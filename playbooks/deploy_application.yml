@@ -1,0 +1,10 @@
+---
+- name: setup deploy_application.yml demo
+  hosts: localhost
+  gather_facts: false
+  become: yes
+  tasks:
+
+    - name: Conditional role
+      include_role:
+        name: "{{playbook_dir}}/../deploy_application"
