@@ -1,0 +1,11 @@
+---
+- name: setup deploy application demo
+  hosts: localhost
+  gather_facts: false
+  connection: local
+
+  tasks:
+
+    - name: install demo
+      include_role:
+        name: "../roles/deploy_application"
