@@ -7,8 +7,8 @@ demos:
     playbook: "playbooks/01_deploy_application.yml"
     credential: "Demo Credential"
     survey_enabled: no
-    survey_spec: "none=none"
-    # survey_spec: "{{ lookup('file', 'my_survey.json') }}"
+    survey_spec: "none"
     workshop_type:
       - f5
       - rhel
+empty_survey: "{{ lookup('file', '../../../playbooks/surveys/00_empty_survey.json') }}"

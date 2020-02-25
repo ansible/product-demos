@@ -1,0 +1,9 @@
+{
+  "name": "empty survey",
+  "description": "don't use this survey",
+  "spec": [
+    {
+      "type": "text",
+    }
+  ]
+}
