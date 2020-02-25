@@ -29,7 +29,7 @@
     tower_host: "{{my_tower_host}}"
     validate_certs: no
   when:
-    - not demos[demo].survey_enabled 
+    - not demos[demo].survey_enabled
 
 - name: add deploy application job template
   tower_job_template:
@@ -45,4 +45,5 @@
     tower_password: "{{my_tower_password}}"
     tower_host: "{{my_tower_host}}"
     validate_certs: no
-  when: demos[demo].survey_enabled == "yes"
+  when:
+    - demos[demo].survey_enabled
