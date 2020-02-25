@@ -8,4 +8,4 @@
 
     - name: install demo
       include_role:
-        name: "../roles/deploy_application"
+        name: "../roles/install_demo"
