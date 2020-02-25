@@ -20,7 +20,7 @@
     playbook: "{{demos[demo].playbook}}"
     credential: "{{demos[demo].credential}}"
     survey_enabled: "{{demos[demo].survey_enabled}}"
-    survey_spec: "{% if demos[demo].survey_enabled == none %}{{empty_survey}}{% endif %}"
+    survey_spec: "{% if demos[demo].survey_enabled == no %}{{empty_survey}}{% endif %}"
     tower_username: "{{my_tower_username}}"
     tower_password: "{{my_tower_password}}"
     tower_host: "{{my_tower_host}}"
