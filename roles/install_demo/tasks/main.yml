@@ -11,6 +11,10 @@
     tower_host: "{{my_tower_host}}"
     validate_certs: no
 
+- name: print out
+  debug:
+    msg: "{{demos[demo].survey_enabled}}"
+
 - name: add deploy application job template
   tower_job_template:
     name: "{{demos[demo].name}}"
@@ -20,8 +24,25 @@
     playbook: "{{demos[demo].playbook}}"
     credential: "{{demos[demo].credential}}"
     survey_enabled: "{{demos[demo].survey_enabled}}"
-    survey_spec: "{% if demos[demo].survey_enabled == no %}{{empty_survey}}{% endif %}"
     tower_username: "{{my_tower_username}}"
     tower_password: "{{my_tower_password}}"
     tower_host: "{{my_tower_host}}"
     validate_certs: no
+  when:
+    - not demos[demo].survey_enabled 
+
+- name: add deploy application job template
+  tower_job_template:
+    name: "{{demos[demo].name}}"
+    job_type: "{{demos[demo].job_type}}"
+    inventory: "{{demos[demo].inventory}}"
+    project: "{{demos[demo].project}}"
+    playbook: "{{demos[demo].playbook}}"
+    credential: "{{demos[demo].credential}}"
+    survey_enabled: "{{demos[demo].survey_enabled}}"
+    survey_spec: "{{empty_survey}}"
+    tower_username: "{{my_tower_username}}"
+    tower_password: "{{my_tower_password}}"
+    tower_host: "{{my_tower_host}}"
+    validate_certs: no
+  when: demos[demo].survey_enabled == "yes"
