@@ -4,10 +4,11 @@ demos:
     job_type: "run"
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
-    playbook: "01_deploy_application.yml"
+    playbook: "playbooks/01_deploy_application.yml"
     credential: "Demo Credential"
-    survey_enabled: yes
-    survey_spec: "{{ lookup('file', 'my_survey.json') }}"
+    survey_enabled: no
+    survey_spec: "none=none"
+    # survey_spec: "{{ lookup('file', 'my_survey.json') }}"
     workshop_type:
       - f5
       - rhel
