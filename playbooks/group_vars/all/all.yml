@@ -1,3 +1,4 @@
+---
 demos:
   deploy_application:
     name: "Deploy Application (survey)"
@@ -6,9 +7,8 @@ demos:
     project: "Ansible official demo project"
     playbook: "playbooks/01_deploy_application.yml"
     credential: "Demo Credential"
-    survey_enabled: no
-    survey_spec: "none"
+    survey_enabled: yes
+    survey_spec: "{{survey_deploy_application}}"
     workshop_type:
       - f5
       - rhel
-empty_survey: "{{ lookup('file', '../../../playbooks/surveys/00_empty_survey.json') }}"

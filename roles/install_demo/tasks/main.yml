@@ -40,7 +40,7 @@
     playbook: "{{demos[demo].playbook}}"
     credential: "{{demos[demo].credential}}"
     survey_enabled: "{{demos[demo].survey_enabled}}"
-    survey_spec: "{{empty_survey}}"
+    survey_spec: "{{demos[demo].survey_spec}}"
     tower_username: "{{my_tower_username}}"
     tower_password: "{{my_tower_password}}"
     tower_host: "{{my_tower_host}}"
