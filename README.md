@@ -20,7 +20,7 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml -e @tower_login_
 
 # Demo Repository
 
-<table">
+<table>
   <tr>
     <th>Demo Name</th>
     <th>Description</th>
