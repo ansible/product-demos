@@ -1,8 +1,9 @@
 ---
-## chose demo or choose all
+## example file for how to choose a demo
+## chose specific demo or choose all
 
-#example that installs just the deploy_application job template
-#demo: deploy_application
+#SPECIFIC - example that installs just the deploy_application job template
+demo: deploy_application
 
-#example that installs all demos
-demo: all
+#ALL - example that installs all demos
+# demo: all
