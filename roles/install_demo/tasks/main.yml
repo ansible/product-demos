@@ -11,12 +11,6 @@
     tower_host: "{{my_tower_host}}"
     validate_certs: no
 
-- name: install job template
+- name: install all job templates
   include: add_job_template.yml
-  when: demo != "all"
-
-- name: install job template
-  include: add_job_template.yml
-  when: demo == "all"
-  with_items:
-    - demos
+  loop: "{{ demos|dict2items }}"
