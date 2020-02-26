@@ -4,15 +4,15 @@ this is currently under construction and working on a minimal viable demo for te
 
 # How to use
 
-## Fill in login information for Ansible Tower
+## 1. Provide login information for Ansible Tower
 
 Modify the `tower_login_info.yml` that is included in this repo with the username, password and IP address (or DNS name) of your Ansible Tower
 
-## Choose your demo
+## 2. Choose your demo
 
 Modify the `choose_demo.yml` that is included in this repo with demo name you want.
 
-## Run Ansible Playbook
+## 3. Run Ansible Playbook
 
 ```
 ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml -e @tower_login_info.yml
