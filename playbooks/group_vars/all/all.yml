@@ -11,6 +11,16 @@ demos:
     workshop_type:
       - f5
       - rhel
+  windows_iis:
+    name: "Windows IIS Server"
+    job_type: "run"
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "playbooks/05_windows_iis.yml"
+    credential: "Demo Credential"
+    survey_enabled: no
+    workshop_type:
+      - windows
   openscap:
     name: "Create Openscap Report"
     job_type: "run"
