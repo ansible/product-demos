@@ -60,6 +60,18 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
     </ul>
     </td>
   </tr>
+  <tr>
+    <td>Developer Report</td>
+    <td><pre>demo: developer_report</pre></td>
+    <td>Create HTML report using <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a></td>
+    <td>Not Available</td>
+    <td>
+    <ul>
+    <li>f5</li>
+    <li>rhel</li>
+    </ul>
+    </td>
+  </tr>
 </table>
 
 # Contribute
