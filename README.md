@@ -20,12 +20,14 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
 <table>
   <tr>
     <th>Demo Name</th>
+    <th>install_demo.yml value</th>
     <th>Description</th>
     <th>Video Walkthrough</th>
     <th>Workshop Types</th>
   </tr>
   <tr>
     <td>Deploy Application</td>
+    <td><pre>demo: deploy_application</pre></td>
     <td>simple survey to install yum applications on Linux</td>
     <td><a href="https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED&index=1">Youtube Video</a></td>
     <td>
@@ -36,7 +38,19 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
     </td>
   </tr>
   <tr>
+    <td>Windows Webserver</td>
+    <td><pre>demo: windows_iis</pre></td>
+    <td>survey to install webserver on Windows Server</td>
+    <td>Not Available</td>
+    <td>
+    <ul>
+    <li>windows</li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
     <td>Openscap</td>
+    <td><pre>demo: openscap</pre></td>
     <td>Create HTML report using SCAP Security Guide (SSG)</td>
     <td>Not Available</td>
     <td>
