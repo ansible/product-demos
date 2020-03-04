@@ -1,15 +1,7 @@
 ---
-- name: add tower project
-  tower_project:
-    name: "Ansible official demo project"
-    description: "prescriptive demos from Red Hat Management Buisness Unit"
-    organization: "Default"
-    scm_type: git
-    scm_url: https://github.com/ansible/product-demos
-    tower_username: "{{my_tower_username}}"
-    tower_password: "{{my_tower_password}}"
-    tower_host: "{{my_tower_host}}"
-    validate_certs: no
+- name: provide info to terminal window
+  debug:
+    msg: "install {{demo}} on {{my_tower_host}}"
 
 - name: install all job templates
   include: add_job_template.yml

@@ -1,3 +1,15 @@
+- name: add tower project
+  tower_project:
+    name: "{{project.my_name}}"
+    description: "{{project.my_description}}"
+    organization: "{{project.my_organization}}"
+    scm_type: "{{project.my_scm_type}}"
+    scm_url: "{{project.my_scm_url}}"
+    tower_username: "{{my_tower_username}}"
+    tower_password: "{{my_tower_password}}"
+    tower_host: "{{my_tower_host}}"
+    validate_certs: no
+
 - name: add job template without survey
   tower_job_template:
     name: "{{item.value.name}}"

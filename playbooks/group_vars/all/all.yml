@@ -8,6 +8,12 @@ demos:
     credential: "Workshop Credential"
     survey_enabled: yes
     survey_spec: "{{survey_deploy_application}}"
+    project:
+      name: "Ansible official demo project"
+      description: "prescriptive demos from Red Hat Management Buisness Unit"
+      organization: "Default"
+      scm_type: git
+      github_url: "https://github.com/ansible/product-demos"
     workshop_type:
       - f5
       - rhel
@@ -19,6 +25,12 @@ demos:
     playbook: "playbooks/05_windows_iis.yml"
     credential: "Demo Credential"
     survey_enabled: no
+    project:
+      name: "Ansible official demo project"
+      description: "prescriptive demos from Red Hat Management Buisness Unit"
+      organization: "Default"
+      scm_type: git
+      github_url: "https://github.com/ansible/product-demos"
     workshop_type:
       - windows
   openscap:
@@ -29,6 +41,12 @@ demos:
     playbook: "playbooks/10_openscap.yml"
     credential: "Workshop Credential"
     survey_enabled: no
+    project:
+      name: "Ansible official demo project"
+      description: "prescriptive demos from Red Hat Management Buisness Unit"
+      organization: "Default"
+      scm_type: git
+      github_url: "https://github.com/ansible/product-demos"
     workshop_type:
       - f5
       - rhel
@@ -40,6 +58,12 @@ demos:
     playbook: "playbooks/11_developer_report.yml"
     credential: "Workshop Credential"
     survey_enabled: no
+    project:
+      name: "Ansible official demo project"
+      description: "prescriptive demos from Red Hat Management Buisness Unit"
+      organization: "Default"
+      scm_type: git
+      github_url: "https://github.com/ansible/product-demos"
     workshop_type:
       - f5
       - rhel
