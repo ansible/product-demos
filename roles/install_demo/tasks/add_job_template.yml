@@ -13,6 +13,7 @@
 - name: add job template without survey
   tower_job_template:
     name: "{{item.value.name}}"
+    description: "{{item.value.description}}"
     job_type: "{{item.value.job_type}}"
     inventory: "{{item.value.inventory}}"
     project: "{{item.value.project}}"
@@ -29,6 +30,7 @@
 - name: add job template with survey
   tower_job_template:
     name: "{{item.value.name}}"
+    description: "{{item.value.description}}"
     job_type: "{{item.value.job_type}}"
     inventory: "{{item.value.inventory}}"
     project: "{{item.value.project}}"

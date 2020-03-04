@@ -1,0 +1,41 @@
+# Official Ansible Product Demos
+
+this is currently under construction and working on a minimal viable demo for testing purposes
+
+# How to use
+
+## 1. Provide login information and choose demo
+
+  - Modify the `choose_demo.yml` file that is included in this repo with the username, password and IP address (or DNS name) of your Ansible Tower
+  - Choose the demo name you want from the table below (or choose `all`)
+
+## 2. Run Ansible Playbook
+
+```
+ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
+```
+
+# Demo Repository
+
+<table>
+  <tr>
+    <th>Demo Name</th>
+    <th>install_demo.yml value</th>
+    <th>Description</th>
+    <th>Video Walkthrough</th>
+    <th>Workshop Types</th>
+  </tr>
+{% for key, value in demos.iteritems() %}
+  <tr>
+    <td>{{value.name}}</td>
+    <td><pre>demo: {{key}}</pre></td>
+    <td>{{value.description}}</td>
+    <td>{% if value.video is defined%}<a href="{{ value.video}}">Video Link</a>{% else %}Not available {% endif %}</td>
+    <td>{{value.workshop_type|to_nice_yaml}}</td>
+  </tr>
+{% endfor %}
+</table>
+
+# Contribute
+
+please refer to the [contribute.md](docs/contribute.md) documentation included in this collection.

@@ -1,6 +1,7 @@
 demos:
   deploy_application:
     name: "Deploy Application (survey)"
+    description: "install yum applications on Linux with a survey"
     job_type: "run"
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
@@ -8,6 +9,7 @@ demos:
     credential: "Workshop Credential"
     survey_enabled: yes
     survey_spec: "{{survey_deploy_application}}"
+    video: "https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED"
     project:
       name: "Ansible official demo project"
       description: "prescriptive demos from Red Hat Management Buisness Unit"
@@ -19,6 +21,7 @@ demos:
       - rhel
   windows_iis:
     name: "Windows IIS Server"
+    description: "install webserver on Windows Server with a survey"
     job_type: "run"
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
@@ -35,6 +38,7 @@ demos:
       - windows
   openscap:
     name: "Create Openscap Report"
+    description: "Create HTML report using SCAP Security Guide (SSG)"
     job_type: "run"
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
@@ -52,6 +56,7 @@ demos:
       - rhel
   developer_report:
     name: "Create Developer Report"
+    description: 'Create HTML report using <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a>'
     job_type: "run"
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"

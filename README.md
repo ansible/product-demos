@@ -28,7 +28,7 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
   <tr>
     <td>Deploy Application</td>
     <td><pre>demo: deploy_application</pre></td>
-    <td>simple survey to install yum applications on Linux</td>
+    <td>install yum applications on Linux with a survey</td>
     <td><a href="https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED&index=1">Youtube Video</a></td>
     <td>
     <ul>

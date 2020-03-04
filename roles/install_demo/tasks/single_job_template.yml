@@ -1,10 +1,10 @@
 - name: add tower project
   tower_project:
-    name: "{{project.my_name}}"
-    description: "{{project.my_description}}"
-    organization: "{{project.my_organization}}"
-    scm_type: "{{project.my_scm_type}}"
-    scm_url: "{{project.my_scm_url}}"
+    name: "{{project.name}}"
+    description: "{{project.description}}"
+    organization: "{{project.organization}}"
+    scm_type: "{{project.scm_type}}"
+    scm_url: "{{project.scm_url}}"
     tower_username: "{{my_tower_username}}"
     tower_password: "{{my_tower_password}}"
     tower_host: "{{my_tower_host}}"
@@ -13,6 +13,7 @@
 - name: add single job template without survey
   tower_job_template:
     name: "{{demos[demo].name}}"
+    description: "{{demos[demo].description}}"
     job_type: "{{demos[demo].job_type}}"
     inventory: "{{demos[demo].inventory}}"
     project: "{{demos[demo].project}}"
@@ -29,6 +30,7 @@
 - name: add single job template with survey
   tower_job_template:
     name: "{{demos[demo].name}}"
+    description: "{{demos[demo].description}}"
     job_type: "{{demos[demo].job_type}}"
     inventory: "{{demos[demo].inventory}}"
     project: "{{demos[demo].project}}"
