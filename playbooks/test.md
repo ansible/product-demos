@@ -30,35 +30,28 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
     <td><pre>demo: windows_iis</pre></td>
     <td>install webserver on Windows Server with a survey</td>
     <td>Not available </td>
-    <td>- windows
-</td>
+    <td><ul><li>windows</li></ul></td>
   </tr>
   <tr>
     <td>Create Developer Report</td>
     <td><pre>demo: developer_report</pre></td>
     <td>Create HTML report using <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a></td>
     <td>Not available </td>
-    <td>- f5
-- rhel
-</td>
+    <td><ul><li>f5</li></ul><li>rhel</li></ul></td>
   </tr>
   <tr>
     <td>Deploy Application (survey)</td>
     <td><pre>demo: deploy_application</pre></td>
     <td>install yum applications on Linux with a survey</td>
     <td><a href="https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED">Video Link</a></td>
-    <td>- f5
-- rhel
-</td>
+    <td><ul><li>f5</li></ul><li>rhel</li></ul></td>
   </tr>
   <tr>
     <td>Create Openscap Report</td>
     <td><pre>demo: openscap</pre></td>
     <td>Create HTML report using SCAP Security Guide (SSG)</td>
     <td>Not available </td>
-    <td>- f5
-- rhel
-</td>
+    <td><ul><li>f5</li></ul><li>rhel</li></ul></td>
   </tr>
 </table>
 

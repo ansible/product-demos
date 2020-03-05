@@ -31,7 +31,7 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
     <td><pre>demo: {{key}}</pre></td>
     <td>{{value.description}}</td>
     <td>{% if value.video is defined%}<a href="{{ value.video}}">Video Link</a>{% else %}Not available {% endif %}</td>
-    <td>{{value.workshop_type|to_nice_yaml}}</td>
+    <td><ul>{% for workshop in value.workshop_type %}<li>{{workshop}}</li></ul>{% endfor %}</td>
   </tr>
 {% endfor %}
 </table>
