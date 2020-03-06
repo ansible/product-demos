@@ -5,7 +5,7 @@
   gather_facts: no
 
   tasks:
-  - name: upgrade all pacakges except kernel
+  - name: upgrade all packages except kernel
     yum:
       name: '*'
       state: latest
