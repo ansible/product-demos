@@ -20,6 +20,7 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
 <table>
   <tr>
     <th>Demo Name</th>
+    <th>Author</th>
     <th>install_demo.yml value</th>
     <th>Description</th>
     <th>Video Walkthrough</th>
@@ -27,6 +28,7 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
   </tr>
   <tr>
     <td>Windows IIS Server</td>
+    <td>Colin McNaughton</td>
     <td><pre>demo: windows_iis</pre></td>
     <td>install webserver on Windows Server with a survey</td>
     <td>Not available </td>
@@ -34,24 +36,35 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
   </tr>
   <tr>
     <td>Create Developer Report</td>
+    <td>Sean Cavanaugh</td>
     <td><pre>demo: developer_report</pre></td>
     <td>Create HTML report using <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a></td>
     <td>Not available </td>
-    <td><ul><li>f5</li></ul><li>rhel</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li></ul></td>
   </tr>
   <tr>
     <td>Deploy Application (survey)</td>
+    <td>Sean Cavanaugh</td>
     <td><pre>demo: deploy_application</pre></td>
     <td>install yum applications on Linux with a survey</td>
     <td><a href="https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED">Video Link</a></td>
-    <td><ul><li>f5</li></ul><li>rhel</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li></ul></td>
   </tr>
   <tr>
     <td>Create Openscap Report</td>
+    <td>Sean Cavanaugh</td>
     <td><pre>demo: openscap</pre></td>
     <td>Create HTML report using SCAP Security Guide (SSG)</td>
     <td>Not available </td>
-    <td><ul><li>f5</li></ul><li>rhel</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li></ul></td>
+  </tr>
+  <tr>
+    <td>SERVER / Patching</td>
+    <td>Will Tome</td>
+    <td><pre>demo: patching</pre></td>
+    <td>patching for Linux servers</td>
+    <td>Not available </td>
+    <td><ul><li>f5</li><li>rhel</li></ul></td>
   </tr>
 </table>
 

@@ -1,0 +1,8 @@
+survey_patching:
+  name: ''
+  description: ''
+  spec:
+  - question_name: 'Enter host to configure'
+    type: text
+    variable: HOSTS
+    required: false

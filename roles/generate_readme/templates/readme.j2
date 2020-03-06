@@ -20,6 +20,7 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
 <table>
   <tr>
     <th>Demo Name</th>
+    <th>Author</th>
     <th>install_demo.yml value</th>
     <th>Description</th>
     <th>Video Walkthrough</th>
@@ -28,10 +29,11 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
 {% for key, value in demos.iteritems() %}
   <tr>
     <td>{{value.name}}</td>
+    <td>{{value.author}}</td>
     <td><pre>demo: {{key}}</pre></td>
     <td>{{value.description}}</td>
     <td>{% if value.video is defined%}<a href="{{ value.video}}">Video Link</a>{% else %}Not available {% endif %}</td>
-    <td><ul>{% for workshop in value.workshop_type %}<li>{{workshop}}</li></ul>{% endfor %}</td>
+    <td><ul>{% for workshop in value.workshop_type %}<li>{{workshop}}</li>{% endfor %}</ul></td>
   </tr>
 {% endfor %}
 </table>

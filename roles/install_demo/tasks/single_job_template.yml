@@ -1,10 +1,10 @@
 - name: add tower project
   tower_project:
-    name: "{{project.name}}"
-    description: "{{project.description}}"
-    organization: "{{project.organization}}"
-    scm_type: "{{project.scm_type}}"
-    scm_url: "{{project.scm_url}}"
+    name: "{{demos[demo].project.name}}"
+    description: "{{demos[demo].project.description}}"
+    organization: "{{demos[demo].project.organization}}"
+    scm_type: "{{demos[demo].project.scm_type}}"
+    scm_url: "{{demos[demo].project.scm_url}}"
     tower_username: "{{my_tower_username}}"
     tower_password: "{{my_tower_password}}"
     tower_host: "{{my_tower_host}}"
