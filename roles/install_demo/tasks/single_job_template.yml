@@ -1,10 +1,10 @@
 - name: add tower project
   tower_project:
-    name: "{{demos[demo].project.name}}"
-    description: "{{demos[demo].project.description}}"
-    organization: "{{demos[demo].project.organization}}"
-    scm_type: "{{demos[demo].project.scm_type}}"
-    scm_url: "{{demos[demo].project.scm_url}}"
+    name: "{{hostvars.localhost[demo].project.name}}"
+    description: "{{hostvars.localhost[demo].project.description}}"
+    organization: "{{hostvars.localhost[demo].project.organization}}"
+    scm_type: "{{hostvars.localhost[demo].project.scm_type}}"
+    scm_url: "{{hostvars.localhost[demo].project.scm_url}}"
     tower_username: "{{my_tower_username}}"
     tower_password: "{{my_tower_password}}"
     tower_host: "{{my_tower_host}}"
@@ -12,37 +12,37 @@
 
 - name: add single job template without survey
   tower_job_template:
-    name: "{{demos[demo].name}}"
-    description: "{{demos[demo].description}}"
-    job_type: "{{demos[demo].job_type}}"
-    inventory: "{{demos[demo].inventory}}"
-    project: "{{demos[demo].project.name}}"
-    playbook: "{{demos[demo].playbook}}"
-    fact_caching_enabled: "{{demos[demo].fact_caching_enabled | default('no')}}"
-    credential: "{{demos[demo].credential}}"
-    survey_enabled: "{{demos[demo].survey_enabled}}"
+    name: "{{hostvars.localhost[demo].name}}"
+    description: "{{hostvars.localhost[demo].description}}"
+    job_type: "{{hostvars.localhost[demo].job_type}}"
+    inventory: "{{hostvars.localhost[demo].inventory}}"
+    project: "{{hostvars.localhost[demo].project.name}}"
+    playbook: "{{hostvars.localhost[demo].playbook}}"
+    fact_caching_enabled: "{{hostvars.localhost[demo].fact_caching_enabled | default('no')}}"
+    credential: "{{hostvars.localhost[demo].credential}}"
+    survey_enabled: "{{hostvars.localhost[demo].survey_enabled}}"
     tower_username: "{{my_tower_username}}"
     tower_password: "{{my_tower_password}}"
     tower_host: "{{my_tower_host}}"
     validate_certs: no
   when:
-    - not demos[demo].survey_enabled
+    - not hostvars.localhost[demo].survey_enabled
 
 - name: add single job template with survey
   tower_job_template:
-    name: "{{demos[demo].name}}"
-    description: "{{demos[demo].description}}"
-    job_type: "{{demos[demo].job_type}}"
-    inventory: "{{demos[demo].inventory}}"
-    project: "{{demos[demo].project.name}}"
-    playbook: "{{demos[demo].playbook}}"
-    fact_caching_enabled: "{{demos[demo].fact_caching_enabled | default('no')}}"
-    credential: "{{demos[demo].credential}}"
-    survey_enabled: "{{demos[demo].survey_enabled}}"
-    survey_spec: "{{demos[demo].survey_spec}}"
+    name: "{{hostvars.localhost[demo].name}}"
+    description: "{{hostvars.localhost[demo].description}}"
+    job_type: "{{hostvars.localhost[demo].job_type}}"
+    inventory: "{{hostvars.localhost[demo].inventory}}"
+    project: "{{hostvars.localhost[demo].project.name}}"
+    playbook: "{{hostvars.localhost[demo].playbook}}"
+    fact_caching_enabled: "{{hostvars.localhost[demo].fact_caching_enabled | default('no')}}"
+    credential: "{{hostvars.localhost[demo].credential}}"
+    survey_enabled: "{{hostvars.localhost[demo].survey_enabled}}"
+    survey_spec: "{{hostvars.localhost[demo].survey_spec}}"
     tower_username: "{{my_tower_username}}"
     tower_password: "{{my_tower_password}}"
     tower_host: "{{my_tower_host}}"
     validate_certs: no
   when:
-    - demos[demo].survey_enabled
+    - hostvars.localhost[demo].survey_enabled
