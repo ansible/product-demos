@@ -10,7 +10,7 @@
     tower_host: "{{my_tower_host}}"
     validate_certs: no
 
-- name: add job template without survey
+- name: "add job template {{item.value.name}} without survey"
   tower_job_template:
     name: "{{item.value.name}}"
     description: "{{item.value.description}}"
@@ -18,7 +18,7 @@
     inventory: "{{item.value.inventory}}"
     project: "{{item.value.project.name}}"
     playbook: "{{item.value.playbook}}"
-    fact_caching_enabled: "{{item.value.fact_caching_enabled | default(no)}}"
+    fact_caching_enabled: "{{item.value.fact_caching_enabled | default('no')}}"
     credential: "{{item.value.credential}}"
     survey_enabled: "{{item.value.survey_enabled}}"
     tower_username: "{{my_tower_username}}"
@@ -28,7 +28,7 @@
   when:
     - not item.value.survey_enabled
 
-- name: add job template with survey
+- name: "add job template {{item.value.name}} with survey"
   tower_job_template:
     name: "{{item.value.name}}"
     description: "{{item.value.description}}"
@@ -36,7 +36,7 @@
     inventory: "{{item.value.inventory}}"
     project: "{{item.value.project.name}}"
     playbook: "{{item.value.playbook}}"
-    fact_caching_enabled: "{{item.value.fact_caching_enabled | default(no)}}"
+    fact_caching_enabled: "{{item.value.fact_caching_enabled | default('no')}}"
     credential: "{{item.value.credential}}"
     survey_enabled: "{{item.value.survey_enabled}}"
     survey_spec: "{{item.value.survey_spec}}"
