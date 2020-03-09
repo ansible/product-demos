@@ -27,38 +27,6 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
     <th>Workshop Types</th>
   </tr>
   <tr>
-    <td>SERVER / Hardening</td>
-    <td>Will Tome</td>
-    <td><pre>demo: hardening</pre></td>
-    <td>hardening for Linux servers</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li></ul></td>
-  </tr>
-  <tr>
-    <td>Windows IIS Server</td>
-    <td>Colin McNaughton</td>
-    <td><pre>demo: windows_iis</pre></td>
-    <td>install webserver on Windows Server with a survey</td>
-    <td>Not available </td>
-    <td><ul><li>windows</li></ul></td>
-  </tr>
-  <tr>
-    <td>Deploy Application (survey)</td>
-    <td>Sean Cavanaugh</td>
-    <td><pre>demo: deploy_application</pre></td>
-    <td>install yum applications on Linux with a survey</td>
-    <td><a href="https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED">Video Link</a></td>
-    <td><ul><li>f5</li><li>rhel</li></ul></td>
-  </tr>
-  <tr>
-    <td>SERVER / Patching</td>
-    <td>Will Tome</td>
-    <td><pre>demo: patching</pre></td>
-    <td>patching for Linux servers</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li></ul></td>
-  </tr>
-  <tr>
     <td>Create Developer Report</td>
     <td>Sean Cavanaugh</td>
     <td><pre>demo: developer_report</pre></td>
@@ -75,12 +43,44 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
     <td><ul><li>f5</li><li>rhel</li></ul></td>
   </tr>
   <tr>
+    <td>Deploy Application (survey)</td>
+    <td>Sean Cavanaugh</td>
+    <td><pre>demo: deploy_application</pre></td>
+    <td>install yum applications on Linux with a survey</td>
+    <td><a href="https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED">Video Link</a></td>
+    <td><ul><li>f5</li><li>rhel</li></ul></td>
+  </tr>
+  <tr>
     <td>SERVER / Fact Scan</td>
     <td>Will Tome</td>
     <td><pre>demo: fact_scan</pre></td>
     <td>scan facts for Linux and Windows systems</td>
     <td>Not available </td>
     <td><ul><li>f5</li><li>rhel</li><li>windows</li></ul></td>
+  </tr>
+  <tr>
+    <td>SERVER / Hardening</td>
+    <td>Will Tome</td>
+    <td><pre>demo: hardening</pre></td>
+    <td>hardening for Linux servers</td>
+    <td>Not available </td>
+    <td><ul><li>f5</li><li>rhel</li></ul></td>
+  </tr>
+  <tr>
+    <td>SERVER / Patching</td>
+    <td>Will Tome</td>
+    <td><pre>demo: patching</pre></td>
+    <td>patching for Linux servers</td>
+    <td>Not available </td>
+    <td><ul><li>f5</li><li>rhel</li></ul></td>
+  </tr>
+  <tr>
+    <td>Windows IIS Server</td>
+    <td>Colin McNaughton</td>
+    <td><pre>demo: windows_iis</pre></td>
+    <td>install webserver on Windows Server with a survey</td>
+    <td>Not available </td>
+    <td><ul><li>windows</li></ul></td>
   </tr>
 </table>
 
