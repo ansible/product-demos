@@ -1,4 +1,24 @@
 ---
+deploy_application:
+  author: "Sean Cavanaugh"
+  name: "Deploy Application (survey)"
+  description: "install yum applications on Linux with a survey"
+  job_type: "run"
+  inventory: "Workshop Inventory"
+  playbook: "playbooks/01_deploy_application.yml"
+  credential: "Workshop Credential"
+  survey_enabled: yes
+  survey_spec: "{{survey_deploy_application}}"
+  video: "https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED"
+  project:
+    name: "Ansible official demo project"
+    description: "prescriptive demos from Red Hat Management Buisness Unit"
+    organization: "Default"
+    scm_type: git
+    scm_url: "https://github.com/ansible/product-demos"
+  workshop_type:
+    - f5
+    - rhel
 survey_deploy_application:
   name: Deploy application survey
   description: Which application do you want to install?

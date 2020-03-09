@@ -1,14 +1,13 @@
 ---
-patching:
-  author: "Will Tome"
-  name: "SERVER / Patching"
-  description: "patching for Linux servers"
+openscap:
+  author: "Sean Cavanaugh"
+  name: "Create Openscap Report"
+  description: "Create HTML report using SCAP Security Guide (SSG)"
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: "playbooks/02_patching.yml"
+  playbook: "playbooks/10_openscap.yml"
   credential: "Workshop Credential"
-  survey_enabled: yes
-  survey_spec: "{{survey_patching}}"
+  survey_enabled: no
   project:
     name: "Ansible official demo project"
     description: "prescriptive demos from Red Hat Management Buisness Unit"
@@ -18,11 +17,3 @@ patching:
   workshop_type:
     - f5
     - rhel
-survey_patching:
-  name: ''
-  description: ''
-  spec:
-  - question_name: 'Enter host to configure'
-    type: text
-    variable: HOSTS
-    required: false

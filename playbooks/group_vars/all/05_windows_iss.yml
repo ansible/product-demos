@@ -1,0 +1,18 @@
+---
+windows_iis:
+  author: "Colin McNaughton"
+  name: "Windows IIS Server"
+  description: "install webserver on Windows Server with a survey"
+  job_type: "run"
+  inventory: "Workshop Inventory"
+  playbook: "playbooks/05_windows_iis.yml"
+  credential: "Demo Credential"
+  survey_enabled: no
+  project:
+    name: "Ansible official demo project"
+    description: "prescriptive demos from Red Hat Management Buisness Unit"
+    organization: "Default"
+    scm_type: git
+    scm_url: "https://github.com/ansible/product-demos"
+  workshop_type:
+    - windows

@@ -4,7 +4,11 @@
   connection: local
 
   tasks:
-
     - name: install demo
-      include_role:
-        name: "../roles/generate_readme"
+      debug:
+        msg: "{{item.key}}"
+      loop: "{{ hostvars['localhost']|dict2items }}"
+      when: "item.key[:8] != 'ansible_'"
+    # - name: install demo
+    #   include_role:
+    #     name: "../roles/generate_readme"
