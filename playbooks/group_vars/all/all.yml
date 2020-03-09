@@ -57,6 +57,26 @@ demos:
     workshop_type:
       - f5
       - rhel
+  fact_scan:
+    author: "Will Tome"
+    name: "SERVER / Fact Scan"
+    description: "scan facts for Linux and Windows systems"
+    job_type: "run"
+    inventory: "Workshop Inventory"
+    playbook: "playbooks/05_scan_facts.yml"
+    credential: "Workshop Credential"
+    survey_enabled: yes
+    survey_spec: "{{survey_hardening}}"
+    project:
+      name: "Ansible official awx-facts-playbooks project"
+      description: "Repository containing playbooks to support fact scanning in Ansible Tower and AWX"
+      organization: "Default"
+      scm_type: git
+      scm_url: "https://github.com/ansible/awx-facts-playbooks.git"
+    workshop_type:
+      - f5
+      - rhel
+      - windows
   windows_iis:
     author: "Colin McNaughton"
     name: "Windows IIS Server"

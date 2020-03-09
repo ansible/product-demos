@@ -74,6 +74,14 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
     <td>Not available </td>
     <td><ul><li>f5</li><li>rhel</li></ul></td>
   </tr>
+  <tr>
+    <td>SERVER / Fact Scan</td>
+    <td>Will Tome</td>
+    <td><pre>demo: fact_scan</pre></td>
+    <td>scan facts for Linux and Windows systems</td>
+    <td>Not available </td>
+    <td><ul><li>f5</li><li>rhel</li><li>windows</li></ul></td>
+  </tr>
 </table>
 
 # Contribute
