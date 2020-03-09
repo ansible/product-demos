@@ -26,6 +26,7 @@
     tower_host: "{{my_tower_host}}"
     validate_certs: no
   when:
+    - workshop_type in item.value.workshop_type
     - not item.value.survey_enabled
 
 - name: "add job template {{item.value.name}} with survey"
@@ -45,4 +46,5 @@
     tower_host: "{{my_tower_host}}"
     validate_certs: no
   when:
+    - workshop_type in item.value.workshop_type
     - item.value.survey_enabled
