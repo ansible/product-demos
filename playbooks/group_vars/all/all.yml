@@ -63,10 +63,10 @@ demos:
     description: "scan facts for Linux and Windows systems"
     job_type: "run"
     inventory: "Workshop Inventory"
-    playbook: "playbooks/05_scan_facts.yml"
+    playbook: scan_facts.yml
     credential: "Workshop Credential"
-    survey_enabled: yes
-    survey_spec: "{{survey_hardening}}"
+    survey_enabled: no
+    fact_caching_enabled: yes
     project:
       name: "Ansible official awx-facts-playbooks project"
       description: "Repository containing playbooks to support fact scanning in Ansible Tower and AWX"
