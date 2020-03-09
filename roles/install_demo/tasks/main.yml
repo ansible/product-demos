@@ -3,10 +3,10 @@
   debug:
     msg: "install {{demo}} on {{my_tower_host}}"
 
-# - name: install all job templates
-#   include: add_job_template.yml
-#   loop: "{{ demos|dict2items }}"
-#   when: demo == "all"
+- name: install all job templates
+  include: add_job_template.yml
+  loop: "{{dict(hostvars[inventory_hostname]|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined'))|dict2items}}"
+  when: demo == "all"
 
 - name: install single job template
   include: single_job_template.yml
