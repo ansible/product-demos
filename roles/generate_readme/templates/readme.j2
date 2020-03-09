@@ -26,7 +26,7 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
     <th>Video Walkthrough</th>
     <th>Workshop Types</th>
   </tr>
-{% for key, value in demos.iteritems() %}
+{% for key, value in demos.items()|sort(attribute='1.name') %}
   <tr>
     <td>{{value.name}}</td>
     <td>{{value.author}}</td>
