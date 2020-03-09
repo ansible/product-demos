@@ -38,6 +38,25 @@ demos:
     workshop_type:
       - f5
       - rhel
+  hardening:
+    author: "Will Tome"
+    name: "SERVER / Hardening"
+    description: "hardening for Linux servers"
+    job_type: "run"
+    inventory: "Workshop Inventory"
+    playbook: "playbooks/03_hardening.yml"
+    credential: "Workshop Credential"
+    survey_enabled: yes
+    survey_spec: "{{survey_hardening}}"
+    project:
+      name: "Ansible official demo project"
+      description: "prescriptive demos from Red Hat Management Buisness Unit"
+      organization: "Default"
+      scm_type: git
+      scm_url: "https://github.com/ansible/product-demos"
+    workshop_type:
+      - f5
+      - rhel
   windows_iis:
     author: "Colin McNaughton"
     name: "Windows IIS Server"

@@ -1,0 +1,37 @@
+---
+survey_hardening:
+  name: ''
+  description: ''
+  spec:
+  - question_name: 'Enter host to configure'
+    type: text
+    variable: HOSTS
+    required: false
+  - question_name: Configure Firewall?
+    type: multiplechoice
+    variable: harden_firewall
+    required: false
+    choices:
+      - 'Yes'
+      - 'No'
+  - question_name: Configure Time?
+    type: multiplechoice
+    variable: harden_time
+    required: false
+    choices:
+      - 'Yes'
+      - 'No'
+  - question_name: Harden SSH?
+    type: multiplechoice
+    variable: harden_ssh
+    required: false
+    choices:
+      - 'Yes'
+      - 'No'
+  - question_name: PCI Baseline?
+    type: multiplechoice
+    variable: harden_pci
+    required: false
+    choices:
+      - 'Yes'
+      - 'No'
