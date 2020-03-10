@@ -10,4 +10,13 @@
 
 - name: install single job template
   include: single_job_template.yml
-  when: demo != "all"
+  when:
+    - demo != "all"
+    - hostvars[inventory_hostname][demo].workflow is undefined or not hostvars[inventory_hostname][demo].workflow
+
+- name: install single workflow
+  include: workflow.yml
+  when:
+    - demo != "all"
+    - hostvars[inventory_hostname][demo].workflow is defined
+    - hostvars[inventory_hostname][demo].workflow

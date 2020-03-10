@@ -1,3 +1,4 @@
+---
 - name: add tower project
   tower_project:
     name: "{{item.value.project.name}}"

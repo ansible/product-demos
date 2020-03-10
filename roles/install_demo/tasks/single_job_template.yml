@@ -1,3 +1,4 @@
+---
 - name: add tower project
   tower_project:
     name: "{{hostvars.localhost[demo].project.name}}"
@@ -26,7 +27,7 @@
     tower_host: "{{my_tower_host}}"
     validate_certs: no
   when:
-    - workshop_type in item.value.workshop_type
+    - workshop_type in hostvars.localhost[demo].workshop_type
     - not hostvars.localhost[demo].survey_enabled
 
 - name: add single job template with survey
@@ -46,5 +47,5 @@
     tower_host: "{{my_tower_host}}"
     validate_certs: no
   when:
-    - workshop_type in item.value.workshop_type
+    - workshop_type in hostvars.localhost[demo].workshop_type
     - hostvars.localhost[demo].survey_enabled
