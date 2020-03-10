@@ -1,0 +1,61 @@
+---
+- name: block for job template (non-workflow)
+  block:
+    - name: add tower project
+      tower_project:
+        name: "{{item.value.project.name}}"
+        description: "{{item.value.project.description}}"
+        organization: "{{item.value.project.organization}}"
+        scm_type: "{{item.value.project.scm_type}}"
+        scm_url: "{{item.value.project.scm_url}}"
+        tower_username: "{{my_tower_username}}"
+        tower_password: "{{my_tower_password}}"
+        tower_host: "{{my_tower_host}}"
+        validate_certs: no
+
+    - name: "add job template {{item.value.name}} without survey"
+      tower_job_template:
+        name: "{{item.value.name}}"
+        description: "{{item.value.description}}"
+        job_type: "{{item.value.job_type}}"
+        inventory: "{{item.value.inventory}}"
+        project: "{{item.value.project.name}}"
+        playbook: "{{item.value.playbook}}"
+        fact_caching_enabled: "{{item.value.fact_caching_enabled | default('no')}}"
+        credential: "{{item.value.credential}}"
+        survey_enabled: "{{item.value.survey_enabled}}"
+        tower_username: "{{my_tower_username}}"
+        tower_password: "{{my_tower_password}}"
+        tower_host: "{{my_tower_host}}"
+        validate_certs: no
+      when:
+        - workshop_type in item.value.workshop_type
+        - not item.value.survey_enabled
+
+    - name: "add job template {{item.value.name}} with survey"
+      tower_job_template:
+        name: "{{item.value.name}}"
+        description: "{{item.value.description}}"
+        job_type: "{{item.value.job_type}}"
+        inventory: "{{item.value.inventory}}"
+        project: "{{item.value.project.name}}"
+        playbook: "{{item.value.playbook}}"
+        fact_caching_enabled: "{{item.value.fact_caching_enabled | default('no')}}"
+        credential: "{{item.value.credential}}"
+        survey_enabled: "{{item.value.survey_enabled}}"
+        survey_spec: "{{item.value.survey_spec}}"
+        tower_username: "{{my_tower_username}}"
+        tower_password: "{{my_tower_password}}"
+        tower_host: "{{my_tower_host}}"
+        validate_certs: no
+      when:
+        - workshop_type in item.value.workshop_type
+        - item.value.survey_enabled
+  when:
+    - item.value.workflow is not defined or not item.value.workflow
+
+- name: install workflow inside loop (workflow)
+  include_tasks: workflow_loop.yml
+  when:
+    - item.value.workflow is defined
+    - item.value.workflow

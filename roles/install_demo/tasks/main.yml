@@ -4,18 +4,18 @@
     msg: "install {{demo}} on {{my_tower_host}}"
 
 - name: install all job templates
-  include: add_job_template.yml
+  include_tasks: job_template_loop.yml
   loop: "{{dict(hostvars[inventory_hostname]|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined'))|dict2items}}"
   when: demo == "all"
 
 - name: install single job template
-  include: single_job_template.yml
+  include_tasks: job_template.yml
   when:
     - demo != "all"
-    - hostvars[inventory_hostname][demo].workflow is undefined or not hostvars[inventory_hostname][demo].workflow
+    - hostvars[inventory_hostname][demo].workflow is not defined or not hostvars[inventory_hostname][demo].workflow
 
 - name: install single workflow
-  include: workflow.yml
+  include_tasks: workflow.yml
   when:
     - demo != "all"
     - hostvars[inventory_hostname][demo].workflow is defined

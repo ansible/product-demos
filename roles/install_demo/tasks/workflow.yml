@@ -1,11 +1,12 @@
 ---
 #these tasks will install a workflow
 
-- name: install all job templates in relation to workflow
-  include: add_job_template.yml
+- name: "install all job templates in relation to workflow {{hostvars[inventory_hostname][demo].name}}"
+  include_tasks: add_job_template.yml
   loop: "{{hostvars[inventory_hostname][demo].job_templates|dict2items}}"
 
-- tower_workflow_template:
+- name: "install workflow template {{hostvars[inventory_hostname][demo].name}}"
+  tower_workflow_template:
     name: "{{hostvars[inventory_hostname][demo].name}}"
     description: "{{hostvars[inventory_hostname][demo].description}}"
     organization: "{{hostvars[inventory_hostname][demo].organization}}"
