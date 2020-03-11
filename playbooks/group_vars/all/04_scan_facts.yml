@@ -1,6 +1,7 @@
 ---
 fact_scan:
   author: "Will Tome"
+  category: infrastructure
   name: "SERVER / Fact Scan"
   description: "scan facts for Linux and Windows systems"
   job_type: "run"

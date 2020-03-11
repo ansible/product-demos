@@ -1,6 +1,7 @@
 ---
 patching:
   author: "Will Tome"
+  category: infrastructure
   name: "SERVER / Patching"
   description: "patching for Linux servers"
   job_type: "run"

@@ -1,6 +1,7 @@
 ---
 developer_report:
   author: "Sean Cavanaugh"
+  category: developer
   name: "Create Developer Report"
   description: 'Create HTML report using <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a>'
   job_type: "run"

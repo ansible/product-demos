@@ -1,6 +1,7 @@
 ---
 openscap:
   author: "Sean Cavanaugh"
+  category: security
   name: "Create Openscap Report"
   description: "Create HTML report using SCAP Security Guide (SSG)"
   job_type: "run"

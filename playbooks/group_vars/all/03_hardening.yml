@@ -1,6 +1,7 @@
 ---
 hardening:
   author: "Will Tome"
+  category: security
   name: "SERVER / Hardening"
   description: "hardening for Linux servers"
   job_type: "run"
