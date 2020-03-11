@@ -1,0 +1,45 @@
+---
+fact_scan:
+  author: "Will Tome"
+  name: "SERVER / Grant Sudo"
+  description: "grant sudo privledges for specified time via survey"
+  job_type: "run"
+  inventory: "Workshop Inventory"
+  playbook: playbooks/05_grant_sudo.yml
+  credential: "Workshop Credential"
+  survey_enabled: yes
+  survey_spec:
+    name: ''
+    description: ''
+    spec:
+    - question_name: 'Enter host to configure'
+      type: text
+      variable: HOSTS
+      required: false
+    - question_name: Username
+      type: text
+      variable: sudo_user
+      required: true
+    - question_name: Time
+      type: integer
+      variable: sudo_count
+      required: true
+      default: 10
+    - question_name: Units
+      type: multiplechoice
+      variable: harden_ssh
+      required: true
+      choices:
+        - 'minutes'
+        - 'hours'
+        - 'days'
+      default: minutes
+  project:
+    name: "Ansible official demo project"
+    description: "prescriptive demos from Red Hat Management Buisness Unit"
+    organization: "Default"
+    scm_type: git
+    scm_url: "https://github.com/ansible/product-demos"
+  workshop_type:
+    - f5
+    - rhel
