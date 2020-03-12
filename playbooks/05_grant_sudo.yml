@@ -20,6 +20,16 @@
         mode: 0640
         content: "{{ sudo_user }} ALL=(ALL) NOPASSWD:ALL"
 
+    - name: install package
+      yum:
+        name: at
+        state: latest
+
+    - name: start service
+      service:
+        name: atd
+        state: started
+
     - name: time based cleanup
       at:
         command: "rm /etc/sudoers.d/{{ sudo_user }}"

@@ -1,0 +1,28 @@
+---
+fact_scan:
+  author: "Will Tome"
+  category: infrastructure
+  name: "SERVER / Security Patching"
+  description: "upgrade all yum packages for security related except kernel"
+  job_type: "run"
+  inventory: "Workshop Inventory"
+  playbook: playbooks/02_patching.yml
+  credential: "Workshop Credential"
+  survey_enabled: yes
+  survey_spec:
+    name: ''
+    description: ''
+    spec:
+    - question_name: 'Enter host to configure'
+      type: text
+      variable: HOSTS
+      required: false
+  project:
+    name: "Ansible official demo project"
+    description: "prescriptive demos from Red Hat Management Buisness Unit"
+    organization: "Default"
+    scm_type: git
+    scm_url: "https://github.com/ansible/product-demos"
+  workshop_type:
+    - f5
+    - rhel
