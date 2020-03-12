@@ -49,6 +49,30 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
     <td><ul><li>f5</li><li>rhel</li></ul></td>
   </tr>
   <tr>
+    <td>SERVER / Fact Scan</td>
+    <td>Will Tome</td>
+    <td><pre>demo: fact_scan</pre></td>
+    <td>scan facts for Linux and Windows systems</td>
+    <td>Not available </td>
+    <td><ul><li>f5</li><li>rhel</li><li>windows</li></ul></td>
+  </tr>
+  <tr>
+    <td>SERVER / Gather Debug Info</td>
+    <td>Will Tome</td>
+    <td><pre>demo: debug_info</pre></td>
+    <td>provide info for memory and CPU usage for specified systems</td>
+    <td>Not available </td>
+    <td><ul><li>f5</li><li>rhel</li></ul></td>
+  </tr>
+  <tr>
+    <td>SERVER / Grant Sudo</td>
+    <td>Will Tome</td>
+    <td><pre>demo: grant_sudo</pre></td>
+    <td>grant sudo privledges for specified time via survey</td>
+    <td>Not available </td>
+    <td><ul><li>f5</li><li>rhel</li></ul></td>
+  </tr>
+  <tr>
     <td>SERVER / Patching</td>
     <td>Will Tome</td>
     <td><pre>demo: patching</pre></td>
@@ -59,7 +83,7 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
   <tr>
     <td>SERVER / Security Patching</td>
     <td>Will Tome</td>
-    <td><pre>demo: fact_scan</pre></td>
+    <td><pre>demo: security_patching</pre></td>
     <td>upgrade all yum packages for security related except kernel</td>
     <td>Not available </td>
     <td><ul><li>f5</li><li>rhel</li></ul></td>

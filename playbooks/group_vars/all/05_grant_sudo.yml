@@ -1,5 +1,5 @@
 ---
-fact_scan:
+grant_sudo:
   author: "Will Tome"
   category: infrastructure
   name: "SERVER / Grant Sudo"

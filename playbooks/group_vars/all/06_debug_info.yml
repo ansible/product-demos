@@ -1,5 +1,5 @@
 ---
-fact_scan:
+debug_info:
   author: "Will Tome"
   category: infrastructure
   name: "SERVER / Gather Debug Info"
