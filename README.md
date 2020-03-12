@@ -30,6 +30,8 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
 
 # Demo Repository
 
+This repository currently holds 11 demos.
+
 ## Infrastructure Demos
 <table>
   <tr>

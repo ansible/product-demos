@@ -30,6 +30,8 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
 
 # Demo Repository
 
+This repository currently holds {{hostvars[inventory_hostname].items()|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined')|sort(attribute='1.name')|count}} demos.
+
 ## Infrastructure Demos
 <table>
   <tr>
