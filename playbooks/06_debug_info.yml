@@ -1,8 +1,8 @@
 ---
 - name: gather debug info
-  hosts: "{{ HOSTS | default('all') }}"
-  become: yes
-  gather_facts: no
+  hosts: "{{ HOSTS | default('web') }}"
+  become: true
+  gather_facts: false
 
   tasks:
     - name: Gather recent vmstat info

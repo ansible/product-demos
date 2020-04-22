@@ -1,0 +1,23 @@
+---
+namespace: ipvsean
+name: product_demos
+version: 1.0.2
+readme: README.md
+
+authors:
+  - Sean Cavanaugh <seanc@redhat.com> @IPvSean
+
+description: repository of demos to showcase Ansible features.
+
+license:
+  - GPL-2.0-or-later
+
+license_file: ''
+
+tags: []
+dependencies: {}
+
+repository: http://github.com/ansible/product-demos
+documentation: http://github.com/ansible/product-demos
+homepage: http://github.com/ansible/product-demos
+issues: https://github.com/ansible/product-demos/issues

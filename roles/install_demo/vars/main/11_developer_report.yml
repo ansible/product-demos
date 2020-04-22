@@ -3,12 +3,14 @@ developer_report:
   author: "Sean Cavanaugh"
   category: developer
   name: "Create Developer Report"
-  description: 'Create HTML report using <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a>'
+  description: >
+    'Create HTML report using
+    <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a>'
   job_type: "run"
   inventory: "Workshop Inventory"
   playbook: "playbooks/11_developer_report.yml"
   credential: "Workshop Credential"
-  survey_enabled: no
+  survey_enabled: false
   project:
     name: "Ansible official demo project"
     description: "prescriptive demos from Red Hat Management Buisness Unit"
@@ -18,3 +20,4 @@ developer_report:
   workshop_type:
     - f5
     - rhel
+    - rhel_90

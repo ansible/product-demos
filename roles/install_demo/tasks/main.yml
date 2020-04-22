@@ -1,22 +1,37 @@
 ---
+- name: set facts from role vars
+  set_fact:
+    demo_list: "{{(dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined'))|dict2items)|map(attribute='key')|list}}"
+
 - name: provide info to terminal window
   debug:
-    msg: "install {{demo}} on {{my_tower_host}}"
+    msg:
+      - "install {{ vars.demo }} on {{ my_tower_host }}"
+      - "available demos are: {{demo_list}}"
+
+- name: make sure demo is a valid demo
+  assert:
+    that:
+      - vars.demo is defined
+      - vars.demo in demo_list or vars.demo == "all"
+    msg:
+      - "demo must be defined and be one of: {{demo_list}}"
+      - "full list can be found on https://github.com/ansible/product-demos"
 
 - name: install all job templates
   include_tasks: job_template_loop.yml
-  loop: "{{dict(hostvars[inventory_hostname]|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined'))|dict2items}}"
+  loop: "{{ dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined'))|dict2items }}"
   when: demo == "all"
 
 - name: install single job template
   include_tasks: job_template.yml
   when:
     - demo != "all"
-    - hostvars[inventory_hostname][demo].workflow is not defined or not hostvars[inventory_hostname][demo].workflow
+    - vars[demo].workflow is not defined or not vars[demo].workflow
 
 - name: install single workflow
   include_tasks: workflow.yml
   when:
     - demo != "all"
-    - hostvars[inventory_hostname][demo].workflow is defined
-    - hostvars[inventory_hostname][demo].workflow
+    - vars[demo].workflow is defined
+    - vars[demo].workflow

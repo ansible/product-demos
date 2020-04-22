@@ -8,11 +8,11 @@ fact_scan:
   inventory: "Workshop Inventory"
   playbook: scan_facts.yml
   credential: "Workshop Credential"
-  survey_enabled: no
-  fact_caching_enabled: yes
+  survey_enabled: false
+  fact_caching_enabled: true
   project:
     name: "Ansible official awx-facts-playbooks project"
-    description: "Repository containing playbooks to support fact scanning in Ansible Tower and AWX"
+    description: "playbooks to support fact scanning in Ansible Tower"
     organization: "Default"
     scm_type: git
     scm_url: "https://github.com/ansible/awx-facts-playbooks.git"
@@ -20,3 +20,4 @@ fact_scan:
     - f5
     - rhel
     - windows
+    - rhel_90

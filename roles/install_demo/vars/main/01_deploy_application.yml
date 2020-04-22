@@ -8,7 +8,7 @@ deploy_application:
   inventory: "Workshop Inventory"
   playbook: "playbooks/01_deploy_application.yml"
   credential: "Workshop Credential"
-  survey_enabled: yes
+  survey_enabled: false
   survey_spec:
     name: Deploy application survey
     description: Which application do you want to install?
@@ -34,3 +34,4 @@ deploy_application:
   workshop_type:
     - f5
     - rhel
+    - rhel_90

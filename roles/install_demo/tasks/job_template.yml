@@ -1,51 +1,54 @@
 ---
 - name: add tower project
   tower_project:
-    name: "{{hostvars.localhost[demo].project.name}}"
-    description: "{{hostvars.localhost[demo].project.description}}"
-    organization: "{{hostvars.localhost[demo].project.organization}}"
-    scm_type: "{{hostvars.localhost[demo].project.scm_type}}"
-    scm_url: "{{hostvars.localhost[demo].project.scm_url}}"
-    tower_username: "{{my_tower_username}}"
-    tower_password: "{{my_tower_password}}"
-    tower_host: "{{my_tower_host}}"
-    validate_certs: no
+    name: "{{ vars[demo].project.name }}"
+    description: "{{ vars[demo].project.description }}"
+    organization: "{{ vars[demo].project.organization }}"
+    scm_type: "{{ vars[demo].project.scm_type }}"
+    scm_url: "{{ vars[demo].project.scm_url }}"
+    tower_username: "{{ my_tower_username }}"
+    tower_password: "{{ my_tower_password }}"
+    tower_host: "{{ my_tower_host }}"
+    validate_certs: false
 
 - name: add single job template without survey
   tower_job_template:
-    name: "{{hostvars.localhost[demo].name}}"
-    description: "{{hostvars.localhost[demo].description}}"
-    job_type: "{{hostvars.localhost[demo].job_type}}"
-    inventory: "{{hostvars.localhost[demo].inventory}}"
-    project: "{{hostvars.localhost[demo].project.name}}"
-    playbook: "{{hostvars.localhost[demo].playbook}}"
-    fact_caching_enabled: "{{hostvars.localhost[demo].fact_caching_enabled | default('no')}}"
-    credential: "{{hostvars.localhost[demo].credential}}"
-    survey_enabled: "{{hostvars.localhost[demo].survey_enabled}}"
-    tower_username: "{{my_tower_username}}"
-    tower_password: "{{my_tower_password}}"
-    tower_host: "{{my_tower_host}}"
-    validate_certs: no
+    name: "{{ vars[demo].name }}"
+    description: "{{ vars[demo].description }}"
+    job_type: "{{ vars[demo].job_type }}"
+    inventory: "{{ vars[demo].inventory}}"
+    project: "{{ vars[demo].project.name }}"
+    playbook: "{{ vars[demo].playbook }}"
+    fact_caching_enabled: "{{ vars[demo].fact_caching_enabled | default('false') }}"
+    credential: "{{ vars[demo].credential }}"
+    survey_enabled: "{{ vars[demo].survey_enabled }}"
+    tower_username: "{{ my_tower_username }}"
+    tower_password: "{{ my_tower_password }}"
+    tower_host: "{{ my_tower_host }}"
+    validate_certs: false
   when:
-    - workshop_type in hostvars.localhost[demo].workshop_type
-    - not hostvars.localhost[demo].survey_enabled
+    - workshop_type in vars[demo].workshop_type
+    - not vars[demo].survey_enabled
+  register: add_project
+  until: add_project is not failed
+  retries: 5
 
 - name: add single job template with survey
   tower_job_template:
-    name: "{{hostvars.localhost[demo].name}}"
-    description: "{{hostvars.localhost[demo].description}}"
-    job_type: "{{hostvars.localhost[demo].job_type}}"
-    inventory: "{{hostvars.localhost[demo].inventory}}"
-    project: "{{hostvars.localhost[demo].project.name}}"
-    playbook: "{{hostvars.localhost[demo].playbook}}"
-    fact_caching_enabled: "{{hostvars.localhost[demo].fact_caching_enabled | default('no')}}"
-    credential: "{{hostvars.localhost[demo].credential}}"
-    survey_enabled: "{{hostvars.localhost[demo].survey_enabled}}"
-    survey_spec: "{{hostvars.localhost[demo].survey_spec}}"
-    tower_username: "{{my_tower_username}}"
-    tower_password: "{{my_tower_password}}"
-    tower_host: "{{my_tower_host}}"
-    validate_certs: no
+    name: "{{ vars[demo].name }}"
+    description: "{{ vars[demo].description }}"
+    job_type: "{{ vars[demo].job_type }}"
+    inventory: "{{ vars[demo].inventory}}"
+    project: "{{ vars[demo].project.name }}"
+    playbook: "{{ vars[demo].playbook }}"
+    fact_caching_enabled: "{{ vars[demo].fact_caching_enabled | default('false') }}"
+    credential: "{{ vars[demo].credential }}"
+    survey_enabled: "{{ vars[demo].survey_enabled }}"
+    survey_spec: "{{ vars[demo].survey_spec}}"
+    tower_username: "{{ my_tower_username }}"
+    tower_password: "{{ my_tower_password }}"
+    tower_host: "{{ my_tower_host }}"
+    validate_certs: false
   when:
-    - workshop_type in hostvars.localhost[demo].workshop_type
-    - hostvars.localhost[demo].survey_enabled
+    - workshop_type in vars[demo].workshop_type
+    - vars[demo].survey_enabled

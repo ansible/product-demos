@@ -8,7 +8,7 @@ windows_iis:
   inventory: "Workshop Inventory"
   playbook: "playbooks/30_windows_iis.yml"
   credential: "Demo Credential"
-  survey_enabled: no
+  survey_enabled: false
   project:
     name: "Ansible official demo project"
     description: "prescriptive demos from Red Hat Management Buisness Unit"

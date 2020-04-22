@@ -11,11 +11,11 @@ f5_bigip_workflow:
   schema:
     - job_template: 'F5 - add nodes'
       success:
-      - job_template: 'F5 - add pool'
-        success:
-        - job_template: 'F5 - add pool members'
+        - job_template: 'F5 - add pool'
           success:
-          - job_template: 'F5 - add virtual server'
+            - job_template: 'F5 - add pool members'
+              success:
+                - job_template: 'F5 - add virtual server'
   job_templates:
     f5_add_nodes:
       name: 'F5 - add nodes'
@@ -24,7 +24,7 @@ f5_bigip_workflow:
       inventory: 'Workshop Inventory'
       playbook: 'exercises/ansible_f5/1.2-add-node/bigip-node.yml'
       credential: 'Workshop Credential'
-      survey_enabled: no
+      survey_enabled: false
       project:
         name: 'Ansible Workshops Project'
         description: 'official workshops from Ansible'
@@ -40,7 +40,7 @@ f5_bigip_workflow:
       inventory: 'Workshop Inventory'
       playbook: 'exercises/ansible_f5/1.3-add-pool/bigip-pool.yml'
       credential: 'Workshop Credential'
-      survey_enabled: no
+      survey_enabled: false
       project:
         name: 'Ansible Workshops Project'
         description: 'official workshops from Ansible'
@@ -56,7 +56,7 @@ f5_bigip_workflow:
       inventory: 'Workshop Inventory'
       playbook: 'exercises/ansible_f5/1.4-add-pool-members/bigip-pool-members.yml'
       credential: 'Workshop Credential'
-      survey_enabled: no
+      survey_enabled: false
       project:
         name: 'Ansible Workshops Project'
         description: 'official workshops from Ansible'
@@ -72,7 +72,7 @@ f5_bigip_workflow:
       inventory: 'Workshop Inventory'
       playbook: 'exercises/ansible_f5/1.5-add-virtual-server/bigip-virtual-server.yml'
       credential: 'Workshop Credential'
-      survey_enabled: no
+      survey_enabled: false
       project:
         name: 'Ansible Workshops Project'
         description: 'official workshops from Ansible'

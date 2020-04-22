@@ -1,8 +1,8 @@
 ---
 - name: apply non-kernel updates
-  hosts: "{{ HOSTS | default('all') }}"
-  become: yes
-  gather_facts: no
+  hosts: "{{ HOSTS | default('web') }}"
+  become: true
+  gather_facts: false
 
   tasks:
   - name: upgrade all packages except kernel
@@ -16,6 +16,6 @@
     yum:
       name: '*'
       state: latest
-      security: yes
+      security: true
       exclude: kernel*
     tags: security

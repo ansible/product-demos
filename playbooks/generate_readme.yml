@@ -4,11 +4,6 @@
   connection: local
 
   tasks:
-    # - name: install demo
-    #   debug:
-    #     msg: "{{item}}"
-    #   loop: "{{dict(hostvars[inventory_hostname]|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined'))|dict2items}}"
-
     - name: install demo
       include_role:
         name: "../roles/generate_readme"

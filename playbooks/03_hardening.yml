@@ -1,31 +1,31 @@
 ---
 - name: harden linux systems
-  hosts: "{{ HOSTS | default('all') }}"
-  become: yes
+  hosts: "{{ HOSTS | default('web') }}"
+  become: true
   vars:
-    - harden_firewall: False
-    - harden_time: False
-    - harden_ssh: False
-    - harden_pci: False
+    - harden_firewall: false
+    - harden_time: false
+    - harden_ssh: false
+    - harden_pci: false
 
   tasks:
-  - name: Configure Firewall
-    when: harden_firewall | bool
-    include_role:
-      name: linux-system-roles.firewall
+    - name: Configure Firewall
+      when: harden_firewall | bool
+      include_role:
+        name: linux-system-roles.firewall
 
-  - name: Configure Timesync
-    when: harden_time | bool
-    include_role:
-      name: linux-system-roles.timesync
+    - name: Configure Timesync
+      when: harden_time | bool
+      include_role:
+        name: linux-system-roles.timesync
 
-  - name: SSH Hardening
-    when: harden_ssh | bool
-    include_role:
-       name: dev-sec.ssh-hardening
+    - name: SSH Hardening
+      when: harden_ssh | bool
+      include_role:
+        name: dev-sec.ssh-hardening
 
-  # run with --skip-tags accounts_passwords_pam_faillock_deny
-  - name: Apply PCI Baseline
-    when: harden_pci | bool
-    include_role:
-      name: redhatofficial.rhel7_pci_dss
+    # run with --skip-tags accounts_passwords_pam_faillock_deny
+    - name: Apply PCI Baseline
+      when: harden_pci | bool
+      include_role:
+        name: redhatofficial.rhel7_pci_dss
