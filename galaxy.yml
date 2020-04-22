@@ -1,7 +1,7 @@
 ---
 namespace: ipvsean
 name: product_demos
-version: 1.0.2
+version: 1.0.3
 readme: README.md
 
 authors:
@@ -10,9 +10,9 @@ authors:
 description: repository of demos to showcase Ansible features.
 
 license:
-  - GPL-2.0-or-later
+  - GPL-3.0-or-later
 
-license_file: ''
+license_file: 'LICENSE'
 
 tags: []
 dependencies: {}

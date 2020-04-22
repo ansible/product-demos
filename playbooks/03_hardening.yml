@@ -28,4 +28,4 @@
     - name: Apply PCI Baseline
       when: harden_pci | bool
       include_role:
-        name: redhatofficial.rhel7_pci_dss
+        name: redhatofficial.rhel8_pci_dss

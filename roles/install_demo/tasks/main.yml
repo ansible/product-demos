@@ -1,13 +1,13 @@
 ---
 - name: set facts from role vars
   set_fact:
-    demo_list: "{{(dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined'))|dict2items)|map(attribute='key')|list}}"
+    demo_list: "{{ (dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined'))|dict2items)|map(attribute='key')|list }}"
 
 - name: provide info to terminal window
   debug:
     msg:
       - "install {{ vars.demo }} on {{ my_tower_host }}"
-      - "available demos are: {{demo_list}}"
+      - "available demos are: {{ demo_list }}"
 
 - name: make sure demo is a valid demo
   assert:
@@ -15,7 +15,7 @@
       - vars.demo is defined
       - vars.demo in demo_list or vars.demo == "all"
     msg:
-      - "demo must be defined and be one of: {{demo_list}}"
+      - "demo must be defined and be one of: {{ demo_list }}"
       - "full list can be found on https://github.com/ansible/product-demos"
 
 - name: install all job templates
