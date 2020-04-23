@@ -1,5 +1,5 @@
 ---
-namespace: ipvsean
+namespace: ansible
 name: product_demos
 version: 1.0.5
 readme: README.md
@@ -14,7 +14,26 @@ license:
 
 license_file: 'LICENSE'
 
-tags: []
+tags:
+  - apache
+  - centos
+  - rhel
+  - el
+  - amazon
+  - linux
+  - fedora
+  - network
+  - f5
+  - developer
+  - infrastructure
+  - security
+  - windows
+  - opencap
+  - insights
+  - patching
+  - tower
+  - awx
+
 dependencies: {}
 
 repository: http://github.com/ansible/product-demos
