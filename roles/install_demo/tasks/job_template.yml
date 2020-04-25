@@ -29,8 +29,8 @@
   when:
     - workshop_type in vars[demo].workshop_type
     - not vars[demo].survey_enabled
-  register: add_project
-  until: add_project is not failed
+  register: add_job_template
+  until: add_job_template is not failed
   retries: 5
 
 - name: add single job template with survey
@@ -52,3 +52,6 @@
   when:
     - workshop_type in vars[demo].workshop_type
     - vars[demo].survey_enabled
+  register: add_job_template
+  until: add_job_template is not failed
+  retries: 5
