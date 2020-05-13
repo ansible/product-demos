@@ -1,4 +1,8 @@
 ---
+- name: installing demo
+  debug:
+    msg: "installing demo: {{item}}"
+
 - name: block for job template loop
   block:
     - name: "add tower project job_template_loop.yml"
