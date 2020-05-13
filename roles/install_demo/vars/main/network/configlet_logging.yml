@@ -1,0 +1,20 @@
+---
+configlet_logging:
+  author: "Colin McCarthy"
+  category: network
+  name: "Cisco IOS logging config audit/remediation"
+  description: "Cisco IOS logging config audit/remediation"
+  job_type: "run"
+  inventory: "Workshop Inventory"
+  playbook: configlet_logging.yml
+  credential: "Workshop Credential"
+  survey_enabled: false
+  fact_caching_enabled: true
+  project:
+    name: "Ansible official demo project"
+    description: "prescriptive demos from Red Hat Management Buisness Unit"
+    organization: "Default"
+    scm_type: git
+    scm_url: "https://github.com/ansible/product-demos"
+  workshop_type:
+    - network
