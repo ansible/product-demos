@@ -1,0 +1,8 @@
+---
+- name: include all demo vars from install_demo roll
+  include_vars:
+    dir: "vars"
+
+- name: will load vars from adjacent vars
+  debug:
+    msg: "variables loaded from install_demo role"

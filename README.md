@@ -30,7 +30,7 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
 
 # Demo Repository
 
-This repository currently holds 11 demos.
+This repository currently holds 14 demos.
 
 ## Infrastructure Demos
 <table>
@@ -48,7 +48,7 @@ This repository currently holds 11 demos.
     <td><pre>demo: deploy_application</pre></td>
     <td>install yum applications on Linux with a survey</td>
     <td><a href="https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED">Video Link</a></td>
-    <td><ul><li>f5</li><li>rhel</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
   </tr>
   <tr>
     <td>SERVER / Fact Scan</td>
@@ -56,7 +56,7 @@ This repository currently holds 11 demos.
     <td><pre>demo: fact_scan</pre></td>
     <td>scan facts for Linux and Windows systems</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>windows</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>windows</li><li>rhel_90</li></ul></td>
   </tr>
   <tr>
     <td>SERVER / Gather Debug Info</td>
@@ -64,7 +64,7 @@ This repository currently holds 11 demos.
     <td><pre>demo: debug_info</pre></td>
     <td>provide info for memory and CPU usage for specified systems</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
   </tr>
   <tr>
     <td>SERVER / Grant Sudo</td>
@@ -72,7 +72,7 @@ This repository currently holds 11 demos.
     <td><pre>demo: grant_sudo</pre></td>
     <td>grant sudo privledges for specified time via survey</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
   </tr>
   <tr>
     <td>SERVER / Patching</td>
@@ -80,7 +80,15 @@ This repository currently holds 11 demos.
     <td><pre>demo: patching</pre></td>
     <td>patching for Linux servers</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
+  </tr>
+  <tr>
+    <td>SERVER / Red Hat Insights</td>
+    <td>Sean Cavanaugh</td>
+    <td><pre>demo: insights</pre></td>
+    <td>install and configure Red Hat Insights</td>
+    <td>Not available </td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
   </tr>
   <tr>
     <td>SERVER / Security Patching</td>
@@ -88,7 +96,7 @@ This repository currently holds 11 demos.
     <td><pre>demo: security_patching</pre></td>
     <td>upgrade all yum packages for security related except kernel</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
   </tr>
   <tr>
     <td>Windows IIS Server</td>
@@ -110,6 +118,22 @@ This repository currently holds 11 demos.
     <th>Description</th>
     <th>Video Walkthrough</th>
     <th>Workshop Types</th>
+  </tr>
+  <tr>
+    <td>Cisco IOS logging config audit/remediation</td>
+    <td>Colin McCarthy</td>
+    <td><pre>demo: configlet_logging</pre></td>
+    <td>Cisco IOS logging config audit/remediation</td>
+    <td>Not available </td>
+    <td><ul><li>network</li></ul></td>
+  </tr>
+  <tr>
+    <td>Cisco IOS ntp config audit/remediation</td>
+    <td>Colin McCarthy</td>
+    <td><pre>demo: configlet_ntp</pre></td>
+    <td>Cisco IOS ntp config audit/remediation</td>
+    <td>Not available </td>
+    <td><ul><li>network</li></ul></td>
   </tr>
   <tr>
     <td>WORKFLOW - F5 BIG-IP</td>
@@ -138,7 +162,7 @@ This repository currently holds 11 demos.
     <td><pre>demo: openscap</pre></td>
     <td>Create HTML report using SCAP Security Guide (SSG)</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
   </tr>
   <tr>
     <td>SERVER / Hardening</td>
@@ -146,7 +170,7 @@ This repository currently holds 11 demos.
     <td><pre>demo: hardening</pre></td>
     <td>hardening for Linux servers</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
   </tr>
 </table>
 
@@ -165,9 +189,10 @@ This repository currently holds 11 demos.
     <td>Create Developer Report</td>
     <td>Sean Cavanaugh</td>
     <td><pre>demo: developer_report</pre></td>
-    <td>Create HTML report using <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a></td>
+    <td>'Create HTML report using <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a>'
+</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
   </tr>
 </table>
 
@@ -178,7 +203,7 @@ please refer to the [contribute.md](docs/contribute.md) documentation included i
 
 # Notes
 
-This README.md was auto-generated by Ansible user **sean** on **2020-03-12** with Ansible version **2.9.5**
+This README.md was auto-generated by Ansible user **sean** on **2020-05-13** with Ansible version **2.9.7**
 
 To generate a README.md, execute the following command
 

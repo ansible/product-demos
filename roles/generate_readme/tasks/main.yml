@@ -1,4 +1,9 @@
 ---
+- name: load variables from adjacent role
+  include_role:
+    name: "../roles/install_demo"
+    tasks_from: load_vars.yml
+
 - name: create readme
   template:
     src: readme.j2
