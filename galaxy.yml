@@ -12,8 +12,6 @@ description: repository of demos to showcase Ansible features.
 license:
   - GPL-3.0-or-later
 
-license_file: 'LICENSE'
-
 tags:
   - apache
   - centos
