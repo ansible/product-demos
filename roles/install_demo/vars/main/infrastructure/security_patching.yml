@@ -1,14 +1,14 @@
 ---
-debug_info:
+security_patching:
   author: "Will Tome"
   category: infrastructure
-  name: "SERVER / Gather Debug Info"
-  description: "provide info for memory and CPU usage for specified systems"
+  name: "INFRASTRUCTURE / Security Patching"
+  description: "upgrade all yum packages for security related except kernel"
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: playbooks/06_debug_info.yml
+  playbook: playbooks/02_patching.yml
   credential: "Workshop Credential"
-  survey_enabled: false
+  survey_enabled: true
   survey_spec:
     name: ''
     description: ''

@@ -2,7 +2,7 @@
 windows_iis:
   author: "Colin McNaughton"
   category: infrastructure
-  name: "Windows IIS Server"
+  name: "SERVER / Windows IIS Server"
   description: "install webserver on Windows Server with a survey"
   job_type: "run"
   inventory: "Workshop Inventory"

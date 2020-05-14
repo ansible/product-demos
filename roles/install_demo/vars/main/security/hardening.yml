@@ -2,7 +2,7 @@
 hardening:
   author: "Will Tome"
   category: security
-  name: "SERVER / Hardening"
+  name: "SECURITY / Hardening"
   description: "hardening for Linux servers"
   job_type: "run"
   inventory: "Workshop Inventory"

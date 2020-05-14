@@ -2,7 +2,7 @@
 deploy_application:
   author: "Sean Cavanaugh"
   category: infrastructure
-  name: "Deploy Application (survey)"
+  name: "INFRASTRUCTURE / Deploy Application (survey)"
   description: "install yum applications on Linux with a survey"
   job_type: "run"
   inventory: "Workshop Inventory"

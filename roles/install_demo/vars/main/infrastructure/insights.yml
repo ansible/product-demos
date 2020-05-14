@@ -2,7 +2,7 @@
 insights:
   author: "Sean Cavanaugh"
   category: infrastructure
-  name: "SERVER / Red Hat Insights"
+  name: "INFRASTRUCTURE / Red Hat Insights"
   description: "install and configure Red Hat Insights"
   job_type: "run"
   inventory: "Workshop Inventory"

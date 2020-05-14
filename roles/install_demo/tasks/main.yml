@@ -2,6 +2,7 @@
 - name: set facts from role vars
   set_fact:
     demo_list: "{{ (dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined')|selectattr('1.workshop_type', 'defined'))|dict2items)|map(attribute='key')|list }}"
+    full_demo_info: "{{ (dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined')|selectattr('1.workshop_type', 'defined'))|dict2items) }}"
 
 - name: provide info to terminal window
   debug:
@@ -21,7 +22,7 @@
 
 - name: install all job templates
   include_tasks: job_template_loop.yml
-  loop: "{{ dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined'))|dict2items }}"
+  loop: "{{ full_demo_info }}"
   when: demo == "all"
 
 - name: install single job template

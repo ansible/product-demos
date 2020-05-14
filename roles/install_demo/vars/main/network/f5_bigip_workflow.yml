@@ -3,7 +3,7 @@ f5_bigip_workflow:
   workflow: true
   author: 'Sean Cavanaugh'
   category: network
-  name: 'WORKFLOW - F5 BIG-IP'
+  name: 'NETWORK / WORKFLOW - F5 BIG-IP'
   description: 'Workflow for F5 BIG-IP to setup a VIP (Virtual IP) load balancer between two RHEL webservers'
   organization: 'Default'
   workshop_type:

@@ -1,12 +1,12 @@
 ---
-security_patching:
+patching:
   author: "Will Tome"
   category: infrastructure
-  name: "SERVER / Security Patching"
-  description: "upgrade all yum packages for security related except kernel"
+  name: "INFRASTRUCTURE / Patching"
+  description: "patching for Linux servers"
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: playbooks/02_patching.yml
+  playbook: "playbooks/02_patching.yml"
   credential: "Workshop Credential"
   survey_enabled: true
   survey_spec:
