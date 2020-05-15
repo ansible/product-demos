@@ -25,8 +25,26 @@ Ansible creates guard rails on which applications can be deployed and how they a
 
 For description of these and other features of the Red Hat Ansible Automation Platform please refer to the [features README](features.md)
 
+# Video
+
+[Watch here](https://youtu.be/pU8ZgSBuEJw)
+
 # Guide
 
-COMING SOON
+1. Login to Ansible Platform UX
 
+2. Navigate to **Templates**
+
+  ![job templates](../../images/templates.png)
+
+3. Click the rocket next to **INFRASTRUCTURE / Deploy Application** to launch the Job
+
+  ![rocket launch](../../images/rocket.png)
+
+4.  The survey will prompt you to install an application.
+
+  ![survey choice](../../images/deploy_application_survey.png)
+
+
+---
 You have finished this demo.  [Click here to return to master demo list](../README.md)
