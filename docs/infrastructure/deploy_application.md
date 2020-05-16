@@ -47,4 +47,4 @@ For description of these and other features of the Red Hat Ansible Automation Pl
 
 
 ---
-You have finished this demo.  [Click here to return to master demo list](../README.md)
+You have finished this demo.  [Click here to return to master demo list](../../README.md)
