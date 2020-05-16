@@ -6,7 +6,7 @@ deploy_application:
   description: "install yum applications on Linux with a survey"
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: "playbooks/01_deploy_application.yml"
+  playbook: "playbooks/infrastructure/deploy_application.yml"
   credential: "Workshop Credential"
   survey_enabled: true
   survey_spec:

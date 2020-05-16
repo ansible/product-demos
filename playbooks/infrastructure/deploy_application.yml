@@ -14,7 +14,7 @@
         msg: "This Ansible Playbook will install {{application}}"
 
     - name: install application
-      yum:
+      dnf:
         name: "{{application}}"
         use_backend: yum
         allow_downgrade: true
