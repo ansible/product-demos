@@ -16,7 +16,6 @@
     - name: install application
       dnf:
         name: "{{application}}"
-        use_backend: yum
         allow_downgrade: true
       register: result
 
