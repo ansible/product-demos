@@ -6,7 +6,7 @@ insights:
   description: "install and configure Red Hat Insights"
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: playbooks/infrastructure/insights.yml
+  playbook: "playbooks/infrastructure/insights.yml"
   credential: "Workshop Credential"
   survey_enabled: true
   survey_spec:

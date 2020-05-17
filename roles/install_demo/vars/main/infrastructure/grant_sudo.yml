@@ -6,7 +6,7 @@ grant_sudo:
   description: "grant sudo privledges for specified time via survey"
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: playbooks/infrastructure/grant_sudo.yml
+  playbook: "playbooks/infrastructure/grant_sudo.yml"
   credential: "Workshop Credential"
   survey_enabled: true
   survey_spec:

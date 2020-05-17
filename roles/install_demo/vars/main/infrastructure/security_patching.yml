@@ -6,7 +6,7 @@ security_patching:
   description: "upgrade all yum packages for security related except kernel"
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: playbooks/infrastructure/patching.yml
+  playbook: "playbooks/infrastructure/patching.yml"
   credential: "Workshop Credential"
   survey_enabled: true
   survey_spec:
