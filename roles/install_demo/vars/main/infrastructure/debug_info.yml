@@ -6,7 +6,7 @@ debug_info:
   description: "provide info for memory and CPU usage for specified systems"
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: playbooks/06_debug_info.yml
+  playbook: playbooks//infrastructure/debug_info.yml
   credential: "Workshop Credential"
   survey_enabled: false
   survey_spec:

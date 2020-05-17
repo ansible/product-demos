@@ -6,7 +6,7 @@ openscap:
   description: "Create HTML report using SCAP Security Guide (SSG)"
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: "playbooks/10_openscap.yml"
+  playbook: "playbooks/security/openscap.yml"
   credential: "Workshop Credential"
   survey_enabled: false
   project:

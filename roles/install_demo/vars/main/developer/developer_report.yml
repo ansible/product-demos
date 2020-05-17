@@ -8,7 +8,7 @@ developer_report:
     <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a>'
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: "playbooks/11_developer_report.yml"
+  playbook: "playbooks/developer/developer_report.yml"
   credential: "Workshop Credential"
   survey_enabled: false
   project:

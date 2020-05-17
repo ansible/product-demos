@@ -6,7 +6,7 @@ windows_iis:
   description: "install webserver on Windows Server with a survey"
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: "playbooks/30_windows_iis.yml"
+  playbook: "playbooks/infrastructure/windows_iis.yml"
   credential: "Demo Credential"
   survey_enabled: false
   project:
