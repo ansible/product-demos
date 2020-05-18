@@ -23,7 +23,7 @@ Ansible creates guard rails on which applications can be deployed and how they a
 - Push button deployment
 - Self Service IT - Surveys
 
-For description of these and other features of the Red Hat Ansible Automation Platform please refer to the [features README](features.md)
+For description of these and other features of the Red Hat Ansible Automation Platform please refer to the [features README](../features.md)
 
 # Video
 
