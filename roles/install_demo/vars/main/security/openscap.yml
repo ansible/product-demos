@@ -11,7 +11,7 @@ openscap:
   survey_enabled: false
   project:
     name: "Ansible official demo project"
-    description: "prescriptive demos from Red Hat Management Buisness Unit"
+    description: "prescriptive demos from Red Hat Management Business Unit"
     organization: "Default"
     scm_type: git
     scm_url: "https://github.com/ansible/product-demos"
