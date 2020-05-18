@@ -1,6 +1,7 @@
 ---
 deploy_application:
   author: "Sean Cavanaugh"
+  readme: "https://github.com/ansible/product-demos/blob/master/docs/infrastructure/deploy_application.md"
   category: infrastructure
   name: "INFRASTRUCTURE / Deploy Application"
   description: "install yum applications on Linux with a survey"

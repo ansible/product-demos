@@ -44,7 +44,7 @@ This repository currently holds {{hostvars[inventory_hostname].items()|rejectatt
   </tr>
 {% for key, value in hostvars[inventory_hostname].items()|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined')|selectattr('1.category', 'match', 'infrastructure$')|sort(attribute='1.name') %}
   <tr>
-    <td>{{value.name}}</td>
+    <td>{% if value.readme is defined%}<a href="{{ value.readme}}">{{value.name}}</a>{% else %}{{value.name}}{% endif %}</td>
     <td>{{value.author}}</td>
     <td><pre>demo: {{key}}</pre></td>
     <td>{{value.description}}</td>
