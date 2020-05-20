@@ -21,3 +21,4 @@ fact_scan:
     - rhel
     - windows
     - rhel_90
+    - demo

@@ -19,3 +19,4 @@ openscap:
     - f5
     - rhel
     - rhel_90
+    - demo

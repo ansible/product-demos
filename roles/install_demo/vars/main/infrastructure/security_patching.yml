@@ -27,3 +27,4 @@ security_patching:
     - f5
     - rhel
     - rhel_90
+    - demo

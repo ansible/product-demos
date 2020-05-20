@@ -18,3 +18,4 @@ configlet_ntp:
     scm_url: "https://github.com/ansible/product-demos"
   workshop_type:
     - network
+    - demo

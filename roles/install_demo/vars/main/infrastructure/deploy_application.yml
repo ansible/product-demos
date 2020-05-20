@@ -36,3 +36,4 @@ deploy_application:
     - f5
     - rhel
     - rhel_90
+    - demo

@@ -8,6 +8,7 @@ f5_bigip_workflow:
   organization: 'Default'
   workshop_type:
     - f5
+    - demo
   schema:
     - job_template: 'F5 - add nodes'
       success:
@@ -33,6 +34,7 @@ f5_bigip_workflow:
         scm_url: 'https://github.com/ansible/workshops'
       workshop_type:
         - f5
+        - demo
     f5_add_pool:
       name: 'F5 - add pool'
       description: 'add webserver nodes into F5 BIG-IP'
@@ -49,6 +51,7 @@ f5_bigip_workflow:
         scm_url: 'https://github.com/ansible/workshops'
       workshop_type:
         - f5
+        - demo
     f5_add_pool_members:
       name: 'F5 - add pool members'
       description: 'add webserver nodes into pool'
@@ -65,6 +68,7 @@ f5_bigip_workflow:
         scm_url: 'https://github.com/ansible/workshops'
       workshop_type:
         - f5
+        - demo
     f5_add_vip:
       name: 'F5 - add virtual server'
       description: 'create VIP and add pool to virtual server'
@@ -81,3 +85,4 @@ f5_bigip_workflow:
         scm_url: 'https://github.com/ansible/workshops'
       workshop_type:
         - f5
+        - demo

@@ -27,3 +27,4 @@ debug_info:
     - f5
     - rhel
     - rhel_90
+    - demo
