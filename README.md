@@ -30,7 +30,7 @@ ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
 
 # Demo Repository
 
-This repository currently holds 14 demos.
+This repository currently holds 15 demos.
 
 ## Infrastructure Demos
 <table>
@@ -48,7 +48,7 @@ This repository currently holds 14 demos.
     <td><pre>demo: deploy_application</pre></td>
     <td>install yum applications on Linux with a survey</td>
     <td><a href="https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED">Video Link</a></td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
   </tr>
   <tr>
     <td>INFRASTRUCTURE / Fact Scan</td>
@@ -56,7 +56,7 @@ This repository currently holds 14 demos.
     <td><pre>demo: fact_scan</pre></td>
     <td>scan facts for Linux and Windows systems</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>windows</li><li>rhel_90</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>windows</li><li>rhel_90</li><li>demo</li></ul></td>
   </tr>
   <tr>
     <td>INFRASTRUCTURE / Gather Debug Info</td>
@@ -64,7 +64,7 @@ This repository currently holds 14 demos.
     <td><pre>demo: debug_info</pre></td>
     <td>provide info for memory and CPU usage for specified systems</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
   </tr>
   <tr>
     <td>INFRASTRUCTURE / Grant Sudo</td>
@@ -72,7 +72,7 @@ This repository currently holds 14 demos.
     <td><pre>demo: grant_sudo</pre></td>
     <td>grant sudo privledges for specified time via survey</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
   </tr>
   <tr>
     <td>INFRASTRUCTURE / Patching</td>
@@ -80,7 +80,7 @@ This repository currently holds 14 demos.
     <td><pre>demo: patching</pre></td>
     <td>patching for Linux servers</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
   </tr>
   <tr>
     <td>INFRASTRUCTURE / Red Hat Insights</td>
@@ -88,7 +88,7 @@ This repository currently holds 14 demos.
     <td><pre>demo: insights</pre></td>
     <td>install and configure Red Hat Insights</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
   </tr>
   <tr>
     <td>INFRASTRUCTURE / Security Patching</td>
@@ -96,7 +96,15 @@ This repository currently holds 14 demos.
     <td><pre>demo: security_patching</pre></td>
     <td>upgrade all yum packages for security related except kernel</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
+  </tr>
+  <tr>
+    <td>INFRASTRUCTURE / Turn off IBM Community Grid</td>
+    <td>Sean Cavanaugh</td>
+    <td><pre>demo: turn_off_community_grid</pre></td>
+    <td>this role turns off IBM Community Grid boinc-client</td>
+    <td>Not available </td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
   </tr>
   <tr>
     <td>SERVER / Windows IIS Server</td>
@@ -104,7 +112,7 @@ This repository currently holds 14 demos.
     <td><pre>demo: windows_iis</pre></td>
     <td>install webserver on Windows Server with a survey</td>
     <td>Not available </td>
-    <td><ul><li>windows</li></ul></td>
+    <td><ul><li>windows</li><li>demo</li></ul></td>
   </tr>
 </table>
 
@@ -125,7 +133,7 @@ This repository currently holds 14 demos.
     <td><pre>demo: configlet_logging</pre></td>
     <td>Cisco IOS logging config audit/remediation</td>
     <td>Not available </td>
-    <td><ul><li>network</li></ul></td>
+    <td><ul><li>network</li><li>demo</li></ul></td>
   </tr>
   <tr>
     <td>Cisco IOS ntp config audit/remediation</td>
@@ -133,7 +141,7 @@ This repository currently holds 14 demos.
     <td><pre>demo: configlet_ntp</pre></td>
     <td>Cisco IOS ntp config audit/remediation</td>
     <td>Not available </td>
-    <td><ul><li>network</li></ul></td>
+    <td><ul><li>network</li><li>demo</li></ul></td>
   </tr>
   <tr>
     <td>NETWORK / WORKFLOW - F5 BIG-IP</td>
@@ -141,7 +149,7 @@ This repository currently holds 14 demos.
     <td><pre>demo: f5_bigip_workflow</pre></td>
     <td>Workflow for F5 BIG-IP to setup a VIP (Virtual IP) load balancer between two RHEL webservers</td>
     <td>Not available </td>
-    <td><ul><li>f5</li></ul></td>
+    <td><ul><li>f5</li><li>demo</li></ul></td>
   </tr>
 </table>
 
@@ -162,7 +170,7 @@ This repository currently holds 14 demos.
     <td><pre>demo: openscap</pre></td>
     <td>Create HTML report using SCAP Security Guide (SSG)</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
   </tr>
   <tr>
     <td>SECURITY / Hardening</td>
@@ -170,7 +178,7 @@ This repository currently holds 14 demos.
     <td><pre>demo: hardening</pre></td>
     <td>hardening for Linux servers</td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
   </tr>
 </table>
 
@@ -192,7 +200,7 @@ This repository currently holds 14 demos.
     <td>'Create HTML report using <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a>'
 </td>
     <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li></ul></td>
+    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
   </tr>
 </table>
 
@@ -203,7 +211,7 @@ please refer to the [contribute.md](docs/contribute.md) documentation included i
 
 # Notes
 
-This README.md was auto-generated by Ansible user **sean** on **2020-05-18** with Ansible version **2.9.9**
+This README.md was auto-generated by Ansible user **sean** on **2020-05-21** with Ansible version **2.9.9**
 
 To generate a README.md, execute the following command
 
