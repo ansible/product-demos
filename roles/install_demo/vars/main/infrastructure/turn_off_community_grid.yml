@@ -1,5 +1,5 @@
 ---
-deploy_application:
+turn_off_community_grid:
   author: "Sean Cavanaugh"
   category: infrastructure
   name: "INFRASTRUCTURE / Turn off IBM Community Grid"
