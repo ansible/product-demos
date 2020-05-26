@@ -4,7 +4,7 @@
   gather_facts: true
 
 - name: build developer report
-  hosts: host1
+  hosts: node1
   gather_facts: false
 
   vars:
