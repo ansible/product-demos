@@ -19,7 +19,7 @@
         ios_config:
           parents: ip access-list extended VTY-ACL
           lines:
-            - permit tcp "{{ ansible_host }}" any eq 22
+            - permit tcp host "{{ ansible_host }}" any eq 22
             - permit tcp 172.16.0.0 0.15.255.255 any eq 22
             - permit tcp 192.168.0.0 0.0.255.255 any eq 22
             - permit tcp 10.0.0.0 0.255.255.255 any eq 22 log-input
