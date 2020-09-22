@@ -3,13 +3,13 @@
 ## chose specific demo or choose all
 
 # SPECIFIC - example that installs just the deploy_application job template
-demo: developer_report
+demo: configlet_ntp
 
 # ALL - example that installs all demos
 # demo: all
 
 ## Ansible Tower login infomation
-my_tower_username: colin
-my_tower_password: mahalo
-my_tower_host: test.rhdemo.io
-workshop_type: rhel
+my_tower_username: admin    
+my_tower_password: 7346sweet
+my_tower_host: tower.geojams.me
+workshop_type: network
