@@ -3,13 +3,13 @@
 ## chose specific demo or choose all
 
 # SPECIFIC - example that installs just the deploy_application job template
-demo: configlet_ntp
+demo: configlet_vtyacl
 
 # ALL - example that installs all demos
 # demo: all
 
 ## Ansible Tower login infomation
 my_tower_username: admin    
-my_tower_password: 7346sweet
-my_tower_host: tower.geojams.me
+my_tower_password: iVVJ3GYjKkNfPs
+my_tower_host: https://student1.5183.open.redhat.com/
 workshop_type: network
