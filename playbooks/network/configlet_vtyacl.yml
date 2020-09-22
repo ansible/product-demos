@@ -1,6 +1,6 @@
 ---
 - name: CORRECT VTY-ACL ON CISCO DEVICES
-  hosts: ios
+  hosts: cisco
   connection: network_cli
   gather_facts: no
 
