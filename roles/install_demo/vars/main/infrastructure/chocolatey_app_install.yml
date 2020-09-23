@@ -1,0 +1,44 @@
+---
+deploy_application:
+  author: "David Rojas"
+  readme: "https://github.com/ansible/product-demos/blob/master/docs/infrastructure/deploy_application.md"
+  category: infrastructure
+  name: "INFRASTRUCTURE / Chocolatey App Install"
+  description: "Install various application packages using Chocolatey from a survey"
+  job_type: "run"
+  inventory: "Workshop Inventory"
+  playbook: "playbooks/infrastructure/win_chocolatey_install.yml"
+  credential: "Workshop Credential"
+  survey_enabled: true
+  survey_spec:
+    name: Chocolatey Application Install
+    description: Which application do you want to install?
+    spec:
+      - type: multiplechoice
+        question_name: Select the application you would like to add, update or remove
+        question_description: You can pick one or more
+        variable: choco_packages
+        required: true
+        default: git
+        choices:
+          - git
+          - 7-zip
+          - googlechrome
+          - putty
+          - vscode
+      - type: multiplechoice
+        question_name: What state do you want these applications in?
+        question_description: Select Present, Absent or Update
+        variable: app_state
+        required: true
+        default: present    
+  #video: "https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED"
+  project:
+    name: "Ansible official demo project"
+    description: "prescriptive demos from Red Hat Management Business Unit"
+    organization: "Default"
+    scm_type: git
+    scm_url: "https://github.com/davidrojas25/product-demos.git"
+  workshop_type:
+    - windows
+    - demo
