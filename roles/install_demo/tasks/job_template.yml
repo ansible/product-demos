@@ -11,10 +11,6 @@
     tower_host: "{{ my_tower_host }}"
     validate_certs: false
 
-- name: UPDATE PROJECT IN TOWER
-  shell: tower-cli project update --name="{{ vars[demo].project.name }}" \
-         -u "{{ my_tower_username }}" -p "{{ my_tower_password }}" -h "{{ my_tower_host }}" --insecure
-  delegate_to: localhost
 
 - name: add single job template without survey
   tower_job_template:
