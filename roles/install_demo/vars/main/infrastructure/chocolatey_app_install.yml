@@ -7,7 +7,7 @@ chocolatey_app_install:
   description: "Install various application packages using Chocolatey from a survey"
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: "playbooks/infrastructure/win_chocolatey_install.yml"
+  playbook: "playbooks/infrastructure/chocolatey_app_install.yml"
   credential: "Workshop Credential"
   survey_enabled: true
   survey_spec:
