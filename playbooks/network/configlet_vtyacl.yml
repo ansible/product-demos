@@ -42,7 +42,7 @@
           delay: 2
           timeout: 6
         ignore_errors: no
-        delegate_to: ansible-1
+        
 
       - name: SSH TEST SUCCESSFUL.  SAVING RUNNING-CONFIG
         ios_config:
