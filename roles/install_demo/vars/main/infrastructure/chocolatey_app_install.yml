@@ -31,7 +31,11 @@ deploy_application:
         question_description: Select Present, Absent or Update
         variable: app_state
         required: true
-        default: present    
+        default: present 
+        choices:
+          - present
+          - absent   
+          - update
   #video: "https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED"
   project:
     name: "Ansible official demo project"
