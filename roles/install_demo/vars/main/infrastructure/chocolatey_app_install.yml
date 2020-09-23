@@ -15,7 +15,7 @@ chocolatey_app_install:
     description: Which application do you want to install?
     spec:
       - type: multiplechoice
-        question_name: Select the application you would like to add, update or remove
+        question_name: Select the application you would like to add update or remove
         question_description: You can pick one or more
         variable: choco_packages
         required: true
@@ -28,7 +28,7 @@ chocolatey_app_install:
           - vscode
       - type: multiplechoice
         question_name: What state do you want these applications in?
-        question_description: Select Present, Absent or Update
+        question_description: Select Present Absent or Update
         variable: app_state
         required: true
         default: present 
