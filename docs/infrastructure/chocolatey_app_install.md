@@ -43,25 +43,25 @@ Coming Soon
 
      ![job templates](../../images/templates.png)
 
-3. Click the rocket next to **INFRASTRUCTURE / Deploy Application** to launch the Job
+3. Click the rocket next to **INFRASTRUCTURE / Chocolatey App Install** to launch the Job
 
      ![rocket launch](../../images/rocket.png)
 
 4.  The survey will prompt you to install an application.
 
-     ![survey choice](../../images/deploy_application_survey.png)
+     ![survey choice](../../images/choco_survey.jpeg)
 
 5. Choose an application and press **NEXT**      
 
-     ![survey preview](../../images/survey_preview.png)
+     ![survey preview](../../images/choco_survey_preview.jpeg)
 
      Explain to audience what is happening here depending on audience persona
 
     **Persona A**: Technical audience that has written Ansible Playbooks before:
-    Surveys create variables that the Job can use within Ansible Playbooks. In this example a pre-defined list of applications that are tested and allowed on IT infrastructure.  The variable is named **application** and the value is **httpd** in this screenshot.
+    Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used for multiple installs instead of a job template for each app. In this case due to the multiple Select option you are not limited to 1 app but can select and install 2 or more apps at once. The survey also gives you the ability to select if the app will be installed, removed, or simply updated to the latest version. Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **choco_package** and **app_state**  with values of  **git** and **present** 
 
     **Persona B**: Decision maker audience, IT manager or above:
-    reiterate business values above.  This allows a non subject matter expert the ability to automate routine tasks.  They can't install applications that are not vetted and put within the survey.  In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
+    reiterate business values above.  This allows a non subject matter expert the ability to automate routine tasks within a Windows environment.  They can't install applications that are not vetted and put within the survey. Freeing them from the mundance and repeative task for application installation while maintaining the highest level of security and compliance across your organization. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
 
 6. Execute the job by pressing the green **LAUNCH** button
 
