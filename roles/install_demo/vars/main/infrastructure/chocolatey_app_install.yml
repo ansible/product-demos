@@ -1,7 +1,7 @@
 ---
 chocolatey_app_install:
   author: "David Rojas"
-  readme: "https://github.com/ansible/product-demos/blob/master/docs/infrastructure/deploy_application.md"
+  readme: "https://github.com/ansible/product-demos/blob/master/docs/infrastructure/chocolatey_app_install.md"
   category: infrastructure
   name: "INFRASTRUCTURE / Chocolatey App Install"
   description: "Install various application packages using Chocolatey from a survey"

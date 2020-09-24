@@ -78,11 +78,11 @@ Coming Soon
        - this pane can be expanded to take up entire browser window
        - Ansible Playbook can be downloaded for troubleshooting purposes
        - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/platform_task_breakdown.png)
+       ![task breakdown](../../images/choco_task_output.jpeg)
 
 8. Circle back and summarize
 
-     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the RHEL web nodes that the application was actually installed but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the boring and routine.  
+     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Windows hosts that the application(s) was actually installed but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
 
 
 
