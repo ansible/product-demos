@@ -22,9 +22,9 @@ chocolatey_app_install:
         default: git
         choices:
           - git
-          - 7-zip
+          - wireshark
           - googlechrome
-          - putty
+          - googledrive
           - vscode
       - type: multiplechoice
         question_name: What state do you want these applications in?
