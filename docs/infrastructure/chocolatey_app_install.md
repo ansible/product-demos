@@ -1,4 +1,4 @@
-# Demo: Deploy Application
+# Demo: Chocolatey App Install
 
 [Click here to return to master demo list](../../README.md#demo-repository)
 
