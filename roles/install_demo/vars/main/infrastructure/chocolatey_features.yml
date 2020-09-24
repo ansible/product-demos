@@ -14,7 +14,7 @@ chocolatey_features:
     name: Chocolatey Features Config
     description: Which feature do you want to select?
     spec:
-      - type: multichoice
+      - type: multiplechoice
         question_name: Select the feature you would like to enable or disable?
         question_description: Select one from the drop-down list
         variable: feature
