@@ -16,17 +16,17 @@ Demostrate how Anisble can be used to enable or disable features in Chocolatey
 
 # What business problem is solved?
 
-- **speed to market**:
-reducing human time to install Windows applications
-- **reduce human error**:
-automation of routine manual processes
-- **reduce complexity**:
-does not require a System Administrator familiar with the specific operating system to install the Application.  Automate and create a self service option to deploy software.
+- **Operational Efficiency**:
+  Ansible provides the ability to save dozen to hundreds of hours of reconfiguration work by systems admins through the configuration automation
+- **Increase Compliance**:
+  Ansible provides the means to get and stay in compliance throughout all your systems
+
+
   
 
 # Features show cased
 
-- Push button deployment
+- Configuration as code
 - Self Service IT - Surveys
 
 For description of these and other features of the Red Hat Ansible Automation Platform please refer to the [features README](../features.md)
@@ -43,25 +43,25 @@ Coming Soon
 
      ![job templates](../../images/templates.png)
 
-3. Click the rocket next to **INFRASTRUCTURE / Chocolatey App Install** to launch the Job
+3. Click the rocket next to **INFRASTRUCTURE / Chocolatey Features Config** to launch the Job
 
      ![rocket launch](../../images/rocket.png)
 
 4.  The survey will prompt you to install an application.
 
-     ![survey choice](../../images/choco_survey.jpeg)
+     ![survey choice](../../images/choco_features_survey.jpeg)
 
 5. Choose an application and press **NEXT**      
 
-     ![survey preview](../../images/choco_survey_preview.jpeg)
+     ![survey preview](../../images/choco_features_survey_preview.jpeg)
 
      Explain to audience what is happening here depending on audience persona
 
     **Persona A**: Technical audience that has written Ansible Playbooks before:
-    Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used for multiple installs instead of a job template for each app. In this case due to the multiple Select option you are not limited to 1 app but can select and install 2 or more apps at once. The survey also gives you the ability to select if the app will be installed, removed, or simply updated to the latest version. Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **choco_package** and **app_state**  with values of  **git** and **present** 
+    Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used to enable or disable any feature instead of having to create or maintain many job templates. The survey also gives you the ability to select if the feature will be enabled or disabled. Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **feature** and **state**  with values of  **virusCheck** and **enabled** 
 
     **Persona B**: Decision maker audience, IT manager or above:
-    reiterate business values above.  This allows a non subject matter expert the ability to automate routine tasks within a Windows environment.  They can't install applications that are not vetted and put within the survey. Freeing them from the mundance and repeative task for application installation while maintaining the highest level of security and compliance across your organization. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
+    reiterate business values above.  This allows a systems admin to automate the reconfiguration of Chocolatey in a low risk repeatable manner.  This will free up IT staff for larger more mission critical projecct all while reducing risk to your production operations. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
 
 6. Execute the job by pressing the green **LAUNCH** button
 
@@ -78,7 +78,7 @@ Coming Soon
        - this pane can be expanded to take up entire browser window
        - Ansible Playbook can be downloaded for troubleshooting purposes
        - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/choco_task_output.jpeg)
+       ![task breakdown](../../images/choco_features_task_output.jpeg)
 
 8. Circle back and summarize
 
