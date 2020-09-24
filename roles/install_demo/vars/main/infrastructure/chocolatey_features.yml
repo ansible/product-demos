@@ -23,7 +23,7 @@ chocolatey_features:
         choices:
           - checksumFiles
           - stopOnFirstPackageFailure
-          - autoInstaller
+          - autoUninstaller
           - virusCheck
       - type: multiplechoice
         question_name: What state do you want the feature in?
