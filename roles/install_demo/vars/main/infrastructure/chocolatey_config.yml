@@ -19,7 +19,7 @@ chocolatey_config:
         question_description: Select one from drop-down
         variable: config_item
         required: true
-        default: 
+        #default: 
         choices:
           - virusCheckMinimumPositives
           - commandExecutionTimeoutSeconds
@@ -38,7 +38,7 @@ chocolatey_config:
         question_description: This is free form as each parameter has different values
         variable: value
         required: true
-        default:  
+        #default:  
            
   #video: "https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED"
   project:
