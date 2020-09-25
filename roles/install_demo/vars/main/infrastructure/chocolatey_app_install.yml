@@ -1,5 +1,5 @@
 ---
-chocolatey_config:
+chocolatey_app_install:
   author: "David Rojas"
   readme: "https://github.com/ansible/product-demos/blob/master/docs/infrastructure/chocolatey_app_install.md"
   category: infrastructure
