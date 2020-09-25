@@ -3,13 +3,13 @@
 ## chose specific demo or choose all
 
 # SPECIFIC - example that installs just the deploy_application job template
-demo: chocolatey_config
+demo: azure_provision_vm
 
 # ALL - example that installs all demos
 # demo: all
 
 ## Ansible Tower login infomation
 my_tower_username: student1
-my_tower_password: 8cNP0QoWF02vr5
-my_tower_host: student1.88dc.open.redhat.com
+my_tower_password: 6nk4if5SHProkr
+my_tower_host: student1.a7d7.open.redhat.com
 workshop_type: windows
