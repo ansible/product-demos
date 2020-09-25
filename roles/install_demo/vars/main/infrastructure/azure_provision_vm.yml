@@ -7,7 +7,7 @@ azure_provision_vm:
   description: "Provision RHEL VM on Azure with Ansible Tower Survey and Environmental variables"
   job_type: "run"
   inventory: "Workshop Inventory"
-  playbook: "playbooks/infrastructure/azure-provision_vm.yml"
+  playbook: "playbooks/infrastructure/azure_provision_vm.yml"
   credential: "Workshop Credential"
   survey_enabled: true
   survey_spec:
