@@ -35,9 +35,9 @@ chocolatey_config:
           - absent  
       - type: text
         question_name: Enter the value for the parameter
-        question_description: This is free form as each parameter has different values
+        question_description: This is free form as each parameter has different values. Leave blank when setting as "absent"
         variable: value
-        required: true
+        required: false
         #default:  
            
   #video: "https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED"
