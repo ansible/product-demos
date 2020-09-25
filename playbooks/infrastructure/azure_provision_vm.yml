@@ -6,7 +6,7 @@
   hosts: localhost
   connection: local
   environment:
-    AZURE_AD_USER: ansible@colombianclimbergmail.onmicrosoft.com
+    AZURE_AD_USER: colombianclimber@gmail.com
     AZURE_PASSWORD: Zapata99!
     AZURE_SUBCRIPTION_ID: bb66f723-9eb9-405b-8063-2e722a5a5a45
   vars:
@@ -18,7 +18,7 @@
   tasks:
   - name: Create a resource group
     azure_rm_resourcegroup:
-      ad_user: ansible@colombianclimbergmail.onmicrosoft.com
+      ad_user: colombianclimber@gmail.com
       password: Zapata99!
       subscription_id: bb66f723-9eb9-405b-8063-2e722a5a5a45
       name: "{{ resource_group }}"
