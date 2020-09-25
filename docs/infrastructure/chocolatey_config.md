@@ -47,18 +47,23 @@ Coming Soon
 
      ![rocket launch](../../images/rocket.png)
 
-4.  The survey will prompt you to install an application.
+4.  The survey will prompt you with 3 questions. What Parameter you want to change, whether you want to make it present or absent in the config, and the value for that paramater.
 
-     ![survey choice](../../images/choco_features_survey.jpeg)
+     ![survey choice](../../images/choco_config_survey.jpeg)
 
-5. Choose an application and press **NEXT**      
+5. Choose a parameter. Select if you want to make it present or absent in the config. Finally, add the value for that parameter and press **NEXT** 
+   Note: These are just a few of the parameters they can add to the list. For these 3 see below for correct format for response.
+   **proxyUser** single text line such as drojas or student25
+   **commandExecutionTimeoutSeconds** interger value. 0 is infinite, 2700 is default, recomendation is 14400
+   **cacheLocation** text of a path to location on windows node such as c:\chocolatey_temp2
+   For more info on possible parameter see [Chocolatey Documentation](https://chocolatey.org/docs/chocolatey-configuration)
 
-     ![survey preview](../../images/choco_features_survey_preview.jpeg)
+     ![survey preview](../../images/choco_config_survey_preview.jpeg)
 
      Explain to audience what is happening here depending on audience persona
 
     **Persona A**: Technical audience that has written Ansible Playbooks before:
-    Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used to enable or disable any feature instead of having to create or maintain many job templates. The survey also gives you the ability to select if the feature will be enabled or disabled. Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **feature** and **state**  with values of  **virusCheck** and **enabled** 
+    Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used to enable or disable and set configuration values instead of having to create or maintain many job templates. Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **config-item**, **state**, and **value**  with values of  **cacheLocation**, **present**, and **c:\chocolatey_temp2**. These will be treated as extra vars and as such overirde any variables from any other source such as the playbook itself
 
     **Persona B**: Decision maker audience, IT manager or above:
     reiterate business values above.  This allows a systems admin to automate the reconfiguration of Chocolatey in a low risk repeatable manner.  This will free up IT staff for larger more mission critical projects all while reducing risk to your production operations. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
@@ -78,7 +83,7 @@ Coming Soon
        - this pane can be expanded to take up entire browser window
        - Ansible Playbook can be downloaded for troubleshooting purposes
        - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/choco_features_task_output.jpeg)
+       ![task breakdown](../../images/choco_config_task_output.jpeg)
 
 8. Circle back and summarize
 
