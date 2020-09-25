@@ -53,9 +53,11 @@ Coming Soon
 
 5. Choose a parameter. Select if you want to make it present or absent in the config. Finally, add the value for that parameter and press **NEXT** 
    Note: These are just a few of the parameters they can add to the list. For these 3 see below for correct format for response.
-   **proxyUser** single text line such as drojas or student25
-   **commandExecutionTimeoutSeconds** interger value. 0 is infinite, 2700 is default, recomendation is 14400
-   **cacheLocation** text of a path to location on windows node such as c:\chocolatey_temp2
+
+   - **proxyUser** single text line such as drojas or student25
+   - **commandExecutionTimeoutSeconds** interger value. 0 is infinite, 2700 is default, recomendation is 14400
+   - **cacheLocation** text of a path to location on windows node such as c:\chocolatey_temp2
+   
    For more info on possible parameter see [Chocolatey Documentation](https://chocolatey.org/docs/chocolatey-configuration)
 
      ![survey preview](../../images/choco_config_survey_preview.jpeg)
