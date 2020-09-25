@@ -26,7 +26,7 @@ azure_provision_vm:
         question_description: Select one from the drop-down
         variable: location
         required: true
-        default: useast 
+        default: eastus 
         choices:
           - eastus
           - eastus2   
