@@ -22,7 +22,6 @@ chocolatey_config:
         #default: 
         choices:
           - proxyUser
-          - proxyPassword
           - commandExecutionTimeoutSeconds
           - cacheLocation
       - type: multiplechoice
