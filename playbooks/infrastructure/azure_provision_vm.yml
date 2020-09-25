@@ -18,6 +18,9 @@
   tasks:
   - name: Create a resource group
     azure_rm_resourcegroup:
+      ad_user: ansible
+      password: Zapata99!
+      subscription_id: bb66f723-9eb9-405b-8063-2e722a5a5a45
       name: "{{ resource_group }}"
       location: "{{ location }}"
   - name: Create virtual network
