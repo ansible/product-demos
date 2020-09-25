@@ -61,7 +61,7 @@ Coming Soon
     Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used to enable or disable any feature instead of having to create or maintain many job templates. The survey also gives you the ability to select if the feature will be enabled or disabled. Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **feature** and **state**  with values of  **virusCheck** and **enabled** 
 
     **Persona B**: Decision maker audience, IT manager or above:
-    reiterate business values above.  This allows a systems admin to automate the reconfiguration of Chocolatey in a low risk repeatable manner.  This will free up IT staff for larger more mission critical projecct all while reducing risk to your production operations. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
+    reiterate business values above.  This allows a systems admin to automate the reconfiguration of Chocolatey in a low risk repeatable manner.  This will free up IT staff for larger more mission critical projects all while reducing risk to your production operations. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
 
 6. Execute the job by pressing the green **LAUNCH** button
 
