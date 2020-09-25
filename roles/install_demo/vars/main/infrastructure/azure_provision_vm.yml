@@ -28,9 +28,9 @@ azure_provision_vm:
         required: true
         default: useast 
         choices:
-          - useast
-          - useast2   
-          - uswest
+          - eastus
+          - eastus2   
+          - westus
           - centralus
 
       - type: text
