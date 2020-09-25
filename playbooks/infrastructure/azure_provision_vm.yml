@@ -5,6 +5,10 @@
 - name: Create Azure VM
   hosts: localhost
   connection: local
+  environment:
+    AZURE_AD_USER: ansible
+    AZURE_PASSWORD: Zapata99!
+    AZURE_SUBCRIPTION_ID: bb66f723-9eb9-405b-8063-2e722a5a5a45
   vars:
     resource_group: "{{ resource_group_name }}"
     vm_name: testvm
@@ -58,7 +62,7 @@
       admin_password: Password@123
       network_interfaces: "{{ vm_name }}"
       image:
-        offer: UbuntuServer
-        publisher: Canonical
-        sku: 16.04-LTS
+        offer: RHEL
+        publisher: RedHat
+        sku: 7-LVM
         version: latest
