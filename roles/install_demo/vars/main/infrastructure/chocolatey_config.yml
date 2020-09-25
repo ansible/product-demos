@@ -21,7 +21,8 @@ chocolatey_config:
         required: true
         #default: 
         choices:
-          - virusCheckMinimumPositives
+          - proxyUser
+          - proxyPassword
           - commandExecutionTimeoutSeconds
           - cacheLocation
       - type: multiplechoice
