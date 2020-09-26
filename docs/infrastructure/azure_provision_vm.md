@@ -64,8 +64,7 @@ Coming Soon
 
 5. Enter values and press **NEXT**      
 
-     ![survey preview](../../images/azure_provision_vm
-     _survey_preview.jpeg)
+     ![survey preview](../../images/azure_provision_vm_survey_preview.jpeg)
 
      Explain to audience what is happening here depending on audience persona
 
