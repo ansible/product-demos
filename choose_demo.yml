@@ -13,3 +13,11 @@ my_tower_username: student1
 my_tower_password: 6nk4if5SHProkr
 my_tower_host: student1.a7d7.open.redhat.com
 workshop_type: windows
+
+#only uncomment these for setting up an Azure Cloud Demo 
+azure_demo: True
+my_subscription:
+my_tenant:
+my_client:
+my_secret:
+

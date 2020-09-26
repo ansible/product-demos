@@ -37,6 +37,23 @@ Coming Soon
 
 # Guide
 
+0. Create Service Principal:
+Azure Active Directory
+App Registration
+new registartion
+enter name and defautl all else click register
+get client Id and tenatn id Alrady have sub ID
+go to subscriptions
+select Access Cntrol
+add role with contributor adn select new app reg
+go back to active dir
+app reg
+cert and secrets
+new clietn secret
+get clietn secret value only chance
+now build cred in Tower
+add cred to job temp
+
 1. Login to Ansible Platform UX
 
 2. Navigate to **Templates**
