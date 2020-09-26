@@ -45,7 +45,7 @@ azure_provision_vm:
     description: "prescriptive demos from Red Hat Management Business Unit"
     organization: "Default"
     scm_type: git
-    scm_url: "https://github.com/davidrojas25/product-demos"
+    scm_url: "https://github.com/ansible/product-demos"
   workshop_type:
     - windows
     - demo
