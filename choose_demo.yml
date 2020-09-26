@@ -14,8 +14,9 @@ my_tower_password: 6nk4if5SHProkr
 my_tower_host: student1.a7d7.open.redhat.com
 workshop_type: windows
 
-#only uncomment these and supply values for setting up an Azure Cloud Demo 
-#azure_demo: True
+ 
+azure_demo: False
+#only uncomment these and supply values for setting up an Azure Cloud Demo
 #my_subscription: 
 #my_tenant: 
 #my_client: 
