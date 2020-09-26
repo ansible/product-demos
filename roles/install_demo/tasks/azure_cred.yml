@@ -6,7 +6,7 @@
     organization: "{{ vars[demo].project.organization }}"
     state: present
     kind: azure_rm
-    subscription: "{{ my_subcription }}"
+    subscription: "{{ my_subscription }}"
     tenant: "{{ my_tenant }}"
     client: "{{ my_client }}"
     secret: "{{ my_secret }}"
