@@ -16,8 +16,8 @@ workshop_type: windows
 
 #only uncomment these for setting up an Azure Cloud Demo 
 azure_demo: True
-my_subscription:
-my_tenant:
-my_client:
-my_secret:
+my_subscription: bb66f723-9eb9-405b-8063-2e722a5a5a45
+my_tenant: bbe51e50-8759-4cc0-93f7-71985d8dbddf
+my_client: 7e7d5fd3-c84b-4f37-ae96-cf474f4aa573
+my_secret: K1S5~EqpmvG68iKw4w-b1hmn3~yROfHM_I
 
