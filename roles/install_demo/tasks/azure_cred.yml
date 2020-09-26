@@ -1,7 +1,7 @@
 ---
 - name: add azure credential
   tower_credential:
-    name: azure credential
+    name: azure_credential
     description: Azure Service Principle 
     organization: "{{ vars[demo].project.organization }}"
     state: present
@@ -15,7 +15,7 @@
     tower_host: "{{ my_tower_host }}"
 
 - name: setting the new azure cred to cloud cred var
-  my_cloud_cred: azure credential 
+  my_cloud_cred: azure_credential 
   
       
 
