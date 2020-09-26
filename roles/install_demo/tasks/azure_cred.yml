@@ -15,7 +15,8 @@
     tower_host: "{{ my_tower_host }}"
 
 - name: setting the new azure cred to cloud cred var
-  my_cloud_cred: azure_credential 
+  set_fact:
+   my_cloud_cred: azure_credential 
   
       
 
