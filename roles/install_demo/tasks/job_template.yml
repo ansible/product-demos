@@ -42,8 +42,9 @@
     project: "{{ vars[demo].project.name }}"
     playbook: "{{ vars[demo].playbook }}"
     fact_caching_enabled: "{{ vars[demo].fact_caching_enabled | default('false') }}"
-    credential: "{{ vars[demo].credential }}"
-    cloud_credential: "{{ my_cloud_cred | default(omit) }}"
+    credential: 
+      - "{{ vars[demo].credential }}"
+      - "{{ my_cloud_cred | default(omit) }}"
     survey_enabled: "{{ vars[demo].survey_enabled }}"
     survey_spec: "{{ vars[demo].survey_spec }}"
     tower_username: "{{ my_tower_username }}"
