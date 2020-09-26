@@ -57,7 +57,7 @@ Coming Soon
    - **proxyUser** single text line such as drojas or student25
    - **commandExecutionTimeoutSeconds** interger value. 0 is infinite, 2700 is default, recomendation is 14400
    - **cacheLocation** text of a path to location on windows node such as c:\chocolatey_temp2
-   
+
    For more info on possible parameter see [Chocolatey Documentation](https://chocolatey.org/docs/chocolatey-configuration)
 
      ![survey preview](../../images/choco_config_survey_preview.jpeg)
@@ -89,7 +89,7 @@ Coming Soon
 
 8. Circle back and summarize
 
-     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Windows hosts that the application(s) was actually installed but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
+     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Windows hosts that the configuration was actually changed but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
 
 
 

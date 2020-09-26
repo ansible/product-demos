@@ -47,11 +47,11 @@ Coming Soon
 
      ![rocket launch](../../images/rocket.png)
 
-4.  The survey will prompt you to install an application.
+4.  The survey will prompt you to install or remove a package.
 
      ![survey choice](../../images/choco_survey.jpeg)
 
-5. Choose an application and press **NEXT**      
+5. Choose a package or packages and press **NEXT**      
 
      ![survey preview](../../images/choco_survey_preview.jpeg)
 
@@ -82,7 +82,7 @@ Coming Soon
 
 8. Circle back and summarize
 
-     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Windows hosts that the application(s) was actually installed but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
+     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Windows hosts that the package(s) was actually installed but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
 
 
 

@@ -12,21 +12,21 @@
 
 # Objective
 
-Demostrate how anisble along with Chocolatey can install applciation packages to Windows nodes
+Demostrate how anisble can be used to provision a RHEL VM in the Azure Cloud
 
 # What business problem is solved?
 
 - **speed to market**:
-reducing human time to install Windows applications
+reducing human time to provision VMs
 - **reduce human error**:
-automation of routine manual processes
+stadardize and automation a complex set of steps to reduce human errors
 - **reduce complexity**:
-does not require a System Administrator familiar with the specific operating system to install the Application.  Automate and create a self service option to deploy software.
+does not require a System Administrator familiar with any cloud provider or its interface in order to provision any resources
   
 
 # Features show cased
 
-- Push button deployment
+- Push button cloud provisioning 
 - Self Service IT - Surveys
 
 For description of these and other features of the Red Hat Ansible Automation Platform please refer to the [features README](../features.md)
@@ -34,6 +34,7 @@ For description of these and other features of the Red Hat Ansible Automation Pl
 # Video
 
 Coming Soon
+
 # Installing Demo
 
 1. You will need to create a Service Principal following these [Azure Docs instructions](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal)
@@ -44,7 +45,7 @@ Coming Soon
  - my_tenant:
  - my_client:
  - my_secret:
- 
+
 # Guide
 
 1. Login to Ansible Platform UX
@@ -57,21 +58,22 @@ Coming Soon
 
      ![rocket launch](../../images/rocket.png)
 
-4.  The survey will prompt you to install an application.
+4.  The survey will prompt you to define the resource group, Azure region, name of the new VM.
 
-     ![survey choice](../../images/choco_survey.jpeg)
+     ![survey choice](../../images/azure_provision_vm_survey.jpeg)
 
-5. Choose an application and press **NEXT**      
+5. Enter values and press **NEXT**      
 
-     ![survey preview](../../images/choco_survey_preview.jpeg)
+     ![survey preview](../../images/azure_provision_vm
+     _survey_preview.jpeg)
 
      Explain to audience what is happening here depending on audience persona
 
     **Persona A**: Technical audience that has written Ansible Playbooks before:
-    Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used for multiple installs instead of a job template for each app. In this case due to the multiple Select option you are not limited to 1 app but can select and install 2 or more apps at once. The survey also gives you the ability to select if the app will be installed, removed, or simply updated to the latest version. Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **choco_package** and **app_state**  with values of  **git** and **present** 
+    Ansible can be used for more than on prem infrustructure it can also be used to provision many resource on the public clouds. Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used for reoccuring RHEL provisioning in various Aure regions instead of a job template for each region or VM provisioned.  Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **resource_group**, **location**, and **vm_name** with the values of testdemorg7, eastus, and test-server07.
 
     **Persona B**: Decision maker audience, IT manager or above:
-    reiterate business values above.  This allows a non subject matter expert the ability to automate routine tasks within a Windows environment.  They can't install applications that are not vetted and put within the survey. Freeing them from the mundance and repeative task for application installation while maintaining the highest level of security and compliance across your organization. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
+    reiterate business values above.  This allows a non Azure Cloud expert the ability to automate routine tasks within a cloud environment.  They can't provision servers that are not vetted and put within the job template or to locations that are not preapproved within the Survey. Freeing them from the mundance and repeative task of VM provisioning while maintaining the highest level of security and compliance across your organization. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
 
 6. Execute the job by pressing the green **LAUNCH** button
 
@@ -88,11 +90,11 @@ Coming Soon
        - this pane can be expanded to take up entire browser window
        - Ansible Playbook can be downloaded for troubleshooting purposes
        - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/choco_task_output.jpeg)
+       ![task breakdown](../../images/azure_provision_vm_task_output.jpeg)
 
 8. Circle back and summarize
 
-     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Windows hosts that the application(s) was actually installed but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
+     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Azure Portal that the RHEL server was actually provisioned but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
 
 
 
