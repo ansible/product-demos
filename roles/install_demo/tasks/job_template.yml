@@ -42,7 +42,7 @@
     project: "{{ vars[demo].project.name }}"
     playbook: "{{ vars[demo].playbook }}"
     fact_caching_enabled: "{{ vars[demo].fact_caching_enabled | default('false') }}"
-    credential: 
+    credentials: 
       - "{{ vars[demo].credential }}"
       - "{{ my_cloud_cred | default(omit) }}"
     survey_enabled: "{{ vars[demo].survey_enabled }}"
