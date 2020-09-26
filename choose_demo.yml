@@ -9,16 +9,16 @@ demo: azure_provision_vm
 # demo: all
 
 ## Ansible Tower login infomation
-my_tower_username: student1
-my_tower_password: 6nk4if5SHProkr
-my_tower_host: student1.a7d7.open.redhat.com
-workshop_type: windows
+my_tower_username: colin  
+my_tower_password: mahalo
+my_tower_host: test.rhdemo.io
+workshop_type: rhel
 
 # leave as false unless you are deploying an Azure Demo 
-azure_demo: True
+azure_demo: False
 #only uncomment these and supply values for setting up an Azure Cloud Demo which means azure_demo: True above
-my_subscription: bb66f723-9eb9-405b-8063-2e722a5a5a45
-my_tenant: bbe51e50-8759-4cc0-93f7-71985d8dbddf
-my_client: 7e7d5fd3-c84b-4f37-ae96-cf474f4aa573
-my_secret: K1S5~EqpmvG68iKw4w-b1hmn3~yROfHM_I 
+#my_subscription: 
+#my_tenant: 
+#my_client: 
+#my_secret: 
 
