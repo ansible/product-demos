@@ -1,0 +1,83 @@
+- name: "include the variables from {{ my_vip_varsfile }}"
+  include_vars: "{{ my_vip_varsfile }}"
+
+- name: Setup provider
+  set_fact:
+    provider:
+      server: "{{private_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "8443"
+      validate_certs: "no"
+
+- name: CREATE NODES
+  bigip_node:
+    provider: "{{provider}}"
+    host: "{{hostvars[loop_create_nodes].ansible_host}}"
+    name: "{{hostvars[loop_create_nodes].inventory_hostname}}"
+  loop: "{{ groups['web'] }}"
+  loop_control:
+    loop_var: loop_create_nodes
+  when: app_exists
+
+- name: "CREATE POOL {{ app_poolname }}"
+  bigip_pool:
+    provider: "{{provider}}"
+    name: "{{ app_poolname }}"
+    lb_method: "round-robin"
+    monitors: "/Common/http"
+    monitor_type: "and_list"
+  when: app_exists
+
+- name: "ADD POOL MEMBERS to {{ app_poolname }}"
+  bigip_pool_member:
+    provider: "{{provider}}"
+    state: "present"
+    name: "{{hostvars[loop_pool_members].inventory_hostname}}"
+    host: "{{hostvars[loop_pool_members].ansible_host}}"
+    port: "80"
+    pool: "{{ app_poolname }}"
+  loop: "{{ groups['web'] }}"
+  loop_control:
+    loop_var: loop_pool_members
+  when: app_exists
+
+- name: "CREATE VIRTUAL SERVER {{ app_vipname }}"
+  bigip_virtual_server:
+    provider: "{{provider}}"
+    name: "{{ app_vipname }}"
+    destination: "{{private_ip}}"
+    port: "{{ app_portnum }}"
+    enabled_vlans: "all"
+    all_profiles: ['http', 'clientssl', 'oneconnect']
+    pool: "{{ app_poolname }}"
+    snat: "Automap"
+  when: app_exists
+
+## DELETE GOES BELOW HERE
+- name: "DELETE VIRTUAL SERVER {{ app_vipname }}"
+  bigip_virtual_server:
+    provider: "{{provider}}"
+    name: "{{ app_vipname }}"
+    state: absent
+  when: not app_exists
+
+- name: "DELETE POOL {{ app_poolname }}"
+  bigip_pool:
+    provider: "{{provider}}"
+    name: "{{ app_poolname }}"
+    state: absent
+  when: not app_exists
+
+- name: DELETE NODES
+  bigip_node:
+    provider: "{{provider}}"
+    name: "{{hostvars[loop_del_hostvars].inventory_hostname}}"
+    state: absent
+  loop: "{{ groups['web'] }}"
+  loop_control:
+    loop_var: loop_del_hostvars
+  when: not app_exists
+  ignore_errors: true
+  failed_when: no
+

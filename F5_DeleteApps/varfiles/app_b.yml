@@ -1,0 +1,6 @@
+---
+app_poolname: BravoPool
+app_vipname: BravoVip
+app_portnum: '4432'
+app_exists: false
+

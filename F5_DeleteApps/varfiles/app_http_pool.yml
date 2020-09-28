@@ -1,0 +1,5 @@
+app_poolname: http_pool
+app_vipname: vip
+app_portnum: '443'
+app_exists: false
+
