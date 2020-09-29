@@ -1,0 +1,12 @@
+---
+- name: Reset to before wordpress was installed
+  hosts: all
+  become: true
+
+  vars:
+    - main_purpose: reset
+     - webhostname: localhost
+     - dbhostname: localhost
+
+  roles:
+    - role: wordpress-server

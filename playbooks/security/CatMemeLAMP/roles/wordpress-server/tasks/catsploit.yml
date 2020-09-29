@@ -1,0 +1,37 @@
+# OPTIONAL exploits pieces for security demos
+---
+#  /var/www/wordpress-root/wp-content/themes/twentyseventeen-catsploit/' must be an existing dir",
+
+- name: "Make sure the directory exists for {{ wpwebpath }}/wp-content/themes/twentyseventeen-catsploit/"
+  file:
+    path: "{{ wpwebpath }}/wp-content/themes/twentyseventeen-catsploit/"
+    state: directory
+    mode: 0755
+    owner: apache
+    group: apache
+
+- name: Install the catsploit theme files
+  unarchive:
+    src: templates/twentyseventeen-catsploit.zip
+    dest: "{{ wpwebpath }}/wp-content/themes/"
+    owner: apache
+    group: apache
+
+#- name: Copy our exploits catsploit
+#  template:
+#    src: "templates/{{ item.name }}"
+#    dest: "{{ item.destdir }}/{{ item.name }}"
+#    mode: "{{ item.chmod }}"
+#    owner: "{{ item.user }}"
+#    group: "{{ item.group }}"
+#  with_items:
+#    - { name: "cat_meme_takeover.sh", destdir: "/tmp", chmod: "0755", user: "root", group: "wheel" }
+#    - { name: "cat_meme_takeover.sql", destdir: "/tmp", chmod: "0644", user: "root", group: "wheel" }
+
+- name: Make sure no unwanted old wordpress themes exist.
+  file:
+    state: absent
+    path: "{{ item.name }}"
+  with_items:
+    - { name: "{{ wpwebpath }}/wp-content/themes/twentysixteen" }
+    - { name: "{{ wpwebpath }}/wp-content/themes/twentynineteen" }

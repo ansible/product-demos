@@ -1,0 +1,19 @@
+---
+- name: Software packages are present
+  yum:
+    name:
+      - nano
+      - mariadb
+    state: latest
+
+- name: Copy our exploits catsploit-tools to the workstation
+  template:
+    src: "templates/{{ item.name }}"
+    dest: "{{ item.destdir }}/{{ item.name }}"
+    mode: "{{ item.chmod }}"
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+  with_items:
+    - { name: "cat_meme_takeover.sh", destdir: "/var/www/html", chmod: "0755", user: "apache", group: "apache" }
+    - { name: "cat_meme_takeover.sql", destdir: "/var/www/html", chmod: "0644", user: "apache", group: "apache" }
+

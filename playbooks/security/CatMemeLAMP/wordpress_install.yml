@@ -1,0 +1,13 @@
+---
+- name: Deploy WordPress to lampweb and lampdb
+  hosts: all
+  become: true
+
+  vars:
+     - webhostname: 3.237.203.65
+     - dbhostname: 18.215.118.50
+#    - webhostname: "{{ hostvars['lampweb']['ansible_nodename'] }}"
+#    - dbhostname: "{{ hostvars['lampdb']['ansible_facts']['eth0']['ipv4']['address'] }}"
+
+  roles:
+    - role: wordpress-server

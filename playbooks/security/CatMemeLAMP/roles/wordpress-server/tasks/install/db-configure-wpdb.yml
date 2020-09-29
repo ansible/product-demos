@@ -1,0 +1,56 @@
+---
+- name: copy our wordpress template sql dumps
+  template:
+    src: templates/wordpress.sql
+    dest: /tmp/wordpress.sql
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Remove any existing database for {{ wpdbname }}"
+  mysql_db:
+    name: "{{ wpdbname }}"
+    state: absent
+
+- name: "Import database for {{ wpdbname }}"
+  mysql_db:
+    name: "{{ wpdbname }}"
+    state: import
+    target: /tmp/wordpress.sql
+
+- name: Create the user root with a password
+  mysql_user:
+    host: '%'
+    name: root
+    password: "{{ wpdbpass }}"
+    priv: '*.*:ALL'
+    update_password: always
+    state: present
+
+- name: Create the user root with no password
+  mysql_user:
+    host: '%'
+    name: root
+    password: ''
+    priv: '*.*:ALL'
+    update_password: always
+    state: present
+
+- name: "Create the user {{ wpdbuser }} for {{ wpdbname }}.*:ALL"
+  mysql_user:
+    host: '%'
+    name: "{{ wpdbuser }}"
+    password: "{{ wpdbpass }}"
+    priv: "{{ wpdbname }}.*:CREATE,DROP,DELETE,INSERT,SELECT,UPDATE"
+    update_password: always
+    state: present
+
+- name: "Create the dangerous root situation with WordPress.*:ALL"
+  mysql_user:
+    host: '%'
+    name: "insecure"
+    password: ''
+    priv: "{{ wpdbname }}.*:CREATE,DROP,DELETE,INSERT,SELECT,UPDATE"
+    update_password: always
+    state: present
+

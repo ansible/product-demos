@@ -1,0 +1,14 @@
+---
+- name: restarting mariadb if we freshly installed it
+  service:
+    name: mariadb.service
+    state: restarted
+    enabled: yes
+  when: wassvcmaria.stat.exists == False
+
+- name: making sure mariadb is started if it was already here before
+  service:
+    name: mariadb.service
+    state: started
+    enabled: yes
+  when: wassvcmaria.stat.exists == True

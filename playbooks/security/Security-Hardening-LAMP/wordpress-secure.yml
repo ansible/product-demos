@@ -1,0 +1,13 @@
+---
+- name: Lock down the accounts
+  hosts: lampdb
+
+  vars:
+
+  tasks:
+  - name: lock down accounts with blank password and world access
+    mysql_user:
+      name: insecure
+      password: ''
+      host: '%'
+      state: absent

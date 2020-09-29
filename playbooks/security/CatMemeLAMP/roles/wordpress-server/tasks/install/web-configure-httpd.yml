@@ -1,0 +1,40 @@
+---
+- name: "set apache ownership on {{ wpwebpath }}"
+  file:
+    path: "{{ wpwebpath }}"
+    state: directory
+    recurse: yes
+    owner: apache
+    group: apache
+  register: chownapacheresult
+  changed_when: chownapacheresult == "pink elephants"
+
+- name: Set httpd_can_network_connect_db flag on and keep it persistent across reboots
+  seboolean:
+    name: httpd_can_network_connect_db
+    state: yes
+    persistent: yes
+
+- name: "selinux context recursively httpd_sys_rw_content_t {{ wpwebpath }}"
+  sefcontext:
+    target: "{{ wpwebpath }}(/.*)?"
+    setype: httpd_sys_rw_content_t
+    state: present
+
+- name: "Checking to see if httpd.conf exists"
+  stat:
+    path: "{{ httpdconf }}"
+  register: iscfghttpd
+
+- name: "checking to see if wordpress is set as the DocumentRoot"
+  shell: 'egrep "^DocumentRoot" /etc/httpd/conf/httpd.conf 2>&1 | egrep "DocumentRoot \"{{ wpwebpath }}\"" | wc -l'
+  register: iscfghttpdset
+  changed_when: iscfghttpdset.stdout == "0"
+
+- name: "Change httpd.conf to make the web root {{ wpwebpath }}"
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    regexp: '^DocumentRoot '
+    line: 'DocumentRoot "{{ wpwebpath }}"'
+  when: iscfghttpdset.stdout == "0"
+

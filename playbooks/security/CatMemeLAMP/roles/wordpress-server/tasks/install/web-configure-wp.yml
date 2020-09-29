@@ -1,0 +1,58 @@
+---
+- set_fact:
+    wpconfigfile: "{{ wpwebpath }}/wp-config.php"
+
+- name: "Checking to see if {{ wpconfigfile }} already exists."
+  stat:
+    path: "{{ wpconfigfile }}"
+  register: iswpcfg
+
+- name: "Does {{ wpconfigfile }} web path exist"
+  debug:
+    msg: "{{ iswpcfg.stat.exists }}"
+
+- name: "copy config template into {{ wpconfigfile }}"
+  template:
+    src: templates/wp-config.php
+    dest: "{{ wpconfigfile }}"
+    owner: apache
+    group: apache
+    mode: 0644
+    backup: yes
+
+- set_fact:
+    myhostname: "{{ ansible_fqdn }}"
+
+- name: Conditionally use inventory_hostname for myhostname if this is an EC2 instance
+  set_fact:
+    myhostname: "{{ inventory_hostname }}"
+  when: ansible_product_version | regex_search('amazon')
+
+- name: copy graphics for our content
+  copy:
+    src: "templates/{{ item }}"
+    dest: "{{ wpwebpath }}/wp-content/themes/twentyseventeen/assets/images/{{ item }}"
+    owner: apache
+    group: apache
+    mode: 0644
+  with_items:
+    - automate_all_the_things.png
+    - header_ansible.jpg
+
+- name: copy our custom logo to the site
+  copy:
+    src: "{{ wpwebpath }}/wp-content/themes/twentyseventeen/assets/images/header_ansible.jpg"
+    dest: "{{ wpwebpath }}/wp-content/themes/twentyseventeen/assets/images/header.jpg"
+    remote_src: yes
+    owner: apache
+    group: apache
+    mode: 0644
+
+- name: add a random string so our header graphic has to load every time
+  template:
+    src: templates/custom-header.php
+    dest: "{{ wpwebpath }}/wp-content/themes/twentyseventeen/inc/custom-header.php"
+    owner: apache
+    group: apache
+    mode: 0644
+

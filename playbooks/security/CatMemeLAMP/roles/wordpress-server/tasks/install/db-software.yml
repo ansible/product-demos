@@ -1,0 +1,29 @@
+---
+- name: "Checking to see if mariadb is installed prior to us installing it"
+  stat:
+    path: "/usr/lib/systemd/system/mariadb.service"
+  register: wassvcmaria
+
+
+- name: Remove existing DB instances that might have conflicting configuration
+  yum:
+    name:
+      - mariadb
+      - mariadb-server
+    state: absent
+
+- name: Make sure no unwanted databases exist.
+  file:
+    state: absent
+    path: /var/lib/mysql/
+
+- name: Software packages are present
+  yum:
+    name:
+      - nano
+      - unzip
+      - python3-PyMySQL
+      - mariadb
+      - mariadb-server
+    state: latest
+  ignore_errors: true

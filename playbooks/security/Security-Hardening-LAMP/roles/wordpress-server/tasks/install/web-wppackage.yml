@@ -1,0 +1,36 @@
+---
+- name: "Checking to see if {{ wptmppath }} already exists."
+  stat:
+    path: "{{ wptmppath }}"
+  register: iswptmppath
+
+- name: "Clear the tmp location {{ wptmppath }} if necessary"
+  file:
+    path: "{{ wptmppath }}"
+    state: absent
+  when: iswptmppath.stat.exists == True
+
+- name: "Checking to see if {{ wpwebpath }} already exists."
+  stat:
+    path: "{{ wpwebpath }}"
+  register: iswpwebpath
+
+- name: download WP
+  get_url:
+    url: 'https://wordpress.org/wordpress-5.1.1.zip'
+    dest: "/tmp/latest.zip"
+    mode: 0644
+
+- name: "unarchive wordpress latest to {{ wpdlpath }}"
+  unarchive:
+    src: "/tmp/latest.zip"
+    dest: "/tmp/"
+    remote_src: True
+  when: iswpwebpath.stat.exists == False
+
+- name: "Copy files from {{ wpdlpath }} to {{ wpwebpath }}"
+  command: "/bin/mv {{ wpdlpath }}/wordpress/ {{ wpwebpath }}"
+  args:
+    creates: "{{ wpwebpath }}"
+  when: iswpwebpath.stat.exists == False
+

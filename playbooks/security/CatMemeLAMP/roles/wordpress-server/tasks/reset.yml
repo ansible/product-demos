@@ -1,0 +1,42 @@
+- name: reset to original state
+  debug:
+    msg: This is a playbook to reset this system to its original state.
+
+- name: Remove existing DB instances that might have conflicting configuration
+  yum:
+    name:
+      - mariadb
+      - mariadb-server
+    state: absent
+
+- name: Make sure no unwanted databases exist.
+  file:
+    state: absent
+    path: /var/lib/mysql/
+
+- name: Make sure no unwanted httpd artifacts exist /etc/httpd
+  file:
+    state: absent
+    path: /etc/httpd
+
+- name: Make sure no unwanted httpd artifacts exist /var/www
+  file:
+    state: absent
+    path: /var/www/
+
+- name: Make sure no unwanted Wordpress download artifacts exist /var/www
+  file:
+    state: absent
+    path: "/tmp/latest.zip"
+
+
+- name: Software packages are absent
+  yum:
+    name:
+      - httpd
+      - php
+      - php-mysql
+      - mariadb
+      - mariadb
+      - mariadb-server
+    state: absent

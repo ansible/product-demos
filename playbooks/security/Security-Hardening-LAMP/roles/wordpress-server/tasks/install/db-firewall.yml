@@ -1,0 +1,17 @@
+---
+- name: "checking to see if firewalld is running"
+  shell: 'pgrep firewalld | wc -l'
+  register: isfirewalldon
+  changed_when: no
+
+- name: enabling firewall rules
+  firewalld:
+    service: "{{ item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  with_items:
+    - mysql
+  ignore_errors: yes
+  when:  isfirewalldon.stdout > "0"
+

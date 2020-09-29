@@ -1,0 +1,6 @@
+---
+- include: db-firewall.yml
+- include: db-software.yml
+- include: db-services-initial.yml
+- include: db-configure-wpdb.yml
+- include: db-services-final.yml

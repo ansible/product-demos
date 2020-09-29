@@ -1,0 +1,14 @@
+---
+- name: restarting httpd if we freshly installed it
+  service:
+    name: httpd.service
+    state: restarted
+    enabled: yes
+  when: wassvchttpd.stat.exists == False
+
+- name: making sure httpd is started if it was already here before
+  service:
+    name: httpd.service
+    state: started
+    enabled: yes
+  when: wassvchttpd.stat.exists == True

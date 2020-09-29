@@ -1,0 +1,17 @@
+galaxy_info:
+  author: Kevin Holmes
+  description: Install a WordPress server
+  company: GoKEV
+
+  license: license GPLV3
+  min_ansible_version: 1.2
+
+  platforms:
+  - name: EL
+    versions:
+    - all
+    - 5
+    - 6
+    - 7
+  galaxy_tags: []
+dependencies: []
