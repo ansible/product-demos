@@ -1,0 +1,25 @@
+---
+- name: BIG-IP SETUP
+  hosts: lb
+  connection: local
+  gather_facts: false
+  serial: 1
+
+  tasks:
+  - name: Use a single pattern that contains a comma formatted as a list
+    raw: ls -1 ./varfiles/app_*yml
+    register: filenames
+
+  - name: loop each config filename
+    include: include-bigip-deploy-app.yml my_vip_varsfile="{{ item }}"
+    with_items: "{{ filenames.stdout_lines }}"
+
+  - name: SAVE RUNNING CONFIGURATION
+    bigip_config:
+      provider: "{{provider}}"
+      save: true
+
+  - name: "Now check your F5 at {{ hostvars['f5']['ansible_host'] }}"
+    debug:
+      msg: "Now, log in to the F5 virtual appliance at https://{{ hostvars['f5']['ansible_host'] }}:8443    username: admin     password: {{ hostvars['f5']['ansible_ssh_pass'] }}     THEN NAVIGATE TO: Local Traffic --> Network Map"
+

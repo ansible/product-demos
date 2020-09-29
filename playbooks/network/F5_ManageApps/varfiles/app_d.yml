@@ -1,0 +1,5 @@
+---
+app_poolname: DeltaPool
+app_vipname: DeltaVip
+app_portnum: '4434'
+app_exists: true
