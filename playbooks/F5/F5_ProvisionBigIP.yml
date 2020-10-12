@@ -1,0 +1,18 @@
+---
+- name: Provision BIG-IP
+  hosts: f5
+  connection: local
+
+  tasks:
+    - name: Provision ASM at "nominal" level
+      bigip_provision:
+        module: asm
+        level: nominal
+        provider:
+          server: "{{ ansible_host }}"
+          server_port: "{{ bigip_port }}"
+          user: "{{ bigip_username }}"
+          password: "{{ bigip_password }}"
+          validate_certs: "{{ validate_certs }}"
+      delegate_to: localhost
+

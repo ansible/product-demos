@@ -1,0 +1,19 @@
+---
+- name: Run tmsh commands
+  hosts: f5
+  connection: local
+
+  tasks:
+  - name: run multiple commands on remote nodes
+    bigip_command:
+      commands:
+        - show sys version
+        - list ltm virtual
+      provider:
+        server: "{{ ansible_host }}"
+        server_port: "{{ bigip_port }}"
+        user: "{{ bigip_username }}"
+        password: "{{ bigip_password }}"
+        validate_certs: "{{ validate_certs }}"
+    delegate_to: localhost
+

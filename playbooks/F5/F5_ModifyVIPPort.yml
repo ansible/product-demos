@@ -1,0 +1,20 @@
+---
+- name: Modify the virtual server’s port
+  hosts: f5
+  connection: local
+
+  tasks:
+  - name: Modify virtual server port
+    bigip_virtual_server:
+      name: VS1
+      partition: Common
+      port: 8080
+      state: present
+      provider:
+        server: "{{ ansible_host }}"
+        server_port: "{{ bigip_port }}"
+        user: "{{ bigip_username }}"
+        password: "{{ bigip_password }}"
+        validate_certs: "{{ validate_certs }}"
+    delegate_to: localhost
+

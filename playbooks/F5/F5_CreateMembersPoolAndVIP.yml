@@ -1,0 +1,56 @@
+---
+- name: Create pool members, a pool, and a virtual server
+  hosts: f5
+  connection: local
+
+  tasks:
+    - name: Create a pool
+      bigip_pool:
+        lb_method: ratio-member
+        name: web_pool
+        slow_ramp_time: 120
+        provider:
+          server: "{{ ansible_host }}"
+          server_port: "{{ bigip_port }}"
+          user: "{{ bigip_username }}"
+          password: "{{ bigip_password }}"
+          validate_certs: "{{ validate_certs }}"
+      delegate_to: localhost
+
+    - name: Create nodes and add them to the pool
+      bigip_pool_member:
+        description: webserver-1
+        host: "{{ item.host }}"
+        pool: web_pool
+        port: 80
+        provider:
+          server: "{{ ansible_host }}"
+          server_port: "{{ bigip_port }}"
+          user: "{{ bigip_username }}"
+          password: "{{ bigip_password }}"
+          validate_certs: "{{ validate_certs }}"
+      delegate_to: localhost
+      with_items:
+        - host: "{{ web1 }}"
+        - host: "{{ web2 }}"
+
+    - name: Create a virtual server and add the pool to it
+      bigip_virtual_server:
+        description: virtual server
+        destination: "{{ ansible_host }}"
+        name: VS1
+        pool: web_pool
+        port: 80
+        snat: Automap
+        all_profiles:
+          - http
+          - clientssl
+        provider:
+          server: "{{ ansible_host }}"
+          server_port: "{{ bigip_port }}"
+          user: "{{ bigip_username }}"
+          password: "{{ bigip_password }}"
+          validate_certs: "{{ validate_certs }}"
+      delegate_to: localhost
+
+

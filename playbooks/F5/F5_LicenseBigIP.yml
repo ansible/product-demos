@@ -1,0 +1,21 @@
+---
+- name: License BIG-IP
+  hosts: f5
+  connection: local
+
+  vars:
+    bigip_license: "XXXXX-XXXXX-XXXXX-XXXXX-XXXXXXX"
+
+  tasks:
+    - name: License BIG-IP
+      bigip_device_license:
+        key: "{{ bigip_license }}"
+        provider:
+          server: "{{ ansible_host }}"
+          server_port: "{{ bigip_port }}"
+          user: "{{ bigip_username }}"
+          password: "{{ bigip_password }}"
+          validate_certs: "{{ validate_certs }}"
+          server_port: "{{ bigip_port }}"
+      delegate_to: localhost
+

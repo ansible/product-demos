@@ -1,0 +1,20 @@
+---
+- name: Import SSL certificates
+  hosts: f5
+  connection: local
+
+  tasks:
+  - name: Import PEM Certificate from local disk
+    bigip_ssl_certificate:
+      name: certificate-name
+      cert_src: "{{ path_to_cert }}"
+      key_src: "{{ path_to_key }}"
+      state: present
+      provider:
+        server: "{{ ansible_host }}"
+        server_port: "{{ bigip_port }}"
+        user: "{{ bigip_username }}"
+        password: "{{ bigip_password }}"
+        validate_certs: "{{ validate_certs }}"
+    delegate_to: localhost
+
