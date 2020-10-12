@@ -1,0 +1,9 @@
+---
+app_poolname: AppName	# Name your app without spaces in the name
+app_vipname: VIPName	# Name your VIP without spaces in the name
+app_portnum: '4431'	# Make this a unique port that isn't in use by another app
+app_exists: true	# true=create it on the F5.  false=delete from the F5.
+
+
+##  Make sure to save your configuration file with the name: app_SOMETHING.yml.
+##  The playbook is scanning ONLY for files that match  ---->  app_*yml
