@@ -49,11 +49,11 @@ Coming Soon
 
 4.  The survey will prompt you to install or remove a package.
 
-     ![survey choice](../../images/choco_survey.jpeg)
+     ![survey choice](../../images/choco_app_install/choco_survey.jpeg)
 
 5. Choose a package or packages and press **NEXT**      
 
-     ![survey preview](../../images/choco_survey_preview.jpeg)
+     ![survey preview](../../images/choco_app_install/choco_survey_preview.jpeg)
 
      Explain to audience what is happening here depending on audience persona
 
@@ -78,7 +78,7 @@ Coming Soon
        - this pane can be expanded to take up entire browser window
        - Ansible Playbook can be downloaded for troubleshooting purposes
        - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/choco_task_output.jpeg)
+       ![task breakdown](../../images/choco_app_install/choco_task_output.jpeg)
 
 8. Circle back and summarize
 

@@ -49,7 +49,7 @@ Coming Soon
 
 4.  The survey will prompt you with 3 questions. What Parameter you want to change, whether you want to make it present or absent in the config, and the value for that paramater.
 
-     ![survey choice](../../images/choco_config_survey.jpeg)
+     ![survey choice](../../images/choco_config/choco_config_survey.jpeg)
 
 5. Choose a parameter. Select if you want to make it present or absent in the config. Finally, add the value for that parameter and press **NEXT** 
    Note: These are just a few of the parameters they can add to the list. For these 3 see below for correct format for response.
@@ -60,7 +60,7 @@ Coming Soon
 
    For more info on possible parameter see [Chocolatey Documentation](https://chocolatey.org/docs/chocolatey-configuration)
 
-     ![survey preview](../../images/choco_config_survey_preview.jpeg)
+     ![survey preview](../../images/choco_config/choco_config_survey_preview.jpeg)
 
      Explain to audience what is happening here depending on audience persona
 
@@ -85,7 +85,7 @@ Coming Soon
        - this pane can be expanded to take up entire browser window
        - Ansible Playbook can be downloaded for troubleshooting purposes
        - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/choco_config_task_output.jpeg)
+       ![task breakdown](../../images/choco_config/choco_config_task_output.jpeg)
 
 8. Circle back and summarize
 

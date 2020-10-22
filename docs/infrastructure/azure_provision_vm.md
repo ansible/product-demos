@@ -39,12 +39,14 @@ Coming Soon
 
 1. You will need to create a Service Principal following these [Azure Docs instructions](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal)
 
-2. Then set the azure_demo variable to True. As well as provide the folowing variable values before loading this demo as shown below
+2. Then set the azure_demo variable to True. As well as provide the folowing variable values before loading this demo as shown below.
  - azure_demo: True
- - my_subscription: 
- - my_tenant:
- - my_client:
- - my_secret:
+ - my_subscription:
+ - my_tenant: 
+ - my_client: 
+ - my_secret: 
+
+ See sample file named choose_demmo_example_azure.yml
 
 # Guide
 
@@ -60,11 +62,11 @@ Coming Soon
 
 4.  The survey will prompt you to define the resource group, Azure region, name of the new VM.
 
-     ![survey choice](../../images/azure_provision_vm_survey.jpeg)
+     ![survey choice](../../images/azure_provision_vm/azure_provision_vm_survey.jpeg)
 
 5. Enter values and press **NEXT**      
 
-     ![survey preview](../../images/azure_provision_vm_survey_preview.jpeg)
+     ![survey preview](../../images/azure_provision_vm/azure_provision_vm_survey_preview.jpeg)
 
      Explain to audience what is happening here depending on audience persona
 
@@ -89,7 +91,7 @@ Coming Soon
        - this pane can be expanded to take up entire browser window
        - Ansible Playbook can be downloaded for troubleshooting purposes
        - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/azure_provision_vm_task_output.jpeg)
+       ![task breakdown](../../images/azure_provision_vm/azure_provision_vm_task_output.jpeg)
 
 8. Circle back and summarize
 
