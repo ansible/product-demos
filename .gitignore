@@ -1,3 +1,5 @@
 
 sean_login_info.yml
 .DS_Store
+choose_demo.yml
+.ansible.cfg

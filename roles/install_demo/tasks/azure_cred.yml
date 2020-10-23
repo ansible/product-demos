@@ -1,0 +1,21 @@
+---
+- name: add azure credential
+  tower_credential:
+    name: azure_credential
+    description: Azure Service Principle 
+    organization: "{{ vars[demo].project.organization }}"
+    state: present
+    kind: azure_rm
+    subscription: "{{ my_subscription }}"
+    tenant: "{{ my_tenant }}"
+    client: "{{ my_client }}"
+    secret: "{{ my_secret }}"
+    tower_username: "{{ my_tower_username }}"
+    tower_password: "{{ my_tower_password }}"
+    tower_host: "{{ my_tower_host }}"
+
+
+  
+      
+
+
