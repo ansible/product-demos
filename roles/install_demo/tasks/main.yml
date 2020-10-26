@@ -20,10 +20,10 @@
       - "demo must be defined and be one of: {{ demo_list }}"
       - "full list can be found on https://github.com/ansible/product-demos"
 
-- name: install Azure cred 
+- name: install Azure cred
   include_tasks: azure_cred.yml
   when:
-    - azure_demo == True
+    - azure_demo | bool
 
 - name: install all job templates
   include_tasks: job_template_loop.yml
