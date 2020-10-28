@@ -3,7 +3,7 @@
 ## chose specific demo or choose all
 
 # SPECIFIC - example that installs just the deploy_application job template
-demo: f5_new_nodes
+demo: f5_new_node
 
 # ALL - example that installs all demos
 # demo: all
