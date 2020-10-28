@@ -1,0 +1,21 @@
+---
+f5_new_nodes:
+  author: "David Rojas"
+  readme: "https://github.com/ansible/product-demos/blob/master/docs/infrastructure/chocolatey_app_install.md"
+  category: network
+  name: "NETWORK / f5 New Node"
+  description: "Define multiple new nodes"
+  job_type: "run"
+  inventory: "Workshop Inventory"
+  playbook: "playbooks/network/f5_new_node.yml"
+  credential: "Workshop Credential"
+  survey_enabled: false
+  project:
+    name: "Ansible official demo project"
+    description: "prescriptive demos from Red Hat Management Business Unit"
+    organization: "Default"
+    scm_type: git
+    scm_url: "https://github.com/davidrojas25/product-demos"
+  workshop_type:
+    - f5
+    - demo
