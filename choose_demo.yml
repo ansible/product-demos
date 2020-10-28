@@ -3,16 +3,16 @@
 ## chose specific demo or choose all
 
 # SPECIFIC - example that installs just the deploy_application job template
-demo: developer_report
+demo: f5_new_nodes
 
 # ALL - example that installs all demos
 # demo: all
 
 ## Ansible Tower login infomation
-my_tower_username: colin
-my_tower_password: mahalo
-my_tower_host: test.rhdemo.io
-workshop_type: rhel
+my_tower_username: admin
+my_tower_password: k8Eqnhe1Hn3tLw
+my_tower_host: student1.4908.open.redhat.com
+workshop_type: f5
 
 # leave as false unless you are deploying an Azure Demo 
 azure_demo: False
