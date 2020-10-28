@@ -1,5 +1,5 @@
 ---
-f5_new_nodes:
+f5_new_node:
   author: "David Rojas"
   readme: "https://github.com/ansible/product-demos/blob/master/docs/infrastructure/chocolatey_app_install.md"
   category: network
