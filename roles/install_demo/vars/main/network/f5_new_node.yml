@@ -1,8 +1,77 @@
 ---
-f5_new_node:
+f5_demo:
   author: "David Rojas"
   readme: "https://github.com/ansible/product-demos/blob/master/docs/infrastructure/chocolatey_app_install.md"
   category: network
+  job_templates:
+    f5_new_nodes:
+      name: 'F5 - add nodes'
+      description: 'add webserver nodes into F5 BIG-IP'
+      job_type: 'run'
+      inventory: 'Workshop Inventory'
+      playbook: '/playbooks/network/f5_new_node.yml'
+      credential: 'Workshop Credential'
+      survey_enabled: false
+      project:
+        name: 'Ansible Workshops Project'
+        description: 'official workshops from Ansible'
+        organization: 'Default'
+        scm_type: git
+        scm_url: 'https://github.com/davidrojas25/product-demos'
+      workshop_type:
+        - f5
+        - demo
+    f5_add_pool:
+      name: 'F5 - add pool'
+      description: 'add webserver nodes into F5 BIG-IP'
+      job_type: 'run'
+      inventory: 'Workshop Inventory'
+      playbook: 'playbooks/network/f5_add_pool.yml'
+      credential: 'Workshop Credential'
+      survey_enabled: false
+      project:
+        name: 'Ansible Workshops Project'
+        description: 'official workshops from Ansible'
+        organization: 'Default'
+        scm_type: git
+        scm_url: 'https://github.com/davidrojas25/product-demos'
+      workshop_type:
+        - f5
+        - demo
+    f5_add_pool_members:
+      name: 'F5 - add pool members'
+      description: 'add webserver nodes into pool'
+      job_type: 'run'
+      inventory: 'Workshop Inventory'
+      playbook: 'exercises/ansible_f5/1.4-add-pool-members/bigip-pool-members.yml'
+      credential: 'Workshop Credential'
+      survey_enabled: false
+      project:
+        name: 'Ansible Workshops Project'
+        description: 'official workshops from Ansible'
+        organization: 'Default'
+        scm_type: git
+        scm_url: 'https://github.com/ansible/workshops'
+      workshop_type:
+        - f5
+        - demo
+    f5_add_vip:
+      name: 'F5 - add virtual server'
+      description: 'create VIP and add pool to virtual server'
+      job_type: 'run'
+      inventory: 'Workshop Inventory'
+      playbook: 'exercises/ansible_f5/1.5-add-virtual-server/bigip-virtual-server.yml'
+      credential: 'Workshop Credential'
+      survey_enabled: false
+      project:
+        name: 'Ansible Workshops Project'
+        description: 'official workshops from Ansible'
+        organization: 'Default'
+        scm_type: git
+        scm_url: 'https://github.com/ansible/workshops'
+      workshop_type:
+        - f5
+        - demo
   name: "NETWORK / f5 New Node"
   description: "Define multiple new nodes"
   job_type: "run"
