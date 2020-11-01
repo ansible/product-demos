@@ -9,11 +9,10 @@ demo: azure_mysql_server
 # demo: all
 
 ## Ansible Tower login infomation
-my_tower_username: admin
-my_tower_password: k8Eqnhe1Hn3tLw
-my_tower_host: student1.4908.open.redhat.com
+my_tower_username: student1
+my_tower_password: eP9JZG7LdeMU84
+my_tower_host: student1.be66.open.redhat.com
 workshop_type: windows
-
 
 # leave as false unless you are deploying an Azure Demo 
 azure_demo: True

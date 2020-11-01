@@ -1,4 +1,4 @@
-# Demo: Azure Provision VM
+# Demo: Azure MySQL Server
 
 [Click here to return to master demo list](../../README.md#demo-repository)
 
@@ -12,12 +12,12 @@
 
 # Objective
 
-Demostrate how anisble can be used to provision a RHEL VM in the Azure Cloud
+Demostrate how anisble can be used to provision a MySQL server and Database in the Azure Cloud
 
 # What business problem is solved?
 
 - **speed to market**:
-reducing human time to provision VMs
+reducing human time to provision a database
 - **reduce human error**:
 standardize and automation a complex set of steps to reduce human errors
 - **reduce complexity**:
