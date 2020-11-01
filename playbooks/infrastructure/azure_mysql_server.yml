@@ -1,5 +1,12 @@
 ---
 - hosts: localhost
+  tasks:
+    - name: Prepare random postfix
+      set_fact:
+        rpfx: "{{ 1000 | random }}"
+      run_once: yes
+
+- hosts: localhost
   
   vars:
     resource_group: "{{ resource_group_name }}"
@@ -13,10 +20,6 @@
     -  azure.azcollection  
 
   tasks:
-    - name: Prepare random postfix
-      set_fact:
-        rpfx: "{{ 1000 | random }}"
-      run_once: yes
 
     - name: Create a resource group
       azure_rm_resourcegroup:
