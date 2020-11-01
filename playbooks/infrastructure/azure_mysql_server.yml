@@ -30,9 +30,6 @@
       azure_rm_mysqlserver:
         resource_group: "{{ resource_group }}"
         name: "{{ mysqlserver_name }}"
-        sku:
-          name: GP_Gen4_2
-          tier: GeneralPurpose
         location: "{{ location }}"
         version: 5.6
         enforce_ssl: True
