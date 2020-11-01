@@ -46,7 +46,7 @@ Coming Soon
  - my_client: 
  - my_secret: 
 
- See sample file named choose_demmo_example_azure.yml
+ See sample file named choose_demo_example_azure.yml
 
 # Guide
 
@@ -56,25 +56,25 @@ Coming Soon
 
      ![job templates](../../images/templates.png)
 
-3. Click the rocket next to **INFRASTRUCTURE / Chocolatey App Install** to launch the Job
+3. Click the rocket next to **INFRASTRUCTURE / Azure create a MySQL Server** to launch the Job
 
      ![rocket launch](../../images/rocket.png)
 
-4.  The survey will prompt you to define the resource group, Azure region, name of the new VM.
+4.  The survey will prompt you to define the resource group, Azure region, name MySQL database, and admin login for database.
 
-     ![survey choice](../../images/azure_provision_vm/azure_provision_vm_survey.jpeg)
+     ![survey choice](../../images/azure_mysql_server/azure_mysql_survey.jpeg)
 
 5. Enter values and press **NEXT**      
 
-     ![survey preview](../../images/azure_provision_vm/azure_provision_vm_survey_preview.jpeg)
+     ![survey preview](../../images/azure_mysql_server/azure_mysql_survey_preview.jpeg)
 
      Explain to audience what is happening here depending on audience persona
 
     **Persona A**: Technical audience that has written Ansible Playbooks before:
-    Ansible can be used for more than on prem infrustructure it can also be used to provision many resource on the public clouds. Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used for reoccuring RHEL provisioning in various Aure regions instead of a job template for each region or VM provisioned.  Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **resource_group**, **location**, and **vm_name** with the values of testdemorg7, eastus, and test-server07.
+    Ansible can be used for more than on prem infrustructure it can also be used to provision many resource on the public clouds. Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used for reoccuring database provisioning in various Azure regions instead of a job template for each region or mySQL provisioned.  Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **resource_group**, **location**, **sqlserver_name**, **admin_pw**, **and adminuser** with the values you entered
 
     **Persona B**: Decision maker audience, IT manager or above:
-    reiterate business values above.  This allows a non Azure Cloud expert the ability to automate routine tasks within a cloud environment.  They can't provision servers that are not vetted and put within the job template or to locations that are not preapproved within the Survey. Freeing them from the mundance and repeative task of VM provisioning while maintaining the highest level of security and compliance across your organization. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
+    reiterate business values above.  This allows a non Azure Cloud expert the ability to automate routine tasks within a cloud environment.  They can't provision servers that are not vetted and put within the job template or to locations that are not preapproved within the Survey. Freeing them from the mundance and repeative task of datebase provisioning while maintaining the highest level of security and compliance across your organization. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
 
 6. Execute the job by pressing the green **LAUNCH** button
 
@@ -91,11 +91,11 @@ Coming Soon
        - this pane can be expanded to take up entire browser window
        - Ansible Playbook can be downloaded for troubleshooting purposes
        - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/azure_provision_vm/azure_provision_vm_task_output.jpeg)
+       ![task breakdown](../../images/azure_mysql_server/azure_mysql_task_output.jpeg)
 
 8. Circle back and summarize
 
-     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Azure Portal that the RHEL server was actually provisioned but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
+     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Azure Portal that the MySQL server database was actually provisioned but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
 
 
 

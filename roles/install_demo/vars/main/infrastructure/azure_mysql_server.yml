@@ -42,13 +42,13 @@ azure_mysql_server:
 
       - type: text
         question_name: Set the name of the Admin user
-        question_description: this will be used to login to your mySql
+        question_description: This will be used to login to your mySql. Do not use Admin or other reserved names
         variable: admin_user
         required: true
 
       - type: password
         question_name: Set the admin password to use
-        question_description: This will be used to login to your mySQL
+        question_description: This will be used to login to your mySQL. Must be at least 8 characters long, must contain upper adn lower case, numbers, and special character.
         variable: admin_pw
         required: true    
   #video: "https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED"
