@@ -1,4 +1,4 @@
-# Demo: Chocolatey App Install
+# Demo: Windows Use Regedit to update legal notice
 
 [Click here to return to master demo list](../../README.md#demo-repository)
 
@@ -12,16 +12,16 @@
 
 # Objective
 
-Demostrate how anisble along with Chocolatey can install applciation packages to Windows nodes
+Demostrate how anisble can be used to automate the updating of Windows registry items such as the legal notice enterprise wide witth one simple playbook. 
 
 # What business problem is solved?
 
-- **speed to market**:
-reducing human time to install Windows applications
+- **speed to production**:
+reducing human time to make large scale changes across an enterprise
 - **reduce human error**:
 automation of routine manual processes
 - **reduce complexity**:
-does not require a System Administrator familiar with the specific operating system to install the Application.  Automate and create a self service option to deploy software.
+does not require a System Administrator to be familar with Ansible or even regedit. Provides a self services option to make technical changes to 1000's of devices
   
 
 # Features show cased
@@ -47,13 +47,13 @@ Coming Soon
 
      ![rocket launch](../../images/rocket.png)
 
-4.  The survey will prompt you to install or remove a package.
+4.  The survey will prompt you for the title and text of the legal notice.
 
-     ![survey choice](../../images/choco_app_install/choco_survey.jpeg)
+     ![survey choice](../../images/windows_regedit_legal_notice/windows_regedit_legal_survey.jpeg)
 
 5. Choose a package or packages and press **NEXT**      
 
-     ![survey preview](../../images/choco_app_install/choco_survey_preview.jpeg)
+     ![survey preview](../../images/windows_regedit_legal_notice/windows_regedit_legal_survey_preview.jpeg)
 
      Explain to audience what is happening here depending on audience persona
 
@@ -78,13 +78,19 @@ Coming Soon
        - this pane can be expanded to take up entire browser window
        - Ansible Playbook can be downloaded for troubleshooting purposes
        - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/choco_app_install/choco_task_output.jpeg)
+       ![task breakdown](../../images/windows_regedit_legal_notice/windows_regedit_legal_task_output.jpeg)
 
 8. Circle back and summarize
 
-     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Windows hosts that the package(s) was actually installed but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
+     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Windows hosts that legal notice was actually changed but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
 
+9. Show new legal notice (optional)
 
+     Using some version of RDP you will need to connect to the windows host. The info needed to connect can be found within "inventories" You will need to navigate to Inventories first. Then click on "workshop inventory". Then click on "hosts". You should see your list of hosts. Click on your windows host which will give you the host IP, the username and the password required to connect via RDP.
+
+     ![Inventory Hosts](../../images/windows_regedit_legal_notice/windows_regedit_legal_host_info.jpeg)
+
+     Once you connect you will see both the title and text first thing. It should match what you updated it to.
 
 ---
 You have finished this demo.  [Click here to return to master demo list](../../README.md#demo-repository)
