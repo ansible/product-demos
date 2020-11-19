@@ -58,10 +58,10 @@ Coming Soon
      Explain to audience what is happening here depending on audience persona
 
     **Persona A**: Technical audience that has written Ansible Playbooks before:
-    Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used for multiple installs instead of a job template for each app. In this case due to the multiple Select option you are not limited to 1 app but can select and install 2 or more apps at once. The survey also gives you the ability to select if the app will be installed, removed, or simply updated to the latest version. Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **choco_package** and **app_state**  with values of  **git** and **present** 
+    Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used for any future updates. In this case you can update the title and test of the legal notice. Again saving you time and effort to modify the playbook directly each time you need to make an update.  In the screenshot you will see the variables are named **text_legal_notice** and **title_legal_notice**  with some default values but the admin can modify them as they need. 
 
     **Persona B**: Decision maker audience, IT manager or above:
-    reiterate business values above.  This allows a non subject matter expert the ability to automate routine tasks within a Windows environment.  They can't install applications that are not vetted and put within the survey. Freeing them from the mundance and repeative task for application installation while maintaining the highest level of security and compliance across your organization. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
+    reiterate business values above.  This allows a non subject matter expert the ability to automate routine tasks within a Windows environment.  They can make these changes on all windows devices with one run. Freeing them from the mundance and repeative task for application installation while maintaining the highest level of security and compliance across your organization. They can do all this with little to no risk as no chance of a fat-finger mistake which in regedit can be disasterous. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
 
 6. Execute the job by pressing the green **LAUNCH** button
 
@@ -88,7 +88,7 @@ Coming Soon
 
      Using some version of RDP you will need to connect to the windows host. The info needed to connect can be found within "inventories" You will need to navigate to Inventories first. Then click on "workshop inventory". Then click on "hosts". You should see your list of hosts. Click on your windows host which will give you the host IP, the username and the password required to connect via RDP.
 
-     ![Inventory Hosts](../../images/windows_regedit_legal_notice/windows_regedit_legal_host_info.jpeg)
+     ![Inventory Hosts](../../images/windows_regedit_legal_notice/windows_regedit_legal_host_info.jpg)
 
      Once you connect you will see both the title and text first thing. It should match what you updated it to.
 
