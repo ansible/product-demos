@@ -43,7 +43,7 @@ Coming Soon
 
      ![job templates](../../images/templates.png)
 
-3. Click the rocket next to **INFRASTRUCTURE / Chocolatey App Install** to launch the Job
+3. Click the rocket next to **INFRASTRUCTURE / Windows regedit legal notice** to launch the Job
 
      ![rocket launch](../../images/rocket.png)
 
@@ -51,7 +51,7 @@ Coming Soon
 
      ![survey choice](../../images/windows_regedit_legal_notice/windows_regedit_legal_survey.jpeg)
 
-5. Choose a package or packages and press **NEXT**      
+5. Type in the Tile and Text and press **NEXT**      
 
      ![survey preview](../../images/windows_regedit_legal_notice/windows_regedit_legal_survey_preview.jpeg)
 
