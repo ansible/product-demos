@@ -18,8 +18,8 @@ workshop_type: windows
 azure_demo: False
 aws_demo: True
 #only uncomment these and supply values for setting up an Azure Cloud Demo which means azure_demo: True above
-my_access_key: AKIAJVR52EEA6VHWIYRA
-my_secret_key: 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
+my_access_key: 
+my_secret_key: 
 
 
 
