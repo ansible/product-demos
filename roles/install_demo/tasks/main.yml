@@ -25,6 +25,11 @@
   when:
     - azure_demo == True
 
+- name: install AWS cred 
+  include_tasks: aws_cred.yml
+  when:
+    - aws_demo == True    
+
 - name: install all job templates
   include_tasks: job_template_loop.yml
   loop: "{{ full_demo_info }}"

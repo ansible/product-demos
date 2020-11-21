@@ -1,0 +1,27 @@
+---
+## example file for how to choose a demo
+## chose specific demo or choose all
+
+# SPECIFIC - example that installs just the deploy_application job template
+demo: aws_provision_vm
+
+# ALL - example that installs all demos
+# demo: all
+
+## Ansible Tower login infomation
+my_tower_username: drojas  
+my_tower_password: zapata
+my_tower_host: test.rhdemo.io
+workshop_type: windows
+
+# leave as false unless you are deploying an Azure Demo 
+azure_demo: False
+aws_demo: True
+#only uncomment these and supply values for setting up an Azure Cloud Demo which means azure_demo: True above
+my_access_key: AKIAJVR52EEA6VHWIYRA
+my_secret_key: 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
+
+
+
+ 
+

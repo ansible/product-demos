@@ -1,0 +1,57 @@
+- name: Create AWS resources
+  hosts: localhost
+  connection: local
+  gather_facts: False
+
+  collections:
+    - azure.azcollection
+
+  tasks:
+
+  - name: Setting the correct AMI per us-east-1
+    set_fact:
+      ami_id: ami-096fda3c22c1c990a
+    when: aws_region == us-east-1   
+
+  - name: Setting the correct AMI per us-east-1
+    set_fact:
+      ami_id: ami-09d9c5cdcfb8fc655
+    when: aws_region == us-west-1 
+
+  - name: create a new ec2 key pair
+    amazon.aws.ec2_key:
+      name: "{{ keypair }}"
+
+  - name: Create VPC 
+    amazon.aws.ec2_vpc_net:
+      name: "{{ vpc_name }}"
+      cidr_block: 10.10.0.0/16
+      region: "{{ aws_region }}" 
+    register: my_vpc  
+
+  - name: Create a security group
+    amazon.aws.ec2_group:
+      name: ansible
+      description: "Ansible Security Group"
+      region: "{{ aws_region }}"
+      vpc_id: "{{ my_vpc.id }}"
+      rules:
+        - proto: all
+          cidr_ip: 10.10.0.0/16
+        - proto: all
+          group_name: ansible
+      rules_egress:
+        - proto: all
+          cidr_ip: 0.0.0.0/0
+    register: firewall
+
+  - name: Create an EC2 instance
+    amazon.aws.ec2:
+      key_name: "{{ keypair }}"
+      region: "{{ aws_region }}"
+      group_id: "{{ firewall.group_id }}"
+      instance_type: "{{ instance_type }}"
+      image: "{{ ami_id }}"
+      wait: yes
+      name: "{{ instance_name }}"
+    register: ec2
