@@ -50,7 +50,7 @@
     ec2_instance:
       key_name: "{{ keypair }}"
       region: "{{ aws_region }}"
-      group_id: "{{ firewall.group_id }}"
+      security_group: "{{ firewall.group_id }}"
       instance_type: "{{ instance_type }}"
       image: "{{ ami_id }}"
       wait: yes
