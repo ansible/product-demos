@@ -35,7 +35,7 @@
       name: ansible
       description: "Ansible Security Group"
       region: "{{ aws_region }}"
-      vpc_id: "{{ my_vpc.id }}"
+      vpc_id: "{{ my_vpc.vpc.id }}"
       rules:
         - proto: all
           cidr_ip: 10.10.0.0/16
