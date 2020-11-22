@@ -1,5 +1,5 @@
 ---
-azure_provision_vm:
+aws_provision_vm:
   author: "David Rojas"
   readme: "https://github.com/ansible/product-demos/blob/master/docs/infrastructure/azure_provision_vm.md"
   category: infrastructure
