@@ -21,6 +21,7 @@
   - name: create a new ec2 key pair
     ec2_key:
       name: "{{ keypair }}"
+      region: "{{ aws_region }}"
 
   - name: Create VPC 
     ec2_vpc_net:
