@@ -52,7 +52,7 @@
       region: "{{ aws_region }}"
       security_group: "{{ firewall.group_id }}"
       instance_type: "{{ instance_type }}"
-      image: "{{ ami_id }}"
+      image_id: "{{ ami_id }}"
       wait: yes
       name: "{{ instance_name }}"
     register: ec2
