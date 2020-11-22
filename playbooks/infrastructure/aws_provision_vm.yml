@@ -47,7 +47,7 @@
     register: firewall
 
   - name: Create an EC2 instance
-    ec2:
+    ec2_instance:
       key_name: "{{ keypair }}"
       region: "{{ aws_region }}"
       group_id: "{{ firewall.group_id }}"
