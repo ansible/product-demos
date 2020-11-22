@@ -9,9 +9,9 @@ demo: aws_provision_vm
 # demo: all
 
 ## Ansible Tower login infomation
-my_tower_username: student1
-my_tower_password: 9lcbn8vYGp94Sm
-my_tower_host: student1.77af.open.redhat.com
+my_tower_username: drojas  
+my_tower_password: zapata
+my_tower_host: test.rhdemo.io
 workshop_type: windows
 
 # leave as false unless you are deploying an Azure Demo 
