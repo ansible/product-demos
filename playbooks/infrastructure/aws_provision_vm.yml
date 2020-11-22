@@ -19,18 +19,18 @@
     when: aws_region == us-west-1 
 
   - name: create a new ec2 key pair
-    amazon.aws.ec2_key:
+    ec2_key:
       name: "{{ keypair }}"
 
   - name: Create VPC 
-    amazon.aws.ec2_vpc_net:
+    ec2_vpc_net:
       name: "{{ vpc_name }}"
       cidr_block: 10.10.0.0/16
       region: "{{ aws_region }}" 
     register: my_vpc  
 
   - name: Create a security group
-    amazon.aws.ec2_group:
+    ec2_group:
       name: ansible
       description: "Ansible Security Group"
       region: "{{ aws_region }}"
@@ -46,7 +46,7 @@
     register: firewall
 
   - name: Create an EC2 instance
-    amazon.aws.ec2:
+    ec2:
       key_name: "{{ keypair }}"
       region: "{{ aws_region }}"
       group_id: "{{ firewall.group_id }}"
