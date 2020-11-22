@@ -69,7 +69,7 @@ Coming Soon
      Explain to audience what is happening here depending on audience persona
 
     **Persona A**: Technical audience that has written Ansible Playbooks before:
-    Ansible can be used for more than on prem infrustructure it can also be used to provision many resource on the public clouds. Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used for reoccuring RHEL provisioning in various AWS regions instead of a job template for each region or VM provisioned.  Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **resource_group**, **location**, and **vm_name** with the values of testdemorg7, eastus, and test-server07.
+    Ansible can be used for more than on prem infrustructure it can also be used to provision many resource on the public clouds. Surveys create variables that the Job can use within Ansible Playbooks. This gives you the ability to create one playbook that can be used for various instance sizes of RHEL provisioned in various AWS regions instead of a job template for each region or VM provisioned.  Again saving you time and effort to write seperate playbooks for each use case.  In the screenshot you will see the variables are named **keypair**, **aws_region**, **vpc_name**, **instance_type** and **instance_name** with the values of testkey1, us-west-1, testvpc1, t2.micro, demo1
 
     **Persona B**: Decision maker audience, IT manager or above:
     reiterate business values above.  This allows a non AWS Cloud expert the ability to automate routine tasks within a cloud environment.  They can't provision servers that are not vetted and put within the job template or to locations that are not preapproved within the Survey. Freeing them from the mundance and repeative task of VM provisioning while maintaining the highest level of security and compliance across your organization. In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
@@ -97,7 +97,7 @@ Coming Soon
 
 9. Verify RHEL VM is up (Optional) 
 
-      qwer
+      Login to the AWS Console. Navigate to the EC2 service and locate your EC2 instances. You should see the new VM. You can cick on that new VM to see the details which should match how you defined it. Below is an example of what you will see
       ![Verify VM](../../images/aws_provision_vm/aws_provision_vm_verify_ec2.jpeg)
 
 
