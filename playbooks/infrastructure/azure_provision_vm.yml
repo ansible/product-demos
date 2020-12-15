@@ -1,7 +1,7 @@
 # Description
 # ===========
 # This playbook create an Azure VM with public IP, and open 22 port for SSH
-
+---
 - name: Create Azure VM
   hosts: localhost
   connection: local
