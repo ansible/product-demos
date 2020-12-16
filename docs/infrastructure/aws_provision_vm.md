@@ -39,8 +39,8 @@ Coming Soon
 
 1. You will need to create programmatic access keys by following these [AWS Docs instructions](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html) See the section called "Programmatic access"
 
-2. Then set the aws_demo variable to True. As well as provide the folowing variable values before loading this demo as shown below.
- - aws_demo: True
+2. Then set the public_cloud variable to aws. As well as provide the folowing variable values before loading this demo as shown below.
+ - public_cloud: aws
  - my_access_key:
  - my_secret_key: 
 
