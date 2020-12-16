@@ -24,8 +24,8 @@ public_cloud: aws
 #my_secret: K1S5~EqpmvG68i8ni9-b1hmn3~yROfHM_I 
 #only uncomment these and supply values for setting up an AWS Cloud Demo which means public_cloud: aws above
 #these value below are fake sample values only
-my_access_key: AKIAJ4EXJBEIQBNI3K6Q
-my_secret_key: rmk8ZHtGKjqzg3KKX0BaZxJeFTwPskfdbaE5MdOV
+my_access_key: AKIAJUNULTMIX6PSQVFQ
+my_secret_key: 5BBqE+YAH7mDJcokP0dFRi3H/xpdAsBU0ro2sS3S
 
 
 
