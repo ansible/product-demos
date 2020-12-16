@@ -33,7 +33,7 @@ For description of these and other features of the Red Hat Ansible Automation Pl
 
 # Video
 
-[Windows Regedit Legal Notice Video Demo](https://www.youtube.com/watch?v=L_S74rdLat8&list=PLdu06OJoEf2bnEaWYY0DXF90KkyqjVqOF&index=2)
+[Windows Regedit Legal Notice Video Demo](https://www.youtube.com/watch?v=L_S74rdLat8&list=PLdu06OJoEf2bnEaWYY0DXF90KkyqjVqOF&index=2) {:target="_blank"}
 
 # Guide
 
