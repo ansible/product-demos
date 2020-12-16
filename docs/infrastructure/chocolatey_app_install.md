@@ -33,7 +33,7 @@ For description of these and other features of the Red Hat Ansible Automation Pl
 
 # Video
 
-Coming Soon
+[Chocolatey Install App Packages Video Demo](https://www.youtube.com/watch?v=6OIgqaMBnfU&list=PLdu06OJoEf2bnEaWYY0DXF90KkyqjVqOF)
 
 # Guide
 
