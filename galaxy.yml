@@ -1,11 +1,13 @@
 ---
 namespace: ansible
 name: product_demos
-version: 1.2.1
+version: 1.2.4
 readme: README.md
 
 authors:
   - Sean Cavanaugh <seanc@redhat.com> @IPvSean
+  - David Rojas <drojas@redhat.com>
+  - Colin McNaughton <cmcnaugh@redhat.com>
 
 description: repository of demos to showcase Ansible features.
 
