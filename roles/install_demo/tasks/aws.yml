@@ -11,3 +11,4 @@
     tower_username: "{{ my_tower_username }}"
     tower_password: "{{ my_tower_password }}"
     tower_host: "{{ my_tower_host }}"
+    validate_certs: false
