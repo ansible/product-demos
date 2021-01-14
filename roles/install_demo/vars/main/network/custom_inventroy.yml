@@ -11,7 +11,7 @@ custom_inventory:
   survey_enabled: false
   fact_caching_enabled: false
   project:
-    name: "Ansible official demo project"
+    name: "Custom inventory demo"
     description: "prescriptive demos from Red Hat Management Business Unit"
     organization: "Default"
     scm_type: git
