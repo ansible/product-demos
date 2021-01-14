@@ -1,0 +1,21 @@
+---
+custom_inventory:
+  author: "Ajay Chenampara"
+  category: network
+  name: "Custom inventory Demo"
+  description: "Custom inventory Demo"
+  job_type: "run"
+  inventory: "Custom Inventory"
+  playbook: "playbook.yaml"
+  credential: "Workshop Credential"
+  survey_enabled: false
+  fact_caching_enabled: false
+  project:
+    name: "Ansible official demo project"
+    description: "prescriptive demos from Red Hat Management Business Unit"
+    organization: "Default"
+    scm_type: git
+    scm_url: "https://github.com/termlen0/custom-inventory-plugin"
+  workshop_type:
+    - network
+    - demo
