@@ -1,4 +1,4 @@
-# Demo: Azure MySQL Server
+# Demo: Custom Inventory Plugin
 
 [Click here to return to master demo list](../../README.md#demo-repository)
 
@@ -51,7 +51,7 @@ Show the customer the [CSV file](https://github.com/termlen0/custom-inventory-pl
 
 5. Navigate to **HOSTS** and **GROUPS** to showcase how the hosts and groups were populated from a spreadsheet
 
-     ![hosts](../../images/custom_inventory.4.png)
+     ![hosts](../../images/custom_inventory4.png)
 
      Explain to audience what is happening here depending on audience persona
 
