@@ -11,6 +11,34 @@
     tower_host: "{{ my_tower_host }}"
     validate_certs: false
 
+- name: add custom inventory block
+  block:
+    - name: Add the inventory
+      tower_inventory:
+        name: "Custom inventory demo"
+        organization: "{{ vars[demo].project.organization }}"
+        description: "Demonstrates a custom inventory plugin"
+        state: present
+        tower_username: "{{ my_tower_username }}"
+        tower_password: "{{ my_tower_password }}"
+        tower_host: "{{ my_tower_host }}"
+        validate_certs: false
+
+    - name: Add the inventory source
+      tower_inventory_source:
+        name: "Custom inventory plugin"
+        inventory: "Custom inventory demo"
+        source: scm
+        source_project: "Custom inventory demo"
+        source_path: csv_inventory.yaml
+        update_on_launch: yes
+        state: present
+        tower_username: "{{ my_tower_username }}"
+        tower_password: "{{ my_tower_password }}"
+        tower_host: "{{ my_tower_host }}"
+        validate_certs: false
+  when: vars.demo == "custom_inventory" or vars.demo == "all"
+
 - name: add single job template without survey
   tower_job_template:
     name: "{{ vars[demo].name }}"

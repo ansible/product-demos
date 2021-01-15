@@ -11,6 +11,9 @@
       - "total demos: {{ demo_list | length }}"
       - "available demos are: {{ demo_list }}"
 
+- name: debug
+  debug: var=vars.demo
+
 - name: make sure demo is a valid demo
   assert:
     that:
