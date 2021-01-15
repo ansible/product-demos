@@ -1,6 +1,7 @@
 ---
 custom_inventory:
   author: "Ajay Chenampara"
+  readme: "https://github.com/ansible/product-demos/blob/master/docs/network/custom_inventory.md"
   category: network
   name: "Custom inventory Demo"
   description: "Custom inventory Demo"
