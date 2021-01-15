@@ -5,7 +5,7 @@ custom_inventory:
   name: "Custom inventory Demo"
   description: "Custom inventory Demo"
   job_type: "run"
-  inventory: "Custom Inventory"
+  inventory: "Custom inventory demo"
   playbook: "playbook.yaml"
   credential: "Workshop Credential"
   survey_enabled: false
