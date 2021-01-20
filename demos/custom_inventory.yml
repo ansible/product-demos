@@ -1,0 +1,32 @@
+---
+name: custom_inventory
+category: all
+workshop_type:
+  - demo
+
+tower_infra_workloads:
+  - redhat_cop.tower_configuration.projects
+  - redhat_cop.tower_configuration.inventories
+  - redhat_cop.tower_configuration.inventory_sources
+
+tower_projects:
+- name: Custom inventory demo
+  description: "prescriptive demos from Red Hat Management Business Unit"
+  organization: Default
+  scm_type: git
+  scm_url: "https://github.com/termlen0/custom-inventory-plugin"
+
+tower_inventories:
+- name: Custom inventory demo
+  organization: Default
+  description: Demonstrates a custom inventory plugin
+  state: present
+
+tower_inventory_sources:
+- name: "Custom inventory plugin"
+  inventory: "Custom inventory demo"
+  source: scm
+  source_project: "Custom inventory demo"
+  source_path: csv_inventory.yaml
+  update_on_launch: yes
+  state: present
