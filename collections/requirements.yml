@@ -1,0 +1,4 @@
+---
+collections:
+  - name: redhat_cop.tower_configuration
+    version: 1.0.1

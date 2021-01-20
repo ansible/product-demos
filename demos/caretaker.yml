@@ -1,0 +1,7 @@
+---
+name: caretaker
+category: network
+workshop_type:
+  - network
+  - demo
+tower_infra_workloads: []

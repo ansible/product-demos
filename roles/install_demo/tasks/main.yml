@@ -1,45 +1,61 @@
 ---
-- name: set facts from role vars
-  set_fact:
-    demo_list: "{{ (dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined')|selectattr('1.workshop_type', 'defined'))|dict2items)|map(attribute='key')|list }}"
-    full_demo_info: "{{ (dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined')|selectattr('1.workshop_type', 'defined'))|dict2items) }}"
+- stat:
+   path: "{{ playbook_dir }}/../demos/{{ demo }}.yml"
+  register: demo_path
 
-- name: provide info to terminal window
-  debug:
-    msg:
-      - "install {{ vars.demo }} on {{ my_tower_host }}"
-      - "total demos: {{ demo_list | length }}"
-      - "available demos are: {{ demo_list }}"
+- name: install tower workloads
+  include_tasks: workloads.yml
+  vars:
+    tower_username: "{{ my_tower_username }}"
+    tower_password: "{{ my_tower_password }}"
+    tower_hostname: "{{ my_tower_host }}"
+  when: demo_path.stat.exists
 
-- name: make sure demo is a valid demo
-  assert:
-    that:
-      - vars.demo is defined
-      - vars.demo in demo_list or vars.demo == "all"
-    msg:
-      - "demo must be defined and be one of: {{ demo_list }}"
-      - "full list can be found on https://github.com/ansible/product-demos"
+- block:
+  - name: set facts from role vars
+    set_fact:
+      demo_list: "{{ (dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined')|selectattr('1.workshop_type', 'defined'))|dict2items)|map(attribute='key')|list }}"
+      full_demo_info: "{{ (dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined')|selectattr('1.workshop_type', 'defined'))|dict2items) }}"
 
-- name: setup public cloud credentials
-  include_tasks: "{{item}}"
-  with_first_found:
-    - "{{role_path}}/tasks/{{public_cloud}}.yml"
-    - "{{role_path}}/tasks/unsupported_cloud.yml"
+  - name: provide info to terminal window
+    debug:
+      msg:
+        - "install {{ vars.demo }} on {{ my_tower_host }}"
+        - "total demos: {{ demo_list | length }}"
+        - "available demos are: {{ demo_list }}"
 
-- name: install all job templates
-  include_tasks: job_template_loop.yml
-  loop: "{{ full_demo_info }}"
-  when: demo == "all"
+  - name: make sure demo is a valid demo
+    assert:
+      that:
+        - vars.demo is defined
+        - vars.demo in demo_list or vars.demo == "all"
+      msg:
+        - "demo must be defined and be one of: {{ demo_list }}"
+        - "full list can be found on https://github.com/ansible/product-demos"
 
-- name: install single job template
-  include_tasks: job_template.yml
-  when:
-    - demo != "all"
-    - vars[demo].workflow is not defined or not vars[demo].workflow
+  - name: setup public cloud credentials
+    include_tasks: "{{item}}"
+    with_first_found:
+      - "{{role_path}}/tasks/{{public_cloud}}.yml"
+      - "{{role_path}}/tasks/unsupported_cloud.yml"
 
-- name: install single workflow
-  include_tasks: workflow.yml
-  when:
-    - demo != "all"
-    - vars[demo].workflow is defined
-    - vars[demo].workflow
+  - name: install all job templates
+    include_tasks: job_template_loop.yml
+    loop: "{{ full_demo_info }}"
+    when: 
+      - demo == "all"
+
+  - name: install single job template
+    include_tasks: job_template.yml
+    when:
+      - demo != "all"
+      - vars[demo].workflow is not defined or not vars[demo].workflow
+      - vars[demo].tower_infra_workloads is not defined
+
+  - name: install single workflow
+    include_tasks: workflow.yml
+    when:
+      - demo != "all"
+      - vars[demo].workflow is defined
+      - vars[demo].workflow
+  when: not demo_path.stat.exists

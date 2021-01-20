@@ -3,14 +3,15 @@
     msg: "there is no public cloud credentials for this install, installing dummy creds"
 
 - name: add azure credential
-  tower_credential:
+  awx.awx.tower_credential:
     name: azure_credential
     description: Azure Service Principle
     organization: "Default"
     state: present
-    kind: azure_rm
-    subscription: "please replace me"
-    tower_username: "{{ my_tower_username }}"
-    tower_password: "{{ my_tower_password }}"
+    credential_type: Microsoft Azure Resource Manager
+    inputs:
+      subscription: "please_replace_me"
+    tower_username: "{{ my_tower_username }}" #"{{ my_tower_username }}"
+    tower_password: "{{ my_tower_password }}" #"{{ my_tower_password }}"
     tower_host: "{{ my_tower_host }}"
     validate_certs: false

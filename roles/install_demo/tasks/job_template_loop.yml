@@ -65,6 +65,7 @@
       retries: 5
   when:
     - item.value.workflow is not defined or not item.value.workflow
+    - item.value.tower_infra_workloads is not defined
 
 - name: install workflow inside loop (workflow)
   include_tasks: workflow_loop.yml
