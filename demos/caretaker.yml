@@ -4,4 +4,46 @@ category: network
 workshop_type:
   - network
   - demo
-tower_infra_workloads: []
+tower_infra_workloads:
+  - redhat_cop.tower_configuration.projects
+  - redhat_cop.tower_configuration.credential_types
+  - redhat_cop.tower_configuration.credentials
+  - redhat_cop.tower_configuration.job_templates
+  - redhat_cop.tower_configuration.workflow_job_templates
+
+tower_projects:
+  - name: "Caretaker-Demo: Deploy"
+    description: "Main deploy repo"
+    organization: "REDHAT NETWORK ORGANIZATION"
+    scm_type: git
+    scm_url: "https://github.com/termlen0/caretaker-demo.git"
+
+  - name: "Caretaker-Demo: Collection"
+    description: "Caretaker collection"
+    organization: "REDHAT NETWORK ORGANIZATION"
+    scm_type: git
+    scm_url: "https://github.com/termlen0/caretaker_collection.git"
+
+tower_credential_types:
+  - name: "caretaker-demo-git-key"
+    description: "credential to store deploy key"
+    inputs:
+      fields:
+        - id: my_private_key
+          type: string
+          label: private_key
+          secret: true
+          multiline: true
+      injectors:
+        file:
+          template.my_key: "{% raw %}{ { my_private_key  }}{% endraw %}"
+        extra_vars:
+          secret_key: "{% raw %}{ { tower.filename.my_key  }}{% endraw %}"
+
+tower_credentials:
+  - name: "Caretaker-Demo: credential"
+    description: Credentials for caretaker deploy key
+    organization: "REDHAT NETWORK ORGANIZATION"
+    credential_type: "caretaker-demo-git-key"
+    inputs:
+      private_key: "blah" # manually replace
