@@ -92,6 +92,7 @@ tower_templates:
 tower_workflows:
   - name: "Caretaker Demo Workflow"
     organization: "REDHAT NETWORK ORGANIZATION"
+    webhook_service: "github"
     workflow_nodes:
       - unified_job_template: "Caretaker-Demo: Main Deploy Task"
         identifier: node101
