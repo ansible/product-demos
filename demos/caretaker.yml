@@ -19,7 +19,7 @@ tower_projects:
     scm_type: git
     scm_update_on_launch: true
     scm_update_cache_timeout: 3600
-    scm_url: "https://github.com/termlen0/caretaker-demo.git"
+    scm_url: "https://github.com/redhattelco/caretaker-demo.git"
 
   - name: "Caretaker-Collection"
     description: "Caretaker collection"
@@ -27,7 +27,7 @@ tower_projects:
     scm_type: git
     scm_update_on_launch: true
     scm_update_cache_timeout: 3600
-    scm_url: "https://github.com/termlen0/caretaker_collection.git"
+    scm_url: "https://github.com/redhattelco/caretaker_collection.git"
 
 tower_credential_types:
   - name: "caretaker-demo-git-key"
