@@ -4,6 +4,7 @@ category: network
 workshop_type:
   - network
   - demo
+tower_validate_certs: false
 tower_infra_workloads:
   - redhat_cop.tower_configuration.projects
   - redhat_cop.tower_configuration.credential_types
@@ -12,21 +13,26 @@ tower_infra_workloads:
   - redhat_cop.tower_configuration.workflow_job_templates
 
 tower_projects:
-  - name: "Caretaker-Demo: Deploy"
+  - name: "Caretaker-Demo"
     description: "Main deploy repo"
     organization: "REDHAT NETWORK ORGANIZATION"
     scm_type: git
+    scm_update_on_launch: true
+    scm_update_cache_timeout: 3600
     scm_url: "https://github.com/termlen0/caretaker-demo.git"
 
-  - name: "Caretaker-Demo: Collection"
+  - name: "Caretaker-Collection"
     description: "Caretaker collection"
     organization: "REDHAT NETWORK ORGANIZATION"
     scm_type: git
+    scm_update_on_launch: true
+    scm_update_cache_timeout: 3600
     scm_url: "https://github.com/termlen0/caretaker_collection.git"
 
 tower_credential_types:
   - name: "caretaker-demo-git-key"
     description: "credential to store deploy key"
+    kind: cloud
     inputs:
       fields:
         - id: my_private_key
@@ -34,16 +40,103 @@ tower_credential_types:
           label: private_key
           secret: true
           multiline: true
-      injectors:
-        file:
-          template.my_key: "{% raw %}{ { my_private_key  }}{% endraw %}"
-        extra_vars:
-          secret_key: "{% raw %}{ { tower.filename.my_key  }}{% endraw %}"
+    injectors:
+      file:
+        template.my_key: "{% raw %}{  { my_private_key  }}{% endraw %}"
+      extra_vars:
+        secret_key: "{% raw %}{  { tower.filename.my_key  }}{% endraw %}"
 
 tower_credentials:
   - name: "Caretaker-Demo: credential"
     description: Credentials for caretaker deploy key
     organization: "REDHAT NETWORK ORGANIZATION"
     credential_type: "caretaker-demo-git-key"
-    inputs:
-      private_key: "blah" # manually replace
+
+tower_templates:
+  - name: "Caretaker-Demo: Main Deploy Task"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Caretaker-Demo"
+    playbook: "deploy.yml"
+    credentials:
+    - "Caretaker-Demo: credential"
+    - "Workshop Credential"
+
+  - name: "Caretaker-Demo: Backup device configs"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Caretaker-Demo"
+    playbook: "git-push.yaml"
+    credentials:
+    - "Caretaker-Demo: credential"
+    - "Workshop Credential"
+
+  - name: "Caretaker: Sync to SoT from devices"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Caretaker-Demo"
+    playbook: "git-push.yaml"
+    credentials:
+    - "Caretaker-Demo: credential"
+    - "Workshop Credential"
+
+  - name: "Caretaker: Sync from SoT to devices"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Caretaker-Collection"
+    playbook: "playbooks/sync_to_devices.yml"
+    credentials:
+    - "Caretaker-Demo: credential"
+    - "Workshop Credential"
+
+tower_workflows:
+  - name: "Caretaker Demo Workflow"
+    organization: "REDHAT NETWORK ORGANIZATION"
+    workflow_nodes:
+      - unified_job_template: "Caretaker-Demo: Main Deploy Task"
+        identifier: node101
+        success_nodes:
+          - node201
+        failure_nodes:
+          - node202
+          - node203
+        always_nodes: []
+      - unified_job_template: "Caretaker-Demo: Backup device configs"
+        identifier: node201
+        success_nodes: []
+        failure_nodes: []
+        always_nodes: []
+      - approval_node:
+          name: "Sync to Devices"
+        success_nodes:
+          - node301
+        failure_nodes: []
+        always_nodes: []
+        identifier: node202
+      - approval_node:
+          name: "Sync to SoT"
+        identifier: node203
+        success_nodes:
+          - node302
+        failure_nodes: []
+        always_nodes: []
+      - unified_job_template: "Caretaker: Sync from SoT to devices"
+        identifier: node301
+        success_nodes:
+          - node401
+        failure_nodes: []
+        always_nodes: []
+      - unified_job_template: "Caretaker: Sync to SoT from devices"
+        identifier: node302
+        success_nodes:
+          - node401
+        failure_nodes: []
+        always_nodes: []
+      - unified_job_template: "Caretaker-Demo: Main Deploy Task"
+        identifier: node401
+        success_nodes:
+          - node501
+        failure_nodes: []
+        always_nodes: []
+      - unified_job_template: "Caretaker-Demo: Backup device configs"
+        identifier: node501
