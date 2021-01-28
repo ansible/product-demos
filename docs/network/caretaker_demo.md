@@ -72,11 +72,20 @@ rtr2(config)#exit
 rtr2#wr mem
 Copy completed successfully.
 ```
-6. Now go back to the SoT and either add or remove a prefix.
+6. Now go back to the SoT and either add or remove a prefix. This triggers the Caretaker workflow. But this time, the first node will fail because caretaker has detected OOB changes that exist on rtr2, for instance. You can dig into the job output to show the changes that were detected: ![Alt Text](../../images/caretaker_changes.png )
+
+7. Go back to the workflow and choose to approve one of the workflow decisions. Either push from SoT to device or vice versa.
 
 
+![Alt Text](../../images/caretaker_approval.png )
 
-8. Circle back and summarize
+8. In this instance, the SoT config was pushed to the routers
+
+![Alt Text](../../images/caretaker_sync.png )
+
+9. You can also confirm this by logging into the router and verifying that the OOB change was removed.
+
+10. Circle back and summarize
 
      You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).
 
