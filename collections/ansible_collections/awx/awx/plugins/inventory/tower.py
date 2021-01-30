@@ -72,7 +72,7 @@ from ansible.errors import AnsibleParserError, AnsibleOptionsError
 from ansible.plugins.inventory import BaseInventoryPlugin
 from ansible.config.manager import ensure_type
 
-from ..module_utils.tower_api import TowerModule
+from ..module_utils.tower_api import TowerAPIModule
 
 
 def handle_error(**kwargs):
@@ -104,12 +104,12 @@ class InventoryModule(BaseInventoryPlugin):
 
         # Defer processing of params to logic shared with the modules
         module_params = {}
-        for plugin_param, module_param in TowerModule.short_params.items():
+        for plugin_param, module_param in TowerAPIModule.short_params.items():
             opt_val = self.get_option(plugin_param)
             if opt_val is not None:
                 module_params[module_param] = opt_val
 
-        module = TowerModule(
+        module = TowerAPIModule(
             argument_spec={}, direct_params=module_params,
             error_callback=handle_error, warn_callback=self.warn_callback
         )
@@ -153,6 +153,8 @@ class InventoryModule(BaseInventoryPlugin):
                     self.inventory.add_host(host_name, group_name)
                 # Then add the parent-children group relationships.
                 for child_group_name in group_content.get('children', []):
+                    # add the child group to groups, if its already there it will just throw a warning
+                    self.inventory.add_group(child_group_name)
                     self.inventory.add_child(group_name, child_group_name)
             # Set the group vars. Note we should set group var for 'all', but not '_meta'.
             if group_name != '_meta':

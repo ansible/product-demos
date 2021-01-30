@@ -16,7 +16,7 @@ Currently:
 |`tower_username`|""|yes|Admin User on the Ansible Tower Server.||
 |`tower_password`|""|yes|Tower Admin User's password on the Ansible Tower Server.  This should be stored in an Ansible Vault at vars/tower-secrets.yml or elsewhere and called from a parent playbook.||
 |`tower_oauthtoken`|""|yes|Tower Admin User's token on the Ansible Tower Server.  This should be stored in an Ansible Vault at or elsewhere and called from a parent playbook.||
-|`job_templates`|`see below`|yes|Data structure describing your orgainzation or orgainzations Described below.||
+|`tower_templates`|`see below`|yes|Data structure describing your orgainzation or orgainzations Described below.||
 
 ### Secure Logging Variables
 The following Variables compliment each other.
@@ -65,6 +65,7 @@ tower_configuration_job_templates_secure_logging defaults to the value of tower_
 |`ask_credential_on_launch`|""|no|bool|Prompt user for credential on launch.|
 |`survey_enabled`|""|no|bool|Enable a survey on the job template.|
 |`survey_spec`|""|no|dict|JSON/YAML dict formatted survey definition.|
+|`survey`|""|no|dict|JSON/YAML dict formatted survey definition. Alias of survey_spec|
 |`become_enabled`|""|no|bool|Activate privilege escalation.|
 |`allow_simultaneous`|""|no|bool|Allow simultaneous runs of the job template.|
 |`timeout`|""|no|int|Maximum time in seconds to wait for a job to finish (server-side).|
@@ -253,7 +254,7 @@ templates:
       include_role:
         name: redhat_cop.tower_configuration.job_templates
       vars:
-        templates: "{{ job_templates_json.templates }}"
+        tower_templates: "{{ job_templates_json.tower_templates }}"
 ```
 ## License
 [MIT](LICENSE)

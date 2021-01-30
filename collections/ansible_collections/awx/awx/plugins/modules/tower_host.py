@@ -72,7 +72,7 @@ EXAMPLES = '''
 '''
 
 
-from ..module_utils.tower_api import TowerModule
+from ..module_utils.tower_api import TowerAPIModule
 import json
 
 
@@ -89,7 +89,7 @@ def main():
     )
 
     # Create a module for ourselves
-    module = TowerModule(argument_spec=argument_spec)
+    module = TowerAPIModule(argument_spec=argument_spec)
 
     # Extract our parameters
     name = module.params.get('name')
@@ -104,9 +104,8 @@ def main():
     inventory_id = module.resolve_name_to_id('inventories', inventory)
 
     # Attempt to look up host based on the provided name and inventory ID
-    host = module.get_one('hosts', **{
+    host = module.get_one('hosts', name_or_id=name, **{
         'data': {
-            'name': name,
             'inventory': inventory_id
         }
     })
@@ -117,7 +116,7 @@ def main():
 
     # Create the data that gets sent for create and update
     host_fields = {
-        'name': new_name if new_name else name,
+        'name': new_name if new_name else (module.get_item_name(host) if host else name),
         'inventory': inventory_id,
         'enabled': enabled,
     }

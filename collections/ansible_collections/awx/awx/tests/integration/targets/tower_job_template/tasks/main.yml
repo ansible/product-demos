@@ -13,7 +13,7 @@
     jt2: "AWX-Collection-tests-tower_job_template-jt2-{{ test_id }}"
     lab1: "AWX-Collection-tests-tower_job_template-lab1-{{ test_id }}"
     email_not: "AWX-Collection-tests-tower_job_template-email-not-{{ test_id }}"
-    webhook_not: "AWX-Collection-tests-tower_notification-wehbook-not-{{ test_id }}"
+    webhook_not: "AWX-Collection-tests-tower_notification_template-wehbook-not-{{ test_id }}"
 
 - name: Create a Demo Project
   tower_project:
@@ -22,14 +22,14 @@
     state: present
     scm_type: git
     scm_url: https://github.com/ansible/ansible-tower-samples.git
-
-  register: result
+  register: proj_result
 
 - name: Create Credential1
   tower_credential:
     name: "{{ cred1 }}"
     organization: Default
     kind: tower
+  register: cred1_result
 
 - name: Create Credential2
   tower_credential:
@@ -49,7 +49,7 @@
     organization: Default
 
 - name: Add email notification
-  tower_notification:
+  tower_notification_template:
     name: "{{ email_not }}"
     organization: Default
     notification_type: email
@@ -65,7 +65,7 @@
     state: present
 
 - name: Add webhook notification
-  tower_notification:
+  tower_notification_template:
     name: "{{ webhook_not }}"
     organization: Default
     notification_type: webhook
@@ -84,19 +84,19 @@
     credentials: ["{{ cred1 }}", "{{ cred2 }}"]
     job_type: run
     state: present
-  register: result
+  register: jt1_result
 
 - assert:
     that:
-      - "result is changed"
+      - "jt1_result is changed"
 
 - name: Add a credential to this JT
   tower_job_template:
     name: "{{ jt1 }}"
-    project: "{{ proj1 }}"
+    project: "{{ proj_result.id }}"
     playbook: hello_world.yml
     credentials:
-      - "{{ cred1 }}"
+      - "{{ cred1_result.id }}"
   register: result
 
 - assert:
@@ -105,7 +105,7 @@
 
 - name: Try to add the same credential to this JT
   tower_job_template:
-    name: "{{ jt1 }}"
+    name: "{{ jt1_result.id }}"
     project: "{{ proj1 }}"
     playbook: hello_world.yml
     credentials:
@@ -366,13 +366,13 @@
 # You can't delete a label directly so no cleanup needed
 
 - name: Delete email notification
-  tower_notification:
+  tower_notification_template:
     name: "{{ email_not }}"
     organization: Default
     state: absent
 
 - name: Delete webhook notification
-  tower_notification:
+  tower_notification_template:
     name: "{{ webhook_not }}"
     organization: Default
     state: absent

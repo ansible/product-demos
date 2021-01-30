@@ -2,7 +2,7 @@
  "collection_info": {
   "namespace": "redhat_cop",
   "name": "tower_configuration",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "authors": [
    "Andrew Huffman",
    "Jonathan Lozada De La Matta @jlozadad",
@@ -33,7 +33,7 @@
   "name": "FILES.json",
   "ftype": "file",
   "chksum_type": "sha256",
-  "chksum_sha256": "fbb2b3113624f675cb01bc8d22d2226055a40b62a88a758e6a5e510c7671fd45",
+  "chksum_sha256": "4504fffa3150eb9db676a130d8d331fb65bf76e5a076c6c25cef8205afaff888",
   "format": 1
  },
  "format": 1

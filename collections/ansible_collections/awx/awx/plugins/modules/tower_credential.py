@@ -52,6 +52,12 @@ options:
           Refer to the Ansible Tower documentation for example syntax.
         - Any fields in this dict will take prescedence over any fields mentioned below (i.e. host, username, etc)
       type: dict
+    update_secrets:
+      description:
+        - C(true) will always update encrypted values.
+        - C(false) will only updated encrypted values if a change is absolutely known to be needed.
+      type: bool
+      default: true
     user:
       description:
         - User that should own this credential.
@@ -68,7 +74,8 @@ options:
         - Deprecated, please use credential_type
       required: False
       type: str
-      choices: ["ssh", "vault", "net", "scm", "aws", "vmware", "satellite6", "cloudforms", "gce", "azure_rm", "openstack", "rhv", "insights", "tower"]
+      choices: ["aws", "tower", "gce", "azure_rm", "openstack", "satellite6", "rhv", "vmware", "aim", "conjur", "hashivault_kv", "hashivault_ssh",
+                "azure_kv", "insights", "kubernetes_bearer_token", "net", "scm", "ssh", "github_token", "gitlab_token", "vault"]
     host:
       description:
         - Host for this credential.
@@ -269,23 +276,30 @@ EXAMPLES = '''
 
 '''
 
-from ..module_utils.tower_api import TowerModule
+from ..module_utils.tower_api import TowerAPIModule
 
 KIND_CHOICES = {
-    'ssh': 'Machine',
-    'vault': 'Vault',
-    'net': 'Network',
-    'scm': 'Source Control',
     'aws': 'Amazon Web Services',
-    'vmware': 'VMware vCenter',
-    'satellite6': 'Red Hat Satellite 6',
-    'cloudforms': 'Red Hat CloudForms',
+    'tower': 'Ansible Tower',
     'gce': 'Google Compute Engine',
     'azure_rm': 'Microsoft Azure Resource Manager',
     'openstack': 'OpenStack',
+    'satellite6': 'Red Hat Satellite 6',
     'rhv': 'Red Hat Virtualization',
+    'vmware': 'VMware vCenter',
+    'aim': 'CyberArk AIM Central Credential Provider Lookup',
+    'conjur': 'CyberArk Conjur Secret Lookup',
+    'hashivault_kv': 'HashiCorp Vault Secret Lookup',
+    'hashivault_ssh': 'HashiCorp Vault Signed SSH',
+    'azure_kv': 'Microsoft Azure Key Vault',
     'insights': 'Insights',
-    'tower': 'Ansible Tower',
+    'kubernetes_bearer_token': 'OpenShift or Kubernetes API Bearer Token',
+    'net': 'Network',
+    'scm': 'Source Control',
+    'ssh': 'Machine',
+    'github_token': 'GitHub Personal Access Token',
+    'gitlab_token': 'GitLab Personal Access Token',
+    'vault': 'Vault',
 }
 
 
@@ -308,6 +322,7 @@ def main():
         organization=dict(),
         credential_type=dict(),
         inputs=dict(type='dict', no_log=True),
+        update_secrets=dict(type='bool', default=True, no_log=False),
         user=dict(),
         team=dict(),
         # These are for backwards compatability
@@ -336,7 +351,7 @@ def main():
     )
 
     # Create a module for ourselves
-    module = TowerModule(argument_spec=argument_spec, required_one_of=[['kind', 'credential_type']])
+    module = TowerAPIModule(argument_spec=argument_spec, required_one_of=[['kind', 'credential_type']])
 
     # Extract our parameters
     name = module.params.get('name')
@@ -365,13 +380,12 @@ def main():
 
     # Attempt to look up the object based on the provided name, credential type and optional organization
     lookup_data = {
-        'name': name,
         'credential_type': cred_type_id,
     }
     if organization:
         lookup_data['organization'] = org_id
 
-    credential = module.get_one('credentials', **{'data': lookup_data})
+    credential = module.get_one('credentials', name_or_id=name, **{'data': lookup_data})
 
     if state == 'absent':
         # If the state was absent we can let the module delete it if needed, the module will handle exiting from this
@@ -384,19 +398,25 @@ def main():
         team_id = module.resolve_name_to_id('teams', team)
 
     # Create credential input from legacy inputs
+    has_inputs = False
     credential_inputs = {}
     for legacy_input in OLD_INPUT_NAMES:
         if module.params.get(legacy_input) is not None:
+            has_inputs = True
             credential_inputs[legacy_input] = module.params.get(legacy_input)
+
     if inputs:
+        has_inputs = True
         credential_inputs.update(inputs)
 
     # Create the data that gets sent for create and update
     credential_fields = {
-        'name': new_name if new_name else name,
+        'name': new_name if new_name else (module.get_item_name(credential) if credential else name),
         'credential_type': cred_type_id,
-        'inputs': credential_inputs,
     }
+    if has_inputs:
+        credential_fields['inputs'] = credential_inputs
+
     if description:
         credential_fields['description'] = description
     if organization:

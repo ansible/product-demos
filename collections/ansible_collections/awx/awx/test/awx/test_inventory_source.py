@@ -80,7 +80,8 @@ def test_create_inventory_source_multiple_orgs(run_module, admin_user):
 
     result = run_module('tower_inventory_source', dict(
         name='Test Inventory Source',
-        inventory=inv2.id,
+        inventory=inv2.name,
+        organization='test-org-number-two',
         source='ec2',
         state='present'
     ), admin_user)
@@ -132,10 +133,10 @@ def test_custom_venv_no_op(run_module, admin_user, base_inventory, mocker, proje
         inventory=base_inventory,
         source_project=project,
         source='scm',
-        custom_virtualenv='/venv/foobar/'
+        custom_virtualenv='/var/lib/awx/venv/foobar/'
     )
     # mock needed due to API behavior, not incorrect client behavior
-    with mocker.patch('awx.main.models.mixins.get_custom_venv_choices', return_value=['/venv/foobar/']):
+    with mocker.patch('awx.main.models.mixins.get_custom_venv_choices', return_value=['/var/lib/awx/venv/foobar/']):
         result = run_module('tower_inventory_source', dict(
             name='foo',
             description='this is the changed description',
@@ -147,7 +148,7 @@ def test_custom_venv_no_op(run_module, admin_user, base_inventory, mocker, proje
         ), admin_user)
     assert result.pop('changed', None), result
     inv_src.refresh_from_db()
-    assert inv_src.custom_virtualenv == '/venv/foobar/'
+    assert inv_src.custom_virtualenv == '/var/lib/awx/venv/foobar/'
     assert inv_src.description == 'this is the changed description'
 
 
@@ -181,21 +182,18 @@ def test_falsy_value(run_module, admin_user, base_inventory):
 # We want to let the API return issues with "this doesn't support that", etc.
 #
 # GUI OPTIONS:
-# - - - - - - - manual:	file:	scm:	ec2:	gce	azure_rm	vmware	sat	cloudforms	openstack	rhv	tower	custom
-# credential		?	?	o	o	r	r		r	r	r		r		r	r	o
-# source_project	?	?	r	-	-	-		-	-	-		-		-	-	-
-# source_path		?	?	r	-	-	-		-	-	-		-		-	-	-
-# verbosity			?	?	o	o	o	o		o	o	o		o		o	o	o
-# overwrite			?	?	o	o	o	o		o	o	o		o		o	o	o
-# overwrite_vars	?	?	o	o	o	o		o	o	o		o		o	o	o
-# update_on_launch	?	?	o	o	o	o		o	o	o		o		o	o	o
-# UoPL          	?	?	o	-	-	-		-	-	-		-		-	-	-
-# source_regions	?	?	-	o	o	o		-	-	-		-		-	-	-
-# instance_filters	?	?	-	o	-	-		o	-	-		-		-	o	-
-# group_by			?	?	-	o	-	-		o	-	-		-		-	-	-
-# source_vars*		?	?	-	o	-	o		o	o	o		o		-	-	-
-# environmet vars*	?	?	o	-	-	-		-	-	-		-		-	-	o
-# source_script		?	?	-	-	-	-		-	-	-		-		-	-	r
+# - - - - - - - manual:	file:	scm:	ec2:	gce	azure_rm	vmware	sat	openstack	rhv	tower	custom
+# credential		?	?	o	o	r	r		r	r		r		r	r	o
+# source_project	?	?	r	-	-	-		-	-		-		-	-	-
+# source_path		?	?	r	-	-	-		-	-		-		-	-	-
+# verbosity			?	?	o	o	o	o		o	o		o		o	o	o
+# overwrite			?	?	o	o	o	o		o	o		o		o	o	o
+# overwrite_vars	?	?	o	o	o	o		o	o		o		o	o	o
+# update_on_launch	?	?	o	o	o	o		o	o		o		o	o	o
+# UoPL          	?	?	o	-	-	-		-	-		-		-	-	-
+# source_vars*		?	?	-	o	-	o		o	o		o		-	-	-
+# environmet vars*	?	?	o	-	-	-		-	-		-		-	-	o
+# source_script		?	?	-	-	-	-		-	-		-		-	-	r
 #
 # UoPL - update_on_project_launch
 # * - source_vars are labeled environment_vars on project and custom sources

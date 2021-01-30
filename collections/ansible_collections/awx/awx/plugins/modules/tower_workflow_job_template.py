@@ -94,10 +94,17 @@ options:
         - Setting that variable will prompt the user for job type on the
           workflow launch.
       type: bool
-    survey:
+    survey_spec:
       description:
         - The definition of the survey associated to the workflow.
       type: dict
+      aliases:
+        - survey
+    labels:
+      description:
+        - The labels applied to this job template
+      type: list
+      elements: str
     state:
       description:
         - Desired state of the resource.
@@ -137,14 +144,14 @@ EXAMPLES = '''
     organization: Default
 '''
 
-from ..module_utils.tower_api import TowerModule
+from ..module_utils.tower_api import TowerAPIModule
 
 import json
 
 
 def update_survey(module, last_request):
     spec_endpoint = last_request.get('related', {}).get('survey_spec')
-    module.post_endpoint(spec_endpoint, **{'data': module.params.get('survey')})
+    module.post_endpoint(spec_endpoint, **{'data': module.params.get('survey_spec')})
     module.exit_json(**module.json_output)
 
 
@@ -156,7 +163,7 @@ def main():
         description=dict(),
         extra_vars=dict(type='dict'),
         organization=dict(),
-        survey=dict(type='dict'),  # special handling
+        survey_spec=dict(type='dict', aliases=['survey']),
         survey_enabled=dict(type='bool'),
         allow_simultaneous=dict(type='bool'),
         ask_variables_on_launch=dict(type='bool'),
@@ -168,6 +175,7 @@ def main():
         ask_limit_on_launch=dict(type='bool'),
         webhook_service=dict(choices=['github', 'gitlab']),
         webhook_credential=dict(),
+        labels=dict(type="list", elements='str'),
         notification_templates_started=dict(type="list", elements='str'),
         notification_templates_success=dict(type="list", elements='str'),
         notification_templates_error=dict(type="list", elements='str'),
@@ -176,7 +184,7 @@ def main():
     )
 
     # Create a module for ourselves
-    module = TowerModule(argument_spec=argument_spec)
+    module = TowerAPIModule(argument_spec=argument_spec)
 
     # Extract our parameters
     name = module.params.get('name')
@@ -184,7 +192,7 @@ def main():
     state = module.params.get('state')
 
     new_fields = {}
-    search_fields = {'name': name}
+    search_fields = {}
 
     # Attempt to look up the related items the user specified (these will fail the module if not found)
     organization = module.params.get('organization')
@@ -193,7 +201,7 @@ def main():
         search_fields['organization'] = new_fields['organization'] = organization_id
 
     # Attempt to look up an existing item based on the provided data
-    existing_item = module.get_one('workflow_job_templates', **{'data': search_fields})
+    existing_item = module.get_one('workflow_job_templates', name_or_id=name, **{'data': search_fields})
 
     if state == 'absent':
         # If the state was absent we can let the module delete it if needed, the module will handle exiting from this
@@ -208,7 +216,7 @@ def main():
         new_fields['webhook_credential'] = module.resolve_name_to_id('webhook_credential', webhook_credential)
 
     # Create the data that gets sent for create and update
-    new_fields['name'] = new_name if new_name else name
+    new_fields['name'] = new_name if new_name else (module.get_item_name(existing_item) if existing_item else name)
     for field_name in (
             'description', 'survey_enabled', 'allow_simultaneous',
             'limit', 'scm_branch', 'extra_vars',
@@ -247,8 +255,20 @@ def main():
         for item in notifications_approval:
             association_fields['notification_templates_approvals'].append(module.resolve_name_to_id('notification_templates', item))
 
+    labels = module.params.get('labels')
+    if labels is not None:
+        association_fields['labels'] = []
+        for item in labels:
+            association_fields['labels'].append(module.resolve_name_to_id('labels', item))
+# Code to use once Issue #7567 is resolved
+#            search_fields = {'name': item}
+#            if organization:
+#                search_fields['organization'] = organization_id
+#            label_id = module.get_one('labels', **{'data': search_fields})
+#            association_fields['labels'].append(label_id)
+
     on_change = None
-    new_spec = module.params.get('survey')
+    new_spec = module.params.get('survey_spec')
     if new_spec:
         existing_spec = None
         if existing_item:
