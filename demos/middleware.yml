@@ -111,7 +111,9 @@ tower_workflows:
       - approval_node:
           name: "Manual override - Reboot"
         identifier: node502
-        success_nodes:
-          - node601
-      - unified_job_template: "Reboot Faulty Nodes"
-        identifier: node601
+        success_nodes: []
+      #     - node601
+      #   always_nodes: []
+      #   failure_nodes: []
+      # - unified_job_template: "Reboot Faulty Nodes"
+      #   identifier: node601
