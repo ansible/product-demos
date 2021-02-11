@@ -25,7 +25,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware/simple.yml"
+    playbook: "middleware_demo/simple.yml"
     job_tags: reverse_proxy
     credentials:
     - "Workshop Credential"
@@ -33,7 +33,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware/simple.yml"
+    playbook: "middleware_demo/simple.yml"
     job_tags: webseal
     credentials:
     - "Workshop Credential"
@@ -42,7 +42,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware/simple.yml"
+    playbook: "middleware_demo/simple.yml"
     job_tags: mga
     credentials:
     - "Workshop Credential"
@@ -51,7 +51,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware/simple.yml"
+    playbook: "middleware_demo/simple.yml"
     job_tags: mga, systems_up
     credentials:
     - "Workshop Credential"
@@ -60,7 +60,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware/reboot.yml"
+    playbook: "middleware_demo/reboot.yml"
     credentials:
     - "Workshop Credential"
 
@@ -68,7 +68,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware/api_call.yml"
+    playbook: "middleware_demo/api_call.yml"
     credentials:
     - "Workshop Credential"
 
