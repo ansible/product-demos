@@ -29,6 +29,16 @@ tower_templates:
     job_tags: reverse_proxy
     credentials:
     - "Workshop Credential"
+
+  - name: "Restart Reverse Proxy"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Intelligent-Ops"
+    playbook: "middleware_demo/simple.yml"
+    job_tags: restart_rp
+    credentials:
+    - "Workshop Credential"
+
   - name: "WebSeal health check"
     job_type: run
     inventory: "Workshop Inventory"
@@ -38,12 +48,30 @@ tower_templates:
     credentials:
     - "Workshop Credential"
 
+  - name: "Restart WebSeal"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Intelligent-Ops"
+    playbook: "middleware_demo/simple.yml"
+    job_tags: restart_ws
+    credentials:
+    - "Workshop Credential"
+
   - name: "Junction health check"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
     playbook: "middleware_demo/simple.yml"
     job_tags: mga
+    credentials:
+    - "Workshop Credential"
+
+  - name: "Restart Junction"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Intelligent-Ops"
+    playbook: "middleware_demo/simple.yml"
+    job_tags: restart_mga
     credentials:
     - "Workshop Credential"
 
@@ -81,6 +109,13 @@ tower_workflows:
         success_nodes:
           - node201
         failure_nodes:
+          - node102
+        always_nodes: []
+      - unified_job_template: "Restart Reverse Proxy"
+        identifier: node102
+        success_nodes:
+          - node201
+        failure_nodes:
           - node401
         always_nodes: []
       - unified_job_template: "WebSeal health check"
@@ -88,10 +123,24 @@ tower_workflows:
         success_nodes:
           - node301
         failure_nodes:
+          - node202
+        always_nodes: []
+      - unified_job_template: "Restart WebSeal"
+        identifier: node202
+        success_nodes:
+          - node301
+        failure_nodes:
           - node401
         always_nodes: []
       - unified_job_template: "Junction health check"
         identifier: node301
+        success_nodes:
+          - node302
+        failure_nodes:
+          - node401
+        always_nodes: []
+      - unified_job_template: "Restart Junction"
+        identifier: node302
         success_nodes:
           - node402
         failure_nodes:
