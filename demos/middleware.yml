@@ -135,9 +135,9 @@ tower_workflows:
       - unified_job_template: "Junction health check"
         identifier: node301
         success_nodes:
-          - node302
+          - node402
         failure_nodes:
-          - node401
+          - node302
         always_nodes: []
       - unified_job_template: "Restart Junction"
         identifier: node302
