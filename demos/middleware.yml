@@ -17,7 +17,7 @@ tower_projects:
     scm_type: git
     scm_update_on_launch: true
     scm_update_cache_timeout: 3600
-    scm_url: "https://github.com/termlen0/nw-demo"
+    scm_url: "https://github.com/redhattelco/intelligent-restarts"
     scm_branch: galaxy
 
 tower_templates:
@@ -25,7 +25,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware_demo/simple.yml"
+    playbook: "simple.yml"
     job_tags: reverse_proxy
     credentials:
     - "Workshop Credential"
@@ -34,7 +34,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware_demo/simple.yml"
+    playbook: "simple.yml"
     job_tags: restart_rp
     credentials:
     - "Workshop Credential"
@@ -43,7 +43,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware_demo/simple.yml"
+    playbook: "simple.yml"
     job_tags: webseal
     credentials:
     - "Workshop Credential"
@@ -52,7 +52,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware_demo/simple.yml"
+    playbook: "simple.yml"
     job_tags: restart_ws
     credentials:
     - "Workshop Credential"
@@ -61,7 +61,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware_demo/simple.yml"
+    playbook: "simple.yml"
     job_tags: new_junction
     credentials:
     - "Workshop Credential"
@@ -70,7 +70,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware_demo/simple.yml"
+    playbook: "simple.yml"
     job_tags: restart_nj
     credentials:
     - "Workshop Credential"
@@ -79,7 +79,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware_demo/simple.yml"
+    playbook: "simple.yml"
     job_tags: mga
     credentials:
     - "Workshop Credential"
@@ -88,7 +88,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware_demo/simple.yml"
+    playbook: "simple.yml"
     job_tags: restart_mga
     credentials:
     - "Workshop Credential"
@@ -97,7 +97,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware_demo/simple.yml"
+    playbook: "simple.yml"
     job_tags: mga, systems_up
     credentials:
     - "Workshop Credential"
@@ -106,7 +106,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware_demo/reboot.yml"
+    playbook: "reboot.yml"
     credentials:
     - "Workshop Credential"
 
@@ -114,7 +114,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware_demo/api_call.yml"
+    playbook: "api_call.yml"
     credentials:
     - "Workshop Credential"
 
@@ -122,7 +122,7 @@ tower_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
-    playbook: "middleware_demo/simple.yml"
+    playbook: "simple.yml"
     job_tags: e2e
     credentials:
     - "Workshop Credential"
