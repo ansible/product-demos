@@ -18,9 +18,16 @@ tower_projects:
     scm_update_on_launch: true
     scm_update_cache_timeout: 3600
     scm_url: "https://github.com/redhattelco/intelligent-restarts"
-    scm_branch: galaxy
 
 tower_templates:
+  - name: "1 - Install Dependencies"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Intelligent-Ops"
+    playbook: "dependencies.yml"
+    credentials:
+    - "Workshop Credential"
+
   - name: "Reverse Proxy health check"
     job_type: run
     inventory: "Workshop Inventory"
