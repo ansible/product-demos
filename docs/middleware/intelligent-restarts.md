@@ -1,4 +1,4 @@
-# Demo: Deploy Application
+# Demo: Intelligent Reboot(middleware)
 
 [Click here to return to master demo list](../../README.md#demo-repository)
 
@@ -12,29 +12,38 @@
 
 # Objective
 
-Demonstrate application deployment for Linux systems.  This demonstration will install applications on multiple RHEL servers.
+Demonstrate how Ansible + Red Hat middleware can elevate common operational workflows.
+
 
 # What business problem is solved?
 
 - **speed to market**:
-reducing human time to install applications
+reducing human time to manually try and restart processes before having to reboot
 - **reduce human error**:
-automation of routine manual processes
-- **reduce complexity**:
-does not require a System Administrator familiar with the specific operating system to install the Application.  Automate and test once and allow all users access to deploy Ansible Jobs.
-- **enforce policy**:
-Ansible creates guard rails on which applications can be deployed and how they are installed on IT infrastructure.  
+automation of routine manual process
+- **add intelligence**:
+tracking state of last reboot outside the automation system and applying decision manager policies allow for intelligent operations
 
 # Features show cased
 
-- Push button deployment
-- Self Service IT - Surveys
+- Workflows
+- Decision Manager
+- Stateful operations
 
-For description of these and other features of the Red Hat Ansible Automation Platform please refer to the [features README](../features.md)
+During manual operations, it may require a human to troubleshoot
+multiple services running on a server by restarting them. They might
+need to make sure that they try to restart a service multiple times
+before it works. Finally if the restarts don't work they might have to
+reboot the system. This however may not be a simple decision. There
+might be reasons why you might not want to reboot a node if you have
+just rebooted it in the past hour for instance. This demo showcases
+how such an use case can be handled, where state tracking outside the
+automation system along with a decision engine instructs the
+automation system whether to reboot or not.
+
 
 # Video
 
-[Watch here](https://youtu.be/pU8ZgSBuEJw)
 
 # Guide
 
@@ -44,46 +53,48 @@ For description of these and other features of the Red Hat Ansible Automation Pl
 
      ![job templates](../../images/templates.png)
 
-3. Click the rocket next to **INFRASTRUCTURE / Deploy Application** to launch the Job
+3. Click the rocket next to **1 Install Dependencies** to set up the demo environment
 
      ![rocket launch](../../images/rocket.png)
+This will also set up the Decision Manager, MySQL and FUSE containers on node3.
 
-4.  The survey will prompt you to install an application.
+4. Ensure that the Decision Manager's GUI is reachable via http://<public_ip_node3>:8088. Set the following:
+- Rule Name: Reboot
 
-     ![survey choice](../../images/deploy_application_survey.png)
+- Restart Minutes: 5
 
-5. Choose an application and press **NEXT**      
+- Restart Count: 1
 
-     ![survey preview](../../images/survey_preview.png)
+> You are telling decision manager that within a 5 minute window you may only reboot a node once.
 
-     Explain to audience what is happening here depending on audience persona
+5. Now ssh into nodes 1 and 2 and start the python listener by typing
 
-    **Persona A**: Technical audience that has written Ansible Playbooks before:
-    Surveys create variables that the Job can use within Ansible Playbooks. In this example a pre-defined list of applications that are tested and allowed on IT infrastructure.  The variable is named **application** and the value is **httpd** in this screenshot.
+``` bash
+python3 -m http.server 8080
+```
 
-    **Persona B**: Decision maker audience, IT manager or above:
-    reiterate business values above.  This allows a non subject matter expert the ability to automate routine tasks.  They can't install applications that are not vetted and put within the survey.  In the event that your IT process does not allow the Red Hat Ansible Automation Platform to be the front end, it has a rich and powerful API that can work with existing workflows such as ServiceNow.
+6. Navigate to **Templates** and run the **Intelligent restart
+   workflow**. This is the first run. Since the Python listeners are up, this should pass.
 
-6. Execute the job by pressing the green **LAUNCH** button
+7. Now from your terminal kill one of the python listeners.
 
-7. Explain what is happening:
+8. Re-run the workflow. Click on the **Can this node be restarted?**
+   Job Template. Look at the log output where Decision Manager's API
+   response instructs Ansible to restart the server. Ansible proceeds
+   to reboot and then run end-to-end tests once the systems are up.
 
-     - Job has started executed in the background.  The user can navigate off this page and the job will continue to execute.
-     - On the left is the **Job Details Pane** labeled simply with **DETAILS**.  This information is logged and tells you who, what, when and how.
-       - **who** - who launched the job, in this example is the admin user
-       - **what** - the project and Ansible Playbook used, and which credential to login to the infrastructure
-       - **when** - time stamps for start, end and duration of the job run.
-       - **how** - the job status (pass, fail), enviornment and execution node
-     - The larger window on the right is the **Standard Out Pane**.  This provides the same console output the user would be used to on the command-line for troubleshooting purposes.  Some important takeways to showcase are:
-       - aggregate info is at the top including the amount of Plays, tasks, hosts and time duration.
-       - this pane can be expanded to take up entire browser window
-       - Ansible Playbook can be downloaded for troubleshooting purposes
-       - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/platform_task_breakdown.png)
+9. Re-Run the workflow within the time interval you defined in
+   step 4. The Python service is still down. However, this time, when
+   Ansible queries Decision Manager whether it is ok to reboot,
+   Decision Manager responds negatively. Ansible can now be configured
+   to alert a human to intervene.
+
+Explain how this can help elevate manual operational tasks that helpdesk can now handle. Also talk about other use cases where external state tracking/decision making might be required. e.g Disaster Recovery
+
 
 8. Circle back and summarize
 
-     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the RHEL web nodes that the application was actually installed but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the boring and routine.  
+     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the RHEL web nodes that the application was actually installed but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the boring and routine.
 
 
 
