@@ -44,3 +44,36 @@ def test_password_no_op_warning(run_module, admin_user, mock_auth_stuff, silence
     silence_warning.assert_called_once_with(
         "The field password of user {0} has encrypted data and "
         "may inaccurately report task is changed.".format(result['id']))
+
+
+@pytest.mark.django_db
+def test_update_password_on_create(run_module, admin_user, mock_auth_stuff):
+    for i in range(2):
+        result = run_module('tower_user', dict(
+            username='Bob',
+            password='pass4word',
+            update_secrets=False
+        ), admin_user)
+        assert not result.get('failed', False), result.get('msg', result)
+
+    assert not result.get('changed')
+
+
+@pytest.mark.django_db
+def test_update_user(run_module, admin_user, mock_auth_stuff):
+    result = run_module('tower_user', dict(
+        username='Bob',
+        password='pass4word',
+        is_system_auditor=True
+    ), admin_user)
+    assert not result.get('failed', False), result.get('msg', result)
+    assert result.get('changed'), result
+
+    update_result = run_module('tower_user', dict(
+        username='Bob',
+        is_system_auditor=False
+    ), admin_user)
+
+    assert update_result.get('changed')
+    user = User.objects.get(id=result['id'])
+    assert not user.is_system_auditor

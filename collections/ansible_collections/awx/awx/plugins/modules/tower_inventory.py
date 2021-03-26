@@ -27,6 +27,14 @@ options:
         - The name to use for the inventory.
       required: True
       type: str
+    copy_from:
+      description:
+        - Name or id to copy the inventory from.
+        - This will copy an existing inventory and change any parameters supplied.
+        - The new inventory name will be the one provided in the name parameter.
+        - The organization parameter is not used in this, to facilitate copy from one organization to another.
+        - Provide the id or use the lookup plugin to provide the id if multiple inventories share the same name.
+      type: str
     description:
       description:
         - The description to use for the inventory.
@@ -48,7 +56,11 @@ options:
       type: str
     host_filter:
       description:
-        -  The host_filter field. Only useful when C(kind=smart).
+        - The host_filter field. Only useful when C(kind=smart).
+      type: str
+    insights_credential:
+      description:
+        - Credentials to be used by hosts belonging to this inventory when accessing Red Hat Insights API.
       type: str
     state:
       description:
@@ -68,10 +80,18 @@ EXAMPLES = '''
     organization: "Bar Org"
     state: present
     tower_config_file: "~/tower_cli.cfg"
+
+- name: Copy tower inventory
+  tower_inventory:
+    name: Copy Foo Inventory
+    copy_from: Default Inventory
+    description: "Our Foo Cloud Servers"
+    organization: Foo
+    state: present
 '''
 
 
-from ..module_utils.tower_api import TowerModule
+from ..module_utils.tower_api import TowerAPIModule
 import json
 
 
@@ -79,36 +99,48 @@ def main():
     # Any additional arguments that are not fields of the item can be added here
     argument_spec = dict(
         name=dict(required=True),
+        copy_from=dict(),
         description=dict(),
         organization=dict(required=True),
         variables=dict(type='dict'),
         kind=dict(choices=['', 'smart'], default=''),
         host_filter=dict(),
+        insights_credential=dict(),
         state=dict(choices=['present', 'absent'], default='present'),
     )
 
     # Create a module for ourselves
-    module = TowerModule(argument_spec=argument_spec)
+    module = TowerAPIModule(argument_spec=argument_spec)
 
     # Extract our parameters
     name = module.params.get('name')
+    copy_from = module.params.get('copy_from')
     description = module.params.get('description')
     organization = module.params.get('organization')
     variables = module.params.get('variables')
     state = module.params.get('state')
     kind = module.params.get('kind')
     host_filter = module.params.get('host_filter')
+    insights_credential = module.params.get('insights_credential')
 
     # Attempt to look up the related items the user specified (these will fail the module if not found)
     org_id = module.resolve_name_to_id('organizations', organization)
 
     # Attempt to look up inventory based on the provided name and org ID
-    inventory = module.get_one('inventories', **{
+    inventory = module.get_one('inventories', name_or_id=name, **{
         'data': {
-            'name': name,
             'organization': org_id
         }
     })
+
+    # Attempt to look up credential to copy based on the provided name
+    if copy_from:
+        # a new existing item is formed when copying and is returned.
+        inventory = module.copy_item(
+            inventory, copy_from, name,
+            endpoint='inventories', item_type='inventory',
+            copy_lookup_data={},
+        )
 
     if state == 'absent':
         # If the state was absent we can let the module delete it if needed, the module will handle exiting from this
@@ -116,7 +148,7 @@ def main():
 
     # Create the data that gets sent for create and update
     inventory_fields = {
-        'name': name,
+        'name': module.get_item_name(inventory) if inventory else name,
         'organization': org_id,
         'kind': kind,
         'host_filter': host_filter,
@@ -125,6 +157,8 @@ def main():
         inventory_fields['description'] = description
     if variables is not None:
         inventory_fields['variables'] = json.dumps(variables)
+    if insights_credential is not None:
+        inventory_fields['insights_credential'] = module.resolve_name_to_id('credentials', insights_credential)
 
     # We need to perform a check to make sure you are not trying to convert a regular inventory into a smart one.
     if inventory and inventory['kind'] == '' and inventory_fields['kind'] == 'smart':

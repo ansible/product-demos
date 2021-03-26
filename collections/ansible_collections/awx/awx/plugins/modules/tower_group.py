@@ -52,6 +52,18 @@ options:
       elements: str
       aliases:
         - groups
+    preserve_existing_hosts:
+      description:
+        - Provide option (False by default) to preserves existing hosts in an existing group in tower.
+      default: False
+      type: bool
+    preserve_existing_children:
+      description:
+        - Provide option (False by default) to preserves existing children in an existing group in tower.
+      default: False
+      type: bool
+      aliases:
+        - preserve_existing_groups
     state:
       description:
         - Desired state of the resource.
@@ -74,9 +86,21 @@ EXAMPLES = '''
     inventory: "Local Inventory"
     state: present
     tower_config_file: "~/tower_cli.cfg"
+
+- name: Add tower group
+  tower_group:
+    name: Cities
+    description: "Local Host Group"
+    inventory: Default Inventory
+    hosts:
+      - fda
+    children:
+      - NewYork
+    preserve_existing_hosts: True
+    preserve_existing_children: True
 '''
 
-from ..module_utils.tower_api import TowerModule
+from ..module_utils.tower_api import TowerAPIModule
 import json
 
 
@@ -90,11 +114,13 @@ def main():
         variables=dict(type='dict'),
         hosts=dict(type='list', elements='str'),
         children=dict(type='list', elements='str', aliases=['groups']),
+        preserve_existing_hosts=dict(type='bool', default=False),
+        preserve_existing_children=dict(type='bool', default=False, aliases=['preserve_existing_groups']),
         state=dict(choices=['present', 'absent'], default='present'),
     )
 
     # Create a module for ourselves
-    module = TowerModule(argument_spec=argument_spec)
+    module = TowerAPIModule(argument_spec=argument_spec)
 
     # Extract our parameters
     name = module.params.get('name')
@@ -102,15 +128,16 @@ def main():
     inventory = module.params.get('inventory')
     description = module.params.get('description')
     state = module.params.pop('state')
+    preserve_existing_hosts = module.params.get('preserve_existing_hosts')
+    preserve_existing_children = module.params.get('preserve_existing_groups')
     variables = module.params.get('variables')
 
     # Attempt to look up the related items the user specified (these will fail the module if not found)
     inventory_id = module.resolve_name_to_id('inventories', inventory)
 
     # Attempt to look up the object based on the provided name and inventory ID
-    group = module.get_one('groups', **{
+    group = module.get_one('groups', name_or_id=name, **{
         'data': {
-            'name': name,
             'inventory': inventory_id
         }
     })
@@ -121,7 +148,7 @@ def main():
 
     # Create the data that gets sent for create and update
     group_fields = {
-        'name': new_name if new_name else name,
+        'name': new_name if new_name else (module.get_item_name(group) if group else name),
         'inventory': inventory_id,
     }
     if description is not None:
@@ -136,12 +163,17 @@ def main():
             continue
         id_list = []
         for sub_name in name_list:
-            sub_obj = module.get_one(resource, **{
-                'data': {'inventory': inventory_id, 'name': sub_name}
+            sub_obj = module.get_one(resource, name_or_id=sub_name, **{
+                'data': {'inventory': inventory_id},
             })
             if sub_obj is None:
                 module.fail_json(msg='Could not find {0} with name {1}'.format(resource, sub_name))
             id_list.append(sub_obj['id'])
+        # Preserve existing objects
+        if (preserve_existing_hosts and relationship == 'hosts') or (preserve_existing_children and relationship == 'children'):
+            preserve_existing_check = module.get_endpoint(group['related'][relationship])
+            for sub_obj in preserve_existing_check['json']['results']:
+                id_list.append(sub_obj['id'])
         if id_list:
             association_fields[relationship] = id_list
 

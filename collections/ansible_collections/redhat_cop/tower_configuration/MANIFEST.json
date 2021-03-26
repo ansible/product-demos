@@ -2,7 +2,7 @@
  "collection_info": {
   "namespace": "redhat_cop",
   "name": "tower_configuration",
-  "version": "1.0.1",
+  "version": "1.3.0",
   "authors": [
    "Andrew Huffman",
    "Jonathan Lozada De La Matta @jlozadad",
@@ -21,9 +21,7 @@
    "GPL-3.0-or-later"
   ],
   "license_file": null,
-  "dependencies": {
-   "awx.awx": "*"
-  },
+  "dependencies": {},
   "repository": "https://github.com/redhat-cop/tower_configuration",
   "documentation": null,
   "homepage": null,
@@ -33,7 +31,7 @@
   "name": "FILES.json",
   "ftype": "file",
   "chksum_type": "sha256",
-  "chksum_sha256": "fbb2b3113624f675cb01bc8d22d2226055a40b62a88a758e6a5e510c7671fd45",
+  "chksum_sha256": "0850ab00a4f7a97091a2667ff04853830cbc3dd290f15a424536292a5b37f4fc",
   "format": 1
  },
  "format": 1

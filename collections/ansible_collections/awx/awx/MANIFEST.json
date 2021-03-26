@@ -20,7 +20,7 @@
   ], 
   "documentation": "https://github.com/ansible/awx/blob/devel/awx_collection/README.md", 
   "namespace": "awx", 
-  "version": "14.0.0", 
+  "version": "18.0.0", 
   "readme": "README.md", 
   "license_file": null, 
   "homepage": "https://www.ansible.com/"
@@ -28,7 +28,7 @@
  "file_manifest_file": {
   "format": 1, 
   "ftype": "file", 
-  "chksum_sha256": "5f22c248bdb4f3d461198b778881b2974935003e4d171c66d48c24715c5604f6", 
+  "chksum_sha256": "13594ce8da633b0f0335c2bf24d2403a93aaa222d20feb33de225cf902fc1913", 
   "name": "FILES.json", 
   "chksum_type": "sha256"
  }, 

@@ -70,22 +70,22 @@ EXAMPLES = '''
 
 '''
 
-from ..module_utils.tower_api import TowerModule
+from ..module_utils.tower_api import TowerAPIModule
 
 
 def main():
     # Any additional arguments that are not fields of the item can be added here
     argument_spec = dict(
-        description=dict(default=''),
+        description=dict(),
         input_field_name=dict(required=True),
         target_credential=dict(required=True),
-        source_credential=dict(default=''),
+        source_credential=dict(),
         metadata=dict(type="dict"),
         state=dict(choices=['present', 'absent'], default='present'),
     )
 
     # Create a module for ourselves
-    module = TowerModule(argument_spec=argument_spec)
+    module = TowerAPIModule(argument_spec=argument_spec)
 
     # Extract our parameters
     description = module.params.get('description')

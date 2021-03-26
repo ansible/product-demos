@@ -11,7 +11,7 @@ Currently:
 |Variable Name|Default Value|Required|Description|Example|
 |:---:|:---:|:---:|:---:|:---:|
 |`tower_hostname`|""|yes|URL to the Ansible Tower Server.|127.0.0.1|
-|`validate_certs`|`False`|no|Whether or not to validate the Ansible Tower Server's SSL certificate.||
+|`tower_validate_certs`|`True`|no|Whether or not to validate the Ansible Tower Server's SSL certificate.||
 |`tower_username`|""|yes|Admin User on the Ansible Tower Server.||
 |`tower_password`|""|yes|Tower Admin User's password on the Ansible Tower Server.  This should be stored in an Ansible Vault at vars/tower-secrets.yml or elsewhere and called from a parent playbook.||
 |`tower_oauthtoken`|""|yes|Tower Admin User's token on the Ansible Tower Server.  This should be stored in an Ansible Vault at or elsewhere and called from a parent playbook.||
@@ -32,7 +32,7 @@ tower_configuration_license_secure_logging defaults to the value of tower_config
 ### Variables
 |Variable Name|Default Value|Required|Type|Description|
 |:---:|:---:|:---:|:---:|:---:|
-|`data`|""|yes|obj|The contents of the license file (Suggested usage with lookup plugin)|
+|`manifest`|""|yes|obj|File path to a Red Hat subscription manifest (a .zip file)|
 |`eula_accepted`|""|yes|bool|Whether to accept the End User License Agreement for Ansible Tower|
 
 For further details on fields see https://docs.ansible.com/ansible-tower/latest/html/userguide/credential_plugins.html

@@ -1,6 +1,6 @@
 # tower_configuration.credential_input_sources
 ## Description
-An Ansible Role to create Job Templates in Ansible Tower.
+An Ansible Role to create credential input sources in Ansible Tower, the below example is for Cyberark as an input source, change accordingly to match your input source type.
 
 ## Requirements
 ansible-galaxy collection install -r tests/collections/requirements.yml to be installed
@@ -12,11 +12,11 @@ Currently:
 |:---:|:---:|:---:|:---:|:---:|
 |`tower_state`|"present"|no|The state all objects will take unless overriden by object default|'absent'|
 |`tower_hostname`|""|yes|URL to the Ansible Tower Server.|127.0.0.1|
-|`validate_certs`|`False`|no|Whether or not to validate the Ansible Tower Server's SSL certificate.||
+|`tower_validate_certs`|`True`|no|Whether or not to validate the Ansible Tower Server's SSL certificate.||
 |`tower_username`|""|yes|Admin User on the Ansible Tower Server.||
 |`tower_password`|""|yes|Tower Admin User's password on the Ansible Tower Server.  This should be stored in an Ansible Vault at vars/tower-secrets.yml or elsewhere and called from a parent playbook.||
 |`tower_oauthtoken`|""|yes|Tower Admin User's token on the Ansible Tower Server.  This should be stored in an Ansible Vault at or elsewhere and called from a parent playbook.||
-|`tower_credential_input_sources`|`see below`|yes|Data structure describing your orgainzation or orgainzations Described below.||
+|`tower_credential_input_sources`|`see below`|yes|Data structure describing your credential input sources Described below.||
 
 ### Secure Logging Variables
 The following Variables compliment each other.

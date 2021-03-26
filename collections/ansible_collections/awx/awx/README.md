@@ -71,6 +71,7 @@ Notable releases of the `awx.awx` collection:
 
 The following notes are changes that may require changes to playbooks:
 
+ - The module tower_notification was renamed tower_notification_template. In ansible >= 2.10 there is a seemless redirect. Ansible 2.9 does not respect the redirect.
  - When a project is created, it will wait for the update/sync to finish by default; this can be turned off with the `wait` parameter, if desired.
  - Creating a "scan" type job template is no longer supported.
  - Specifying a custom certificate via the `TOWER_CERTIFICATE` environment variable no longer works.
@@ -91,9 +92,9 @@ The following notes are changes that may require changes to playbooks:
  - Specified `tower_config` file used to handle `k=v` pairs on a single line; this is no longer supported. Please use a file formatted as `yaml`, `json` or `ini` only.
  - Some return values (e.g., `credential_type`) have been removed. Use of `id` is recommended.
  - `tower_job_template` no longer supports the deprecated `extra_vars_path` parameter, please use `extra_vars` with the lookup plugin to replace this functionality.
- - The `notification_configuration` parameter of `tower_notification` has changed from a string to a dict. Please use the `lookup` plugin to read an existing file into a dict.
+ - The `notification_configuration` parameter of `tower_notification_template` has changed from a string to a dict. Please use the `lookup` plugin to read an existing file into a dict.
  - `tower_credential` no longer supports passing a file name to ssh_key_data.
- - The HipChat `notification_type` has been removed and can no longer be created using the `tower_notification` module.
+ - The HipChat `notification_type` has been removed and can no longer be created using the `tower_notification_template` module.
 
 ## Running Unit Tests
 

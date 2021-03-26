@@ -14,12 +14,12 @@ ansible-galaxy collection install -r tests/collections/requirements.yml to be in
 |:---:|:---:|:---:|:---:|:---:|
 |`tower_state`|"present"|no|The state all objects will take unless overriden by object default|'absent'|
 |`tower_hostname`|""|yes|URL to the Ansible Tower Server.|127.0.0.1|
-|`tower_validate_certs`|`False`|no|Whether or not to validate the Ansible Tower Server's SSL certificate.||
+|`tower_validate_certs`|`True`|no|Whether or not to validate the Ansible Tower Server's SSL certificate.||
 |`tower_config_file`|""|no|Path to the Tower or AWX config file.||
 |`tower_username`|""|yes|Admin User on the Ansible Tower Server.||
 |`tower_password`|""|yes|Tower Admin User's password on the Ansible Tower Server.  This should be stored in an Ansible Vault at vars/tower-secrets.yml or elsewhere and called from a parent playbook.||
 |`tower_oauthtoken`|""|yes|Tower Admin User's token on the Ansible Tower Server.  This should be stored in an Ansible Vault at or elsewhere and called from a parent playbook.||
-|`tower_credentials`|`see below`|yes|Data structure describing your orgainzation or orgainzations Described below.||
+|`tower_credentials`|`see below`|yes|Data structure describing your credentials Described below.||
 
 ### Secure Logging Variables
 The following Variables compliment each other.
@@ -45,6 +45,7 @@ tower_configuration_credentials_secure_logging defaults to the value of tower_co
 |`user`|""|no|User that should own this credential. If provided, do not give either team or organization. |
 |`team`|""|no|Team that should own this credential. If provided, do not give either user or organization. |
 |`state`|`present`|no|Desired state of the resource.|
+|`update_secrets`|true|no|bool| True will always change password if user specifies password, even if API gives $encrypted$ for password. False will only set the password if other values change too.|
 
 ### Credential types
 |Credential types|
