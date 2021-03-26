@@ -17,6 +17,7 @@ tower_projects:
     scm_type: git
     scm_update_on_launch: true
     scm_update_cache_timeout: 3600
+    wait: yes
     scm_url: "https://github.com/redhattelco/intelligent-restarts"
 
 tower_templates:
@@ -46,7 +47,7 @@ tower_templates:
     credentials:
     - "Workshop Credential"
 
-  - name: "WebSeal health check"
+  - name: "WebServer health check"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
@@ -55,7 +56,7 @@ tower_templates:
     credentials:
     - "Workshop Credential"
 
-  - name: "Restart WebSeal"
+  - name: "Restart WebServer"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
@@ -64,25 +65,7 @@ tower_templates:
     credentials:
     - "Workshop Credential"
 
-  - name: "New Junction health check"
-    job_type: run
-    inventory: "Workshop Inventory"
-    project: "Intelligent-Ops"
-    playbook: "simple.yml"
-    job_tags: new_junction
-    credentials:
-    - "Workshop Credential"
-
-  - name: "Restart New Junction"
-    job_type: run
-    inventory: "Workshop Inventory"
-    project: "Intelligent-Ops"
-    playbook: "simple.yml"
-    job_tags: restart_nj
-    credentials:
-    - "Workshop Credential"
-
-  - name: "Junction health check"
+  - name: "App Server health check"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
@@ -91,7 +74,7 @@ tower_templates:
     credentials:
     - "Workshop Credential"
 
-  - name: "Restart Junction"
+  - name: "Restart App Server"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Intelligent-Ops"
@@ -150,70 +133,56 @@ tower_workflows:
         success_nodes:
           - node201
         failure_nodes:
-          - node501
+          - node401
         always_nodes: []
-      - unified_job_template: "WebSeal health check"
+      - unified_job_template: "WebServer health check"
         identifier: node201
         success_nodes:
           - node301
         failure_nodes:
           - node202
         always_nodes: []
-      - unified_job_template: "Restart WebSeal"
+      - unified_job_template: "Restart WebServer"
         identifier: node202
         success_nodes:
           - node301
         failure_nodes:
-          - node501
+          - node401
         always_nodes: []
-      - unified_job_template: "New Junction health check"
+      - unified_job_template: "App Server health check"
         identifier: node301
         success_nodes:
-          - node401
+          - node402
         failure_nodes:
           - node302
         always_nodes: []
-      - unified_job_template: "Restart New Junction"
+      - unified_job_template: "Restart App Server"
         identifier: node302
         success_nodes:
-          - node401
-        failure_nodes:
-          - node501
-        always_nodes: []
-      - unified_job_template: "Junction health check"
-        identifier: node401
-        success_nodes:
-          - node502
-        failure_nodes:
           - node402
-        always_nodes: []
-      - unified_job_template: "Restart Junction"
-        identifier: node402
-        success_nodes:
-          - node502
         failure_nodes:
-          - node501
+          - node401
         always_nodes: []
       - unified_job_template: "All systems up"
-        identifier: node502
+        identifier: node402
       - unified_job_template: "Can the node be restarted?"
+        identifier: node401
+        success_nodes:
+          - node501
+        failure_nodes:
+          - node502
+        always_nodes: []
+      - unified_job_template: "Reboot Faulty Nodes"
         identifier: node501
         success_nodes:
           - node601
-        failure_nodes:
-          - node602
-        always_nodes: []
-      - unified_job_template: "Reboot Faulty Nodes"
-        identifier: node601
-        success_nodes:
-          - node701
         failure_nodes: []
         always_nodes: []
       - unified_job_template: "End to End Testing"
-        identifier: node701
+        identifier: node601
       - approval_node:
           name: "Manual override - Reboot"
-        identifier: node602
+        identifier: node502
         success_nodes: []
       #     - node601
       #   always_nodes: []
