@@ -89,55 +89,78 @@ tower_templates:
     - "Caretaker-Demo: credential"
     - "Workshop Credential"
 
+  - name: "Caretaker: Open a ticket"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Caretaker-Demo"
+    playbook: "open_ticket.yml"
+    credentials:
+    - "Workshop Credential"
+
 tower_workflows:
   - name: "Caretaker Demo Workflow"
     organization: "REDHAT NETWORK ORGANIZATION"
     webhook_service: "github"
     workflow_nodes:
+      - identifier: node101
+        unified_job_template:
+          organization:
+            name: "REDHAT NETWORK ORGANIZATION"
+          name: "Caretaker-Demo"
+          type: project
+        related:
+          success_nodes: []
+          failure_nodes: []
+          always_nodes: []
+          credentials: []
       - unified_job_template: "Caretaker-Demo: Main Deploy Task"
-        identifier: node101
+        identifier: node201
         success_nodes:
-          - node201
+          - node301
         failure_nodes:
-          - node202
-          - node203
+          - node302
         always_nodes: []
       - unified_job_template: "Caretaker-Demo: Backup device configs"
-        identifier: node201
+        identifier: node301
         success_nodes: []
         failure_nodes: []
         always_nodes: []
       - approval_node:
           name: "Sync to Devices"
         success_nodes:
-          - node301
-        failure_nodes: []
+          - node401
+        failure_nodes: node402
         always_nodes: []
-        identifier: node202
+        identifier: node302
       - approval_node:
           name: "Sync to SoT"
-        identifier: node203
+        identifier: node402
         success_nodes:
-          - node302
-        failure_nodes: []
+          - node501
+        failure_nodes: node502
         always_nodes: []
       - unified_job_template: "Caretaker: Sync from SoT to devices"
-        identifier: node301
+        identifier: node401
         success_nodes:
-          - node401
+          - node601
         failure_nodes: []
         always_nodes: []
       - unified_job_template: "Caretaker: Sync to SoT from devices"
-        identifier: node302
+        identifier: node501
         success_nodes:
-          - node401
+          - node601
+        failure_nodes: []
+        always_nodes: []
+      - unified_job_template: "Caretaker: Open a ticket"
+        identifier: node502
+        success_nodes: []
         failure_nodes: []
         always_nodes: []
       - unified_job_template: "Caretaker-Demo: Main Deploy Task"
-        identifier: node401
+        identifier: node601
         success_nodes:
-          - node501
+          - node701
         failure_nodes: []
         always_nodes: []
       - unified_job_template: "Caretaker-Demo: Backup device configs"
-        identifier: node501
+        identifier: node701
