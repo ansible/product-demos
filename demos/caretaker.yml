@@ -109,9 +109,10 @@ tower_workflows:
           name: "Caretaker-Demo"
           type: project
         related:
-          success_nodes: node201
+          success_nodes: []
           failure_nodes: []
-          always_nodes: []
+          always_nodes:
+            - node201
           credentials: []
       - unified_job_template: "Caretaker-Demo: Main Deploy Task"
         identifier: node201
