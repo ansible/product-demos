@@ -30,14 +30,14 @@ no_endpoint_for_module = [
 
 # Global module parameters we can ignore
 ignore_parameters = [
-    'state', 'new_name', 'update_secrets'
+    'state', 'new_name', 'update_secrets', 'copy_from'
 ]
 
 # Some modules take additional parameters that do not appear in the API
 # Add the module name as the key with the value being the list of params to ignore
 no_api_parameter_ok = {
     # The wait is for whether or not to wait for a project update on change
-    'tower_project': ['wait'],
+    'tower_project': ['wait', 'interval', 'update_project'],
     # Existing_token and id are for working with an existing tokens
     'tower_token': ['existing_token', 'existing_token_id'],
     # /survey spec is now how we handle associations
@@ -48,8 +48,10 @@ no_api_parameter_ok = {
     'tower_workflow_job_template_node': ['organization', 'approval_node'],
     # Survey is how we handle associations
     'tower_workflow_job_template': ['survey_spec'],
-    # ad hoc commands support interval and timeout since its more like tower_job_launc
+    # ad hoc commands support interval and timeout since its more like tower_job_launch
     'tower_ad_hoc_command': ['interval', 'timeout', 'wait'],
+    # tower_group parameters to perserve hosts and children.
+    'tower_group': ['preserve_existing_children', 'preserve_existing_hosts'],
 }
 
 # When this tool was created we were not feature complete. Adding something in here indicates a module
@@ -138,6 +140,7 @@ def determine_state(module_id, endpoint, module, parameter, api_option, module_o
         if not api_option and module_option and module_option.get('type', 'str') == 'list':
             return "OK, Field appears to be relation"
             # TODO, at some point try and check the object model to confirm its actually a relation
+
         return cause_error('Failed, option mismatch')
 
     # We made it through all of the checks so we are ok
