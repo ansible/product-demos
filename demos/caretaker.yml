@@ -102,18 +102,12 @@ tower_workflows:
     organization: "REDHAT NETWORK ORGANIZATION"
     webhook_service: "github"
     workflow_nodes:
-      - identifier: node101
-        unified_job_template:
-          organization:
-            name: "REDHAT NETWORK ORGANIZATION"
-          name: "Caretaker-Demo"
-          type: project
-        related:
-          success_nodes: []
-          failure_nodes: []
-          always_nodes:
-            - node201
-          credentials: []
+      - unified_job_template: "Caretaker-Demo"
+        identifier: node101
+        success_nodes:
+          - node201
+        failure_nodes: []
+        always_nodes: []
       - unified_job_template: "Caretaker-Demo: Main Deploy Task"
         identifier: node201
         success_nodes:

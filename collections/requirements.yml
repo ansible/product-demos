@@ -1,5 +1,4 @@
 ---
 collections:
-  - name: redhat_cop.tower_configuration
-    version: 1.0.2
+  - redhat_cop.tower_configuration
   - awx.awx
