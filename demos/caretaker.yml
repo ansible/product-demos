@@ -109,7 +109,7 @@ tower_workflows:
           name: "Caretaker-Demo"
           type: project
         related:
-          success_nodes: []
+          success_nodes: node201
           failure_nodes: []
           always_nodes: []
           credentials: []
