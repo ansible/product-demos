@@ -4,7 +4,7 @@
   loop: "{{ item.value.job_templates|dict2items }}"
 
 - name: "INSIDE LOOP - install workflow template {{ item.value.name }}"
-  tower_workflow_template:
+  awx.awx.tower_workflow_template:
     name: "{{ item.value.name }}"
     description: "{{ item.value.description }}"
     organization: "{{ item.value.organization }}"

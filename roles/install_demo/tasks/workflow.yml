@@ -6,7 +6,7 @@
   loop: "{{ hostvars[inventory_hostname][demo].job_templates|dict2items }}"
 
 - name: "install workflow template {{ hostvars[inventory_hostname][demo].name }}"
-  tower_workflow_template:
+  awx.awx.tower_workflow_template:
     name: "{{ hostvars[inventory_hostname][demo].name }}"
     description: "{{ hostvars[inventory_hostname][demo].description }}"
     organization: "{{ hostvars[inventory_hostname][demo].organization }}"

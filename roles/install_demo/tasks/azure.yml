@@ -1,6 +1,6 @@
 ---
 - name: add azure credential
-  tower_credential:
+  awx.awx.tower_credential:
     name: azure_credential
     description: Azure Service Principle
     organization: "Default"

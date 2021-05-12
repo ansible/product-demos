@@ -1,6 +1,6 @@
 ---
 - name: add tower project
-  tower_project:
+  awx.awx.tower_project:
     name: "{{ vars[demo].project.name }}"
     description: "{{ vars[demo].project.description }}"
     organization: "{{ vars[demo].project.organization }}"
@@ -11,8 +11,22 @@
     tower_host: "{{ my_tower_host }}"
     validate_certs: false
 
+- name: show values
+  debug:
+    msg:
+      - "name: {{ vars[demo].name }}"
+      - "description: {{ vars[demo].description }}"
+      - "job_type: {{ vars[demo].job_type }}"
+      - "inventory: {{ vars[demo].inventory }}"
+      - "project: {{ vars[demo].project.name }}"
+      - "playbook: {{ vars[demo].playbook }}"
+      - "fact_caching_enabled: {{ vars[demo].fact_caching_enabled | default('false') }}"
+      - "credential: {{ vars[demo].credential }}"
+      - "survey_enabled: {{ vars[demo].survey_enabled  | default('false')  }}"
+
+
 - name: add single job template without survey
-  tower_job_template:
+  awx.awx.tower_job_template:
     name: "{{ vars[demo].name }}"
     description: "{{ vars[demo].description }}"
     job_type: "{{ vars[demo].job_type }}"
@@ -34,7 +48,7 @@
   retries: 5
 
 - name: add single job template with survey
-  tower_job_template:
+  awx.awx.tower_job_template:
     name: "{{ vars[demo].name }}"
     description: "{{ vars[demo].description }}"
     job_type: "{{ vars[demo].job_type }}"
