@@ -6,7 +6,7 @@
 - name: block for job template loop
   block:
     - name: "add tower project job_template_loop.yml"
-      tower_project:
+      awx.awx.tower_project:
         name: "{{ item.value.project.name }}"
         description: "{{ item.value.project.description }}"
         organization: "{{ item.value.project.organization }}"
