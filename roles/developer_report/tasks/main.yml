@@ -1,7 +1,7 @@
 ---
 - name: Create filepath directory
   file: 
-    path: {{ file_path }}
+    path: "{{ file_path }}"
     state: directory
     mode: '0755'
 
