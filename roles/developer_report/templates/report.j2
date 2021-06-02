@@ -21,6 +21,12 @@
 {% for linux_node in groups['web'] %}
         <tr>
             <td>{{ hostvars[linux_node]['ansible_hostname'] }}</td>
+            <td>{{ hostvars[linux_node]['ansible_distribution'] }} {{hostvars[linux_node]['ansible_distribution_version']}}</td>
+            <td>{{ hostvars[linux_node]['ansible_env']['PATH'] }}</td>
+            <td>{{ hostvars[linux_node]['ansible_kernel'] }}</td>
+            <td>{{ hostvars[linux_node]['ansible_python_version'] }}</td>
+            <td>{{ hostvars[linux_node]['ansible_pkg_mgr'] }}</td>
+            <td>{{ hostvars[linux_node]['ansible_date_time']['date'] }}</td>
             
         </tr>
 {% endfor %}
