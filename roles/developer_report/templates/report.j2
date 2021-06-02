@@ -20,7 +20,7 @@
     <tbody>
 {% for linux_node in groups['all'] %}
         <tr>
-            <td>{{ hostvars[linux_node]['ansible_facts']['hostname'] }}</td>
+            <td>{{ hostvars[linux_node]['ansible_facts']['ansible_hostname'] }}</td>
             <td>{{ hostvars[linux_node]['ansible_distribution'] }} {{hostvars[linux_node]['ansible_distribution_version']}}</td>
             <td>{{ hostvars[linux_node]['ansible_env']['PATH'] }}</td>
             <td>{{ hostvars[linux_node]['ansible_kernel'] }}</td>
