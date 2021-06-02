@@ -1,5 +1,6 @@
 ---
 - name: install web package
+  become: true
   yum:
     name: httpd
     state: latest
@@ -18,6 +19,7 @@
     dest: "{{ file_path }}/index.html"
     
 - name: restart service 
+  become: true
   service:
     name: httpd
     state: restarted
