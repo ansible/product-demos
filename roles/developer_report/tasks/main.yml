@@ -1,9 +1,15 @@
 ---
+- name: Create filepath directory
+  file: 
+    path: {{ file_path }}
+    state: directory
+    mode: '0755'
+
 - name: create HTML report
   become: true
   template:
     src: report.j2
-    dest: "{{ file_path }}"
+    dest: "{{ file_path }}/index.html"
 
 - name: DISPLAY LINK TO INVENTORY REPORT
   debug:
