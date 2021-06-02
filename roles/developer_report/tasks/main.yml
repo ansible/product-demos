@@ -1,4 +1,9 @@
 ---
+- name: install web package
+  yum:
+    name: httpd
+    status: latest
+    
 - name: Create filepath directory
   become: true
   file: 
@@ -11,6 +16,11 @@
   template:
     src: report.j2
     dest: "{{ file_path }}/index.html"
+    
+- name: restart service 
+  service:
+    name: httpd
+    status: restarted
 
 - name: DISPLAY LINK TO INVENTORY REPORT
   debug:
