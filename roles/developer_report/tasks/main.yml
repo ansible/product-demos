@@ -1,5 +1,6 @@
 ---
 - name: Create filepath directory
+  become: true
   file: 
     path: "{{ file_path }}"
     state: directory
