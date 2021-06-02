@@ -20,7 +20,7 @@
     <tbody>
 {% for linux_node in groups['web'] %}
         <tr>
-            <td>{{ hostvars[linux_node]['ansible_facts']['hostname'] }}</td>
+            <td>{{ hostvars[linux_node]['ansible_hostname'] }}</td>
             
         </tr>
 {% endfor %}
