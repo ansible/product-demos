@@ -2,7 +2,7 @@
 - name: install web package
   yum:
     name: httpd
-    status: latest
+    state: latest
     
 - name: Create filepath directory
   become: true
@@ -20,7 +20,7 @@
 - name: restart service 
   service:
     name: httpd
-    status: restarted
+    state: restarted
 
 - name: DISPLAY LINK TO INVENTORY REPORT
   debug:
