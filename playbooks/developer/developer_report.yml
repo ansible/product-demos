@@ -5,6 +5,8 @@
 
 - name: build developer report
   hosts: node1
+  gather_facts: true
+  
   vars:
     file_path: /var/www/html/report/index.html
 
