@@ -18,9 +18,9 @@
         </tr>
     </thead>
     <tbody>
-{% for linux_node in groups['all'] %}
+{% for linux_node in groups['web'] %}
         <tr>
-            <td>{{ hostvars[linux_node].ansible_facts.ansible_hostname }}</td>
+            <td>{{ hostvars[linux_node]['ansible_facts']['ansible_hostname'] }}</td>
             
         </tr>
 {% endfor %}
