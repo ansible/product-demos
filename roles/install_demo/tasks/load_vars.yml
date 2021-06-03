@@ -2,7 +2,8 @@
 - name: include all demo vars from install_demo roll
   include_vars:
     dir: "vars"
+    name: job_template_definitions
 
-- name: will load vars from adjacent vars
+- name: will load vars
   debug:
-    msg: "variables loaded from install_demo role"
+    msg: "variables loaded from install_demo role into job_template_definitions"

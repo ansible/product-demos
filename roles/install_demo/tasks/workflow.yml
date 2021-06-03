@@ -1,16 +1,16 @@
 ---
 # these tasks will install a workflow
 
-- name: "install all job templates in relation to workflow {{ hostvars[inventory_hostname][demo].name }}"
+- name: "install all job templates in relation to workflow {{ job_template_definitions[demo].name }}"
   include_tasks: add_job_template.yml
-  loop: "{{ hostvars[inventory_hostname][demo].job_templates|dict2items }}"
+  loop: "{{ job_template_definitions[demo].job_templates|dict2items }}"
 
-- name: "install workflow template {{ hostvars[inventory_hostname][demo].name }}"
+- name: "install workflow template {{ job_template_definitions[demo].name }}"
   awx.awx.tower_workflow_template:
-    name: "{{ hostvars[inventory_hostname][demo].name }}"
-    description: "{{ hostvars[inventory_hostname][demo].description }}"
-    organization: "{{ hostvars[inventory_hostname][demo].organization }}"
-    schema: "{{ hostvars[inventory_hostname][demo].schema }}"
+    name: "{{ job_template_definitions[demo].name }}"
+    description: "{{ job_template_definitions[demo].description }}"
+    organization: "{{ job_template_definitions[demo].organization }}"
+    schema: "{{ job_template_definitions[demo].schema }}"
     tower_username: "{{ my_tower_username }}"
     tower_password: "{{ my_tower_password }}"
     tower_host: "{{ my_tower_host }}"

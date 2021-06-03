@@ -1,11 +1,11 @@
 ---
 - name: add tower project
   awx.awx.tower_project:
-    name: "{{ vars[demo].project.name }}"
-    description: "{{ vars[demo].project.description }}"
-    organization: "{{ vars[demo].project.organization }}"
-    scm_type: "{{ vars[demo].project.scm_type }}"
-    scm_url: "{{ vars[demo].project.scm_url }}"
+    name: "{{ job_template_definitions[demo].project.name }}"
+    description: "{{ job_template_definitions[demo].project.description }}"
+    organization: "{{ job_template_definitions[demo].project.organization }}"
+    scm_type: "{{ job_template_definitions[demo].project.scm_type }}"
+    scm_url: "{{ job_template_definitions[demo].project.scm_url }}"
     tower_username: "{{ my_tower_username }}"
     tower_password: "{{ my_tower_password }}"
     tower_host: "{{ my_tower_host }}"
@@ -14,58 +14,58 @@
 - name: show values
   debug:
     msg:
-      - "name: {{ vars[demo].name }}"
-      - "description: {{ vars[demo].description }}"
-      - "job_type: {{ vars[demo].job_type }}"
-      - "inventory: {{ vars[demo].inventory }}"
-      - "project: {{ vars[demo].project.name }}"
-      - "playbook: {{ vars[demo].playbook }}"
-      - "fact_caching_enabled: {{ vars[demo].fact_caching_enabled | default('false') }}"
-      - "credential: {{ vars[demo].credential }}"
-      - "survey_enabled: {{ vars[demo].survey_enabled  | default('false')  }}"
+      - "name: {{ job_template_definitions[demo].name }}"
+      - "description: {{ job_template_definitions[demo].description }}"
+      - "job_type: {{ job_template_definitions[demo].job_type }}"
+      - "inventory: {{ job_template_definitions[demo].inventory }}"
+      - "project: {{ job_template_definitions[demo].project.name }}"
+      - "playbook: {{ job_template_definitions[demo].playbook }}"
+      - "fact_caching_enabled: {{ job_template_definitions[demo].fact_caching_enabled | default('false') }}"
+      - "credential: {{ job_template_definitions[demo].credential }}"
+      - "survey_enabled: {{ job_template_definitions[demo].survey_enabled  | default('false')  }}"
 
 
 - name: add single job template without survey
   awx.awx.tower_job_template:
-    name: "{{ vars[demo].name }}"
-    description: "{{ vars[demo].description }}"
-    job_type: "{{ vars[demo].job_type }}"
-    inventory: "{{ vars[demo].inventory }}"
-    project: "{{ vars[demo].project.name }}"
-    playbook: "{{ vars[demo].playbook }}"
-    fact_caching_enabled: "{{ vars[demo].fact_caching_enabled | default('false') }}"
-    credential: "{{ vars[demo].credential }}"
-    survey_enabled: "{{ vars[demo].survey_enabled }}"
+    name: "{{ job_template_definitions[demo].name }}"
+    description: "{{ job_template_definitions[demo].description }}"
+    job_type: "{{ job_template_definitions[demo].job_type }}"
+    inventory: "{{ job_template_definitions[demo].inventory }}"
+    project: "{{ job_template_definitions[demo].project.name }}"
+    playbook: "{{ job_template_definitions[demo].playbook }}"
+    fact_caching_enabled: "{{ job_template_definitions[demo].fact_caching_enabled | default('false') }}"
+    credential: "{{ job_template_definitions[demo].credential }}"
+    survey_enabled: "{{ job_template_definitions[demo].survey_enabled }}"
     tower_username: "{{ my_tower_username }}"
     tower_password: "{{ my_tower_password }}"
     tower_host: "{{ my_tower_host }}"
     validate_certs: false
   when:
-    - workshop_type in vars[demo].workshop_type
-    - not vars[demo].survey_enabled
+    - workshop_type in job_template_definitions[demo].workshop_type
+    - not job_template_definitions[demo].survey_enabled
   register: add_job_template
   until: add_job_template is not failed
   retries: 5
 
 - name: add single job template with survey
   awx.awx.tower_job_template:
-    name: "{{ vars[demo].name }}"
-    description: "{{ vars[demo].description }}"
-    job_type: "{{ vars[demo].job_type }}"
-    inventory: "{{ vars[demo].inventory }}"
-    project: "{{ vars[demo].project.name }}"
-    playbook: "{{ vars[demo].playbook }}"
-    fact_caching_enabled: "{{ vars[demo].fact_caching_enabled | default('false') }}"
-    credential: "{{ vars[demo].credential }}"
-    survey_enabled: "{{ vars[demo].survey_enabled }}"
-    survey_spec: "{{ vars[demo].survey_spec }}"
+    name: "{{ job_template_definitions[demo].name }}"
+    description: "{{ job_template_definitions[demo].description }}"
+    job_type: "{{ job_template_definitions[demo].job_type }}"
+    inventory: "{{ job_template_definitions[demo].inventory }}"
+    project: "{{ job_template_definitions[demo].project.name }}"
+    playbook: "{{ job_template_definitions[demo].playbook }}"
+    fact_caching_enabled: "{{ job_template_definitions[demo].fact_caching_enabled | default('false') }}"
+    credential: "{{ job_template_definitions[demo].credential }}"
+    survey_enabled: "{{ job_template_definitions[demo].survey_enabled }}"
+    survey_spec: "{{ job_template_definitions[demo].survey_spec }}"
     tower_username: "{{ my_tower_username }}"
     tower_password: "{{ my_tower_password }}"
     tower_host: "{{ my_tower_host }}"
     validate_certs: false
   when:
-    - workshop_type in vars[demo].workshop_type
-    - vars[demo].survey_enabled
+    - workshop_type in job_template_definitions[demo].workshop_type
+    - job_template_definitions[demo].survey_enabled
   register: add_job_template
   until: add_job_template is not failed
   retries: 5
