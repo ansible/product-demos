@@ -1,21 +1,24 @@
 ---
+- name: explicitly load vars under a subkey for reliable access
+  include_tasks: load_vars.yml
+
 - name: set facts from role vars
   set_fact:
-    demo_list: "{{ (dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined')|selectattr('1.workshop_type', 'defined'))|dict2items)|map(attribute='key')|list }}"
-    full_demo_info: "{{ (dict(vars|dictsort|rejectattr('0', 'match', 'ansible_')|selectattr('1.name', 'defined')|selectattr('1.workshop_type', 'defined'))|dict2items) }}"
+    demo_list: "{{ ( job_template_definitions|map(attribute='key')|list }}"
+    full_demo_info: "{{ job_template_definitions|dict2items) }}"
 
 - name: provide info to terminal window
   debug:
     msg:
-      - "install {{ vars.demo }} on {{ my_tower_host }}"
+      - "install {{ demo }} on {{ my_tower_host }}"
       - "total demos: {{ demo_list | length }}"
       - "available demos are: {{ demo_list }}"
 
 - name: make sure demo is a valid demo
   assert:
     that:
-      - vars.demo is defined
-      - vars.demo in demo_list or vars.demo == "all"
+      - demo is defined
+      - demo in demo_list or demo == "all"
     msg:
       - "demo must be defined and be one of: {{ demo_list }}"
       - "full list can be found on https://github.com/ansible/product-demos"
@@ -35,11 +38,11 @@
   include_tasks: job_template.yml
   when:
     - demo != "all"
-    - vars[demo].workflow is not defined or not vars[demo].workflow
+    - job_template_definitions[demo].workflow is not defined or not job_template_definitions[demo].workflow
 
 - name: install single workflow
   include_tasks: workflow.yml
   when:
     - demo != "all"
-    - vars[demo].workflow is defined
-    - vars[demo].workflow
+    - job_template_definitions[demo].workflow is defined
+    - job_template_definitions[demo].workflow
