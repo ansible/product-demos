@@ -1,7 +1,7 @@
 ---
 azure_mysql_server:
   author: "David Rojas"
-  readme: "https://github.com/ansible/product-demos/blob/master/docs/infrastructure/azure_provision_vm.md"
+  readme: "https://github.com/ansible/product-demos/blob/master/docs/infrastructure/azure_mysql_server.md"
   category: infrastructure
   name: "INFRASTRUCTURE / Azure create a MySQL Server"
   description: "Provision MySQL server on Azure with Ansible Tower Survey and Environmental variables"

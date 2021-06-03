@@ -39,8 +39,8 @@ Coming Soon
 
 1. You will need to create a Service Principal following these [Azure Docs instructions](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal)
 
-2. Then set the azure_demo variable to True. As well as provide the folowing variable values before loading this demo as shown below.
- - azure_demo: True
+2. Then set the public_cloud variable to azure. As well as provide the folowing variable values before loading this demo as shown below.
+ - public_cloud: azure
  - my_subscription:
  - my_tenant: 
  - my_client: 
