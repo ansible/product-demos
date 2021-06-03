@@ -34,6 +34,10 @@ tags:
   - tower
   - awx
 
+build_ignore:
+  - images
+  - '*.tar.gz'
+
 dependencies: {}
 
 repository: http://github.com/ansible/product-demos

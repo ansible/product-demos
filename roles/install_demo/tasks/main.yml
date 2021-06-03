@@ -4,8 +4,8 @@
 
 - name: set facts from role vars
   set_fact:
-    demo_list: "{{ ( job_template_definitions|map(attribute='key')|list }}"
-    full_demo_info: "{{ job_template_definitions|dict2items) }}"
+    demo_list: "{{ job_template_definitions|map(attribute='key')|list }}"
+    full_demo_info: "{{ job_template_definitions|dict2items }}"
 
 - name: provide info to terminal window
   debug:
