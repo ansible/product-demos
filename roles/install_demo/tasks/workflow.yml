@@ -4,14 +4,3 @@
 - name: "install all job templates in relation to workflow {{ job_template_definitions[demo].name }}"
   include_tasks: add_job_template.yml
   loop: "{{ job_template_definitions[demo].job_templates|dict2items }}"
-
-- name: "install workflow template {{ job_template_definitions[demo].name }}"
-  awx.awx.tower_workflow_template:
-    name: "{{ job_template_definitions[demo].name }}"
-    description: "{{ job_template_definitions[demo].description }}"
-    organization: "{{ job_template_definitions[demo].organization }}"
-    schema: "{{ job_template_definitions[demo].schema }}"
-    tower_username: "{{ my_tower_username }}"
-    tower_password: "{{ my_tower_password }}"
-    tower_host: "{{ my_tower_host }}"
-    validate_certs: false
