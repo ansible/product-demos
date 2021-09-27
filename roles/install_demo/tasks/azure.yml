@@ -1,16 +1,17 @@
 ---
 - name: add azure credential
-  awx.awx.tower_credential:
+  awx.awx.credential:
     name: azure_credential
     description: Azure Service Principle
     organization: "Default"
     state: present
-    kind: azure_rm
-    subscription: "{{ my_subscription }}"
-    tenant: "{{ my_tenant }}"
-    client: "{{ my_client }}"
-    secret: "{{ my_secret }}"
-    tower_username: "{{ my_tower_username }}"
-    tower_password: "{{ my_tower_password }}"
-    tower_host: "{{ my_tower_host }}"
+    credential_type: Microsoft Azure Resource Manager
+    inputs:
+      subscription: "{{ my_subscription }}"
+      tenant: "{{ my_tenant }}"
+      client: "{{ my_client }}"
+      secret: "{{ my_secret }}"
+    controller_username: "{{ my_controller_username }}"
+    controller_password: "{{ my_controller_password }}"
+    controller_host: "{{ my_controller_host }}"
     validate_certs: false
