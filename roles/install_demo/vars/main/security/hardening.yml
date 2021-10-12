@@ -9,6 +9,7 @@ hardening:
   playbook: "playbooks/security/hardening.yml"
   credential: "Workshop Credential"
   survey_enabled: true
+  execution_environment: "Default execution environment"
   survey_spec:
     name: ''
     description: ''
