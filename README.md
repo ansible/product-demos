@@ -13,3 +13,5 @@ This is a centralized location for all Ansible Product Demos going forward.
 ## Contributions
 
 Please push contributions via a pull request following the naming convention of name-of-demo.
+
+[![GitHub Super-Linter](https://github.com/ansible/ansible-demos/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
