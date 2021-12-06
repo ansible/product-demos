@@ -1,6 +1,6 @@
 # Official Ansible Product Demos
 
-This is a centralized location for all Ansible Product Demos going forward. 
+This is a centralized location for all Ansible Product Demos going forward.
 
 | Demo Name                                                        | Description                                                                                 |
 |------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
