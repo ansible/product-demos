@@ -34,30 +34,30 @@ This repository currently holds {{job_template_definitions.items()|sort(attribut
 
 ## Infrastructure Demos
 
-| Demo Name | Author | install_demo.yml value | Description | Video Walkthrough | Workshop Types |
-| --------- | ------ | ---------------------- | ----------- | ----------------- | -------------- |
-{% for key, value in job_template_definitions.items()|selectattr('1.category', 'match', 'infrastructure$')|sort(attribute='1.name') %}| {% if value.readme is defined%}[{{value.name}}]({{ value.readme}}"){% else %}{{value.name}}{% endif %} | {{value.author}} | `demo: {{key}}` | {{value.description}} | {% if value.video is defined%}[Video Link]({{ value.video}}){% else %}Not available {% endif %} | {% for workshop in value.workshop_type %} <li>{{workshop}}</li>{% endfor %} |
+| Demo Name | Author | install_demo.yml value | Description | Video Walkthrough |
+| --------- | ------ | ---------------------- | ----------- | ----------------- |
+{% for key, value in job_template_definitions.items()|selectattr('1.category', 'match', 'infrastructure$')|sort(attribute='1.name') %}| {% if value.readme is defined%}[{{value.name}}]({{ value.readme}}"){% else %}{{value.name}}{% endif %} | {{value.author}} | `demo: {{key}}` | {{value.description}} | {% if value.video is defined%}[Video Link]({{ value.video}}){% else %}Not available {% endif %} |
 {% endfor %}
 
 ## Network Demos
 
-| Demo Name | Author | install_demo.yml value | Description | Video Walkthrough | Workshop Types |
-| --------- | ------ | ---------------------- | ----------- | ----------------- | -------------- |
-{% for key, value in job_template_definitions.items()|selectattr('1.category', 'match', 'network$')|sort(attribute='1.name') %}| {% if value.readme is defined%}[{{value.name}}]({{ value.readme}}"){% else %}{{value.name}}{% endif %} | {{value.author}} | `demo: {{key}}` | {{value.description}} | {% if value.video is defined%}[Video Link]({{ value.video}}){% else %}Not available {% endif %} | {% for workshop in value.workshop_type %} <li>{{workshop}}</li>{% endfor %} |
+| Demo Name | Author | install_demo.yml value | Description | Video Walkthrough |
+| --------- | ------ | ---------------------- | ----------- | ----------------- |
+{% for key, value in job_template_definitions.items()|selectattr('1.category', 'match', 'network$')|sort(attribute='1.name') %}| {% if value.readme is defined%}[{{value.name}}]({{ value.readme}}"){% else %}{{value.name}}{% endif %} | {{value.author}} | `demo: {{key}}` | {{value.description}} | {% if value.video is defined%}[Video Link]({{ value.video}}){% else %}Not available {% endif %} |
 {% endfor %}
 
 ## Security Demos
 
-| Demo Name | Author | install_demo.yml value | Description | Video Walkthrough | Workshop Types |
-| --------- | ------ | ---------------------- | ----------- | ----------------- | -------------- |
-{% for key, value in job_template_definitions.items()|selectattr('1.category', 'match', 'security$')|sort(attribute='1.name') %}| {% if value.readme is defined%}[{{value.name}}]({{ value.readme}}"){% else %}{{value.name}}{% endif %} | {{value.author}} | `demo: {{key}}` | {{value.description}} | {% if value.video is defined%}[Video Link]({{ value.video}}){% else %}Not available {% endif %} | {% for workshop in value.workshop_type %} <li>{{workshop}}</li>{% endfor %} |
+| Demo Name | Author | install_demo.yml value | Description | Video Walkthrough |
+| --------- | ------ | ---------------------- | ----------- | ----------------- |
+{% for key, value in job_template_definitions.items()|selectattr('1.category', 'match', 'security$')|sort(attribute='1.name') %}| {% if value.readme is defined%}[{{value.name}}]({{ value.readme}}"){% else %}{{value.name}}{% endif %} | {{value.author}} | `demo: {{key}}` | {{value.description}} | {% if value.video is defined%}[Video Link]({{ value.video}}){% else %}Not available {% endif %} |
 {% endfor %}
 
 ## Developer Demos
 
-| Demo Name | Author | install_demo.yml value | Description | Video Walkthrough | Workshop Types |
-| --------- | ------ | ---------------------- | ----------- | ----------------- | -------------- |
-{% for key, value in job_template_definitions.items()|selectattr('1.category', 'match', 'developer$')|sort(attribute='1.name') %}| {% if value.readme is defined%}[{{value.name}}]({{ value.readme}}"){% else %}{{value.name}}{% endif %} | {{value.author}} | `demo: {{key}}` |{{value.description}}| {% if value.video is defined%}[Video Link]({{ value.video}}){% else %}Not available {% endif %} | {% for workshop in value.workshop_type %} <li>{{workshop}}</li>{% endfor %} |
+| Demo Name | Author | install_demo.yml value | Description | Video Walkthrough |
+| --------- | ------ | ---------------------- | ----------- | ----------------- |
+{% for key, value in job_template_definitions.items()|selectattr('1.category', 'match', 'developer$')|sort(attribute='1.name') %}| {% if value.readme is defined%}[{{value.name}}]({{ value.readme}}"){% else %}{{value.name}}{% endif %} | {{value.author}} | `demo: {{key}}` | {{value.description}} | {% if value.video is defined%}[Video Link]({{ value.video}}){% else %}Not available {% endif %} |
 {% endfor %}
 
 ## Contribute
