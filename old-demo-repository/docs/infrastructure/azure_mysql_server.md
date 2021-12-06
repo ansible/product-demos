@@ -4,17 +4,20 @@
 
 ## Table of Contents
 
-* [Objective](#objective)
-* [What business problem is solved?](#what-business-problem-is-solved)
-* [Features show cased](#features-show-cased)
-* [Video](#video)
-* [Guide](#guide)
+- [Demo: Azure MySQL Server](#demo-azure-mysql-server)
+  - [Table of Contents](#table-of-contents)
+  - [Objective](#objective)
+  - [What business problem is solved?](#what-business-problem-is-solved)
+  - [Features show cased](#features-show-cased)
+  - [Video](#video)
+  - [Installing Demo](#installing-demo)
+  - [Guide](#guide)
 
-# Objective
+## Objective
 
 Demostrate how anisble can be used to provision a MySQL server and Database in the Azure Cloud
 
-# What business problem is solved?
+## What business problem is solved?
 
 - **speed to market**:
 reducing human time to provision a database
@@ -23,50 +26,50 @@ standardize and automation a complex set of steps to reduce human errors
 - **reduce complexity**:
 does not require a System Administrator familiar with any cloud provider or its interface in order to provision any resources
   
+## Features show cased
 
-# Features show cased
-
-- Push button cloud provisioning 
+- Push button cloud provisioning
 - Self Service IT - Surveys
 
 For description of these and other features of the Red Hat Ansible Automation Platform please refer to the [features README](../features.md)
 
-# Video
+## Video
 
 Coming Soon
 
-# Installing Demo
+## Installing Demo
 
 1. You will need to create a Service Principal following these [Azure Docs instructions](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal)
 
 2. Then set the public_cloud variable to azure. As well as provide the folowing variable values before loading this demo as shown below.
- - public_cloud: azure
- - my_subscription:
- - my_tenant: 
- - my_client: 
- - my_secret: 
+
+- public_cloud: azure
+- my_subscription:
+- my_tenant:
+- my_client:
+- my_secret:
 
  See sample file named choose_demo_example_azure.yml
 
-# Guide
+## Guide
 
 1. Login to Ansible Platform UX
 
 2. Navigate to **Templates**
 
-     ![job templates](../../images/templates.png)
+     ![job templates](../images/templates.png)
 
 3. Click the rocket next to **INFRASTRUCTURE / Azure create a MySQL Server** to launch the Job
 
-     ![rocket launch](../../images/rocket.png)
+     ![rocket launch](../images/rocket.png)
 
-4.  The survey will prompt you to define the resource group, Azure region, name MySQL database, and admin login for database.
+4. The survey will prompt you to define the resource group, Azure region, name MySQL database, and admin login for database.
 
-     ![survey choice](../../images/azure_mysql_server/azure_mysql_survey.jpeg)
+     ![survey choice](../images/azure_mysql_server/azure_mysql_survey.jpeg)
 
-5. Enter values and press **NEXT**      
+5. Enter values and press **NEXT**
 
-     ![survey preview](../../images/azure_mysql_server/azure_mysql_survey_preview.jpeg)
+     ![survey preview](../images/azure_mysql_server/azure_mysql_survey_preview.jpeg)
 
      Explain to audience what is happening here depending on audience persona
 
@@ -91,13 +94,11 @@ Coming Soon
        - this pane can be expanded to take up entire browser window
        - Ansible Playbook can be downloaded for troubleshooting purposes
        - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/azure_mysql_server/azure_mysql_task_output.jpeg)
+       ![task breakdown](../images/azure_mysql_server/azure_mysql_task_output.jpeg)
 
 8. Circle back and summarize
 
-     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Azure Portal that the MySQL server database was actually provisioned but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
-
-
+     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the Azure Portal that the MySQL server database was actually provisioned but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative.
 
 ---
 You have finished this demo.  [Click here to return to master demo list](../../README.md#demo-repository)

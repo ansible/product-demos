@@ -4,17 +4,20 @@
 
 ## Table of Contents
 
-* [Objective](#objective)
-* [What business problem is solved?](#what-business-problem-is-solved)
-* [Features show cased](#features-show-cased)
-* [Video](#video)
-* [Guide](#guide)
+- [Demo: AMS Provision VM](#demo-ams-provision-vm)
+  - [Table of Contents](#table-of-contents)
+  - [Objective](#objective)
+  - [What business problem is solved?](#what-business-problem-is-solved)
+  - [Features show cased](#features-show-cased)
+  - [Video](#video)
+  - [Installing Demo](#installing-demo)
+  - [Guide](#guide)
 
-# Objective
+## Objective
 
 Demostrate how anisble can be used to provision a RHEL VM in AWS
 
-# What business problem is solved?
+## What business problem is solved?
 
 - **speed to market**:
 reducing human time to provision VMs
@@ -23,48 +26,48 @@ standardize and automation a complex set of steps to reduce human errors
 - **reduce complexity**:
 does not require a System Administrator familiar with any cloud provider or its interface in order to provision any resources
   
+## Features show cased
 
-# Features show cased
-
-- Push button cloud provisioning 
+- Push button cloud provisioning
 - Self Service IT - Surveys
 
 For description of these and other features of the Red Hat Ansible Automation Platform please refer to the [features README](../features.md)
 
-# Video
+## Video
 
 Coming Soon
 
-# Installing Demo
+## Installing Demo
 
 1. You will need to create programmatic access keys by following these [AWS Docs instructions](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html) See the section called "Programmatic access"
 
 2. Then set the public_cloud variable to aws. As well as provide the folowing variable values before loading this demo as shown below.
- - public_cloud: aws
- - my_access_key:
- - my_secret_key: 
+
+- public_cloud: aws
+- my_access_key:
+- my_secret_key:
 
  See sample file named choose_demo_example_aws.yml
 
-# Guide
+## Guide
 
 1. Login to Ansible Platform UX
 
 2. Navigate to **Templates**
 
-     ![job templates](../../images/templates.png)
+     ![job templates](../images/templates.png)
 
 3. Click the rocket next to **INFRASTRUCTURE / AWS Provision VM** to launch the Job
 
-     ![rocket launch](../../images/rocket.png)
+     ![rocket launch](../images/rocket.png)
 
-4.  The survey will prompt you to define the key pair, AWS region, VPC, Instance Type, and name of the new VM.
+4. The survey will prompt you to define the key pair, AWS region, VPC, Instance Type, and name of the new VM.
 
-     ![survey choice](../../images/aws_provision_vm/aws_provision_vm_survey.jpeg)
+     ![survey choice](../images/aws_provision_vm/aws_provision_vm_survey.jpeg)
 
-5. Enter values and press **NEXT**      
+5. Enter values and press **NEXT**
 
-     ![survey preview](../../images/aws_provision_vm/aws_provision_vm_survey_preview.jpeg)
+     ![survey preview](../images/aws_provision_vm/aws_provision_vm_survey_preview.jpeg)
 
      Explain to audience what is happening here depending on audience persona
 
@@ -89,18 +92,16 @@ Coming Soon
        - this pane can be expanded to take up entire browser window
        - Ansible Playbook can be downloaded for troubleshooting purposes
        - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/aws_provision_vm/aws_provision_vm_task_output.jpeg)
+       ![task breakdown](../images/aws_provision_vm/aws_provision_vm_task_output.jpeg)
 
 8. Circle back and summarize
 
-     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on AWS Console that the RHEL server was actually provisioned but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative. 
+     You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on AWS Console that the RHEL server was actually provisioned but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the mundane and repetative.
 
-9. Verify RHEL VM is up (Optional) 
+9. Verify RHEL VM is up (Optional)
 
       Login to the AWS Console. Navigate to the EC2 service and locate your EC2 instances. You should see the new VM. You can cick on that new VM to see the details which should match how you defined it. Below is an example of what you will see
-      ![Verify VM](../../images/aws_provision_vm/aws_provision_vm_verify_ec2.jpeg)
-
-
+      ![Verify VM](../images/aws_provision_vm/aws_provision_vm_verify_ec2.jpeg)
 
 ---
 You have finished this demo.  [Click here to return to master demo list](../../README.md#demo-repository)

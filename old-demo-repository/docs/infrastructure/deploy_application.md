@@ -4,17 +4,19 @@
 
 ## Table of Contents
 
-* [Objective](#objective)
-* [What business problem is solved?](#what-business-problem-is-solved)
-* [Features show cased](#features-show-cased)
-* [Video](#video)
-* [Guide](#guide)
+- [Demo: Deploy Application](#demo-deploy-application)
+  - [Table of Contents](#table-of-contents)
+  - [Objective](#objective)
+  - [What business problem is solved?](#what-business-problem-is-solved)
+- [Features show cased](#features-show-cased)
+  - [Video](#video)
+  - [Guide](#guide)
 
-# Objective
+## Objective
 
 Demonstrate application deployment for Linux systems.  This demonstration will install applications on multiple RHEL servers.
 
-# What business problem is solved?
+## What business problem is solved?
 
 - **speed to market**:
 reducing human time to install applications
@@ -32,29 +34,29 @@ Ansible creates guard rails on which applications can be deployed and how they a
 
 For description of these and other features of the Red Hat Ansible Automation Platform please refer to the [features README](../features.md)
 
-# Video
+## Video
 
 [Watch here](https://youtu.be/pU8ZgSBuEJw)
 
-# Guide
+## Guide
 
 1. Login to Ansible Platform UX
 
 2. Navigate to **Templates**
 
-     ![job templates](../../images/templates.png)
+     ![job templates](../images/templates.png)
 
 3. Click the rocket next to **INFRASTRUCTURE / Deploy Application** to launch the Job
 
-     ![rocket launch](../../images/rocket.png)
+     ![rocket launch](../images/rocket.png)
 
-4.  The survey will prompt you to install an application.
+4. The survey will prompt you to install an application.
 
-     ![survey choice](../../images/deploy_application_survey.png)
+     ![survey choice](../images/deploy_application_survey.png)
 
-5. Choose an application and press **NEXT**      
+5. Choose an application and press **NEXT**
 
-     ![survey preview](../../images/survey_preview.png)
+     ![survey preview](../images/survey_preview.png)
 
      Explain to audience what is happening here depending on audience persona
 
@@ -79,13 +81,11 @@ For description of these and other features of the Red Hat Ansible Automation Pl
        - this pane can be expanded to take up entire browser window
        - Ansible Playbook can be downloaded for troubleshooting purposes
        - **click on task output** to show them task-by-task JSON output that can be used for troubleshooting or just getting additional information
-       ![task breakdown](../../images/platform_task_breakdown.png)
+       ![task breakdown](../images/platform_task_breakdown.png)
 
 8. Circle back and summarize
 
      You need to circle back what has been showcased to the [business reasons listed above](#what-business-problem-is-solved).  You are welcome to verify on the RHEL web nodes that the application was actually installed but unless you have a very technical audience you are going to start losing folks.  The real business solution here is automating away the boring and routine.  
-
-
 
 ---
 You have finished this demo.  [Click here to return to master demo list](../../README.md#demo-repository)
