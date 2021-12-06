@@ -2,267 +2,90 @@
 
 This repo currently under construction and working on a minimal viable demo for testing purposes
 
-# Table of contents
+## Table of contents
 
-   * [How to use](#how-to-use)
-      * [1. Provide login information and choose demo](#1-provide-login-information-and-choose-demo)
-      * [2. Run Ansible Playbook](#2-run-ansible-playbook)
-   * [Demo Repository](#demo-repository)
-      * [Infrastructure Demos](#infrastructure-demos)
-      * [Network Demos](#network-demos)
-      * [Security Demos](#security-demos)
-      * [Developer Demos](#developer-demos)
-   * [Contribute](#contribute)
-   * [Notes](#notes)
+- [How to use](#how-to-use)
+  - [1. Provide login information and choose demo](#1-provide-login-information-and-choose-demo)
+  - [2. Run Ansible Playbook](#2-run-ansible-playbook)
+- [Demo Repository](#demo-repository)
+  - [Infrastructure Demos](#infrastructure-demos)
+  - [Network Demos](#network-demos)
+  - [Security Demos](#security-demos)
+  - [Developer Demos](#developer-demos)
+- [Contribute](#contribute)
+- [Notes](#notes)
 
-# How to use
+## How to use
 
 ## 1. Provide login information and choose demo
 
-  - Modify the `choose_demo.yml` file that is included in this repo with the username, password and IP address (or DNS name) of your Ansible Tower
-  - Choose the demo name you want from the table below (or choose `all`)
+- Modify the `choose_demo.yml` file that is included in this repo with the username, password and IP address (or DNS name) of your Ansible Tower
+- Choose the demo name you want from the table below (or choose `all`)
 
 ## 2. Run Ansible Playbook
 
-```
+```shell
 ansible-playbook playbooks/install_demo.yml -e @choose_demo.yml
 ```
 
-# Demo Repository
+## Demo Repository
 
-This repository currently holds 21 demos.
+This repository currently holds 23 demos.
 
 ## Infrastructure Demos
-<table>
-  <tr>
-    <th>Demo Name</th>
-    <th>Author</th>
-    <th>install_demo.yml value</th>
-    <th>Description</th>
-    <th>Video Walkthrough</th>
-    <th>Workshop Types</th>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/ansible/product-demos/blob/master/docs/infrastructure/azure_provision_vm.md">INFRASTRUCTURE / Azure create a MySQL Server</a></td>
-    <td>David Rojas</td>
-    <td><pre>demo: azure_mysql_server</pre></td>
-    <td>Provision MySQL server on Azure with Ansible Tower Survey and Environmental variables</td>
-    <td>Not available </td>
-    <td><ul><li>windows</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/ansible/product-demos/blob/master/docs/infrastructure/azure_provision_vm.md">INFRASTRUCTURE / Azure Provision VM</a></td>
-    <td>David Rojas</td>
-    <td><pre>demo: azure_provision_vm</pre></td>
-    <td>Provision RHEL VM on Azure with Ansible Tower Survey and Environmental variables</td>
-    <td>Not available </td>
-    <td><ul><li>windows</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/ansible/product-demos/blob/master/docs/infrastructure/chocolatey_app_install.md">INFRASTRUCTURE / Chocolatey App Install</a></td>
-    <td>David Rojas</td>
-    <td><pre>demo: chocolatey_app_install</pre></td>
-    <td>Install various application packages using Chocolatey from a survey</td>
-    <td>Not available </td>
-    <td><ul><li>windows</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/ansible/product-demos/blob/master/docs/infrastructure/chocolatey_config.md">INFRASTRUCTURE / Chocolatey Config</a></td>
-    <td>David Rojas</td>
-    <td><pre>demo: chocolatey_config</pre></td>
-    <td>Configure Chocolatey parameters that require not just enabling but adding values</td>
-    <td>Not available </td>
-    <td><ul><li>windows</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/ansible/product-demos/blob/master/docs/infrastructure/chocolatey_features.md">INFRASTRUCTURE / Chocolatey Features Config</a></td>
-    <td>David Rojas</td>
-    <td><pre>demo: chocolatey_features</pre></td>
-    <td>Enable or disable various Chocolatey features</td>
-    <td>Not available </td>
-    <td><ul><li>windows</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/ansible/product-demos/blob/master/docs/infrastructure/deploy_application.md">INFRASTRUCTURE / Deploy Application</a></td>
-    <td>Sean Cavanaugh</td>
-    <td><pre>demo: deploy_application</pre></td>
-    <td>install yum applications on Linux with a survey</td>
-    <td><a href="https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED">Video Link</a></td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td>INFRASTRUCTURE / Fact Scan</td>
-    <td>Will Tome</td>
-    <td><pre>demo: fact_scan</pre></td>
-    <td>scan facts for Linux and Windows systems</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>windows</li><li>rhel_90</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td>INFRASTRUCTURE / Gather Debug Info</td>
-    <td>Will Tome</td>
-    <td><pre>demo: debug_info</pre></td>
-    <td>provide info for memory and CPU usage for specified systems</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td>INFRASTRUCTURE / Grant Sudo</td>
-    <td>Will Tome</td>
-    <td><pre>demo: grant_sudo</pre></td>
-    <td>grant sudo privledges for specified time via survey</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td>INFRASTRUCTURE / Patching</td>
-    <td>Will Tome</td>
-    <td><pre>demo: patching</pre></td>
-    <td>patching for Linux servers</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td>INFRASTRUCTURE / Red Hat Insights</td>
-    <td>Sean Cavanaugh</td>
-    <td><pre>demo: insights</pre></td>
-    <td>install and configure Red Hat Insights</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td>INFRASTRUCTURE / Security Patching</td>
-    <td>Will Tome</td>
-    <td><pre>demo: security_patching</pre></td>
-    <td>upgrade all yum packages for security related except kernel</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td>INFRASTRUCTURE / Turn off IBM Community Grid</td>
-    <td>Sean Cavanaugh</td>
-    <td><pre>demo: turn_off_community_grid</pre></td>
-    <td>this role turns off IBM Community Grid boinc-client</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/ansible/product-demos/blob/master/docs/infrastructure/windows_regedit_legal_notice.md">INFRASTRUCTURE / Windows regedit legal notice</a></td>
-    <td>David Rojas</td>
-    <td><pre>demo: windows_regedit_legal_notice</pre></td>
-    <td>using regedit modify the legal notice</td>
-    <td>Not available </td>
-    <td><ul><li>windows</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td>SERVER / Windows IIS Server</td>
-    <td>Colin McNaughton</td>
-    <td><pre>demo: windows_iis</pre></td>
-    <td>install webserver on Windows Server with a survey</td>
-    <td>Not available </td>
-    <td><ul><li>windows</li><li>demo</li></ul></td>
-  </tr>
-</table>
+
+| Demo Name | Author | install_demo.yml value | Description | Video Walkthrough | Workshop Types |
+| --------- | ------ | ---------------------- | ----------- | ----------------- | -------------- |
+| [INFRASTRUCTURE / AWS Provision VM](https://github.com/ansible/product-demos/blob/master/docs/infrastructure/azure_provision_vm.md") | David Rojas | `demo: aws_provision_vm` | Provision RHEL VM on AWS with Ansible Tower Survey and Environmental variables | Not available  |  <li>windows</li> <li>demo</li> |
+| [INFRASTRUCTURE / Azure create a MySQL Server](https://github.com/ansible/product-demos/blob/master/docs/infrastructure/azure_mysql_server.md") | David Rojas | `demo: azure_mysql_server` | Provision MySQL server on Azure with Ansible Tower Survey and Environmental variables | Not available  |  <li>windows</li> <li>demo</li> |
+| [INFRASTRUCTURE / Azure Provision VM](https://github.com/ansible/product-demos/blob/master/docs/infrastructure/azure_provision_vm.md") | David Rojas | `demo: azure_provision_vm` | Provision RHEL VM on Azure with Ansible Tower Survey and Environmental variables | Not available  |  <li>windows</li> <li>demo</li> |
+| [INFRASTRUCTURE / Chocolatey App Install](https://github.com/ansible/product-demos/blob/master/docs/infrastructure/chocolatey_app_install.md") | David Rojas | `demo: chocolatey_app_install` | Install various application packages using Chocolatey from a survey | Not available  |  <li>windows</li> <li>demo</li> |
+| [INFRASTRUCTURE / Chocolatey Config](https://github.com/ansible/product-demos/blob/master/docs/infrastructure/chocolatey_config.md") | David Rojas | `demo: chocolatey_config` | Configure Chocolatey parameters that require not just enabling but adding values | Not available  |  <li>windows</li> <li>demo</li> |
+| [INFRASTRUCTURE / Chocolatey Features Config](https://github.com/ansible/product-demos/blob/master/docs/infrastructure/chocolatey_features.md") | David Rojas | `demo: chocolatey_features` | Enable or disable various Chocolatey features | Not available  |  <li>windows</li> <li>demo</li> |
+| [INFRASTRUCTURE / Deploy Application](https://github.com/ansible/product-demos/blob/master/docs/infrastructure/deploy_application.md") | Sean Cavanaugh | `demo: deploy_application` | install yum applications on Linux with a survey | [Video Link](https://www.youtube.com/watch?v=pU8ZgSBuEJw&list=PLdu06OJoEf2bp-PNtxPP_2n7Avkax8TED) |  <li>f5</li> <li>rhel</li> <li>rhel_90</li> <li>demo</li> |
+| INFRASTRUCTURE / Fact Scan | Will Tome | `demo: fact_scan` | scan facts for Linux and Windows systems | Not available  |  <li>f5</li> <li>rhel</li> <li>windows</li> <li>rhel_90</li> <li>demo</li> |
+| INFRASTRUCTURE / Gather Debug Info | Will Tome | `demo: debug_info` | provide info for memory and CPU usage for specified systems | Not available  |  <li>f5</li> <li>rhel</li> <li>rhel_90</li> <li>demo</li> |
+| INFRASTRUCTURE / Grant Sudo | Will Tome | `demo: grant_sudo` | grant sudo privledges for specified time via survey | Not available  |  <li>f5</li> <li>rhel</li> <li>rhel_90</li> <li>demo</li> |
+| INFRASTRUCTURE / Patching | Will Tome | `demo: patching` | patching for Linux servers | Not available  |  <li>f5</li> <li>rhel</li> <li>rhel_90</li> <li>demo</li> |
+| INFRASTRUCTURE / Red Hat Insights | Sean Cavanaugh | `demo: insights` | install and configure Red Hat Insights | Not available  |  <li>f5</li> <li>rhel</li> <li>rhel_90</li> <li>demo</li> |
+| INFRASTRUCTURE / Security Patching | Will Tome | `demo: security_patching` | upgrade all yum packages for security related except kernel | Not available  |  <li>f5</li> <li>rhel</li> <li>rhel_90</li> <li>demo</li> |
+| INFRASTRUCTURE / Turn off IBM Community Grid | Sean Cavanaugh | `demo: turn_off_community_grid` | this role turns off IBM Community Grid boinc-client | Not available  |  <li>f5</li> <li>rhel</li> <li>rhel_90</li> <li>demo</li> |
+| [INFRASTRUCTURE / Windows regedit legal notice](https://github.com/ansible/product-demos/blob/master/docs/infrastructure/windows_regedit_legal_notice.md") | David Rojas | `demo: windows_regedit_legal_notice` | using regedit modify the legal notice | Not available  |  <li>windows</li> <li>demo</li> |
+| SERVER / Windows IIS Server | Colin McNaughton | `demo: windows_iis` | install webserver on Windows Server with a survey | Not available  |  <li>windows</li> <li>demo</li> |
 
 ## Network Demos
 
-<table>
-  <tr>
-    <th>Demo Name</th>
-    <th>Author</th>
-    <th>install_demo.yml value</th>
-    <th>Description</th>
-    <th>Video Walkthrough</th>
-    <th>Workshop Types</th>
-  </tr>
-  <tr>
-    <td>Cisco IOS logging config audit/remediation</td>
-    <td>Colin McCarthy</td>
-    <td><pre>demo: configlet_logging</pre></td>
-    <td>Cisco IOS logging config audit/remediation</td>
-    <td>Not available </td>
-    <td><ul><li>network</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td>Cisco IOS ntp config audit/remediation</td>
-    <td>Colin McCarthy</td>
-    <td><pre>demo: configlet_ntp</pre></td>
-    <td>Cisco IOS ntp config audit/remediation</td>
-    <td>Not available </td>
-    <td><ul><li>network</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td>NETWORK / WORKFLOW - F5 BIG-IP</td>
-    <td>Sean Cavanaugh</td>
-    <td><pre>demo: f5_bigip_workflow</pre></td>
-    <td>Workflow for F5 BIG-IP to setup a VIP (Virtual IP) load balancer between two RHEL webservers</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>demo</li></ul></td>
-  </tr>
-</table>
+| Demo Name | Author | install_demo.yml value | Description | Video Walkthrough | Workshop Types |
+| --------- | ------ | ---------------------- | ----------- | ----------------- | -------------- |
+| Cisco IOS logging config audit/remediation | Colin McCarthy | `demo: configlet_logging` | Cisco IOS logging config audit/remediation | Not available  |  <li>network</li> <li>demo</li> |
+| Cisco IOS ntp config audit/remediation | Colin McCarthy | `demo: configlet_ntp` | Cisco IOS ntp config audit/remediation | Not available  |  <li>network</li> <li>demo</li> |
+| Cisco IOS VTY ACL config audit/remediation | George James | `demo: configlet_vtyacl` | Cisco IOS VTY ACL config audit/remediation | Not available  |  <li>network</li> <li>demo</li> |
+| NETWORK / WORKFLOW - F5 BIG-IP | Sean Cavanaugh | `demo: f5_bigip_workflow` | Workflow for F5 BIG-IP to setup a VIP (Virtual IP) load balancer between two RHEL webservers | Not available  |  <li>f5</li> <li>demo</li> |
 
 ## Security Demos
 
-<table>
-  <tr>
-    <th>Demo Name</th>
-    <th>Author</th>
-    <th>install_demo.yml value</th>
-    <th>Description</th>
-    <th>Video Walkthrough</th>
-    <th>Workshop Types</th>
-  </tr>
-  <tr>
-    <td>SECURITY / Create Openscap Report</td>
-    <td>Sean Cavanaugh</td>
-    <td><pre>demo: openscap</pre></td>
-    <td>Create HTML report using SCAP Security Guide (SSG)</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
-  </tr>
-  <tr>
-    <td>SECURITY / Hardening</td>
-    <td>Will Tome</td>
-    <td><pre>demo: hardening</pre></td>
-    <td>hardening for Linux servers</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
-  </tr>
-</table>
+| Demo Name | Author | install_demo.yml value | Description | Video Walkthrough | Workshop Types |
+| --------- | ------ | ---------------------- | ----------- | ----------------- | -------------- |
+| SECURITY / Create Openscap Report | Sean Cavanaugh | `demo: openscap` | Create HTML report using SCAP Security Guide (SSG) | Not available  |  <li>f5</li> <li>rhel</li> <li>rhel_90</li> <li>demo</li> |
+| SECURITY / Hardening | Will Tome | `demo: hardening` | hardening for Linux servers | Not available  |  <li>f5</li> <li>rhel</li> <li>rhel_90</li> <li>demo</li> |
 
 ## Developer Demos
 
-<table>
-  <tr>
-    <th>Demo Name</th>
-    <th>Author</th>
-    <th>install_demo.yml value</th>
-    <th>Description</th>
-    <th>Video Walkthrough</th>
-    <th>Workshop Types</th>
-  </tr>
-  <tr>
-    <td>DEVELOPER / Create Developer Report</td>
-    <td>Sean Cavanaugh</td>
-    <td><pre>demo: developer_report</pre></td>
-    <td>'Create HTML report using <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a>'
-</td>
-    <td>Not available </td>
-    <td><ul><li>f5</li><li>rhel</li><li>rhel_90</li><li>demo</li></ul></td>
-  </tr>
-</table>
+| Demo Name | Author | install_demo.yml value | Description | Video Walkthrough | Workshop Types |
+| --------- | ------ | ---------------------- | ----------- | ----------------- | -------------- |
+| DEVELOPER / Create Developer Report | Sean Cavanaugh | `demo: developer_report` |Create HTML report using [Ansible facts](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts)
+| Not available  |  <li>f5</li> <li>rhel</li> <li>rhel_90</li> <li>demo</li> |
 
+## Contribute
 
-# Contribute
+Please refer to the [contribute.md](docs/contribute.md) documentation included in this collection.
 
-please refer to the [contribute.md](docs/contribute.md) documentation included in this collection.
+## Notes
 
-# Notes
-
-This README.md was auto-generated by Ansible user **colin** on **2020-12-09** with Ansible version **2.9.13.post0**
+This README.md was auto-generated by Ansible user **chadmf*- on **2021-12-06*- with Ansible version **2.9.27**
 
 To generate a README.md, execute the following command
 
-```
+```shell
 ansible-playbook playbooks/generate_readme.yml
 ```

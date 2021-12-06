@@ -4,8 +4,8 @@ developer_report:
   category: developer
   name: "DEVELOPER / Create Developer Report"
   description: >
-    'Create HTML report using
-    <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts">Ansible facts</a>'
+    Create HTML report using
+    [Ansible facts](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variables-discovered-from-systems-facts)
   job_type: "run"
   inventory: "Workshop Inventory"
   playbook: "playbooks/developer/developer_report.yml"
