@@ -15,7 +15,7 @@ controller_projects:
 
 controller_credentials:
   - name: Azure Infrastructure
-    kind: azure_rm
+    credential_type: Microsoft Azure Resource Manager
     organization: Default
     inputs:
       subscription: REPLACEME
