@@ -25,7 +25,7 @@ controller_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Azure Repo"
-    playbook: "create_rhel_vm_demo.yml"
+    playbook: "project/create_rhel_vm_demo.yml"
     credentials:
     - "Azure Infrastructure"
     extra_vars:
@@ -49,7 +49,7 @@ controller_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Azure Repo"
-    playbook: "create_windows_vm_demo.yml"
+    playbook: "project/create_windows_vm_demo.yml"
     credentials:
     - "Azure Infrastructure"
     extra_vars:
@@ -72,7 +72,7 @@ controller_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Azure Repo"
-    playbook: "destroy_resource_group.yml"
+    playbook: "project/destroy_resource_group.yml"
     credentials:
     - "Azure Infrastructure"
     extra_vars:
