@@ -37,7 +37,6 @@
       state: present
       activationkey: "{{ activation_key }}"
       org_id: "{{ org_id }}"
-      auto_attach: yes
 
   - name: disable htb repo
     community.general.rhsm_repository:
