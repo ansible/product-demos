@@ -23,7 +23,7 @@ controller_credentials:
 controller_templates:
   - name: "RHEL 8 VM"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: "Workshop Inventory"
     project: "Azure Demo"
     playbook: "create_rhel_vm_demo.yml"
     credentials:
@@ -47,7 +47,7 @@ controller_templates:
 
   - name: "Windows VM"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: "Workshop Inventory"
     project: "Azure Demo"
     playbook: "create_windows_vm_demo.yml"
     credentials:
@@ -70,7 +70,7 @@ controller_templates:
 
   - name: "Destroy Resource Group"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: "Workshop Inventory"
     project: "Azure Demo"
     playbook: "destroy_resource_group.yml"
     credentials:
