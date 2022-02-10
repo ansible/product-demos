@@ -1,0 +1,53 @@
+---
+- hosts: "{{ HOSTS }}"
+  become: yes
+
+  tasks:
+  - name: set hostname
+    hostname:
+      name: "{{ inventory_hostname | regex_replace('_','-')}}"
+
+  - name: remove rhui client packages
+    yum:
+      name: rh-amazon-rhui-client*
+      state: removed
+
+  - name: get current repos
+    command:
+      cmd: ls /etc/yum.repos.d/
+    register: repos
+    changed_when: False
+
+  - name: remove existing rhui repos
+    file:
+      path: "/etc/yum.repos.d/{{ item }}"
+      state: absent
+    loop: "{{ repos.stdout_lines }}"
+    when: "'rhui' in item"
+
+  - name: install katello package
+    yum:
+      name: "https://{{ sat_url }}/pub/katello-ca-consumer-latest.noarch.rpm"
+      state: present
+      validate_certs: no
+    when: sat_url is defined
+
+  - name: register subscription mangler
+    redhat_subscription:
+      state: present
+      activationkey: "{{ activation_key }}"
+      org_id: "{{ org_id }}"
+      auto_attach: yes
+
+  - name: disable htb repo
+    rhsm_repository:
+      name: rhel-7-server-htb*
+      state: disabled
+    ignore_errors: yes
+
+  - name: configure Red Hat insights
+    import_role:
+      name: redhat.insights.insights_client
+    vars:
+      insights_tags:
+        env: "{{ env }}"

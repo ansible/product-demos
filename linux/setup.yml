@@ -1,0 +1,33 @@
+---
+controller_validate_certs: false
+controller_components:
+  - job_templates
+
+controller_templates:
+  - name: "LINUX / Register"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/ec2_register.yml"
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    extra_vars:
+      activation_key: undef
+      org_id: undef
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+        - question_name: Choose Environment
+          type: multiplechoice
+          variable: env
+          choices:
+            - Dev
+            - QA
+            - Prod
+          required: true
