@@ -21,7 +21,7 @@ controller_credentials:
       subscription: REPLACEME
 
 controller_templates:
-  - name: "RHEL 8 VM"
+  - name: "AZURE / RHEL 8 VM"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Azure Repo"
@@ -45,7 +45,7 @@ controller_templates:
       rhel_public_key: "{{ azure_public_key }}"
       survey_public_ip: "True"
 
-  - name: "Windows VM"
+  - name: "AZURE / Windows VM"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Azure Repo"
@@ -68,7 +68,7 @@ controller_templates:
       win_admin_user: "azureuser"
       win_admin_password: "AnsibleTest@123"
 
-  - name: "Destroy Resource Group"
+  - name: "AZURE / Destroy Resource Group"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Azure Repo"
@@ -80,7 +80,7 @@ controller_templates:
       region: "eastus"
 
 controller_schedules:
-  - name: Destroy Resource Group
+  - name: AZURE / Destroy Resource Group
     description: A demonstration
     unified_job_template: Destroy Resource Group
     rrule: "DTSTART:20220101T000000Z RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
