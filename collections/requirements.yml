@@ -4,3 +4,4 @@ collections:
   - redhat_cop.controller_configuration
   #linux
   - redhat.insights
+  - community.general

@@ -9,6 +9,7 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/ec2_register.yml"
+    execution_environment: Default execution environment
     credentials:
     - "Workshop Credential"
     survey_enabled: true

@@ -33,14 +33,14 @@
     when: sat_url is defined
 
   - name: register subscription mangler
-    redhat_subscription:
+    community.general.redhat_subscription:
       state: present
       activationkey: "{{ activation_key }}"
       org_id: "{{ org_id }}"
       auto_attach: yes
 
   - name: disable htb repo
-    rhsm_repository:
+    community.general.rhsm_repository:
       name: rhel-7-server-htb*
       state: disabled
     ignore_errors: yes
