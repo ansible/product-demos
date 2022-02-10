@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - "{{demo}}"/setup.yml
+
+  tasks:
+    - name: setup components
+      include_role:
+        name: "redhat_cop.tower_configuration.{{ item }}"
+      loop: "{{ controller_components }}"
+      when:
+        - controller_components | d("") | length > 0

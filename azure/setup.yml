@@ -1,0 +1,89 @@
+---
+controller_validate_certs: false
+azure_public_key: undef
+controller_components:
+  - projects
+  - credentials
+  - job_templates
+
+controller_projects:
+  - name: Azure Repo
+    description: Azure Demo Repo
+    organization: Default
+    scm_type: git
+    scm_url: https://github.com/ansible-cloud/azure.git
+
+controller_credentials:
+  - name: Azure Infrastructure
+    kind: azure_rm
+    organization: Default
+    inputs:
+      subscription: REPLACEME
+
+controller_templates:
+  - name: "RHEL 8 VM"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Azure Demo"
+    playbook: "create_rhel_vm_demo.yml"
+    credentials:
+    - "Azure Infrastructure"
+    extra_vars:
+      resource_group_name: "ansible_test"
+      region: "eastus"
+      vnet_cidr: "10.0.0.0/16"
+      subnet_cidr: "10.0.1.0/24"
+      vnet_name: "demo_vnet"
+      subnet_name: "demo_subnet"
+      network_sec_group_name: "demo_sec_group"
+      rhel_admin_user: "azureuser"
+      rhel_public_ip_name: "rhel_demo_ip"
+      rhel_nic_name: "rhel_demo_nic"
+      rhel_vm_name: "RHEL8-ansible"
+      rhel_vm_size: "Standard_DS1_v2"
+      rhel_vm_sku: "8_5"
+      rhel_public_key: "{{ azure_public_key }}"
+      survey_public_ip: "True"
+
+  - name: "Windows VM"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Azure Demo"
+    playbook: "create_windows_vm_demo.yml"
+    credentials:
+    - "Azure Infrastructure"
+    extra_vars:
+      resource_group_name: "ansible_test"
+      region: "eastus"
+      vnet_cidr: "10.0.0.0/16"
+      subnet_cidr: "10.0.1.0/24"
+      vnet_name: "demo_vnet"
+      subnet_name: "demo_subnet"
+      network_sec_group_name: "demo_sec_group"
+      win_vm_name: "WIN-ansible"
+      win_vm_size: "Standard_DS1_v2"
+      win_vm_sku: "2022-Datacenter"
+      win_public_ip_name: "win_demo_ip"
+      win_nic_name: "win_demo_nic"
+      win_admin_user: "azureuser"
+      win_admin_password: "AnsibleTest@123"
+
+  - name: "Destroy Resource Group"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Azure Demo"
+    playbook: "destroy_resource_group.yml"
+    credentials:
+    - "Azure Infrastructure"
+    extra_vars:
+      resource_group_name: "ansible_test"
+      region: "eastus"
+
+controller_schedules:
+  - name: Destroy Resource Group
+    description: A demonstration
+    unified_job_template: Destroy Resource Group
+    rrule: "DTSTART:20220101T000000Z RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
+    extra_data:
+      scheduled: true
+    verbosity: 1
