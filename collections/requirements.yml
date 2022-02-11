@@ -5,3 +5,4 @@ collections:
   #linux
   - redhat.insights
   - community.general
+  - containers.podman
