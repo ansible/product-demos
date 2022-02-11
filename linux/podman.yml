@@ -35,7 +35,7 @@
 
   - name: Check Web Page
     ansible.builtin.uri:
-      url: 127.0.0.1:8080
+      url: http://127.0.0.1:8080
       return_content: yes
     register: web_output
     changed_when: false
