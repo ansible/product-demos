@@ -1,8 +1,10 @@
 ---
 user_message: |
-  Be sure to update the activation_key and org_id extra variables for LINUX /Register
+  Be sure to update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register'
 controller_components:
   - projects
+  - credential_types
+  - credentials
   - job_templates
 
 controller_projects:
@@ -10,6 +12,31 @@ controller_projects:
     organization: Default
     scm_type: git
     scm_url: 'https://github.com/ansible/awx-facts-playbooks.git'
+
+controller_credential_types:
+  - name: "Insights Collection"
+    kind: cloud
+    inputs:
+      fields:
+        - id: insights_user
+          type: string
+          label: Insights User
+        - id: insights_password
+          type: string
+          label: Insights Password
+          secret: true
+    injectors:
+      env:
+        INSIGHTS_USER: "{% raw %}{  { insights_user  }}{% endraw %}"
+        INSIGHTS_PASSWORD: "{% raw %}{  { insights_password  }}{% endraw %}"
+
+controller_credentials:
+  - name: Insights Inventory
+    credential_type: Insights Collection
+    organization: Default
+    inputs:
+      insights_user: REPLACEME
+      insights_password: REPLACEME
 
 controller_templates:
   - name: "LINUX / Register"
