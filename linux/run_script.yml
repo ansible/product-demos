@@ -12,3 +12,4 @@
 
     - debug:
         msg: You should really consider converting this script to a playbook!
+      run_once: yes

@@ -194,7 +194,7 @@ controller_templates:
           type: text
           variable: HOSTS
           required: true
-        - question_name: Service Name
+        - question_name: Shell Script
           type: textarea
           variable: shell_script
           required: true

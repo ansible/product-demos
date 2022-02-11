@@ -48,6 +48,7 @@
     import_role:
       name: redhat.insights.insights_client
     vars:
+      insights_display_name: "{{ inventory_hostname }}"
       insights_tags:
         env: "{{ env }}"
         purpose: demo
