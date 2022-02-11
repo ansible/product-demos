@@ -80,7 +80,7 @@ controller_templates:
           variable: sudo_user
           required: true
         - question_name: How long to grant access in minutes
-          type: text
+          type: number
           variable: sudo_time
           default: 10
           required: true
