@@ -67,6 +67,10 @@ controller_templates:
             - QA
             - Prod
           required: true
+        - question_name: Ansible Group
+          type: text
+          variable: ansible_group
+          required: true
   - name: "LINUX / Troubleshoot"
     job_type: run
     inventory: "Workshop Inventory"
