@@ -1,0 +1,20 @@
+---
+- name: Apply Non-kernel Updates
+  hosts: "{{ HOSTS }}"
+  become: true
+
+  tasks:
+  - name: upgrade all packages except kernel
+    yum:
+      name: '*'
+      state: latest
+      exclude: kernel*
+    tags: all
+
+  - name: upgrade all packages security related except kernel
+    yum:
+      name: '*'
+      state: latest
+      security: true
+      exclude: kernel*
+    tags: security

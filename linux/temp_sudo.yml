@@ -1,0 +1,41 @@
+---
+- name: Temporary Sudo
+  hosts: "{{ HOSTS }}"
+  become: yes
+  gather_facts: no
+  vars:
+    sudo_cleanup: true
+    sudo_user: undef
+    sudo_time: 10
+    sudo_units: minutes
+
+  tasks:
+    - name: Check if sudo user exists on system
+      getent:
+        database: passwd
+        key: "{{ sudo_user }}"
+
+    - name: Check Cleanup package
+      yum:
+        name: at
+        state: latest
+
+    - name: Check Cleanup Service
+      service:
+        name: atd
+        state: started
+
+    - name: Create Sudo Rule
+      copy:
+        dest: "/etc/sudoers.d/{{ sudo_user }}"
+        owner: root
+        group: root
+        mode: 0640
+        content: "{{ sudo_user }} ALL=(ALL) NOPASSWD:ALL"
+
+    - name: Set Permission Cleanup
+      at:
+        command: "rm /etc/sudoers.d/{{ sudo_user }}"
+        count: "{{ sudo_time }}"
+        units: "{{ sudo_units }}"
+      when: sudo_cleanup|bool

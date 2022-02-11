@@ -50,3 +50,4 @@
     vars:
       insights_tags:
         env: "{{ env }}"
+        purpose: demo
