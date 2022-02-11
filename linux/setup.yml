@@ -82,6 +82,8 @@ controller_templates:
         - question_name: How long to grant access in minutes
           type: text
           variable: sudo_time
+          default: 10
+          required: true
   - name: "LINUX / Patching"
     job_type: run
     inventory: "Workshop Inventory"
@@ -104,7 +106,7 @@ controller_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
-    playbook: "linux/start_service.yml"
+    playbook: "linux/service_start.yml"
     execution_environment: Default execution environment
     use_fact_cache: true
     credentials:
@@ -126,7 +128,7 @@ controller_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
-    playbook: "linux/stop_service.yml"
+    playbook: "linux/service_stop.yml"
     execution_environment: Default execution environment
     use_fact_cache: true
     credentials:
@@ -162,7 +164,7 @@ controller_templates:
           variable: HOSTS
           required: true
         - question_name: Service Name
-          type: block
+          type: textarea
           variable: shell_script
           required: true
   - name: "LINUX / Fact Scan"

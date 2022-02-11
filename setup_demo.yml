@@ -17,4 +17,4 @@
     - name: Print Message
       debug:
         msg: "{{ user_message }}"
-      when: user_message is defined
+      #when: user_message is defined
