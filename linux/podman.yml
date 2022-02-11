@@ -1,9 +1,8 @@
 ---
 - name: Podman
   hosts: "{{ HOSTS }}"
-  become: yes
   vars:
-    volume_path: /var/podman
+    volume_path: podman
     message: undef
 
   tasks:
@@ -11,6 +10,7 @@
     ansible.builtin.dnf:
       name: podman
       state: latest
+    become: yes
 
   - name: Create volume dir
     ansible.builtin.file:
@@ -31,7 +31,6 @@
         - "{{ volume_path }}:/usr/local/apache2/htdocs"
       ports:
         - "8080:80"
-    become: false
 
   - name: Check Web Page
     ansible.builtin.uri:
@@ -44,7 +43,6 @@
     shell: podman ps
     register: podman_output
     changed_when: false
-    become: false
 
   - name: Output
     ansible.builtin.debug:
