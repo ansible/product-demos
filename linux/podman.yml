@@ -9,7 +9,7 @@
     ansible.builtin.dnf:
       name: podman
       state: latest
-      become: true
+    become: true
 
   - name: Create volume dir
     ansible.builtin.file:
