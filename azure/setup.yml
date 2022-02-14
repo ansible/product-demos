@@ -9,7 +9,6 @@ controller_components:
   - inventories
   - inventory_sources
   - job_templates
-  - schedules
 
 controller_projects:
   - name: Azure Repo
@@ -108,10 +107,3 @@ controller_templates:
     extra_vars:
       resource_group_name: "ansible_test"
       region: "eastus"
-
-controller_schedules:
-  - name: AZURE / Destroy Resource Group
-    description: A demonstration
-    unified_job_template: Azure / Destroy Resource Group
-    rrule: "DTSTART;TZID=America/New_York:20220101T000000 RRULE:INTERVAL=1;FREQ=DAILY"
-    verbosity: 1
