@@ -113,5 +113,5 @@ controller_schedules:
   - name: AZURE / Destroy Resource Group
     description: A demonstration
     unified_job_template: Destroy Resource Group
-    rrule: "DTSTART:20220214T162753Z RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=SU"
+    rrule: "DTSTART;TZID=America/New_York:20220101T000000 RRULE:INTERVAL=1;FREQ=DAILY"
     verbosity: 1
