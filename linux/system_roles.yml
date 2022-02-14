@@ -1,0 +1,13 @@
+---
+- name: Apply RHEL System Roles
+  hosts: "{{ HOSTS }}"
+  vars:
+    system_roles: undef
+
+  tasks:
+    - name: Apply System Roles
+      include_role:
+        name: "redhat_cop.controller_configuration.{{ item }}"
+      loop: "{{ system_roles }}"
+      when:
+        - system_roles | d("") | length > 0

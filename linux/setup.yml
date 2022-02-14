@@ -228,3 +228,28 @@ controller_templates:
           type: textarea
           variable: message
           required: true
+  - name: "LINUX / System Roles"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/system_roles.yml"
+    execution_environment: Default execution environment
+    diff_mode: yes
+    ask_job_type_on_launch: yes
+    extra_vars:
+      system_roles: undef
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+        - question_name: Web Page Message
+          type: textarea
+          variable: message
+          required: true

@@ -1,8 +1,9 @@
 ---
 collections:
-  - ansible.controller
+  - ansible.controller:4.1.1
   - redhat_cop.controller_configuration
   #linux
   - redhat.insights
+  - redhat.rhel_system_roles
   - community.general
   - containers.podman
