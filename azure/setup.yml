@@ -1,10 +1,15 @@
 ---
-controller_validate_certs: false
+user_message: |
+  Be sure to update the public_key extra_var on the 'Azure RHEL 8 VM' Template
+  The Azure Infrastructure credential must be updated with your service principal credentials to access Azure API
 azure_public_key: undef
 controller_components:
   - projects
   - credentials
+  - inventories
+  - inventory_sources
   - job_templates
+  - schedules
 
 controller_projects:
   - name: Azure Repo
@@ -19,6 +24,29 @@ controller_credentials:
     organization: Default
     inputs:
       subscription: REPLACEME
+
+controller_inventories:
+  - name: Workshop Inventory
+
+controller_inventory_sources:
+  - name: Azure Inventory
+    source: Microsoft Azure Resource Manager
+    credential: Azure Infrastructure
+    overwrite: true
+    update_on_launch: true
+    source_vars:
+      include_vm_resource_groups:
+       - ansible_test
+       
+      hostnames:
+       - computer_name
+       - default
+       
+      keyed_groups:
+      - prefix: azure_loc
+        key: location
+      - prefix: azure_os
+        key: os_profile.system
 
 controller_templates:
   - name: "AZURE / RHEL 8 VM"
