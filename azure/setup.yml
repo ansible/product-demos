@@ -114,6 +114,4 @@ controller_schedules:
     description: A demonstration
     unified_job_template: Destroy Resource Group
     rrule: "DTSTART:20220214T162753Z RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=SU"
-    extra_data:
-      days: 120
     verbosity: 1
