@@ -1,6 +1,7 @@
 ---
 collections:
-  - ansible.controller:4.1.1
+  - name: ansible.controller
+    version: :4.1.1
   - redhat_cop.controller_configuration
   #linux
   - redhat.insights
