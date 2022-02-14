@@ -27,6 +27,7 @@ controller_credentials:
 
 controller_inventories:
   - name: Workshop Inventory
+    organization: Default
 
 controller_inventory_sources:
   - name: Azure Inventory
