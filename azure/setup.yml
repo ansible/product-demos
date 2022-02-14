@@ -32,7 +32,7 @@ controller_inventories:
 controller_inventory_sources:
   - name: Azure Inventory
     inventory: Workshop Inventory
-    source: Microsoft Azure Resource Manager
+    source: azure_rm
     credential: Azure Infrastructure
     overwrite: true
     update_on_launch: true
