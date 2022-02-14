@@ -113,7 +113,7 @@ controller_schedules:
   - name: AZURE / Destroy Resource Group
     description: A demonstration
     unified_job_template: Destroy Resource Group
-    rrule: "DTSTART:20220101T000000Z RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
+    rrule: "DTSTART:20220214T162753Z RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=SU"
     extra_data:
-      scheduled: true
+      days: 120
     verbosity: 1
