@@ -1,0 +1,9 @@
+---
+- name: Windows updates
+  hosts: "{{ HOSTS | default('windows') }}"
+
+  tasks:
+    - name: Install Windows Updates
+      win_updates:
+        category_names: "{{ categories | default(omit) }}"
+        reboot: '{{ reboot_server | default(yes) }}'

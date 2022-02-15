@@ -8,3 +8,5 @@ collections:
   - redhat.rhel_system_roles
   - community.general
   - containers.podman
+  #windows
+  - chocolatey.chocolatey

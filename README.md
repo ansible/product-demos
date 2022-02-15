@@ -38,5 +38,4 @@ Please push contributions via a pull request following the naming convention of 
         - Name: Controller Credential
      - Extra vars:
   
-            demo: linux
-
+            demo: <linux or windows>
