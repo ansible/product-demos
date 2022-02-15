@@ -38,6 +38,14 @@ controller_credentials:
       insights_user: REPLACEME
       insights_password: REPLACEME
 
+controller_inventory_sources:
+  - name: Insights Inventory
+    souce: scm
+    source_project: Ansible official demo project
+    source_path: linux/inventory.insights.yml
+    credential: Insights Inventory
+
+
 controller_templates:
   - name: "LINUX / Register"
     job_type: run
