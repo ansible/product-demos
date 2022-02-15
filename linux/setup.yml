@@ -1,6 +1,8 @@
 ---
 user_message: |
-  Be sure to update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register'
+  Be sure to update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register'. https://access.redhat.com/management/activation_keys
+
+  Update Credential for Insights Inventory with Red Hat account.
 controller_components:
   - projects
   - credential_types
@@ -40,6 +42,7 @@ controller_credentials:
 
 controller_inventory_sources:
   - name: Insights Inventory
+    inventory: Workshop Inventory
     souce: scm
     source_project: Ansible official demo project
     source_path: linux/inventory.insights.yml
