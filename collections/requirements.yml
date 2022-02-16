@@ -10,3 +10,5 @@ collections:
   - containers.podman
   #windows
   - chocolatey.chocolatey
+  #
+  - azure.azcollection
