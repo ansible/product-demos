@@ -32,6 +32,12 @@
       validate_certs: no
     when: sat_url is defined
 
+  - name: manage repos with subscription mangler
+    ansible.builtin.lineinfile:
+      path: /etc/rhsm/rhsm.conf
+      regexp: '^manage_repos'
+      line: 'manage_repos = 1'
+
   - name: register subscription mangler
     community.general.redhat_subscription:
       state: present
