@@ -114,3 +114,52 @@ controller_templates:
           type: text
           variable: package_name
           required: true
+
+  - name: "WINDOWS / Arbitrary PowerShell"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/arbitrary_powershell.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+        - question_name: PowerShell Script (Default returns random cat fact)
+          type: textarea
+          variable: ps_script
+          default: "(Invoke-RestMethod -Method 'GET' -Uri 'https://catfact.ninja/fact').fact"
+          required: true
+
+  - name: "WINDOWS / PowerShell Script"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/powershell_script.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+        - question_name: Service state to query?
+          type: multiplechoice
+          variable: service_state
+          required: false
+          default: 'Running'
+          choices:
+            - 'Running'
+            - 'Stopped'
