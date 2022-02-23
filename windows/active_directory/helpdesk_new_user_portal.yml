@@ -1,0 +1,38 @@
+---
+- name: Helpdesk new user portal
+  hosts: "{{ HOSTS | default('windows') }}"
+
+  tasks:
+  - name: Setting host facts using complex arguments
+    set_fact:
+      temp_password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
+      # Example result: ['&Qw2|E[-']
+
+  - name: Create new user
+    community.windows.win_domain_user:
+      name: "{{ firstname }} {{ surname }}"
+      firstname: "{{ firstname }}"
+      surname: "{{ surname }}"
+      sam_account_name: "{{ firstname[0] }}{{ surname }}"
+      company: BobCo
+      password: "{{ temp_password }}"
+      state: present
+      groups:
+        - "GroupA"
+        - "GroupB"
+      street: 123 4th St.
+      city: Sometown
+      state_province: IN
+      postal_code: 12345
+      country: US
+      attributes:
+        telephoneNumber: 555-123456
+    register: new_user
+
+  - name: Display User
+    debug:
+      var: new_user
+
+  - name: Show temp password
+    debug:
+      var: temp_password

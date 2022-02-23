@@ -1,0 +1,34 @@
+---
+- name: Create Active Directory domain
+  hosts: "{{ HOSTS | default('windows') }}"
+
+  tasks:
+  - name: Create new domain in a new forest on the target host
+    ansible.windows.win_domain:
+      dns_domain_name: ansible.local
+      safe_mode_password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
+    register: new_forest
+
+  - name: Reboot the target host
+    ansible.windows.win_reboot:
+      reboot_timeout: 3600
+    when: new_forest.reboot_required
+
+  - name: Create some groups
+    community.windows.win_domain_group:
+      name: "{{ item.name }}"
+      scope: global
+    loop:
+      - { name: "GroupA" }
+      - { name: "GroupB" }
+      - { name: "GroupC" }
+
+  - name: Create some users
+    community.windows.win_domain_user:
+      name: "{{ item.name }}"
+      groups: "{{ item.groups }}"
+      password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
+    loop:
+      - { name: "UserA", groups: "GroupA" }
+      - { name: "UserB", groups: "GroupB" }
+      - { name: "UserC", groups: "GroupC" }

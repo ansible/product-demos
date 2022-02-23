@@ -39,3 +39,5 @@ Please push contributions via a pull request following the naming convention of 
      - Extra vars:
   
             demo: <linux or windows>
+
+4. If you require a Windows Active Directory domain you will need to run the "ACTIVE DIRECTORY / Create Active Directory domain" template after the Windows setup completes. This will create the "ansible.local" domain as well as a few generic users and groups.

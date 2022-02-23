@@ -163,3 +163,43 @@ controller_templates:
           choices:
             - 'Running'
             - 'Stopped'
+
+  - name: "ACTIVE DIRECTORY / Create Active Directory domain"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/active_directory/create_ad_domain.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+
+  - name: "ACTIVE DIRECTORY / Helpdesk new user portal"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/active_directory/helpdesk_new_user_portal.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Firstname
+          type: text
+          variable: firstname
+          required: true
+        - question_name: Surname
+          type: text
+          variable: surname
+          required: true
