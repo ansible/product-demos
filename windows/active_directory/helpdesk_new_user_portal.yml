@@ -17,7 +17,7 @@
       company: BobCo
       password: "{{ temp_password }}"
       state: present
-      groups: {{ groups }}
+      groups: groups
       street: "{{ street }}"
       city: "{{ city }}"
       state_province: IN
