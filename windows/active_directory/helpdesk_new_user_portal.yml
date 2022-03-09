@@ -1,6 +1,7 @@
 ---
 - name: Helpdesk new user portal
   hosts: "{{ HOSTS | default('windows') }}"
+  gather_facts: false
 
   tasks:
   - name: Setting host facts using complex arguments
