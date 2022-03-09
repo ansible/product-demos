@@ -264,14 +264,6 @@ controller_templates:
           variable: telephone_number
           default: 555-123456
           required: false
-        - question_name: Groups
-          type: multiplechoice
-          variable: groups
-          required: false
-          choices:
-            - GroupA
-            - GroupB
-            - GroupC
 
   - name: "Rollback"
     job_type: run
