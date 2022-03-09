@@ -244,6 +244,34 @@ controller_templates:
           type: text
           variable: surname
           required: true
+        - question_name: Street
+          type: text
+          variable: street
+          default: 123 4th St.
+          required: false
+        - question_name: City
+          type: text
+          variable: city
+          default: Sometown
+          required: false
+        - question_name: Postal code
+          type: text
+          variable: postal_code
+          default: IN
+          required: false
+        - question_name: Telephone number
+          type: text
+          variable: telephone_number
+          default: 555-123456
+          required: false
+        - question_name: Groups
+          type: multiplechoice
+          variable: groups
+          required: false
+          choices:
+            - GroupA
+            - GroupB
+            - GroupC
 
   - name: "Rollback"
     job_type: run
