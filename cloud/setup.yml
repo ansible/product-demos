@@ -1,0 +1,46 @@
+---
+user_message:
+ - Update AWS credential with Access and Secret key
+
+controller_components:
+  - credentials
+  - inventory_sources
+  - job_templates
+
+controller_credentials:
+  - name: AWS
+    credential_type: Amazon Web Services
+    organization: Default
+    update_secrets: false
+    inputs:
+      username: REPLACEME
+      password: REPLACEME
+
+controller_inventory_sources:
+  - name: AWS Inventory
+    organization: Default
+    source: ec2
+    inventory: Workshop Inventory
+    credential: AWS
+
+controller_templates:
+  - name: Cloud / Create Infra
+    job_type: run
+    organization: Default
+    credentials: 
+     - AWS
+    project: Ansible official demo project
+    playbook: cloud/create_infra.yml
+    inventory: Demo Inventory
+    execution_environment: Default execution environment
+    survey_enabled: true
+    extra_vars:
+      aws_region: us-east-2
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Public Key
+          type: textarea
+          variable: aws_public_key
+          required: true
