@@ -26,11 +26,11 @@
   amazon.aws.ec2_instance:
     network:
       assign_public_ip: yes
-      groups: "{{ aws_securitygroup_name }}"
     key_name: "{{ aws_keypair_name }}"
     instance_type: "{{ aws_instance_size }}"
     image_id: "{{ aws_instance_ami.image_id }}"
     region: "{{ aws_region }}"
+    security_group: "{{ aws_securitygroup_name }}"
     tags:
       blueprint: "{{ aws_blueprint }}"
       purpose: "{{ aws_purpose_tag }}"
