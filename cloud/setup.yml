@@ -4,6 +4,7 @@ user_message:
 
 controller_components:
   - credentials
+  - groups
   - inventory_sources
   - job_templates
 
@@ -16,12 +17,33 @@ controller_credentials:
       username: REPLACEME
       password: REPLACEME
 
+controller_groups:
+  - name: os_windows
+    inventory: Workshop Inventory
+    variables:
+      ansible_port: 5986
+      ansible_connection: "winrm"
+      ansible_winrm_transport: "ntlm"
+      ansible_winrm_server_cert_validation: "ignore"
+      ansible_winrm_operation_timeout_sec: 120
+
 controller_inventory_sources:
   - name: AWS Inventory
     organization: Default
     source: ec2
     inventory: Workshop Inventory
     credential: AWS
+    overwrite: true
+    sourc_vars:
+      hostnames:
+        - tag:Name
+      compose:
+        ansible_host: public_ip_address
+      groups:
+        cloud_aws: true
+      keyed_groups:
+        - key: platform
+          prefix: os
 
 controller_templates:
   - name: Cloud / Create Infra
@@ -84,4 +106,5 @@ controller_templates:
           type: multiplechoice
           variable: vm_blueprint
           required: true
-          choices: "{{ lookup('fileglob', 'blueprints/*.yml') | regex_replace(',','\n') | regex_findall('.*/(.*)(?=.yml)') | list }}"
+          choices: #"{{ lookup('fileglob', 'blueprints/*.yml') | regex_replace(',','\n') | regex_findall('.*/(.*)(?=.yml)') | list }}"
+            - windows
