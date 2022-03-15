@@ -44,3 +44,39 @@ controller_templates:
           type: textarea
           variable: aws_public_key
           required: true
+  - name: Cloud / Create VM
+    job_type: run
+    organization: Default
+    credentials: 
+     - AWS
+     - Workshop Credential
+    project: Ansible official demo project
+    playbook: cloud/create_vm.yml
+    inventory: Workshop Inventory
+    execution_environment: Default execution environment
+    survey_enabled: true
+    extra_vars:
+      aws_region: us-east-2
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Name
+          type: text
+          variable: vm_name
+          required: true
+        - question_name: Owner
+          type: text
+          variable: vm_owner
+          required: true
+        - question_name: Provider
+          type: multiplechoice
+          variable: vm_provider
+          required: true
+          choices:
+            - aws
+        - question_name: Blueprint
+          type: multiplechoice
+          variable: vm_blueprint
+          required: true
+          choices: "{{ lookup('fileglob', 'blueprints/*.yml') | regex_replace(',','\n') | regex_findall('.*/(.*)(?=.yml)') }}"

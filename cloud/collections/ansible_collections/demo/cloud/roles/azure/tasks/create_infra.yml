@@ -1,0 +1,76 @@
+---
+- name: AZURE | CREATE INFRA | resource group
+  azure.azcollection.azure_rm_resourcegroup:
+      name: "{{ az_rg_name }}-{{ az_rg_prefix }}-rg"
+      location: "{{ az_region }}"
+
+- name: AZURE | CREATE INFRA | virtual network
+  azure.azcollection.azure_rm_virtualnetwork:
+    resource_group: "{{ az_rg_name }}-{{ az_rg_prefix }}-rg"
+    name: "{{ az_rg_name }}-{{ az_rg_prefix }}-vnet"
+    address_prefixes: "{{ az_vnet_cidr }}"
+
+- name: AZURE | CREATE INFRA | subnet
+  azure.azcollection.azure_rm_subnet:
+    resource_group: "{{ az_rg_name }}-{{ az_rg_prefix }}-rg"
+    name: "{{ az_rg_name }}-{{ az_rg_prefix }}-subnet }}"
+    address_prefix: "{{ az_subnet_cidr }}"
+    virtual_network: "{{ az_rg_name }}-{{ az_rg_prefix }}-vnet"
+
+- name: AZURE | CREATE INFRA | security group
+  azure.azcollection.azure_rm_securitygroup:
+    resource_group: "{{ az_rg_name }}-{{ az_rg_prefix }}-rg"
+    name: "{{ az_rg_name }}-{{ az_rg_prefix }}-sec-group"
+    rules:
+      - name: External
+        protocol: Tcp
+        destination_port_range:
+          - 80 # HTTP
+          - 443 # HTTPS
+          - 5986 # WinRM
+          - 3389 # RDP
+        access: Allow
+        priority: 1001
+        direction: Inbound
+      - name: Ping
+        protocol: Icmp
+        access: Allow
+        priority: 1002
+        direction: Inbound
+      - name: Internal TCP
+        protocol: Tcp
+        destination_port_range:
+          - 80 # HTTP
+          - 5986 # WinRM
+          - 3389 # RDP
+          - 53 # DNS
+          - 88 # Kerberos Authentication
+          - 135 # RPC
+          - 139 # Netlogon
+          - 389 # LDAP
+          - 445 # SMB
+          - 464 # Kerberos Authentication
+          - 5432 # PostgreSQL
+          - 636 # LDAPS (LDAP over TLS)
+          - 873 # Rsync 
+          - 3268-3269 # Global Catalog 
+          - 1024-65535 # Ephemeral RPC ports
+        access: Allow
+        priority: 1003
+        direction: Inbound
+        source_address_prefix: "{{ az_vnet_cidr_block }}"
+      - name: Internal UDP
+        protocol: Udp
+        destination_port_range:
+          - 53 # DNS
+          - 88 # Kerberos Authentication
+          - 123 # NTP
+          - 137-138 # Netlogon 
+          - 389 # LDAP 
+          - 445 # SMB
+          - 464 # Kerberos Authentication
+          - 1024-65535 # Ephemeral RPC ports
+        access: Allow
+        priority: 1004
+        direction: Inbound
+        source_address_prefix: "{{ az_vnet_cidr_block }}"
