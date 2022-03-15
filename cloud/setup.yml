@@ -40,10 +40,15 @@ controller_templates:
       name: ''
       description: ''
       spec:
+        - question_name: Infra Provider
+          type: multiplechoice
+          variable: infra_provider
+          required: true
+          choices:
+            - aws
         - question_name: Public Key
           type: textarea
           variable: aws_public_key
-          required: true
   - name: Cloud / Create VM
     job_type: run
     organization: Default
@@ -79,4 +84,4 @@ controller_templates:
           type: multiplechoice
           variable: vm_blueprint
           required: true
-          choices: "{{ lookup('fileglob', 'blueprints/*.yml') | regex_replace(',','\n') | regex_findall('.*/(.*)(?=.yml)') }}"
+          choices: "{{ lookup('fileglob', 'blueprints/*.yml') | regex_replace(',','\n') | regex_findall('.*/(.*)(?=.yml)') | list }}"

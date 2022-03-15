@@ -4,8 +4,7 @@
   gather_facts: no
   vars:
     infra_provider: undef
-    aws_public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCK93BIfZx+MeEyP6qBha48FxtoZYsmx4grYOM3ZQMbkDp0v/cHFKHlUrZR67bVHuOriqrCScBaBfZ0RQk7mYpTAR5CgLed8Vun3LcQz7bZHq26CS83J8KE5Kbfhm07VzZfOND/yeuq3dU9P6Kb2HBufj+mUGgktUjuLVlRAk1KTYfTAevYcCfm75LtCKAkTsR5hG+yGHRo0n1lWeEhz8m0Gl1g0e3/eGo/bmViHvrKi5cGPu7K8p8JGhtXhpr0jMIqh5Ej7Iu2fPe/sV05Qp+am4upGPW7PmS2V82sMuZxLPeWZRJxvqstW7aSziUxbWu6b8gMfRJdzGa6b24ejp1R 2cfb-key
-
+    aws_public_key: undef
   tasks:
   - include_role:
       name: "demo.cloud.{{ infra_provider }}"

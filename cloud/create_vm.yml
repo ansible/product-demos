@@ -15,7 +15,7 @@
 
   - name: "Check Provider Compatibility"
     assert:
-      that: "{{ vm_provider }} in {{ vm_blueprint_providers }}"
+      that: "'{{ vm_provider }}' in {{ vm_blueprint_providers }}"
       fail_msg: "{{ vm_blueprint | upper }} is not available for {{ vm_provider | upper }}"
     when: "vm_blueprint_providers is defined"
 
