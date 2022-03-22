@@ -68,8 +68,9 @@ controller_templates:
           required: true
           choices:
             - aws
-        - question_name: Public Key
+        - question_name: AWS Public Key (only required for aws provider)
           type: textarea
+          required: false
           variable: aws_public_key
   - name: Cloud / Create VM
     job_type: run
