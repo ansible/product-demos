@@ -1,6 +1,7 @@
 ---
 user_message:
  - Update AWS credential with Access and Secret key
+ - Update Workshop Credential with password used to login to Controller
 
 controller_components:
   - credentials
@@ -109,3 +110,5 @@ controller_templates:
           required: true
           choices: #"{{ lookup('fileglob', 'blueprints/*.yml') | regex_replace(',','\n') | regex_findall('.*/(.*)(?=.yml)') | list }}"
             - windows
+            - rhel8
+            - rhel7
