@@ -205,6 +205,24 @@ controller_templates:
             - 'Running'
             - 'Stopped'
 
+  - name: "WINDOWS / PowerShell DSC configuring password requirements"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/powershell_dsc.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+
   - name: "ACTIVE DIRECTORY / Create Active Directory domain"
     job_type: run
     inventory: "Workshop Inventory"
