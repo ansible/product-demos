@@ -1,0 +1,25 @@
+---
+- name: Create Cloud Infra
+  hosts: localhost
+  gather_facts: no
+  vars:
+    vm_name: undef
+    vm_owner: undef
+    vm_provider: undef
+    vm_blueprint: undef
+
+  tasks:
+  - name: "Importing {{ vm_blueprint | upper }} Blueprint"
+    include_vars:
+      file: "blueprints/{{ vm_blueprint }}.yml"
+
+  - name: "Check Provider Compatibility"
+    assert:
+      that: "'{{ vm_provider }}' in {{ vm_blueprint_providers }}"
+      fail_msg: "{{ vm_blueprint | upper }} is not available for {{ vm_provider | upper }}"
+    when: "vm_blueprint_providers is defined"
+
+  - name: "Building {{ vm_blueprint | upper }} in {{ vm_provider | upper }}"
+    include_role:
+      name: "demo.cloud.{{ vm_provider }}"
+      tasks_from: create_vm

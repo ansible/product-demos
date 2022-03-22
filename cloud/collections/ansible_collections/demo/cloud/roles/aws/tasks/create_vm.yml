@@ -1,0 +1,47 @@
+---
+- name: AWS | CREATE VM | get subnet info
+  amazon.aws.ec2_vpc_subnet_info:
+    region: "{{ aws_region }}"
+    filters:
+      "tag:Name": "{{ aws_vpc_name }}-{{ aws_vpc_prefix }}-subnet"
+  register: aws_subnet
+
+- name: AWS | CREATE VM | save subnet id
+  set_fact:
+    aws_subnet_id: "{{ aws_subnet.subnets|map(attribute='id')| list | last }}"
+
+- name: AWS| CREATE VM | find ami
+  amazon.aws.ec2_ami_info:
+    region: "{{ aws_region }}"
+    owners: "{{ aws_image_owners }}"
+    filters:
+      name: "{{ aws_image_filter }}"
+      architecture: "{{ aws_image_architecture }}"
+  register: amis
+
+- name: AWS| CREATE VM | save ami
+  set_fact:
+    aws_instance_ami: >
+      {{ amis.images | selectattr('name', 'defined') | sort(attribute='creation_date') | last }}
+
+- name: AWS| CREATE VM | create instance
+  amazon.aws.ec2_instance:
+    network:
+      assign_public_ip: yes
+    key_name: "{{ aws_keypair_name }}"
+    instance_type: "{{ aws_instance_size }}"
+    image_id: "{{ aws_instance_ami.image_id }}"
+    region: "{{ aws_region }}"
+    security_group: "{{ aws_securitygroup_name }}"
+    tags:
+      blueprint: "{{ aws_blueprint }}"
+      purpose: "{{ aws_purpose_tag }}"
+      env: "{{ aws_env_tag }}"
+      ansible_group: "{{ aws_ansiblegroup_tag }}"
+      owner: "{{ aws_vm_owner }}"
+      info: "This instance was built by Red Hat Product Demos"
+      Name: "{{ aws_vm_name }}"
+    wait: "{{ aws_ec2_wait }}"
+    vpc_subnet_id: "{{ aws_subnet_id }}"
+    user_data: "{{ lookup('template', aws_userdata_template+'.j2', template_vars=dict(aws_vm_name=vm_name)) }}"
+  register: aws_vm_output
