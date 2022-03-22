@@ -34,7 +34,7 @@ controller_inventory_sources:
     inventory: Workshop Inventory
     credential: AWS
     overwrite: true
-    sourc_vars:
+    source_vars:
       hostnames:
         - tag:Name
       compose:
