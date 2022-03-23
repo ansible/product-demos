@@ -14,7 +14,7 @@
   - name: Scan services (Unix/Linux)
     demo.patching.scan_services:
 
-    block:
+  - block:
     - yum:
         name: httpd
         state: latest
