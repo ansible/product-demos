@@ -1,5 +1,6 @@
 ---
 - hosts: "{{ HOSTS }}"
+  become: yes
   
   tasks:
   - name: Ensure Unix/Linux platforms only
@@ -8,24 +9,24 @@
 
   - name: Scan packages (Unix/Linux)
     demo.patching.scan_packages:
-      os_family: '{{ ansible_os_family }}'
+      os_family: "{{ ansible_os_family }}"
 
   - name: Scan services (Unix/Linux)
     demo.patching.scan_services:
 
-  block:
-  - yum:
-      name: httpd
-      state: latest
+    block:
+    - yum:
+        name: httpd
+        state: latest
 
-  - service:
-      name: httpd
-      state: started
+    - service:
+        name: httpd
+        state: started
 
-  - include_role:
-      name: demo.patching.build_report_linux
+    - include_role:
+        name: demo.patching.build_report_linux
 
-  - include_role:
-      name: demo.patching.build_report_linux_patch
-  delegate_to: report_servers
-  run_once: yes
+    - include_role:
+        name: demo.patching.build_report_linux_patch
+    delegate_to: report_servers
+    run_once: yes
