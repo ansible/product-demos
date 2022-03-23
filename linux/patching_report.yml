@@ -1,6 +1,8 @@
 ---
 - hosts: "{{ HOSTS }}"
   become: yes
+  vars:
+    report_server: node1
   
   tasks:
   - name: Ensure Unix/Linux platforms only
@@ -28,5 +30,5 @@
 
     - include_role:
         name: demo.patching.build_report_linux_patch
-    delegate_to: report_servers
+    delegate_to: "{{ report_server }}"
     run_once: yes
