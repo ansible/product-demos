@@ -1,0 +1,15 @@
+---
+- hosts: "{{ HOSTS }}"
+  gather_facts: no
+
+  tasks:
+  - name: list systems to be destroyed
+    pause:
+      seconds: 30
+      prompt: "{{ inventory_hostname }} will be DESTROYED in 30 seconds."
+
+  - name: destroy vm
+    include_role:
+      name: "demo.cloud.aws"
+      tasks_from: destroy_vm
+    when: "'cloud_aws' in group_names"
