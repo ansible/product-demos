@@ -28,7 +28,7 @@
         </tr>
     </thead>
     <tbody>
-{% for linux_host in groups['tag_RHEL']|sort %}
+{% for linux_host in ansible_play_hosts |sort %}
         <tr>
             <td>{{hostvars[linux_host]['inventory_hostname']}}</td>
             <td>{{hostvars[linux_host]['ansible_os_family']|default("none")}}</td>

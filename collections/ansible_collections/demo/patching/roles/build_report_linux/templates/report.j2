@@ -77,7 +77,7 @@ collapsible: true
         </tr>
     </thead>
     <tbody>
-{% for linux_host in groups['tag_Insights']|sort %}
+{% for linux_host in ansible_play_hosts |sort %}
         <tr>
             <td class="summary_info">
               <div id="hostname">
