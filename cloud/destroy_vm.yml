@@ -6,7 +6,7 @@
   - name: list systems to be destroyed
     pause:
       seconds: 30
-      prompt: "{{ inventory_hostname }} will be DESTROYED in 30 seconds."
+      prompt: "{{ inventory_hostname }} will be DESTROYED in 30 seconds. Cancel the job to Abort."
 
   - name: destroy vm
     include_role:
