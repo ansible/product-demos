@@ -1,0 +1,41 @@
+<!–– INTERNAL TABLE FOR INTERFACES --!>
+<div id="accordion">
+<div class="ui-accordion ui-widget ui-helper-reset" role="tablist">
+<h3 class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-icons ui-accordion-header-collapsed ui-corner-all" role="tab" id="ui-id-3" aria-controls="ui-id-4" aria-selected="false" aria-expanded="false" tabindex="0">
+  Interfaces - MTU/Duplex/Speed
+</h3>
+<div class="net_content ui-accordion-content ui-corner-bottom ui-helper-reset ui-widget-content" id="ui-id-4" aria-labelledby="ui-id-3" role="tabpanel" aria-hidden="true" style="display: none; height: 194px;">
+{% if hostvars[network_switch]['ansible_network_resources']['interfaces'] is defined and hostvars[network_switch]['ansible_network_resources']['interfaces']|length > 0  %}
+<table id="subtable">
+    <thead>
+        <tr>
+            <th>Interface Name</th>
+            <th>Description</th>
+            <th>Duplex</th>
+            <th>Enabled</th>
+            <th>MTU</th>
+            <th>Speed</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for interface in hostvars[network_switch]['ansible_network_resources']['interfaces'] %}
+        <tr>
+            <td>{{interface['name']}}</td>
+            <td>{{interface['description']|default("none")}}</td>
+            <td>{{interface['duplex']|default("default")}}</td>
+            <td>{{interface['enabled']}}</td>
+            <td>{{interface['mtu']|default("default")}}</td>
+            <td>{{interface['speed']|default("default")}}</td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% elif hostvars[network_switch]['ansible_network_resources']['interfaces'] is defined and hostvars[network_switch]['ansible_network_resources']['interfaces']|length == 0 %}
+No interfaces configured on this device
+{% else %}
+No Interface information available
+{% endif %}
+</div>
+</div>
+</div>
+<!–– END INTERNAL TABLE FOR INTERFACES --!>

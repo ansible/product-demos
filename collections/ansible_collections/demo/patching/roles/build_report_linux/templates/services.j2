@@ -1,0 +1,30 @@
+<!–– INTERNAL TABLE FOR SERVICES --!>
+<div id="accordion">
+<div class="ui-accordion ui-widget ui-helper-reset" role="tablist">
+<h3 class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-icons ui-accordion-header-collapsed ui-corner-all" role="tab" id="ui-id-3" aria-controls="ui-id-4" aria-selected="false" aria-expanded="false" tabindex="0">Services Facts</h3>
+<div class="net_content ui-accordion-content ui-corner-bottom ui-helper-reset ui-widget-content" id="ui-id-4" aria-labelledby="ui-id-3" role="tabpanel" aria-hidden="true" style="display: none; height: 194px;">
+<table id="subtable" class="sortable">
+    <thead>
+        <tr>
+            <th>Service Name</th>
+            <th>State</th>
+            <th>Source</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if hostvars[linux_host]['services'] is defined %}
+    {% for servicesname in hostvars[linux_host]['services']|sort %}
+    {% set service = hostvars[linux_host]['services'][servicesname] %}
+        <tr>
+            <td>{{service['name']}}</td>
+            <td>{{service['state']}}</td>
+            <td>{{service['source']}}</td>
+        </tr>
+{% endfor %}
+{% endif %}
+    </tbody>
+</table>
+</div>
+</div>
+</div>
+<!–– END INTERNAL TABLE FOR SERVICES --!>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title> Ansible Linux Automation Report </title>
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="css/new.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
+<script>
+$(function() {
+$( "#accordion > div" ).accordion({
+    header: "h3",
+    active: false,
+collapsible: true
+});
+});
+</script>
+<script>
+        (function(document) {
+            'use strict';
+
+            var TableFilter = (function(myArray) {
+                var search_input;
+
+                function _onInputSearch(e) {
+                    search_input = e.target;
+                    var tables = document.getElementsByClassName(search_input.getAttribute('data-table'));
+                    myArray.forEach.call(tables, function(table) {
+                        myArray.forEach.call(table.tBodies, function(tbody) {
+                            myArray.forEach.call(tbody.rows, function(row) {
+                                var text_content = row.textContent.toLowerCase();
+                                var search_val = search_input.value.toLowerCase();
+                                row.style.display = text_content.indexOf(search_val) > -1 ? '' : 'none';
+                            });
+                        });
+                    });
+                }
+
+                return {
+                    init: function() {
+                        var inputs = document.getElementsByClassName('search-input');
+                        myArray.forEach.call(inputs, function(input) {
+                            input.oninput = _onInputSearch;
+                        });
+                    }
+                };
+            })(Array.prototype);
+
+            document.addEventListener('readystatechange', function() {
+                if (document.readyState === 'complete') {
+                    TableFilter.init();
+                }
+            });
+
+        })(document);
+    </script>
+</head>
+<body>
+<div class="wrapper">
+  {% include 'header.j2' %}
+<section>
+<center>
+<h1>Ansible Linux Automation Report</h1>
+<h3><input type="search" placeholder="Search..." class="form-control search-input" data-table="main_net_table"/>
+</center>
+<table class="table table-striped mt32 main_net_table">
+    <thead>
+        <tr>
+            <th>Linux Device</th>
+            <th>Package Manager</th>
+            <th>Operating System</th>
+            <th>Operating System Version</th>
+            <th>Operating System Kernel Version</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for linux_host in groups['tag_Insights']|sort %}
+        <tr>
+            <td class="summary_info">
+              <div id="hostname">
+                <p class="hostname"> 
+                  <img class="router_image" src="server.png"> {{ hostvars[linux_host]['inventory_hostname'].split('.')[0] }}</p>
+                </div>
+{% if detailedreport == 'True' %}
+{% include 'packages.j2' %}
+{% include 'services.j2' %}
+{% endif %}
+</td>
+            <td>{{hostvars[linux_host]['ansible_pkg_mgr']|default("none")}}</td>
+            <td>{{hostvars[linux_host]['ansible_os_family']|default("none")}}</td>
+            <td>{{hostvars[linux_host]['ansible_distribution_version']|default("none")}}</td>
+            <td>{{hostvars[linux_host]['ansible_kernel']|default("none")}}</td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+<center><p>Created with</p><br><img src="webpage_logo.png" width="300">
+</center>
+</section>
+</div>
+</body>
+</html>
