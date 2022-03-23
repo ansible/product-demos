@@ -23,6 +23,6 @@
         name: demo.patching.report_linux
 
     - include_role:
-        name: demo.patching.report_linux_patch
+        name: demo.patching.report_linux_patching
     delegate_to: "{{ report_server }}"
     run_once: yes

@@ -2,9 +2,11 @@
 - name: Scan packages
   demo.patching.scan_packages:
     os_family: "{{ ansible_os_family }}"
+  check_mode: no
 
 - name: Scan services
   demo.patching.scan_services:
+  check_mode: no
 
 - name: upgrade packages (yum)
   yum:
