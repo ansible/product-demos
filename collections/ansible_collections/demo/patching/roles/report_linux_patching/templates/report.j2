@@ -56,7 +56,7 @@
 {% endfor %}
     </tbody>
 </table>
-<center><p>Created with Ansible on {{hostvars[host].ansible_date_time.iso8601}}</p></center>
+<center><p>Created with Ansible on {{hostvars[inventory_hostname].ansible_date_time.iso8601}}</p></center>
 <script type="text/javascript">
 function tableToCSV() {
 
