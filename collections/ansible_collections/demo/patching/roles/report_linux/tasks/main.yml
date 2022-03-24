@@ -2,12 +2,14 @@
   ansible.builtin.template:
     src: report.j2
     dest: "{{ file_path }}/linux.html"
+  check_mode: no
 
 - name: copy CSS over
   ansible.builtin.copy:
     src: "css"
     dest: "{{ file_path }}"
     directory_mode: true
+  check_mode: no
 
 - name: copy logos over
   ansible.builtin.copy:
@@ -18,6 +20,7 @@
     - "webpage_logo.png"
     - "redhat-ansible-logo.svg"
     - "server.png"
+  check_mode: no
 
 - name: display link to inventory report
   ansible.builtin.debug:

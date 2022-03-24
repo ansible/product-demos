@@ -134,6 +134,8 @@ controller_templates:
     playbook: "linux/patching.yml"
     execution_environment: Default execution environment
     use_fact_cache: true
+    job_type: check
+    ask_job_type_on_launch: yes
     credentials:
     - "Workshop Credential"
     survey_enabled: true
