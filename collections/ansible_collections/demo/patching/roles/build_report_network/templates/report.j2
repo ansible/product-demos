@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title> Ansible Network Automation Report </title>
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="css/new.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+$(function() {
+$( "#accordion > div" ).accordion({
+    header: "h3",
+    active: false,
+collapsible: true
+});
+});
+</script>
+<script>
+        (function(document) {
+            'use strict';
+
+            var TableFilter = (function(myArray) {
+                var search_input;
+
+                function _onInputSearch(e) {
+                    search_input = e.target;
+                    var tables = document.getElementsByClassName(search_input.getAttribute('data-table'));
+                    myArray.forEach.call(tables, function(table) {
+                        myArray.forEach.call(table.tBodies, function(tbody) {
+                            myArray.forEach.call(tbody.rows, function(row) {
+                                var text_content = row.textContent.toLowerCase();
+                                var search_val = search_input.value.toLowerCase();
+                                row.style.display = text_content.indexOf(search_val) > -1 ? '' : 'none';
+                            });
+                        });
+                    });
+                }
+
+                return {
+                    init: function() {
+                        var inputs = document.getElementsByClassName('search-input');
+                        myArray.forEach.call(inputs, function(input) {
+                            input.oninput = _onInputSearch;
+                        });
+                    }
+                };
+            })(Array.prototype);
+
+            document.addEventListener('readystatechange', function() {
+                if (document.readyState === 'complete') {
+                    TableFilter.init();
+                }
+            });
+
+        })(document);
+    </script>
+</head>
+<body>
+<div class="wrapper">
+  {% include 'header.j2' %}
+<section>
+<center>
+<h1>Ansible Network Automation Report</h1>
+<h3><input type="search" placeholder="Search..." class="form-control search-input" data-table="main_net_table"/>
+</center>
+<table class="table table-striped mt32 main_net_table">
+    <thead>
+        <tr>
+            <th>Network Device</th>
+            <th>Layer 1</th>
+            <th>Layer 2</th>
+            <th>Layer 3</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for network_switch in groups['tag_Router']|sort %}
+        <tr>
+            <td class="summary_info">
+              <div id="hostname">
+                <p class="hostname"> 
+                  <img class="router_image" src="router.png"> {{ hostvars[network_switch]['ansible_net_hostname'].split('.')[0] }}</p>
+                </div>
+{% include 'summary.j2' %}
+</td>
+<td>
+{% include 'interfaces.j2' %}
+</td>
+<td>
+{% include 'vlans.j2' %}
+{% include 'lldp_interfaces.j2' %}
+{% include 'l2_interfaces.j2' %}
+</td>
+<td>
+{% include 'l3_interfaces.j2' %}
+{% include 'lacp.j2' %}
+{% include 'bgp.j2' %}
+{% include 'ospf.j2' %}
+</td>
+            
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+<center><p>Created with</p><br><img src="webpage_logo.png" width="300">
+</center>
+</section>
+</div>
+</body>
+</html>
