@@ -10,8 +10,8 @@ aws_region: us-east-1
 aws_vm_name: "{{ vm_name }}"
 aws_vm_owner: "{{ vm_owner }}"
 aws_blueprint: "{{ vm_blueprint }}"
-aws_image_filter: "{{ omit }}"
-aws_image_size: "{{ omit }}"
+#aws_image_filter: "{{ omit }}"
+#aws_instance_size: "{{ omit }}"
 #aws_image_architecture: "{{ omit }}"
 #aws_image_owners: "{{ omit }} "
 aws_userdata_template: default

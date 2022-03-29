@@ -35,4 +35,4 @@
   ansible.builtin.reboot:
   when:
    - result.rc == 1
-   - allow_reboot is true
+   - allow_reboot == true
