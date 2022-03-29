@@ -13,10 +13,10 @@
 - name: AWS| CREATE VM | find ami
   amazon.aws.ec2_ami_info:
     region: "{{ aws_region }}"
-    owners: "{{ aws_image_owners }}"
+    owners: "{{ aws_image_owners | default(omit)}}"
     filters:
       name: "{{ aws_image_filter }}"
-      architecture: "{{ aws_image_architecture }}"
+      architecture: "{{ aws_image_architecture | default(omit) }}"
   register: amis
 
 - name: AWS| CREATE VM | save ami
