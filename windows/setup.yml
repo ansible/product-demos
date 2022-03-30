@@ -74,11 +74,13 @@ controller_templates:
           variable: iis_message
           required: true
 
-  - name: "WINDOWS / Windows updates"
-    job_type: run
+  - name: "WINDOWS / Patching"
+    use_fact_cache: true
+    job_type: check
+    ask_job_type_on_launch: yes
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
-    playbook: "windows/windows_updates.yml"
+    playbook: "windows/patching.yml"
     execution_environment: Default execution environment
     credentials:
     - "Workshop Credential"
@@ -92,8 +94,8 @@ controller_templates:
           variable: HOSTS
           required: false
         - question_name: Update categories
-          type: multiplechoice
-          variable: categories
+          type: multiselect
+          variable: win_update_categories
           required: false
           default: SecurityUpdates
           choices:
@@ -110,7 +112,7 @@ controller_templates:
             - Updates
         - question_name: Reboot after install?
           type: multiplechoice
-          variable: reboot_server
+          variable: allow_reboot
           required: false
           default: 'Yes'
           choices:

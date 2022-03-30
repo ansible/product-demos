@@ -12,6 +12,8 @@ collections:
   #windows
   - chocolatey.chocolatey
   - community.windows
+  - name: ansible.windows
+    version: 1.9.0
   #cloud
   - name: azure.azcollection
     version: 1.11.0

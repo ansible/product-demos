@@ -27,16 +27,16 @@
         </tr>
     </thead>
     <tbody>
-{% for windows_host in groups['tag_Windows']|sort %}
+{% for windows_host in ansible_play_hosts |sort %}
         <tr>
             <td>{{hostvars[windows_host]['inventory_hostname']}}</td>
             <td>{{hostvars[windows_host]['ansible_distribution']|default("none")}}</td>
             <td>
               <ul>
 
-{% if hostvars[windows_host].patchresult.updates is defined and hostvars[windows_host].patchresult.found_update_count|int > 0  %}
-{% for update in hostvars[windows_host].patchresult.updates %}
-{% set updatenum = hostvars[windows_host].patchresult.updates[update] %}
+{% if hostvars[windows_host].patchingresult.updates is defined and hostvars[windows_host].patchingresult.found_update_count|int > 0  %}
+{% for update in hostvars[windows_host].patchingresult.updates %}
+{% set updatenum = hostvars[windows_host].patchingresult.updates[update] %}
             <li>{{updatenum.title}}</li>
 {% endfor %}
 {% else %}
@@ -49,9 +49,7 @@
 {% endfor %}
     </tbody>
 </table>
-{% for host in ansible_play_hosts %}
-<center><p>Created with Ansible on {{hostvars[host].ansible_date_time.iso8601}}</p></center>
-{% endfor %}
+<center><p>Created with Ansible on {{hostvars[inventory_hostname].ansible_date_time.iso8601}}</p></center>
 <script type="text/javascript">
 function tableToCSV() {
 

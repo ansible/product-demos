@@ -4,9 +4,13 @@
 
   tasks:
   - name: list systems to be destroyed
+    debug:
+      msg: "{{ inventory_hostname }}"
+
+  - name: pause for review...
     pause:
       seconds: 30
-      prompt: "{{ inventory_hostname }} will be DESTROYED in 30 seconds. Cancel the job to Abort."
+      prompt: "Systems listed above will be DESTROYED in 30 seconds. Cancel the job to Abort."
 
   - name: destroy vm
     include_role:

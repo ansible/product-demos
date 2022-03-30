@@ -24,4 +24,4 @@
 
 - name: display link to inventory report
   ansible.builtin.debug:
-    msg: "Please go to http://{{ ansible_host }}/reports/linux.html"
+    msg: "Please go to http://{{ hostvars[report_server]['ansible_host'] }}/reports/linux.html"

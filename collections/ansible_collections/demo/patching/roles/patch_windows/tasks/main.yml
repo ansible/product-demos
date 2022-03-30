@@ -1,0 +1,15 @@
+---
+- name: Scan packages
+  demo.patching.win_scan_packages:
+  check_mode: no
+
+- name: Scan Services
+  demo.patching.win_scan_services:
+  check_mode: no
+
+- name: Install Windows Updates
+  ansible.windows.win_updates:
+    category_names: "{{ win_update_categories | default(omit) }}"
+    reboot: "{{ allow_reboot }}"
+    state: installed
+  register: patchingresult
