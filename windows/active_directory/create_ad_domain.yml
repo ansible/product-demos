@@ -1,6 +1,7 @@
 ---
 - name: Create Active Directory domain
   hosts: "{{ HOSTS | default('windows') }}"
+  gather_facts: false
 
   tasks:
   - name: Create new domain in a new forest on the target host
