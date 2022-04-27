@@ -1,6 +1,6 @@
 ---
 - name: Create Active Directory domain
-  hosts: "{{ HOSTS | default('windows') }}"
+  hosts: windows
   gather_facts: false
 
   tasks:
