@@ -7,7 +7,7 @@ controller_components:
   - credential_types
   - credentials
   - job_templates
-  - workflow_job_templates
+  #- workflow_job_templates
 
 controller_projects:
   - name: Fact Scan
