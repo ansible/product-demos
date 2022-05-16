@@ -213,7 +213,15 @@ controller_templates:
     execution_environment: Default execution environment
     credentials:
     - "Workshop Credential"
-    survey_enabled: false
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
 
   - name: "ACTIVE DIRECTORY / Helpdesk new user portal"
     job_type: run
