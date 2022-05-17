@@ -1,0 +1,10 @@
+---
+- name: Linux Reboot Demo
+  hosts: web
+  gather_facts: no
+  become: true
+ 
+  tasks:
+    - name: Reboot the machine
+      reboot:
+        reboot_timeout: 5
