@@ -35,6 +35,23 @@ controller_inventory_sources:
         - key: platform
           prefix: os
 
+  - name: Azure Inventory
+    organization: Default
+    source: azure_rm
+    inventory: Workshop Inventory
+    credential: Azure
+    overwrite: true
+    source_vars:
+      hostnames: 
+        - tags.Name
+        - default
+      keyed_groups:
+        - key: os_profile.system
+          prefix: os
+      groups:
+        cloud_azure: true
+
+
 controller_templates:
   - name: Cloud / Create Infra
     job_type: run
@@ -58,6 +75,7 @@ controller_templates:
           required: true
           choices:
             - aws
+            - azure
         - question_name: AWS Public Key (only required for aws provider)
           type: textarea
           required: false
@@ -93,6 +111,7 @@ controller_templates:
           required: true
           choices:
             - aws
+            - azure
         - question_name: Blueprint
           type: multiplechoice
           variable: vm_blueprint

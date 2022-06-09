@@ -1,8 +1,8 @@
 ---
 - name: AZURE | CREATE INFRA | resource group
   azure.azcollection.azure_rm_resourcegroup:
-      name: "{{ az_rg_name }}-{{ az_rg_prefix }}-rg"
-      location: "{{ az_region }}"
+    name: "{{ az_rg_name }}-{{ az_rg_prefix }}-rg"
+    location: "{{ az_region }}"
 
 - name: AZURE | CREATE INFRA | virtual network
   azure.azcollection.azure_rm_virtualnetwork:

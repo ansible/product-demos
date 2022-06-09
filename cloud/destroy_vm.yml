@@ -12,4 +12,4 @@
     include_role:
       name: "demo.cloud.aws"
       tasks_from: destroy_vm
-    when: "'cloud_aws' in group_names"
+    when: "'cloud_aws' in group_names or 'cloud_azure' in group_names"
