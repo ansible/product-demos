@@ -16,6 +16,13 @@ controller_credentials:
     inputs:
       username: REPLACEME
       password: REPLACEME
+    
+  - name: Azure
+    credential_type: Microsoft Azure Resource Manager
+    organization: Default
+    update_secrets: false
+    inputs:
+      subscription: REPLACEME
 
 controller_inventory_sources:
   - name: AWS Inventory
@@ -40,6 +47,7 @@ controller_inventory_sources:
     source: azure_rm
     inventory: Workshop Inventory
     credential: Azure
+    execution_environment: Ansible Engine 2.9 execution environment
     overwrite: true
     source_vars:
       hostnames: 
@@ -48,7 +56,7 @@ controller_inventory_sources:
       keyed_groups:
         - key: os_profile.system
           prefix: os
-      groups:
+      conditional_groups:
         cloud_azure: true
 
 
@@ -56,8 +64,10 @@ controller_templates:
   - name: Cloud / Create Infra
     job_type: run
     organization: Default
+    execution_environment: Ansible Engine 2.9 execution environment
     credentials: 
      - AWS
+     - Azure
     project: Ansible official demo project
     playbook: cloud/create_infra.yml
     inventory: Workshop Inventory
@@ -83,8 +93,10 @@ controller_templates:
   - name: Cloud / Create VM
     job_type: run
     organization: Default
+    execution_environment: Ansible Engine 2.9 execution environment
     credentials: 
      - AWS
+     - Azure
      - Workshop Credential
     project: Ansible official demo project
     playbook: cloud/create_vm.yml
