@@ -14,6 +14,6 @@ collections:
   - community.windows
   #cloud
   - name: azure.azcollection
-    version: 1.11.0
+    version: 1.13.0
   - name: amazon.aws
     version: 3.1.1
