@@ -1,6 +1,7 @@
 ---
 - name: Helpdesk new user portal
   hosts: "{{ HOSTS | default('windows') }}"
+  gather_facts: false
 
   tasks:
   - name: Setting host facts using complex arguments
@@ -20,13 +21,13 @@
       groups:
         - "GroupA"
         - "GroupB"
-      street: 123 4th St.
-      city: Sometown
+      street: "{{ street }}"
+      city: "{{ city }}"
       state_province: IN
-      postal_code: 12345
+      postal_code: "{{ postal_code }}"
       country: US
       attributes:
-        telephoneNumber: 555-123456
+        telephoneNumber: "{{ telephone_number }}"
     register: new_user
 
   - name: Display User
