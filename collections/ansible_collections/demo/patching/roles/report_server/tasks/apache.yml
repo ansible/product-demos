@@ -1,0 +1,20 @@
+---
+- yum:
+    name: httpd
+    state: latest
+  check_mode: no
+
+- file:
+    path: /var/www/html/reports/
+    state: directory
+  check_mode: no
+
+- copy:
+    dest: /var/www/html/reports/.htaccess
+    content: Options +Indexes
+  check_mode: no
+
+- service:
+    name: httpd
+    state: started
+  check_mode: no

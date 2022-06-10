@@ -1,0 +1,14 @@
+---
+win_update_categories:
+  - Application
+  - Connectors
+  - CriticalUpdates
+  - DefinitionUpdates
+  - DeveloperKits
+  - FeaturePacks Guidance
+  - SecurityUpdates
+  - ServicePacks
+  - Tools
+  - UpdateRollups
+  - Updates
+allow_reboot: true

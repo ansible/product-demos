@@ -6,6 +6,7 @@ groups:
   patch_enhancements: insights_patching.rhea_count > 0
   patch_security: insights_patching.rhsa_count > 0
 get_tags: yes
+selection: none
 filter_tags:
   - insights-client/purpose=demo
 keyed_groups:
