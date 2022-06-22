@@ -17,7 +17,7 @@
     - name: Configure Timesync
       when: harden_time | bool
       include_role:
-        name: redhat.rhel_system_roles.timesync
+        name: redhat-rhel_system_roles.timesync
 
     - name: SSH Hardening
       when: harden_ssh | bool
