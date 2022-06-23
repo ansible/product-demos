@@ -263,7 +263,3 @@ controller_templates:
           type: text
           variable: HOSTS
           required: true
-        - question_name: Web Page Message
-          type: textarea
-          variable: message
-          required: true
