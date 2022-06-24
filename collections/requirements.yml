@@ -1,0 +1,23 @@
+---
+collections:
+  - name: ansible.controller
+    version: 4.1.1
+  - name: redhat_cop.controller_configuration
+    version: 2.1.1
+  #linux
+  - name: redhat.insights
+    version: 1.0.7
+  - name: redhat.rhel_system_roles
+    version: 1.16.2
+  - community.general
+  - containers.podman
+  #windows
+  - chocolatey.chocolatey
+  - community.windows
+  - name: ansible.windows
+    version: 1.9.0
+  #cloud
+  - name: azure.azcollection
+    version: 1.13.0
+  - name: amazon.aws
+    version: 3.1.1

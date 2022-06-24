@@ -1,0 +1,265 @@
+---
+user_message: |
+  Be sure to update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register'. https://access.redhat.com/management/activation_keys
+
+  Update Credential for Insights Inventory with Red Hat account.
+controller_components:
+  - projects
+  - credential_types
+  - credentials
+  - inventory_sources
+  - job_templates
+
+controller_projects:
+  - name: Fact Scan
+    organization: Default
+    scm_type: git
+    scm_url: 'https://github.com/ansible/awx-facts-playbooks.git'
+
+controller_credential_types:
+  - name: "Insights Collection"
+    kind: cloud
+    inputs:
+      fields:
+        - id: insights_user
+          type: string
+          label: Insights User
+        - id: insights_password
+          type: string
+          label: Insights Password
+          secret: true
+    injectors:
+      env:
+        INSIGHTS_USER: "{% raw %}{  { insights_user  }}{% endraw %}"
+        INSIGHTS_PASSWORD: "{% raw %}{  { insights_password  }}{% endraw %}"
+
+controller_credentials:
+  - name: Insights Inventory
+    credential_type: Insights Collection
+    organization: Default
+    inputs:
+      insights_user: REPLACEME
+      insights_password: REPLACEME
+
+controller_inventory_sources:
+  - name: Insights Inventory
+    inventory: Workshop Inventory
+    source: scm
+    source_project: Ansible official demo project
+    source_path: linux/inventory.insights.yml
+    credential: Insights Inventory
+
+
+controller_templates:
+  - name: "LINUX / Register"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/ec2_register.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    extra_vars:
+      activation_key: undef
+      org_id: undef
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+        - question_name: Choose Environment
+          type: multiplechoice
+          variable: env
+          choices:
+            - Dev
+            - QA
+            - Prod
+          required: true
+        - question_name: Ansible Group
+          type: text
+          variable: ansible_group
+          required: true
+  - name: "LINUX / Troubleshoot"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/tshoot.yml"
+    execution_environment: Default execution environment
+    use_fact_cache: true
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+  - name: "LINUX / Temporary Sudo"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/temp_sudo.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+        - question_name: User Name
+          type: text
+          variable: sudo_user
+          required: true
+        - question_name: How long to grant access in minutes
+          type: integer
+          variable: sudo_time
+          default: 10
+          required: true
+  - name: "LINUX / Patching"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/patching.yml"
+    execution_environment: Default execution environment
+    use_fact_cache: true
+    job_type: check
+    ask_job_type_on_launch: yes
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+  - name: "LINUX / Start Service"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/service_start.yml"
+    execution_environment: Default execution environment
+    use_fact_cache: true
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+        - question_name: Service Name
+          type: text
+          variable: service_name
+          required: true
+  - name: "LINUX / Stop Service"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/service_stop.yml"
+    execution_environment: Default execution environment
+    use_fact_cache: true
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+        - question_name: Service Name
+          type: text
+          variable: service_name
+          required: true
+  - name: "LINUX / Run Shell Script"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/run_script.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+        - question_name: Shell Script
+          type: textarea
+          variable: shell_script
+          required: true
+  - name: "LINUX / Fact Scan"
+    project: Fact Scan
+    playbook: scan_facts.yml
+    inventory: Workshop Inventory
+    execution_environment: Default execution environment
+    ask_limit_on_launch: true
+    use_fact_cache: true
+    credentials:
+      - Workshop Credential
+  - name: "LINUX / Podman Webserver"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/podman.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+        - question_name: Web Page Message
+          type: textarea
+          variable: message
+          required: true
+  - name: "LINUX / System Roles"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/system_roles.yml"
+    execution_environment: Default execution environment
+    diff_mode: yes
+    ask_job_type_on_launch: yes
+    extra_vars:
+      system_roles: undef
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true

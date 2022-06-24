@@ -1,0 +1,7 @@
+---
+- name: Destroy VM
+  amazon.aws.ec2_instance:
+    state: absent
+    instance_ids: "{{ instance_id }}"
+    region: "{{ placement.region }}"
+  delegate_to: localhost

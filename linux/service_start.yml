@@ -1,0 +1,14 @@
+---
+- hosts: "{{ HOSTS }}"
+  vars:
+    service_name: undef
+
+  tasks:
+  - name: Check Service
+    service_facts:
+
+  - name: Start Service
+    service:
+      name: "{{ service_name }}"
+      state: started
+    when: service_name + '.service' in services

@@ -1,0 +1,16 @@
+---
+- name: Arbitrary PowerShell
+  hosts: "{{ HOSTS | default('windows') }}"
+  gather_facts: false
+  vars:
+    ps_script: undef
+
+  tasks:
+  - name: Run PowerShell
+    ansible.windows.win_powershell:
+      script: | 
+        {{ ps_script }}
+    register: ps_output
+
+  - debug:
+      msg: "{{ ps_output.output }}"

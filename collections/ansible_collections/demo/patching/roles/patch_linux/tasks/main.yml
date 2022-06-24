@@ -1,0 +1,38 @@
+---
+- name: Scan packages
+  demo.patching.scan_packages:
+    os_family: "{{ ansible_os_family }}"
+  check_mode: no
+
+- name: Scan services
+  demo.patching.scan_services:
+  check_mode: no
+
+- name: upgrade packages (yum)
+  yum:
+    name: '*'
+    state: latest
+    exclude: "{{ exclude_packages }}"
+  when: ansible_pkg_mgr == "yum"
+  register: patchingresult_yum
+
+- name: upgrade packages (dnf)
+  ansible.builtin.dnf:
+    name: '*'
+    state: latest
+    exclude: "{{ exclude_packages }}"
+  when: ansible_pkg_mgr == "dnf"
+  register: patchingresult_dnf
+
+- name: Check to see if we need a reboot
+  ansible.builtin.command: needs-restarting -r
+  register: result
+  changed_when: result.rc == 1
+  failed_when: result.rc > 1
+  check_mode: no
+
+- name: Reboot Server if Necessary
+  ansible.builtin.reboot:
+  when:
+   - result.rc == 1
+   - allow_reboot == true

@@ -1,0 +1,29 @@
+<!–– INTERNAL TABLE FOR PACKAGES --!>
+<div id="accordion">
+<div class="ui-accordion ui-widget ui-helper-reset" role="tablist">
+<h3 class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-icons ui-accordion-header-collapsed ui-corner-all" role="tab" id="ui-id-3" aria-controls="ui-id-4" aria-selected="false" aria-expanded="false" tabindex="0">Package Facts</h3>
+<div class="net_content ui-accordion-content ui-corner-bottom ui-helper-reset ui-widget-content" id="ui-id-4" aria-labelledby="ui-id-3" role="tabpanel" aria-hidden="true" style="display: none; height: 194px;">
+<table id="subtable" class="sortable">
+    <thead>
+        <tr>
+            <th>Package Name</th>
+            <th>Version</th>
+            <th>Publisher</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if hostvars[windows_host]['packages'] is defined %}
+    {% for package in hostvars[windows_host]['packages'] %}
+        <tr>
+            <td>{{package['name']}}</td>
+            <td>{{package['version']}}</td>
+            <td>{{package['publisher']}}</td>
+        </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+</table>
+</div>
+</div>
+</div>
+<!–– END INTERNAL TABLE FOR PACKAGES --!>

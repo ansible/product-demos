@@ -1,0 +1,247 @@
+---
+user_message: |
+  ''
+
+controller_components:
+  - projects
+  - job_templates
+
+controller_projects:
+  - name: Fact Scan
+    organization: Default
+    scm_type: git
+    scm_url: 'https://github.com/ansible/awx-facts-playbooks.git'
+
+controller_templates:
+  - name: "WINDOWS / Install IIS"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/install_iis.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+        - question_name: web content
+          type: text
+          variable: iis_message
+          required: true
+
+  - name: "WINDOWS / Patching"
+    use_fact_cache: true
+    job_type: check
+    ask_job_type_on_launch: yes
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/patching.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+        - question_name: Update categories
+          type: multiselect
+          variable: win_update_categories
+          required: false
+          default: SecurityUpdates
+          choices:
+            - Application
+            - Connectors
+            - CriticalUpdates
+            - DefinitionUpdates
+            - DeveloperKits
+            - FeaturePacks Guidance
+            - SecurityUpdates
+            - ServicePacks
+            - Tools
+            - UpdateRollups
+            - Updates
+        - question_name: Reboot after install?
+          type: multiplechoice
+          variable: allow_reboot
+          required: false
+          default: 'Yes'
+          choices:
+            - 'Yes'
+            - 'No'
+
+  - name: "WINDOWS / Chocolatey install multiple"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/windows_choco_multiple.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+
+  - name: "WINDOWS / Chocolatey install specific"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/windows_choco_specific.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+        - question_name: Package name
+          type: text
+          variable: package_name
+          required: true
+  - name: "WINDOWS / Arbitrary PowerShell"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/arbitrary_powershell.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+        - question_name: PowerShell Script (Default returns random cat fact)
+          type: textarea
+          variable: ps_script
+          default: "(Invoke-RestMethod -Method 'GET' -Uri 'https://catfact.ninja/fact').fact"
+          required: true
+
+  - name: "WINDOWS / PowerShell Script"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/powershell_script.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+        - question_name: Service state to query?
+          type: multiplechoice
+          variable: service_state
+          required: false
+          default: 'Running'
+          choices:
+            - 'Running'
+            - 'Stopped'
+
+  - name: "WINDOWS / PowerShell DSC configuring password requirements"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/powershell_dsc.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+
+  - name: "ACTIVE DIRECTORY / Create Active Directory domain"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/active_directory/create_ad_domain.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+
+  - name: "ACTIVE DIRECTORY / Helpdesk new user portal"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/active_directory/helpdesk_new_user_portal.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Firstname
+          type: text
+          variable: firstname
+          required: true
+        - question_name: Surname
+          type: text
+          variable: surname
+          required: true
+        - question_name: Street
+          type: text
+          variable: street
+          default: 123 4th St.
+          required: false
+        - question_name: City
+          type: text
+          variable: city
+          default: Sometown
+          required: false
+        - question_name: Postal code
+          type: text
+          variable: postal_code
+          default: IN
+          required: false
+        - question_name: Telephone number
+          type: text
+          variable: telephone_number
+          default: 555-123456
+          required: false

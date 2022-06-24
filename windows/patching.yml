@@ -1,0 +1,22 @@
+---
+- name: Windows updates
+  hosts: "{{ HOSTS | default('os_windows') }}"
+  vars:
+    report_server: win1
+  
+  tasks:
+  - include_role:
+      name: demo.patching.patch_windows
+
+  - block:
+    - include_role:
+        name: demo.patching.report_server
+        tasks_from: iis
+
+    - include_role:
+        name: demo.patching.report_windows
+
+    - include_role:
+        name: demo.patching.report_windows_patching
+    delegate_to: "{{ report_server }}"
+    run_once: yes

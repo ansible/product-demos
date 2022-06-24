@@ -1,0 +1,7 @@
+---
+- hosts: windows
+  name: Rollback playbook
+  tasks:
+    - name: "Rollback this step"
+      debug:
+        msg: "Rolling back this step"

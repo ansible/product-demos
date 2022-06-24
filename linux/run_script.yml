@@ -1,0 +1,15 @@
+---
+- name: Run Shell Script
+  hosts: "{{ HOSTS }}"
+  become: yes
+  gather_facts: no
+  vars:
+    shell_script: undef
+
+  tasks:
+    - name: Run Shell Script
+      shell: "{{ shell_script }}"
+
+    - debug:
+        msg: You should really consider converting this script to a playbook!
+      run_once: yes

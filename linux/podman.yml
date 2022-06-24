@@ -1,0 +1,51 @@
+---
+- name: Podman
+  hosts: "{{ HOSTS }}"
+  vars:
+    volume_path: podman
+    message: undef
+
+  tasks:
+  - name: Install Podman
+    ansible.builtin.dnf:
+      name: podman
+      state: latest
+    become: yes
+
+  - name: Create volume dir
+    ansible.builtin.file:
+      path: "{{ volume_path }}"
+      state: directory
+
+  - name: Create index.html
+    ansible.builtin.copy:
+      dest: "{{ volume_path }}/index.html"
+      content: "{{ message }}"
+
+  - name: Run httpd container
+    containers.podman.podman_container:
+      name: apache
+      image: docker.io/httpd
+      state: started
+      volume:
+        - "{{ volume_path }}:/usr/local/apache2/htdocs"
+      ports:
+        - "8080:80"
+
+  - name: Check Web Page
+    ansible.builtin.uri:
+      url: http://127.0.0.1:8080
+      return_content: yes
+    register: web_output
+    changed_when: false
+
+  - name: podman ps
+    shell: podman ps
+    register: podman_output
+    changed_when: false
+
+  - name: Output
+    ansible.builtin.debug:
+      msg: 
+        - "{{ podman_output.stdout_lines }}"
+        - "{{ web_output.content }}"

@@ -1,0 +1,23 @@
+---
+- name: Install IIS
+  ansible.windows.win_feature:
+    name: Web-Server
+    state: present
+  check_mode: no
+
+- name: Start IIS service
+  ansible.windows.win_service:
+    name: W3Svc
+    state: started
+  check_mode: no
+
+- name: Create Directory
+  ansible.windows.win_file:
+    path: C:\Inetpub\wwwroot\reports
+    state: directory
+  check_mode: no
+
+- name: Enable Directory Browsing
+  ansible.windows.win_powershell:
+    script: |
+      "Set-WebConfigurationProperty -filter /system.webServer/directoryBrowse -name enabled -value true -PSPath 'IIS:\Sites\Default Web Site\reports'"
