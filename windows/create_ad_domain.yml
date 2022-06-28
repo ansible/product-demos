@@ -1,9 +1,14 @@
 ---
 - name: Create Active Directory domain
-  hosts: "{{ HOSTS | default('windows') }}"
+  hosts: "{{ HOSTS | default('os_windows') }}"
   gather_facts: false
 
   tasks:
+  - name: Set Local Admin Password
+    ansible.windows.win_user:
+      name: Administrator
+      password: "{{ ansible_password }}"
+
   - name: Create new domain in a new forest on the target host
     ansible.windows.win_domain:
       dns_domain_name: ansible.local
@@ -22,6 +27,7 @@
       state: present
       timeout: 600
       sleep: 10
+    remote_user: Administrator
 
   - name: Create some groups
     community.windows.win_domain_group:

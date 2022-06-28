@@ -18,7 +18,7 @@
     - name: Check Cleanup package
       yum:
         name: at
-        state: latest
+        state: present
 
     - name: Check Cleanup Service
       service:

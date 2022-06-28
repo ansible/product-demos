@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    organization: Default Organization
+    lifecycle_environment: undef
+    current_lifecycle_environment: undef
+    content_view: undef
+
+  tasks:
+  - name: Promote Content View
+    redhat.satellite.content_view_version:
+      content_view: "{{ content_view }}"
+      organization: "{{ organization }}"
+      lifecycle_environments: "{{ lifecycle_environment }}"
+      current_lifecycle_environment: "{{ current_lifecycle_environment }}"

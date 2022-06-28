@@ -1,1 +1,11 @@
-file_path: /var/www/html
+file_path: "{{ web_path | default('/var/www/html/reports') }}"
+vendor:
+  ios: &my_value 'Cisco'
+  nxos: *my_value
+  iosxr: *my_value
+  junos: "Juniper"
+  eos: "Arista"
+transport:
+  cliconf: "Network_CLI"
+  netconf: "NETCONF"
+  nxapi: "NX-API"

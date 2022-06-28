@@ -1,0 +1,85 @@
+---
+- name: Install openscap client packages
+  yum:
+    name:
+     - openscap-scanner
+     - rubygem-foreman_scap_client
+    state: present
+
+- name: Get Policy parameters
+  uri:
+    url: "{{ foreman_server_url }}/api/v2/compliance/policies"
+    method: GET
+    user: "{{ foreman_username }}"
+    password:  "{{ foreman_password }}"
+    force_basic_auth: yes
+    body_format: json
+    validate_certs: False
+  register: policies
+  no_log: "{{ foreman_operations_scap_client_secure_logging }}"
+
+- name: Build policy {{ policy_name }} parameters
+  set_fact:
+    policy: "{{ policy | default([]) }} + {{ [item] }}"
+  loop: "{{policies.json.results}}"
+  when: item.name in policy_name or policy_name == 'all'
+
+- name: Fail if no policy found with required name
+  fail:
+  when: policy is not defined
+
+- name: Get scap content information
+  uri:
+    url: "{{ foreman_server_url }}/api/v2/compliance/scap_contents/{{item.scap_content_id}}"
+    method: GET
+    user: "{{ foreman_username }}"
+    password: "{{ foreman_password }}"
+    force_basic_auth: yes
+    body_format: json
+    validate_certs: False
+  register: scapcontents
+  loop: "{{ policy }}"
+  no_log: "{{ foreman_operations_scap_client_secure_logging }}"
+
+- name: Get tailoring content information
+  uri:
+    url: "{{ foreman_server_url }}/api/v2/compliance/tailoring_files/{{item.tailoring_file_id}}"
+    method: GET
+    user: "{{ foreman_username }}"
+    password: "{{ foreman_password }}"
+    force_basic_auth: yes
+    body_format: json
+    validate_certs: False
+  register: tailoringfiles
+  when: item.tailoring_file_id | int > 0 | d(False)
+  loop: "{{ policy }}"
+  no_log: "{{ foreman_operations_scap_client_secure_logging }}"
+
+- name: Build scap content parameters
+  set_fact:
+    scap_content: "{{ scap_content | default({}) | combine({item.json.id: item.json }) }}"
+  loop: "{{ scapcontents.results }}"
+
+- name: Build tailoring content parameters
+  set_fact:
+    tailoring_files: "{{ tailoring_files | default({}) | combine({item.json.id: item.json }) }}"
+  when: item.json is defined
+  loop: "{{ tailoringfiles.results }}"
+
+- name: Apply openscap client configuration template
+  template:
+    src: openscap_client_config.yaml.j2
+    dest: /etc/foreman_scap_client/config.yaml
+    mode: 0644
+    owner: root
+    group: root
+
+#- name: Configure execution crontab
+#  cron:
+#    name: "Openscap Execution"
+#    cron_file: 'foreman_openscap_client'
+#    job: '/usr/bin/foreman_scap_client {{policy.id}} > /dev/null'
+#    weekday: "{{crontab_weekdays}}"
+#    hour: "{{crontab_hour}}"
+#    minute: "{{crontab_minute}}"
+#    user: root

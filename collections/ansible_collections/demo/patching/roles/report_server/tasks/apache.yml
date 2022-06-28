@@ -1,16 +1,18 @@
 ---
+- include_vars: "{{ ansible_system }}.yml"
+
 - yum:
     name: httpd
     state: latest
   check_mode: no
 
 - file:
-    path: /var/www/html/reports/
+    path: "{{ doc_root }}/{{ reports_dir }}"
     state: directory
   check_mode: no
 
 - copy:
-    dest: /var/www/html/reports/.htaccess
+    dest: "{{ doc_root }}/{{ reports_dir }}/.htaccess"
     content: Options +Indexes
   check_mode: no
 

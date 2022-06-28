@@ -9,6 +9,11 @@
   tasks:
     - name: Run Shell Script
       shell: "{{ shell_script }}"
+      register: shell_output
+
+    - name: Print script output
+      debug:
+        var: shell_output.stdout_lines
 
     - debug:
         msg: You should really consider converting this script to a playbook!

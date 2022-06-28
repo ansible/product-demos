@@ -1,0 +1,29 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    content_view: undef
+    env: undef
+    organization: Default Organization
+    lifecycle_environment: "{{ content_view }}_{{ env }}"
+    publish_timeout: 14400
+    publish_retry_interval: 15
+
+  tasks:
+  - name: publish content view
+    redhat.satellite.content_view_version:
+      content_view: "{{ content_view }}"
+      organization: "{{ organization }}"
+      lifecycle_environments: "{{ lifecycle_environment }}"
+#    async: "{{ publish_timeout }}"
+#    poll: 0
+#    register: publish_async
+
+#  - name: check if content view is finished
+#    async_status:
+#      jid: "{{ publish_async.ansible_job_id }}"
+#    register: job_result
+#    until: job_result.finished
+#    retries: "{{ ( publish_timeout / publish_retry_interval ) | int }}"
+#   delay: "{{ publish_retry_interval }}"

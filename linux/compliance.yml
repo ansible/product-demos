@@ -1,0 +1,14 @@
+---
+- hosts: "{{ HOSTS }}"
+  become: true
+  vars:
+    compliance_profile: undef
+
+  tasks:
+    - name: Check OS Type
+      assert:
+        that: "ansible_os_family == 'RedHat'"
+
+    - name: Run Compliance Profile
+      include_role:
+        name: "redhatofficial.rhel{{ ansible_distribution_major_version }}_{{ compliance_profile }}"

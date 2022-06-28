@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xccdf:Tailoring xmlns:xccdf="http://checklists.nist.gov/xccdf/1.2" id="xccdf_scap-workbench_tailoring_default">
+  <xccdf:benchmark href="/tmp/scap-workbench-iwLkek/ssg-rhel7-ds.xml"/>
+  <xccdf:version time="2022-07-21T09:19:44">1</xccdf:version>
+  <xccdf:Profile id="xccdf_org.ssgproject.content_profile_stig_customized" extends="xccdf_org.ssgproject.content_profile_stig">
+    <xccdf:title xmlns:xhtml="http://www.w3.org/1999/xhtml" xml:lang="en-US" override="true">DISA STIG for Red Hat Enterprise Linux 7 [CUSTOMIZED]</xccdf:title>
+    <xccdf:description xmlns:xhtml="http://www.w3.org/1999/xhtml" xml:lang="en-US" override="true">This profile contains configuration checks that align to the
+DISA STIG for Red Hat Enterprise Linux V3R7.
+
+In addition to being applicable to Red Hat Enterprise Linux 7, DISA recognizes this
+configuration baseline as applicable to the operating system tier of
+Red Hat technologies that are based on Red Hat Enterprise Linux 7, such as:
+
+- Red Hat Enterprise Linux Server
+- Red Hat Enterprise Linux Workstation and Desktop
+- Red Hat Enterprise Linux for HPC
+- Red Hat Storage
+- Red Hat Containers with a Red Hat Enterprise Linux 7 image</xccdf:description>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_rpm_verify_ownership" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_aide_use_fips_hashes" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_aide_verify_acls" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_aide_verify_ext_attributes" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_install_antivirus" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_agent_mfetpd_running" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_package_mcafeetp_installed" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_mcafee_endpoint_security_software" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_mcafee_security_software" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_endpoint_security_software" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_home" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_tmp" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_log_audit" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_disk_partitioning" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sudo_remove_nopasswd" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_accounts_passwords_pam_faillock_deny" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_accounts_passwords_pam_faillock_deny_root" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_accounts_passwords_pam_faillock_interval" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_install_smartcard_packages" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_smartcard_auth" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_account_disable_post_pw_expiration" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_account_expiration" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_accounts_authorized_local_users" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_grub2_admin_username" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_grub2_password" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_service_firewalld_enabled" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_firewalld_activation" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_configure_firewalld_ports" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_set_firewalld_default_zone" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_ruleset_modifications" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_network-firewalld" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_network_configure_name_resolution" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_mount_option_home_nosuid" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_postfix_prevent_unrestricted_relay" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_postfix_server_relay" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_postfix_server_cfg" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_postfix_harden_os" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_mail" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_chronyd_or_ntpd_set_maxpoll" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_group_ntp" selected="false"/>
+  </xccdf:Profile>
+</xccdf:Tailoring>

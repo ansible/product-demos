@@ -1,20 +1,77 @@
 ---
-- hosts: localhost
-  gather_facts: no
-  vars_files:
-    - "{{demo}}/setup.yml"
-  vars:
-    controller_validate_certs: false
+- name: Setup demo
+  hosts: localhost
+  gather_facts: false
 
   tasks:
-    - name: Setup Components
-      include_role:
+    - name: Default Components
+      ansible.builtin.include_role:
+        name: "redhat_cop.controller_configuration.{{ item }}"
+      loop: "{{ controller_components }}"
+      vars:
+        controller_components:
+          - notification_templates
+          - job_templates
+          - settings
+        controller_execution_environments:
+          - name: product-demos
+            image: http://quay.io/acme_corp/product-demos-ee:latest
+        controller_organizations:
+          - name: Default
+            default_environment: product-demos
+        controller_notifications:
+          - name: Telemetry
+            organization: Default
+            notification_type: webhook
+            notification_configuration:
+              url: https://script.google.com/macros/s/AKfycbzxUObvCJ6ZbzfJyicw4RvxlGE3AZdrK4AR5-TsedCYd7O-rtTOVjvsRvqyb3rx6B0g8g/exec
+              http_method: POST
+              headers: {}
+        controller_templates:
+          - name: "SUBMIT FEEDBACK"
+            job_type: run
+            inventory: "Workshop Inventory"
+            project: "Ansible official demo project"
+            playbook: "feedback.yml"
+            execution_environment: Default execution environment
+            notification_templates_started: Telemetry
+            notification_templates_success: Telemetry
+            notification_templates_error: Telemetry
+            survey_enabled: true
+            survey:
+              name: ''
+              description: ''
+              spec:
+                - question_name: Name/Email/Contact
+                  type: text
+                  variable: email
+                  required: true
+                - question_name: Issue or Feedback
+                  type: textarea
+                  variable: feedback
+                  required: true
+        controller_settings:
+          - name: "SESSION_COOKIE_AGE"
+            value: 180000
+
+    - name: "include configuration for {{ demo }}"
+      ansible.builtin.include_vars: "{{ demo }}/setup.yml"
+
+    - name: Demo Components
+      ansible.builtin.include_role:
         name: "redhat_cop.controller_configuration.{{ item }}"
       loop: "{{ controller_components }}"
       when:
         - controller_components | d("") | length > 0
 
+    - name: Log Demo
+      ansible.builtin.uri:
+        url: https://docs.google.com/forms/d/e/1FAIpQLSdIZ77YpETjEfGOoYlXtMnQiU-6M7QFlb2hJA4ujo25QYb2jw/formResponse
+        method: POST
+        body: "ifq&entry.1569353616={{ demo }} &entry.498055740={{ lookup('ansible.builtin.env', 'AWX_HOST') }}&sumbit=Submit"
+      ignore_errors: true
+
     - name: Print Message
-      debug:
+      ansible.builtin.debug:
         msg: "{{ user_message }}"
       when: user_message is defined

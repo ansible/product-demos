@@ -1,0 +1,24 @@
+---
+- hosts: "{{ HOSTS }}"
+  become: true
+  vars:
+    #compliance_profile: undef
+
+  tasks:
+    - name: Check OS Type
+      assert:
+        that: "ansible_os_family == 'RedHat'"
+
+    - name: Check variable values
+      debug:
+        msg: "Value of compliance_profile_configured is {{ compliance_profile_configured }}"
+
+    - name: Run Insights Compliance scan
+      import_role:
+        name: redhat.insights.compliance
+      when: compliance_profile_configured == "Yes"
+
+    - name: Notify user that Compliance scan is not being attempted
+      debug:
+        msg: "User has not confirmed that all hosts are associated with an Insights Compliance profile. Scan aborted."
+      when: compliance_profile_configured == "No"

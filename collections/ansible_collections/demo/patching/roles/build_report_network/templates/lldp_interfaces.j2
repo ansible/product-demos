@@ -1,9 +1,9 @@
-<!–– INTERNAL TABLE FOR lldp_interfaces --!>
+<!-- INTERNAL TABLE FOR lldp_interfaces -->
 <div id="accordion">
-<div class="ui-accordion ui-widget ui-helper-reset" role="tablist">
-<h3 class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-icons ui-accordion-header-collapsed ui-corner-all" role="tab" id="ui-id-3" aria-controls="ui-id-4" aria-selected="false" aria-expanded="false" tabindex="0">LLDP Interfaces</h3>
-<div class="net_content ui-accordion-content ui-corner-bottom ui-helper-reset ui-widget-content" id="ui-id-4" aria-labelledby="ui-id-3" role="tabpanel" aria-hidden="true" style="display: none; height: 194px;">
-{% if hostvars[network_switch]['ansible_network_resources']['lldp_interfaces'] is defined and hostvars[network_switch]['ansible_network_resources']['lldp_interfaces']|length > 0 %}
+<div>
+<h3>LLDP Interfaces</h3>
+<div class="net_content">
+{% if hostvars[network_switch]['ansible_network_resources']['lldp_interfaces'] is defined %}
 <table id="subtable">
     <thead>
         <tr>
@@ -22,12 +22,10 @@
 {% endfor %}
     </tbody>
 </table>
-{% elif hostvars[network_switch]['ansible_network_resources']['lldp_interfaces'] is defined and hostvars[network_switch]['ansible_network_resources']['lldp_interfaces'].keys()|length == 0 %}
-LLDP is not configured on this device
 {% else %}
 No LLDP information available
 {% endif %}
 </div>
 </div>
 </div>
-<!–– END INTERNAL TABLE FOR lldp_interfaces --!>
+<!-- END INTERNAL TABLE FOR lldp_interfaces -->

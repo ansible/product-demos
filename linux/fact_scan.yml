@@ -1,0 +1,12 @@
+---
+- hosts: "{{ HOSTS }}"
+  become: yes
+
+  tasks:
+  - name: get packages
+    ansible.builtin.package_facts:
+
+  - name: get services
+    ansible.builtin.service_facts:
+
+  

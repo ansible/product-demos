@@ -1,0 +1,4 @@
+---
+instance_name: "{{ inventory_hostname | regex_replace('_','-') }}"
+activation_key: "{{ 'RHEL' + ansible_distribution_major_version + '_' + env }}"
+rex_user: root # "{{ ansible_user }}"

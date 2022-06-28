@@ -3,9 +3,25 @@
   become: yes
 
   tasks:
+  - name: check for vars
+    assert:
+      that:
+        - org_id is defined
+        - activation_key is defined
+        - org_id != ''
+        - activation_key != ''
+        - org_id != 'undef'
+        - activation_key != 'undef'
+
   - name: set hostname
     hostname:
       name: "{{ inventory_hostname | regex_replace('_','-')}}"
+
+# Install subscription-manager if it's not there
+  - name: Install subscription-manager
+    ansible.builtin.yum:
+      name: subscription-manager
+      state: present
 
   - name: remove rhui client packages
     yum:
@@ -30,6 +46,7 @@
       name: "https://{{ sat_url }}/pub/katello-ca-consumer-latest.noarch.rpm"
       state: present
       validate_certs: no
+      disable_gpg_check: true
     when: sat_url is defined
 
   - name: manage repos with subscription mangler
@@ -44,12 +61,6 @@
       activationkey: "{{ activation_key }}"
       org_id: "{{ org_id }}"
 
-  - name: disable htb repo
-    community.general.rhsm_repository:
-      name: rhel-7-server-htb*
-      state: disabled
-    ignore_errors: yes
-
   - name: configure Red Hat insights
     import_role:
       name: redhat.insights.insights_client
@@ -58,4 +69,4 @@
       insights_tags:
         env: "{{ env }}"
         purpose: demo
-        group: "{{ ansible_group }}"
+        group: "{{ insights_tag }}"

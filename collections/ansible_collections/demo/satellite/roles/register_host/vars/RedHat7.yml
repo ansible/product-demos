@@ -1,0 +1,4 @@
+---
+rhsm_enabled_repos:
+  - rhel-7-server-rpms
+  #- rhel-7-server-satellite-maintenance-6.11-rpms
