@@ -265,7 +265,7 @@ controller_templates:
           required: true
   - name: "LINUX / Compliance"
     job_type: run
-    inventory: "Workshop inventory"
+    inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/compliance.yml"
     execution_environment: Default execution environment
