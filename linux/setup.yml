@@ -263,3 +263,27 @@ controller_templates:
           type: text
           variable: HOSTS
           required: true
+  - name: "LINUX / Compliance"
+    job_type: run
+    inventory: "Workshop inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/compliance.yml"
+    execution_environment: Default execution environment
+    diff_mode: yes
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+        - question_name: Compliance Profile
+          type: multiplechoice
+          variable: compliance_profile
+          required: true
+          choices:
+            - stig
