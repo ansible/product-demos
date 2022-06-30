@@ -269,9 +269,10 @@ controller_templates:
     project: "Ansible official demo project"
     playbook: "linux/compliance.yml"
     execution_environment: Default execution environment
-    diff_mode: yes
     credentials:
     - "Workshop Credential"
+    extra_vars:
+      sudo_remove_nopasswd: false
     survey_enabled: true
     survey:
       name: ''
