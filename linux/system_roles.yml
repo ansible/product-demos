@@ -1,6 +1,7 @@
 ---
 - name: Apply RHEL System Roles
   hosts: "{{ HOSTS }}"
+  become: true
   vars:
     system_roles: undef
 
