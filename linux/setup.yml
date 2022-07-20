@@ -1,8 +1,8 @@
 ---
 user_message: |
-  Be sure to update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register'. https://access.redhat.com/management/activation_keys
-
-  Update Credential for Insights Inventory with Red Hat account.
+  - Be sure to update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register'. https://access.redhat.com/management/activation_keys
+  - Update Credential for Insights Inventory with Red Hat account.
+  - Add variables for system_roles. https://console.redhat.com/ansible/automation-hub/repo/published/redhat/rhel_system_roles
 controller_components:
   - projects
   - credential_types
@@ -263,3 +263,28 @@ controller_templates:
           type: text
           variable: HOSTS
           required: true
+  - name: "LINUX / Compliance"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/compliance.yml"
+    execution_environment: Default execution environment
+    credentials:
+    - "Workshop Credential"
+    extra_vars:
+      sudo_remove_nopasswd: false
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+        - question_name: Compliance Profile
+          type: multiplechoice
+          variable: compliance_profile
+          required: true
+          choices:
+            - stig
