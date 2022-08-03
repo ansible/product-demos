@@ -2,24 +2,19 @@
 
 This is a centralized location for all Ansible Product Demos going forward. 
 
-| Demo Name                                                        | Description                                                                                 |
-|------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
-| [AAP on CodeReady](aap-on-crc/README.md)                         | Repository and video of how to install Ansible Automation Platform on Code Ready Containers |
-| [Infrastructure Demos](old-demo-repository#infrastructure-demos) | Azure, AWS, Chocolatey, Linux and Windows Demos                                             |
-| [Network Demos](old-demo-repository#network-demos)               | Cisco IOS and F5 Demos                                                                      |
-| [Security Demos](old-demo-repository#security-demos)             | OSCAP and hardening demos                                                                   |
-| [Developer Demos](old-demo-repository#developer-demos)           | Create Reports with Ansible                                                                 |
+| Demo Name | Description |
+|-----------|-------------|
+| [Linux](linux/README.md) | Repository of demos for RHEL and Linux automation |
+| [Windows](windows/README.md) | Repository of demos for Windows Server automation |
+| [Cloud](cloud/README.md) | Demo for infrastructure and cloud provisioning automation |
 
 ## Contributions
 
-Please push contributions via a pull request following the naming convention of name-of-demo.
-
-[![GitHub Super-Linter](https://github.com/ansible/ansible-demos/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
-
+If you would like to contribute to this project please refer to [contribution guide](CONTRIBUTING.md) for best practices.
 
 ## Using this project
 
-  >  This project is tested for compatibility with AAP2 Linux Automation Workshop available to Red Hat Employees and Partners.
+  > This project is tested for compatibility with AAP2 Linux Automation Workshop available to Red Hat Employees and Partners. To use with other Ansible Controller installations, review the [pre-requisite documentation](https://github.com/RedHatGov/ansible-tower-samples/tree/product-demos).
 
 1. First you must create a credential for [Automation Hub](https://console.redhat.com/ansible/automation-hub/) to successfully sync collections used by this project.
    
@@ -40,6 +35,4 @@ Please push contributions via a pull request following the naming convention of 
         - Name: Controller Credential
      - Extra vars:
   
-            demo: <linux or windows>
-
-4. If you require a Windows Active Directory domain you will need to run the "ACTIVE DIRECTORY / Create Active Directory domain" template after the Windows setup completes. This will create the "ansible.local" domain as well as a few generic users and groups.
+            demo: <linux or windows or cloud>
