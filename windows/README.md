@@ -23,3 +23,7 @@ This category of demos shows examples of Windows Server operations and managemen
 - [**WINDOWS / Helpdesk new user portal**](active_directory/helpdesk_new_user_portal.yml) - Create user in AD Domain
 
 ## Suggested Usage
+
+**WINDOWS / Create Active Directory Domain** - This job can take some to complete. It is recommended to run ahead of time if you would like to demo creating a helpdesk user.
+
+**WINDOWS / Helpdesk new user portal** - This job is dependant on the Create Active Directory Domain completing before users can be created.
