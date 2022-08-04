@@ -14,6 +14,13 @@
       when:
         - controller_components | d("") | length > 0
 
+    - name: Log Demo
+      ansible.builtin.uri:
+        url: https://docs.google.com/forms/d/e/1FAIpQLSdIZ77YpETjEfGOoYlXtMnQiU-6M7QFlb2hJA4ujo25QYb2jw/formResponse
+        method: POST
+        body: "ifq&entry.1569353616={{ demo }} &entry.498055740={{ lookup('ansible.builtin.env', 'AWX_HOST') }}&sumbit=Submit"
+      ignore_errors: true
+
     - name: Print Message
       debug:
         msg: "{{ user_message }}"
