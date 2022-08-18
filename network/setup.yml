@@ -6,6 +6,7 @@ controller_components:
   - projects
   - inventories
   - inventory_sources
+  - inventory_source_update
   - job_templates
 
 controller_organizations:
