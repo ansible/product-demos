@@ -4,7 +4,7 @@ user_message:
 controller_components:
   - organizations
   - projects
-  - inventory
+  - inventories
   - inventory_sources
   - job_templates
 
