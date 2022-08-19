@@ -11,6 +11,9 @@ controller_components:
 
 controller_organizations:
   - name: Networking
+    galaxy_credentials:
+      - Automation Hub
+      - Ansible Galaxy
 
 controller_projects:
   - name: Network Golden Configs
@@ -40,6 +43,7 @@ controller_templates:
     project: Network Golden Configs
     playbook: main.yml
     ask_limit_on_launch: true
+    use_fact_cache: yes
     survey:
       name: ''
       description: ''
