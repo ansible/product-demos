@@ -1,0 +1,66 @@
+---
+user_message:
+
+controller_components:
+  - organizations
+  - projects
+  - inventories
+  - inventory_sources
+  - inventory_source_update
+  - job_templates
+
+controller_organizations:
+  - name: Networking
+    galaxy_credentials:
+      - Automation Hub
+      - Ansible Galaxy
+
+controller_projects:
+  - name: Network Golden Configs
+    organization: Networking
+    scm_type: git
+    scm_url: https://github.com/nleiva/ansible-net-modules
+    update_project: yes
+    wait: yes
+
+controller_inventories:
+  - name: Network Inventory
+    organization: Networking
+
+controller_inventory_sources:
+  - name: DevNet always-on sandboxes
+    source: scm
+    inventory: Network Inventory
+    overwrite: true
+    source_project: Network Golden Configs
+    source_path: hosts
+
+controller_templates:
+  - name: NETWORK / Configuration
+    organization: Networking
+    inventory: Network Inventory
+    survey_enabled: true
+    project: Network Golden Configs
+    playbook: main.yml
+    ask_limit_on_launch: true
+    use_fact_cache: yes
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: What resource would you like to configure?
+          type: multiplechoice
+          variable: rm
+          required: true
+          choices:
+            - acls
+            - banner
+            - bgp_global
+            - hostname
+            - l3_interface
+            - logging
+            - ntp
+            - ospfv2
+            - prefix_lists
+            - snmp
+            - user

@@ -7,6 +7,7 @@ This is a centralized location for all Ansible Product Demos going forward.
 | [Linux](linux/README.md) | Repository of demos for RHEL and Linux automation |
 | [Windows](windows/README.md) | Repository of demos for Windows Server automation |
 | [Cloud](cloud/README.md) | Demo for infrastructure and cloud provisioning automation |
+| [Network](network/README.md) | Ansible Network automation demos |
 
 ## Contributions
 
@@ -35,4 +36,4 @@ If you would like to contribute to this project please refer to [contribution gu
         - Name: Controller Credential
      - Extra vars:
   
-            demo: <linux or windows or cloud>
+            demo: <linux or windows or cloud or network>
