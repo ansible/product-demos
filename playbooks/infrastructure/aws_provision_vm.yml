@@ -13,7 +13,7 @@
       ami_id: ami-096fda3c22c1c990a
     when: aws_region == "us-east-1"   
 
-  - name: Setting the correct AMI per us-east-1
+  - name: Setting the correct AMI per us-west-1
     set_fact:
       ami_id: ami-09d9c5cdcfb8fc655
     when: aws_region == "us-west-1" 
