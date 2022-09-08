@@ -8,7 +8,7 @@
         name: "redhat_cop.controller_configuration.{{ item }}"
       loop: "{{ controller_components }}"
       vars:
-        contoller_components:
+        controller_components:
           - controller_notifications
         controller_notifications:
           - name: Telemetry
