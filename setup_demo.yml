@@ -19,7 +19,7 @@
               url: https://script.google.com/macros/s/AKfycbzxUObvCJ6ZbzfJyicw4RvxlGE3AZdrK4AR5-TsedCYd7O-rtTOVjvsRvqyb3rx6B0g8g/exec
               http_method: POST
               headers: {}
-        controller_job_templates:
+        controller_templates:
           - name: "FEEDBACK"
             job_type: run
             inventory: "Workshop Inventory"
