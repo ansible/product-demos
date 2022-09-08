@@ -140,7 +140,7 @@ controller_templates:
           required: true
 
   - name: "LINUX / Patching"
-    job_type: run
+    job_type: check
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/patching.yml"
@@ -149,7 +149,6 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
-    job_type: check
     ask_job_type_on_launch: yes
     credentials:
     - "Workshop Credential"

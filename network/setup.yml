@@ -42,6 +42,9 @@ controller_templates:
     survey_enabled: true
     project: Network Golden Configs
     playbook: main.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     ask_limit_on_launch: true
     use_fact_cache: yes
     survey:
