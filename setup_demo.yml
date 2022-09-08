@@ -10,7 +10,7 @@
       vars:
         controller_components:
           - controller_notifications
-        controller_notifications:
+        controller_notification_templates:
           - name: Telemetry
             organization: Default
             notification_type: webhook
