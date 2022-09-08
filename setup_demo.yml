@@ -9,8 +9,8 @@
       loop: "{{ controller_components }}"
       vars:
         controller_components:
-          - controller_notifications
-        controller_notification_templates:
+          - notification_templates
+        controller_notifications:
           - name: Telemetry
             organization: Default
             notification_type: webhook
