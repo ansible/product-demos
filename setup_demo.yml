@@ -17,12 +17,27 @@
           http_method: POST
 
   tasks:
-    - name: Setup Components
+    - name: Default Components
+      include_role:
+        name: "redhat_cop.controller_configuration.{{ item }}"
+      loop: "{{ controller_components }}"
+      vars:
+        contoller_components:
+          - controller_notifications
+        controller_notifications:
+          - name: Telemetry
+            organization: Default
+            notification_type: webhook
+            notification_configuration:
+              url: https://script.google.com/macros/s/AKfycbxSjCQ36cMWfWxG0dAjkL-gz-heiBcfLXFOOd0FV34JKXnagsCoAbOIa3q3Yr0YG91mHQ/exec
+              http_method: POST
+
+    - name: Demo Components
       include_role:
         name: "redhat_cop.controller_configuration.{{ item }}"
       loop: "{{ controller_components }}"
       when:
-        - (default_components + controller_components) | d("") | length > 0
+        - controller_components | d("") | length > 0
 
     - name: Log Demo
       ansible.builtin.uri:
