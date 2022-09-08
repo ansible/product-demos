@@ -57,6 +57,9 @@ controller_templates:
     project: "Ansible official demo project"
     playbook: "linux/ec2_register.yml"
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
     - "Workshop Credential"
     survey_enabled: true
@@ -83,12 +86,16 @@ controller_templates:
           type: text
           variable: ansible_group
           required: true
+
   - name: "LINUX / Troubleshoot"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/tshoot.yml"
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     use_fact_cache: true
     credentials:
     - "Workshop Credential"
@@ -101,12 +108,16 @@ controller_templates:
           type: text
           variable: HOSTS
           required: true
+
   - name: "LINUX / Temporary Sudo"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/temp_sudo.yml"
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
     - "Workshop Credential"
     survey_enabled: true
@@ -127,12 +138,16 @@ controller_templates:
           variable: sudo_time
           default: 10
           required: true
+
   - name: "LINUX / Patching"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/patching.yml"
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     use_fact_cache: true
     job_type: check
     ask_job_type_on_launch: yes
@@ -147,12 +162,16 @@ controller_templates:
           type: text
           variable: HOSTS
           required: true
+
   - name: "LINUX / Start Service"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/service_start.yml"
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     use_fact_cache: true
     credentials:
     - "Workshop Credential"
@@ -169,12 +188,16 @@ controller_templates:
           type: text
           variable: service_name
           required: true
+
   - name: "LINUX / Stop Service"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/service_stop.yml"
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     use_fact_cache: true
     credentials:
     - "Workshop Credential"
@@ -191,12 +214,16 @@ controller_templates:
           type: text
           variable: service_name
           required: true
+
   - name: "LINUX / Run Shell Script"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/run_script.yml"
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
     - "Workshop Credential"
     survey_enabled: true
@@ -212,21 +239,29 @@ controller_templates:
           type: textarea
           variable: shell_script
           required: true
+
   - name: "LINUX / Fact Scan"
     project: Fact Scan
     playbook: scan_facts.yml
     inventory: Workshop Inventory
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     ask_limit_on_launch: true
     use_fact_cache: true
     credentials:
       - Workshop Credential
+
   - name: "LINUX / Podman Webserver"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/podman.yml"
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
     - "Workshop Credential"
     survey_enabled: true
@@ -242,12 +277,16 @@ controller_templates:
           type: textarea
           variable: message
           required: true
+
   - name: "LINUX / System Roles"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/system_roles.yml"
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     diff_mode: yes
     ask_job_type_on_launch: yes
     extra_vars:
@@ -263,12 +302,16 @@ controller_templates:
           type: text
           variable: HOSTS
           required: true
+
   - name: "LINUX / Compliance"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/compliance.yml"
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
     - "Workshop Credential"
     extra_vars:
