@@ -1,20 +1,6 @@
 ---
 - hosts: localhost
   gather_facts: no
-  vars_files:
-    - "{{demo}}/setup.yml"
-
-  vars:
-    controller_validate_certs: false
-    default_components:
-      - controller_notifications
-    controller_notifications:
-      - name: Telemetry
-        organization: Default
-        notification_type: webhook
-        notification_configuration:
-          url: https://script.google.com/macros/s/AKfycbxSjCQ36cMWfWxG0dAjkL-gz-heiBcfLXFOOd0FV34JKXnagsCoAbOIa3q3Yr0YG91mHQ/exec
-          http_method: POST
 
   tasks:
     - name: Default Components
@@ -31,6 +17,9 @@
             notification_configuration:
               url: https://script.google.com/macros/s/AKfycbxSjCQ36cMWfWxG0dAjkL-gz-heiBcfLXFOOd0FV34JKXnagsCoAbOIa3q3Yr0YG91mHQ/exec
               http_method: POST
+
+    - name: "include configuration for {{ demo }}"
+      include_vars: "{{demo}}/setup.yml"
 
     - name: Demo Components
       include_role:
