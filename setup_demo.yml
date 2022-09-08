@@ -22,7 +22,7 @@
         name: "redhat_cop.controller_configuration.{{ item }}"
       loop: "{{ controller_components }}"
       when:
-        - default_components + configuration_components | d("") | length > 0
+        - (default_components + configuration_components) | d("") | length > 0
 
     - name: Log Demo
       ansible.builtin.uri:
