@@ -15,7 +15,7 @@
             organization: Default
             notification_type: webhook
             notification_configuration:
-              url: https://script.google.com/macros/s/AKfycbxSjCQ36cMWfWxG0dAjkL-gz-heiBcfLXFOOd0FV34JKXnagsCoAbOIa3q3Yr0YG91mHQ/exec
+              url: https://script.google.com/macros/s/AKfycbzxUObvCJ6ZbzfJyicw4RvxlGE3AZdrK4AR5-TsedCYd7O-rtTOVjvsRvqyb3rx6B0g8g/exec
               http_method: POST
               headers: {}
 
