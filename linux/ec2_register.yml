@@ -3,6 +3,12 @@
   become: yes
 
   tasks:
+  - name: check for vars
+    assert:
+      that:
+        - org_id is defined
+        - activation_key is defined
+
   - name: set hostname
     hostname:
       name: "{{ inventory_hostname | regex_replace('_','-')}}"
