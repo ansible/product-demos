@@ -36,11 +36,17 @@ controller_inventory_sources:
         - tag:Name
       compose:
         ansible_host: public_ip_address
+        ansible_user: 'ec2-user'
       groups:
         cloud_aws: true
+        os_linux: tags.blueprint.startswith('rhel')
       keyed_groups:
         - key: platform
           prefix: os
+        - key: tags.blueprint
+          prefix: blueprint
+        - key: tags.owner
+          prefix: owner
 
   #- name: Azure Inventory
   #  organization: Default
