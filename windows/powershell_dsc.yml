@@ -9,6 +9,7 @@
       name: SecurityPolicyDSC
       module_version: 2.10.0.0
       state: present
+      accept_license: yes
   
   - name: Set password history
     ansible.windows.win_dsc:

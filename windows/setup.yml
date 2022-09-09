@@ -166,7 +166,7 @@ controller_templates:
         - question_name: PowerShell Script 
           type: textarea
           variable: ps_script
-          default: "Get-Service | Where-Object -FilterScript running | Select-Object -Property 'Name'"
+          default: "Get-Service | Where-Object -FilterScript {$_.Status -eq 'running'} | Select-Object -Property 'Name'"
           required: true
 
   - name: "WINDOWS / Query Services"
