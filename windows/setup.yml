@@ -64,7 +64,18 @@ controller_templates:
           type: multiselect
           variable: win_update_categories
           required: false
-          default: SecurityUpdates
+          default:
+            - Application
+            - Connectors
+            - CriticalUpdates
+            - DefinitionUpdates
+            - DeveloperKits
+            - FeaturePacks Guidance
+            - SecurityUpdates
+            - ServicePacks
+            - Tools
+            - UpdateRollups
+            - Updates
           choices:
             - Application
             - Connectors
@@ -131,11 +142,12 @@ controller_templates:
           type: text
           variable: package_name
           required: true
-  - name: "WINDOWS / Arbitrary PowerShell"
+
+  - name: "WINDOWS / Run PowerShell"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
-    playbook: "windows/arbitrary_powershell.yml"
+    playbook: "windows/powershell.yml"
     execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -151,13 +163,13 @@ controller_templates:
           type: text
           variable: HOSTS
           required: false
-        - question_name: PowerShell Script (Default returns random cat fact)
+        - question_name: PowerShell Script 
           type: textarea
           variable: ps_script
-          default: "(Invoke-RestMethod -Method 'GET' -Uri 'https://catfact.ninja/fact').fact"
+          default: "Get-Service | Where-Object -FilterScript running | Select-Object -Property 'Name'"
           required: true
 
-  - name: "WINDOWS / PowerShell Script"
+  - name: "WINDOWS / Query Services"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
@@ -186,7 +198,7 @@ controller_templates:
             - 'Running'
             - 'Stopped'
 
-  - name: "WINDOWS / PowerShell DSC configuring password requirements"
+  - name: "WINDOWS / Configuring Password Requirements"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"

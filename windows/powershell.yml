@@ -1,5 +1,5 @@
 ---
-- name: Arbitrary PowerShell
+- name: Run PowerShell
   hosts: "{{ HOSTS | default('windows') }}"
   gather_facts: false
   vars:
