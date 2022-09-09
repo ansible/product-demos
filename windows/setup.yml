@@ -64,18 +64,7 @@ controller_templates:
           type: multiselect
           variable: win_update_categories
           required: false
-          default:
-            - Application
-            - Connectors
-            - CriticalUpdates
-            - DefinitionUpdates
-            - DeveloperKits
-            - FeaturePacks Guidance
-            - SecurityUpdates
-            - ServicePacks
-            - Tools
-            - UpdateRollups
-            - Updates
+          default: Application\nConnectors\nCriticalUpdates\nDefinitionUpdates\nDeveloperKits\nFeaturePacks Guidance\nSecurityUpdates\nServicePacks\nTools\nUpdateRollups\nUpdates
           choices:
             - Application
             - Connectors
