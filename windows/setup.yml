@@ -208,68 +208,68 @@ controller_templates:
           variable: HOSTS
           required: false
 
-#  - name: "ACTIVE DIRECTORY / Create Active Directory domain"
-#    job_type: run
-#    inventory: "Workshop Inventory"
-#    project: "Ansible official demo project"
-#    playbook: "windows/active_directory/create_ad_domain.yml"
-#    execution_environment: Default execution environment
-#    notification_templates_started: Telemetry
-#    notification_templates_success: Telemetry
-#    notification_templates_error: Telemetry
-#    credentials:
-#    - "Workshop Credential"
-#    survey_enabled: true
-#    survey:
-#      name: ''
-#      description: ''
-#      spec:
-#        - question_name: Server Name or Pattern
-#          type: text
-#          variable: HOSTS
-#          required: false
+  - name: "WINDOWS / AD /Create Domain"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/create_ad_domain.yml"
+    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
 
-#  - name: "ACTIVE DIRECTORY / Helpdesk new user portal"
-#    job_type: run
-#    inventory: "Workshop Inventory"
-#    project: "Ansible official demo project"
-#    playbook: "windows/active_directory/helpdesk_new_user_portal.yml"
-#    execution_environment: Default execution environment
-#    notification_templates_started: Telemetry
-#    notification_templates_success: Telemetry
-#    notification_templates_error: Telemetry
-#    credentials:
-#    - "Workshop Credential"
-#    survey_enabled: true
-#    survey:
-#      name: ''
-#      description: ''
-#      spec:
-#        - question_name: Firstname
-#          type: text
-#          variable: firstname
-#          required: true
-#        - question_name: Surname
-#          type: text
-#          variable: surname
-#          required: true
-#        - question_name: Street
-#          type: text
-#          variable: street
-#          default: 123 4th St.
-#          required: false
-#        - question_name: City
-#          type: text
-#          variable: city
-#          default: Sometown
-#          required: false
-#        - question_name: Postal code
-#          type: text
-#          variable: postal_code
-#          default: IN
-#          required: false
-#        - question_name: Telephone number
-#          type: text
-#          variable: telephone_number
-#          default: 555-123456
-#          required: false
+  - name: "WINDOWS / AD / New User"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/helpdesk_new_user_portal.yml"
+    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Firstname
+          type: text
+          variable: firstname
+          required: true
+        - question_name: Surname
+          type: text
+          variable: surname
+          required: true
+        - question_name: Street
+          type: text
+          variable: street
+          default: 123 4th St.
+          required: false
+        - question_name: City
+          type: text
+          variable: city
+          default: Sometown
+          required: false
+        - question_name: Postal code
+          type: text
+          variable: postal_code
+          default: IN
+          required: false
+        - question_name: Telephone number
+          type: text
+          variable: telephone_number
+          default: 555-123456
+          required: false
