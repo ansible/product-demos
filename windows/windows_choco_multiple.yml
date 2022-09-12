@@ -5,14 +5,12 @@
   vars:
     choco_packages:
       - name: nodejs
-        version: 13.0.0
       - name: python
-        version: 3.6.0
   tasks:
   - name: Install specific versions of packages sequentially
     win_chocolatey:
       name: "{{ item.name }}"
-      version: "{{ item.version }}"
+      state: latest
     loop: "{{ choco_packages }}"
 
   - name: Check python version

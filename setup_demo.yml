@@ -1,13 +1,52 @@
 ---
 - hosts: localhost
   gather_facts: no
-  vars_files:
-    - "{{demo}}/setup.yml"
-  vars:
-    controller_validate_certs: false
 
   tasks:
-    - name: Setup Components
+    - name: Default Components
+      include_role:
+        name: "redhat_cop.controller_configuration.{{ item }}"
+      loop: "{{ controller_components }}"
+      vars:
+        controller_components:
+          - notification_templates
+          - job_templates
+        controller_notifications:
+          - name: Telemetry
+            organization: Default
+            notification_type: webhook
+            notification_configuration:
+              url: https://script.google.com/macros/s/AKfycbzxUObvCJ6ZbzfJyicw4RvxlGE3AZdrK4AR5-TsedCYd7O-rtTOVjvsRvqyb3rx6B0g8g/exec
+              http_method: POST
+              headers: {}
+        controller_templates:
+          - name: "FEEDBACK"
+            job_type: run
+            inventory: "Workshop Inventory"
+            project: "Ansible official demo project"
+            playbook: "feedback.yml"
+            execution_environment: Default execution environment
+            notification_templates_started: Telemetry
+            notification_templates_success: Telemetry
+            notification_templates_error: Telemetry
+            survey_enabled: true
+            survey:
+              name: ''
+              description: ''
+              spec:
+                - question_name: Name/Email/Contact
+                  type: text
+                  variable: email
+                  required: true
+                - question_name: Issue or Feedback
+                  type: textarea
+                  variable: feedback
+                  required: true
+
+    - name: "include configuration for {{ demo }}"
+      include_vars: "{{demo}}/setup.yml"
+
+    - name: Demo Components
       include_role:
         name: "redhat_cop.controller_configuration.{{ item }}"
       loop: "{{ controller_components }}"

@@ -36,11 +36,17 @@ controller_inventory_sources:
         - tag:Name
       compose:
         ansible_host: public_ip_address
+        ansible_user: 'ec2-user'
       groups:
         cloud_aws: true
+        os_linux: tags.blueprint.startswith('rhel')
       keyed_groups:
         - key: platform
           prefix: os
+        - key: tags.blueprint
+          prefix: blueprint
+        - key: tags.owner
+          prefix: owner
 
   #- name: Azure Inventory
   #  organization: Default
@@ -70,6 +76,9 @@ controller_templates:
     playbook: cloud/create_infra.yml
     inventory: Workshop Inventory
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     survey_enabled: true
     extra_vars:
       aws_region: us-east-2
@@ -88,6 +97,7 @@ controller_templates:
           type: textarea
           required: false
           variable: aws_public_key
+
   - name: Cloud / Create VM
     job_type: run
     organization: Default
@@ -99,6 +109,9 @@ controller_templates:
     playbook: cloud/create_vm.yml
     inventory: Workshop Inventory
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     survey_enabled: true
     extra_vars:
       aws_region: us-east-2
@@ -130,6 +143,7 @@ controller_templates:
             - windows_full
             - rhel8
             - rhel7
+
   - name: Cloud / Destroy VM
     job_type: run
     organization: Default
@@ -141,6 +155,9 @@ controller_templates:
     playbook: cloud/destroy_vm.yml
     inventory: Workshop Inventory
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     survey_enabled: true
     extra_vars:
       aws_region: us-east-2
@@ -152,4 +169,3 @@ controller_templates:
           type: text
           variable: HOSTS
           required: true
-

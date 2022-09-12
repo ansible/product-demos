@@ -3,11 +3,11 @@
   hosts: "{{ HOSTS | default('windows') }}"
   gather_facts: false
   vars:
-    remote_dest: "C:\\sample_script.ps1"
+    remote_dest: "C:\\query_services.ps1"
   tasks:
   - name: Copy script to remote
     ansible.windows.win_copy:
-      src: "{{playbook_dir}}/sample_script.ps1"
+      src: "{{playbook_dir}}/query_services.ps1"
       dest: "{{ remote_dest }}"
   
   - name: Run Script

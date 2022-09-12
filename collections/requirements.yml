@@ -13,7 +13,8 @@ collections:
   - containers.podman
   #windows
   - chocolatey.chocolatey
-  - community.windows
+  - name: community.windows
+    version: 1.10.0
   - name: ansible.windows
     version: 1.9.0
   #cloud
