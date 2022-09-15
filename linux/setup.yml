@@ -56,7 +56,6 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/ec2_register.yml"
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -92,7 +91,6 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/tshoot.yml"
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -114,7 +112,6 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/temp_sudo.yml"
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -144,7 +141,6 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/patching.yml"
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -167,7 +163,6 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/service_start.yml"
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -193,7 +188,6 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/service_stop.yml"
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -219,7 +213,6 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/run_script.yml"
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -243,7 +236,6 @@ controller_templates:
     project: Fact Scan
     playbook: scan_facts.yml
     inventory: Workshop Inventory
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -257,7 +249,6 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/podman.yml"
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -282,7 +273,6 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/system_roles.yml"
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -307,7 +297,6 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/compliance.yml"
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
