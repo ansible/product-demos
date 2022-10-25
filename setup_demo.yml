@@ -11,6 +11,7 @@
         controller_components:
           - notification_templates
           - job_templates
+          - settings
         controller_notifications:
           - name: Telemetry
             organization: Default
@@ -42,6 +43,9 @@
                   type: textarea
                   variable: feedback
                   required: true
+        controller_settings:
+          - name: "SESSION_COOKIE_AGE"
+            value: 180000
 
     - name: "include configuration for {{ demo }}"
       include_vars: "{{demo}}/setup.yml"
