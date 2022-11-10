@@ -75,7 +75,6 @@ controller_templates:
     project: Ansible official demo project
     playbook: cloud/create_infra.yml
     inventory: Workshop Inventory
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -108,7 +107,6 @@ controller_templates:
     project: Ansible official demo project
     playbook: cloud/create_vm.yml
     inventory: Workshop Inventory
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -154,7 +152,6 @@ controller_templates:
     project: Ansible official demo project
     playbook: cloud/destroy_vm.yml
     inventory: Workshop Inventory
-    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry

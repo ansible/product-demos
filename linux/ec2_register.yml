@@ -8,6 +8,10 @@
       that:
         - org_id is defined
         - activation_key is defined
+        - org_id != ''
+        - activation_key != ''
+        - org_id != 'undef'
+        - activation_key != 'undef'
 
   - name: set hostname
     hostname:
