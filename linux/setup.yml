@@ -81,7 +81,7 @@ controller_templates:
             - QA
             - Prod
           required: true
-        - question_name: Ansible Group
+        - question_name: Ansible Inventory Group (and Insights tag) to be created
           type: text
           variable: ansible_group
           required: true
