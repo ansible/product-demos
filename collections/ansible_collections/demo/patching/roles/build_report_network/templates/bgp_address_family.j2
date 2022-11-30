@@ -1,0 +1,46 @@
+<!-- INTERNAL TABLE FOR BGP -->
+<div id="accordion">
+<div>
+<h3>BGP Address Family</h3>
+<div class="net_content">
+{% if hostvars[network_switch]['ansible_network_resources']['bgp_address_family']['address_family'] is defined and hostvars[network_switch]['ansible_network_resources']['bgp_address_family']['address_family']|length > 0 %}
+
+{% for address_family in hostvars[network_switch]['ansible_network_resources']['bgp_address_family']['address_family'] %}
+<p class="internal_label">Address Family {{ address_family['afi'] }}</p>
+<table id="subtable">
+    <thead>
+        <tr>
+            <th>Network</th>
+
+        </tr>
+    </thead>
+    <tbody>
+    {% if hostvars[network_switch]['ansible_network_resources']['bgp_address_family']['address_family']['networks'] is defined %}
+    {% for bgp_network in address_family['networks'] %}
+        <tr>
+            <td>{{ bgp_network['prefix']|default("Not Configured") }}</td>
+        </tr>
+    {% endfor %}
+    {% elif hostvars[network_switch]['ansible_network_resources']['bgp_address_family']['address_family']['network'] is defined %}
+    {% for bgp_network in address_family['network'] %}
+        <tr>
+            <td>{{ bgp_network['address']|default("Not Configured") }}</td>
+            <td>{{ bgp_network['mask']|default("Not Configured") }}</td>
+        </tr>
+    {% endfor %}
+    {% else %}
+    No BGP networks information available
+    {% endif %}
+    </tbody>
+</table>
+{% endfor %}
+
+{% elif hostvars[network_switch]['ansible_network_resources']['bgp_address_family']['address_family'] is defined and hostvars[network_switch]['ansible_network_resources']['bgp_address_family']['address_family']|length == 0 %}
+no BGP address-family is not configured on this device
+{% else %}
+No BGP information available
+{% endif %}
+</div>
+</div>
+</div>
+<!-- END INTERNAL TABLE FOR BGP -->

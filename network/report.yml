@@ -1,0 +1,58 @@
+---
+# Re-write of: 
+# https://github.com/network-automation/toolkit/blob/master/playbooks/network_report.yml
+# https://github.com/network-automation/toolkit/blob/master/roles/build_report/tasks/main.yml
+
+- name: Collect facts
+  hosts: "{{ HOSTS }}"
+  gather_facts: false
+
+  tasks:
+    - name: Gather all network resource and minimal legacy facts [Cisco IOS]
+      cisco.ios.ios_facts:
+        gather_subset: min
+        gather_network_resources: all
+      when: ansible_network_os == 'cisco.ios.ios'
+
+    - name: Gather all network resource and minimal legacy facts [Cisco NX-OS]
+      cisco.nxos.nxos_facts:
+        gather_subset: min
+        gather_network_resources: all
+      when: ansible_network_os == 'cisco.nxos.nxos'
+
+    - name: Gather all network resource and minimal legacy facts [Cisco IOS XR]
+      cisco.iosxr.iosxr_facts:
+        gather_subset: min
+        gather_network_resources: all
+      when: ansible_network_os == 'cisco.iosxr.iosxr'
+
+    # The dig lookup requires the python 'dnspython' library  
+    # - name: Resolve IP address
+    #   ansible.builtin.set_fact:
+    #     ansible_host: "{{ lookup('community.general.dig', inventory_hostname)}}"
+
+- hosts: node1
+  become: yes
+  vars:
+    report_server: node1
+    web_path: /var/www/html/reports/
+  
+  tasks:
+    - ansible.builtin.include_role:
+        name: "{{ item }}"
+      loop:
+        - demo.patching.report_server
+        - demo.patching.build_report_network
+
+    - block:
+      - ansible.builtin.include_role:
+          name: "{{ item }}"
+        loop:
+          - demo.patching.report_server
+          - demo.patching.build_report_network
+          
+      - ansible.builtin.include_role:
+          name: demo.patching.report_server
+          tasks_from: linux_landing_page
+      delegate_to: "{{ report_server }}"
+      run_once: yes

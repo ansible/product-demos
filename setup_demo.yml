@@ -1,10 +1,11 @@
 ---
-- hosts: localhost
-  gather_facts: no
+- name: Setup demo
+  hosts: localhost
+  gather_facts: false
 
   tasks:
     - name: Default Components
-      include_role:
+      ansible.builtin.include_role:
         name: "redhat_cop.controller_configuration.{{ item }}"
       loop: "{{ controller_components }}"
       vars:
@@ -48,10 +49,10 @@
             value: 180000
 
     - name: "include configuration for {{ demo }}"
-      include_vars: "{{demo}}/setup.yml"
+      ansible.builtin.include_vars: "{{ demo }}/setup.yml"
 
     - name: Demo Components
-      include_role:
+      ansible.builtin.include_role:
         name: "redhat_cop.controller_configuration.{{ item }}"
       loop: "{{ controller_components }}"
       when:
@@ -65,6 +66,6 @@
       ignore_errors: true
 
     - name: Print Message
-      debug:
+      ansible.builtin.debug:
         msg: "{{ user_message }}"
       when: user_message is defined

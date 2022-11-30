@@ -2,22 +2,16 @@
 user_message:
 
 controller_components:
-  - organizations
   - projects
   - inventories
+  - hosts
   - inventory_sources
   - inventory_source_update
   - job_templates
 
-controller_organizations:
-  - name: Networking
-    galaxy_credentials:
-      - Automation Hub
-      - Ansible Galaxy
-
 controller_projects:
   - name: Network Golden Configs
-    organization: Networking
+    organization: Default
     scm_type: git
     scm_url: https://github.com/nleiva/ansible-net-modules
     update_project: yes
@@ -25,7 +19,7 @@ controller_projects:
 
 controller_inventories:
   - name: Network Inventory
-    organization: Networking
+    organization: Default
 
 controller_inventory_sources:
   - name: DevNet always-on sandboxes
@@ -35,9 +29,16 @@ controller_inventory_sources:
     source_project: Network Golden Configs
     source_path: hosts
 
+controller_hosts:
+  - name: node1
+    inventory: Network Inventory
+    variables:
+      ansible_user: rhel
+      ansible_host: node1
+
 controller_templates:
   - name: NETWORK / Configuration
-    organization: Networking
+    organization: Default
     inventory: Network Inventory
     survey_enabled: true
     project: Network Golden Configs
@@ -67,3 +68,32 @@ controller_templates:
             - prefix_lists
             - snmp
             - user
+
+  - name: "NETWORK / Report"
+    job_type: check
+    organization: Default
+    inventory: Network Inventory
+    project: "Ansible official demo project"
+    playbook: "network/report.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    use_fact_cache: true
+    ask_job_type_on_launch: yes
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: What devices do you want to include in the report?
+          type: multiplechoice
+          variable: HOSTS
+          default: routers
+          required: true
+          choices:
+            - sandbox-iosxe-latest-1.cisco.com
+            - sandbox-iosxr-1.cisco.com
+            - sandbox-nxos-1.cisco.com
+            - routers
