@@ -1,6 +1,7 @@
 ---
 - name: Podman
   hosts: "{{ HOSTS }}"
+
   vars:
     volume_path: podman
     message: undef
@@ -28,7 +29,7 @@
       image: docker.io/httpd
       state: started
       volume:
-        - "{{ volume_path }}:/usr/local/apache2/htdocs"
+        - "./{{ volume_path }}/:/usr/local/apache2/htdocs:z"
       ports:
         - "8080:80"
 
@@ -47,5 +48,7 @@
   - name: Output
     ansible.builtin.debug:
       msg: 
+        - "Output of podman ps command:"
         - "{{ podman_output.stdout_lines }}"
+        - "Contents of web page:"
         - "{{ web_output.content }}"

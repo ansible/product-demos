@@ -267,6 +267,7 @@ controller_templates:
           type: textarea
           variable: message
           required: true
+          default: "This is Apache webserver running in a container with podman"
 
   - name: "LINUX / System Roles"
     job_type: run
