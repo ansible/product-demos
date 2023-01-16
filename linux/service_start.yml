@@ -1,5 +1,6 @@
 ---
 - hosts: "{{ HOSTS }}"
+  become: yes
   vars:
     service_name: undef
 

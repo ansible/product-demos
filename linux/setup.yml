@@ -10,12 +10,6 @@ controller_components:
   - inventory_sources
   - job_templates
 
-controller_projects:
-  - name: Fact Scan
-    organization: Default
-    scm_type: git
-    scm_url: 'https://github.com/ansible/awx-facts-playbooks.git'
-
 controller_credential_types:
   - name: "Insights Collection"
     kind: cloud
@@ -233,16 +227,24 @@ controller_templates:
           required: true
 
   - name: "LINUX / Fact Scan"
-    project: Fact Scan
-    playbook: scan_facts.yml
+    project: "Ansible official demo project"
+    playbook: linux/fact_scan.yml
     inventory: Workshop Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    ask_limit_on_launch: true
     use_fact_cache: true
     credentials:
       - Workshop Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
 
   - name: "LINUX / Podman Webserver"
     job_type: run
