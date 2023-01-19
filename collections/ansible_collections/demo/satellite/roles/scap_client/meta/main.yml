@@ -1,0 +1,3 @@
+galaxy_info:
+  author: morenod
+  description: Role created to configure a client to execute openscap policies based on the information obtained from a Red Hat Satellite/Foreman Host.

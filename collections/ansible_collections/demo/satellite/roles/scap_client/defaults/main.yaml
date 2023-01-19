@@ -1,0 +1,12 @@
+foreman_server_url: "{{ lookup('env', 'SATELLITE_SERVER') }}"
+foreman_username: "{{ lookup('env', 'SATELLITE_USERNAME') }}"
+foreman_password: "{{ lookup('env', 'SATELLITE_PASSWORD') }}"
+foreman_validate_certs: "{{ lookup('env', 'FOREMAN_VALIDATE_CERTS') | default(true) }}"
+capsule_server: "{{ foreman_server_url }}"
+capsule_port: '9090'
+policy_name: 'all'
+policy_scan: "{{ policy_name }}"
+crontab_hour: 2
+crontab_minute: 0
+crontab_weekdays: 0
+foreman_operations_scap_client_secure_logging: true

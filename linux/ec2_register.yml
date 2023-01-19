@@ -40,6 +40,7 @@
       name: "https://{{ sat_url }}/pub/katello-ca-consumer-latest.noarch.rpm"
       state: present
       validate_certs: no
+      disable_gpg_check: true
     when: sat_url is defined
 
   - name: manage repos with subscription mangler
@@ -54,12 +55,6 @@
       activationkey: "{{ activation_key }}"
       org_id: "{{ org_id }}"
 
-  - name: disable htb repo
-    community.general.rhsm_repository:
-      name: rhel-7-server-htb*
-      state: disabled
-    ignore_errors: yes
-
   - name: configure Red Hat insights
     import_role:
       name: redhat.insights.insights_client
@@ -68,4 +63,4 @@
       insights_tags:
         env: "{{ env }}"
         purpose: demo
-        group: "{{ ansible_group }}"
+        group: "{{ insights_tag }}"

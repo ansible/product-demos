@@ -11,7 +11,7 @@ controller_components:
   - job_templates
 
 controller_credential_types:
-  - name: "Insights Collection"
+  - name: Insights Collection
     kind: cloud
     inputs:
       fields:
@@ -34,6 +34,13 @@ controller_credentials:
     inputs:
       insights_user: REPLACEME
       insights_password: REPLACEME
+  - name: Satellite Inventory
+    credential_type: Red Hat Satellite 6
+    organization: Default
+    inputs:
+      host: https://satellite.example.com
+      username: admin
+      password: ansible123!
 
 controller_inventory_sources:
   - name: Insights Inventory
@@ -42,6 +49,25 @@ controller_inventory_sources:
     source_project: Ansible official demo project
     source_path: linux/inventory.insights.yml
     credential: Insights Inventory
+  - name: Satellite Inventory
+    inventory: Workshop Inventory
+    source: satellite6
+    overwrite: true
+    credential: Satellite Inventory
+    source_vars:
+      hostnames:
+        - name.split('.')[0]
+      groups:
+        patch_bugs: foreman_content_facet_attributes.errata_counts.bugfix
+        patch_enhancements: foreman_content_facet_attributes.errata_counts.enhancement
+        patch_security: foreman_content_facet_attributes.errata_counts.security
+      keyed_groups:
+              - prefix: env
+                key: foreman_content_facet_attributes.lifecycle_environment_name
+              - prefix: cv
+                key: foreman_content_facet_attributes.content_view_name
+              - prefix: os
+                key: foreman_operatingsystem_name
 
 
 controller_templates:
@@ -57,8 +83,9 @@ controller_templates:
     - "Workshop Credential"
     survey_enabled: true
     extra_vars:
-      activation_key: undef
-      org_id: undef
+      activation_key: !unsafe "RHEL{{ ansible_distribution_major_version }}_{{ env }}"
+      org_id: Default_Organization
+      sat_url: satellite.example.com
     survey:
       name: ''
       description: ''
@@ -77,7 +104,7 @@ controller_templates:
           required: true
         - question_name: Ansible Inventory Group (and Insights tag) to be created
           type: text
-          variable: ansible_group
+          variable: insights_tag
           required: true
 
   - name: "LINUX / Troubleshoot"
@@ -135,6 +162,7 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/patching.yml"
+    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -230,6 +258,7 @@ controller_templates:
     project: "Ansible official demo project"
     playbook: linux/fact_scan.yml
     inventory: Workshop Inventory
+    execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -293,6 +322,40 @@ controller_templates:
         - question_name: Server Name or Pattern
           type: text
           variable: HOSTS
+          required: true
+
+  - name: "LINUX / Install web console"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/system_roles.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    diff_mode: yes
+    ask_job_type_on_launch: yes
+    extra_vars:
+      system_roles: 
+        - cockpit
+    credentials:
+      - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+        - question_name: Cockpit package load
+          type: multiplechoice
+          variable: cockpit_packages
+          default: minimal
+          choices:
+            - default
+            - minimal
+            - full
           required: true
 
   - name: "LINUX / Compliance Enforce"

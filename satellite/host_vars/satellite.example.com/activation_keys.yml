@@ -1,0 +1,22 @@
+---
+satellite_activation_keys:
+  # Red Hat Enterprise Linux 7
+  - name: "RHEL7_Dev"
+    lifecycle_environment: "RHEL7_Dev"
+    content_view: "RHEL7"
+  - name: "RHEL7_QA"
+    lifecycle_environment: "RHEL7_QA"
+    content_view: "RHEL7"
+  - name: "RHEL7_Prod"
+    lifecycle_environment: "RHEL7_Prod"
+    content_view: "RHEL7"
+  # Red Hat Enterprise Linux 8
+  - name: "RHEL8_Dev"
+    lifecycle_environment: "RHEL8_Dev"
+    content_view: "RHEL8"
+  - name: "RHEL8_QA"
+    lifecycle_environment: "RHEL8_QA"
+    content_view: "RHEL8"
+  - name: "RHEL8_Prod"
+    lifecycle_environment: "RHEL8_Prod"
+    content_view: "RHEL8"

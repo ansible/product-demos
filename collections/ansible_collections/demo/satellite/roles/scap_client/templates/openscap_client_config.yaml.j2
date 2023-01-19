@@ -1,0 +1,47 @@
+# Foreman proxy to which reports should be uploaded
+:server: {{ capsule_server | urlsplit('hostname') }}
+:port: {{ capsule_port }}
+
+## SSL specific options ##
+# Client CA file.
+# It could be Puppet CA certificate (e.g., '/var/lib/puppet/ssl/certs/ca.pem')
+# Or (recommended for client reporting to Katello) subscription manager CA file, (e.g., '/etc/rhsm/ca/katello-server-ca.pem')
+:ca_file: '/etc/rhsm/ca/katello-server-ca.pem'
+# Client host certificate.
+# It could be Puppet agent host certificate (e.g., '/var/lib/puppet/ssl/certs/myhost.example.com.pem')
+# Or (recommended for client reporting to Katello) consumer certificate (e.g., '/etc/pki/consumer/cert.pem')
+:host_certificate: '/etc/pki/consumer/cert.pem'
+#
+# Client private key
+# It could be Puppet agent private key (e.g., '/var/lib/puppet/ssl/private_keys/myhost.example.com.pem')
+# Or (recommended for client reporting to Katello) consumer private key (e.g., '/etc/pki/consumer/key.pem')
+:host_private_key: '/etc/pki/consumer/key.pem'
+# policy (key is id as in Foreman)
+{% for item in policy %} 
+{{ item.id }}:
+{% if item.tailoring_file_id | int > 0 | d(False) %}
+{% for profile in tailoring_files[item.tailoring_file_id].tailoring_file_profiles %}
+{% if profile.id == item.tailoring_file_profile_id %}
+  :profile: {{profile.profile_id}}
+{% endif%}
+{% endfor %}
+  :content_path: '/var/lib/openscap/content/{{scap_content[item.scap_content_id].digest}}.xml'
+  # Download path
+  # A path to download SCAP content from proxy
+  :download_path: '/compliance/policies/{{item.id}}/content/{{scap_content[item.scap_content_id].digest}}'
+  :tailoring_path: '/var/lib/openscap/content/{{tailoring_files[item.tailoring_file_id].digest}}.xml'
+  :tailoring_download_path: '/compliance/policies/{{item.id}}/tailoring/{{tailoring_files[item.tailoring_file_id].digest}}'
+{% else %}
+{% for profile in scap_content[item.scap_content_id].scap_content_profiles %}
+{% if profile.id == item.scap_content_profile_id %}
+  :profile: {{profile.profile_id}}
+{% endif%}
+{% endfor %}
+  :content_path: '/var/lib/openscap/content/{{scap_content[item.scap_content_id].digest}}.xml'
+  # Download path
+  # A path to download SCAP content from proxy
+  :download_path: '/compliance/policies/{{item.id}}/content/{{scap_content[item.scap_content_id].digest}}'
+  :tailoring_path: ''
+  :tailoring_download_path: ''
+{% endif %}
+{% endfor %}

@@ -4,7 +4,6 @@
   gather_facts: false
 
   tasks:
-
   - name: Set Local Admin Password
     ansible.windows.win_user:
       name: Administrator

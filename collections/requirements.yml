@@ -23,6 +23,9 @@ collections:
     version: 1.13.0
   - name: amazon.aws
     version: 3.1.1
+  #satellite
+  - name: redhat.satellite
+    version: 3.3.0
   #network
   - name: cisco.ios
     version: 3.1.0
@@ -30,4 +33,3 @@ collections:
     version: 3.0.0
   - name: cisco.iosxr
     version: 3.0.0
-
