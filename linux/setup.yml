@@ -1,6 +1,6 @@
 ---
 user_message:
-  - Be sure to update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register'. https://access.redhat.com/management/activation_keys
+  - Be sure to update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register with Insights'. https://access.redhat.com/management/activation_keys
   - Update Credential for Insights Inventory with Red Hat account.
   - Add variables for system_roles. https://console.redhat.com/ansible/automation-hub/repo/published/redhat/rhel_system_roles
 controller_components:
@@ -34,13 +34,6 @@ controller_credentials:
     inputs:
       insights_user: REPLACEME
       insights_password: REPLACEME
-  - name: Satellite Inventory
-    credential_type: Red Hat Satellite 6
-    organization: Default
-    inputs:
-      host: https://satellite.example.com
-      username: admin
-      password: ansible123!
 
 controller_inventory_sources:
   - name: Insights Inventory
@@ -49,29 +42,9 @@ controller_inventory_sources:
     source_project: Ansible official demo project
     source_path: linux/inventory.insights.yml
     credential: Insights Inventory
-  - name: Satellite Inventory
-    inventory: Workshop Inventory
-    source: satellite6
-    overwrite: true
-    credential: Satellite Inventory
-    source_vars:
-      hostnames:
-        - name.split('.')[0]
-      groups:
-        patch_bugs: foreman_content_facet_attributes.errata_counts.bugfix
-        patch_enhancements: foreman_content_facet_attributes.errata_counts.enhancement
-        patch_security: foreman_content_facet_attributes.errata_counts.security
-      keyed_groups:
-              - prefix: env
-                key: foreman_content_facet_attributes.lifecycle_environment_name
-              - prefix: cv
-                key: foreman_content_facet_attributes.content_view_name
-              - prefix: os
-                key: foreman_operatingsystem_name
-
 
 controller_templates:
-  - name: "LINUX / Register"
+  - name: "LINUX / Register with Insights"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
@@ -84,8 +57,7 @@ controller_templates:
     survey_enabled: true
     extra_vars:
       activation_key: !unsafe "RHEL{{ ansible_distribution_major_version }}_{{ env }}"
-      org_id: Default_Organization
-      sat_url: satellite.example.com
+      org_id: REPLACEME
     survey:
       name: ''
       description: ''
@@ -105,6 +77,10 @@ controller_templates:
         - question_name: Ansible Inventory Group (and Insights tag) to be created
           type: text
           variable: insights_tag
+          required: true
+        - question_name: Org ID
+          type: text
+          variable: org_id
           required: true
 
   - name: "LINUX / Troubleshoot"
@@ -311,7 +287,9 @@ controller_templates:
     diff_mode: yes
     ask_job_type_on_launch: yes
     extra_vars:
-      system_roles: undef
+      system_roles:
+        - selinux
+      selinux_policy: enforcing
     credentials:
     - "Workshop Credential"
     survey_enabled: true
@@ -324,7 +302,7 @@ controller_templates:
           variable: HOSTS
           required: true
 
-  - name: "LINUX / Install web console"
+  - name: "LINUX / Install Web Console (cockpit)"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"

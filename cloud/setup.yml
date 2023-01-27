@@ -6,6 +6,7 @@ user_message:
 controller_components:
   - credentials
   - inventory_sources
+  - groups
   - job_templates
 
 controller_credentials:
@@ -64,6 +65,12 @@ controller_inventory_sources:
   #        prefix: os
   #    conditional_groups:
   #      cloud_azure: true
+
+controller_groups:
+  - name: cloud_aws
+    inventory: Workshop Inventory
+    variables:
+      ansible_user: ec2-user
 
 controller_templates:
   - name: Cloud / Create Infra
