@@ -10,7 +10,7 @@ collections:
   - name: redhat.rhel_system_roles
     version: 1.16.2
   - name: community.general
-    version: 0.1.1
+    version: 5.8.5
   - containers.podman
   #windows
   - chocolatey.chocolatey
