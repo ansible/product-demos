@@ -5,6 +5,12 @@
     report_server: node1
   
   tasks:
+# Install yum-utils if it's not there
+  - name: Install yum-utils
+    ansible.builtin.yum:
+      name: yum-utils
+      state: latest
+
   - include_role:
       name: demo.patching.patch_linux
 

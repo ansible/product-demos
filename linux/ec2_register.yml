@@ -17,6 +17,12 @@
     hostname:
       name: "{{ inventory_hostname | regex_replace('_','-')}}"
 
+# Install subscription-manager if it's not there
+  - name: Install subscription-manager
+    ansible.builtin.yum:
+      name: subscription-manager
+      state: present
+
   - name: remove rhui client packages
     yum:
       name: rh-amazon-rhui-client*
