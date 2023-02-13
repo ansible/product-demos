@@ -1,0 +1,7 @@
+---
+vm_providers:
+  - aws
+aws_image_owners: 309956199498
+aws_instance_size: t3.micro
+aws_image_architecture: x86_64
+aws_image_filter: 'RHEL-9*HVM-*Hourly*'
