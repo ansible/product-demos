@@ -337,7 +337,7 @@ controller_templates:
             - full
           required: true
 
-  - name: "LINUX / Compliance Enforce"
+  - name: "LINUX / DISA STIG"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
@@ -358,12 +358,6 @@ controller_templates:
           type: text
           variable: _hosts
           required: true
-        - question_name: Compliance Profile
-          type: multiplechoice
-          variable: compliance_profile
-          required: true
-          choices:
-            - stig
 
   - name: "LINUX / Insights Compliance Scan"
     job_type: run
