@@ -196,7 +196,7 @@ controller_templates:
     
 controller_launch_jobs:
   - name: SETUP
-    wait: true
+    wait: false
     extra_vars:
       demo: linux
 
@@ -222,9 +222,23 @@ controller_workflows:
           - node201
       - identifier: node201
         unified_job_template: 'LINUX / Patching'
+        job_type: check
         extra_data:
           - HOSTS: env_RHEL8_Dev
         all_parents_must_converge: true
+        success_nodes:
+          - noode301
+        failure_nodes:
+          - node202
+      - identifier: node202
+        unified_job_template: 'SUBMIT FEEDBACK'
+        email: patch_dev@workflow
+        feedback: Failed to check for updates
+      - identifier: node301
+        approval_node:
+          name: Push patches to Dev?
+          description: Review the patch report before approving
+
 
 
 #######################
