@@ -206,6 +206,7 @@ controller_launch_jobs:
 controller_workflows:
   - name: Patch Dev
     description: A workflow to patch the dev environment
+    organization: Default
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
