@@ -218,14 +218,14 @@ controller_workflows:
       - identifier: node102
         unified_job_template: 'SATELLITE / Publish Content View Version'
         extra_data:
-          - content_view: RHEL8
+          content_view: RHEL8
         success_nodes:
           - node201
       - identifier: node201
         unified_job_template: 'LINUX / Patching'
         job_type: check
         extra_data:
-          - HOSTS: env_RHEL8_Dev
+          HOSTS: env_RHEL8_Dev
         all_parents_must_converge: true
         success_nodes:
           - noode301
