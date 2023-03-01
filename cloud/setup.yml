@@ -1,13 +1,26 @@
 ---
 user_message:
- - Update AWS credential with Access and Secret key
- - Update Workshop Credential with password used to login to Controller
 
 controller_components:
+  - execution_environments
+  - projects
   - credentials
   - inventory_sources
   - groups
   - job_templates
+
+controller_execution_environments:
+  - name: Cloud Services Execution Environment
+    image: quay.io/scottharwell/cloud-ee:latest
+
+controller_projects:
+- name: Ansible Cloud Content Lab - AWS
+  organization: Default
+  scm_type: git
+  wait: yes
+  #scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
+  scm_url: https://github.com/willtome/aws.infrastructure_config_demos.git
+  default_environment: Cloud Services Execution Environment
 
 controller_credentials:
   - name: AWS
@@ -73,6 +86,66 @@ controller_groups:
       ansible_user: ec2-user
 
 controller_templates:
+  - name: Cloud / AWS / Create Peer Infrastructure
+    job_type: run
+    organization: Default
+    credentials:
+     - AWS
+    project: Ansible Cloud Content Lab - AWS
+    playbook: playbook_create_peer_network.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      aws_region: us-east-1
+      dmz_ssh_key_name: aws-test-key
+      priv_network_ssh_key_name: aws-test-key
+
+  - name: Cloud / AWS / Delete Peer Infrastructure
+    job_type: run
+    organization: Default
+    credentials:
+     - AWS
+    project: Ansible Cloud Content Lab - AWS
+    playbook: playbook_delete_peer_network.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      aws_region: us-east-1
+
+  - name: Cloud / AWS / Create Transit Infrastructure
+    job_type: run
+    organization: Default
+    credentials:
+     - AWS
+    project: Ansible Cloud Content Lab - AWS
+    playbook: playbook_create_transit_network.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      aws_region: us-east-1
+      dmz_ssh_key_name: aws-test-key
+      priv_network_ssh_key_name: aws-test-key
+
+  - name: Cloud / AWS / Delete Transit Infrastructure
+    job_type: run
+    organization: Default
+    credentials:
+     - AWS
+    project: Ansible Cloud Content Lab - AWS
+    playbook: playbook_delete_transit_network.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      aws_region: us-east-1
+
   - name: Cloud / Create Infra
     job_type: run
     organization: Default
@@ -104,22 +177,22 @@ controller_templates:
           required: false
           variable: aws_public_key
 
-  - name: Cloud / Create VM
+  - name: Cloud / AWS / Create VM
     job_type: run
     organization: Default
     credentials: 
      - AWS
-     #- Azure
      - Workshop Credential
-    project: Ansible official demo project
-    playbook: cloud/create_vm.yml
+    project: Ansible Cloud Content Lab - AWS
+    playbook: playbook_create_vm.yml
     inventory: Workshop Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     survey_enabled: true
     extra_vars:
-      aws_region: us-east-2
+      aws_region: us-east-1
+      aws_keypair_name: aws-test-key
     survey:
       name: ''
       description: ''
@@ -132,45 +205,121 @@ controller_templates:
           type: text
           variable: vm_owner
           required: true
-        - question_name: Provider
+        - question_name: Deployment
+          type: text
+          variable: vm_deployment
+          required: true
+        - question_name: Environment
           type: multiplechoice
-          variable: vm_provider
+          variable: vm_environment
           required: true
           choices:
-            - aws
-            #- azure
+            - Dev
+            - QA
+            - Prod
         - question_name: Blueprint
           type: multiplechoice
           variable: vm_blueprint
           required: true
-          choices: #"{{ lookup('fileglob', 'blueprints/*.yml') | regex_replace(',','\n') | regex_findall('.*/(.*)(?=.yml)') | list }}"
+          choices:
             - windows_core
             - windows_full
             - rhel9
             - rhel8
             - rhel7
+        - question_name: Subnet
+          type: text
+          variable: aws_vpc_subnet_name
+          required: true
+          default: dmz-subnet
+        - question_name: Security Group
+          type: text
+          variable: aws_securitygroup_name
+          required: true
+          default: dmz-sg
 
-  - name: Cloud / Destroy VM
+  - name: Cloud / AWS / Delete VM
     job_type: run
     organization: Default
     credentials: 
      - AWS
-     #- Azure
      - Workshop Credential
-    project: Ansible official demo project
-    playbook: cloud/destroy_vm.yml
+    project: Ansible Cloud Content Lab - AWS
+    playbook: playbook_delete_inventory_vm.yml
     inventory: Workshop Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     survey_enabled: true
     extra_vars:
-      aws_region: us-east-2
+      aws_region: us-east-1
     survey:
       name: ''
       description: ''
       spec:
         - question_name: Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
+          required: true
+
+  - name: Cloud / AWS / VPC Report
+    job_type: run
+    organization: Default
+    credentials:
+     - AWS
+    project: Ansible Cloud Content Lab - AWS
+    playbook: playbook_create_reports.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      aws_region: us-east-1
+      aws_report: vpc
+
+  - name: Cloud / AWS / Tags Report
+    job_type: run
+    organization: Default
+    credentials:
+     - AWS
+    project: Ansible Cloud Content Lab - AWS
+    playbook: playbook_create_reports.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      aws_region: us-east-1
+      aws_report: tags
+
+  - name: Cloud / AWS / Create Keypair
+    job_type: run
+    organization: Default
+    credentials: 
+     - AWS
+    project: Ansible official demo project
+    playbook: cloud/aws_key.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    extra_vars:
+      aws_region: us-east-1
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Keypair Name
+          type: text
+          variable: aws_key_name
+          required: true
+          default: aws-test-key
+        - question_name: Keypair Public Key
+          type: textarea
+          variable: aws_public_key
+          required: true
+        - question_name: Owner
+          type: text
+          variable: aws_keypair_owner
           required: true
