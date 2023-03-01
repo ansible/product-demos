@@ -221,44 +221,44 @@ controller_workflows:
           required: false
 
     simplified_workflow_nodes:
-      - identifier: node101
+      - identifier: Update Inventory
         unified_job_template: Satellite Inventory
         success_nodes:
-          - node201
-      - identifier: node102
+          - Check for Updates
+      - identifier: Publish New Patches
         unified_job_template: 'SATELLITE / Publish Content View Version'
         extra_data:
           content_view: RHEL8
         success_nodes:
-          - node201
-      - identifier: node201
+          - Check for Updates
+      - identifier: Check for Updates
         unified_job_template: 'LINUX / Patching'
         job_type: check
         extra_data:
           HOSTS: env_RHEL8_Dev
         all_parents_must_converge: true
         success_nodes:
-          - node301
+          - Approve Patches
         failure_nodes:
-          - node202
-      - identifier: node202
+          - Ticket - Update Check
+      - identifier: Ticket - Update Check
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to check for updates in RHEL8_Dev
-      - identifier: node301
+      - identifier: Approve Patches
         approval_node:
           name: Push patches to Dev?
           description: Review the patch report before approving
         success_nodes:
-          - node401
-      - identifier: node401
+          - Apply Patches
+      - identifier: Apply Patches
         unified_job_template: 'LINUX / Patching'
         job_type: run
         extra_data:
           HOSTS: env_RHEL8_Dev
         failure_nodes:
-          - node501
-      - identifier: node501
+          - Ticket - Update Apply
+      - identifier: Ticket - Update Apply
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to apply updates to RHEL8_Dev
