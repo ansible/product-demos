@@ -239,6 +239,8 @@ controller_workflows:
         approval_node:
           name: Push patches to Dev?
           description: Review the patch report before approving
+        success_nodes:
+          - node401
       - identifier: node401
         unified_job_template: 'LINUX / Patching'
         job_type: run
