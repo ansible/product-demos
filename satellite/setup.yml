@@ -228,7 +228,7 @@ controller_workflows:
           HOSTS: env_RHEL8_Dev
         all_parents_must_converge: true
         success_nodes:
-          - noode301
+          - node301
         failure_nodes:
           - node202
       - identifier: node202
