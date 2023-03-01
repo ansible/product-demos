@@ -234,11 +234,22 @@ controller_workflows:
       - identifier: node202
         unified_job_template: 'SUBMIT FEEDBACK'
         email: patch_dev@workflow
-        feedback: Failed to check for updates
+        feedback: Failed to check for updates in RHEL8_Dev
       - identifier: node301
         approval_node:
           name: Push patches to Dev?
           description: Review the patch report before approving
+      - identifier: node401
+        unified_job_template: 'LINUX / Patching'
+        job_type: run
+        extra_data:
+          HOSTS: env_RHEL8_Dev
+        failure_nodes:
+          - node501
+      - identifier: node501
+        unified_job_template: 'SUBMIT FEEDBACK'
+        email: patch_dev@workflow
+        feedback: Failed to apply updates to RHEL8_Dev
 
 
 
