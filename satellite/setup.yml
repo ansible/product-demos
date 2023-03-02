@@ -219,7 +219,6 @@ controller_workflows:
           type: text
           variable: email
           required: false
-
     simplified_workflow_nodes:
       - identifier: Update Inventory
         unified_job_template: Satellite Inventory
