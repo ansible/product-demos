@@ -265,3 +265,23 @@ controller_templates:
           variable: telephone_number
           default: 555-123456
           required: false
+          
+  - name: "WINDOWS / DISA STIG"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/compliance.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false

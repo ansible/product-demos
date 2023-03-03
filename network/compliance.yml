@@ -5,4 +5,4 @@
     ignore_all_errors: false
     ansible_command_timeout: 60
   roles:
-    - iosxeSTIG
+    - demo.compliance.iosxeSTIG
