@@ -389,3 +389,28 @@ controller_templates:
             - "Yes"
             - "No"
           default: "No"
+
+  - name: "LINUX / Deploy Application"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/deploy_application.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    use_fact_cache: true
+    credentials:
+    - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: true
+        - question_name: Application Package Name
+          type: text
+          variable: application
+          required: true

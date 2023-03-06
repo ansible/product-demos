@@ -1,8 +1,9 @@
 ---
 - name: application deployment
-  hosts: web
+  hosts: "{{ HOSTS }}"
   gather_facts: false
   become: true
+  
   tasks:
     - name: make sure application is not empty
       assert:

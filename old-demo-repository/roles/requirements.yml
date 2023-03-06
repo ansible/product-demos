@@ -1,5 +1,0 @@
----
-- src: dev-sec.ssh-hardening
-- src: redhatofficial.rhel8_pci_dss
-- src: linux-system-roles.firewall
-- src: RedHatInsights.insights-client

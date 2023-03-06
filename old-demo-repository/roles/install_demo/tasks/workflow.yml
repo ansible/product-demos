@@ -1,6 +1,0 @@
----
-# these tasks will install a workflow
-
-- name: "install all job templates in relation to workflow {{ job_template_definitions[demo].name }}"
-  include_tasks: add_job_template.yml
-  loop: "{{ job_template_definitions[demo].job_templates|dict2items }}"
