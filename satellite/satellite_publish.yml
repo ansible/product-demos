@@ -1,7 +1,8 @@
 ---
-- hosts: localhost
+- name: Publish content view version
+  hosts: localhost
   connection: local
-  gather_facts: no
+  gather_facts: false
   vars:
     content_view: undef
     env: undef
@@ -11,11 +12,11 @@
     publish_retry_interval: 15
 
   tasks:
-  - name: publish content view
-    redhat.satellite.content_view_version:
-      content_view: "{{ content_view }}"
-      organization: "{{ organization }}"
-      lifecycle_environments: "{{ lifecycle_environment }}"
+    - name: Publish content view # noqa: args[module] - required parameters provided with environment vars
+      redhat.satellite.content_view_version:
+        content_view: "{{ content_view }}"
+        organization: "{{ organization }}"
+        lifecycle_environments: "{{ lifecycle_environment }}"
 #    async: "{{ publish_timeout }}"
 #    poll: 0
 #    register: publish_async

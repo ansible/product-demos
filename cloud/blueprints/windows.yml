@@ -1,7 +1,7 @@
 ---
 vm_blueprint_providers:
- - aws
- - azure
+  - aws
+  - azure
 aws_image_filter: 'Windows_Server-2019-English-Core-Base*'
 aws_instance_size: t3.medium
 aws_userdata_template: aws_windows_userdata

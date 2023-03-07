@@ -1,34 +1,34 @@
 ---
-- include_vars: "{{ ansible_system }}.yml"
+- name: Include system vars
+  ansible.builtin.include_vars: "{{ ansible_system }}.yml"
 
-- name: get reports
+- name: Get reports
   ansible.builtin.find:
     paths: "{{ doc_root }}/{{ reports_dir }}"
     patterns: '*.html'
   register: reports
-  check_mode: no
+  check_mode: false
 
-- name: publish landing page
+- name: Publish landing page
   ansible.builtin.template:
     src: linux_report.j2
     dest: "{{ doc_root }}/index.html"
-  check_mode: no
+  check_mode: false
 
-- name: copy CSS over
+- name: Copy CSS
   ansible.builtin.copy:
     src: "css"
     dest: "{{ doc_root }}"
     directory_mode: true
-  check_mode: no
+  check_mode: false
 
-- name: copy logos over
+- name: Copy logos
   ansible.builtin.copy:
-    src: "{{ item }}" 
+    src: "{{ item }}"
     dest: "{{ doc_root }}"
     directory_mode: true
   loop:
     - "webpage_logo.png"
     - "redhat-ansible-logo.svg"
     - "report.png"
-  check_mode: no
-    
+  check_mode: false

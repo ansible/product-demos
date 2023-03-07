@@ -1,23 +1,24 @@
 ---
-- include_vars: "{{ ansible_system }}.yml"
+- name: Include system vars
+  ansible.builtin.include_vars: "{{ ansible_system }}.yml"
 
 - name: Install IIS
   ansible.windows.win_feature:
     name: Web-Server
     state: present
-  check_mode: no
+  check_mode: false
 
 - name: Start IIS service
   ansible.windows.win_service:
     name: W3Svc
     state: started
-  check_mode: no
+  check_mode: false
 
 - name: Create Directory
   ansible.windows.win_file:
     path: "{{ doc_root }}\\{{ reports_dir }}"
     state: directory
-  check_mode: no
+  check_mode: false
 
 - name: Enable Directory Browsing
   ansible.windows.win_powershell:

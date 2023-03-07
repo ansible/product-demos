@@ -7,27 +7,27 @@
   register: aws_subnet
 
 - name: AWS | CREATE VM | save subnet id
-  set_fact:
-    aws_subnet_id: "{{ aws_subnet.subnets|map(attribute='id')| list | last }}"
+  ansible.builtin.set_fact:
+    aws_subnet_id: "{{ aws_subnet.subnets | map(attribute='id') | list | last }}"
 
 - name: AWS| CREATE VM | find ami
   amazon.aws.ec2_ami_info:
     region: "{{ aws_region }}"
-    owners: "{{ aws_image_owners | default(omit)}}"
+    owners: "{{ aws_image_owners | default(omit) }}"
     filters:
       name: "{{ aws_image_filter }}"
       architecture: "{{ aws_image_architecture | default(omit) }}"
   register: amis
 
 - name: AWS| CREATE VM | save ami
-  set_fact:
+  ansible.builtin.set_fact:
     aws_instance_ami: >
       {{ (amis.images | selectattr('name', 'defined') | sort(attribute='creation_date'))[-2] }}
 
 - name: AWS| CREATE VM | create instance
   amazon.aws.ec2_instance:
     network:
-      assign_public_ip: yes
+      assign_public_ip: true
     key_name: "{{ aws_keypair_name }}"
     instance_type: "{{ aws_instance_size }}"
     image_id: "{{ aws_instance_ami.image_id }}"
@@ -43,5 +43,5 @@
       Name: "{{ aws_vm_name }}"
     wait: "{{ aws_ec2_wait }}"
     vpc_subnet_id: "{{ aws_subnet_id }}"
-    user_data: "{{ lookup('template', aws_userdata_template+'.j2', template_vars=dict(aws_vm_name=vm_name)) }}"
+    user_data: "{{ lookup('template', aws_userdata_template + '.j2', template_vars=dict(aws_vm_name=vm_name)) }}"
   register: aws_vm_output

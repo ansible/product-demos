@@ -3,7 +3,7 @@
   hosts: "{{ _hosts | default(omit) }}"
   become: true
   vars:
-    # compliance_profile: undef
+    compliance_profile_configured: undef
 
   tasks:
     - name: Check OS Type

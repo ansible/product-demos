@@ -6,20 +6,20 @@
     aws_keypair_owner: undef
 
   tasks:
-  - name: Fail if variables not defined
-    ansible.builtin.assert:
-      that:
-        - aws_key_name is defined
-        - aws_region is defined
-        - aws_public_key is defined
-        - aws_keypair_owner is defined
-      fail_msg: "Required variables not set"
+    - name: Fail if variables not defined
+      ansible.builtin.assert:
+        that:
+          - aws_key_name is defined
+          - aws_region is defined
+          - aws_public_key is defined
+          - aws_keypair_owner is defined
+        fail_msg: "Required variables not set"
 
-  - name: Create AWS keypair
-    amazon.aws.ec2_key:
-      name: "{{ aws_key_name }}"
-      region: "{{ aws_region }}"
-      key_material: "{{ aws_public_key }}"
-      state: present
-      tags:
-        owner: "{{ aws_keypair_owner }}"
+    - name: Create AWS keypair
+      amazon.aws.ec2_key:
+        name: "{{ aws_key_name }}"
+        region: "{{ aws_region }}"
+        key_material: "{{ aws_public_key }}"
+        state: present
+        tags:
+          owner: "{{ aws_keypair_owner }}"

@@ -3,10 +3,10 @@
   hosts: "{{ _hosts | default('web') }}"
   become: true
   vars:
-    - harden_firewall: false
-    - harden_time: false
-    - harden_ssh: false
-    - harden_pci: false
+    harden_firewall: false
+    harden_time: false
+    harden_ssh: false
+    harden_pci: false
 
   tasks:
     - name: Configure Firewall

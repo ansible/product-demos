@@ -12,6 +12,8 @@
       ansible.builtin.pause: seconds="{{ 5 | random }}"
 
     - name: Run SCAP Scan
-      ansible.builtin.shell: "/usr/bin/foreman_scap_client {{ item.id }}"
+      ansible.builtin.command: "/usr/bin/foreman_scap_client {{ item.id }}"
       loop: "{{ policy }}"
       when: policy_scan == 'all' or item.name in policy_scan
+      register: scap_cmd_output
+      failed_when: "'Error' in command_result.stderr"

@@ -2,21 +2,21 @@
   ansible.builtin.template:
     src: report.j2
     dest: "{{ file_path }}/windowspatch.html"
-  check_mode: no
+  check_mode: false
 
 - name: Copy CSS over
   ansible.builtin.copy:
     src: "css"
     dest: "{{ file_path }}"
     directory_mode: true
-  check_mode: no
+  check_mode: false
 
 - name: Copy logo over
   ansible.builtin.copy:
     src: "webpage_logo.png"
     dest: "{{ file_path }}"
     directory_mode: true
-  check_mode: no
+  check_mode: false
 
 - name: Display link to Patch report
   ansible.builtin.debug:
@@ -33,6 +33,6 @@
     from: "{{ EMAIL_FROM }}"
     to: "{{ EMAIL_TO }}"
     subtype: html
-  delegate_to: localhost  
+  delegate_to: localhost
   become: false
-  check_mode: no
+  check_mode: false

@@ -2,7 +2,6 @@
 - name: Linux server patching
   hosts: "{{ _hosts | default(omit) }}"
   become: true
-  strategy: linear
   vars:
     report_server: node1
 
@@ -23,7 +22,7 @@
       when:
         - ansible_local.insights.system_id is not defined
 
-    - name: Run the Insights Client Scan
+    - name: Run the Insights Client Scan # noqa: no-changed-when
       ansible.builtin.command: insights-client
       when:
         - not ansible_check_mode
@@ -31,7 +30,7 @@
 
     - name: Deploy report server
       delegate_to: "{{ report_server }}"
-      run_once: true
+      run_once: true # noqa: run-once[task]
       block:
         - name: Build report server
           ansible.builtin.include_role:

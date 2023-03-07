@@ -4,29 +4,29 @@
     state: directory
     mode: '0755'
 
-- name: create HTML report
+- name: Create HTML report
   ansible.builtin.template:
     src: report.j2
     dest: "{{ file_path }}/network.html"
-  check_mode: no
+  check_mode: false
 
-- name: copy CSS over
+- name: Copy CSS over
   ansible.builtin.copy:
     src: "css"
     dest: "{{ file_path }}"
     directory_mode: true
-  check_mode: no
+  check_mode: false
 
-- name: copy logos over
+- name: Copy logos over
   ansible.builtin.copy:
-    src: "{{ item }}" 
+    src: "{{ item }}"
     dest: "{{ file_path }}"
     directory_mode: true
   loop:
     - "webpage_logo.png"
     - "redhat-ansible-logo.svg"
     - "router.png"
-  check_mode: no
+  check_mode: false
 
 # - name: Display link to Linux patch report
 #   ansible.builtin.debug:

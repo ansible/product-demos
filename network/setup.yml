@@ -81,7 +81,7 @@ controller_templates:
     use_fact_cache: true
     ask_job_type_on_launch: true
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''

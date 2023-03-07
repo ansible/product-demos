@@ -1,11 +1,12 @@
 ---
 - name: Create Cloud Infra
   hosts: localhost
-  gather_facts: no
+  gather_facts: false
   vars:
     infra_provider: undef
     aws_public_key: undef
   tasks:
-  - include_role:
-      name: "demo.cloud.{{ infra_provider }}"
-      tasks_from: create_infra
+    - name: Include provider role
+      ansible.builtin.include_role:
+        name: "demo.cloud.{{ infra_provider }}"
+        tasks_from: create_infra

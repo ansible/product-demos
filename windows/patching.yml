@@ -1,7 +1,6 @@
 ---
 - name: Windows updates
   hosts: "{{ _hosts | default('os_windows') }}"
-  strategy: linear
   vars:
     report_server: win1
 
@@ -12,7 +11,7 @@
 
     - name: Build report server
       delegate_to: "{{ report_server }}"
-      run_once: true
+      run_once: true  # noqa: run-once[task]
       block:
         - name: Install report server
           ansible.builtin.include_role:

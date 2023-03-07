@@ -1,13 +1,14 @@
 ---
-- hosts: localhost
-  gather_facts: no
+- name: Submit feedback
+  hosts: localhost
+  gather_facts: false
   tasks:
     - name: Submit Feedback
       ansible.builtin.uri:
         url: https://docs.google.com/forms/d/e/1FAIpQLSfTq7Dm0hw0sOthHTH2F6wbwwJc-fsJPbn72IZX4CY7p4uGBg/formResponse
         method: POST
         body: "ifq&entry.1139138403={{ email }} &entry.735882959={{ feedback }}&sumbit=Submit"
-    
+
     - name: Thank you
-      debug:
+      ansible.builtin.debug:
         msg: Thank you for your feedback!

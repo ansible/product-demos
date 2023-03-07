@@ -1,7 +1,8 @@
 ---
-- hosts: localhost
+- name: Promote content view version
+  hosts: localhost
   connection: local
-  gather_facts: no
+  gather_facts: false
   vars:
     organization: Default Organization
     lifecycle_environment: undef
@@ -9,9 +10,9 @@
     content_view: undef
 
   tasks:
-  - name: Promote Content View
-    redhat.satellite.content_view_version:
-      content_view: "{{ content_view }}"
-      organization: "{{ organization }}"
-      lifecycle_environments: "{{ lifecycle_environment }}"
-      current_lifecycle_environment: "{{ current_lifecycle_environment }}"
+    - name: Promote Content View # noqa: args[module] - required parameters provided with environment vars
+      redhat.satellite.content_view_version:
+        content_view: "{{ content_view }}"
+        organization: "{{ organization }}"
+        lifecycle_environments: "{{ lifecycle_environment }}"
+        current_lifecycle_environment: "{{ current_lifecycle_environment }}"

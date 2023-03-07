@@ -10,10 +10,10 @@ aws_region: us-east-1
 aws_vm_name: "{{ vm_name }}"
 aws_vm_owner: "{{ vm_owner }}"
 aws_blueprint: "{{ vm_blueprint }}"
-#aws_image_filter: "{{ omit }}"
-#aws_instance_size: "{{ omit }}"
-#aws_image_architecture: "{{ omit }}"
-#aws_image_owners: "{{ omit }} "
+# aws_image_filter: "{{ omit }}"
+# aws_instance_size: "{{ omit }}"
+# aws_image_architecture: "{{ omit }}"
+# aws_image_owners: "{{ omit }} "
 aws_userdata_template: default
 aws_keypair_name: "{{ aws_vpc_name }}-{{ aws_vpc_prefix }}-demo-key"
 aws_securitygroup_name: "{{ aws_vpc_name }}-{{ aws_vpc_prefix }}-sec-group"
@@ -21,4 +21,3 @@ aws_env_tag: prod
 aws_purpose_tag: ansible_demo
 aws_ansiblegroup_tag: cloud
 aws_ec2_wait: true
-

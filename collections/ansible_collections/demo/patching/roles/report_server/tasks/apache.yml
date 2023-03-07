@@ -1,22 +1,27 @@
 ---
-- include_vars: "{{ ansible_system }}.yml"
+- name: Inlcude system variables
+  ansible.builtin.include_vars: "{{ ansible_system }}.yml"
 
-- yum:
+- name: Install httpd package
+  ansible.builtin.yum:
     name: httpd
-    state: latest
-  check_mode: no
+    state: installed
+  check_mode: false
 
-- file:
+- name: Create reports directory
+  ansible.builtin.file:
     path: "{{ doc_root }}/{{ reports_dir }}"
     state: directory
-  check_mode: no
+  check_mode: false
 
-- copy:
+- name: Copy .htaccess
+  ansible.builtin.copy:
     dest: "{{ doc_root }}/{{ reports_dir }}/.htaccess"
     content: Options +Indexes
-  check_mode: no
+  check_mode: false
 
-- service:
+- name: Install httpd service
+  ansible.builtin.service:
     name: httpd
     state: started
-  check_mode: no
+  check_mode: false
