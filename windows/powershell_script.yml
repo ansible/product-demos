@@ -1,20 +1,22 @@
 ---
 - name: PowerShell Script
-  hosts: "{{ HOSTS | default('windows') }}"
+  hosts: "{{ _hosts | default('os_windows') }}"
   gather_facts: false
   vars:
     remote_dest: "C:\\query_services.ps1"
-  tasks:
-  - name: Copy script to remote
-    ansible.windows.win_copy:
-      src: "{{playbook_dir}}/query_services.ps1"
-      dest: "{{ remote_dest }}"
-  
-  - name: Run Script
-    ansible.windows.win_powershell:
-      script: | 
-        {{ remote_dest }} -ServiceState {{ service_state }}
-    register: ps_output
 
-  - debug:
-      var: ps_output
+  tasks:
+    - name: Copy script to remote
+      ansible.windows.win_copy:
+        src: "{{ playbook_dir }}/query_services.ps1"
+        dest: "{{ remote_dest }}"
+
+    - name: Run Script
+      ansible.windows.win_powershell:
+        script: |
+          {{ remote_dest }} -ServiceState {{ service_state }}
+      register: ps_output
+
+    - name: Print output
+      ansible.builtin.debug:
+        var: ps_output

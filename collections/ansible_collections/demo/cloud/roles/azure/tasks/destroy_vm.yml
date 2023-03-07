@@ -1,8 +1,0 @@
----
-- name: Destroy VM
-  azure.azcollection.azure_rm_virtualmachine:
-    resource_group: "{{ az_rg_name }}-{{ az_rg_prefix }}-rg"
-    name: "{{ inventory_hostname }}"
-    state: absent
-    remove_on_absent: all_autocreated
-  delegate_to: localhost

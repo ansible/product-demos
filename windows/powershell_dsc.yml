@@ -1,42 +1,42 @@
 ---
 - name: PowerShell DSC
-  hosts: "{{ HOSTS | default('windows') }}"
+  hosts: "{{ _hosts | default('os_windows') }}"
   gather_facts: false
 
   tasks:
-  - name: Setup the SecurityPolicyDSC module
-    community.windows.win_psmodule:
-      name: SecurityPolicyDSC
-      module_version: 2.10.0.0
-      state: present
-      accept_license: yes
-  
-  - name: Set password history
-    ansible.windows.win_dsc:
-      resource_name: AccountPolicy
-      Name: Enforce_password_history
-      Enforce_password_history: 24
+    - name: Setup the SecurityPolicyDSC module
+      community.windows.win_psmodule:
+        name: SecurityPolicyDSC
+        module_version: 2.10.0.0
+        state: present
+        accept_license: true
 
-  - name: Set maximum password age
-    ansible.windows.win_dsc:
-      resource_name: AccountPolicy
-      Name: Maximum_Password_Age
-      Maximum_Password_Age: 60
+    - name: Set password history
+      ansible.windows.win_dsc:
+        resource_name: AccountPolicy
+        Name: Enforce_password_history
+        Enforce_password_history: 24
 
-  - name: Set minimum password age
-    ansible.windows.win_dsc:
-      resource_name: AccountPolicy
-      Name: Minimum_Password_Age
-      Maximum_Password_Age: 20
+    - name: Set maximum password age
+      ansible.windows.win_dsc:
+        resource_name: AccountPolicy
+        Name: Maximum_Password_Age
+        Maximum_Password_Age: 60
 
-  - name: Set minimum password length
-    ansible.windows.win_dsc:
-      resource_name: AccountPolicy
-      Name: Minimum_Password_Length
-      Maximum_Password_Age: 8
+    - name: Set minimum password age
+      ansible.windows.win_dsc:
+        resource_name: AccountPolicy
+        Name: Minimum_Password_Age
+        Maximum_Password_Age: 20
 
-  - name: Set password complexity requirements
-    ansible.windows.win_dsc:
-      resource_name: AccountPolicy
-      Name: Password_must_meet_complexity_requirements
-      Password_must_meet_complexity_requirements: Enabled
+    - name: Set minimum password length
+      ansible.windows.win_dsc:
+        resource_name: AccountPolicy
+        Name: Minimum_Password_Length
+        Maximum_Password_Age: 8
+
+    - name: Set password complexity requirements
+      ansible.windows.win_dsc:
+        resource_name: AccountPolicy
+        Name: Password_must_meet_complexity_requirements
+        Password_must_meet_complexity_requirements: Enabled

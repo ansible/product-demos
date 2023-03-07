@@ -1,9 +1,9 @@
 ---
 - name: Chocolatey install specific
-  hosts: "{{ HOSTS | default('windows') }}"
+  hosts: "{{ _hosts | default('os_windows') }}"
   gather_facts: false
 
   tasks:
-  - name: Install choco package with specific version
-    win_chocolatey:
-      name: "{{ package_name }}"
+    - name: Install choco package with specific version
+      chocolatey.chocolatey.win_chocolatey:
+        name: "{{ package_name }}"

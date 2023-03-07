@@ -54,7 +54,7 @@
           - name: "SESSION_COOKIE_AGE"
             value: 180000
 
-    - name: "include configuration for {{ demo }}"
+    - name: "Include configuration for {{ demo }}"
       ansible.builtin.include_vars: "{{ demo }}/setup.yml"
 
     - name: Demo Components

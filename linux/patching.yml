@@ -1,43 +1,47 @@
 ---
-- hosts: "{{ HOSTS }}"
-  become: yes
+- name: Linux server patching
+  hosts: "{{ _hosts | default(omit) }}"
+  become: true
+  strategy: linear
   vars:
     report_server: node1
-  
+
   tasks:
-# Install yum-utils if it's not there
-  - name: Install yum-utils
-    ansible.builtin.yum:
-      name: yum-utils
-      state: latest
+    # Install yum-utils if it's not there
+    - name: Install yum-utils
+      ansible.builtin.yum:
+        name: yum-utils
+        state: installed
 
-  - include_role:
-      name: demo.patching.patch_linux
+    - name: Include patching role
+      ansible.builtin.include_role:
+        name: demo.patching.patch_linux
 
-  - name: Tell user when Insights Client is not configured
-    debug:
-      msg: "Insights client does not appear to be configured. Scan will be skipped"
-    when:
-      - ansible_local.insights.system_id is not defined
+    - name: Tell user when Insights Client is not configured
+      ansible.builtin.debug:
+        msg: "Insights client does not appear to be configured. Scan will be skipped"
+      when:
+        - ansible_local.insights.system_id is not defined
 
-  - name: Run the Insights Client Scan
-    command: insights-client
-    when:
-      - not ansible_check_mode
-      - ansible_local.insights.system_id is defined
+    - name: Run the Insights Client Scan
+      ansible.builtin.command: insights-client
+      when:
+        - not ansible_check_mode
+        - ansible_local.insights.system_id is defined
 
-  - block:
+    - name: Deploy report server
+      delegate_to: "{{ report_server }}"
+      run_once: true
+      block:
+        - name: Build report server
+          ansible.builtin.include_role:
+            name: "{{ item }}"
+          loop:
+            - demo.patching.report_server
+            - demo.patching.report_linux
+            - demo.patching.report_linux_patching
 
-    - include_role:
-        name: "{{ item }}"
-      loop:
-        - demo.patching.report_server
-        - demo.patching.report_linux
-        - demo.patching.report_linux_patching
-
-    - include_role:
-        name: demo.patching.report_server
-        tasks_from: linux_landing_page
-        
-    delegate_to: "{{ report_server }}"
-    run_once: yes
+        - name: Publish landing page
+          ansible.builtin.include_role:
+            name: demo.patching.report_server
+            tasks_from: linux_landing_page

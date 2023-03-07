@@ -1,13 +1,13 @@
 ---
 - name: Apply RHEL System Roles
-  hosts: "{{ HOSTS }}"
+  hosts: "{{ _hosts | default(omit) }}"
   become: true
   vars:
     system_roles: undef
 
   tasks:
     - name: Apply System Roles
-      include_role:
+      ansible.builtin.include_role:
         name: "redhat.rhel_system_roles.{{ item }}"
       loop: "{{ system_roles }}"
       when:

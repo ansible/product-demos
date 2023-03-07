@@ -1,25 +1,25 @@
 ---
 - name: Install IIS
-  hosts: "{{ HOSTS | default('windows') }}"
+  hosts: "{{ _hosts | default('windows') }}"
   vars:
     iis_message: undef
 
   tasks:
     - name: Install IIS
-      win_feature:
+      ansible.windows.win_feature:
         name: Web-Server
         state: present
 
     - name: Start IIS service
-      win_service:
+      ansible.windows.win_service:
         name: W3Svc
         state: started
 
     - name: Create website index.html
-      win_copy:
+      ansible.windows.win_copy:
         content: "{{ iis_message }}"
         dest: C:\Inetpub\wwwroot\index.html
 
     - name: Show website address
-      debug:
+      ansible.builtin.debug:
         msg: http://{{ ansible_host }}

@@ -1,20 +1,22 @@
 ---
 - name: Run Shell Script
-  hosts: "{{ HOSTS }}"
-  become: yes
-  gather_facts: no
+  hosts: "{{ _hosts | default(omit) }}"
+  become: true
+  gather_facts: false
   vars:
     shell_script: undef
 
   tasks:
     - name: Run Shell Script
-      shell: "{{ shell_script }}"
+      ansible.builtin.shell: "{{ shell_script }}"
       register: shell_output
+      tags:
+        - skip_ansible_lint # provided variable could require shell modele
 
     - name: Print script output
-      debug:
+      ansible.builtin.debug:
         var: shell_output.stdout_lines
 
-    - debug:
+    - name: Print message
+      ansible.builtin.debug:
         msg: You should really consider converting this script to a playbook!
-      run_once: yes

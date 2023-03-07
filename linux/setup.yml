@@ -1,6 +1,6 @@
 ---
 user_message:
-  - Be sure to update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register with Insights'. https://access.redhat.com/management/activation_keys
+  - Update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register with Insights'. https://access.redhat.com/management/activation_keys
   - Update Credential for Insights Inventory with Red Hat account.
   - Add variables for system_roles. https://console.redhat.com/ansible/automation-hub/repo/published/redhat/rhel_system_roles
 controller_components:
@@ -53,7 +53,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     extra_vars:
       activation_key: !unsafe "RHEL{{ ansible_distribution_major_version }}_{{ env }}"
@@ -64,7 +64,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
         - question_name: Choose Environment
           type: multiplechoice
@@ -93,7 +93,7 @@ controller_templates:
     notification_templates_error: Telemetry
     use_fact_cache: true
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -101,7 +101,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
 
   - name: "LINUX / Temporary Sudo"
@@ -113,7 +113,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -121,7 +121,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
         - question_name: User Name
           type: text
@@ -143,9 +143,9 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
-    ask_job_type_on_launch: yes
+    ask_job_type_on_launch: true
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -153,7 +153,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
 
   - name: "LINUX / Start Service"
@@ -166,7 +166,7 @@ controller_templates:
     notification_templates_error: Telemetry
     use_fact_cache: true
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -174,7 +174,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
         - question_name: Service Name
           type: text
@@ -191,7 +191,7 @@ controller_templates:
     notification_templates_error: Telemetry
     use_fact_cache: true
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -199,7 +199,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
         - question_name: Service Name
           type: text
@@ -215,7 +215,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -223,7 +223,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
         - question_name: Shell Script
           type: textarea
@@ -248,7 +248,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
 
   - name: "LINUX / Podman Webserver"
@@ -260,7 +260,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -268,7 +268,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
         - question_name: Web Page Message
           type: textarea
@@ -284,15 +284,15 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    diff_mode: yes
-    ask_job_type_on_launch: yes
+    diff_mode: true
+    ask_job_type_on_launch: true
     extra_vars:
       system_roles:
         - selinux
       selinux_policy: targeted
       selinux_state: enforcing
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -300,7 +300,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
 
   - name: "LINUX / Install Web Console (cockpit)"
@@ -311,10 +311,10 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    diff_mode: yes
-    ask_job_type_on_launch: yes
+    diff_mode: true
+    ask_job_type_on_launch: true
     extra_vars:
-      system_roles: 
+      system_roles:
         - cockpit
     credentials:
       - "Workshop Credential"
@@ -325,7 +325,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
         - question_name: Cockpit package load
           type: multiplechoice
@@ -346,7 +346,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     extra_vars:
       sudo_remove_nopasswd: false
     survey_enabled: true
@@ -356,7 +356,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
         - question_name: Compliance Profile
           type: multiplechoice
@@ -371,7 +371,7 @@ controller_templates:
     project: "Ansible official demo project"
     playbook: "linux/insights_compliance_scan.yml"
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -379,7 +379,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
         - question_name: Have you associated a compliance profile in the Insights Console for all hosts to be scanned?  If not, then the scan will fail.
           type: multiplechoice
@@ -400,7 +400,7 @@ controller_templates:
     notification_templates_error: Telemetry
     use_fact_cache: true
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -408,7 +408,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: true
         - question_name: Application Package Name
           type: text

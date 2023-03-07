@@ -1,11 +1,11 @@
 ---
 plugin: redhat.insights.insights
-get_patches: yes
+get_patches: true
 groups:
   patch_bugs: insights_patching.rhba_count > 0
   patch_enhancements: insights_patching.rhea_count > 0
   patch_security: insights_patching.rhsa_count > 0
-get_tags: yes
+get_tags: true
 selection: none
 filter_tags:
   - insights-client/purpose=demo

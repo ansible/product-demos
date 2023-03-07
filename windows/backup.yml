@@ -3,5 +3,5 @@
   name: Rollback playbook
   tasks:
     - name: "Rollback this step"
-      debug:
+      ansible.builtin.debug:
         msg: "Rolling back this step"

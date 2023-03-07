@@ -1,72 +1,73 @@
 ---
-- hosts: "{{ HOSTS }}"
-  become: yes
+- name: Register ec2 instance with subscription mangler
+  hosts: "{{ _hosts | default(omit)  }}"
+  become: true
 
   tasks:
-  - name: check for vars
-    assert:
-      that:
-        - org_id is defined
-        - activation_key is defined
-        - org_id != ''
-        - activation_key != ''
-        - org_id != 'undef'
-        - activation_key != 'undef'
+    - name: Check for vars
+      ansible.builtin.assert:
+        that:
+          - org_id is defined
+          - activation_key is defined
+          - org_id != ''
+          - activation_key != ''
+          - org_id != 'undef'
+          - activation_key != 'undef'
 
-  - name: set hostname
-    hostname:
-      name: "{{ inventory_hostname | regex_replace('_','-')}}"
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname | regex_replace('_', '-') }}"
 
 # Install subscription-manager if it's not there
-  - name: Install subscription-manager
-    ansible.builtin.yum:
-      name: subscription-manager
-      state: present
+    - name: Install subscription-manager
+      ansible.builtin.yum:
+        name: subscription-manager
+        state: present
 
-  - name: remove rhui client packages
-    yum:
-      name: rh-amazon-rhui-client*
-      state: removed
+    - name: Remove rhui client packages
+      ansible.builtin.yum:
+        name: rh-amazon-rhui-client*
+        state: removed
 
-  - name: get current repos
-    command:
-      cmd: ls /etc/yum.repos.d/
-    register: repos
-    changed_when: False
+    - name: Get current repos
+      ansible.builtin.command:
+        cmd: ls /etc/yum.repos.d/
+      register: repos
+      changed_when: false
 
-  - name: remove existing rhui repos
-    file:
-      path: "/etc/yum.repos.d/{{ item }}"
-      state: absent
-    loop: "{{ repos.stdout_lines }}"
-    when: "'rhui' in item"
+    - name: Remove existing rhui repos
+      ansible.builtin.file:
+        path: "/etc/yum.repos.d/{{ item }}"
+        state: absent
+      loop: "{{ repos.stdout_lines }}"
+      when: "'rhui' in item"
 
-  - name: install katello package
-    yum:
-      name: "https://{{ sat_url }}/pub/katello-ca-consumer-latest.noarch.rpm"
-      state: present
-      validate_certs: no
-      disable_gpg_check: true
-    when: sat_url is defined
+    - name: Install katello package
+      ansible.builtin.yum:
+        name: "https://{{ sat_url }}/pub/katello-ca-consumer-latest.noarch.rpm"
+        state: present
+        validate_certs: false
+        disable_gpg_check: true
+      when: sat_url is defined
 
-  - name: manage repos with subscription mangler
-    ansible.builtin.lineinfile:
-      path: /etc/rhsm/rhsm.conf
-      regexp: '^manage_repos'
-      line: 'manage_repos = 1'
+    - name: Manage repos with subscription mangler
+      ansible.builtin.lineinfile:
+        path: /etc/rhsm/rhsm.conf
+        regexp: '^manage_repos'
+        line: 'manage_repos = 1'
 
-  - name: register subscription mangler
-    community.general.redhat_subscription:
-      state: present
-      activationkey: "{{ activation_key }}"
-      org_id: "{{ org_id }}"
+    - name: Register subscription mangler
+      community.general.redhat_subscription:
+        state: present
+        activationkey: "{{ activation_key }}"
+        org_id: "{{ org_id }}"
 
-  - name: configure Red Hat insights
-    import_role:
-      name: redhat.insights.insights_client
-    vars:
-      insights_display_name: "{{ inventory_hostname }}"
-      insights_tags:
-        env: "{{ env }}"
-        purpose: demo
-        group: "{{ insights_tag }}"
+    - name: Configure Red Hat insights
+      ansible.builtin.import_role:
+        name: redhat.insights.insights_client
+      vars:
+        insights_display_name: "{{ inventory_hostname }}"
+        insights_tags:
+          env: "{{ env }}"
+          purpose: demo
+          group: "{{ insights_tag }}"

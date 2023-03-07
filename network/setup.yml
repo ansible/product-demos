@@ -14,8 +14,8 @@ controller_projects:
     organization: Default
     scm_type: git
     scm_url: https://github.com/nleiva/ansible-net-modules
-    update_project: yes
-    wait: yes
+    update_project: true
+    wait: true
 
 controller_inventories:
   - name: Network Inventory
@@ -47,7 +47,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     ask_limit_on_launch: true
-    use_fact_cache: yes
+    use_fact_cache: true
     survey:
       name: ''
       description: ''
@@ -79,7 +79,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
-    ask_job_type_on_launch: yes
+    ask_job_type_on_launch: true
     credentials:
     - "Workshop Credential"
     survey_enabled: true
@@ -89,7 +89,7 @@ controller_templates:
       spec:
         - question_name: What devices do you want to include in the report?
           type: multiplechoice
-          variable: HOSTS
+          variable: _hosts
           default: routers
           required: true
           choices:

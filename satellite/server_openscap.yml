@@ -1,16 +1,17 @@
 ---
-- hosts: "{{ HOSTS }}"
-  become: yes
+- name: Run openSCAP scan
+  hosts: "{{ _hosts | default(omit) }}"
+  become: true
   vars:
     policy_name: all
   roles:
     - demo.satellite.scap_client
 
   tasks:
-  - name: Randomized startup delay...
-    pause: seconds="{{ 5 | random }}"
+    - name: Randomized startup delay...
+      ansible.builtin.pause: seconds="{{ 5 | random }}"
 
-  - name: "Run SCAP Scan"
-    shell: "/usr/bin/foreman_scap_client {{ item.id }}"
-    loop: "{{ policy }}"
-    when: policy_scan == 'all' or item.name in policy_scan
+    - name: Run SCAP Scan
+      ansible.builtin.shell: "/usr/bin/foreman_scap_client {{ item.id }}"
+      loop: "{{ policy }}"
+      when: policy_scan == 'all' or item.name in policy_scan

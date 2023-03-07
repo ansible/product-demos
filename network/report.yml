@@ -4,7 +4,7 @@
 # https://github.com/network-automation/toolkit/blob/master/roles/build_report/tasks/main.yml
 
 - name: Collect facts
-  hosts: "{{ HOSTS }}"
+  hosts: "{{ _hosts | default(omit) }}"
   gather_facts: false
 
   tasks:
@@ -32,7 +32,7 @@
     #     ansible_host: "{{ lookup('community.general.dig', inventory_hostname)}}"
 
 - hosts: node1
-  become: yes
+  become: true
   vars:
     report_server: node1
     web_path: /var/www/html/reports/
@@ -50,7 +50,7 @@
         loop:
           - demo.patching.report_server
           - demo.patching.build_report_network
-          
+
       - ansible.builtin.include_role:
           name: demo.patching.report_server
           tasks_from: linux_landing_page

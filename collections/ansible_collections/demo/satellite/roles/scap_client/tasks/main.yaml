@@ -70,7 +70,7 @@
   template:
     src: openscap_client_config.yaml.j2
     dest: /etc/foreman_scap_client/config.yaml
-    mode: 0644
+    mode: "0644"
     owner: root
     group: root
 

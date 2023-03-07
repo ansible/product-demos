@@ -1,12 +1,11 @@
 ---
-- hosts: "{{ HOSTS }}"
-  become: yes
+- name: Scan host for facts
+  hosts: "{{ _hosts  | default(omit) }}"
+  become: true
 
   tasks:
-  - name: get packages
-    ansible.builtin.package_facts:
+    - name: Get packages
+      ansible.builtin.package_facts:
 
-  - name: get services
-    ansible.builtin.service_facts:
-
-  
+    - name: Get services
+      ansible.builtin.service_facts:

@@ -1,16 +1,17 @@
 ---
 - name: Run PowerShell
-  hosts: "{{ HOSTS | default('windows') }}"
+  hosts: "{{ _hosts | default('os_windows') }}"
   gather_facts: false
   vars:
     ps_script: undef
 
   tasks:
-  - name: Run PowerShell
-    ansible.windows.win_powershell:
-      script: | 
-        {{ ps_script }}
-    register: ps_output
+    - name: Run PowerShell
+      ansible.windows.win_powershell:
+        script: |
+          {{ ps_script }}
+      register: ps_output
 
-  - debug:
-      msg: "{{ ps_output.output }}"
+    - name: Print output
+      ansible.builtin.debug:
+        msg: "{{ ps_output.output }}"
