@@ -96,7 +96,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: false
         - question_name: Choose Environment
           type: multiplechoice
@@ -127,7 +127,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: false
 
   - name: SATELLITE / Publish Content View Version
