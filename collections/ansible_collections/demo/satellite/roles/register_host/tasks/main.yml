@@ -41,6 +41,7 @@
     activationkey: "{{ activation_key }}"
     consumer_name: "{{ instance_name }}"
     org_id: "{{ org_id | default('Default_Organization') }}"
+    force_register: "{{ force_register }}"
   throttle: 1
 
 - name: Include repos
