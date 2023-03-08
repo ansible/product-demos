@@ -15,7 +15,7 @@ jobs:
       - name: Run ansible-lint
         uses: ansible/ansible-lint-action@v6
         env:
-          ANSIBLE_GALAXY_SERVER_LIST: ${{ vars.ANSIBLE_GALAXY_SERVER_LIST }}
+          ANSIBLE_GALAXY_SERVER_LIST: ah,galaxy
           ANSIBLE_GALAXY_SERVER_AH_URL: ${{ vars.ANSIBLE_GALAXY_SERVER_AH_URL }}
           ANSIBLE_GALAXY_SERVER_AH_AUTH_URL: ${{ vars.ANSIBLE_GALAXY_SERVER_AH_AUTH_URL }}
           ANSIBLE_GALAXY_SERVER_AH_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_AH_TOKEN }}
