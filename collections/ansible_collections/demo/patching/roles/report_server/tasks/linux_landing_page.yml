@@ -13,6 +13,7 @@
   ansible.builtin.template:
     src: linux_report.j2
     dest: "{{ doc_root }}/index.html"
+    mode: "0644"
   check_mode: false
 
 - name: Copy CSS
@@ -20,6 +21,7 @@
     src: "css"
     dest: "{{ doc_root }}"
     directory_mode: true
+    mode: "0775"
   check_mode: false
 
 - name: Copy logos
@@ -27,6 +29,7 @@
     src: "{{ item }}"
     dest: "{{ doc_root }}"
     directory_mode: true
+    mode: "0775"
   loop:
     - "webpage_logo.png"
     - "redhat-ansible-logo.svg"

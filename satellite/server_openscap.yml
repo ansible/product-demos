@@ -9,9 +9,10 @@
 
   tasks:
     - name: Randomized startup delay...
-      ansible.builtin.pause: seconds="{{ 5 | random }}"
+      ansible.builtin.pause:
+        seconds: "{{ 5 | random }}"
 
-    - name: Run SCAP Scan
+    - name: Run SCAP Scan # noqa: no-changed-when - purpose is to run everytime
       ansible.builtin.command: "/usr/bin/foreman_scap_client {{ item.id }}"
       loop: "{{ policy }}"
       when: policy_scan == 'all' or item.name in policy_scan

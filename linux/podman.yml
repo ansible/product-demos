@@ -16,11 +16,14 @@
       ansible.builtin.file:
         path: "{{ volume_path }}"
         state: directory
+        mode: "0775"
 
     - name: Create index.html
       ansible.builtin.copy:
         dest: "{{ volume_path }}/index.html"
         content: "{{ message }}"
+        mode: "0664"
+
 
     - name: Run httpd container
       containers.podman.podman_container:
@@ -30,11 +33,11 @@
         volume:
           - "./{{ volume_path }}/:/usr/local/apache2/htdocs:z"
         ports:
-          - "8080:80"
+          - "8081:80"
 
     - name: Check Web Page
       ansible.builtin.uri:
-        url: http://127.0.0.1:8080
+        url: http://127.0.0.1:8081
         return_content: true
       register: web_output
       changed_when: false

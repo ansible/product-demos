@@ -2,12 +2,13 @@
   ansible.builtin.file:
     path: "{{ file_path }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Create HTML report
   ansible.builtin.template:
     src: report.j2
     dest: "{{ file_path }}/network.html"
+    mode: "0644"
   check_mode: false
 
 - name: Copy CSS over
@@ -15,6 +16,7 @@
     src: "css"
     dest: "{{ file_path }}"
     directory_mode: true
+    mode: "0775"
   check_mode: false
 
 - name: Copy logos over
@@ -22,6 +24,7 @@
     src: "{{ item }}"
     dest: "{{ file_path }}"
     directory_mode: true
+    mode: "0644"
   loop:
     - "webpage_logo.png"
     - "redhat-ansible-logo.svg"

@@ -2,6 +2,7 @@
   ansible.builtin.template:
     src: report.j2
     dest: "{{ file_path }}/windowspatch.html"
+    mode: "0644"
   check_mode: false
 
 - name: Copy CSS over
@@ -9,6 +10,7 @@
     src: "css"
     dest: "{{ file_path }}"
     directory_mode: true
+    mode: "0775"
   check_mode: false
 
 - name: Copy logo over
@@ -16,23 +18,9 @@
     src: "webpage_logo.png"
     dest: "{{ file_path }}"
     directory_mode: true
+    mode: "0644"
   check_mode: false
 
 - name: Display link to Patch report
   ansible.builtin.debug:
     msg: "Please go to http://{{ ansible_host }}/windowspatch.html"
-
-- name: Send Report via E-mail
-  community.general.mail:
-    host: "{{ EMAIL_HOST }}"
-    username: "{{ EMAIL_USERNAME }}"
-    password: "{{ EMAIL_PASSWORD }}"
-    port: "{{ EMAIL_PORT }}"
-    subject: "Windows Patching Report"
-    body: "{{ lookup('template', 'report.j2') }}"
-    from: "{{ EMAIL_FROM }}"
-    to: "{{ EMAIL_TO }}"
-    subtype: html
-  delegate_to: localhost
-  become: false
-  check_mode: false

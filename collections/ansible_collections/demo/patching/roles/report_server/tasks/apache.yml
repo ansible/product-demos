@@ -12,12 +12,14 @@
   ansible.builtin.file:
     path: "{{ doc_root }}/{{ reports_dir }}"
     state: directory
+    mode: "0775"
   check_mode: false
 
 - name: Copy .htaccess
   ansible.builtin.copy:
     dest: "{{ doc_root }}/{{ reports_dir }}/.htaccess"
     content: Options +Indexes
+    mode: "0644"
   check_mode: false
 
 - name: Install httpd service
