@@ -6,7 +6,7 @@ controller_components:
   - inventory_sources
   - job_templates
   - job_launch
-#  - workflow_job_templates
+  - workflow_job_templates
 
 controller_credential_types:
   - name: Satellite Collection
@@ -62,19 +62,20 @@ controller_inventory_sources:
     hostnames:
       - name.split('.')[0]
     groups:
-      patch_bugs: foreman_content_facet_attributes.errata_counts.bugfix
-      patch_enhancements: foreman_content_facet_attributes.errata_counts.enhancement
-      patch_security: foreman_content_facet_attributes.errata_counts.security
+      patch_bugs: foreman_content_attributes.errata_counts.bugfix
+      patch_enhancements: foreman_content_attributes.errata_counts.enhancement
+      patch_security: foreman_content_attributes.errata_counts.security
     keyed_groups:
       - prefix: env
-        key: foreman_content_facet_attributes.lifecycle_environment_name
+        key: foreman_content_attributes.lifecycle_environment_name
       - prefix: cv
-        key: foreman_content_facet_attributes.content_view_name
+        key: foreman_content_attributes.content_view_name
       - prefix: os
         key: foreman_operatingsystem_name
       - prefix: scap
         key: foreman_compliance_status_label
     validate_certs: no
+    group_prefix: satellite_
 
 controller_templates:
 - name: LINUX / Register with Satellite
@@ -200,7 +201,68 @@ controller_launch_jobs:
       demo: linux
 
   - name: SETUP / Satellite
-    wait: false
+    wait: true
+
+controller_workflows:
+  - name: Patch Dev
+    description: A workflow to patch the dev environment
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Email
+          type: text
+          variable: email
+          required: false
+    simplified_workflow_nodes:
+      - identifier: Update Inventory
+        unified_job_template: Satellite Inventory
+        success_nodes:
+          - Check for Updates
+      - identifier: Publish New Patches
+        unified_job_template: 'SATELLITE / Publish Content View Version'
+        extra_data:
+          content_view: RHEL8
+        success_nodes:
+          - Check for Updates
+      - identifier: Check for Updates
+        unified_job_template: 'LINUX / Patching'
+        job_type: check
+        extra_data:
+          HOSTS: env_RHEL8_Dev
+        all_parents_must_converge: true
+        success_nodes:
+          - Approve Patches
+        failure_nodes:
+          - Ticket - Update Check
+      - identifier: Ticket - Update Check
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to check for updates in RHEL8_Dev
+      - identifier: Approve Patches
+        approval_node:
+          name: Push patches to Dev?
+          description: Review the patch report before approving
+        success_nodes:
+          - Apply Patches
+      - identifier: Apply Patches
+        unified_job_template: 'LINUX / Patching'
+        job_type: run
+        extra_data:
+          HOSTS: env_RHEL8_Dev
+        failure_nodes:
+          - Ticket - Update Apply
+      - identifier: Ticket - Update Apply
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to apply updates to RHEL8_Dev
+
+
 
 #######################
 ### Satellite Vars ###
