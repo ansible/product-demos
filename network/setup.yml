@@ -49,6 +49,7 @@ controller_templates:
     survey_enabled: true
     project: Network Golden Configs
     playbook: main.yml
+    execution_environment: Networking Execution Environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -84,8 +85,8 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    execution_environment: Networking Execution Environment
     use_fact_cache: true
-    ask_job_type_on_launch: true
     credentials:
       - "Workshop Credential"
     survey_enabled: true
