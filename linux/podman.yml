@@ -24,7 +24,6 @@
         content: "{{ message }}"
         mode: "0664"
 
-
     - name: Run httpd container
       containers.podman.podman_container:
         name: apache
