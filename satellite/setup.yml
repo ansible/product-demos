@@ -51,149 +51,148 @@ controller_credentials:
       password: ansible123!
 
 controller_inventory_sources:
-- name: Satellite Inventory
-  inventory: Workshop Inventory
-  credential: Satellite Inventory
-  source: satellite6
-  update_on_launch: false
-  execution_environment: Control Plane Execution Environment
-  overwrite: true
-  source_vars:
-    hostnames:
-      - name.split('.')[0]
-    groups:
-      patch_bugs: foreman_content_attributes.errata_counts.bugfix
-      patch_enhancements: foreman_content_attributes.errata_counts.enhancement
-      patch_security: foreman_content_attributes.errata_counts.security
-    keyed_groups:
-      - prefix: env
-        key: foreman_content_attributes.lifecycle_environment_name
-      - prefix: cv
-        key: foreman_content_attributes.content_view_name
-      - prefix: os
-        key: foreman_operatingsystem_name
-      - prefix: scap
-        key: foreman_compliance_status_label
-    validate_certs: false
-    group_prefix: satellite_
+  - name: Satellite Inventory
+    inventory: Workshop Inventory
+    credential: Satellite Inventory
+    source: satellite6
+    update_on_launch: false
+    execution_environment: Control Plane Execution Environment
+    overwrite: true
+    source_vars:
+      hostnames:
+        - name.split('.')[0]
+      groups:
+        patch_bugs: foreman_content_attributes.errata_counts.bugfix
+        patch_enhancements: foreman_content_attributes.errata_counts.enhancement
+        patch_security: foreman_content_attributes.errata_counts.security
+      keyed_groups:
+        - prefix: env
+          key: foreman_content_attributes.lifecycle_environment_name
+        - prefix: cv
+          key: foreman_content_attributes.content_view_name
+        - prefix: os
+          key: foreman_operatingsystem_name
+        - prefix: scap
+          key: foreman_compliance_status_label
+      validate_certs: false
+      group_prefix: satellite_
 
 controller_templates:
-- name: LINUX / Register with Satellite
-  project: Ansible official demo project
-  playbook: satellite/server_register.yml
-  inventory: Workshop Inventory
-  notification_templates_started: Telemetry
-  notification_templates_success: Telemetry
-  notification_templates_error: Telemetry
-  credentials:
-    - Workshop Credential
-    - Satellite Credential
-  extra_vars:
-    org_id: "Default_Organization"
-  survey_enabled: true
-  survey:
-    name: ''
-    description: ''
-    spec:
-      - question_name: Server Name or Pattern
-        type: text
-        variable: HOSTS
-        required: false
-      - question_name: Choose Environment
-        type: multiplechoice
-        variable: env
-        choices:
-          - Dev
-          - QA
-          - Prod
-        required: true
+  - name: LINUX / Register with Satellite
+    project: Ansible official demo project
+    playbook: satellite/server_register.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - Workshop Credential
+      - Satellite Credential
+    extra_vars:
+      org_id: "Default_Organization"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+        - question_name: Choose Environment
+          type: multiplechoice
+          variable: env
+          choices:
+            - Dev
+            - QA
+            - Prod
+          required: true
 
-- name: LINUX / Compliance Scan with Satellite
-  project: Ansible official demo project
-  playbook: satellite/server_openscap.yml
-  inventory: Workshop Inventory
-  execution_environment: Ansible Engine 2.9 execution environment
-  notification_templates_started: Telemetry
-  notification_templates_success: Telemetry
-  notification_templates_error: Telemetry
-  credentials:
-    - Satellite Credential
-    - Workshop Credential
-  extra_vars:
-    policy_scan: all
-  survey_enabled: true
-  survey:
-    name: ''
-    description: ''
-    spec:
-      - question_name: Server Name or Pattern
-        type: text
-        variable: HOSTS
-        required: false
+  - name: LINUX / Compliance Scan with Satellite
+    project: Ansible official demo project
+    playbook: satellite/server_openscap.yml
+    inventory: Workshop Inventory
+    execution_environment: Ansible Engine 2.9 execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - Satellite Credential
+      - Workshop Credential
+    extra_vars:
+      policy_scan: all
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
 
-- name: SATELLITE / Publish Content View Version
-  project: Ansible official demo project
-  playbook: satellite/satellite_publish.yml
-  inventory: Workshop Inventory
-  notification_templates_started: Telemetry
-  notification_templates_success: Telemetry
-  notification_templates_error: Telemetry
-  credentials:
-    - Satellite Credential
-  extra_vars:
-    env: Dev
-  survey_enabled: true
-  survey:
-    name: ''
-    description: ''
-    spec:
-      - question_name: Select Content View
-        variable: content_view
-        type: multiplechoice
-        choices: "{{ satellite_content_views | selectattr('name', 'match', '^RHEL.*$') | map(attribute='name') | list}}"
-        required: true
+  - name: SATELLITE / Publish Content View Version
+    project: Ansible official demo project
+    playbook: satellite/satellite_publish.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - Satellite Credential
+    extra_vars:
+      env: Dev
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Select Content View
+          variable: content_view
+          type: multiplechoice
+          choices: "{{ satellite_content_views | selectattr('name', 'match', '^RHEL.*$') | map(attribute='name') | list}}"
+          required: true
 
-- name: SATELLITE / Promote Content View Version
-  project: Ansible official demo project
-  playbook: satellite/satellite_promote.yml
-  inventory: Workshop Inventory
-  notification_templates_started: Telemetry
-  notification_templates_success: Telemetry
-  notification_templates_error: Telemetry
-  credentials:
-    - Satellite Credential
-  survey_enabled: true
-  survey:
-    name: ''
-    description: ''
-    spec:
-      - question_name: Select Content View
-        variable: content_view
-        type: multiplechoice
-        choices: "{{ satellite_content_views | selectattr('name', 'match', '^RHEL.*$') | map(attribute='name') | list}}"
-        required: true
-      - question_name: Current Lifecycle Environment
-        variable: current_lifecycle_environment
-        type: multiplechoice
-        choices: "{{ satellite_lifecycle_environments | selectattr('name', 'match', '^RHEL.*$') | map(attribute='name') | list}}"
-        required: true
-      - question_name: Next Lifecycle Environment
-        variable: lifecycle_environment
-        type: multiplechoice
-        choices: "{{ satellite_lifecycle_environments | selectattr('name', 'match', '^RHEL.*$') | map(attribute='name') | list}}"
-        required: true
+  - name: SATELLITE / Promote Content View Version
+    project: Ansible official demo project
+    playbook: satellite/satellite_promote.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - Satellite Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Select Content View
+          variable: content_view
+          type: multiplechoice
+          choices: "{{ satellite_content_views | selectattr('name', 'match', '^RHEL.*$') | map(attribute='name') | list}}"
+          required: true
+        - question_name: Current Lifecycle Environment
+          variable: current_lifecycle_environment
+          type: multiplechoice
+          choices: "{{ satellite_lifecycle_environments | selectattr('name', 'match', '^RHEL.*$') | map(attribute='name') | list}}"
+          required: true
+        - question_name: Next Lifecycle Environment
+          variable: lifecycle_environment
+          type: multiplechoice
+          choices: "{{ satellite_lifecycle_environments | selectattr('name', 'match', '^RHEL.*$') | map(attribute='name') | list}}"
+          required: true
 
-- name: SETUP / Satellite
-  project: Ansible official demo project
-  playbook: satellite/setup_satellite.yml
-  inventory: Workshop Inventory
-  notification_templates_started: Telemetry
-  notification_templates_success: Telemetry
-  notification_templates_error: Telemetry
-  credentials:
-    - Satellite Credential
+  - name: SETUP / Satellite
+    project: Ansible official demo project
+    playbook: satellite/setup_satellite.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - Satellite Credential
 
-    
 controller_launch_jobs:
   - name: SETUP
     wait: false
@@ -261,8 +260,6 @@ controller_workflows:
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to apply updates to RHEL8_Dev
-
-
 
 #######################
 ### Satellite Vars ###

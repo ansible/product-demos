@@ -15,19 +15,6 @@ controller_execution_environments:
     image: quay.io/scottharwell/cloud-ee:latest
 
 controller_projects:
-- name: Ansible Cloud Content Lab - AWS
-  organization: Default
-  scm_type: git
-  wait: yes
-  #scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
-  scm_url: https://github.com/willtome/aws.infrastructure_config_demos.git
-  default_environment: Cloud Services Execution Environment
-
-controller_execution_environments:
-  - name: Cloud Services Execution Environment
-    image: quay.io/scottharwell/cloud-ee:latest
-
-controller_projects:
   - name: Ansible Cloud Content Lab - AWS
     organization: Default
     scm_type: git
@@ -99,22 +86,12 @@ controller_groups:
     variables:
       ansible_user: ec2-user
 
-controller_groups:
-  - name: cloud_aws
-    inventory: Workshop Inventory
-    variables:
-      ansible_user: ec2-user
-
 controller_templates:
   - name: Cloud / AWS / Create Peer Infrastructure
     job_type: run
     organization: Default
     credentials:
-<<<<<<< HEAD
       - AWS
-=======
-     - AWS
->>>>>>> main
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_create_peer_network.yml
     inventory: Workshop Inventory
@@ -130,11 +107,7 @@ controller_templates:
     job_type: run
     organization: Default
     credentials:
-<<<<<<< HEAD
       - AWS
-=======
-     - AWS
->>>>>>> main
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_delete_peer_network.yml
     inventory: Workshop Inventory
@@ -148,11 +121,7 @@ controller_templates:
     job_type: run
     organization: Default
     credentials:
-<<<<<<< HEAD
       - AWS
-=======
-     - AWS
->>>>>>> main
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_create_transit_network.yml
     inventory: Workshop Inventory
@@ -168,11 +137,7 @@ controller_templates:
     job_type: run
     organization: Default
     credentials:
-<<<<<<< HEAD
       - AWS
-=======
-     - AWS
->>>>>>> main
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_delete_transit_network.yml
     inventory: Workshop Inventory
@@ -182,20 +147,11 @@ controller_templates:
     extra_vars:
       aws_region: us-east-1
 
-<<<<<<< HEAD
-  - name: Cloud / Create Infra
-    job_type: run
-    organization: Default
-    credentials:
-      - AWS
-      # - Azure
-=======
   - name: Cloud / AWS / Create VPC
     job_type: run
     organization: Default
     credentials:
-     - AWS
->>>>>>> main
+      - AWS
     project: Ansible official demo project
     playbook: cloud/create_vpc.yml
     inventory: Workshop Inventory
@@ -213,29 +169,13 @@ controller_templates:
           type: text
           variable: aws_owner_tag
           required: true
-<<<<<<< HEAD
-          choices:
-            - aws
-            # - azure
-        - question_name: AWS Public Key (only required for aws provider)
-          type: textarea
-          required: false
-          variable: aws_public_key
-=======
->>>>>>> main
 
   - name: Cloud / AWS / Create VM
     job_type: run
     organization: Default
-<<<<<<< HEAD
     credentials:
       - AWS
       - Workshop Credential
-=======
-    credentials: 
-     - AWS
-     - Workshop Credential
->>>>>>> main
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_create_vm.yml
     inventory: Workshop Inventory
@@ -285,33 +225,19 @@ controller_templates:
           type: text
           variable: aws_vpc_subnet_name
           required: true
-<<<<<<< HEAD
-          default: dmz-subnet
-=======
           default: aws-test-subnet
->>>>>>> main
         - question_name: Security Group
           type: text
           variable: aws_securitygroup_name
           required: true
-<<<<<<< HEAD
-          default: dmz-sg
-=======
           default: aws-test-sg
->>>>>>> main
 
   - name: Cloud / AWS / Delete VM
     job_type: run
     organization: Default
-<<<<<<< HEAD
     credentials:
       - AWS
       - Workshop Credential
-=======
-    credentials: 
-     - AWS
-     - Workshop Credential
->>>>>>> main
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_delete_inventory_vm.yml
     inventory: Workshop Inventory
@@ -328,7 +254,6 @@ controller_templates:
         - question_name: Name or Pattern
           type: text
           variable: _hosts
-<<<<<<< HEAD
           required: true
 
   - name: Cloud / AWS / VPC Report
@@ -336,17 +261,6 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbook_create_reports.yml
-    inventory: Workshop Inventory
-=======
-          required: true
-
-  - name: Cloud / AWS / VPC Report
-    job_type: run
-    organization: Default
-    credentials:
-     - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_create_reports.yml
     inventory: Workshop Inventory
@@ -361,7 +275,7 @@ controller_templates:
     job_type: run
     organization: Default
     credentials:
-     - AWS
+      - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_create_reports.yml
     inventory: Workshop Inventory
@@ -375,8 +289,8 @@ controller_templates:
   - name: Cloud / AWS / Create Keypair
     job_type: run
     organization: Default
-    credentials: 
-     - AWS
+    credentials:
+      - AWS
     project: Ansible official demo project
     playbook: cloud/aws_key.yml
     inventory: Workshop Inventory
@@ -408,59 +322,16 @@ controller_workflows:
   - name: Deploy Cloud Stack in AWS
     description: A workflow to deploy a cloud stack
     organization: Default
->>>>>>> main
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-<<<<<<< HEAD
-      aws_region: us-east-1
-      aws_report: vpc
-
-  - name: Cloud / AWS / Tags Report
-    job_type: run
-    organization: Default
-    credentials:
-      - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbook_create_reports.yml
-    inventory: Workshop Inventory
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-    extra_vars:
-      aws_region: us-east-1
-      aws_report: tags
-
-  - name: Cloud / AWS / Create Keypair
-    job_type: run
-    organization: Default
-    credentials:
-      - AWS
-    project: Ansible official demo project
-    playbook: cloud/aws_key.yml
-    inventory: Workshop Inventory
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-    survey_enabled: true
-    extra_vars:
-      aws_region: us-east-1
-=======
       vm_deployment: cloud_stack
     survey_enabled: true
->>>>>>> main
     survey:
       name: ''
       description: ''
       spec:
-<<<<<<< HEAD
-        - question_name: Keypair Name
-          type: text
-          variable: aws_key_name
-          required: true
-          default: aws-test-key
-=======
         - question_name: Owner
           type: text
           variable: aws_owner_tag
@@ -473,17 +344,10 @@ controller_workflows:
             - Dev
             - QA
             - Prod
->>>>>>> main
         - question_name: Keypair Public Key
           type: textarea
           variable: aws_public_key
           required: true
-<<<<<<< HEAD
-        - question_name: Owner
-          type: text
-          variable: aws_keypair_owner
-          required: true
-=======
         - question_name: Email
           type: text
           variable: email
@@ -558,4 +422,3 @@ controller_workflows:
           feedback: Failed to create AWS instance
       - identifier: Tag Report
         unified_job_template: Cloud / AWS / Tags Report
->>>>>>> main
