@@ -10,7 +10,7 @@
     - name: Install specific versions of packages sequentially
       chocolatey.chocolatey.win_chocolatey:
         name: "{{ item.name }}"
-        state: installed
+        state: present
       loop: "{{ choco_packages }}"
 
     - name: Check python version

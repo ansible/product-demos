@@ -37,6 +37,8 @@
         - { name: "GroupA" }
         - { name: "GroupB" }
         - { name: "GroupC" }
+      retries: 5
+      delay: 10
 
     - name: Create some users
       community.windows.win_domain_user:
@@ -48,3 +50,5 @@
         - { name: "UserA", groups: "GroupA" }
         - { name: "UserB", groups: "GroupB" }
         - { name: "UserC", groups: "GroupC" }
+      retries: 5
+      delay: 10

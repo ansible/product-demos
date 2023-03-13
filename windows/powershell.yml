@@ -1,6 +1,6 @@
 ---
 - name: Run PowerShell
-  hosts: "{{ HOSTS | default('windows') }}"
+  hosts: "{{ _hosts | default('os_windows') }}"
   gather_facts: false
   vars:
     ps_script: undef
