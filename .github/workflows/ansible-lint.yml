@@ -4,10 +4,10 @@ on: [push, pull_request]
 
 env:
   ANSIBLE_GALAXY_SERVER_LIST: ah,galaxy
-  ANSIBLE_GALAXY_SERVER_AH_URL: ${{ vars.ANSIBLE_GALAXY_SERVER_AH_URL }}
-  ANSIBLE_GALAXY_SERVER_AH_AUTH_URL: ${{ vars.ANSIBLE_GALAXY_SERVER_AH_AUTH_URL }}
+  ANSIBLE_GALAXY_SERVER_AH_URL: https://console.redhat.com/api/automation-hub/
+  ANSIBLE_GALAXY_SERVER_AH_AUTH_URL: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
   ANSIBLE_GALAXY_SERVER_AH_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_AH_TOKEN }}
-  ANSIBLE_GALAXY_SERVER_GALAXY_URL: ${{ vars.ANSIBLE_GALAXY_SERVER_GALAXY_URL }}
+  ANSIBLE_GALAXY_SERVER_GALAXY_URL: https://galaxy.ansible.com/
 
 jobs:
   build:
