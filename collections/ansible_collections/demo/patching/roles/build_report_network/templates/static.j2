@@ -1,0 +1,45 @@
+<!-- INTERNAL TABLE FOR Static Routes -->
+<div id="accordion">
+<div>
+<h3>Static Routes</h3>
+<div class="net_content">
+{% if hostvars[network_switch]['ansible_network_resources']['static_routes'] is defined and hostvars[network_switch]['ansible_network_resources']['static_routes']|length > 0 %}
+<table id="subtable">
+    <thead>
+        <tr>
+            <th>VRF</th>
+            <th>Address-Family</th>
+            <th>Route</th>
+            <th>Interface</th>
+            <th>Next-Hop Address</th>
+            <th>Global</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for net_route in hostvars[network_switch]['ansible_network_resources']['static_routes'] %}
+<tr>
+    <td>{{ net_route['vrf']|default("N/A") }}</td>
+{% for address_family in net_route.address_families|default([]) %}
+<td>{{ address_family['afi'] }}</td>
+{% for routes in address_family['routes'] %}
+<td>{{ routes['dest'] }}</td>
+{% for next_hops in routes['next_hops'] %}
+<td>{{ next_hops['interface']|default("N/A") }}</td>
+<td>{{ next_hops['forward_router_address']|default("N/A") }}</td>
+<td>{{ next_hops['global']|default("N/A") }}</td>
+{% endfor %}
+{% endfor %}
+{% endfor %}
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% elif hostvars[network_switch]['ansible_network_resources']['static_routes'] is defined and hostvars[network_switch]['ansible_network_resources']['static_routes']|length == 0 %}
+Static Routes are not configured on this device
+{% else %}
+No Static Route information available
+{% endif %}
+</div>
+</div>
+</div>
+<!-- END INTERNAL TABLE FOR Static Routes -->

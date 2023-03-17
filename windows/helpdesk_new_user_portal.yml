@@ -1,0 +1,39 @@
+---
+- name: Helpdesk new user portal
+  hosts: "{{ _hosts | default('os_windows') }}"
+  gather_facts: false
+
+  tasks:
+    - name: Setting host facts using complex arguments
+      ansible.builtin.set_fact:
+        temp_password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
+        # Example result: ['&Qw2|E[-']
+
+    - name: Create new user
+      community.windows.win_domain_user:
+        name: "{{ firstname }} {{ surname }}"
+        firstname: "{{ firstname }}"
+        surname: "{{ surname }}"
+        sam_account_name: "{{ firstname[0] }}{{ surname }}"
+        company: BobCo
+        password: "{{ temp_password }}"
+        state: present
+        groups:
+          - "GroupA"
+          - "GroupB"
+        street: "{{ street }}"
+        city: "{{ city }}"
+        state_province: IN
+        postal_code: "{{ postal_code }}"
+        country: US
+        attributes:
+          telephoneNumber: "{{ telephone_number }}"
+      register: new_user
+
+    - name: Display User
+      ansible.builtin.debug:
+        var: new_user
+
+    - name: Show temp password
+      ansible.builtin.debug:
+        var: temp_password

@@ -1,11 +1,11 @@
 ---
 - name: Scan packages
   demo.patching.win_scan_packages:
-  check_mode: no
+  check_mode: false
 
 - name: Scan Services
   demo.patching.win_scan_services:
-  check_mode: no
+  check_mode: false
 
 - name: Install Windows Updates
   ansible.windows.win_updates:

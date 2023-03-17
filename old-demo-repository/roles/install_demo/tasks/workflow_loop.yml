@@ -1,4 +1,0 @@
----
-- name: "INSIDE LOOP - install all job templates in relation to workflow {{ item.value.name }}"
-  include_tasks: job_template_loop.yml
-  loop: "{{ item.value.job_templates|dict2items }}"

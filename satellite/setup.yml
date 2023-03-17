@@ -1,0 +1,334 @@
+user_message:
+
+controller_components:
+  - credential_types
+  - credentials
+  - inventory_sources
+  - job_templates
+  - job_launch
+  - workflow_job_templates
+
+controller_credential_types:
+  - name: Satellite Collection
+    kind: cloud
+    inputs:
+      fields:
+        - id: username
+          type: string
+          label: Satellite Username
+        - id: password
+          type: string
+          label: Satellite Password
+          secret: true
+        - id: host
+          type: string
+          label: Satellite Hostname
+      required:
+        - username
+        - password
+        - host
+    injectors:
+      env:
+        SATELLITE_SERVER: "{% raw %}{  { host  }}{% endraw %}"
+        SATELLITE_USERNAME: "{% raw %}{  { username  }}{% endraw %}"
+        SATELLITE_PASSWORD: "{% raw %}{  { password  }}{% endraw %}"
+        SATELLITE_VALIDATE_CERTS: 'false'
+
+controller_credentials:
+  - name: Satellite Inventory
+    credential_type: Red Hat Satellite 6
+    organization: Default
+    inputs:
+      host: https://satellite.example.com
+      username: admin
+      password: ansible123!
+  - name: Satellite Credential
+    credential_type: Satellite Collection
+    organization: Default
+    inputs:
+      host: https://satellite.example.com
+      username: admin
+      password: ansible123!
+
+controller_inventory_sources:
+  - name: Satellite Inventory
+    inventory: Workshop Inventory
+    credential: Satellite Inventory
+    source: satellite6
+    update_on_launch: false
+    execution_environment: Control Plane Execution Environment
+    overwrite: true
+    source_vars:
+      hostnames:
+        - name.split('.')[0]
+      groups:
+        patch_bugs: foreman_content_attributes.errata_counts.bugfix
+        patch_enhancements: foreman_content_attributes.errata_counts.enhancement
+        patch_security: foreman_content_attributes.errata_counts.security
+      keyed_groups:
+        - prefix: env
+          key: foreman_content_attributes.lifecycle_environment_name
+        - prefix: cv
+          key: foreman_content_attributes.content_view_name
+        - prefix: os
+          key: foreman_operatingsystem_name
+        - prefix: scap
+          key: foreman_compliance_status_label
+      validate_certs: false
+      group_prefix: satellite_
+
+controller_templates:
+  - name: LINUX / Register with Satellite
+    project: Ansible official demo project
+    playbook: satellite/server_register.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - Workshop Credential
+      - Satellite Credential
+    extra_vars:
+      org_id: "Default_Organization"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+        - question_name: Choose Environment
+          type: multiplechoice
+          variable: env
+          choices:
+            - Dev
+            - QA
+            - Prod
+          required: true
+
+  - name: LINUX / Compliance Scan with Satellite
+    project: Ansible official demo project
+    playbook: satellite/server_openscap.yml
+    inventory: Workshop Inventory
+    execution_environment: Ansible Engine 2.9 execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - Satellite Credential
+      - Workshop Credential
+    extra_vars:
+      policy_scan: all
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
+
+  - name: SATELLITE / Publish Content View Version
+    project: Ansible official demo project
+    playbook: satellite/satellite_publish.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - Satellite Credential
+    extra_vars:
+      env: Dev
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Select Content View
+          variable: content_view
+          type: multiplechoice
+          choices: "{{ satellite_content_views | selectattr('name', 'match', '^RHEL.*$') | map(attribute='name') | list}}"
+          required: true
+
+  - name: SATELLITE / Promote Content View Version
+    project: Ansible official demo project
+    playbook: satellite/satellite_promote.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - Satellite Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Select Content View
+          variable: content_view
+          type: multiplechoice
+          choices: "{{ satellite_content_views | selectattr('name', 'match', '^RHEL.*$') | map(attribute='name') | list}}"
+          required: true
+        - question_name: Current Lifecycle Environment
+          variable: current_lifecycle_environment
+          type: multiplechoice
+          choices: "{{ satellite_lifecycle_environments | selectattr('name', 'match', '^RHEL.*$') | map(attribute='name') | list}}"
+          required: true
+        - question_name: Next Lifecycle Environment
+          variable: lifecycle_environment
+          type: multiplechoice
+          choices: "{{ satellite_lifecycle_environments | selectattr('name', 'match', '^RHEL.*$') | map(attribute='name') | list}}"
+          required: true
+
+  - name: SETUP / Satellite
+    project: Ansible official demo project
+    playbook: satellite/setup_satellite.yml
+    inventory: Workshop Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - Satellite Credential
+
+controller_launch_jobs:
+  - name: SETUP
+    wait: false
+    extra_vars:
+      demo: linux
+
+  - name: SETUP / Satellite
+    wait: true
+
+controller_workflows:
+  - name: Patch Dev
+    description: A workflow to patch the dev environment
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Email
+          type: text
+          variable: email
+          required: false
+    simplified_workflow_nodes:
+      - identifier: Update Inventory
+        unified_job_template: Satellite Inventory
+        success_nodes:
+          - Check for Updates
+      - identifier: Publish New Patches
+        unified_job_template: 'SATELLITE / Publish Content View Version'
+        extra_data:
+          content_view: RHEL8
+        success_nodes:
+          - Check for Updates
+      - identifier: Check for Updates
+        unified_job_template: 'LINUX / Patching'
+        job_type: check
+        extra_data:
+          HOSTS: env_RHEL8_Dev
+        all_parents_must_converge: true
+        success_nodes:
+          - Approve Patches
+        failure_nodes:
+          - Ticket - Update Check
+      - identifier: Ticket - Update Check
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to check for updates in RHEL8_Dev
+      - identifier: Approve Patches
+        approval_node:
+          name: Push patches to Dev?
+          description: Review the patch report before approving
+        success_nodes:
+          - Apply Patches
+      - identifier: Apply Patches
+        unified_job_template: 'LINUX / Patching'
+        job_type: run
+        extra_data:
+          HOSTS: env_RHEL8_Dev
+        failure_nodes:
+          - Ticket - Update Apply
+      - identifier: Ticket - Update Apply
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to apply updates to RHEL8_Dev
+
+#######################
+### Satellite Vars ###
+######################
+satellite_components:
+  - content_views
+  # - content_view_publish
+  - lifecycle_environments
+  - activation_keys
+
+satellite_organization: "Default Organization"
+satellite_validate_certs: false
+
+satellite_content_views:
+  # Red Hat Enterprise Linux 7
+  - name: RHEL7
+    content_view: RHEL7
+    repositories:
+      - name: Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server
+        product: 'Red Hat Enterprise Linux Server'
+      - name: Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64
+        product: 'Red Hat Enterprise Linux Server'
+      - name: Red Hat Satellite Client 6 for RHEL 7 Server RPMs x86_64
+        product: 'Red Hat Enterprise Linux Server'
+  # Red Hat Enterprise Linux 8
+  - name: RHEL8
+    content_view: RHEL8
+    repositories:
+      - name: Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs 8
+        product: Red Hat Enterprise Linux for x86_64
+      - name: Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8
+        product: Red Hat Enterprise Linux for x86_64
+      - name: Red Hat Satellite Client 6 for RHEL 8 x86_64 RPMs
+        product: Red Hat Enterprise Linux for x86_64
+
+satellite_lifecycle_environments:
+  # Red Hat Enterprise Linux 7
+  - name: "RHEL7_Dev"
+    prior: "Library"
+  - name: "RHEL7_QA"
+    prior: "RHEL7_Dev"
+  - name: "RHEL7_Prod"
+    prior: "RHEL7_QA"
+  # Red Hat Enterprise Linux 8
+  - name: "RHEL8_Dev"
+    prior: "Library"
+  - name: "RHEL8_QA"
+    prior: "RHEL8_Dev"
+  - name: "RHEL8_Prod"
+    prior: "RHEL8_QA"
+
+satellite_activation_keys:
+  # Red Hat Enterprise Linux 7
+  - name: "RHEL7_Dev"
+    lifecycle_environment: "RHEL7_Dev"
+    content_view: "RHEL7"
+  - name: "RHEL7_QA"
+    lifecycle_environment: "RHEL7_QA"
+    content_view: "RHEL7"
+  - name: "RHEL7_Prod"
+    lifecycle_environment: "RHEL7_Prod"
+    content_view: "RHEL7"
+  # Red Hat Enterprise Linux 8
+  - name: "RHEL8_Dev"
+    lifecycle_environment: "RHEL8_Dev"
+    content_view: "RHEL8"
+  - name: "RHEL8_QA"
+    lifecycle_environment: "RHEL8_QA"
+    content_view: "RHEL8"
+  - name: "RHEL8_Prod"
+    lifecycle_environment: "RHEL8_Prod"
+    content_view: "RHEL8"

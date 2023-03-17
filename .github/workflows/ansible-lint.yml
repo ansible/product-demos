@@ -1,0 +1,23 @@
+---
+name: Ansible Lint
+on: [push, pull_request]
+
+env:
+  ANSIBLE_GALAXY_SERVER_LIST: ah,galaxy
+  ANSIBLE_GALAXY_SERVER_AH_URL: https://console.redhat.com/api/automation-hub/
+  ANSIBLE_GALAXY_SERVER_AH_AUTH_URL: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+  ANSIBLE_GALAXY_SERVER_AH_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_AH_TOKEN }}
+  ANSIBLE_GALAXY_SERVER_GALAXY_URL: https://galaxy.ansible.com/
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Important: This sets up your GITHUB_WORKSPACE environment variable
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # needed for progressive mode to work
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint-action@v6.11.0

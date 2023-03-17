@@ -1,9 +1,0 @@
----
-- name: setup deploy application demo
-  hosts: localhost
-  connection: local
-
-  tasks:
-    - name: install demo
-      include_role:
-        name: "../roles/generate_readme"

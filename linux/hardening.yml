@@ -1,0 +1,31 @@
+---
+- name: Harden linux systems
+  hosts: "{{ _hosts | default('web') }}"
+  become: true
+  vars:
+    harden_firewall: false
+    harden_time: false
+    harden_ssh: false
+    harden_pci: false
+
+  tasks:
+    - name: Configure Firewall
+      when: harden_firewall | bool
+      ansible.builtin.include_role:
+        name: linux-system-roles.firewall
+
+    - name: Configure Timesync
+      when: harden_time | bool
+      ansible.builtin.include_role:
+        name: redhat.rhel_system_roles.timesync
+
+    - name: SSH Hardening
+      when: harden_ssh | bool
+      ansible.builtin.include_role:
+        name: dev-sec.ssh-hardening
+
+    # run with --skip-tags accounts_passwords_pam_faillock_deny
+    - name: Apply PCI Baseline
+      when: harden_pci | bool
+      ansible.builtin.include_role:
+        name: redhatofficial.rhel8_pci_dss

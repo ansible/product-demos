@@ -2,21 +2,21 @@
   ansible.windows.win_template:
     src: report.j2
     dest: "{{ file_path }}/windowspatch.html"
-  check_mode: no
+  check_mode: false
 
 - name: Copy CSS over
   ansible.windows.win_copy:
     src: "css"
     dest: "{{ file_path }}"
     directory_mode: true
-  check_mode: no
+  check_mode: false
 
 - name: Copy logo over
   ansible.windows.win_copy:
     src: "webpage_logo.png"
     dest: "{{ file_path }}"
     directory_mode: true
-  check_mode: no
+  check_mode: false
 
 - name: Display link to Patch report
   ansible.builtin.debug:

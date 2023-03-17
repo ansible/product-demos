@@ -1,0 +1,33 @@
+---
+- name: Application deployment
+  hosts: "{{ _hosts | default('web') }}"
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Make sure application is not empty
+      ansible.builtin.assert:
+        that:
+          - "application != ''"
+
+    - name: Printing to terminal application information
+      ansible.builtin.debug:
+        msg: "This Ansible Playbook will install {{ application }}"
+
+    - name: Install application
+      ansible.builtin.dnf:
+        name: "{{ application }}"
+        allow_downgrade: true
+      register: result
+      notify: Printing to terminal application information
+
+    - name: Printing to terminal application information # noqa: no-handler
+      ansible.builtin.debug:
+        msg: "The application: {{ application }} was already installed"
+      when: not result.changed | bool
+
+  handlers:
+    - name: Printing to terminal application information
+      ansible.builtin.debug:
+        msg: "The application: {{ application }} has been installed"
+      when: result.changed | bool

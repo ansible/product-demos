@@ -1,22 +1,27 @@
 ---
 - name: Windows updates
-  hosts: "{{ HOSTS | default('os_windows') }}"
+  hosts: "{{ _hosts | default('os_windows') }}"
   vars:
     report_server: win1
-  
+
   tasks:
-  - include_role:
-      name: demo.patching.patch_windows
+    - name: Patch windows server
+      ansible.builtin.include_role:
+        name: demo.patching.patch_windows
 
-  - block:
-    - include_role:
-        name: demo.patching.report_server
-        tasks_from: iis
+    - name: Build report server
+      delegate_to: "{{ report_server }}"
+      run_once: true  # noqa: run-once[task]
+      block:
+        - name: Install report server
+          ansible.builtin.include_role:
+            name: "{{ item }}"
+          loop:
+            - demo.patching.report_server
+            - demo.patching.report_windows
+            - demo.patching.report_windows_patching
 
-    - include_role:
-        name: demo.patching.report_windows
-
-    - include_role:
-        name: demo.patching.report_windows_patching
-    delegate_to: "{{ report_server }}"
-    run_once: yes
+        - name: Update landing page
+          ansible.builtin.include_role:
+            name: demo.patching.report_server
+            tasks_from: windows_landing_page

@@ -1,0 +1,8 @@
+---
+- name: Include Linux tasks
+  ansible.builtin.include_tasks: apache.yml
+  when: ansible_system == 'Linux'
+
+- name: Include Windows tasks
+  ansible.builtin.include_tasks: iis.yml
+  when: ansible_system == 'Win32NT'

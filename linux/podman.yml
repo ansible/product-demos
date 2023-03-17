@@ -1,51 +1,55 @@
 ---
 - name: Podman
-  hosts: "{{ HOSTS }}"
+  hosts: "{{ _hosts | default(omit) }}"
   vars:
     volume_path: podman
     message: undef
 
   tasks:
-  - name: Install Podman
-    ansible.builtin.dnf:
-      name: podman
-      state: latest
-    become: yes
+    - name: Install Podman
+      ansible.builtin.dnf:
+        name: podman
+        state: installed
+      become: true
 
-  - name: Create volume dir
-    ansible.builtin.file:
-      path: "{{ volume_path }}"
-      state: directory
+    - name: Create volume dir
+      ansible.builtin.file:
+        path: "{{ volume_path }}"
+        state: directory
+        mode: "0775"
 
-  - name: Create index.html
-    ansible.builtin.copy:
-      dest: "{{ volume_path }}/index.html"
-      content: "{{ message }}"
+    - name: Create index.html
+      ansible.builtin.copy:
+        dest: "{{ volume_path }}/index.html"
+        content: "{{ message }}"
+        mode: "0664"
 
-  - name: Run httpd container
-    containers.podman.podman_container:
-      name: apache
-      image: docker.io/httpd
-      state: started
-      volume:
-        - "{{ volume_path }}:/usr/local/apache2/htdocs"
-      ports:
-        - "8080:80"
+    - name: Run httpd container
+      containers.podman.podman_container:
+        name: apache
+        image: docker.io/httpd
+        state: started
+        volume:
+          - "./{{ volume_path }}/:/usr/local/apache2/htdocs:z"
+        ports:
+          - "8081:80"
 
-  - name: Check Web Page
-    ansible.builtin.uri:
-      url: http://127.0.0.1:8080
-      return_content: yes
-    register: web_output
-    changed_when: false
+    - name: Check Web Page
+      ansible.builtin.uri:
+        url: http://127.0.0.1:8081
+        return_content: true
+      register: web_output
+      changed_when: false
 
-  - name: podman ps
-    shell: podman ps
-    register: podman_output
-    changed_when: false
+    - name: Podman ps
+      ansible.builtin.command: podman ps
+      register: podman_output
+      changed_when: false
 
-  - name: Output
-    ansible.builtin.debug:
-      msg: 
-        - "{{ podman_output.stdout_lines }}"
-        - "{{ web_output.content }}"
+    - name: Output
+      ansible.builtin.debug:
+        msg:
+          - "Output of podman ps command:"
+          - "{{ podman_output.stdout_lines }}"
+          - "Contents of web page:"
+          - "{{ web_output.content }}"

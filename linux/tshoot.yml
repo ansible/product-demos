@@ -1,29 +1,29 @@
 ---
-- name: gather debug info
-  hosts: "{{ HOSTS }}"
-  become: yes
+- name: Gather debug info
+  hosts: "{{ _hosts | default(omit) }}"
+  become: true
 
   tasks:
-    - name: Gather recent vmstat info
-      command: /bin/vmstat 1 5
+    - name: Gather recent vmstat info # noqa: no-changed-when
+      ansible.builtin.command: /bin/vmstat 1 5
       register: vmstat
-    
-    - name: Gather top CPU hogs
-      command: ps -eo user,pid,size,pcpu,cmd --sort=-pcpu
+
+    - name: Gather top CPU hogs # noqa: no-changed-when
+      ansible.builtin.command: ps -eo user,pid,size,pcpu,cmd --sort=-pcpu
       register: pscpu
-    
-    - name: Gather top memory hogs
-      command: ps -eo user,pid,size,pcpu,cmd --sort=-size
+
+    - name: Gather top memory hogs # noqa: no-changed-when
+      ansible.builtin.command: ps -eo user,pid,size,pcpu,cmd --sort=-size
       register: pssize
-    
+
     - name: Swap + wait states
-      debug:
+      ansible.builtin.debug:
         var: vmstat.stdout_lines
-    
+
     - name: Top 3 CPU hogs
-      debug:
+      ansible.builtin.debug:
         var: pscpu.stdout_lines[:4]
-    
+
     - name: Top 3 memory hogs
-      debug:
+      ansible.builtin.debug:
         var: pssize.stdout_lines[:4]

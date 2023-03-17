@@ -17,19 +17,19 @@
     vpc_id: "{{ aws_vpc.vpc.id }}"
     region: "{{ aws_region }}"
     tags:
-      Name: "{{ aws_vpc_name }}-{{aws_vpc_prefix }}-vpc-igw"
+      Name: "{{ aws_vpc_name }}-{{ aws_vpc_prefix }}-vpc-igw"
       owner: "{{ aws_vpc_name }}"
       purpose: "{{ aws_purpose_tag }}"
   register: aws_gateway
 
 - name: Create security group internal
-  amazon.aws.ec2_group: 
+  amazon.aws.ec2_security_group:
     state: present
-    name: "{{ aws_vpc_name }}-{{aws_vpc_prefix }}-sec-group"
+    name: "{{ aws_vpc_name }}-{{ aws_vpc_prefix }}-sec-group"
     region: "{{ aws_region }}"
-    description: Inbound WinRM and RDP, http for demo servers and internal AD ports 
+    description: Inbound WinRM and RDP, http for demo servers and internal AD ports
     rules:
-      - proto: tcp 
+      - proto: tcp
         ports:
           - 80 # HTTP
           - 443 # HTTPS
@@ -42,7 +42,7 @@
         from_port: -1
         cidr_ip: 0.0.0.0/0
       - proto: tcp
-        ports: 
+        ports:
           - 80 # HTTP
           - 5986 # WinRM
           - 3389 # RDP
@@ -55,27 +55,27 @@
           - 464 # Kerberos Authentication
           - 5432 # PostgreSQL
           - 636 # LDAPS (LDAP over TLS)
-          - 873 # Rsync 
-          - 3268-3269 # Global Catalog 
+          - 873 # Rsync
+          - 3268-3269 # Global Catalog
           - 1024-65535 # Ephemeral RPC ports
         cidr_ip: 10.0.0.0/16
-      - proto: udp 
-        ports: 
+      - proto: udp
+        ports:
           - 53 # DNS
           - 88 # Kerberos Authentication
           - 123 # NTP
-          - 137-138 # Netlogon 
-          - 389 # LDAP 
+          - 137-138 # Netlogon
+          - 389 # LDAP
           - 445 # SMB
           - 464 # Kerberos Authentication
           - 1024-65535 # Ephemeral RPC ports
         cidr_ip: 10.0.0.0/16
     rules_egress:
-      - proto: -1 
+      - proto: -1
         cidr_ip: 0.0.0.0/0
     vpc_id: "{{ aws_vpc.vpc.id }}"
     tags:
-      Name: "{{ aws_vpc_name }}-{{aws_vpc_prefix }}-sec-group"
+      Name: "{{ aws_vpc_name }}-{{ aws_vpc_prefix }}-sec-group"
       owner: "{{ aws_vpc_name }}"
       purpose: "{{ aws_purpose_tag }}"
 
@@ -85,31 +85,31 @@
     vpc_id: "{{ aws_vpc.vpc.id }}"
     cidr: "{{ aws_subnet_cidr }}"
     region: "{{ aws_region }}"
-    map_public: yes
+    map_public: true
     tags:
-      Name: "{{ aws_vpc_name }}-{{aws_vpc_prefix }}-subnet"
+      Name: "{{ aws_vpc_name }}-{{ aws_vpc_prefix }}-subnet"
       owner: "{{ aws_vpc_name }}"
       purpose: "{{ aws_purpose_tag }}"
   register: aws_subnet
 
-- name: Create a subnet route table 
+- name: Create a subnet route table
   amazon.aws.ec2_vpc_route_table:
-    state: present 
+    state: present
     vpc_id: "{{ aws_vpc.vpc.id }}"
     region: "{{ aws_region }}"
     subnets:
       - "{{ aws_subnet.subnet.id }}"
     routes:
-      - dest: 0.0.0.0/0 
+      - dest: 0.0.0.0/0
         gateway_id: "{{ aws_gateway.gateway_id }}"
-    tags: 
-      Name: "{{ aws_vpc_name }}-{{aws_vpc_prefix }}-vpc-rtbl"
+    tags:
+      Name: "{{ aws_vpc_name }}-{{ aws_vpc_prefix }}-vpc-rtbl"
       owner: "{{ aws_vpc_name }}"
       purpose: "{{ aws_purpose_tag }}"
 
 - name: Create AWS keypair
   amazon.aws.ec2_key:
-    name: "{{ aws_vpc_name }}-{{aws_vpc_prefix }}-demo-key"
+    name: "{{ aws_vpc_name }}-{{ aws_vpc_prefix }}-demo-key"
     region: "{{ aws_region }}"
     key_material: "{{ aws_public_key }}"
     state: present

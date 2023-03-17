@@ -1,0 +1,6 @@
+---
+roles:
+  - name: redhatofficial.rhel7_stig
+    version: 0.1.61
+  - name: redhatofficial.rhel8_stig
+    version: 0.1.60

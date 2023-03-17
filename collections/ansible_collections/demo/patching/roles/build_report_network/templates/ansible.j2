@@ -1,0 +1,41 @@
+<!-- INTERNAL TABLE FOR Ansible -->
+<div id="accordion">
+<div>
+<h3>Ansible Automation Info</h3>
+<div class="net_content">
+<table class="net_info">
+<tbody>
+  <tr>
+    <td>Ansible user</td>
+    <td class="sub_net_info">{{ hostvars[network_switch]['ansible_user'] }}</td>
+  </tr>
+  <tr>
+    <td>Transport</td>
+    <td class="sub_net_info">{% set ansible_connection = hostvars[network_switch]['ansible_net_api'] %}{{ transport[ansible_connection] }}</td>
+  </tr>
+  <tr>
+    <td>Ansible Mgmt IP</td>
+    <td class="sub_net_info">{{ hostvars[network_switch]['ansible_host'] | default('N/A') }}</td>
+  </tr>
+  <tr>
+    <td>Ansible groups</td>
+    <td class="sub_net_info">{% for group in hostvars[network_switch]['group_names'] %}{{ group }} {% endfor %}</td>
+  </tr>
+  <tr>
+    <td>Ansible core version</td>
+    <td class="sub_net_info">{% for group in hostvars[network_switch]['ansible_version']['string']|default("Unknown") %}{{ group }} {% endfor %}</td>
+  </tr>
+  <tr>
+    <td>Ansible Python</td>
+    <td class="sub_net_info">{{ hostvars[network_switch]['ansible_playbook_python']|default("Unknown") }} </td>
+  </tr>
+  <tr>
+    <td>Python version</td>
+    <td class="sub_net_info">{{ hostvars[network_switch]['ansible_net_python_version']|default("Unknown") }} </td>
+  </tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- END INTERNAL TABLE FOR Ansible -->

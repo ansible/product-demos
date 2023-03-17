@@ -1,0 +1,20 @@
+---
+- name: Run openSCAP scan
+  hosts: "{{ _hosts | default(omit) }}"
+  become: true
+  vars:
+    policy_name: all
+  roles:
+    - demo.satellite.scap_client
+
+  tasks:
+    - name: Randomized startup delay...
+      ansible.builtin.pause:
+        seconds: "{{ 5 | random }}"
+
+    - name: Run SCAP Scan # noqa: no-changed-when - purpose is to run everytime
+      ansible.builtin.command: "/usr/bin/foreman_scap_client {{ item.id }}"
+      loop: "{{ policy }}"
+      when: policy_scan == 'all' or item.name in policy_scan
+      register: scap_cmd_output
+      failed_when: "'Error' in command_result.stderr"

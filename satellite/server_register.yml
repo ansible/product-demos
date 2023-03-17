@@ -1,0 +1,9 @@
+---
+- name: Register host to Satellite
+  hosts: "{{ _hosts | default(omit) }}"
+  become: true
+  vars:
+    # env: undef
+    satellite_url: "{{ lookup('ansible.builtin.env', 'SATELLITE_SERVER') }}"
+  roles:
+    - demo.satellite.register_host

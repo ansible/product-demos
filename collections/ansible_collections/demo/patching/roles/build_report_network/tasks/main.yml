@@ -1,24 +1,36 @@
-- name: create HTML report
+- name: Create web directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ file_path }}"
+    state: directory
+    mode: "0755"
+
+- name: Create HTML report
   ansible.builtin.template:
     src: report.j2
     dest: "{{ file_path }}/network.html"
+    mode: "0644"
+  check_mode: false
 
-- name: copy CSS over
+- name: Copy CSS over
   ansible.builtin.copy:
     src: "css"
     dest: "{{ file_path }}"
     directory_mode: true
+    mode: "0775"
+  check_mode: false
 
-- name: copy logos over
+- name: Copy logos over
   ansible.builtin.copy:
-    src: "{{ item }}" 
+    src: "{{ item }}"
     dest: "{{ file_path }}"
     directory_mode: true
+    mode: "0644"
   loop:
     - "webpage_logo.png"
     - "redhat-ansible-logo.svg"
     - "router.png"
+  check_mode: false
 
-- name: display link to inventory report
-  ansible.builtin.debug:
-    msg: "Please go to http://{{ ansible_host }}/network.html"
+# - name: Display link to Linux patch report
+#   ansible.builtin.debug:
+#     msg: "Please go to http://{{ hostvars[report_server]['ansible_host'] }}/reports/network.html"

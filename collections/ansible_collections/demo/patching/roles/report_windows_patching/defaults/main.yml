@@ -1,3 +1,4 @@
-EMAIL_FROM: tower@shadowman.dev
+---
+email_from: tower@shadowman.dev
 to_emails: alex@shadowman.dev,tower@shadowman.dev
-EMAIL_TO: "{{ to_emails.split(',') }}"
+to_emails_list: "{{ to_emails.split(',') }}"

@@ -1,8 +1,8 @@
-<!–– INTERNAL TABLE FOR L3_INTERFACES --!>
+<!-- INTERNAL TABLE FOR L3_INTERFACES -->
 <div id="accordion">
-<div class="ui-accordion ui-widget ui-helper-reset" role="tablist">
-<h3 class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-icons ui-accordion-header-collapsed ui-corner-all" role="tab" id="ui-id-3" aria-controls="ui-id-4" aria-selected="false" aria-expanded="false" tabindex="0">L3 Interfaces - IP Addresses</h3>
-<div class="net_content ui-accordion-content ui-corner-bottom ui-helper-reset ui-widget-content" id="ui-id-4" aria-labelledby="ui-id-3" role="tabpanel" aria-hidden="true" style="display: none; height: 194px;">
+<div>
+<h3>L3 Interfaces - IP Addresses</h3>
+<div class="net_content">
 {% if hostvars[network_switch]['ansible_network_resources']['l3_interfaces'] is defined and hostvars[network_switch]['ansible_network_resources']['l3_interfaces']|length > 0 %}
 <table id="subtable">
     <thead>
@@ -16,15 +16,11 @@
 {% for interface in hostvars[network_switch]['ansible_network_resources']['l3_interfaces'] %}
         <tr>
             <td>{{interface['name']}}</td>
-<!–– INTERNAL IPv4 LOOP FOR L3_INTERFACES --!>
+<!-- INTERNAL IPv4 LOOP FOR L3_INTERFACES -->
             <td>
 {% if interface.ipv4 is defined %}
 {% for address in interface.ipv4 %}
-{% if address['address'] is defined %}
-{{address['address']}}
-{% else %}
-dhcp
-{% endif %}
+{{ address['address']|default("Not Configured") }}
 {% if address['secondary'] is defined %}
 secondary
 {% endif %}
@@ -32,17 +28,17 @@ secondary
 {% endfor %}
 {% endif %}
             </td>
-<!–– END IPv4 INTERNAL LOOP FOR L3_INTERFACES --!>
-<!–– INTERNAL IPv6 LOOP FOR L3_INTERFACES --!>
+<!-- END IPv4 INTERNAL LOOP FOR L3_INTERFACES -->
+<!-- INTERNAL IPv6 LOOP FOR L3_INTERFACES -->
             <td>
 {% if interface.ipv6 is defined %}
 {% for v6address in interface.ipv6 %}
-{{v6address['address']}}
+{{v6address['address']|default("Not Configured") }}
 {% if loop.length > 1 and not loop.last %}<br>{% endif %}
 {% endfor %}
 {% endif %}
             </td>
-<!–– END INTERNAL LOOP FOR L3_INTERFACES --!>
+<!-- END INTERNAL LOOP FOR L3_INTERFACES -->
         </tr>
 {% endfor %}
     </tbody>
@@ -55,4 +51,4 @@ No L3 information available
 </div>
 </div>
 </div>
- <!–– END INTERNAL TABLE FOR L3_INTERFACES --!>
+<!-- END INTERNAL TABLE FOR L3_INTERFACES -->

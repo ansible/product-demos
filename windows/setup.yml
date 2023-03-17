@@ -18,9 +18,11 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "windows/install_iis.yml"
-    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -28,7 +30,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: false
         - question_name: web content
           type: text
@@ -38,13 +40,16 @@ controller_templates:
   - name: "WINDOWS / Patching"
     use_fact_cache: true
     job_type: check
-    ask_job_type_on_launch: yes
+    ask_job_type_on_launch: true
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "windows/patching.yml"
     execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -52,7 +57,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: false
         - question_name: Update categories
           type: multiselect
@@ -85,9 +90,11 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "windows/windows_choco_multiple.yml"
-    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -95,7 +102,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: false
 
   - name: "WINDOWS / Chocolatey install specific"
@@ -103,9 +110,11 @@ controller_templates:
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "windows/windows_choco_specific.yml"
-    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -113,20 +122,23 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: false
         - question_name: Package name
           type: text
           variable: package_name
           required: true
-  - name: "WINDOWS / Arbitrary PowerShell"
+
+  - name: "WINDOWS / Run PowerShell"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
-    playbook: "windows/arbitrary_powershell.yml"
-    execution_environment: Default execution environment
+    playbook: "windows/powershell.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -134,22 +146,24 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: false
-        - question_name: PowerShell Script (Default returns random cat fact)
+        - question_name: PowerShell Script
           type: textarea
           variable: ps_script
-          default: "(Invoke-RestMethod -Method 'GET' -Uri 'https://catfact.ninja/fact').fact"
+          default: "Get-Service | Where-Object -FilterScript {$_.Status -eq 'running'} | Select-Object -Property 'Name'"
           required: true
 
-  - name: "WINDOWS / PowerShell Script"
+  - name: "WINDOWS / Query Services"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "windows/powershell_script.yml"
-    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -157,7 +171,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: false
         - question_name: Service state to query?
           type: multiplechoice
@@ -168,14 +182,16 @@ controller_templates:
             - 'Running'
             - 'Stopped'
 
-  - name: "WINDOWS / PowerShell DSC configuring password requirements"
+  - name: "WINDOWS / Configuring Password Requirements"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "windows/powershell_dsc.yml"
-    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -183,17 +199,19 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: false
 
-  - name: "ACTIVE DIRECTORY / Create Active Directory domain"
+  - name: "WINDOWS / AD /Create Domain"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
-    playbook: "windows/active_directory/create_ad_domain.yml"
-    execution_environment: Default execution environment
+    playbook: "windows/create_ad_domain.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -201,17 +219,19 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: false
 
-  - name: "ACTIVE DIRECTORY / Helpdesk new user portal"
+  - name: "WINDOWS / AD / New User"
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
-    playbook: "windows/active_directory/helpdesk_new_user_portal.yml"
-    execution_environment: Default execution environment
+    playbook: "windows/helpdesk_new_user_portal.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''

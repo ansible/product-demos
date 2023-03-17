@@ -1,25 +1,24 @@
 ---
-- name: Scan packages
-  demo.patching.scan_packages:
-    os_family: "{{ ansible_os_family }}"
-  check_mode: no
+- name: Get packages
+  ansible.builtin.package_facts:
+  check_mode: false
 
-- name: Scan services
-  demo.patching.scan_services:
-  check_mode: no
+- name: Get services
+  ansible.builtin.service_facts:
+  check_mode: false
 
-- name: upgrade packages (yum)
-  yum:
+- name: Upgrade packages (yum)
+  ansible.builtin.yum:
     name: '*'
-    state: latest
+    state: latest # noqa: package-latest - Intended to update packages to latest
     exclude: "{{ exclude_packages }}"
   when: ansible_pkg_mgr == "yum"
   register: patchingresult_yum
 
-- name: upgrade packages (dnf)
+- name: Upgrade packages (dnf)
   ansible.builtin.dnf:
     name: '*'
-    state: latest
+    state: latest # noqa: package-latest - Intended to update packages to latest
     exclude: "{{ exclude_packages }}"
   when: ansible_pkg_mgr == "dnf"
   register: patchingresult_dnf
@@ -29,10 +28,10 @@
   register: result
   changed_when: result.rc == 1
   failed_when: result.rc > 1
-  check_mode: no
+  check_mode: false
 
 - name: Reboot Server if Necessary
   ansible.builtin.reboot:
   when:
-   - result.rc == 1
-   - allow_reboot == true
+    - result.rc == 1
+    - allow_reboot

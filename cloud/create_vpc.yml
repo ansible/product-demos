@@ -1,0 +1,125 @@
+---
+- name: Create Cloud Infra
+  hosts: localhost
+  gather_facts: false
+  vars:
+    aws_vpc_name: aws-test-vpc
+    aws_owner_tag: default
+    aws_purpose_tag: ansible_demo
+    aws_tenancy: default
+    aws_vpc_cidr_block: 10.0.0.0/16
+    aws_subnet_cidr: 10.0.1.0/24
+    aws_region: us-east-1
+    aws_sg_name: aws-test-sg
+    aws_subnet_name: aws-test-subnet
+    aws_rt_name: aws-test-rt
+
+  tasks:
+    - name: Create VPC
+      amazon.aws.ec2_vpc_net:
+        state: present
+        name: "{{ aws_vpc_name }}"
+        cidr_block: "{{ aws_vpc_cidr_block }}"
+        tenancy: "{{ aws_tenancy }}"
+        region: "{{ aws_region }}"
+        tags:
+          owner: "{{ aws_owner_tag }}"
+          purpose: "{{ aws_purpose_tag }}"
+      register: aws_vpc
+
+    - name: Create internet gateway
+      amazon.aws.ec2_vpc_igw:
+        state: present
+        vpc_id: "{{ aws_vpc.vpc.id }}"
+        region: "{{ aws_region }}"
+        tags:
+          Name: "{{ aws_vpc_name }}"
+          owner: "{{ aws_owner_tag }}"
+          purpose: "{{ aws_purpose_tag }}"
+      register: aws_gateway
+
+    - name: Create security group internal
+      amazon.aws.ec2_security_group:
+        state: present
+        name: "{{ aws_sg_name }}"
+        region: "{{ aws_region }}"
+        description: Inbound WinRM and RDP, http for demo servers and internal AD ports
+        rules:
+          - proto: tcp
+            ports:
+              - 80 # HTTP
+              - 443 # HTTPS
+              - 22 # SSH
+              - 5986 # WinRM
+              - 3389 # RDP
+              - 9090 # Cockpit
+            cidr_ip: 0.0.0.0/0
+          - proto: icmp
+            to_port: -1
+            from_port: -1
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            ports:
+              - 80 # HTTP
+              - 5986 # WinRM
+              - 3389 # RDP
+              - 53 # DNS
+              - 88 # Kerberos Authentication
+              - 135 # RPC
+              - 139 # Netlogon
+              - 389 # LDAP
+              - 445 # SMB
+              - 464 # Kerberos Authentication
+              - 5432 # PostgreSQL
+              - 636 # LDAPS (LDAP over TLS)
+              - 873 # Rsync
+              - 3268-3269 # Global Catalog
+              - 1024-65535 # Ephemeral RPC ports
+            cidr_ip: "{{ aws_vpc_cidr_block }}"
+          - proto: udp
+            ports:
+              - 53 # DNS
+              - 88 # Kerberos Authentication
+              - 123 # NTP
+              - 137-138 # Netlogon
+              - 389 # LDAP
+              - 445 # SMB
+              - 464 # Kerberos Authentication
+              - 1024-65535 # Ephemeral RPC ports
+            cidr_ip: "{{ aws_vpc_cidr_block }}"
+        rules_egress:
+          - proto: -1
+            cidr_ip: 0.0.0.0/0
+        vpc_id: "{{ aws_vpc.vpc.id }}"
+        tags:
+          Name: "{{ aws_sg_name }}"
+          owner: "{{ aws_owner_tag }}"
+          purpose: "{{ aws_purpose_tag }}"
+
+    - name: Create a subnet on the VPC
+      amazon.aws.ec2_vpc_subnet:
+        state: present
+        vpc_id: "{{ aws_vpc.vpc.id }}"
+        cidr: "{{ aws_subnet_cidr }}"
+        region: "{{ aws_region }}"
+        map_public: true
+        tags:
+          Name: "{{ aws_subnet_name }}"
+          owner: "{{ aws_owner_tag }}"
+          purpose: "{{ aws_purpose_tag }}"
+      register: aws_subnet
+
+    - name: Create a subnet route table
+      amazon.aws.ec2_vpc_route_table:
+        state: present
+        vpc_id: "{{ aws_vpc.vpc.id }}"
+        region: "{{ aws_region }}"
+        subnets:
+          - "{{ aws_subnet.subnet.id }}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ aws_gateway.gateway_id }}"
+        tags:
+          Name: "{{ aws_rt_name }}"
+          owner: "{{ aws_owner_tag }}"
+          purpose: "{{ aws_purpose_tag }}"

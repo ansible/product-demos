@@ -1,0 +1,67 @@
+---
+- name: Verify operating system
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == 'RedHat'
+      - (ansible_distribution_major_version == '7') or (ansible_distribution_major_version == '8')
+
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: "{{ instance_name }}"
+
+- name: Remove rhui client packages
+  ansible.builtin.yum:
+    name:
+      - google-rhui-client*
+      - rh-amazon-rhui-client*
+    state: removed
+
+- name: Get current repos
+  ansible.builtin.command:
+    cmd: ls /etc/yum.repos.d/
+  register: repos
+  changed_when: false
+
+- name: Remove existing rhui repos
+  ansible.builtin.file:
+    path: "/etc/yum.repos.d/{{ item }}"
+    state: absent
+  loop: "{{ repos.stdout_lines }}"
+
+- name: Install satellite certificate
+  ansible.builtin.yum:
+    name: "{{ satellite_url }}/pub/katello-ca-consumer-latest.noarch.rpm"
+    state: present
+    validate_certs: false
+    disable_gpg_check: true
+
+- name: Register system via subscription-mangler
+  community.general.redhat_subscription:
+    state: present
+    activationkey: "{{ activation_key }}"
+    consumer_name: "{{ instance_name }}"
+    org_id: "{{ org_id | default('Default_Organization') }}"
+    force_register: "{{ force_register }}"
+  throttle: 1
+
+- name: Include repos
+  ansible.builtin.include_vars: "vars/{{ ansible_distribution + ansible_distribution_major_version }}.yml"
+
+- name: Enable repos
+  community.general.rhsm_repository:
+    name: "{{ rhsm_enabled_repos }}"
+    state: enabled
+
+- name: Install satellite client
+  ansible.builtin.yum:
+    name:
+      - katello-host-tools
+      - katello-host-tools-tracer
+    state: installed
+
+- name: Enable remote execution
+  ansible.posix.authorized_key:
+    user: "{{ rex_user }}"
+    state: present
+    key: "{{ satellite_url }}:9090/ssh/pubkey"
+    validate_certs: false
