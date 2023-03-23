@@ -159,12 +159,19 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     survey_enabled: true
-    extra_vars:
-      aws_region: us-east-1
     survey:
       name: ''
       description: ''
       spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
         - question_name: Owner
           type: text
           variable: aws_owner_tag
@@ -191,6 +198,15 @@ controller_templates:
       name: ''
       description: ''
       spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
         - question_name: Name
           type: text
           variable: vm_name
@@ -283,8 +299,21 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      aws_region: us-east-1
       aws_report: tags
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
 
   - name: Cloud / AWS / Create Keypair
     job_type: run
@@ -298,12 +327,19 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     survey_enabled: true
-    extra_vars:
-      aws_region: us-east-1
     survey:
       name: ''
       description: ''
       spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
         - question_name: Keypair Name
           type: text
           variable: aws_key_name
@@ -332,6 +368,15 @@ controller_workflows:
       name: ''
       description: ''
       spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
         - question_name: Owner
           type: text
           variable: aws_owner_tag
