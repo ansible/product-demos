@@ -97,7 +97,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: false
         - question_name: Choose Environment
           type: multiplechoice
@@ -128,7 +128,7 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           type: text
-          variable: HOSTS
+          variable: _hosts
           required: false
 
   - name: SATELLITE / Publish Content View Version
@@ -233,7 +233,7 @@ controller_workflows:
         unified_job_template: 'LINUX / Patching'
         job_type: check
         extra_data:
-          HOSTS: env_RHEL8_Dev
+          _hosts: env_RHEL8_Dev
         all_parents_must_converge: true
         success_nodes:
           - Approve Patches
@@ -253,7 +253,7 @@ controller_workflows:
         unified_job_template: 'LINUX / Patching'
         job_type: run
         extra_data:
-          HOSTS: env_RHEL8_Dev
+          _hosts: env_RHEL8_Dev
         failure_nodes:
           - Ticket - Update Apply
       - identifier: Ticket - Update Apply
