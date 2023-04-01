@@ -1,0 +1,3 @@
+---
+exclude_paths:
+  - collections/ansible_collections/demo/compliance/roles/
