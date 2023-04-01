@@ -11,5 +11,5 @@
         that: "ansible_os_family == 'RedHat'"
 
     - name: Run Compliance Profile
-      include_role:
+      ansible.builtin.include_role:
         name: "demo.compliance.rhel{{ ansible_distribution_major_version }}STIG"

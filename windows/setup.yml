@@ -265,7 +265,7 @@ controller_templates:
           variable: telephone_number
           default: 555-123456
           required: false
-          
+
   - name: "WINDOWS / DISA STIG"
     job_type: run
     inventory: "Workshop Inventory"
@@ -275,7 +275,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-    - "Workshop Credential"
+      - "Workshop Credential"
     survey_enabled: true
     survey:
       name: ''

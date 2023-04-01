@@ -115,5 +115,5 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
-    ask_job_type_on_launch: yes
+    ask_job_type_on_launch: true
     survey_enabled: true
