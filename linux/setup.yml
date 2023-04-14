@@ -341,14 +341,18 @@ controller_templates:
     job_type: run
     inventory: "Workshop Inventory"
     project: "Ansible official demo project"
-    playbook: "linux/compliance.yml"
+    playbook: "linux/compliance-enforce.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
       - "Workshop Credential"
     extra_vars:
+      # used by CIS profile role
+      sudo_require_authentication: false
+      # used by STIG profile role
       sudo_remove_nopasswd: false
+      sudo_remove_no_authenticate: false
     survey_enabled: true
     survey:
       name: ''
@@ -363,7 +367,51 @@ controller_templates:
           variable: compliance_profile
           required: true
           choices:
+            - cis
+            - cui
+            - hipaa
+            - ospp
+            - pci_dss
             - stig
+
+  - name: "LINUX / Compliance Report"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/compliance-report.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: true
+        - question_name: Compliance Profile
+          type: multiplechoice
+          variable: compliance_profile
+          required: true
+          choices:
+            - cis
+            - cui
+            - hipaa
+            - ospp
+            - pci_dss
+            - stig
+        - question_name: Use httpd on the target host(s) to access reports locally?
+          type: multiplechoice
+          variable: use_httpd
+          required: true
+          choices:
+            - "true"
+            - "false"
+          default: "true"
 
   - name: "LINUX / Insights Compliance Scan"
     job_type: run
@@ -414,3 +462,5 @@ controller_templates:
           type: text
           variable: application
           required: true
+
+...
