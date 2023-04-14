@@ -10,7 +10,7 @@
     - [Configure Credentials](#configure-credentials)
     - [Add Workshop Credential Password](#add-workshop-credential-password)
     - [Remove Inventory Variables](#remove-inventory-variables)
-    - [Getting your Puiblic Key for Create Infra Job](#getting-your-puiblic-key-for-create-infra-job)
+    - [Getting your Public Key for Create Infra Job](#getting-your-public-key-for-create-infra-job)
   - [Suggested Usage](#suggested-usage)
   - [Known Issues](#known-issues)
 
@@ -46,7 +46,7 @@ After running the setup job template, there are a few steps required to make the
 
 1) Remove Workshop Inventory variables on the Details page of the inventory. Required until [RFE](https://github.com/ansible/workshops/issues/1597]) is complete
 
-### Getting your Puiblic Key for Create Infra Job
+### Getting your Public Key for Create Infra Job
 
 1) Connect to the command line of your Controller server. This is easiest to do by opening the VS Code Web Editor from the landing page where you found the Controller login details.
 2) Open a Terminal Window in the VS Code Web Editor.

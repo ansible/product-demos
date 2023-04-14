@@ -12,4 +12,6 @@
 
     - name: Run Compliance Profile
       ansible.builtin.include_role:
-        name: "demo.compliance.rhel{{ ansible_distribution_major_version }}STIG"
+        name: "redhatofficial.rhel{{ ansible_distribution_major_version }}_{{ compliance_profile }}"
+
+...
