@@ -71,7 +71,7 @@
       args:
         creates: '{{ _report }}'
       register: _oscap
-      failed_when: _oscap.rc == 1
+      failed_when: _oscap.rc not in [0, 2]
 
     - name: Set report permissions
       ansible.builtin.file:
