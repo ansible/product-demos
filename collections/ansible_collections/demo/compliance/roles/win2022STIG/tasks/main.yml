@@ -1,0 +1,1648 @@
+# R-254269 WN22-00-000320
+- name: stigrule_254269_Fax
+  win_feature:
+    name: Fax
+    state: "{{ win2022STIG_stigrule_254269_Fax_State }}"
+  when: win2022STIG_stigrule_254269_Manage
+# R-254270 WN22-00-000330
+- name: stigrule_254270_Web_Ftp_Service
+  win_feature:
+    name: Web-Ftp-Service
+    state: "{{ win2022STIG_stigrule_254270_Web_Ftp_Service_State }}"
+  when: win2022STIG_stigrule_254270_Manage
+# R-254271 WN22-00-000340
+- name: stigrule_254271_PNRP
+  win_feature:
+    name: PNRP
+    state: "{{ win2022STIG_stigrule_254271_PNRP_State }}"
+  when: win2022STIG_stigrule_254271_Manage
+# R-254272 WN22-00-000350
+- name: stigrule_254272_Simple_TCPIP
+  win_feature:
+    name: Simple-TCPIP
+    state: "{{ win2022STIG_stigrule_254272_Simple_TCPIP_State }}"
+  when: win2022STIG_stigrule_254272_Manage
+# R-254273 WN22-00-000360
+- name: stigrule_254273_Telnet_Client
+  win_feature:
+    name: Telnet-Client
+    state: "{{ win2022STIG_stigrule_254273_Telnet_Client_State }}"
+  when: win2022STIG_stigrule_254273_Manage
+# R-254275 WN22-00-000380
+- name: stigrule_254275_FS_SMB1
+  win_feature:
+    name: FS-SMB1
+    state: "{{ win2022STIG_stigrule_254275_FS_SMB1_State }}"
+  when: win2022STIG_stigrule_254275_Manage
+# R-254276 WN22-00-000390
+- name: stigrule_254276_SMB1
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254276_SMB1_Key }}"
+    name: SMB1
+    data: "{{ win2022STIG_stigrule_254276_SMB1_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254276_SMB1_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254276_SMB1_State }}"
+  when: win2022STIG_stigrule_254276_Manage
+# R-254276 WN22-00-000390
+- name: stigrule_254276_TFTP_Client
+  win_feature:
+    name: TFTP-Client
+    state: "{{ win2022STIG_stigrule_254276_TFTP_Client_State }}"
+  when: win2022STIG_stigrule_254276_Manage
+# R-254277 WN22-00-000400
+- name: stigrule_254277_Start
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254277_Start_Key }}"
+    name: Start
+    data: "{{ win2022STIG_stigrule_254277_Start_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254277_Start_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254277_Start_State }}"
+  when: win2022STIG_stigrule_254277_Manage
+# R-254278 WN22-00-000410
+- name: stigrule_254278_PowerShell_v2
+  win_feature:
+    name: PowerShell-v2
+    state: "{{ win2022STIG_stigrule_254278_PowerShell_v2_State }}"
+  when: win2022STIG_stigrule_254278_Manage
+# R-254281 WN22-00-000440
+# Please choose an appropriate DoD time source from http://tycho.usno.navy.mil/ntp.html
+- name: stigrule_254281_NtpServer
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254281_NtpServer_Key }}"
+    name: NtpServer
+    data: "{{ win2022STIG_stigrule_254281_NtpServer_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254281_NtpServer_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254281_NtpServer_State }}"
+  when: win2022STIG_stigrule_254281_Manage
+# R-254281 WN22-00-000440
+# Please choose an appropriate DoD time source from http://tycho.usno.navy.mil/ntp.html
+- name: stigrule_254281_Type
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254281_Type_Key }}"
+    name: Type
+    data: "{{ win2022STIG_stigrule_254281_Type_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254281_Type_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254281_Type_State }}"
+  when: win2022STIG_stigrule_254281_Manage
+# R-254281 WN22-00-000440
+# Please choose an appropriate DoD time source from http://tycho.usno.navy.mil/ntp.html
+- name: stigrule_254281_CrossSiteSyncFlags
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254281_CrossSiteSyncFlags_Key }}"
+    name: CrossSiteSyncFlags
+    data: "{{ win2022STIG_stigrule_254281_CrossSiteSyncFlags_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254281_CrossSiteSyncFlags_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254281_CrossSiteSyncFlags_State }}"
+  when: win2022STIG_stigrule_254281_Manage
+# R-254281 WN22-00-000440
+# Please choose an appropriate DoD time source from http://tycho.usno.navy.mil/ntp.html
+- name: stigrule_254281_EventLogFlags
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254281_EventLogFlags_Key }}"
+    name: EventLogFlags
+    data: "{{ win2022STIG_stigrule_254281_EventLogFlags_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254281_EventLogFlags_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254281_EventLogFlags_State }}"
+  when: win2022STIG_stigrule_254281_Manage
+# R-254281 WN22-00-000440
+# Please choose an appropriate DoD time source from http://tycho.usno.navy.mil/ntp.html
+- name: stigrule_254281_ResolvePeerBackoffMaxTimes
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254281_ResolvePeerBackoffMaxTimes_Key }}"
+    name: ResolvePeerBackoffMaxTimes
+    data: "{{ win2022STIG_stigrule_254281_ResolvePeerBackoffMaxTimes_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254281_ResolvePeerBackoffMaxTimes_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254281_ResolvePeerBackoffMaxTimes_State }}"
+  when: win2022STIG_stigrule_254281_Manage
+# R-254281 WN22-00-000440
+# Please choose an appropriate DoD time source from http://tycho.usno.navy.mil/ntp.html
+- name: stigrule_254281_ResolvePeerBackoffMinutes
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254281_ResolvePeerBackoffMinutes_Key }}"
+    name: ResolvePeerBackoffMinutes
+    data: "{{ win2022STIG_stigrule_254281_ResolvePeerBackoffMinutes_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254281_ResolvePeerBackoffMinutes_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254281_ResolvePeerBackoffMinutes_State }}"
+  when: win2022STIG_stigrule_254281_Manage
+# R-254281 WN22-00-000440
+# Please choose an appropriate DoD time source from http://tycho.usno.navy.mil/ntp.html
+- name: stigrule_254281_SpecialPollInterval
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254281_SpecialPollInterval_Key }}"
+    name: SpecialPollInterval
+    data: "{{ win2022STIG_stigrule_254281_SpecialPollInterval_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254281_SpecialPollInterval_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254281_SpecialPollInterval_State }}"
+  when: win2022STIG_stigrule_254281_Manage
+# R-254285 WN22-AC-000010
+- name: Enabling LockoutBadCount first
+  win_security_policy:
+    section: System Access
+    key: LockoutBadCount
+    value: 3
+  when: win2022STIG_stigrule_254285_Manage
+- name: stigrule_254285_Account_lockout_duration
+  win_security_policy:
+    section: System Access
+    key: LockoutDuration
+    value: "{{ win2022STIG_stigrule_254285_Account_lockout_duration_Value }}"
+  when: win2022STIG_stigrule_254285_Manage
+# R-254286 WN22-AC-000020
+- name: stigrule_254286_Account_lockout_threshold
+  win_security_policy:
+    section: System Access
+    key: LockoutBadCount
+    value: "{{ win2022STIG_stigrule_254286_Account_lockout_threshold_Value }}"
+  when: win2022STIG_stigrule_254286_Manage
+# R-254287 WN22-AC-000030
+- name: stigrule_254287_Reset_account_lockout_counter_after
+  win_security_policy:
+    section: System Access
+    key: ResetLockoutCount
+    value: "{{ win2022STIG_stigrule_254287_Reset_account_lockout_counter_after_Value }}"
+  when: win2022STIG_stigrule_254287_Manage
+# R-254288 WN22-AC-000040
+- name: stigrule_254288_Enforce_password_history
+  win_security_policy:
+    section: System Access
+    key: PasswordHistorySize
+    value: "{{ win2022STIG_stigrule_254288_Enforce_password_history_Value }}"
+  when: win2022STIG_stigrule_254288_Manage
+# R-254289 WN22-AC-000050
+- name: stigrule_254289_Maximum_Password_Age
+  win_security_policy:
+    section: System Access
+    key: MaximumPasswordAge
+    value: "{{ win2022STIG_stigrule_254289_Maximum_Password_Age_Value }}"
+  when: win2022STIG_stigrule_254289_Manage
+# R-254290 WN22-AC-000060
+- name: stigrule_254290_Minimum_Password_Age
+  win_security_policy:
+    section: System Access
+    key: MinimumPasswordAge
+    value: "{{ win2022STIG_stigrule_254290_Minimum_Password_Age_Value }}"
+  when: win2022STIG_stigrule_254290_Manage
+# R-254291 WN22-AC-000070
+- name: stigrule_254291_Minimum_Password_Length
+  win_security_policy:
+    section: System Access
+    key: MinimumPasswordLength
+    value: "{{ win2022STIG_stigrule_254291_Minimum_Password_Length_Value }}"
+  when: win2022STIG_stigrule_254291_Manage
+# R-254292 WN22-AC-000080
+- name: stigrule_254292_Password_must_meet_complexity_requirements
+  win_security_policy:
+    section: System Access
+    key: PasswordComplexity
+    value: "{{ win2022STIG_stigrule_254292_Password_must_meet_complexity_requirements_Value }}"
+  when: win2022STIG_stigrule_254292_Manage
+# R-254293 WN22-AC-000090
+- name: stigrule_254293_Store_passwords_using_reversible_encryption
+  win_security_policy:
+    section: System Access
+    key: ClearTextPassword
+    value: "{{ win2022STIG_stigrule_254293_Store_passwords_using_reversible_encryption_Value }}"
+  when: win2022STIG_stigrule_254293_Manage
+# R-254296 WN22-AU-000030
+- name: stigrule_254296_C__Windows_System32_winevt_Logs_Application_evtx_Eventlog
+  win_acl:
+    path: C:\Windows\System32\winevt\Logs\Application.evtx
+    type: allow
+    rights: FullControl
+    user: NT Service\EventLog
+  when: win2022STIG_stigrule_254296_Manage
+- name: stigrule_254296_C__Windows_System32_winevt_Logs_Application_evtx_SYSTEM
+  win_acl:
+    path: C:\Windows\System32\winevt\Logs\Application.evtx
+    type: allow
+    rights: FullControl
+    user: SYSTEM
+  when: win2022STIG_stigrule_254296_Manage
+- name: stigrule_254296_C__Windows_System32_winevt_Logs_Application_evtx_Administrators
+  win_acl:
+    path: C:\Windows\System32\winevt\Logs\Application.evtx
+    type: allow
+    rights: FullControl
+    user: Administrators
+  when: win2022STIG_stigrule_254296_Manage
+# R-254297 WN22-AU-000040
+- name: stigrule_254297_C__Windows_System32_winevt_Logs_Security_evtx_Eventlog
+  win_acl:
+    path: C:\Windows\System32\winevt\Logs\Security.evtx
+    type: allow
+    rights: FullControl
+    user: NT Service\EventLog
+  when: win2022STIG_stigrule_254297_Manage
+- name: stigrule_254297_C__Windows_System32_winevt_Logs_Security_evtx_SYSTEM
+  win_acl:
+    path: C:\Windows\System32\winevt\Logs\Security.evtx
+    type: allow
+    rights: FullControl
+    user: SYSTEM
+  when: win2022STIG_stigrule_254297_Manage
+- name: stigrule_254297_C__Windows_System32_winevt_Logs_Security_evtx_Administrators
+  win_acl:
+    path: C:\Windows\System32\winevt\Logs\Security.evtx
+    type: allow
+    rights: FullControl
+    user: Administrators
+  when: win2022STIG_stigrule_254297_Manage
+# R-254298 WN22-AU-000050
+- name: stigrule_254298_C__Windows_System32_winevt_Logs_System_evtx_Eventlog
+  win_acl:
+    path: C:\Windows\System32\winevt\Logs\System.evtx
+    type: allow
+    rights: FullControl
+    user: NT Service\EventLog
+  when: win2022STIG_stigrule_254298_Manage
+- name: stigrule_254298_C__Windows_System32_winevt_Logs_System_evtx_SYSTEM
+  win_acl:
+    path: C:\Windows\System32\winevt\Logs\System.evtx
+    type: allow
+    rights: FullControl
+    user: SYSTEM
+  when: win2022STIG_stigrule_254298_Manage
+- name: stigrule_254298_C__Windows_System32_winevt_Logs_System_evtx_Administrators
+  win_acl:
+    path: C:\Windows\System32\winevt\Logs\System.evtx
+    type: allow
+    rights: FullControl
+    user: Administrators
+  when: win2022STIG_stigrule_254298_Manage
+# R-254300 WN22-AU-000070
+- name: stigrule_254300_Credential_Validation
+  win_audit_policy_system:
+    subcategory: Credential Validation
+    audit_type: "{{ win2022STIG_stigrule_254300_Credential_Validation_AuditType }}"
+  when: win2022STIG_stigrule_254300_Manage
+# R-254301 WN22-AU-000080
+- name: stigrule_254301_Credential_Validation
+  win_audit_policy_system:
+    subcategory: Credential Validation
+    audit_type: "{{ win2022STIG_stigrule_254301_Credential_Validation_AuditType }}"
+  when: win2022STIG_stigrule_254301_Manage
+# R-254302 WN22-AU-000090
+- name: stigrule_254302_Other_Account_Management_Events
+  win_audit_policy_system:
+    subcategory: Other Account Management Events
+    audit_type: "{{ win2022STIG_stigrule_254302_Other_Account_Management_Events_AuditType }}"
+  when: win2022STIG_stigrule_254302_Manage
+# R-254303 WN22-AU-000100
+- name: stigrule_254303_Security_Group_Management
+  win_audit_policy_system:
+    subcategory: Security Group Management
+    audit_type: "{{ win2022STIG_stigrule_254303_Security_Group_Management_AuditType }}"
+  when: win2022STIG_stigrule_254303_Manage
+# R-254304 WN22-AU-000110
+- name: stigrule_254304_User_Account_Management
+  win_audit_policy_system:
+    subcategory: User Account Management
+    audit_type: "{{ win2022STIG_stigrule_254304_User_Account_Management_AuditType }}"
+  when: win2022STIG_stigrule_254304_Manage
+# R-254305 WN22-AU-000120
+- name: stigrule_254305_User_Account_Management
+  win_audit_policy_system:
+    subcategory: User Account Management
+    audit_type: "{{ win2022STIG_stigrule_254305_User_Account_Management_AuditType }}"
+  when: win2022STIG_stigrule_254305_Manage
+# R-254306 WN22-AU-000130
+- name: stigrule_254306_PNP_Activity
+  win_audit_policy_system:
+    subcategory: Plug and Play Events
+    audit_type: "{{ win2022STIG_stigrule_254306_PNP_Activity_AuditType }}"
+  when: win2022STIG_stigrule_254306_Manage
+# R-254307 WN22-AU-000140
+- name: stigrule_254307_Process_Creation
+  win_audit_policy_system:
+    subcategory: Process Creation
+    audit_type: "{{ win2022STIG_stigrule_254307_Process_Creation_AuditType }}"
+  when: win2022STIG_stigrule_254307_Manage
+# R-254308 WN22-AU-000150
+- name: stigrule_254308_Account_Lockout
+  win_audit_policy_system:
+    subcategory: Account Lockout
+    audit_type: "{{ win2022STIG_stigrule_254308_Account_Lockout_AuditType }}"
+  when: win2022STIG_stigrule_254308_Manage
+# R-254309 WN22-AU-000160
+- name: stigrule_254309_Account_Lockout
+  win_audit_policy_system:
+    subcategory: Account Lockout
+    audit_type: "{{ win2022STIG_stigrule_254309_Account_Lockout_AuditType }}"
+  when: win2022STIG_stigrule_254309_Manage
+# R-254310 WN22-AU-000170
+- name: stigrule_254310_Group_Membership
+  win_audit_policy_system:
+    subcategory: Group Membership
+    audit_type: "{{ win2022STIG_stigrule_254310_Group_Membership_AuditType }}"
+  when: win2022STIG_stigrule_254310_Manage
+# R-254311 WN22-AU-000180
+- name: stigrule_254311_Logoff
+  win_audit_policy_system:
+    subcategory: Logoff
+    audit_type: "{{ win2022STIG_stigrule_254311_Logoff_AuditType }}"
+  when: win2022STIG_stigrule_254311_Manage
+# R-254312 WN22-AU-000190
+- name: stigrule_254312_Logon
+  win_audit_policy_system:
+    subcategory: Logon
+    audit_type: "{{ win2022STIG_stigrule_254312_Logon_AuditType }}"
+  when: win2022STIG_stigrule_254312_Manage
+# R-254313 WN22-AU-000200
+- name: stigrule_254313_Logon
+  win_audit_policy_system:
+    subcategory: Logon
+    audit_type: "{{ win2022STIG_stigrule_254313_Logon_AuditType }}"
+  when: win2022STIG_stigrule_254313_Manage
+# R-254314 WN22-AU-000210
+- name: stigrule_254314_Special_Logon
+  win_audit_policy_system:
+    subcategory: Special Logon
+    audit_type: "{{ win2022STIG_stigrule_254314_Special_Logon_AuditType }}"
+  when: win2022STIG_stigrule_254314_Manage
+# R-254315 WN22-AU-000220
+- name: stigrule_254315_Other_Object_Access_Events
+  win_audit_policy_system:
+    subcategory: Other Object Access Events
+    audit_type: "{{ win2022STIG_stigrule_254315_Other_Object_Access_Events_AuditType }}"
+  when: win2022STIG_stigrule_254315_Manage
+# R-254316 WN22-AU-000230
+- name: stigrule_254316_Other_Object_Access_Events
+  win_audit_policy_system:
+    subcategory: Other Object Access Events
+    audit_type: "{{ win2022STIG_stigrule_254316_Other_Object_Access_Events_AuditType }}"
+  when: win2022STIG_stigrule_254316_Manage
+# R-254317 WN22-AU-000240
+- name: stigrule_254317_Removable_Storage
+  win_audit_policy_system:
+    subcategory: Removable Storage
+    audit_type: "{{ win2022STIG_stigrule_254317_Removable_Storage_AuditType }}"
+  when: win2022STIG_stigrule_254317_Manage
+# R-254318 WN22-AU-000250
+- name: stigrule_254318_Removable_Storage
+  win_audit_policy_system:
+    subcategory: Removable Storage
+    audit_type: "{{ win2022STIG_stigrule_254318_Removable_Storage_AuditType }}"
+  when: win2022STIG_stigrule_254318_Manage
+# R-254319 WN22-AU-000260
+- name: stigrule_254319_Policy_Change
+  win_audit_policy_system:
+    subcategory: Audit Policy Change
+    audit_type: "{{ win2022STIG_stigrule_254319_Policy_Change_AuditType }}"
+  when: win2022STIG_stigrule_254319_Manage
+# R-254320 WN22-AU-000270
+- name: stigrule_254320_Policy_Change
+  win_audit_policy_system:
+    subcategory: Audit Policy Change
+    audit_type: "{{ win2022STIG_stigrule_254320_Policy_Change_AuditType }}"
+  when: win2022STIG_stigrule_254320_Manage
+# R-254321 WN22-AU-000280
+- name: stigrule_254321_Authentication_Policy_Change
+  win_audit_policy_system:
+    subcategory: Authentication Policy Change
+    audit_type: "{{ win2022STIG_stigrule_254321_Authentication_Policy_Change_AuditType }}"
+  when: win2022STIG_stigrule_254321_Manage
+# R-254322 WN22-AU-000290
+- name: stigrule_254322_Authorization_Policy_Change
+  win_audit_policy_system:
+    subcategory: Authorization Policy Change
+    audit_type: "{{ win2022STIG_stigrule_254322_Authorization_Policy_Change_AuditType }}"
+  when: win2022STIG_stigrule_254322_Manage
+# R-254323 WN22-AU-000300
+- name: stigrule_254323_Sensitive_Privilege_Use
+  win_audit_policy_system:
+    subcategory: Sensitive Privilege Use
+    audit_type: "{{ win2022STIG_stigrule_254323_Sensitive_Privilege_Use_AuditType }}"
+  when: win2022STIG_stigrule_254323_Manage
+# R-254324 WN22-AU-000310
+- name: stigrule_254324_Sensitive_Privilege_Use
+  win_audit_policy_system:
+    subcategory: Sensitive Privilege Use
+    audit_type: "{{ win2022STIG_stigrule_254324_Sensitive_Privilege_Use_AuditType }}"
+  when: win2022STIG_stigrule_254324_Manage
+# R-254325 WN22-AU-000320
+- name: stigrule_254325_IPsec_Driver
+  win_audit_policy_system:
+    subcategory: IPsec Driver
+    audit_type: "{{ win2022STIG_stigrule_254325_IPsec_Driver_AuditType }}"
+  when: win2022STIG_stigrule_254325_Manage
+# R-254326 WN22-AU-000330
+- name: stigrule_254326_IPsec_Driver
+  win_audit_policy_system:
+    subcategory: IPsec Driver
+    audit_type: "{{ win2022STIG_stigrule_254326_IPsec_Driver_AuditType }}"
+  when: win2022STIG_stigrule_254326_Manage
+# R-254327 WN22-AU-000340
+- name: stigrule_254327_Other_System_Events
+  win_audit_policy_system:
+    subcategory: Other System Events
+    audit_type: "{{ win2022STIG_stigrule_254327_Other_System_Events_AuditType }}"
+  when: win2022STIG_stigrule_254327_Manage
+# R-254328 WN22-AU-000350
+- name: stigrule_254328_Other_System_Events
+  win_audit_policy_system:
+    subcategory: Other System Events
+    audit_type: "{{ win2022STIG_stigrule_254328_Other_System_Events_AuditType }}"
+  when: win2022STIG_stigrule_254328_Manage
+# R-254329 WN22-AU-000360
+- name: stigrule_254329_Security_State_Change
+  win_audit_policy_system:
+    subcategory: Security State Change
+    audit_type: "{{ win2022STIG_stigrule_254329_Security_State_Change_AuditType }}"
+  when: win2022STIG_stigrule_254329_Manage
+# R-254330 WN22-AU-000370
+- name: stigrule_254330_Security_System_Extension
+  win_audit_policy_system:
+    subcategory: Security System Extension
+    audit_type: "{{ win2022STIG_stigrule_254330_Security_System_Extension_AuditType }}"
+  when: win2022STIG_stigrule_254330_Manage
+# R-254331 WN22-AU-000380
+- name: stigrule_254331_System_Integrity
+  win_audit_policy_system:
+    subcategory: System Integrity
+    audit_type: "{{ win2022STIG_stigrule_254331_System_Integrity_AuditType }}"
+  when: win2022STIG_stigrule_254331_Manage
+# R-254332 WN22-AU-000390
+- name: stigrule_254332_System_Integrity
+  win_audit_policy_system:
+    subcategory: System Integrity
+    audit_type: "{{ win2022STIG_stigrule_254332_System_Integrity_AuditType }}"
+  when: win2022STIG_stigrule_254332_Manage
+# R-254333 WN22-CC-000010
+- name: stigrule_254333_NoLockScreenSlideshow
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254333_NoLockScreenSlideshow_Key }}"
+    name: NoLockScreenSlideshow
+    data: "{{ win2022STIG_stigrule_254333_NoLockScreenSlideshow_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254333_NoLockScreenSlideshow_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254333_NoLockScreenSlideshow_State }}"
+  when: win2022STIG_stigrule_254333_Manage
+# R-254334 WN22-CC-000020
+- name: stigrule_254334_UseLogonCredential
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254334_UseLogonCredential_Key }}"
+    name: UseLogonCredential
+    data: "{{ win2022STIG_stigrule_254334_UseLogonCredential_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254334_UseLogonCredential_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254334_UseLogonCredential_State }}"
+  when: win2022STIG_stigrule_254334_Manage
+# R-254335 WN22-CC-000030
+- name: stigrule_254335_DisableIPSourceRouting
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254335_DisableIPSourceRouting_Key }}"
+    name: DisableIPSourceRouting
+    data: "{{ win2022STIG_stigrule_254335_DisableIPSourceRouting_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254335_DisableIPSourceRouting_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254335_DisableIPSourceRouting_State }}"
+  when: win2022STIG_stigrule_254335_Manage
+# R-254336 WN22-CC-000040
+- name: stigrule_254336_DisableIPSourceRouting
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254336_DisableIPSourceRouting_Key }}"
+    name: DisableIPSourceRouting
+    data: "{{ win2022STIG_stigrule_254336_DisableIPSourceRouting_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254336_DisableIPSourceRouting_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254336_DisableIPSourceRouting_State }}"
+  when: win2022STIG_stigrule_254336_Manage
+# R-254337 WN22-CC-000050
+- name: stigrule_254337_EnableICMPRedirect
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254337_EnableICMPRedirect_Key }}"
+    name: EnableICMPRedirect
+    data: "{{ win2022STIG_stigrule_254337_EnableICMPRedirect_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254337_EnableICMPRedirect_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254337_EnableICMPRedirect_State }}"
+  when: win2022STIG_stigrule_254337_Manage
+# R-254338 WN22-CC-000060
+- name: stigrule_254338_NoNameReleaseOnDemand
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254338_NoNameReleaseOnDemand_Key }}"
+    name: NoNameReleaseOnDemand
+    data: "{{ win2022STIG_stigrule_254338_NoNameReleaseOnDemand_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254338_NoNameReleaseOnDemand_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254338_NoNameReleaseOnDemand_State }}"
+  when: win2022STIG_stigrule_254338_Manage
+# R-254339 WN22-CC-000070
+- name: stigrule_254339_AllowInsecureGuestAuth
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254339_AllowInsecureGuestAuth_Key }}"
+    name: AllowInsecureGuestAuth
+    data: "{{ win2022STIG_stigrule_254339_AllowInsecureGuestAuth_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254339_AllowInsecureGuestAuth_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254339_AllowInsecureGuestAuth_State }}"
+  when: win2022STIG_stigrule_254339_Manage
+# R-254340 WN22-CC-000080
+- name: stigrule_254340_____NETLOGON
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254340_____NETLOGON_Key }}"
+    name: \\*\NETLOGON
+    data: "{{ win2022STIG_stigrule_254340_____NETLOGON_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254340_____NETLOGON_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254340_____NETLOGON_State }}"
+  when: win2022STIG_stigrule_254340_Manage
+# R-254340 WN22-CC-000080
+- name: stigrule_254340_____SYSVOL
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254340_____SYSVOL_Key }}"
+    name: \\*\SYSVOL
+    data: "{{ win2022STIG_stigrule_254340_____SYSVOL_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254340_____SYSVOL_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254340_____SYSVOL_State }}"
+  when: win2022STIG_stigrule_254340_Manage
+# R-254341 WN22-CC-000090
+- name: stigrule_254341_ProcessCreationIncludeCmdLine_Enabled
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254341_ProcessCreationIncludeCmdLine_Enabled_Key }}"
+    name: ProcessCreationIncludeCmdLine_Enabled
+    data: "{{ win2022STIG_stigrule_254341_ProcessCreationIncludeCmdLine_Enabled_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254341_ProcessCreationIncludeCmdLine_Enabled_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254341_ProcessCreationIncludeCmdLine_Enabled_State }}"
+  when: win2022STIG_stigrule_254341_Manage
+# R-254342 WN22-CC-000100
+- name: stigrule_254342_AllowProtectedCreds
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254342_AllowProtectedCreds_Key }}"
+    name: AllowProtectedCreds
+    data: "{{ win2022STIG_stigrule_254342_AllowProtectedCreds_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254342_AllowProtectedCreds_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254342_AllowProtectedCreds_State }}"
+  when: win2022STIG_stigrule_254342_Manage
+# R-254343 WN22-CC-000110
+# Please ensure the hardware requirements are met. See https://docs.microsoft.com/en-us/windows/security/identity-protection/credential-guard/credential-guard-requirements
+- name: stigrule_254343_EnableVirtualizationBasedSecurity
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254343_EnableVirtualizationBasedSecurity_Key }}"
+    name: EnableVirtualizationBasedSecurity
+    data: "{{ win2022STIG_stigrule_254343_EnableVirtualizationBasedSecurity_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254343_EnableVirtualizationBasedSecurity_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254343_EnableVirtualizationBasedSecurity_State }}"
+  when: win2022STIG_stigrule_254343_Manage
+# R-254343 WN22-CC-000110
+# Please ensure the hardware requirements are met. See https://docs.microsoft.com/en-us/windows/security/identity-protection/credential-guard/credential-guard-requirements
+- name: stigrule_254343_RequirePlatformSecurityFeatures
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254343_RequirePlatformSecurityFeatures_Key }}"
+    name: RequirePlatformSecurityFeatures
+    data: "{{ win2022STIG_stigrule_254343_RequirePlatformSecurityFeatures_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254343_RequirePlatformSecurityFeatures_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254343_RequirePlatformSecurityFeatures_State }}"
+  when: win2022STIG_stigrule_254343_Manage
+# R-254344 WN22-CC-000130
+- name: stigrule_254344_DriverLoadPolicy
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254344_DriverLoadPolicy_Key }}"
+    name: DriverLoadPolicy
+    data: "{{ win2022STIG_stigrule_254344_DriverLoadPolicy_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254344_DriverLoadPolicy_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254344_DriverLoadPolicy_State }}"
+  when: win2022STIG_stigrule_254344_Manage
+# R-254345 WN22-CC-000140
+- name: stigrule_254345_NoGPOListChanges
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254345_NoGPOListChanges_Key }}"
+    name: NoGPOListChanges
+    data: "{{ win2022STIG_stigrule_254345_NoGPOListChanges_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254345_NoGPOListChanges_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254345_NoGPOListChanges_State }}"
+  when: win2022STIG_stigrule_254345_Manage
+# R-254346 WN22-CC-000150
+- name: stigrule_254346_DisableWebPnPDownload
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254346_DisableWebPnPDownload_Key }}"
+    name: DisableWebPnPDownload
+    data: "{{ win2022STIG_stigrule_254346_DisableWebPnPDownload_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254346_DisableWebPnPDownload_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254346_DisableWebPnPDownload_State }}"
+  when: win2022STIG_stigrule_254346_Manage
+# R-254347 WN22-CC-000160
+- name: stigrule_254347_DisableHTTPPrinting
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254347_DisableHTTPPrinting_Key }}"
+    name: DisableHTTPPrinting
+    data: "{{ win2022STIG_stigrule_254347_DisableHTTPPrinting_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254347_DisableHTTPPrinting_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254347_DisableHTTPPrinting_State }}"
+  when: win2022STIG_stigrule_254347_Manage
+# R-254348 WN22-CC-000170
+- name: stigrule_254348_DontDisplayNetworkSelectionUI
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254348_DontDisplayNetworkSelectionUI_Key }}"
+    name: DontDisplayNetworkSelectionUI
+    data: "{{ win2022STIG_stigrule_254348_DontDisplayNetworkSelectionUI_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254348_DontDisplayNetworkSelectionUI_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254348_DontDisplayNetworkSelectionUI_State }}"
+  when: win2022STIG_stigrule_254348_Manage
+# R-254349 WN22-CC-000180
+- name: stigrule_254349_DCSettingIndex
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254349_DCSettingIndex_Key }}"
+    name: DCSettingIndex
+    data: "{{ win2022STIG_stigrule_254349_DCSettingIndex_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254349_DCSettingIndex_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254349_DCSettingIndex_State }}"
+  when: win2022STIG_stigrule_254349_Manage
+# R-254350 WN22-CC-000190
+- name: stigrule_254350_ACSettingIndex
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254350_ACSettingIndex_Key }}"
+    name: ACSettingIndex
+    data: "{{ win2022STIG_stigrule_254350_ACSettingIndex_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254350_ACSettingIndex_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254350_ACSettingIndex_State }}"
+  when: win2022STIG_stigrule_254350_Manage
+# R-254351 WN22-CC-000200
+- name: stigrule_254351_DisableInventory
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254351_DisableInventory_Key }}"
+    name: DisableInventory
+    data: "{{ win2022STIG_stigrule_254351_DisableInventory_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254351_DisableInventory_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254351_DisableInventory_State }}"
+  when: win2022STIG_stigrule_254351_Manage
+# R-254352 WN22-CC-000210
+- name: stigrule_254352_NoAutoplayfornonVolume
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254352_NoAutoplayfornonVolume_Key }}"
+    name: NoAutoplayfornonVolume
+    data: "{{ win2022STIG_stigrule_254352_NoAutoplayfornonVolume_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254352_NoAutoplayfornonVolume_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254352_NoAutoplayfornonVolume_State }}"
+  when: win2022STIG_stigrule_254352_Manage
+# R-254353 WN22-CC-000220
+- name: stigrule_254353_NoAutorun
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254353_NoAutorun_Key }}"
+    name: NoAutorun
+    data: "{{ win2022STIG_stigrule_254353_NoAutorun_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254353_NoAutorun_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254353_NoAutorun_State }}"
+  when: win2022STIG_stigrule_254353_Manage
+# R-254354 WN22-CC-000230
+- name: stigrule_254354_NoDriveTypeAutoRun
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254354_NoDriveTypeAutoRun_Key }}"
+    name: NoDriveTypeAutoRun
+    data: "{{ win2022STIG_stigrule_254354_NoDriveTypeAutoRun_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254354_NoDriveTypeAutoRun_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254354_NoDriveTypeAutoRun_State }}"
+  when: win2022STIG_stigrule_254354_Manage
+# R-254355 WN22-CC-000240
+- name: stigrule_254355_EnumerateAdministrators
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254355_EnumerateAdministrators_Key }}"
+    name: EnumerateAdministrators
+    data: "{{ win2022STIG_stigrule_254355_EnumerateAdministrators_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254355_EnumerateAdministrators_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254355_EnumerateAdministrators_State }}"
+  when: win2022STIG_stigrule_254355_Manage
+# R-254356 WN22-CC-000250
+- name: stigrule_254356_AllowTelemetry
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254356_AllowTelemetry_Key }}"
+    name: AllowTelemetry
+    data: "{{ win2022STIG_stigrule_254356_AllowTelemetry_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254356_AllowTelemetry_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254356_AllowTelemetry_State }}"
+  when: win2022STIG_stigrule_254356_Manage
+# R-254357 WN22-CC-000260
+- name: stigrule_254357_DODownloadMode
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254357_DODownloadMode_Key }}"
+    name: DODownloadMode
+    data: "{{ win2022STIG_stigrule_254357_DODownloadMode_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254357_DODownloadMode_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254357_DODownloadMode_State }}"
+  when: win2022STIG_stigrule_254357_Manage
+# R-254358 WN22-CC-000270
+- name: stigrule_254358_MaxSize
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254358_MaxSize_Key }}"
+    name: MaxSize
+    data: "{{ win2022STIG_stigrule_254358_MaxSize_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254358_MaxSize_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254358_MaxSize_State }}"
+  when: win2022STIG_stigrule_254358_Manage
+# R-254359 WN22-CC-000280
+- name: stigrule_254359_MaxSize
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254359_MaxSize_Key }}"
+    name: MaxSize
+    data: "{{ win2022STIG_stigrule_254359_MaxSize_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254359_MaxSize_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254359_MaxSize_State }}"
+  when: win2022STIG_stigrule_254359_Manage
+# R-254360 WN22-CC-000290
+- name: stigrule_254360_MaxSize
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254360_MaxSize_Key }}"
+    name: MaxSize
+    data: "{{ win2022STIG_stigrule_254360_MaxSize_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254360_MaxSize_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254360_MaxSize_State }}"
+  when: win2022STIG_stigrule_254360_Manage
+# R-254361 WN22-CC-000300
+- name: stigrule_254361_EnableSmartScreen
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254361_EnableSmartScreen_Key }}"
+    name: EnableSmartScreen
+    data: "{{ win2022STIG_stigrule_254361_EnableSmartScreen_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254361_EnableSmartScreen_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254361_EnableSmartScreen_State }}"
+  when: win2022STIG_stigrule_254361_Manage
+# R-254362 WN22-CC-000310
+- name: stigrule_254362_NoDataExecutionPrevention
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254362_NoDataExecutionPrevention_Key }}"
+    name: NoDataExecutionPrevention
+    data: "{{ win2022STIG_stigrule_254362_NoDataExecutionPrevention_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254362_NoDataExecutionPrevention_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254362_NoDataExecutionPrevention_State }}"
+  when: win2022STIG_stigrule_254362_Manage
+# R-254363 WN22-CC-000320
+- name: stigrule_254363_NoHeapTerminationOnCorruption
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254363_NoHeapTerminationOnCorruption_Key }}"
+    name: NoHeapTerminationOnCorruption
+    data: "{{ win2022STIG_stigrule_254363_NoHeapTerminationOnCorruption_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254363_NoHeapTerminationOnCorruption_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254363_NoHeapTerminationOnCorruption_State }}"
+  when: win2022STIG_stigrule_254363_Manage
+# R-254364 WN22-CC-000330
+- name: stigrule_254364_PreXPSP2ShellProtocolBehavior
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254364_PreXPSP2ShellProtocolBehavior_Key }}"
+    name: PreXPSP2ShellProtocolBehavior
+    data: "{{ win2022STIG_stigrule_254364_PreXPSP2ShellProtocolBehavior_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254364_PreXPSP2ShellProtocolBehavior_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254364_PreXPSP2ShellProtocolBehavior_State }}"
+  when: win2022STIG_stigrule_254364_Manage
+# R-254365 WN22-CC-000340
+- name: stigrule_254365_DisablePasswordSaving
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254365_DisablePasswordSaving_Key }}"
+    name: DisablePasswordSaving
+    data: "{{ win2022STIG_stigrule_254365_DisablePasswordSaving_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254365_DisablePasswordSaving_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254365_DisablePasswordSaving_State }}"
+  when: win2022STIG_stigrule_254365_Manage
+# R-254366 WN22-CC-000350
+- name: stigrule_254366_fDisableCdm
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254366_fDisableCdm_Key }}"
+    name: fDisableCdm
+    data: "{{ win2022STIG_stigrule_254366_fDisableCdm_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254366_fDisableCdm_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254366_fDisableCdm_State }}"
+  when: win2022STIG_stigrule_254366_Manage
+# R-254367 WN22-CC-000360
+- name: stigrule_254367_fPromptForPassword
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254367_fPromptForPassword_Key }}"
+    name: fPromptForPassword
+    data: "{{ win2022STIG_stigrule_254367_fPromptForPassword_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254367_fPromptForPassword_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254367_fPromptForPassword_State }}"
+  when: win2022STIG_stigrule_254367_Manage
+# R-254368 WN22-CC-000370
+- name: stigrule_254368_fEncryptRPCTraffic
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254368_fEncryptRPCTraffic_Key }}"
+    name: fEncryptRPCTraffic
+    data: "{{ win2022STIG_stigrule_254368_fEncryptRPCTraffic_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254368_fEncryptRPCTraffic_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254368_fEncryptRPCTraffic_State }}"
+  when: win2022STIG_stigrule_254368_Manage
+# R-254369 WN22-CC-000380
+- name: stigrule_254369_MinEncryptionLevel
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254369_MinEncryptionLevel_Key }}"
+    name: MinEncryptionLevel
+    data: "{{ win2022STIG_stigrule_254369_MinEncryptionLevel_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254369_MinEncryptionLevel_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254369_MinEncryptionLevel_State }}"
+  when: win2022STIG_stigrule_254369_Manage
+# R-254370 WN22-CC-000390
+- name: stigrule_254370_DisableEnclosureDownload
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254370_DisableEnclosureDownload_Key }}"
+    name: DisableEnclosureDownload
+    data: "{{ win2022STIG_stigrule_254370_DisableEnclosureDownload_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254370_DisableEnclosureDownload_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254370_DisableEnclosureDownload_State }}"
+  when: win2022STIG_stigrule_254370_Manage
+# R-254371 WN22-CC-000400
+- name: stigrule_254371_AllowBasicAuthInClear
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254371_AllowBasicAuthInClear_Key }}"
+    name: AllowBasicAuthInClear
+    data: "{{ win2022STIG_stigrule_254371_AllowBasicAuthInClear_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254371_AllowBasicAuthInClear_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254371_AllowBasicAuthInClear_State }}"
+  when: win2022STIG_stigrule_254371_Manage
+# R-254372 WN22-CC-000410
+- name: stigrule_254372_AllowIndexingEncryptedStoresOrItems
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254372_AllowIndexingEncryptedStoresOrItems_Key }}"
+    name: AllowIndexingEncryptedStoresOrItems
+    data: "{{ win2022STIG_stigrule_254372_AllowIndexingEncryptedStoresOrItems_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254372_AllowIndexingEncryptedStoresOrItems_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254372_AllowIndexingEncryptedStoresOrItems_State }}"
+  when: win2022STIG_stigrule_254372_Manage
+# R-254373 WN22-CC-000420
+- name: stigrule_254373_EnableUserControl
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254373_EnableUserControl_Key }}"
+    name: EnableUserControl
+    data: "{{ win2022STIG_stigrule_254373_EnableUserControl_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254373_EnableUserControl_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254373_EnableUserControl_State }}"
+  when: win2022STIG_stigrule_254373_Manage
+# R-254374 WN22-CC-000430
+- name: stigrule_254374_AlwaysInstallElevated
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254374_AlwaysInstallElevated_Key }}"
+    name: AlwaysInstallElevated
+    data: "{{ win2022STIG_stigrule_254374_AlwaysInstallElevated_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254374_AlwaysInstallElevated_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254374_AlwaysInstallElevated_State }}"
+  when: win2022STIG_stigrule_254374_Manage
+# R-254375 WN22-CC-000440
+- name: stigrule_254375_SafeForScripting
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254375_SafeForScripting_Key }}"
+    name: SafeForScripting
+    data: "{{ win2022STIG_stigrule_254375_SafeForScripting_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254375_SafeForScripting_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254375_SafeForScripting_State }}"
+  when: win2022STIG_stigrule_254375_Manage
+# R-254376 WN22-CC-000450
+- name: stigrule_254376_DisableAutomaticRestartSignOn
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254376_DisableAutomaticRestartSignOn_Key }}"
+    name: DisableAutomaticRestartSignOn
+    data: "{{ win2022STIG_stigrule_254376_DisableAutomaticRestartSignOn_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254376_DisableAutomaticRestartSignOn_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254376_DisableAutomaticRestartSignOn_State }}"
+  when: win2022STIG_stigrule_254376_Manage
+# R-254378 WN22-CC-000470
+- name: stigrule_254378_EnableScriptBlockLogging
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254378_EnableScriptBlockLogging_Key }}"
+    name: EnableScriptBlockLogging
+    data: "{{ win2022STIG_stigrule_254378_EnableScriptBlockLogging_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254378_EnableScriptBlockLogging_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254378_EnableScriptBlockLogging_State }}"
+  when: win2022STIG_stigrule_254378_Manage
+# R-254379 WN22-CC-000480
+- name: stigrule_254379_AllowBasic
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254379_AllowBasic_Key }}"
+    name: AllowBasic
+    data: "{{ win2022STIG_stigrule_254379_AllowBasic_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254379_AllowBasic_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254379_AllowBasic_State }}"
+  when: win2022STIG_stigrule_254379_Manage
+# R-254380 WN22-CC-000490
+- name: stigrule_254380_AllowUnencryptedTraffic
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254380_AllowUnencryptedTraffic_Key }}"
+    name: AllowUnencryptedTraffic
+    data: "{{ win2022STIG_stigrule_254380_AllowUnencryptedTraffic_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254380_AllowUnencryptedTraffic_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254380_AllowUnencryptedTraffic_State }}"
+  when: win2022STIG_stigrule_254380_Manage
+# R-254381 WN22-CC-000500
+- name: stigrule_254381_AllowDigest
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254381_AllowDigest_Key }}"
+    name: AllowDigest
+    data: "{{ win2022STIG_stigrule_254381_AllowDigest_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254381_AllowDigest_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254381_AllowDigest_State }}"
+  when: win2022STIG_stigrule_254381_Manage
+# R-254382 WN22-CC-000510
+- name: stigrule_254382_AllowBasic
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254382_AllowBasic_Key }}"
+    name: AllowBasic
+    data: "{{ win2022STIG_stigrule_254382_AllowBasic_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254382_AllowBasic_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254382_AllowBasic_State }}"
+  when: win2022STIG_stigrule_254382_Manage
+# R-254383 WN22-CC-000520
+- name: stigrule_254383_AllowUnencryptedTraffic
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254383_AllowUnencryptedTraffic_Key }}"
+    name: AllowUnencryptedTraffic
+    data: "{{ win2022STIG_stigrule_254383_AllowUnencryptedTraffic_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254383_AllowUnencryptedTraffic_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254383_AllowUnencryptedTraffic_State }}"
+  when: win2022STIG_stigrule_254383_Manage
+# R-254384 WN22-CC-000530
+- name: stigrule_254384_DisableRunAs
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254384_DisableRunAs_Key }}"
+    name: DisableRunAs
+    data: "{{ win2022STIG_stigrule_254384_DisableRunAs_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254384_DisableRunAs_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254384_DisableRunAs_State }}"
+  when: win2022STIG_stigrule_254384_Manage
+# R-254407 WN22-DC-000230
+- name: stigrule_254407_Computer_Account_Management
+  win_audit_policy_system:
+    subcategory: Computer Account Management
+    audit_type: "{{ win2022STIG_stigrule_254407_Computer_Account_Management_AuditType }}"
+  when: win2022STIG_stigrule_254407_Manage
+# R-254408 WN22-DC-000240
+- name: stigrule_254408_Directory_Service_Access
+  win_audit_policy_system:
+    subcategory: Directory Service Access
+    audit_type: "{{ win2022STIG_stigrule_254408_Directory_Service_Access_AuditType }}"
+  when: win2022STIG_stigrule_254408_Manage
+# R-254409 WN22-DC-000250
+- name: stigrule_254409_Directory_Service_Access
+  win_audit_policy_system:
+    subcategory: Directory Service Access
+    audit_type: "{{ win2022STIG_stigrule_254409_Directory_Service_Access_AuditType }}"
+  when: win2022STIG_stigrule_254409_Manage
+# R-254410 WN22-DC-000260
+- name: stigrule_254410_Directory_Service_Changes
+  win_audit_policy_system:
+    subcategory: Directory Service Changes
+    audit_type: "{{ win2022STIG_stigrule_254410_Directory_Service_Changes_AuditType }}"
+  when: win2022STIG_stigrule_254410_Manage
+# R-254411 WN22-DC-000270
+- name: stigrule_254411_Directory_Service_Changes
+  win_audit_policy_system:
+    subcategory: Directory Service Changes
+    audit_type: "{{ win2022STIG_stigrule_254411_Directory_Service_Changes_AuditType }}"
+  when: win2022STIG_stigrule_254411_Manage
+# R-254416 WN22-DC-000320
+- name: stigrule_254416_Domain_controller_LDAP_server_signing_requirements
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254416_Domain_controller_LDAP_server_signing_requirements_Key }}"
+    name: LDAPServerIntegrity
+    data: "{{ win2022STIG_stigrule_254416_Domain_controller_LDAP_server_signing_requirements_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254416_Domain_controller_LDAP_server_signing_requirements_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254416_Domain_controller_LDAP_server_signing_requirements_State }}"
+  when: win2022STIG_stigrule_254416_Manage
+# R-254417 WN22-DC-000330
+- name: stigrule_254417_Domain_controller_Refuse_machine_account_password_changes
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254417_Domain_controller_Refuse_machine_account_password_changes_Key }}"
+    name: RefusePasswordChange
+    data: "{{ win2022STIG_stigrule_254417_Domain_controller_Refuse_machine_account_password_changes_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254417_Domain_controller_Refuse_machine_account_password_changes_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254417_Domain_controller_Refuse_machine_account_password_changes_State }}"
+  when: win2022STIG_stigrule_254417_Manage
+# R-254418 WN22-DC-000340
+- name: stigrule_254418_SeNetworkLogonRight
+  win_user_right:
+    name: SeNetworkLogonRight
+    users: "{{ win2022STIG_stigrule_254418_SeNetworkLogonRight_Users }}"
+  when: win2022STIG_stigrule_254418_Manage
+# R-254419 WN22-DC-000350
+- name: stigrule_254419_SeMachineAccountPrivilege
+  win_user_right:
+    name: SeMachineAccountPrivilege
+    users: "{{ win2022STIG_stigrule_254419_SeMachineAccountPrivilege_Users }}"
+  when: win2022STIG_stigrule_254419_Manage
+# R-254420 WN22-DC-000360
+- name: stigrule_254420_SeRemoteInteractiveLogonRight
+  win_user_right:
+    name: SeRemoteInteractiveLogonRight
+    users: "{{ win2022STIG_stigrule_254420_SeRemoteInteractiveLogonRight_Users }}"
+  when: win2022STIG_stigrule_254420_Manage
+# R-254421 WN22-DC-000370
+- name: stigrule_254421_SeDenyNetworkLogonRight
+  win_user_right:
+    name: SeDenyNetworkLogonRight
+    users: "{{ win2022STIG_stigrule_254421_SeDenyNetworkLogonRight_Users }}"
+  when: win2022STIG_stigrule_254421_Manage
+# R-254422 WN22-DC-000380
+- name: stigrule_254422_SeDenyBatchLogonRight
+  win_user_right:
+    name: SeDenyBatchLogonRight
+    users: "{{ win2022STIG_stigrule_254422_SeDenyBatchLogonRight_Users }}"
+  when: win2022STIG_stigrule_254422_Manage
+# R-254423 WN22-DC-000390
+- name: stigrule_254423_SeDenyServiceLogonRight
+  win_user_right:
+    name: SeDenyServiceLogonRight
+    users: "{{ win2022STIG_stigrule_254423_SeDenyServiceLogonRight_Users }}"
+  when: win2022STIG_stigrule_254423_Manage
+# R-254424 WN22-DC-000400
+- name: stigrule_254424_SeDenyInteractiveLogonRight
+  win_user_right:
+    name: SeDenyInteractiveLogonRight
+    users: "{{ win2022STIG_stigrule_254424_SeDenyInteractiveLogonRight_Users }}"
+  when: win2022STIG_stigrule_254424_Manage
+# R-254425 WN22-DC-000410
+- name: stigrule_254425_SeDenyRemoteInteractiveLogonRight
+  win_user_right:
+    name: SeDenyRemoteInteractiveLogonRight
+    users: "{{ win2022STIG_stigrule_254425_SeDenyRemoteInteractiveLogonRight_Users }}"
+  when: win2022STIG_stigrule_254425_Manage
+# R-254426 WN22-DC-000420
+- name: stigrule_254426_SeEnableDelegationPrivilege
+  win_user_right:
+    name: SeEnableDelegationPrivilege
+    users: "{{ win2022STIG_stigrule_254426_SeEnableDelegationPrivilege_Users }}"
+  when: win2022STIG_stigrule_254426_Manage
+# R-254429 WN22-MS-000020
+- name: stigrule_254429_LocalAccountTokenFilterPolicy
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254429_LocalAccountTokenFilterPolicy_Key }}"
+    name: LocalAccountTokenFilterPolicy
+    data: "{{ win2022STIG_stigrule_254429_LocalAccountTokenFilterPolicy_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254429_LocalAccountTokenFilterPolicy_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254429_LocalAccountTokenFilterPolicy_State }}"
+  when: win2022STIG_stigrule_254429_Manage
+# R-254430 WN22-MS-000030
+- name: stigrule_254430_EnumerateLocalUsers
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254430_EnumerateLocalUsers_Key }}"
+    name: EnumerateLocalUsers
+    data: "{{ win2022STIG_stigrule_254430_EnumerateLocalUsers_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254430_EnumerateLocalUsers_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254430_EnumerateLocalUsers_State }}"
+  when: win2022STIG_stigrule_254430_Manage
+# R-254431 WN22-MS-000040
+- name: stigrule_254431_RestrictRemoteClients
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254431_RestrictRemoteClients_Key }}"
+    name: RestrictRemoteClients
+    data: "{{ win2022STIG_stigrule_254431_RestrictRemoteClients_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254431_RestrictRemoteClients_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254431_RestrictRemoteClients_State }}"
+  when: win2022STIG_stigrule_254431_Manage
+# R-254432 WN22-MS-000050
+- name: stigrule_254432_Interactive_logon_Number_of_previous_logons_to_cache_in_case_domain_controller_is_not_available
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254432_Interactive_logon_Number_of_previous_logons_to_cache_in_case_domain_controller_is_not_available_Key }}"
+    name: CachedLogonsCount
+    data: "{{ win2022STIG_stigrule_254432_Interactive_logon_Number_of_previous_logons_to_cache_in_case_domain_controller_is_not_available_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254432_Interactive_logon_Number_of_previous_logons_to_cache_in_case_domain_controller_is_not_available_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254432_Interactive_logon_Number_of_previous_logons_to_cache_in_case_domain_controller_is_not_available_State }}"
+  when: win2022STIG_stigrule_254432_Manage
+# R-254434 WN22-MS-000070
+- name: stigrule_254434_SeNetworkLogonRight
+  win_user_right:
+    name: SeNetworkLogonRight
+    users: "{{ win2022STIG_stigrule_254434_SeNetworkLogonRight_Users }}"
+  when: win2022STIG_stigrule_254434_Manage
+# R-254436 WN22-MS-000090
+- name: stigrule_254436_SeDenyBatchLogonRight
+  win_user_right:
+    name: SeDenyBatchLogonRight
+    users: "{{ win2022STIG_stigrule_254436_SeDenyBatchLogonRight_Users }}"
+  when: win2022STIG_stigrule_254436_Manage
+# R-254437 WN22-MS-000100
+- name: stigrule_254437_SeDenyServiceLogonRight
+  win_user_right:
+    name: SeDenyServiceLogonRight
+    users: "{{ win2022STIG_stigrule_254437_SeDenyServiceLogonRight_Users }}"
+  when: win2022STIG_stigrule_254437_Manage
+# R-254438 WN22-MS-000110
+- name: stigrule_254438_SeDenyInteractiveLogonRight
+  win_user_right:
+    name: SeDenyInteractiveLogonRight
+    users: "{{ win2022STIG_stigrule_254438_SeDenyInteractiveLogonRight_Users }}"
+  when: win2022STIG_stigrule_254438_Manage
+# R-254440 WN22-MS-000130
+- name: stigrule_254440_SeEnableDelegationPrivilege
+  win_user_right:
+    name: SeEnableDelegationPrivilege
+    users: "{{ win2022STIG_stigrule_254440_SeEnableDelegationPrivilege_Users }}"
+  when: win2022STIG_stigrule_254440_Manage
+# R-254441 WN22-MS-000140
+# Please ensure the hardware requirements are met. See https://docs.microsoft.com/en-us/windows/security/identity-protection/credential-guard/credential-guard-requirements
+- name: stigrule_254441_LsaCfgFlags
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254441_LsaCfgFlags_Key }}"
+    name: LsaCfgFlags
+    data: "{{ win2022STIG_stigrule_254441_LsaCfgFlags_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254441_LsaCfgFlags_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254441_LsaCfgFlags_State }}"
+  when: win2022STIG_stigrule_254441_Manage
+# R-254445 WN22-SO-000010
+- name: stigrule_254445_Accounts_Guest_account_status
+  win_security_policy:
+    section: System Access
+    key: EnableGuestAccount
+    value: "{{ win2022STIG_stigrule_254445_Accounts_Guest_account_status_ValueData }}"
+  when: win2022STIG_stigrule_254445_Manage
+# R-254446 WN22-SO-000020
+- name: stigrule_254446_Accounts_Limit_local_account_use_of_blank_passwords_to_console_logon_only
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254446_Accounts_Limit_local_account_use_of_blank_passwords_to_console_logon_only_Key }}"
+    name: LimitBlankPasswordUse
+    data: "{{ win2022STIG_stigrule_254446_Accounts_Limit_local_account_use_of_blank_passwords_to_console_logon_only_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254446_Accounts_Limit_local_account_use_of_blank_passwords_to_console_logon_only_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254446_Accounts_Limit_local_account_use_of_blank_passwords_to_console_logon_only_State }}"
+  when: win2022STIG_stigrule_254446_Manage
+# R-254448 WN22-SO-000040
+- name: stigrule_254448_Accounts_Rename_guest_account
+  win_security_policy:
+    section: System Access
+    key: NewGuestName
+    value: "{{ win2022STIG_stigrule_254448_Accounts_Rename_guest_account_ValueData }}"
+  when: win2022STIG_stigrule_254448_Manage
+# R-254449 WN22-SO-000050
+- name: stigrule_254449_Audit_Force_audit_policy_subcategory_settings_Windows_Vista_or_later_to_override_audit_policy_category_settings
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254449_Audit_Force_audit_policy_subcategory_settings_Windows_Vista_or_later_to_override_audit_policy_category_settings_Key }}"
+    name: SCENoApplyLegacyAuditPolicy
+    data: "{{ win2022STIG_stigrule_254449_Audit_Force_audit_policy_subcategory_settings_Windows_Vista_or_later_to_override_audit_policy_category_settings_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254449_Audit_Force_audit_policy_subcategory_settings_Windows_Vista_or_later_to_override_audit_policy_category_settings_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254449_Audit_Force_audit_policy_subcategory_settings_Windows_Vista_or_later_to_override_audit_policy_category_settings_State }}"
+  when: win2022STIG_stigrule_254449_Manage
+# R-254450 WN22-SO-000060
+- name: stigrule_254450_Domain_member_Digitally_encrypt_or_sign_secure_channel_data_always
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254450_Domain_member_Digitally_encrypt_or_sign_secure_channel_data_always_Key }}"
+    name: RequireSignOrSeal
+    data: "{{ win2022STIG_stigrule_254450_Domain_member_Digitally_encrypt_or_sign_secure_channel_data_always_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254450_Domain_member_Digitally_encrypt_or_sign_secure_channel_data_always_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254450_Domain_member_Digitally_encrypt_or_sign_secure_channel_data_always_State }}"
+  when: win2022STIG_stigrule_254450_Manage
+# R-254451 WN22-SO-000070
+- name: stigrule_254451_Domain_member_Digitally_encrypt_secure_channel_data_when_possible
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254451_Domain_member_Digitally_encrypt_secure_channel_data_when_possible_Key }}"
+    name: SealSecureChannel
+    data: "{{ win2022STIG_stigrule_254451_Domain_member_Digitally_encrypt_secure_channel_data_when_possible_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254451_Domain_member_Digitally_encrypt_secure_channel_data_when_possible_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254451_Domain_member_Digitally_encrypt_secure_channel_data_when_possible_State }}"
+  when: win2022STIG_stigrule_254451_Manage
+# R-254452 WN22-SO-000080
+- name: stigrule_254452_Domain_member_Digitally_sign_secure_channel_data_when_possible
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254452_Domain_member_Digitally_sign_secure_channel_data_when_possible_Key }}"
+    name: SignSecureChannel
+    data: "{{ win2022STIG_stigrule_254452_Domain_member_Digitally_sign_secure_channel_data_when_possible_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254452_Domain_member_Digitally_sign_secure_channel_data_when_possible_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254452_Domain_member_Digitally_sign_secure_channel_data_when_possible_State }}"
+  when: win2022STIG_stigrule_254452_Manage
+# R-254453 WN22-SO-000090
+- name: stigrule_254453_Domain_member_Disable_machine_account_password_changes
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254453_Domain_member_Disable_machine_account_password_changes_Key }}"
+    name: DisablePasswordChange
+    data: "{{ win2022STIG_stigrule_254453_Domain_member_Disable_machine_account_password_changes_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254453_Domain_member_Disable_machine_account_password_changes_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254453_Domain_member_Disable_machine_account_password_changes_State }}"
+  when: win2022STIG_stigrule_254453_Manage
+# R-254454 WN22-SO-000100
+- name: stigrule_254454_Domain_member_Maximum_machine_account_password_age
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254454_Domain_member_Maximum_machine_account_password_age_Key }}"
+    name: MaximumPasswordAge
+    data: "{{ win2022STIG_stigrule_254454_Domain_member_Maximum_machine_account_password_age_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254454_Domain_member_Maximum_machine_account_password_age_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254454_Domain_member_Maximum_machine_account_password_age_State }}"
+  when: win2022STIG_stigrule_254454_Manage
+# R-254455 WN22-SO-000110
+- name: stigrule_254455_Domain_member_Require_strong_Windows_2000_or_later_session_key
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254455_Domain_member_Require_strong_Windows_2000_or_later_session_key_Key }}"
+    name: RequireStrongKey
+    data: "{{ win2022STIG_stigrule_254455_Domain_member_Require_strong_Windows_2000_or_later_session_key_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254455_Domain_member_Require_strong_Windows_2000_or_later_session_key_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254455_Domain_member_Require_strong_Windows_2000_or_later_session_key_State }}"
+  when: win2022STIG_stigrule_254455_Manage
+# R-254456 WN22-SO-000120
+- name: stigrule_254456_Interactive_logon_Machine_inactivity_limit
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254456_Interactive_logon_Machine_inactivity_limit_Key }}"
+    name: InactivityTimeoutSecs
+    data: "{{ win2022STIG_stigrule_254456_Interactive_logon_Machine_inactivity_limit_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254456_Interactive_logon_Machine_inactivity_limit_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254456_Interactive_logon_Machine_inactivity_limit_State }}"
+  when: win2022STIG_stigrule_254456_Manage
+# R-254457 WN22-SO-000130
+- name: stigrule_254457_Interactive_logon_Message_text_for_users_attempting_to_log_on
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254457_Interactive_logon_Message_text_for_users_attempting_to_log_on_Key }}"
+    name: LegalNoticeText
+    data: "{{ win2022STIG_stigrule_254457_Interactive_logon_Message_text_for_users_attempting_to_log_on_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254457_Interactive_logon_Message_text_for_users_attempting_to_log_on_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254457_Interactive_logon_Message_text_for_users_attempting_to_log_on_State }}"
+  when: win2022STIG_stigrule_254457_Manage
+# R-254458 WN22-SO-000140
+- name: stigrule_254458_Interactive_logon_Message_title_for_users_attempting_to_log_on
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254458_Interactive_logon_Message_title_for_users_attempting_to_log_on_Key }}"
+    name: LegalNoticeCaption
+    data: "{{ win2022STIG_stigrule_254458_Interactive_logon_Message_title_for_users_attempting_to_log_on_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254458_Interactive_logon_Message_title_for_users_attempting_to_log_on_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254458_Interactive_logon_Message_title_for_users_attempting_to_log_on_State }}"
+  when: win2022STIG_stigrule_254458_Manage
+# R-254459 WN22-SO-000150
+- name: stigrule_254459_Interactive_logon_Smart_card_removal_behavior
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254459_Interactive_logon_Smart_card_removal_behavior_Key }}"
+    name: scremoveoption
+    data: "{{ win2022STIG_stigrule_254459_Interactive_logon_Smart_card_removal_behavior_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254459_Interactive_logon_Smart_card_removal_behavior_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254459_Interactive_logon_Smart_card_removal_behavior_State }}"
+  when: win2022STIG_stigrule_254459_Manage
+# R-254460 WN22-SO-000160
+- name: stigrule_254460_Microsoft_network_client_Digitally_sign_communications_always
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254460_Microsoft_network_client_Digitally_sign_communications_always_Key }}"
+    name: RequireSecuritySignature
+    data: "{{ win2022STIG_stigrule_254460_Microsoft_network_client_Digitally_sign_communications_always_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254460_Microsoft_network_client_Digitally_sign_communications_always_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254460_Microsoft_network_client_Digitally_sign_communications_always_State }}"
+  when: win2022STIG_stigrule_254460_Manage
+# R-254461 WN22-SO-000170
+- name: stigrule_254461_Microsoft_network_client_Digitally_sign_communications_if_server_agrees
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254461_Microsoft_network_client_Digitally_sign_communications_if_server_agrees_Key }}"
+    name: EnableSecuritySignature
+    data: "{{ win2022STIG_stigrule_254461_Microsoft_network_client_Digitally_sign_communications_if_server_agrees_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254461_Microsoft_network_client_Digitally_sign_communications_if_server_agrees_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254461_Microsoft_network_client_Digitally_sign_communications_if_server_agrees_State }}"
+  when: win2022STIG_stigrule_254461_Manage
+# R-254462 WN22-SO-000180
+- name: stigrule_254462_Microsoft_network_client_Send_unencrypted_password_to_third_party_SMB_servers
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254462_Microsoft_network_client_Send_unencrypted_password_to_third_party_SMB_servers_Key }}"
+    name: EnablePlainTextPassword
+    data: "{{ win2022STIG_stigrule_254462_Microsoft_network_client_Send_unencrypted_password_to_third_party_SMB_servers_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254462_Microsoft_network_client_Send_unencrypted_password_to_third_party_SMB_servers_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254462_Microsoft_network_client_Send_unencrypted_password_to_third_party_SMB_servers_State }}"
+  when: win2022STIG_stigrule_254462_Manage
+# R-254463 WN22-SO-000190
+- name: stigrule_254463_Microsoft_network_server_Digitally_sign_communications_always
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254463_Microsoft_network_server_Digitally_sign_communications_always_Key }}"
+    name: RequireSecuritySignature
+    data: "{{ win2022STIG_stigrule_254463_Microsoft_network_server_Digitally_sign_communications_always_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254463_Microsoft_network_server_Digitally_sign_communications_always_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254463_Microsoft_network_server_Digitally_sign_communications_always_State }}"
+  when: win2022STIG_stigrule_254463_Manage
+# R-254464 WN22-SO-000200
+- name: stigrule_254464_Microsoft_network_server_Digitally_sign_communications_if_client_agrees
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254464_Microsoft_network_server_Digitally_sign_communications_if_client_agrees_Key }}"
+    name: EnableSecuritySignature
+    data: "{{ win2022STIG_stigrule_254464_Microsoft_network_server_Digitally_sign_communications_if_client_agrees_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254464_Microsoft_network_server_Digitally_sign_communications_if_client_agrees_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254464_Microsoft_network_server_Digitally_sign_communications_if_client_agrees_State }}"
+  when: win2022STIG_stigrule_254464_Manage
+# R-254465 WN22-SO-000210
+- name: stigrule_254465_Network_access_Allow_anonymous_SID_Name_translation
+  win_security_policy:
+    section: System Access
+    key: null
+    value: "{{ win2022STIG_stigrule_254465_Network_access_Allow_anonymous_SID_Name_translation_ValueData }}"
+  when: win2022STIG_stigrule_254465_Manage
+# R-254466 WN22-SO-000220
+- name: stigrule_254466_Network_access_Do_not_allow_anonymous_enumeration_of_SAM_accounts
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254466_Network_access_Do_not_allow_anonymous_enumeration_of_SAM_accounts_Key }}"
+    name: RestrictAnonymousSAM
+    data: "{{ win2022STIG_stigrule_254466_Network_access_Do_not_allow_anonymous_enumeration_of_SAM_accounts_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254466_Network_access_Do_not_allow_anonymous_enumeration_of_SAM_accounts_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254466_Network_access_Do_not_allow_anonymous_enumeration_of_SAM_accounts_State }}"
+  when: win2022STIG_stigrule_254466_Manage
+# R-254467 WN22-SO-000230
+- name: stigrule_254467_Network_access_Do_not_allow_anonymous_enumeration_of_SAM_accounts_and_shares
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254467_Network_access_Do_not_allow_anonymous_enumeration_of_SAM_accounts_and_shares_Key }}"
+    name: RestrictAnonymous
+    data: "{{ win2022STIG_stigrule_254467_Network_access_Do_not_allow_anonymous_enumeration_of_SAM_accounts_and_shares_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254467_Network_access_Do_not_allow_anonymous_enumeration_of_SAM_accounts_and_shares_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254467_Network_access_Do_not_allow_anonymous_enumeration_of_SAM_accounts_and_shares_State }}"
+  when: win2022STIG_stigrule_254467_Manage
+# R-254468 WN22-SO-000240
+- name: stigrule_254468_Network_access_Let_Everyone_permissions_apply_to_anonymous_users
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254468_Network_access_Let_Everyone_permissions_apply_to_anonymous_users_Key }}"
+    name: EveryoneIncludesAnonymous
+    data: "{{ win2022STIG_stigrule_254468_Network_access_Let_Everyone_permissions_apply_to_anonymous_users_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254468_Network_access_Let_Everyone_permissions_apply_to_anonymous_users_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254468_Network_access_Let_Everyone_permissions_apply_to_anonymous_users_State }}"
+  when: win2022STIG_stigrule_254468_Manage
+# R-254469 WN22-SO-000250
+- name: stigrule_254469_Network_access_Restrict_anonymous_access_to_Named_Pipes_and_Shares
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254469_Network_access_Restrict_anonymous_access_to_Named_Pipes_and_Shares_Key }}"
+    name: RestrictNullSessAccess
+    data: "{{ win2022STIG_stigrule_254469_Network_access_Restrict_anonymous_access_to_Named_Pipes_and_Shares_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254469_Network_access_Restrict_anonymous_access_to_Named_Pipes_and_Shares_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254469_Network_access_Restrict_anonymous_access_to_Named_Pipes_and_Shares_State }}"
+  when: win2022STIG_stigrule_254469_Manage
+# R-254470 WN22-SO-000260
+- name: stigrule_254470_Network_security_Allow_Local_System_to_use_computer_identity_for_NTLM
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254470_Network_security_Allow_Local_System_to_use_computer_identity_for_NTLM_Key }}"
+    name: UseMachineId
+    data: "{{ win2022STIG_stigrule_254470_Network_security_Allow_Local_System_to_use_computer_identity_for_NTLM_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254470_Network_security_Allow_Local_System_to_use_computer_identity_for_NTLM_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254470_Network_security_Allow_Local_System_to_use_computer_identity_for_NTLM_State }}"
+  when: win2022STIG_stigrule_254470_Manage
+# R-254471 WN22-SO-000270
+- name: stigrule_254471_Network_security_Allow_LocalSystem_NULL_session_fallback
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254471_Network_security_Allow_LocalSystem_NULL_session_fallback_Key }}"
+    name: allownullsessionfallback
+    data: "{{ win2022STIG_stigrule_254471_Network_security_Allow_LocalSystem_NULL_session_fallback_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254471_Network_security_Allow_LocalSystem_NULL_session_fallback_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254471_Network_security_Allow_LocalSystem_NULL_session_fallback_State }}"
+  when: win2022STIG_stigrule_254471_Manage
+# R-254472 WN22-SO-000280
+- name: stigrule_254472_Network_Security_Allow_PKU2U_authentication_requests_to_this_computer_to_use_online_identities
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254472_Network_Security_Allow_PKU2U_authentication_requests_to_this_computer_to_use_online_identities_Key }}"
+    name: AllowOnlineID
+    data: "{{ win2022STIG_stigrule_254472_Network_Security_Allow_PKU2U_authentication_requests_to_this_computer_to_use_online_identities_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254472_Network_Security_Allow_PKU2U_authentication_requests_to_this_computer_to_use_online_identities_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254472_Network_Security_Allow_PKU2U_authentication_requests_to_this_computer_to_use_online_identities_State }}"
+  when: win2022STIG_stigrule_254472_Manage
+# R-254474 WN22-SO-000300
+- name: stigrule_254474_Network_security_Do_not_store_LAN_Manager_hash_value_on_next_password_change
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254474_Network_security_Do_not_store_LAN_Manager_hash_value_on_next_password_change_Key }}"
+    name: NoLMHash
+    data: "{{ win2022STIG_stigrule_254474_Network_security_Do_not_store_LAN_Manager_hash_value_on_next_password_change_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254474_Network_security_Do_not_store_LAN_Manager_hash_value_on_next_password_change_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254474_Network_security_Do_not_store_LAN_Manager_hash_value_on_next_password_change_State }}"
+  when: win2022STIG_stigrule_254474_Manage
+# R-254475 WN22-SO-000310
+- name: stigrule_254475_Network_security_LAN_Manager_authentication_level
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254475_Network_security_LAN_Manager_authentication_level_Key }}"
+    name: LmCompatibilityLevel
+    data: "{{ win2022STIG_stigrule_254475_Network_security_LAN_Manager_authentication_level_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254475_Network_security_LAN_Manager_authentication_level_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254475_Network_security_LAN_Manager_authentication_level_State }}"
+  when: win2022STIG_stigrule_254475_Manage
+# R-254476 WN22-SO-000320
+- name: stigrule_254476_Network_security_LDAP_client_signing_requirements
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254476_Network_security_LDAP_client_signing_requirements_Key }}"
+    name: LDAPClientIntegrity
+    data: "{{ win2022STIG_stigrule_254476_Network_security_LDAP_client_signing_requirements_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254476_Network_security_LDAP_client_signing_requirements_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254476_Network_security_LDAP_client_signing_requirements_State }}"
+  when: win2022STIG_stigrule_254476_Manage
+# R-254477 WN22-SO-000330
+- name: stigrule_254477_Network_security_Minimum_session_security_for_NTLM_SSP_based_including_secure_RPC_clients
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254477_Network_security_Minimum_session_security_for_NTLM_SSP_based_including_secure_RPC_clients_Key }}"
+    name: NTLMMinClientSec
+    data: "{{ win2022STIG_stigrule_254477_Network_security_Minimum_session_security_for_NTLM_SSP_based_including_secure_RPC_clients_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254477_Network_security_Minimum_session_security_for_NTLM_SSP_based_including_secure_RPC_clients_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254477_Network_security_Minimum_session_security_for_NTLM_SSP_based_including_secure_RPC_clients_State }}"
+  when: win2022STIG_stigrule_254477_Manage
+# R-254478 WN22-SO-000340
+- name: stigrule_254478_Network_security_Minimum_session_security_for_NTLM_SSP_based_including_secure_RPC_servers
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254478_Network_security_Minimum_session_security_for_NTLM_SSP_based_including_secure_RPC_servers_Key }}"
+    name: NTLMMinServerSec
+    data: "{{ win2022STIG_stigrule_254478_Network_security_Minimum_session_security_for_NTLM_SSP_based_including_secure_RPC_servers_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254478_Network_security_Minimum_session_security_for_NTLM_SSP_based_including_secure_RPC_servers_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254478_Network_security_Minimum_session_security_for_NTLM_SSP_based_including_secure_RPC_servers_State }}"
+  when: win2022STIG_stigrule_254478_Manage
+# R-254479 WN22-SO-000350
+- name: stigrule_254479_System_cryptography_Force_strong_key_protection_for_user_keys_stored_on_the_computer
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254479_System_cryptography_Force_strong_key_protection_for_user_keys_stored_on_the_computer_Key }}"
+    name: ForceKeyProtection
+    data: "{{ win2022STIG_stigrule_254479_System_cryptography_Force_strong_key_protection_for_user_keys_stored_on_the_computer_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254479_System_cryptography_Force_strong_key_protection_for_user_keys_stored_on_the_computer_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254479_System_cryptography_Force_strong_key_protection_for_user_keys_stored_on_the_computer_State }}"
+  when: win2022STIG_stigrule_254479_Manage
+# R-254480 WN22-SO-000360
+- name: stigrule_254480_System_cryptography_Use_FIPS_compliant_algorithms_for_encryption_hashing_and_signing
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254480_System_cryptography_Use_FIPS_compliant_algorithms_for_encryption_hashing_and_signing_Key }}"
+    name: Enabled
+    data: "{{ win2022STIG_stigrule_254480_System_cryptography_Use_FIPS_compliant_algorithms_for_encryption_hashing_and_signing_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254480_System_cryptography_Use_FIPS_compliant_algorithms_for_encryption_hashing_and_signing_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254480_System_cryptography_Use_FIPS_compliant_algorithms_for_encryption_hashing_and_signing_State }}"
+  when: win2022STIG_stigrule_254480_Manage
+# R-254481 WN22-SO-000370
+- name: stigrule_254481_System_objects_Strengthen_default_permissions_of_internal_system_objects_eg_Symbolic_Links
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254481_System_objects_Strengthen_default_permissions_of_internal_system_objects_eg_Symbolic_Links_Key }}"
+    name: ProtectionMode
+    data: "{{ win2022STIG_stigrule_254481_System_objects_Strengthen_default_permissions_of_internal_system_objects_eg_Symbolic_Links_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254481_System_objects_Strengthen_default_permissions_of_internal_system_objects_eg_Symbolic_Links_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254481_System_objects_Strengthen_default_permissions_of_internal_system_objects_eg_Symbolic_Links_State }}"
+  when: win2022STIG_stigrule_254481_Manage
+# R-254482 WN22-SO-000380
+- name: stigrule_254482_User_Account_Control_Admin_Approval_Mode_for_the_Built_in_Administrator_account
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254482_User_Account_Control_Admin_Approval_Mode_for_the_Built_in_Administrator_account_Key }}"
+    name: FilterAdministratorToken
+    data: "{{ win2022STIG_stigrule_254482_User_Account_Control_Admin_Approval_Mode_for_the_Built_in_Administrator_account_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254482_User_Account_Control_Admin_Approval_Mode_for_the_Built_in_Administrator_account_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254482_User_Account_Control_Admin_Approval_Mode_for_the_Built_in_Administrator_account_State }}"
+  when: win2022STIG_stigrule_254482_Manage
+# R-254483 WN22-SO-000390
+- name: stigrule_254483_User_Account_Control_Allow_UIAccess_applications_to_prompt_for_elevation_without_using_the_secure_desktop
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254483_User_Account_Control_Allow_UIAccess_applications_to_prompt_for_elevation_without_using_the_secure_desktop_Key }}"
+    name: EnableUIADesktopToggle
+    data: "{{ win2022STIG_stigrule_254483_User_Account_Control_Allow_UIAccess_applications_to_prompt_for_elevation_without_using_the_secure_desktop_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254483_User_Account_Control_Allow_UIAccess_applications_to_prompt_for_elevation_without_using_the_secure_desktop_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254483_User_Account_Control_Allow_UIAccess_applications_to_prompt_for_elevation_without_using_the_secure_desktop_State }}"
+  when: win2022STIG_stigrule_254483_Manage
+# R-254484 WN22-SO-000400
+- name: stigrule_254484_User_Account_Control_Behavior_of_the_elevation_prompt_for_administrators_in_Admin_Approval_Mode
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254484_User_Account_Control_Behavior_of_the_elevation_prompt_for_administrators_in_Admin_Approval_Mode_Key }}"
+    name: ConsentPromptBehaviorAdmin
+    data: "{{ win2022STIG_stigrule_254484_User_Account_Control_Behavior_of_the_elevation_prompt_for_administrators_in_Admin_Approval_Mode_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254484_User_Account_Control_Behavior_of_the_elevation_prompt_for_administrators_in_Admin_Approval_Mode_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254484_User_Account_Control_Behavior_of_the_elevation_prompt_for_administrators_in_Admin_Approval_Mode_State }}"
+  when: win2022STIG_stigrule_254484_Manage
+# R-254485 WN22-SO-000410
+- name: stigrule_254485_User_Account_Control_Behavior_of_the_elevation_prompt_for_standard_users
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254485_User_Account_Control_Behavior_of_the_elevation_prompt_for_standard_users_Key }}"
+    name: ConsentPromptBehaviorUser
+    data: "{{ win2022STIG_stigrule_254485_User_Account_Control_Behavior_of_the_elevation_prompt_for_standard_users_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254485_User_Account_Control_Behavior_of_the_elevation_prompt_for_standard_users_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254485_User_Account_Control_Behavior_of_the_elevation_prompt_for_standard_users_State }}"
+  when: win2022STIG_stigrule_254485_Manage
+# R-254486 WN22-SO-000420
+- name: stigrule_254486_User_Account_Control_Detect_application_installations_and_prompt_for_elevation
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254486_User_Account_Control_Detect_application_installations_and_prompt_for_elevation_Key }}"
+    name: EnableInstallerDetection
+    data: "{{ win2022STIG_stigrule_254486_User_Account_Control_Detect_application_installations_and_prompt_for_elevation_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254486_User_Account_Control_Detect_application_installations_and_prompt_for_elevation_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254486_User_Account_Control_Detect_application_installations_and_prompt_for_elevation_State }}"
+  when: win2022STIG_stigrule_254486_Manage
+# R-254487 WN22-SO-000430
+- name: stigrule_254487_User_Account_Control_Only_elevate_UIAccess_applications_that_are_installed_in_secure_locations
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254487_User_Account_Control_Only_elevate_UIAccess_applications_that_are_installed_in_secure_locations_Key }}"
+    name: EnableSecureUIAPaths
+    data: "{{ win2022STIG_stigrule_254487_User_Account_Control_Only_elevate_UIAccess_applications_that_are_installed_in_secure_locations_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254487_User_Account_Control_Only_elevate_UIAccess_applications_that_are_installed_in_secure_locations_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254487_User_Account_Control_Only_elevate_UIAccess_applications_that_are_installed_in_secure_locations_State }}"
+  when: win2022STIG_stigrule_254487_Manage
+# R-254488 WN22-SO-000440
+- name: stigrule_254488_User_Account_Control_Run_all_administrators_in_Admin_Approval_Mode
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254488_User_Account_Control_Run_all_administrators_in_Admin_Approval_Mode_Key }}"
+    name: EnableLUA
+    data: "{{ win2022STIG_stigrule_254488_User_Account_Control_Run_all_administrators_in_Admin_Approval_Mode_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254488_User_Account_Control_Run_all_administrators_in_Admin_Approval_Mode_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254488_User_Account_Control_Run_all_administrators_in_Admin_Approval_Mode_State }}"
+  when: win2022STIG_stigrule_254488_Manage
+# R-254489 WN22-SO-000450
+- name: stigrule_254489_User_Account_Control_Virtualize_file_and_registry_write_failures_to_per_user_locations
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254489_User_Account_Control_Virtualize_file_and_registry_write_failures_to_per_user_locations_Key }}"
+    name: EnableVirtualization
+    data: "{{ win2022STIG_stigrule_254489_User_Account_Control_Virtualize_file_and_registry_write_failures_to_per_user_locations_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254489_User_Account_Control_Virtualize_file_and_registry_write_failures_to_per_user_locations_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254489_User_Account_Control_Virtualize_file_and_registry_write_failures_to_per_user_locations_State }}"
+  when: win2022STIG_stigrule_254489_Manage
+# R-254490 WN22-UC-000010
+- name: stigrule_254490_SaveZoneInformation
+  win_regedit:
+    path: "{{ win2022STIG_stigrule_254490_SaveZoneInformation_Key }}"
+    name: SaveZoneInformation
+    data: "{{ win2022STIG_stigrule_254490_SaveZoneInformation_ValueData }}"
+    type: "{{ win2022STIG_stigrule_254490_SaveZoneInformation_ValueType }}"
+    state: "{{ win2022STIG_stigrule_254490_SaveZoneInformation_State }}"
+  when: win2022STIG_stigrule_254490_Manage
+# R-254491 WN22-UR-000010
+- name: stigrule_254491_SeTrustedCredManAccessPrivilege
+  win_user_right:
+    name: SeTrustedCredManAccessPrivilege
+    users: "{{ win2022STIG_stigrule_254491_SeTrustedCredManAccessPrivilege_Users }}"
+  when: win2022STIG_stigrule_254491_Manage
+# R-254492 WN22-UR-000020
+- name: stigrule_254492_SeTcbPrivilege
+  win_user_right:
+    name: SeTcbPrivilege
+    users: "{{ win2022STIG_stigrule_254492_SeTcbPrivilege_Users }}"
+  when: win2022STIG_stigrule_254492_Manage
+# R-254493 WN22-UR-000030
+- name: stigrule_254493_SeInteractiveLogonRight
+  win_user_right:
+    name: SeInteractiveLogonRight
+    users: "{{ win2022STIG_stigrule_254493_SeInteractiveLogonRight_Users }}"
+  when: win2022STIG_stigrule_254493_Manage
+# R-254494 WN22-UR-000040
+- name: stigrule_254494_SeBackupPrivilege
+  win_user_right:
+    name: SeBackupPrivilege
+    users: "{{ win2022STIG_stigrule_254494_SeBackupPrivilege_Users }}"
+  when: win2022STIG_stigrule_254494_Manage
+# R-254495 WN22-UR-000050
+- name: stigrule_254495_SeCreatePagefilePrivilege
+  win_user_right:
+    name: SeCreatePagefilePrivilege
+    users: "{{ win2022STIG_stigrule_254495_SeCreatePagefilePrivilege_Users }}"
+  when: win2022STIG_stigrule_254495_Manage
+# R-254496 WN22-UR-000060
+- name: stigrule_254496_SeCreateTokenPrivilege
+  win_user_right:
+    name: SeCreateTokenPrivilege
+    users: "{{ win2022STIG_stigrule_254496_SeCreateTokenPrivilege_Users }}"
+  when: win2022STIG_stigrule_254496_Manage
+# R-254497 WN22-UR-000070
+- name: stigrule_254497_SeCreateGlobalPrivilege
+  win_user_right:
+    name: SeCreateGlobalPrivilege
+    users: "{{ win2022STIG_stigrule_254497_SeCreateGlobalPrivilege_Users }}"
+  when: win2022STIG_stigrule_254497_Manage
+# R-254498 WN22-UR-000080
+- name: stigrule_254498_SeCreatePermanentPrivilege
+  win_user_right:
+    name: SeCreatePermanentPrivilege
+    users: "{{ win2022STIG_stigrule_254498_SeCreatePermanentPrivilege_Users }}"
+  when: win2022STIG_stigrule_254498_Manage
+# R-254499 WN22-UR-000090
+- name: stigrule_254499_SeCreateSymbolicLinkPrivilege
+  win_user_right:
+    name: SeCreateSymbolicLinkPrivilege
+    users: "{{ win2022STIG_stigrule_254499_SeCreateSymbolicLinkPrivilege_Users }}"
+  when: win2022STIG_stigrule_254499_Manage
+# R-254500 WN22-UR-000100
+- name: stigrule_254500_SeDebugPrivilege
+  win_user_right:
+    name: SeDebugPrivilege
+    users: "{{ win2022STIG_stigrule_254500_SeDebugPrivilege_Users }}"
+  when: win2022STIG_stigrule_254500_Manage
+# R-254501 WN22-UR-000110
+- name: stigrule_254501_SeRemoteShutdownPrivilege
+  win_user_right:
+    name: SeRemoteShutdownPrivilege
+    users: "{{ win2022STIG_stigrule_254501_SeRemoteShutdownPrivilege_Users }}"
+  when: win2022STIG_stigrule_254501_Manage
+# R-254502 WN22-UR-000120
+- name: stigrule_254502_SeAuditPrivilege
+  win_user_right:
+    name: SeAuditPrivilege
+    users: "{{ win2022STIG_stigrule_254502_SeAuditPrivilege_Users }}"
+  when: win2022STIG_stigrule_254502_Manage
+# R-254503 WN22-UR-000130
+- name: stigrule_254503_SeImpersonatePrivilege
+  win_user_right:
+    name: SeImpersonatePrivilege
+    users: "{{ win2022STIG_stigrule_254503_SeImpersonatePrivilege_Users }}"
+  when: win2022STIG_stigrule_254503_Manage
+# R-254504 WN22-UR-000140
+- name: stigrule_254504_SeIncreaseBasePriorityPrivilege
+  win_user_right:
+    name: SeIncreaseBasePriorityPrivilege
+    users: "{{ win2022STIG_stigrule_254504_SeIncreaseBasePriorityPrivilege_Users }}"
+  when: win2022STIG_stigrule_254504_Manage
+# R-254505 WN22-UR-000150
+- name: stigrule_254505_SeLoadDriverPrivilege
+  win_user_right:
+    name: SeLoadDriverPrivilege
+    users: "{{ win2022STIG_stigrule_254505_SeLoadDriverPrivilege_Users }}"
+  when: win2022STIG_stigrule_254505_Manage
+# R-254506 WN22-UR-000160
+- name: stigrule_254506_SeLockMemoryPrivilege
+  win_user_right:
+    name: SeLockMemoryPrivilege
+    users: "{{ win2022STIG_stigrule_254506_SeLockMemoryPrivilege_Users }}"
+  when: win2022STIG_stigrule_254506_Manage
+# R-254507 WN22-UR-000170
+- name: stigrule_254507_SeSecurityPrivilege
+  win_user_right:
+    name: SeSecurityPrivilege
+    users: "{{ win2022STIG_stigrule_254507_SeSecurityPrivilege_Users }}"
+  when: win2022STIG_stigrule_254507_Manage
+# R-254508 WN22-UR-000180
+- name: stigrule_254508_SeSystemEnvironmentPrivilege
+  win_user_right:
+    name: SeSystemEnvironmentPrivilege
+    users: "{{ win2022STIG_stigrule_254508_SeSystemEnvironmentPrivilege_Users }}"
+  when: win2022STIG_stigrule_254508_Manage
+# R-254509 WN22-UR-000190
+- name: stigrule_254509_SeManageVolumePrivilege
+  win_user_right:
+    name: SeManageVolumePrivilege
+    users: "{{ win2022STIG_stigrule_254509_SeManageVolumePrivilege_Users }}"
+  when: win2022STIG_stigrule_254509_Manage
+# R-254510 WN22-UR-000200
+- name: stigrule_254510_SeProfileSingleProcessPrivilege
+  win_user_right:
+    name: SeProfileSingleProcessPrivilege
+    users: "{{ win2022STIG_stigrule_254510_SeProfileSingleProcessPrivilege_Users }}"
+  when: win2022STIG_stigrule_254510_Manage
+# R-254511 WN22-UR-000210
+- name: stigrule_254511_SeRestorePrivilege
+  win_user_right:
+    name: SeRestorePrivilege
+    users: "{{ win2022STIG_stigrule_254511_SeRestorePrivilege_Users }}"
+  when: win2022STIG_stigrule_254511_Manage
+# R-254512 WN22-UR-000220
+- name: stigrule_254512_SeTakeOwnershipPrivilege
+  win_user_right:
+    name: SeTakeOwnershipPrivilege
+    users: "{{ win2022STIG_stigrule_254512_SeTakeOwnershipPrivilege_Users }}"
+  when: win2022STIG_stigrule_254512_Manage

@@ -1,0 +1,595 @@
+# R-215807 CISC-ND-000010
+- name : stigrule_215807_ip_http_max_connections_2
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215807_ip_http_max_connections_2_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215807_Manage
+# R-215807 CISC-ND-000010
+- name: get line vty sections
+  ios_command:
+    commands: show running-config all | include ^line vty
+  register: cmd_result
+- name : stigrule_215807_session_limit_for_all_line_vty_sections
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215807_session_limit_for_all_line_vty_sections_Lines }}"
+    parents: "{{ item }}"
+  loop: "{{ cmd_result.stdout_lines|flatten(levels=1) }}"
+  when:
+    - iosxeSTIG_stigrule_215807_Manage
+# R-215813 CISC-ND-000150
+- name : stigrule_215813_login_block_for_900_attempts_3_within_120
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215813_login_block_for_900_attempts_3_within_120_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215813_Manage
+# R-215814 CISC-ND-000160
+- name : stigrule_215814_login
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_banner:
+    banner: login
+    text: "{{ iosxeSTIG_stigrule_215814_login_Text }}"
+  when: iosxeSTIG_stigrule_215814_Manage
+# R-215815 CISC-ND-000210
+- name : stigrule_215815_login_logging
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215815_login_logging_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215815_Manage
+# R-215815 CISC-ND-000210
+- name : stigrule_215815_logging_enable
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215815_logging_enable_Lines }}"
+    parents: "{{ iosxeSTIG_stigrule_215815_logging_enable_Parents }}"
+  when:
+    - iosxeSTIG_stigrule_215815_Manage
+# R-215816 CISC-ND-000250
+- name : stigrule_215816_login_logging
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215816_login_logging_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215816_Manage
+# R-215817 CISC-ND-000280
+- name : stigrule_215817_service_timestamps_log_datetime_localtime
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215817_service_timestamps_log_datetime_localtime_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215817_Manage
+# R-215820 CISC-ND-000380
+- name : stigrule_215820_file_privilege
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215820_file_privilege_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215820_Manage
+# R-215823 CISC-ND-000470
+- name: check for boot network
+  ios_command:
+    commands: show running-config all | include ^boot network
+  register: cmd_result
+- name : stigrule_215823_disable_boot_network
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_boot_network_Lines }}"
+  when:
+    - (cmd_result.stdout|join('\n')).find('boot network') != -1
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name: check for ip boot server
+  ios_command:
+    commands: show running-config all | include ^ip boot server
+  register: cmd_result
+- name : stigrule_215823_disable_boot_server
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_boot_server_Lines }}"
+  when:
+    - (cmd_result.stdout|join('\n')).find('ip boot server') != -1
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name : stigrule_215823_disable_bootp_server
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_bootp_server_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name: check for DNS server configuration
+  ios_command:
+    commands: show running-config all | include ^ip dns server
+  register: cmd_result
+- name : stigrule_215823_disable_dns_server
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_dns_server_Lines }}"
+  when:
+    - (cmd_result.stdout|join('\n')).find('ip dns server') != -1
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name : stigrule_215823_disable_identd
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_identd_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name : stigrule_215823_disable_finger
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_finger_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name : stigrule_215823_disable_http_server
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_http_server_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name: check for ip rcmd rcp-enable
+  ios_command:
+    commands: show running-config all | include ^ip rcmd rcp-enable
+  register: cmd_result
+- name : stigrule_215823_disable_rcmd_rcp_enable
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_rcmd_rcp_enable_Lines }}"
+  when:
+    - (cmd_result.stdout|join('\n')).find('ip rcmd rcp-enable') != -1
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name: check for ip rcmd rsh-enable
+  ios_command:
+    commands: show running-config all | include ^ip rcmd rsh-enable
+  register: cmd_result
+- name : stigrule_215823_disable_rcmd_rsh_enable
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_rcmd_rsh_enable_Lines }}"
+  when:
+    - (cmd_result.stdout|join('\n')).find('ip rcmd rsh-enable') != -1
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name: check for tcp-small-servers
+  ios_command:
+    commands: show running-config all | include ^service tcp-small-servers
+  register: cmd_result
+- name : stigrule_215823_disable_tcp_small_servers
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_tcp_small_servers_Lines }}"
+  when:
+    - (cmd_result.stdout|join('\n')).find('service tcp-small-servers') != -1
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name: check for udp-small-servers
+  ios_command:
+    commands: show running-config all | include ^service udp-small-servers
+  register: cmd_result
+- name : stigrule_215823_disable_udp_small_servers
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_udp_small_servers_Lines }}"
+  when:
+    - (cmd_result.stdout|join('\n')).find('service udp-small-servers') != -1
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name: check for service finger
+  ios_command:
+    commands: show running-config all | include ^service finger
+  register: cmd_result
+- name : stigrule_215823_disable_service_finger
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_service_finger_Lines }}"
+  when:
+    - (cmd_result.stdout|join('\n')).find('service finger') != -1
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name : stigrule_215823_disable_service_config
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_service_config_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215823 CISC-ND-000470
+- name : stigrule_215823_disable_service_pad
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215823_disable_service_pad_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215823_Manage
+# R-215825 CISC-ND-000530
+# ip ssh server algorithm encryption is set in 215845.
+- name : stigrule_215825_ip_ssh_version_2
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215825_ip_ssh_version_2_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215825_Manage
+# R-215826 CISC-ND-000550
+- name : stigrule_215826_password_min_len
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215826_password_min_len_Lines }}"
+    parents: "{{ iosxeSTIG_stigrule_215826_password_min_len_Parents }}"
+  when:
+    - iosxeSTIG_stigrule_215826_Manage
+# R-215827 CISC-ND-000570
+- name : stigrule_215827_password_upper_case
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215827_password_upper_case_Lines }}"
+    parents: "{{ iosxeSTIG_stigrule_215827_password_upper_case_Parents }}"
+  when:
+    - iosxeSTIG_stigrule_215827_Manage
+# R-215828 CISC-ND-000580
+- name : stigrule_215828_password_lower_case
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215828_password_lower_case_Lines }}"
+    parents: "{{ iosxeSTIG_stigrule_215828_password_lower_case_Parents }}"
+  when:
+    - iosxeSTIG_stigrule_215828_Manage
+# R-215829 CISC-ND-000590
+- name : stigrule_215829_password_numeric_count
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215829_password_numeric_count_Lines }}"
+    parents: "{{ iosxeSTIG_stigrule_215829_password_numeric_count_Parents }}"
+  when:
+    - iosxeSTIG_stigrule_215829_Manage
+# R-215830 CISC-ND-000600
+- name : stigrule_215830_password_special_case
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215830_password_special_case_Lines }}"
+    parents: "{{ iosxeSTIG_stigrule_215830_password_special_case_Parents }}"
+  when:
+    - iosxeSTIG_stigrule_215830_Manage
+# R-215831 CISC-ND-000610
+- name : stigrule_215831_password_upper_case
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215831_password_upper_case_Lines }}"
+    parents: "{{ iosxeSTIG_stigrule_215831_password_upper_case_Parents }}"
+  when:
+    - iosxeSTIG_stigrule_215831_Manage
+# R-215832 CISC-ND-000620
+- name : stigrule_215832_service_password_encryption
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215832_service_password_encryption_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215832_Manage
+# R-215833 CISC-ND-000720
+- name : stigrule_215833_exec_timeout_for_console
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215833_exec_timeout_for_console_Lines }}"
+    parents: "{{ iosxeSTIG_stigrule_215833_exec_timeout_for_console_Parents }}"
+  when:
+    - iosxeSTIG_stigrule_215833_Manage
+# R-215833 CISC-ND-000720
+- name: get line vty sections
+  ios_command:
+    commands: show running-config all | include ^line vty
+  register: cmd_result
+- name : stigrule_215833_exec_timeout_for_all_line_vty_sections
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215833_exec_timeout_for_all_line_vty_sections_Lines }}"
+    parents: "{{ item }}"
+  loop: "{{ cmd_result.stdout_lines|flatten(levels=1) }}"
+  when:
+    - iosxeSTIG_stigrule_215833_Manage
+# R-215833 CISC-ND-000720
+- name : stigrule_215833_ip_http_timeout_policy_idle_600_life_3600_requests_10
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215833_ip_http_timeout_policy_idle_600_life_3600_requests_10_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215833_Manage
+# R-215836 CISC-ND-000980
+- name : stigrule_215836_logging_buffered_4096_informational
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215836_logging_buffered_4096_informational_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215836_Manage
+# R-215837 CISC-ND-001000
+# Please configure name IP address to a valid one.
+- name : stigrule_215837_host
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_logging:
+    dest: host
+    name: "{{ iosxeSTIG_stigrule_215837_host_Name }}"
+  when: iosxeSTIG_stigrule_215837_Manage
+# R-215837 CISC-ND-001000
+# Please configure name IP address to a valid one.
+- name : stigrule_215837_logging_trap_critical
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215837_logging_trap_critical_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215837_Manage
+# R-215838 CISC-ND-001030
+# Replace ntp servers' IP address before enabling.
+- name : stigrule_215838_ntp_server_1
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_ntp:
+    server: "{{ iosxeSTIG_stigrule_215838_ntp_server_1_Server }}"
+  when: iosxeSTIG_stigrule_215838_Manage
+# R-215838 CISC-ND-001030
+# Replace ntp servers' IP address before enabling.
+- name : stigrule_215838_ntp_server_2
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_ntp:
+    server: "{{ iosxeSTIG_stigrule_215838_ntp_server_2_Server }}"
+  when: iosxeSTIG_stigrule_215838_Manage
+# R-215840 CISC-ND-001050
+# service timestamps log datetime localtime is set in 215817.
+- name : stigrule_215840_service_timestamps_log_datetime_localtime
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215840_service_timestamps_log_datetime_localtime_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215840_Manage
+# R-215844 CISC-ND-001200
+- name : stigrule_215844_ip_ssh_server_algorithm_mac_hmac_sha1
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215844_ip_ssh_server_algorithm_mac_hmac_sha1_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215844_Manage
+# R-215844 CISC-ND-001200
+- name : stigrule_215844_ip_http_secure_ciphersuite_aes_128_cbc_sha
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215844_ip_http_secure_ciphersuite_aes_128_cbc_sha_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215844_Manage
+# R-215845 CISC-ND-001210
+# Option ip http secure-ciphersuite is set in 215844
+- name : stigrule_215845_ip_ssh_server_algorithm_encryption_aes128_cbc_aes128_ctr_aes192_cbc_aes192_ctr
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215845_ip_ssh_server_algorithm_encryption_aes128_cbc_aes128_ctr_aes192_cbc_aes192_ctr_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215845_Manage
+# R-215854 CISC-ND-001370
+# Configure the authentication server key before enabling.
+- name : stigrule_215854_radius_host_10_1_48_2_key_xxxxxx
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215854_radius_host_10_1_48_2_key_xxxxxx_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215854_Manage
+# R-215854 CISC-ND-001370
+# Configure the authentication server key before enabling.
+- name : stigrule_215854_aaa_authentication_login_LOGIN_AUTHENTICATION_group_radius_local
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215854_aaa_authentication_login_LOGIN_AUTHENTICATION_group_radius_local_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215854_Manage
+# R-215854 CISC-ND-001370
+# Configure the authentication server key before enabling.
+- name : stigrule_215854_ip_http_authentication_aaa_login_authentication_LOGIN_AUTHENTICATION
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215854_ip_http_authentication_aaa_login_authentication_LOGIN_AUTHENTICATION_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_215854_Manage
+# R-215854 CISC-ND-001370
+# Configure the authentication server key before enabling.
+- name : stigrule_215854_login_authentication_for_console
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215854_login_authentication_for_console_Lines }}"
+    parents: "{{ iosxeSTIG_stigrule_215854_login_authentication_for_console_Parents }}"
+  when:
+    - iosxeSTIG_stigrule_215854_Manage
+# R-215854 CISC-ND-001370
+# Configure the authentication server key before enabling.
+- name: get line vty sections
+  ios_command:
+    commands: show running-config all | include ^line vty
+  register: cmd_result
+- name : stigrule_215854_login_authentication_for_all_line_vty_sections
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215854_login_authentication_for_all_line_vty_sections_Lines }}"
+    parents: "{{ item }}"
+  loop: "{{ cmd_result.stdout_lines|flatten(levels=1) }}"
+  when:
+    - iosxeSTIG_stigrule_215854_Manage
+# R-215856 CISC-ND-001440
+# Insert an appropriate URL (including protocol and port)
+- name : stigrule_215856_enrollment_url
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_215856_enrollment_url_Lines }}"
+    parents: "{{ iosxeSTIG_stigrule_215856_enrollment_url_Parents }}"
+  when:
+    - iosxeSTIG_stigrule_215856_Manage
+# R-216661 CISC-RT-000230
+- name : stigrule_216661_Disable_the_auxiliary_port
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_216661_Disable_the_auxiliary_port_Lines }}"
+    parents: "{{ iosxeSTIG_stigrule_216661_Disable_the_auxiliary_port_Parents }}"
+  when:
+    - iosxeSTIG_stigrule_216661_Manage
+# R-216675 CISC-RT-000370
+- name : stigrule_216675_no_cdp_run
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_216675_no_cdp_run_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_216675_Manage
+# R-216700 CISC-RT-000620
+- name : stigrule_216700_no_mpls_ip_propagate_ttl
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_216700_no_mpls_ip_propagate_ttl_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_216700_Manage
+# R-216723 CISC-RT-000850
+- name : stigrule_216723_ip_pim_register_rate_limit_10
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_216723_ip_pim_register_rate_limit_10_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_216723_Manage
+# R-216726 CISC-RT-000880
+- name : stigrule_216726_ip_igmp_limit
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_216726_ip_igmp_limit_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_216726_Manage
+# R-216727 CISC-RT-000890
+- name : stigrule_216727_ip_pim_spt_threshold_infinity
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_216727_ip_pim_spt_threshold_infinity_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_216727_Manage
+# R-216996 CISC-RT-000080
+- name: check for call-home
+  ios_command:
+    commands: show running-config | include ^call-home
+  register: cmd_result
+- name : stigrule_216996_no_call_home
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_216996_no_call_home_Lines }}"
+  when:
+    - (cmd_result.stdout|join('\n')).find('call-home') != -1
+    - iosxeSTIG_stigrule_216996_Manage
+# R-217001 CISC-RT-000750
+# Options drop or ignore are allowed.
+- name : stigrule_217001_ip_options_drop
+  ignore_errors: "{{ ignore_all_errors }}"
+  notify: "save configuration"
+  ios_config:
+    defaults: yes
+    lines: "{{ iosxeSTIG_stigrule_217001_ip_options_drop_Lines }}"
+  when:
+    - iosxeSTIG_stigrule_217001_Manage

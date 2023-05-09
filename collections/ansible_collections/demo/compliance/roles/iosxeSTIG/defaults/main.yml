@@ -1,0 +1,280 @@
+# R-215807 CISC-ND-000010
+iosxeSTIG_stigrule_215807_Manage: True
+iosxeSTIG_stigrule_215807_ip_http_max_connections_2_Lines:
+  - ip http max-connections 2
+iosxeSTIG_stigrule_215807_session_limit_for_all_line_vty_sections_Lines:
+  - session-limit 2
+# R-215808 CISC-ND-000090
+# A partial of 215815
+# duplicate of 215815
+# R-215809 CISC-ND-000100
+# A partial of 215815
+# duplicate of 215815
+# R-215810 CISC-ND-000110
+# A partial of 215815
+# duplicate of 215815
+# R-215811 CISC-ND-000120
+# A partial of 215815
+# duplicate of 215815
+# R-215813 CISC-ND-000150
+iosxeSTIG_stigrule_215813_Manage: True
+iosxeSTIG_stigrule_215813_login_block_for_900_attempts_3_within_120_Lines:
+  - login block-for 900 attempts 3 within 120
+# R-215814 CISC-ND-000160
+iosxeSTIG_stigrule_215814_Manage: True
+iosxeSTIG_stigrule_215814_login_Text: 'You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.
+
+By using this IS (which includes any device attached to this IS), you consent to the following conditions:
+
+-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and 
+
+counterintelligence (CI) investigations.
+
+-At any time, the USG may inspect and seize data stored on this IS.
+
+-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG authorized purpose.
+
+-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.
+
+-Notwithstanding the above, using this IS does not constitute consent to PM, LE, or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, 
+
+psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'
+# R-215815 CISC-ND-000210
+iosxeSTIG_stigrule_215815_Manage: True
+iosxeSTIG_stigrule_215815_login_logging_Lines:
+  - logging userinfo
+iosxeSTIG_stigrule_215815_logging_enable_Lines:
+  - logging enable
+iosxeSTIG_stigrule_215815_logging_enable_Parents:
+  - archive
+  - log config
+# R-215816 CISC-ND-000250
+iosxeSTIG_stigrule_215816_Manage: True
+iosxeSTIG_stigrule_215816_login_logging_Lines:
+  - login on-failure log
+  - login on-success log
+# R-215817 CISC-ND-000280
+iosxeSTIG_stigrule_215817_Manage: True
+iosxeSTIG_stigrule_215817_service_timestamps_log_datetime_localtime_Lines:
+  - service timestamps log datetime localtime
+# R-215819 CISC-ND-000330
+# A partial of 215815
+# duplicate of 215815
+# R-215820 CISC-ND-000380
+iosxeSTIG_stigrule_215820_Manage: True
+iosxeSTIG_stigrule_215820_file_privilege_Lines:
+  - file privilege 15
+# R-215821 CISC-ND-000390
+# A duplicate of 215820
+# duplicate of 215820
+# R-215822 CISC-ND-000460
+# A duplicate of 215820
+# duplicate of 215820
+# R-215823 CISC-ND-000470
+iosxeSTIG_stigrule_215823_Manage: True
+iosxeSTIG_stigrule_215823_disable_boot_network_Lines:
+  - no boot network
+iosxeSTIG_stigrule_215823_disable_boot_server_Lines:
+  - no ip boot server
+iosxeSTIG_stigrule_215823_disable_bootp_server_Lines:
+  - no ip bootp server
+iosxeSTIG_stigrule_215823_disable_dns_server_Lines:
+  - no ip dns server
+iosxeSTIG_stigrule_215823_disable_identd_Lines:
+  - no ip identd
+iosxeSTIG_stigrule_215823_disable_finger_Lines:
+  - no ip finger
+iosxeSTIG_stigrule_215823_disable_http_server_Lines:
+  - no ip http server
+iosxeSTIG_stigrule_215823_disable_rcmd_rcp_enable_Lines:
+  - no ip rcmd rcp-enable
+iosxeSTIG_stigrule_215823_disable_rcmd_rsh_enable_Lines:
+  - no ip rcmd rsh-enable
+iosxeSTIG_stigrule_215823_disable_tcp_small_servers_Lines:
+  - no service tcp-small-servers
+iosxeSTIG_stigrule_215823_disable_udp_small_servers_Lines:
+  - no service udp-small-servers
+iosxeSTIG_stigrule_215823_disable_service_finger_Lines:
+  - no service finger
+iosxeSTIG_stigrule_215823_disable_service_config_Lines:
+  - no service config
+iosxeSTIG_stigrule_215823_disable_service_pad_Lines:
+  - no service pad
+# R-215825 CISC-ND-000530
+# ip ssh server algorithm encryption is set in 215845.
+iosxeSTIG_stigrule_215825_Manage: True
+iosxeSTIG_stigrule_215825_ip_ssh_version_2_Lines:
+  - ip ssh version 2
+# R-215826 CISC-ND-000550
+iosxeSTIG_stigrule_215826_Manage: False
+iosxeSTIG_stigrule_215826_password_min_len_Lines:
+  - min-length 15
+iosxeSTIG_stigrule_215826_password_min_len_Parents:
+  - aaa common-criteria policy PASSWORD_POLICY
+# R-215827 CISC-ND-000570
+iosxeSTIG_stigrule_215827_Manage: False
+iosxeSTIG_stigrule_215827_password_upper_case_Lines:
+  - upper-case 1
+iosxeSTIG_stigrule_215827_password_upper_case_Parents:
+  - aaa common-criteria policy PASSWORD_POLICY
+# R-215828 CISC-ND-000580
+iosxeSTIG_stigrule_215828_Manage: False
+iosxeSTIG_stigrule_215828_password_lower_case_Lines:
+  - lower-case 1
+iosxeSTIG_stigrule_215828_password_lower_case_Parents:
+  - aaa common-criteria policy PASSWORD_POLICY
+# R-215829 CISC-ND-000590
+iosxeSTIG_stigrule_215829_Manage: False
+iosxeSTIG_stigrule_215829_password_numeric_count_Lines:
+  - numeric-count 1
+iosxeSTIG_stigrule_215829_password_numeric_count_Parents:
+  - aaa common-criteria policy PASSWORD_POLICY
+# R-215830 CISC-ND-000600
+iosxeSTIG_stigrule_215830_Manage: False
+iosxeSTIG_stigrule_215830_password_special_case_Lines:
+  - special-case 1
+iosxeSTIG_stigrule_215830_password_special_case_Parents:
+  - aaa common-criteria policy PASSWORD_POLICY
+# R-215831 CISC-ND-000610
+iosxeSTIG_stigrule_215831_Manage: False
+iosxeSTIG_stigrule_215831_password_upper_case_Lines:
+  - char-changes 8
+iosxeSTIG_stigrule_215831_password_upper_case_Parents:
+  - aaa common-criteria policy PASSWORD_POLICY
+# R-215832 CISC-ND-000620
+iosxeSTIG_stigrule_215832_Manage: True
+iosxeSTIG_stigrule_215832_service_password_encryption_Lines:
+  - service password-encryption
+# R-215833 CISC-ND-000720
+iosxeSTIG_stigrule_215833_Manage: True
+iosxeSTIG_stigrule_215833_exec_timeout_for_console_Lines:
+  - exec-timeout 10 0
+iosxeSTIG_stigrule_215833_exec_timeout_for_console_Parents:
+  - line con 0
+iosxeSTIG_stigrule_215833_exec_timeout_for_all_line_vty_sections_Lines:
+  - exec-timeout 10 0
+iosxeSTIG_stigrule_215833_ip_http_timeout_policy_idle_600_life_3600_requests_10_Lines:
+  - ip http timeout-policy idle 600 life 3600 requests 10
+# R-215834 CISC-ND-000880
+# A partial of 215815
+# duplicate of 215815
+# R-215835 CISC-ND-000940
+# A duplicate of 215815
+# duplicate of 215815
+# R-215836 CISC-ND-000980
+iosxeSTIG_stigrule_215836_Manage: True
+iosxeSTIG_stigrule_215836_logging_buffered_4096_informational_Lines:
+  - logging buffered 4096 informational
+# R-215837 CISC-ND-001000
+# Please configure name IP address to a valid one.
+iosxeSTIG_stigrule_215837_Manage: False
+iosxeSTIG_stigrule_215837_host_Name: '192.0.2.128'
+iosxeSTIG_stigrule_215837_logging_trap_critical_Lines:
+  - logging trap critical
+# R-215838 CISC-ND-001030
+# Replace ntp servers' IP address before enabling.
+iosxeSTIG_stigrule_215838_Manage: False
+iosxeSTIG_stigrule_215838_ntp_server_1_Server: '192.0.2.0'
+iosxeSTIG_stigrule_215838_ntp_server_2_Server: '192.0.2.1'
+# R-215839 CISC-ND-001040
+# A duplicate of 215817
+# duplicate of 215817
+# R-215840 CISC-ND-001050
+# service timestamps log datetime localtime is set in 215817.
+iosxeSTIG_stigrule_215840_Manage: True
+iosxeSTIG_stigrule_215840_service_timestamps_log_datetime_localtime_Lines:
+  - clock timezone EST -5 0
+# R-215844 CISC-ND-001200
+iosxeSTIG_stigrule_215844_Manage: True
+iosxeSTIG_stigrule_215844_ip_ssh_server_algorithm_mac_hmac_sha1_Lines:
+  - ip ssh server algorithm mac hmac-sha1
+iosxeSTIG_stigrule_215844_ip_http_secure_ciphersuite_aes_128_cbc_sha_Lines:
+  - ip http secure-ciphersuite aes-128-cbc-sha
+# R-215845 CISC-ND-001210
+# Option ip http secure-ciphersuite is set in 215844
+iosxeSTIG_stigrule_215845_Manage: True
+iosxeSTIG_stigrule_215845_ip_ssh_server_algorithm_encryption_aes128_cbc_aes128_ctr_aes192_cbc_aes192_ctr_Lines:
+  - ip ssh server algorithm encryption aes128-cbc aes128-ctr aes192-cbc aes192-ctr
+# R-215847 CISC-ND-001240
+# A duplicate of 215815
+# duplicate of 215815
+# R-215848 CISC-ND-001250
+# A partial of 215815
+# duplicate of 215815
+# R-215849 CISC-ND-001260
+# A subset of 215816
+# duplicate of 215816
+# R-215850 CISC-ND-001270
+# A partial of 215815
+# duplicate of 215815
+# R-215852 CISC-ND-001290
+# A subset of 215816
+# duplicate of 215816
+# R-215853 CISC-ND-001310
+# A duplicate of 215837
+# duplicate of 215837
+# R-215854 CISC-ND-001370
+# Configure the authentication server key before enabling.
+iosxeSTIG_stigrule_215854_Manage: False
+iosxeSTIG_stigrule_215854_radius_host_10_1_48_2_key_xxxxxx_Lines:
+  - radius host 10.1.48.2 key xxxxxx
+iosxeSTIG_stigrule_215854_aaa_authentication_login_LOGIN_AUTHENTICATION_group_radius_local_Lines:
+  - aaa authentication login LOGIN_AUTHENTICATION group radius local
+iosxeSTIG_stigrule_215854_ip_http_authentication_aaa_login_authentication_LOGIN_AUTHENTICATION_Lines:
+  - ip http authentication aaa login-authentication LOGIN_AUTHENTICATION
+iosxeSTIG_stigrule_215854_login_authentication_for_console_Lines:
+  - login authentication LOGIN_AUTHENTICATION
+iosxeSTIG_stigrule_215854_login_authentication_for_console_Parents:
+  - line con 0
+iosxeSTIG_stigrule_215854_login_authentication_for_all_line_vty_sections_Lines:
+  - login authentication LOGIN_AUTHENTICATION
+# R-215856 CISC-ND-001440
+# Insert an appropriate URL (including protocol and port)
+iosxeSTIG_stigrule_215856_Manage: False
+iosxeSTIG_stigrule_215856_enrollment_url_Lines:
+  - enrollment url http://trustpoint1.example.com:80
+iosxeSTIG_stigrule_215856_enrollment_url_Parents:
+  - crypto pki trustpoint CA_X
+# R-216647 CISC-RT-000070
+# A duplicate of 215823
+# duplicate of 215823
+# R-216661 CISC-RT-000230
+iosxeSTIG_stigrule_216661_Manage: False
+iosxeSTIG_stigrule_216661_Disable_the_auxiliary_port_Lines:
+  - no exec
+  - transport input none
+iosxeSTIG_stigrule_216661_Disable_the_auxiliary_port_Parents:
+  - line aux 0
+# R-216675 CISC-RT-000370
+iosxeSTIG_stigrule_216675_Manage: True
+iosxeSTIG_stigrule_216675_no_cdp_run_Lines:
+  - no cdp run
+# R-216700 CISC-RT-000620
+iosxeSTIG_stigrule_216700_Manage: True
+iosxeSTIG_stigrule_216700_no_mpls_ip_propagate_ttl_Lines:
+  - no mpls ip propagate-ttl
+# R-216723 CISC-RT-000850
+iosxeSTIG_stigrule_216723_Manage: False
+iosxeSTIG_stigrule_216723_ip_pim_register_rate_limit_10_Lines:
+  - ip pim register-rate-limit 10
+# R-216726 CISC-RT-000880
+iosxeSTIG_stigrule_216726_Manage: True
+iosxeSTIG_stigrule_216726_ip_igmp_limit_Lines:
+  - ip igmp limit 2
+# R-216727 CISC-RT-000890
+iosxeSTIG_stigrule_216727_Manage: True
+iosxeSTIG_stigrule_216727_ip_pim_spt_threshold_infinity_Lines:
+  - ip pim spt-threshold infinity
+# R-216996 CISC-RT-000080
+iosxeSTIG_stigrule_216996_Manage: True
+iosxeSTIG_stigrule_216996_no_call_home_Lines:
+  - no call-home
+# R-217001 CISC-RT-000750
+# Options drop or ignore are allowed.
+iosxeSTIG_stigrule_217001_Manage: True
+iosxeSTIG_stigrule_217001_ip_options_drop_Lines:
+  - ip options drop
+# R-220139 CISC-ND-001450
+# A duplicate of 215837
+# duplicate of 215837
+iosxeSTIG_save_configuration_Manage: False

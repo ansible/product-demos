@@ -1,0 +1,503 @@
+# R-204393 RHEL-07-010030
+rhel7STIG_stigrule_204393_Manage: True
+rhel7STIG_stigrule_204393__etc_dconf_db_local_d_01_banner_message_Value: 'true'
+# R-204394 RHEL-07-010040
+rhel7STIG_stigrule_204394_Manage: True
+rhel7STIG_stigrule_204394__etc_dconf_db_local_d_01_banner_message_Value: '''You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\nBy using this IS (which includes any device attached to this IS), you consent to the following conditions:\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n-At any time, the USG may inspect and seize data stored on this IS.\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'''
+# R-204395 RHEL-07-010050
+rhel7STIG_stigrule_204395_Manage: True
+rhel7STIG_stigrule_204395__etc_issue_Dest: /etc/issue
+rhel7STIG_stigrule_204395__etc_issue_Content: 'You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.
+
+By using this IS (which includes any device attached to this IS), you consent to the following conditions:
+
+-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.
+
+-At any time, the USG may inspect and seize data stored on this IS.
+
+-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.
+
+-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.
+
+-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.
+
+'
+# R-204396 RHEL-07-010060
+rhel7STIG_stigrule_204396_Manage: True
+rhel7STIG_stigrule_204396__etc_dconf_db_local_d_00_screensaver_Value: 'true'
+# R-204397 RHEL-07-010061
+rhel7STIG_stigrule_204397_Manage: True
+rhel7STIG_stigrule_204397__etc_dconf_db_local_d_00_defaults_Value: 'true'
+# R-204398 RHEL-07-010070
+rhel7STIG_stigrule_204398_Manage: True
+rhel7STIG_stigrule_204398__etc_dconf_db_local_d_00_screensaver_Value: 'uint32 900'
+# R-204399 RHEL-07-010081
+rhel7STIG_stigrule_204399_Manage: True
+rhel7STIG_stigrule_204399__etc_dconf_db_local_d_locks_session_Line: '/org/gnome/desktop/screensaver/lock-delay'
+# R-204400 RHEL-07-010082
+rhel7STIG_stigrule_204400_Manage: True
+rhel7STIG_stigrule_204400__etc_dconf_db_local_d_locks_session_Line: '/org/gnome/desktop/session/idle-delay'
+# R-204402 RHEL-07-010100
+rhel7STIG_stigrule_204402_Manage: True
+rhel7STIG_stigrule_204402__etc_dconf_db_local_d_00_screensaver_Value: 'true'
+# R-204403 RHEL-07-010101
+rhel7STIG_stigrule_204403_Manage: True
+rhel7STIG_stigrule_204403__etc_dconf_db_local_d_locks_session_Line: '/org/gnome/desktop/screensaver/idle-activation-enabled'
+# R-204404 RHEL-07-010110
+rhel7STIG_stigrule_204404_Manage: True
+rhel7STIG_stigrule_204404__etc_dconf_db_local_d_00_screensaver_Value: 'uint32 5'
+# R-204407 RHEL-07-010120
+rhel7STIG_stigrule_204407_Manage: True
+rhel7STIG_stigrule_204407__etc_security_pwquality_conf_Line: 'ucredit = -1'
+# R-204408 RHEL-07-010130
+rhel7STIG_stigrule_204408_Manage: True
+rhel7STIG_stigrule_204408__etc_security_pwquality_conf_Line: 'lcredit = -1'
+# R-204409 RHEL-07-010140
+rhel7STIG_stigrule_204409_Manage: True
+rhel7STIG_stigrule_204409__etc_security_pwquality_conf_Line: 'dcredit = -1'
+# R-204410 RHEL-07-010150
+rhel7STIG_stigrule_204410_Manage: True
+rhel7STIG_stigrule_204410__etc_security_pwquality_conf_Line: 'ocredit = -1'
+# R-204411 RHEL-07-010160
+rhel7STIG_stigrule_204411_Manage: True
+rhel7STIG_stigrule_204411__etc_security_pwquality_conf_Line: 'difok = 8'
+# R-204412 RHEL-07-010170
+rhel7STIG_stigrule_204412_Manage: True
+rhel7STIG_stigrule_204412__etc_security_pwquality_conf_Line: 'minclass = 4'
+# R-204413 RHEL-07-010180
+rhel7STIG_stigrule_204413_Manage: True
+rhel7STIG_stigrule_204413__etc_security_pwquality_conf_Line: 'maxrepeat = 3'
+# R-204414 RHEL-07-010190
+rhel7STIG_stigrule_204414_Manage: True
+rhel7STIG_stigrule_204414__etc_security_pwquality_conf_Line: 'maxclassrepeat = 4'
+# R-204416 RHEL-07-010210
+rhel7STIG_stigrule_204416_Manage: True
+rhel7STIG_stigrule_204416__etc_login_defs_Line: 'ENCRYPT_METHOD SHA512'
+# R-204417 RHEL-07-010220
+rhel7STIG_stigrule_204417_Manage: True
+rhel7STIG_stigrule_204417__etc_libuser_conf_Value: 'sha512'
+# R-204418 RHEL-07-010230
+rhel7STIG_stigrule_204418_Manage: True
+rhel7STIG_stigrule_204418__etc_login_defs_Line: 'PASS_MIN_DAYS 1'
+# R-204419 RHEL-07-010240
+rhel7STIG_stigrule_204419_Manage: True
+rhel7STIG_stigrule_204419_chage__m_1_user_Command: chage -m 1
+# R-204420 RHEL-07-010250
+rhel7STIG_stigrule_204420_Manage: True
+rhel7STIG_stigrule_204420__etc_login_defs_Line: 'PASS_MAX_DAYS 60'
+# R-204421 RHEL-07-010260
+rhel7STIG_stigrule_204421_Manage: True
+rhel7STIG_stigrule_204421_chage__M_60_user_Command: chage -M 60
+# R-204423 RHEL-07-010280
+rhel7STIG_stigrule_204423_Manage: True
+rhel7STIG_stigrule_204423__etc_security_pwquality_conf_Line: 'minlen = 15'
+# R-204425 RHEL-07-010300
+rhel7STIG_stigrule_204425_Manage: True
+rhel7STIG_stigrule_204425_PermitEmptyPasswords_Line: PermitEmptyPasswords no
+# R-204426 RHEL-07-010310
+rhel7STIG_stigrule_204426_Manage: True
+rhel7STIG_stigrule_204426__etc_default_useradd_Line: 'INACTIVE=0'
+# R-204431 RHEL-07-010430
+rhel7STIG_stigrule_204431_Manage: True
+rhel7STIG_stigrule_204431__etc_login_defs_Line: 'FAIL_DELAY 4'
+# R-204432 RHEL-07-010440
+rhel7STIG_stigrule_204432_Manage: True
+rhel7STIG_stigrule_204432__etc_gdm_custom_conf_Value: 'false'
+# R-204433 RHEL-07-010450
+rhel7STIG_stigrule_204433_Manage: True
+rhel7STIG_stigrule_204433__etc_gdm_custom_conf_Value: 'false'
+# R-204434 RHEL-07-010460
+rhel7STIG_stigrule_204434_Manage: True
+rhel7STIG_stigrule_204434_PermitUserEnvironment_Line: PermitUserEnvironment no
+# R-204435 RHEL-07-010470
+rhel7STIG_stigrule_204435_Manage: True
+rhel7STIG_stigrule_204435_HostbasedAuthentication_Line: HostbasedAuthentication no
+# R-204442 RHEL-07-020000
+rhel7STIG_stigrule_204442_Manage: True
+rhel7STIG_stigrule_204442_rsh_server_State: removed
+# R-204443 RHEL-07-020010
+rhel7STIG_stigrule_204443_Manage: True
+rhel7STIG_stigrule_204443_ypserv_State: removed
+# R-204445 RHEL-07-020030
+# Edit email address.
+rhel7STIG_stigrule_204445_Manage: True
+rhel7STIG_stigrule_204445__etc_cron_daily_aide_Dest: /etc/cron.daily/aide
+rhel7STIG_stigrule_204445__etc_cron_daily_aide_Content: '#!/bin/bash
+
+
+
+/usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root'
+rhel7STIG_stigrule_204445__etc_cron_daily_aide_Mode: '700'
+rhel7STIG_stigrule_204445_aide_State: installed
+# R-204446 RHEL-07-020040
+# Edit email address.
+rhel7STIG_stigrule_204446_Manage: True
+rhel7STIG_stigrule_204446__etc_cron_daily_aide_notify_Dest: /etc/cron.daily/aide
+rhel7STIG_stigrule_204446__etc_cron_daily_aide_notify_Content: '#!/bin/bash
+
+
+
+/usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root'
+rhel7STIG_stigrule_204446__etc_cron_daily_aide_notify_Mode: '700'
+rhel7STIG_stigrule_204446_aide_notify_State: installed
+# R-204447 RHEL-07-020050
+rhel7STIG_stigrule_204447_Manage: True
+rhel7STIG_stigrule_204447__etc_yum_conf_Value: '1'
+# R-204448 RHEL-07-020060
+rhel7STIG_stigrule_204448_Manage: True
+rhel7STIG_stigrule_204448__etc_yum_conf_Value: '1'
+# R-204449 RHEL-07-020100
+rhel7STIG_stigrule_204449_Manage: True
+rhel7STIG_stigrule_204449__etc_modprobe_d_blacklist_conf_Line: 'blacklist usb-storage'
+rhel7STIG_stigrule_204449__etc_modprobe_d_usb_storage_conf_Line: 'install usb-storage /bin/true'
+# R-204450 RHEL-07-020101
+rhel7STIG_stigrule_204450_Manage: True
+rhel7STIG_stigrule_204450__etc_modprobe_d_dccp_conf_Dest: /etc/modprobe.d/dccp.conf
+rhel7STIG_stigrule_204450__etc_modprobe_d_dccp_conf_Content: 'install dccp /bin/true'
+rhel7STIG_stigrule_204450__etc_modprobe_d_blacklist_conf_Line: 'blacklist dccp'
+# R-204451 RHEL-07-020110
+rhel7STIG_stigrule_204451_Manage: True
+rhel7STIG_stigrule_204451_autofs_disable_Enabled: no
+rhel7STIG_stigrule_204451_autofs_stop_State: stopped
+# R-204452 RHEL-07-020200
+rhel7STIG_stigrule_204452_Manage: True
+rhel7STIG_stigrule_204452__etc_yum_conf_Value: '1'
+# R-204453 RHEL-07-020210
+rhel7STIG_stigrule_204453_Manage: True
+rhel7STIG_stigrule_204453__etc_selinux_config_Line: 'SELINUX=enforcing'
+# R-204454 RHEL-07-020220
+rhel7STIG_stigrule_204454_Manage: True
+rhel7STIG_stigrule_204454__etc_selinux_config_Line: 'SELINUXTYPE=targeted'
+# R-204455 RHEL-07-020230
+rhel7STIG_stigrule_204455_Manage: True
+rhel7STIG_stigrule_204455_systemctl_mask_ctrl_alt_del_target_Command: systemctl mask ctrl-alt-del.target
+# R-204457 RHEL-07-020240
+rhel7STIG_stigrule_204457_Manage: True
+rhel7STIG_stigrule_204457__etc_login_defs_Line: 'UMASK 077'
+# R-204466 RHEL-07-020610
+rhel7STIG_stigrule_204466_Manage: True
+rhel7STIG_stigrule_204466__etc_login_defs_Line: 'CREATE_HOME yes'
+# R-204489 RHEL-07-021100
+rhel7STIG_stigrule_204489_Manage: True
+rhel7STIG_stigrule_204489__etc_rsyslog_conf_Line: 'cron.* /var/log/cron.log'
+# R-204490 RHEL-07-021110
+rhel7STIG_stigrule_204490_Manage: True
+rhel7STIG_stigrule_204490__etc_cron_allow_Dest: /etc/cron.allow
+rhel7STIG_stigrule_204490__etc_cron_allow_Owner: root
+# R-204491 RHEL-07-021120
+rhel7STIG_stigrule_204491_Manage: True
+rhel7STIG_stigrule_204491__etc_cron_allow_Dest: /etc/cron.allow
+rhel7STIG_stigrule_204491__etc_cron_allow_Group: root
+# R-204492 RHEL-07-021300
+# If kernel core dumps are required, document the need with the ISSO.
+rhel7STIG_stigrule_204492_Manage: True
+rhel7STIG_stigrule_204492_kdump_disable_Enabled: no
+rhel7STIG_stigrule_204492_kdump_stop_State: stopped
+# R-204496 RHEL-07-021340
+rhel7STIG_stigrule_204496_Manage: True
+rhel7STIG_stigrule_204496_tmp_mount_Enabled: yes
+# R-204502 RHEL-07-021710
+rhel7STIG_stigrule_204502_Manage: True
+rhel7STIG_stigrule_204502_telnet_server_State: removed
+# R-204503 RHEL-07-030000
+rhel7STIG_stigrule_204503_Manage: True
+rhel7STIG_stigrule_204503_auditd_enable_Enabled: yes
+rhel7STIG_stigrule_204503_auditd_start_State: started
+# R-204504 RHEL-07-030010
+rhel7STIG_stigrule_204504_Manage: True
+rhel7STIG_stigrule_204504__etc_audit_rules_d_audit_rules_critical_error_Line: '-f 2'
+# R-204506 RHEL-07-030201
+rhel7STIG_stigrule_204506_Manage: True
+rhel7STIG_stigrule_204506__etc_audisp_plugins_d_au_remote_conf_direction_Line: 'direction = out'
+rhel7STIG_stigrule_204506__etc_audisp_plugins_d_au_remote_conf_path_Line: 'path = /sbin/audisp-remote'
+rhel7STIG_stigrule_204506__etc_audisp_plugins_d_au_remote_conf_type_Line: 'type = always'
+# R-204507 RHEL-07-030210
+rhel7STIG_stigrule_204507_Manage: True
+rhel7STIG_stigrule_204507__etc_audisp_audispd_conf_Line: 'overflow_action = syslog'
+# R-204508 RHEL-07-030211
+rhel7STIG_stigrule_204508_Manage: True
+rhel7STIG_stigrule_204508__etc_audisp_audispd_conf_Line: 'name_format = hostname'
+# R-204509 RHEL-07-030300
+# Ensure to set the IP address of the log aggregation server.
+rhel7STIG_stigrule_204509_Manage: False
+rhel7STIG_stigrule_204509__etc_audisp_audisp_remote_conf_Line: 'remote_server = 192.0.2.255'
+# R-204510 RHEL-07-030310
+# Ensure to set the IP address of the log aggregation server.
+rhel7STIG_stigrule_204510_Manage: True
+rhel7STIG_stigrule_204510__etc_audisp_audisp_remote_conf_Line: 'enable_krb5 = yes'
+# R-204511 RHEL-07-030320
+rhel7STIG_stigrule_204511_Manage: True
+rhel7STIG_stigrule_204511__etc_audisp_audisp_remote_conf_Line: 'disk_full_action = single'
+# R-204512 RHEL-07-030321
+rhel7STIG_stigrule_204512_Manage: True
+rhel7STIG_stigrule_204512__etc_audisp_audisp_remote_conf_Line: 'network_failure_action = syslog'
+# R-204514 RHEL-07-030340
+rhel7STIG_stigrule_204514_Manage: True
+rhel7STIG_stigrule_204514__etc_audit_auditd_conf_Line: 'space_left_action = email'
+# R-204515 RHEL-07-030350
+rhel7STIG_stigrule_204515_Manage: True
+rhel7STIG_stigrule_204515__etc_audit_auditd_conf_Line: 'action_mail_acct = root'
+# R-204516 RHEL-07-030360
+rhel7STIG_stigrule_204516_Manage: True
+rhel7STIG_stigrule_204516__etc_audit_rules_d_audit_rules_euid_b32_Line: '-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid'
+rhel7STIG_stigrule_204516__etc_audit_rules_d_audit_rules_euid_b64_Line: '-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid'
+rhel7STIG_stigrule_204516__etc_audit_rules_d_audit_rules_egid_b32_Line: '-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid'
+rhel7STIG_stigrule_204516__etc_audit_rules_d_audit_rules_egid_b64_Line: '-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid'
+# R-204517 RHEL-07-030370
+rhel7STIG_stigrule_204517_Manage: True
+rhel7STIG_stigrule_204517__etc_audit_rules_d_audit_rules_b32_Line: '-a always,exit -F arch=b32 -S chown,fchown,fchownat,lchown -F auid>=1000 -F auid!=unset -k perm_mod'
+rhel7STIG_stigrule_204517__etc_audit_rules_d_audit_rules_b64_Line: '-a always,exit -F arch=b64 -S chown,fchown,fchownat,lchown -F auid>=1000 -F auid!=unset -k perm_mod'
+# R-204521 RHEL-07-030410
+rhel7STIG_stigrule_204521_Manage: True
+rhel7STIG_stigrule_204521__etc_audit_rules_d_audit_rules_b32_Line: '-a always,exit -F arch=b32 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=unset -k perm_mod'
+rhel7STIG_stigrule_204521__etc_audit_rules_d_audit_rules_b64_Line: '-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=unset -k perm_mod'
+# R-204524 RHEL-07-030440
+rhel7STIG_stigrule_204524_Manage: True
+rhel7STIG_stigrule_204524__etc_audit_rules_d_audit_rules_b32_Line: '-a always,exit -F arch=b32 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid>=1000 -F auid!=unset -k perm_mod'
+rhel7STIG_stigrule_204524__etc_audit_rules_d_audit_rules_b64_Line: '-a always,exit -F arch=b64 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid>=1000 -F auid!=unset -k perm_mod'
+# R-204531 RHEL-07-030510
+rhel7STIG_stigrule_204531_Manage: True
+rhel7STIG_stigrule_204531__etc_audit_rules_d_audit_rules_EPERM_b32_Line: '-a always,exit -F arch=b32 -S creat,open,openat,open_by_handle_at,truncate,ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=unset -k access'
+rhel7STIG_stigrule_204531__etc_audit_rules_d_audit_rules_EPERM_b64_Line: '-a always,exit -F arch=b64 -S creat,open,openat,open_by_handle_at,truncate,ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=unset -k access'
+rhel7STIG_stigrule_204531__etc_audit_rules_d_audit_rules_EACCES_b32_Line: '-a always,exit -F arch=b32 -S creat,open,openat,open_by_handle_at,truncate,ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=unset -k access'
+rhel7STIG_stigrule_204531__etc_audit_rules_d_audit_rules_EACCES_b64_Line: '-a always,exit -F arch=b64 -S creat,open,openat,open_by_handle_at,truncate,ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=unset -k access'
+# R-204536 RHEL-07-030560
+rhel7STIG_stigrule_204536_Manage: True
+rhel7STIG_stigrule_204536__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/sbin/semanage -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change'
+# R-204537 RHEL-07-030570
+rhel7STIG_stigrule_204537_Manage: True
+rhel7STIG_stigrule_204537__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/sbin/setsebool -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change'
+# R-204538 RHEL-07-030580
+rhel7STIG_stigrule_204538_Manage: True
+rhel7STIG_stigrule_204538__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/bin/chcon -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change'
+# R-204539 RHEL-07-030590
+rhel7STIG_stigrule_204539_Manage: True
+rhel7STIG_stigrule_204539__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/sbin/setfiles -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change'
+# R-204540 RHEL-07-030610
+rhel7STIG_stigrule_204540_Manage: True
+rhel7STIG_stigrule_204540__etc_audit_rules_d_audit_rules_Line: '-w /var/run/faillock -p wa -k logins'
+# R-204541 RHEL-07-030620
+rhel7STIG_stigrule_204541_Manage: True
+rhel7STIG_stigrule_204541__etc_audit_rules_d_audit_rules_Line: '-w /var/log/lastlog -p wa -k logins'
+# R-204542 RHEL-07-030630
+rhel7STIG_stigrule_204542_Manage: True
+rhel7STIG_stigrule_204542__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/bin/passwd -F auid>=1000 -F auid!=4294967295 -k privileged-passwd'
+# R-204543 RHEL-07-030640
+rhel7STIG_stigrule_204543_Manage: True
+rhel7STIG_stigrule_204543__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/sbin/unix_chkpwd -F auid>=1000 -F auid!=4294967295 -k privileged-passwd'
+# R-204544 RHEL-07-030650
+rhel7STIG_stigrule_204544_Manage: True
+rhel7STIG_stigrule_204544__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/bin/gpasswd -F auid>=1000 -F auid!=4294967295 -k privileged-passwd'
+# R-204545 RHEL-07-030660
+rhel7STIG_stigrule_204545_Manage: True
+rhel7STIG_stigrule_204545__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/bin/chage -F auid>=1000 -F auid!=4294967295 -k privileged-passwd'
+# R-204546 RHEL-07-030670
+rhel7STIG_stigrule_204546_Manage: True
+rhel7STIG_stigrule_204546__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/sbin/userhelper -F auid>=1000 -F auid!=4294967295 -k privileged-passwd'
+# R-204547 RHEL-07-030680
+rhel7STIG_stigrule_204547_Manage: True
+rhel7STIG_stigrule_204547__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/bin/su -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change'
+# R-204548 RHEL-07-030690
+rhel7STIG_stigrule_204548_Manage: True
+rhel7STIG_stigrule_204548__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/bin/sudo -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change'
+# R-204549 RHEL-07-030700
+rhel7STIG_stigrule_204549_Manage: True
+rhel7STIG_stigrule_204549__etc_audit_rules_d_audit_rules_sudoers_Line: '-w /etc/sudoers -p wa -k privileged-actions'
+rhel7STIG_stigrule_204549__etc_audit_rules_d_audit_rules_sudoers_d_Line: '-w /etc/sudoers.d/ -p wa -k privileged-actions'
+# R-204550 RHEL-07-030710
+rhel7STIG_stigrule_204550_Manage: True
+rhel7STIG_stigrule_204550__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/bin/newgrp -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change'
+# R-204551 RHEL-07-030720
+rhel7STIG_stigrule_204551_Manage: True
+rhel7STIG_stigrule_204551__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/bin/chsh -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change'
+# R-204552 RHEL-07-030740
+rhel7STIG_stigrule_204552_Manage: True
+rhel7STIG_stigrule_204552__etc_audit_rules_d_audit_rules_mount_b32_Line: '-a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=4294967295 -k privileged-mount'
+rhel7STIG_stigrule_204552__etc_audit_rules_d_audit_rules_mount_b64_Line: '-a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=4294967295 -k privileged-mount'
+rhel7STIG_stigrule_204552__etc_audit_rules_d_audit_rules__usr_bin_mount_Line: '-a always,exit -F path=/usr/bin/mount -F auid>=1000 -F auid!=4294967295 -k privileged-mount'
+# R-204553 RHEL-07-030750
+rhel7STIG_stigrule_204553_Manage: True
+rhel7STIG_stigrule_204553__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/bin/umount -F auid>=1000 -F auid!=4294967295 -k privileged-mount'
+# R-204554 RHEL-07-030760
+rhel7STIG_stigrule_204554_Manage: True
+rhel7STIG_stigrule_204554__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/sbin/postdrop -F auid>=1000 -F auid!=4294967295 -k privileged-postfix'
+# R-204555 RHEL-07-030770
+rhel7STIG_stigrule_204555_Manage: True
+rhel7STIG_stigrule_204555__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/sbin/postqueue -F auid>=1000 -F auid!=4294967295 -k privileged-postfix'
+# R-204556 RHEL-07-030780
+rhel7STIG_stigrule_204556_Manage: True
+rhel7STIG_stigrule_204556__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/libexec/openssh/ssh-keysign -F auid>=1000 -F auid!=4294967295 -k privileged-ssh'
+# R-204557 RHEL-07-030800
+rhel7STIG_stigrule_204557_Manage: True
+rhel7STIG_stigrule_204557__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/bin/crontab -F auid>=1000 -F auid!=4294967295 -k privileged-cron'
+# R-204558 RHEL-07-030810
+rhel7STIG_stigrule_204558_Manage: True
+rhel7STIG_stigrule_204558__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/sbin/pam_timestamp_check -F auid>=1000 -F auid!=4294967295 -k privileged-pam'
+# R-204559 RHEL-07-030819
+rhel7STIG_stigrule_204559_Manage: True
+rhel7STIG_stigrule_204559__etc_audit_audit_rules_b32_Line: '-a always,exit -F arch=b32 -S create_module -k module-change'
+rhel7STIG_stigrule_204559__etc_audit_audit_rules_b64_Line: '-a always,exit -F arch=b64 -S create_module -k module-change'
+# R-204560 RHEL-07-030820
+rhel7STIG_stigrule_204560_Manage: True
+rhel7STIG_stigrule_204560__etc_audit_rules_d_audit_rules_b32_Line: '-a always,exit -F arch=b32 -S init_module,finit_module -k modulechange'
+rhel7STIG_stigrule_204560__etc_audit_rules_d_audit_rules_b64_Line: '-a always,exit -F arch=b64 -S init_module,finit_module -k modulechange'
+# R-204562 RHEL-07-030830
+rhel7STIG_stigrule_204562_Manage: True
+rhel7STIG_stigrule_204562__etc_audit_rules_d_audit_rules_b32_Line: '-a always,exit -F arch=b32 -S delete_module -k module-change'
+rhel7STIG_stigrule_204562__etc_audit_rules_d_audit_rules_b64_Line: '-a always,exit -F arch=b64 -S delete_module -k module-change'
+# R-204563 RHEL-07-030840
+rhel7STIG_stigrule_204563_Manage: True
+rhel7STIG_stigrule_204563__etc_audit_rules_d_audit_rules_Line: '-a always,exit -F path=/usr/bin/kmod -F perm=x -F auid>=1000 -F auid!=unset -k modules'
+# R-204564 RHEL-07-030870
+rhel7STIG_stigrule_204564_Manage: True
+rhel7STIG_stigrule_204564__etc_audit_rules_d_audit_rules_Line: '-w /etc/passwd -p wa -k identity'
+# R-204565 RHEL-07-030871
+rhel7STIG_stigrule_204565_Manage: True
+rhel7STIG_stigrule_204565__etc_audit_audit_rules_Line: '-w /etc/group -p wa -k identity'
+# R-204566 RHEL-07-030872
+rhel7STIG_stigrule_204566_Manage: True
+rhel7STIG_stigrule_204566__etc_audit_audit_rules_Line: '-w /etc/gshadow -p wa -k identity'
+# R-204567 RHEL-07-030873
+rhel7STIG_stigrule_204567_Manage: True
+rhel7STIG_stigrule_204567__etc_audit_audit_rules_Line: '-w /etc/shadow -p wa -k identity'
+# R-204568 RHEL-07-030874
+rhel7STIG_stigrule_204568_Manage: True
+rhel7STIG_stigrule_204568__etc_audit_audit_rules_Line: '-w /etc/security/opasswd -p wa -k identity'
+# R-204572 RHEL-07-030910
+rhel7STIG_stigrule_204572_Manage: True
+rhel7STIG_stigrule_204572__etc_audit_rules_d_audit_rules_b32_Line: '-a always,exit -F arch=b32 -S unlink,unlinkat,rename,renameat,rmdir -F auid>=1000 -F auid!=unset -k delete'
+rhel7STIG_stigrule_204572__etc_audit_rules_d_audit_rules_b64_Line: '-a always,exit -F arch=b64 -S unlink,unlinkat,rename,renameat,rmdir -F auid>=1000 -F auid!=unset -k delete'
+# R-204576 RHEL-07-040000
+rhel7STIG_stigrule_204576_Manage: True
+rhel7STIG_stigrule_204576__etc_security_limits_conf_Line: '* hard maxlogins 10'
+# R-204578 RHEL-07-040110
+rhel7STIG_stigrule_204578_Manage: True
+rhel7STIG_stigrule_204578_Ciphers_Line: Ciphers aes256-ctr,aes192-ctr,aes128-ctr
+# R-204579 RHEL-07-040160
+rhel7STIG_stigrule_204579_Manage: True
+rhel7STIG_stigrule_204579__etc_profile_d_tmout_sh_Dest: /etc/profile.d/tmout.sh
+rhel7STIG_stigrule_204579__etc_profile_d_tmout_sh_Content: '#!/bin/bash
+
+
+
+declare -xr TMOUT=900'
+# R-204580 RHEL-07-040170
+rhel7STIG_stigrule_204580_Manage: True
+rhel7STIG_stigrule_204580_banner_Line: banner /etc/issue
+# R-204584 RHEL-07-040201
+rhel7STIG_stigrule_204584_Manage: True
+rhel7STIG_stigrule_204584_kernel_randomize_va_space_Value: 2
+# R-204585 RHEL-07-040300
+rhel7STIG_stigrule_204585_Manage: True
+rhel7STIG_stigrule_204585_openssh_clients_x86_64_State: installed
+rhel7STIG_stigrule_204585_openssh_server_x86_64_State: installed
+# R-204586 RHEL-07-040310
+rhel7STIG_stigrule_204586_Manage: True
+rhel7STIG_stigrule_204586_sshd_enable_Enabled: yes
+rhel7STIG_stigrule_204586_sshd_start_State: started
+# R-204587 RHEL-07-040320
+rhel7STIG_stigrule_204587_Manage: True
+rhel7STIG_stigrule_204587_ClientAliveInterval_Line: ClientAliveInterval 600
+# R-204588 RHEL-07-040330
+rhel7STIG_stigrule_204588_Manage: True
+rhel7STIG_stigrule_204588_RhostsRSAAuthentication_Line: RhostsRSAAuthentication no
+# R-204589 RHEL-07-040340
+rhel7STIG_stigrule_204589_Manage: True
+rhel7STIG_stigrule_204589_ClientAliveCountMax_Line: ClientAliveCountMax 0
+# R-204590 RHEL-07-040350
+rhel7STIG_stigrule_204590_Manage: True
+rhel7STIG_stigrule_204590_IgnoreRhosts_Line: IgnoreRhosts yes
+# R-204591 RHEL-07-040360
+rhel7STIG_stigrule_204591_Manage: True
+rhel7STIG_stigrule_204591_PrintLastLog_Line: PrintLastLog yes
+# R-204592 RHEL-07-040370
+rhel7STIG_stigrule_204592_Manage: True
+rhel7STIG_stigrule_204592_PermitRootLogin_Line: PermitRootLogin no
+# R-204593 RHEL-07-040380
+rhel7STIG_stigrule_204593_Manage: True
+rhel7STIG_stigrule_204593_IgnoreUserKnownHosts_Line: IgnoreUserKnownHosts yes
+# R-204594 RHEL-07-040390
+rhel7STIG_stigrule_204594_Manage: True
+rhel7STIG_stigrule_204594_Protocol_Line: Protocol 2
+# R-204595 RHEL-07-040400
+rhel7STIG_stigrule_204595_Manage: True
+rhel7STIG_stigrule_204595_MACs_Line: MACs hmac-sha2-512,hmac-sha2-256
+# R-204598 RHEL-07-040430
+rhel7STIG_stigrule_204598_Manage: True
+rhel7STIG_stigrule_204598_GSSAPIAuthentication_Line: GSSAPIAuthentication no
+# R-204599 RHEL-07-040440
+rhel7STIG_stigrule_204599_Manage: True
+rhel7STIG_stigrule_204599_KerberosAuthentication_Line: KerberosAuthentication no
+# R-204600 RHEL-07-040450
+rhel7STIG_stigrule_204600_Manage: True
+rhel7STIG_stigrule_204600_StrictModes_Line: StrictModes yes
+# R-204601 RHEL-07-040460
+rhel7STIG_stigrule_204601_Manage: True
+rhel7STIG_stigrule_204601_UsePrivilegeSeparation_Line: UsePrivilegeSeparation sandbox
+# R-204602 RHEL-07-040470
+rhel7STIG_stigrule_204602_Manage: True
+rhel7STIG_stigrule_204602_Compression_Line: Compression no
+# R-204604 RHEL-07-040520
+rhel7STIG_stigrule_204604_Manage: True
+rhel7STIG_stigrule_204604_firewalld_service_State: installed
+rhel7STIG_stigrule_204604_firewalld_active_Enabled: yes
+rhel7STIG_stigrule_204604_firewalld_start_State: started
+# R-204609 RHEL-07-040610
+rhel7STIG_stigrule_204609_Manage: True
+rhel7STIG_stigrule_204609_net_ipv4_conf_all_accept_source_route_Value: 0
+# R-204610 RHEL-07-040611
+rhel7STIG_stigrule_204610_Manage: True
+rhel7STIG_stigrule_204610_net_ipv4_conf_all_rp_filter_Value: 1
+rhel7STIG_stigrule_204610_net_ipv4_conf_default_rp_filter_Value: 1
+# R-204612 RHEL-07-040620
+rhel7STIG_stigrule_204612_Manage: True
+rhel7STIG_stigrule_204612_net_ipv4_conf_default_accept_source_route_Value: 0
+# R-204613 RHEL-07-040630
+rhel7STIG_stigrule_204613_Manage: True
+rhel7STIG_stigrule_204613_net_ipv4_icmp_echo_ignore_broadcasts_Value: 1
+# R-204614 RHEL-07-040640
+rhel7STIG_stigrule_204614_Manage: True
+rhel7STIG_stigrule_204614_net_ipv4_conf_default_accept_redirects_Value: 0
+# R-204615 RHEL-07-040641
+rhel7STIG_stigrule_204615_Manage: True
+rhel7STIG_stigrule_204615_net_ipv4_conf_all_accept_redirects_Value: 0
+# R-204616 RHEL-07-040650
+rhel7STIG_stigrule_204616_Manage: True
+rhel7STIG_stigrule_204616_net_ipv4_conf_default_send_redirects_Value: 0
+# R-204617 RHEL-07-040660
+rhel7STIG_stigrule_204617_Manage: True
+rhel7STIG_stigrule_204617_net_ipv4_conf_all_send_redirects_Value: 0
+# R-204619 RHEL-07-040680
+rhel7STIG_stigrule_204619_Manage: True
+rhel7STIG_stigrule_204619_postconf__e__smtpd_client_restrictions___permit_mynetworks_reject__Command: postconf -e 'smtpd_client_restrictions = permit_mynetworks,reject'
+# R-204620 RHEL-07-040690
+rhel7STIG_stigrule_204620_Manage: True
+rhel7STIG_stigrule_204620_vsftpd_State: removed
+# R-204621 RHEL-07-040700
+rhel7STIG_stigrule_204621_Manage: True
+rhel7STIG_stigrule_204621_tftp_server_State: removed
+# R-204622 RHEL-07-040710
+rhel7STIG_stigrule_204622_Manage: True
+rhel7STIG_stigrule_204622_X11Forwarding_Line: X11Forwarding no
+# R-204624 RHEL-07-040730
+# Document the requirement for an X Windows server with the ISSO or remove.
+rhel7STIG_stigrule_204624_Manage: False
+rhel7STIG_stigrule_204624_xorg_x11_server_common_State: removed
+# R-204625 RHEL-07-040740
+rhel7STIG_stigrule_204625_Manage: True
+rhel7STIG_stigrule_204625_net_ipv4_ip_forward_Value: 0
+# R-204630 RHEL-07-040830
+rhel7STIG_stigrule_204630_Manage: True
+rhel7STIG_stigrule_204630_net_ipv6_conf_all_accept_source_route_Value: 0
+# R-204631 RHEL-07-041001
+rhel7STIG_stigrule_204631_Manage: True
+rhel7STIG_stigrule_204631_pam_pkcs11_State: installed
+# R-204634 RHEL-07-041010
+rhel7STIG_stigrule_204634_Manage: True
+rhel7STIG_stigrule_204634_nmcli_radio_wifi_off_Command: nmcli radio wifi off
+# R-214937 RHEL-07-010062
+rhel7STIG_stigrule_214937_Manage: True
+rhel7STIG_stigrule_214937__etc_dconf_db_local_d_locks_session_Line: '/org/gnome/desktop/screensaver/lock-enabled'
+# R-233307 RHEL-07-040711
+rhel7STIG_stigrule_233307_Manage: True
+rhel7STIG_stigrule_233307_X11UseLocalhost_Line: X11UseLocalhost yes
