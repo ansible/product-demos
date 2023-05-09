@@ -1,12 +1,22 @@
 # Contribution Guidelines
 This document aims to outline the requirements for the various forms of contribution for this project.
 
-**ALL** contributions are subject to review via pull request
+## Project Architecture
+
+![project-architecture](.github/images/project-architecture.png)
+
+
+
+
 
 ## Pull Requests
+
+**ALL** contributions are subject to review via pull request
+
+### Pull Requests
 1) Ensure the "base repository" is set to "ansible/product-demos".
 
-### Pull Request Guidelines
+#### Pull Request Guidelines
 - PRs should include the playbook/demo and required entry in corresponding `<demo>/setup.yml`.
 - PRs should include documentation in corresponding `<demo>/README.md`.
 - PRs should be rebased against the `main` branch to avoid conflicts.
