@@ -1,0 +1,12 @@
+schemaVersion: 2.2.0
+metadata:
+  name: product-demos
+components:
+  - name: product-demos-ee
+    container:
+      image: quay.io/mloriedo/ansible-creator-ee:latest # workaround for https://github.com/eclipse/che/issues/21778
+      memoryRequest: 256M
+      memoryLimit: 5Gi
+      cpuRequest: 250m
+      cpuLimit: 2000m
+      args: ['tail', '-f', '/dev/null']
