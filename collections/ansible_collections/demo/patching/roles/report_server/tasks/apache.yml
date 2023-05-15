@@ -8,7 +8,7 @@
     permanent: true
     state: enabled
   check_mode: false
-   
+
 - name: Install httpd package
   ansible.builtin.yum:
     name: httpd
