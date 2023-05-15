@@ -2,7 +2,7 @@
 - name: Include system variables
   ansible.builtin.include_vars: "{{ ansible_system }}.yml"
 
-- name: permit traffic in default zone for http service
+- name: Permit traffic in default zone for http service
   ansible.posix.firewalld:
     service: http
     permanent: true
