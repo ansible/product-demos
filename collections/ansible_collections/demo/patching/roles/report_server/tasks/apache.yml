@@ -7,6 +7,7 @@
     service: http
     permanent: true
     state: enabled
+    immediate: true
   check_mode: false
 
 - name: Install httpd package
