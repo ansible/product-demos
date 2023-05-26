@@ -27,7 +27,7 @@ If you would like to contribute to this project please refer to [contribution gu
 3. Finally, Create a Job Template called `Setup` with the following configuration:
   
      - Name: Setup
-     - Inventory: Workshop Inventory
+     - Inventory: Demo Inventory
      - Exec Env: Control Plane EE
      - Playbook: setup_demo.yml
      - Credentials:

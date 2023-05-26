@@ -43,7 +43,7 @@ controller_inventory_sources:
   - name: AWS Inventory
     organization: Default
     source: ec2
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     credential: AWS
     overwrite: true
     source_vars:
@@ -66,7 +66,7 @@ controller_inventory_sources:
   # - name: Azure Inventory
   #   organization: Default
   #   source: azure_rm
-  #  inventory: Workshop Inventory
+  #  inventory: Demo Inventory
   #   credential: Azure
   #   execution_environment: Ansible Engine 2.9 execution environment
   #   overwrite: true
@@ -82,7 +82,7 @@ controller_inventory_sources:
 
 controller_groups:
   - name: cloud_aws
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     variables:
       ansible_user: ec2-user
 
@@ -94,7 +94,7 @@ controller_templates:
       - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_create_peer_network.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -110,7 +110,7 @@ controller_templates:
       - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_delete_peer_network.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -124,7 +124,7 @@ controller_templates:
       - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_create_transit_network.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -140,7 +140,7 @@ controller_templates:
       - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_delete_transit_network.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -154,7 +154,7 @@ controller_templates:
       - AWS
     project: Ansible official demo project
     playbook: cloud/create_vpc.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -182,10 +182,10 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
-      - Workshop Credential
+      - Demo Credential
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_create_vm.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -253,10 +253,10 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
-      - Workshop Credential
+      - Demo Credential
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_delete_inventory_vm.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -279,7 +279,7 @@ controller_templates:
       - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_create_reports.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -294,7 +294,7 @@ controller_templates:
       - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbook_create_reports.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -322,7 +322,7 @@ controller_templates:
       - AWS
     project: Ansible official demo project
     playbook: cloud/aws_key.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
