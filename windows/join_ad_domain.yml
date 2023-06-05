@@ -1,0 +1,30 @@
+---
+- name: Join Active Directory domain
+  hosts: "{{ _hosts | default(omit) }}"
+  gather_facts: false
+
+  tasks:
+    - name: Set a single address on the adapter named Ethernet
+      ansible.windows.win_dns_client:
+        adapter_names: 'Ethernet*'
+        dns_servers: "{{ hostvars[domain_controller]['private_ip_address'] }}"
+
+    - name: Ensure Demo OU exists
+      delegate_to: "{{ domain_controller }}"
+      community.windows.win_domain_ou:
+        name: Demo
+        state: present
+
+    - name: Join ansible.local domain
+      register: r_domain_membership
+      ansible.windows.win_domain_membership:
+        dns_domain_name: ansible.local
+        hostname: "{{ inventory_hostname }}"
+        domain_admin_user: "{{ ansible_user }}@ansible.local"
+        domain_admin_password: "{{ ansible_password }}"
+        domain_ou_path: "OU=Demo,DC=ansible,DC=local"
+        state: domain
+
+    - name: Reboot windows machine
+      when: r_domain_membership.reboot_required
+      ansible.windows.win_reboot:
