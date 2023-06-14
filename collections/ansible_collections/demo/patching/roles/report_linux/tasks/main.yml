@@ -15,7 +15,7 @@
 
 - name: Copy logos over
   ansible.builtin.copy:
-    src: "{{ item }}"
+    src: "{{ logo }}"
     dest: "{{ file_path }}"
     directory_mode: true
     mode: "0644"
@@ -24,6 +24,8 @@
     - "redhat-ansible-logo.svg"
     - "server.png"
   check_mode: false
+  loop_control:
+    loop_var: logo
 
 - name: Display link to inventory report
   ansible.builtin.debug:
