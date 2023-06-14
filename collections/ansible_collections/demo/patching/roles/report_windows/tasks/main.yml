@@ -14,7 +14,7 @@
 
 - name: Copy logos over
   ansible.windows.win_copy:
-    src: "{{ item }}"
+    src: "{{ logo }}"
     dest: "{{ file_path }}"
     directory_mode: true
   loop:
@@ -22,6 +22,8 @@
     - "redhat-ansible-logo.svg"
     - "server.png"
   check_mode: false
+  loop_control:
+    loop_var: logo
 
 # - name: display link to inventory report
 #   ansible.builtin.debug:
