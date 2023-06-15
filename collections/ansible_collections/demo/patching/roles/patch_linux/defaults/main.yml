@@ -1,3 +1,7 @@
 ---
-exclude_packages: []
+exclude_packages:
+  - authselect
+  - authselect-compat
+  - authselect-libs
+  - fprintd-pam
 allow_reboot: true
