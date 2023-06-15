@@ -1,0 +1,9 @@
+---    
+- name: AWS | PATCH VM | install yum-utils
+  ansible.builtin.yum:
+    name: yum-utils
+    state: installed
+
+- name: AWS | PATCH VM | include patching role
+  ansible.builtin.include_role:
+    name: demo.patching.patch_linux
