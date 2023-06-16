@@ -2,6 +2,7 @@
 - name: Patch ec2 Instance
   hosts: "{{ _hosts | default(omit) }}"
   gather_facts: false
+  become: true
 
   tasks:
     - name: Include snapshot role
