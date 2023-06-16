@@ -2,6 +2,15 @@
 - name: AWS | SNAPSHOT VM
   delegate_to: localhost
   block:
+    - name: AWS | SNAPSHOT VM | assert id
+      ansible.builtin.assert:
+        that: instance_id is defined
+        fail_msg: "instance_id is required for snapshot operations"
+
+    - name: AWS | SNAPSHOT VM | include vars
+      ansible.builtin.include_vars:
+        file: snapshot_vm.yml
+
     - name: AWS | SNAPSHOT VM | get volumes
       register: r_vol_info
       amazon.aws.ec2_vol_info:
@@ -21,12 +30,11 @@
         description: "Snapshot taken by Red Hat Product demos"
         snapshot_tags: "{{ tags }}"
 
+    - name: AWS | SNAPSHOT VM | record snapshot info
+      ansible.builtin.set_stats:
+        data:
+          snapshots: "{{ r_snapshots.results | json_query(aws_ec2_snapshot_query) }}"
+        per_host: yes
+
     - debug:
-        var: r_snapshots
-
-    # - name: AWS | SNAPSHOT VM | record snapshot info
-    #   ansible.builtin.set_stats:
-    #     data:
-    #       snapshots: r_snapshots.results
-    #     per_host: yes
-
+        var: snapshots

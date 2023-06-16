@@ -1,0 +1,1 @@
+aws_ec2_snapshot_query: "[].{snapshot_id: snapshot_id, vol_id: volume.id, device: volume.attachment_set[?instance_id=='{{ instance_id }}'].device | [0]}"
