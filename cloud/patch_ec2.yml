@@ -12,7 +12,7 @@
         tasks_from: patch_vm
 
     - name: Demo patch failure path
-      when: aws_demo_fail | default(false)
+      when: aws_demo_patch_fail == 'yes'
       ansible.builtin.assert:
-        that: aws_demo_fail
+        that: true
         fail_msg: "Forcing a failure to demonstrate the patching failure path"
