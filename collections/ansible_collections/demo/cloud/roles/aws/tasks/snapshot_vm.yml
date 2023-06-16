@@ -14,9 +14,19 @@
       loop_control:
         loop_var: volume
         label: "{{ volume.id }}"
+      register: r_snapshots
       amazon.aws.ec2_snapshot:
         region: "{{ aws_region }}"
         volume_id: "{{ volume.id }}"
         description: "Snapshot taken by Red Hat Product demos"
         snapshot_tags: "{{ tags }}"
+
+    - debug:
+        var: r_snapshots
+
+    # - name: AWS | SNAPSHOT VM | record snapshot info
+    #   ansible.builtin.set_stats:
+    #     data:
+    #       snapshots: r_snapshots.results
+    #     per_host: yes
 
