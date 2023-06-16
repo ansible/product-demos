@@ -10,3 +10,9 @@
       ansible.builtin.include_role:
         name: "demo.cloud.aws"
         tasks_from: patch_vm
+
+    - name: Demo patch failure path
+      when: aws_demo_fail | default(false)
+      ansible.builtin.assert:
+        that: aws_demo_fail
+        fail_msg: "Forcing a failure to demonstrate the patching failure path"
