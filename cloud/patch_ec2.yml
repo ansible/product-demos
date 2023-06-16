@@ -1,11 +1,11 @@
 ---
 - name: Patch ec2 Instance
   hosts: "{{ _hosts | default(omit) }}"
-  gather_facts: false
+  gather_facts: true
   become: true
 
   tasks:
-    - name: Include snapshot role
+    - name: Include patching role
       when: tags.blueprint is match('rhel.*')
       ansible.builtin.include_role:
         name: "demo.cloud.aws"
