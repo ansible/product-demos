@@ -14,5 +14,5 @@
     - name: Demo patch failure path
       when: aws_demo_patch_fail == 'yes'
       ansible.builtin.assert:
-        that: true
+        that: false
         fail_msg: "Forcing a failure to demonstrate the patching failure path"
