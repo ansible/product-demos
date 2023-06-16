@@ -44,7 +44,7 @@
       amazon.aws.ec2_snapshot_info:
         region: "{{ aws_region }}"
         filters:
-          "tag:Name": "{{ instance_hostname }}"
+          "tag:Name": "{{ inventory_hostname }}"
 
     - name: AWS | RESTORE VM | create volume from latest snapshot
       when: stat_snapshots is not defined
