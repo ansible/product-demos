@@ -27,8 +27,8 @@
         instance: None
 
     - name: AWS | RESTORE VM | attach snapshots from stat
-      when: stat_snapshots is defined
-      loop: "{{ stat_snapshots }}"
+      when: aws_snapshots is defined
+      loop: "{{ aws_snapshots }}"
       loop_control:
         loop_var: snap
         label: "{{ snap.snapshot_id }}"
@@ -39,7 +39,7 @@
         device_name: "{{ snap.device }}"
 
     - name: AWS | RESTORE VM | get all snapshots
-      when: stat_snapshots is not defined
+      when: aws_snapshots is not defined
       register: r_snapshots
       amazon.aws.ec2_snapshot_info:
         region: "{{ aws_region }}"
@@ -47,7 +47,7 @@
           "tag:Name": "{{ inventory_hostname }}"
 
     - name: AWS | RESTORE VM | create volume from latest snapshot
-      when: stat_snapshots is not defined
+      when: aws_snapshots is not defined
       amazon.aws.ec2_vol:
         region: "{{ aws_region }}"
         instance: "{{ instance_id }}"
