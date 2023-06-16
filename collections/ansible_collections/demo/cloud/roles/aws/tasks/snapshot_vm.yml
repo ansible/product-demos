@@ -30,8 +30,14 @@
         description: "Snapshot taken by Red Hat Product demos"
         snapshot_tags: "{{ tags }}"
 
-- name: AWS | SNAPSHOT VM | record snapshot info
+- name: AWS | SNAPSHOT VM | format snapshot stat
   ansible.builtin.set_fact:
-    aws_snapshots: "{{ r_snapshots.results | json_query(aws_ec2_snapshot_query) }}"
-    cacheable: true
+    snapshot_stat:
+      - key: "{{ inventory_hostname }}"
+        value: "{{ r_snapshots.results | json_query(aws_ec2_snapshot_query) }}"
+
+- name: AWS | SNAPSHOT VM | record snapshot with host key
+  ansible.builtin.set_stats:
+    data:
+      aws_snapshots: "{{ snapshot_stat | items2dict }}"
 
