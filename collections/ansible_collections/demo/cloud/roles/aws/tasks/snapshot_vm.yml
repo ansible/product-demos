@@ -31,7 +31,7 @@
         snapshot_tags: "{{ tags }}"
 
 - name: AWS | SNAPSHOT VM | record snapshot info
-  ansible.builtin.set_stats:
-    data:
-      stat_snapshots: "{{ r_snapshots.results | json_query(aws_ec2_snapshot_query) }}"
-    per_host: yes
+  ansible.builtin.set_fact:
+    snapshots: "{{ r_snapshots.results | json_query(aws_ec2_snapshot_query) }}"
+    cacheable: true
+
