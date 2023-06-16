@@ -1,4 +1,15 @@
 ---    
+- name: AWS | PATCH VM | start vm
+  delegate_to: localhost
+  amazon.aws.ec2_instance:
+    region: "{{ aws_region }}"
+    instance_ids: "{{ instance_id }}"
+    state: started
+    wait: true
+
+- name: AWS | PATCH VM | wait for connection
+  ansible.builtin.wait_for_connection:
+
 - name: AWS | PATCH VM | install yum-utils
   ansible.builtin.yum:
     name: yum-utils
