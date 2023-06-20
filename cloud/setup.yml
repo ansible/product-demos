@@ -390,6 +390,7 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
+      - Workshop Credential
     project: Ansible official demo project
     playbook: cloud/patch_ec2.yml
     inventory: Workshop Inventory
