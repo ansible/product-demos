@@ -1,0 +1,766 @@
+[
+{
+    "id": 51,
+    "type": "job_template",
+    "url": "/api/v2/job_templates/51/",
+    "related": {
+        "named_url": "/api/v2/job_templates/Cloud %2F AWS %2F Patch EC2++Default/",
+        "created_by": "/api/v2/users/1/",
+        "modified_by": "/api/v2/users/1/",
+        "labels": "/api/v2/job_templates/51/labels/",
+        "inventory": "/api/v2/inventories/2/",
+        "project": "/api/v2/projects/9/",
+        "organization": "/api/v2/organizations/1/",
+        "credentials": "/api/v2/job_templates/51/credentials/",
+        "last_job": "/api/v2/jobs/152/",
+        "jobs": "/api/v2/job_templates/51/jobs/",
+        "schedules": "/api/v2/job_templates/51/schedules/",
+        "activity_stream": "/api/v2/job_templates/51/activity_stream/",
+        "launch": "/api/v2/job_templates/51/launch/",
+        "webhook_key": "/api/v2/job_templates/51/webhook_key/",
+        "webhook_receiver": "",
+        "notification_templates_started": "/api/v2/job_templates/51/notification_templates_started/",
+        "notification_templates_success": "/api/v2/job_templates/51/notification_templates_success/",
+        "notification_templates_error": "/api/v2/job_templates/51/notification_templates_error/",
+        "access_list": "/api/v2/job_templates/51/access_list/",
+        "survey_spec": "/api/v2/job_templates/51/survey_spec/",
+        "object_roles": "/api/v2/job_templates/51/object_roles/",
+        "instance_groups": "/api/v2/job_templates/51/instance_groups/",
+        "slice_workflow_jobs": "/api/v2/job_templates/51/slice_workflow_jobs/",
+        "copy": "/api/v2/job_templates/51/copy/"
+    },
+    "summary_fields": {
+        "organization": {
+            "id": 1,
+            "name": "Default",
+            "description": ""
+        },
+        "inventory": {
+            "id": 2,
+            "name": "Workshop Inventory",
+            "description": "",
+            "has_active_failures": false,
+            "total_hosts": 5,
+            "hosts_with_active_failures": 0,
+            "total_groups": 7,
+            "has_inventory_sources": true,
+            "total_inventory_sources": 2,
+            "inventory_sources_with_failures": 0,
+            "organization_id": 1,
+            "kind": ""
+        },
+        "project": {
+            "id": 9,
+            "name": "Ansible official demo project",
+            "description": "prescriptive demos from Red Hat",
+            "status": "successful",
+            "scm_type": "git",
+            "allow_override": false
+        },
+        "last_job": {
+            "id": 152,
+            "name": "Cloud / AWS / Patch EC2",
+            "description": "",
+            "finished": "2023-06-16T19:22:59.990581Z",
+            "status": "failed",
+            "failed": true
+        },
+        "last_update": {
+            "id": 152,
+            "name": "Cloud / AWS / Patch EC2",
+            "description": "",
+            "status": "failed",
+            "failed": true
+        },
+        "created_by": {
+            "id": 1,
+            "username": "admin",
+            "first_name": "",
+            "last_name": ""
+        },
+        "modified_by": {
+            "id": 1,
+            "username": "admin",
+            "first_name": "",
+            "last_name": ""
+        },
+        "object_roles": {
+            "admin_role": {
+                "description": "Can manage all aspects of the job template",
+                "name": "Admin",
+                "id": 183
+            },
+            "execute_role": {
+                "description": "May run the job template",
+                "name": "Execute",
+                "id": 184
+            },
+            "read_role": {
+                "description": "May view settings for the job template",
+                "name": "Read",
+                "id": 185
+            }
+        },
+        "user_capabilities": {
+            "edit": true,
+            "delete": true,
+            "start": true,
+            "schedule": true,
+            "copy": true
+        },
+        "labels": {
+            "count": 0,
+            "results": []
+        },
+        "resolved_environment": {
+            "id": 3,
+            "name": "Default execution environment",
+            "description": "",
+            "image": "registry.redhat.io/ansible-automation-platform-23/ee-supported-rhel8:latest"
+        },
+        "survey": {
+            "title": "",
+            "description": ""
+        },
+        "recent_jobs": [
+            {
+                "id": 152,
+                "status": "failed",
+                "finished": "2023-06-16T19:22:59.990581Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 145,
+                "status": "failed",
+                "finished": "2023-06-16T18:55:14.762247Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 139,
+                "status": "successful",
+                "finished": "2023-06-16T18:43:42.888939Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 133,
+                "status": "successful",
+                "finished": "2023-06-16T18:20:51.682914Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 126,
+                "status": "failed",
+                "finished": "2023-06-16T17:58:29.338025Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 119,
+                "status": "failed",
+                "finished": "2023-06-16T17:41:13.937124Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 112,
+                "status": "failed",
+                "finished": "2023-06-16T17:25:22.733973Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 105,
+                "status": "failed",
+                "finished": "2023-06-16T16:37:15.483698Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 98,
+                "status": "failed",
+                "finished": "2023-06-16T16:31:18.252653Z",
+                "canceled_on": null,
+                "type": "job"
+            }
+        ],
+        "credentials": [
+            {
+                "id": 9,
+                "name": "AWS",
+                "description": "",
+                "kind": "aws",
+                "cloud": true
+            },
+            {
+                "id": 5,
+                "name": "Workshop Credential",
+                "description": "",
+                "kind": "ssh",
+                "cloud": false
+            }
+        ]
+    },
+    "created": "2023-06-16T16:21:48.684001Z",
+    "modified": "2023-06-16T17:22:00.182274Z",
+    "name": "Cloud / AWS / Patch EC2",
+    "description": "",
+    "job_type": "run",
+    "inventory": 2,
+    "project": 9,
+    "playbook": "cloud/patch_ec2.yml",
+    "scm_branch": "",
+    "forks": 0,
+    "limit": "",
+    "verbosity": 0,
+    "extra_vars": "---",
+    "job_tags": "",
+    "force_handlers": false,
+    "skip_tags": "",
+    "start_at_task": "",
+    "timeout": 0,
+    "use_fact_cache": false,
+    "organization": 1,
+    "last_job_run": "2023-06-16T19:22:59.990581Z",
+    "last_job_failed": true,
+    "next_job_run": null,
+    "status": "failed",
+    "execution_environment": null,
+    "host_config_key": "",
+    "ask_scm_branch_on_launch": false,
+    "ask_diff_mode_on_launch": false,
+    "ask_variables_on_launch": false,
+    "ask_limit_on_launch": false,
+    "ask_tags_on_launch": false,
+    "ask_skip_tags_on_launch": false,
+    "ask_job_type_on_launch": false,
+    "ask_verbosity_on_launch": false,
+    "ask_inventory_on_launch": false,
+    "ask_credential_on_launch": false,
+    "ask_execution_environment_on_launch": false,
+    "ask_labels_on_launch": false,
+    "ask_forks_on_launch": false,
+    "ask_job_slice_count_on_launch": false,
+    "ask_timeout_on_launch": false,
+    "ask_instance_groups_on_launch": false,
+    "survey_enabled": true,
+    "become_enabled": false,
+    "diff_mode": false,
+    "allow_simultaneous": false,
+    "custom_virtualenv": null,
+    "job_slice_count": 1,
+    "webhook_service": "",
+    "webhook_credential": null,
+    "prevent_instance_group_fallback": false
+},
+{
+    "id": 47,
+    "type": "job_template",
+    "url": "/api/v2/job_templates/47/",
+    "related": {
+        "named_url": "/api/v2/job_templates/Cloud %2F AWS %2F Snapshot EC2++Default/",
+        "created_by": "/api/v2/users/1/",
+        "modified_by": "/api/v2/users/1/",
+        "labels": "/api/v2/job_templates/47/labels/",
+        "inventory": "/api/v2/inventories/2/",
+        "project": "/api/v2/projects/9/",
+        "organization": "/api/v2/organizations/1/",
+        "credentials": "/api/v2/job_templates/47/credentials/",
+        "last_job": "/api/v2/jobs/151/",
+        "jobs": "/api/v2/job_templates/47/jobs/",
+        "schedules": "/api/v2/job_templates/47/schedules/",
+        "activity_stream": "/api/v2/job_templates/47/activity_stream/",
+        "launch": "/api/v2/job_templates/47/launch/",
+        "webhook_key": "/api/v2/job_templates/47/webhook_key/",
+        "webhook_receiver": "",
+        "notification_templates_started": "/api/v2/job_templates/47/notification_templates_started/",
+        "notification_templates_success": "/api/v2/job_templates/47/notification_templates_success/",
+        "notification_templates_error": "/api/v2/job_templates/47/notification_templates_error/",
+        "access_list": "/api/v2/job_templates/47/access_list/",
+        "survey_spec": "/api/v2/job_templates/47/survey_spec/",
+        "object_roles": "/api/v2/job_templates/47/object_roles/",
+        "instance_groups": "/api/v2/job_templates/47/instance_groups/",
+        "slice_workflow_jobs": "/api/v2/job_templates/47/slice_workflow_jobs/",
+        "copy": "/api/v2/job_templates/47/copy/"
+    },
+    "summary_fields": {
+        "organization": {
+            "id": 1,
+            "name": "Default",
+            "description": ""
+        },
+        "inventory": {
+            "id": 2,
+            "name": "Workshop Inventory",
+            "description": "",
+            "has_active_failures": false,
+            "total_hosts": 5,
+            "hosts_with_active_failures": 0,
+            "total_groups": 7,
+            "has_inventory_sources": true,
+            "total_inventory_sources": 2,
+            "inventory_sources_with_failures": 0,
+            "organization_id": 1,
+            "kind": ""
+        },
+        "project": {
+            "id": 9,
+            "name": "Ansible official demo project",
+            "description": "prescriptive demos from Red Hat",
+            "status": "successful",
+            "scm_type": "git",
+            "allow_override": false
+        },
+        "last_job": {
+            "id": 151,
+            "name": "Cloud / AWS / Snapshot EC2",
+            "description": "",
+            "finished": "2023-06-16T19:22:16.017721Z",
+            "status": "successful",
+            "failed": false
+        },
+        "last_update": {
+            "id": 151,
+            "name": "Cloud / AWS / Snapshot EC2",
+            "description": "",
+            "status": "successful",
+            "failed": false
+        },
+        "created_by": {
+            "id": 1,
+            "username": "admin",
+            "first_name": "",
+            "last_name": ""
+        },
+        "modified_by": {
+            "id": 1,
+            "username": "admin",
+            "first_name": "",
+            "last_name": ""
+        },
+        "object_roles": {
+            "admin_role": {
+                "description": "Can manage all aspects of the job template",
+                "name": "Admin",
+                "id": 170
+            },
+            "execute_role": {
+                "description": "May run the job template",
+                "name": "Execute",
+                "id": 171
+            },
+            "read_role": {
+                "description": "May view settings for the job template",
+                "name": "Read",
+                "id": 172
+            }
+        },
+        "user_capabilities": {
+            "edit": true,
+            "delete": true,
+            "start": true,
+            "schedule": true,
+            "copy": true
+        },
+        "labels": {
+            "count": 0,
+            "results": []
+        },
+        "resolved_environment": {
+            "id": 3,
+            "name": "Default execution environment",
+            "description": "",
+            "image": "registry.redhat.io/ansible-automation-platform-23/ee-supported-rhel8:latest"
+        },
+        "survey": {
+            "title": "",
+            "description": ""
+        },
+        "recent_jobs": [
+            {
+                "id": 151,
+                "status": "successful",
+                "finished": "2023-06-16T19:22:16.017721Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 144,
+                "status": "successful",
+                "finished": "2023-06-16T18:54:47.685513Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 138,
+                "status": "successful",
+                "finished": "2023-06-16T18:43:19.266901Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 132,
+                "status": "successful",
+                "finished": "2023-06-16T18:10:33.925333Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 125,
+                "status": "successful",
+                "finished": "2023-06-16T17:57:47.433661Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 118,
+                "status": "successful",
+                "finished": "2023-06-16T17:41:05.608571Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 111,
+                "status": "successful",
+                "finished": "2023-06-16T17:25:06.154709Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 104,
+                "status": "successful",
+                "finished": "2023-06-16T16:37:06.764492Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 97,
+                "status": "successful",
+                "finished": "2023-06-16T16:31:00.082721Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 92,
+                "status": "successful",
+                "finished": "2023-06-16T15:52:04.254055Z",
+                "canceled_on": null,
+                "type": "job"
+            }
+        ],
+        "credentials": [
+            {
+                "id": 9,
+                "name": "AWS",
+                "description": "",
+                "kind": "aws",
+                "cloud": true
+            }
+        ]
+    },
+    "created": "2023-06-15T02:27:32.299433Z",
+    "modified": "2023-06-16T15:23:24.049066Z",
+    "name": "Cloud / AWS / Snapshot EC2",
+    "description": "",
+    "job_type": "run",
+    "inventory": 2,
+    "project": 9,
+    "playbook": "cloud/snapshot_ec2.yml",
+    "scm_branch": "",
+    "forks": 0,
+    "limit": "",
+    "verbosity": 0,
+    "extra_vars": "---\naws_region: us-east-1",
+    "job_tags": "",
+    "force_handlers": false,
+    "skip_tags": "",
+    "start_at_task": "",
+    "timeout": 0,
+    "use_fact_cache": false,
+    "organization": 1,
+    "last_job_run": "2023-06-16T19:22:16.017721Z",
+    "last_job_failed": false,
+    "next_job_run": null,
+    "status": "successful",
+    "execution_environment": null,
+    "host_config_key": "",
+    "ask_scm_branch_on_launch": false,
+    "ask_diff_mode_on_launch": false,
+    "ask_variables_on_launch": true,
+    "ask_limit_on_launch": false,
+    "ask_tags_on_launch": false,
+    "ask_skip_tags_on_launch": false,
+    "ask_job_type_on_launch": false,
+    "ask_verbosity_on_launch": false,
+    "ask_inventory_on_launch": false,
+    "ask_credential_on_launch": false,
+    "ask_execution_environment_on_launch": false,
+    "ask_labels_on_launch": false,
+    "ask_forks_on_launch": false,
+    "ask_job_slice_count_on_launch": false,
+    "ask_timeout_on_launch": false,
+    "ask_instance_groups_on_launch": false,
+    "survey_enabled": true,
+    "become_enabled": false,
+    "diff_mode": false,
+    "allow_simultaneous": false,
+    "custom_virtualenv": null,
+    "job_slice_count": 1,
+    "webhook_service": "",
+    "webhook_credential": null,
+    "prevent_instance_group_fallback": false
+},
+{
+    "id": 48,
+    "type": "job_template",
+    "url": "/api/v2/job_templates/48/",
+    "related": {
+        "named_url": "/api/v2/job_templates/Cloud %2F AWS %2F Snapshot Restore EC2++Default/",
+        "created_by": "/api/v2/users/1/",
+        "modified_by": "/api/v2/users/1/",
+        "labels": "/api/v2/job_templates/48/labels/",
+        "inventory": "/api/v2/inventories/2/",
+        "project": "/api/v2/projects/9/",
+        "organization": "/api/v2/organizations/1/",
+        "credentials": "/api/v2/job_templates/48/credentials/",
+        "last_job": "/api/v2/jobs/153/",
+        "jobs": "/api/v2/job_templates/48/jobs/",
+        "schedules": "/api/v2/job_templates/48/schedules/",
+        "activity_stream": "/api/v2/job_templates/48/activity_stream/",
+        "launch": "/api/v2/job_templates/48/launch/",
+        "webhook_key": "/api/v2/job_templates/48/webhook_key/",
+        "webhook_receiver": "",
+        "notification_templates_started": "/api/v2/job_templates/48/notification_templates_started/",
+        "notification_templates_success": "/api/v2/job_templates/48/notification_templates_success/",
+        "notification_templates_error": "/api/v2/job_templates/48/notification_templates_error/",
+        "access_list": "/api/v2/job_templates/48/access_list/",
+        "survey_spec": "/api/v2/job_templates/48/survey_spec/",
+        "object_roles": "/api/v2/job_templates/48/object_roles/",
+        "instance_groups": "/api/v2/job_templates/48/instance_groups/",
+        "slice_workflow_jobs": "/api/v2/job_templates/48/slice_workflow_jobs/",
+        "copy": "/api/v2/job_templates/48/copy/"
+    },
+    "summary_fields": {
+        "organization": {
+            "id": 1,
+            "name": "Default",
+            "description": ""
+        },
+        "inventory": {
+            "id": 2,
+            "name": "Workshop Inventory",
+            "description": "",
+            "has_active_failures": false,
+            "total_hosts": 5,
+            "hosts_with_active_failures": 0,
+            "total_groups": 7,
+            "has_inventory_sources": true,
+            "total_inventory_sources": 2,
+            "inventory_sources_with_failures": 0,
+            "organization_id": 1,
+            "kind": ""
+        },
+        "project": {
+            "id": 9,
+            "name": "Ansible official demo project",
+            "description": "prescriptive demos from Red Hat",
+            "status": "successful",
+            "scm_type": "git",
+            "allow_override": false
+        },
+        "last_job": {
+            "id": 153,
+            "name": "Cloud / AWS / Snapshot Restore EC2",
+            "description": "",
+            "finished": "2023-06-16T19:32:04.099972Z",
+            "status": "successful",
+            "failed": false
+        },
+        "last_update": {
+            "id": 153,
+            "name": "Cloud / AWS / Snapshot Restore EC2",
+            "description": "",
+            "status": "successful",
+            "failed": false
+        },
+        "created_by": {
+            "id": 1,
+            "username": "admin",
+            "first_name": "",
+            "last_name": ""
+        },
+        "modified_by": {
+            "id": 1,
+            "username": "admin",
+            "first_name": "",
+            "last_name": ""
+        },
+        "object_roles": {
+            "admin_role": {
+                "description": "Can manage all aspects of the job template",
+                "name": "Admin",
+                "id": 173
+            },
+            "execute_role": {
+                "description": "May run the job template",
+                "name": "Execute",
+                "id": 174
+            },
+            "read_role": {
+                "description": "May view settings for the job template",
+                "name": "Read",
+                "id": 175
+            }
+        },
+        "user_capabilities": {
+            "edit": true,
+            "delete": true,
+            "start": true,
+            "schedule": true,
+            "copy": true
+        },
+        "labels": {
+            "count": 0,
+            "results": []
+        },
+        "resolved_environment": {
+            "id": 3,
+            "name": "Default execution environment",
+            "description": "",
+            "image": "registry.redhat.io/ansible-automation-platform-23/ee-supported-rhel8:latest"
+        },
+        "survey": {
+            "title": "",
+            "description": ""
+        },
+        "recent_jobs": [
+            {
+                "id": 153,
+                "status": "successful",
+                "finished": "2023-06-16T19:32:04.099972Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 146,
+                "status": "successful",
+                "finished": "2023-06-16T19:02:50.068807Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 127,
+                "status": "successful",
+                "finished": "2023-06-16T18:06:48.580255Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 120,
+                "status": "successful",
+                "finished": "2023-06-16T17:48:48.824917Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 113,
+                "status": "successful",
+                "finished": "2023-06-16T17:32:56.374916Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 106,
+                "status": "successful",
+                "finished": "2023-06-16T16:44:47.477409Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 99,
+                "status": "failed",
+                "finished": "2023-06-16T16:31:45.228824Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 69,
+                "status": "failed",
+                "finished": "2023-06-15T13:42:17.848980Z",
+                "canceled_on": null,
+                "type": "job"
+            },
+            {
+                "id": 62,
+                "status": "successful",
+                "finished": "2023-06-15T13:34:03.394419Z",
+                "canceled_on": null,
+                "type": "job"
+            }
+        ],
+        "credentials": [
+            {
+                "id": 9,
+                "name": "AWS",
+                "description": "",
+                "kind": "aws",
+                "cloud": true
+            }
+        ]
+    },
+    "created": "2023-06-15T12:34:37.043796Z",
+    "modified": "2023-06-16T16:20:44.668623Z",
+    "name": "Cloud / AWS / Snapshot Restore EC2",
+    "description": "",
+    "job_type": "run",
+    "inventory": 2,
+    "project": 9,
+    "playbook": "cloud/restore_ec2.yml",
+    "scm_branch": "",
+    "forks": 0,
+    "limit": "",
+    "verbosity": 0,
+    "extra_vars": "---\naws_region: us-east-1",
+    "job_tags": "",
+    "force_handlers": false,
+    "skip_tags": "",
+    "start_at_task": "",
+    "timeout": 0,
+    "use_fact_cache": false,
+    "organization": 1,
+    "last_job_run": "2023-06-16T19:32:04.099972Z",
+    "last_job_failed": false,
+    "next_job_run": null,
+    "status": "successful",
+    "execution_environment": null,
+    "host_config_key": "",
+    "ask_scm_branch_on_launch": false,
+    "ask_diff_mode_on_launch": false,
+    "ask_variables_on_launch": true,
+    "ask_limit_on_launch": false,
+    "ask_tags_on_launch": false,
+    "ask_skip_tags_on_launch": false,
+    "ask_job_type_on_launch": false,
+    "ask_verbosity_on_launch": false,
+    "ask_inventory_on_launch": false,
+    "ask_credential_on_launch": false,
+    "ask_execution_environment_on_launch": false,
+    "ask_labels_on_launch": false,
+    "ask_forks_on_launch": false,
+    "ask_job_slice_count_on_launch": false,
+    "ask_timeout_on_launch": false,
+    "ask_instance_groups_on_launch": false,
+    "survey_enabled": true,
+    "become_enabled": false,
+    "diff_mode": false,
+    "allow_simultaneous": false,
+    "custom_virtualenv": null,
+    "job_slice_count": 1,
+    "webhook_service": "",
+    "webhook_credential": null,
+    "prevent_instance_group_fallback": false
+}
+]

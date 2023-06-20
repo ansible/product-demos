@@ -1,0 +1,212 @@
+{
+    "id": 49,
+    "type": "workflow_job_template",
+    "url": "/api/v2/workflow_job_templates/49/",
+    "related": {
+        "named_url": "/api/v2/workflow_job_templates/Cloud %2F AWS %2F Patch Workflow++Default/",
+        "created_by": "/api/v2/users/1/",
+        "modified_by": "/api/v2/users/1/",
+        "last_job": "/api/v2/workflow_jobs/148/",
+        "workflow_jobs": "/api/v2/workflow_job_templates/49/workflow_jobs/",
+        "schedules": "/api/v2/workflow_job_templates/49/schedules/",
+        "launch": "/api/v2/workflow_job_templates/49/launch/",
+        "webhook_key": "/api/v2/workflow_job_templates/49/webhook_key/",
+        "webhook_receiver": "",
+        "workflow_nodes": "/api/v2/workflow_job_templates/49/workflow_nodes/",
+        "labels": "/api/v2/workflow_job_templates/49/labels/",
+        "activity_stream": "/api/v2/workflow_job_templates/49/activity_stream/",
+        "notification_templates_started": "/api/v2/workflow_job_templates/49/notification_templates_started/",
+        "notification_templates_success": "/api/v2/workflow_job_templates/49/notification_templates_success/",
+        "notification_templates_error": "/api/v2/workflow_job_templates/49/notification_templates_error/",
+        "notification_templates_approvals": "/api/v2/workflow_job_templates/49/notification_templates_approvals/",
+        "access_list": "/api/v2/workflow_job_templates/49/access_list/",
+        "object_roles": "/api/v2/workflow_job_templates/49/object_roles/",
+        "survey_spec": "/api/v2/workflow_job_templates/49/survey_spec/",
+        "copy": "/api/v2/workflow_job_templates/49/copy/",
+        "organization": "/api/v2/organizations/1/",
+        "inventory": "/api/v2/inventories/2/"
+    },
+    "summary_fields": {
+        "organization": {
+            "id": 1,
+            "name": "Default",
+            "description": ""
+        },
+        "inventory": {
+            "id": 2,
+            "name": "Workshop Inventory",
+            "description": "",
+            "has_active_failures": false,
+            "total_hosts": 5,
+            "hosts_with_active_failures": 0,
+            "total_groups": 7,
+            "has_inventory_sources": true,
+            "total_inventory_sources": 2,
+            "inventory_sources_with_failures": 0,
+            "organization_id": 1,
+            "kind": ""
+        },
+        "last_job": {
+            "id": 148,
+            "name": "Cloud / AWS / Patch Workflow",
+            "description": "",
+            "finished": "2023-06-16T19:32:09.055368Z",
+            "status": "successful",
+            "failed": false
+        },
+        "last_update": {
+            "id": 148,
+            "name": "Cloud / AWS / Patch Workflow",
+            "description": "",
+            "status": "successful",
+            "failed": false
+        },
+        "created_by": {
+            "id": 1,
+            "username": "admin",
+            "first_name": "",
+            "last_name": ""
+        },
+        "modified_by": {
+            "id": 1,
+            "username": "admin",
+            "first_name": "",
+            "last_name": ""
+        },
+        "object_roles": {
+            "admin_role": {
+                "description": "Can manage all aspects of the workflow job template",
+                "name": "Admin",
+                "id": 176
+            },
+            "execute_role": {
+                "description": "May run the workflow job template",
+                "name": "Execute",
+                "id": 177
+            },
+            "read_role": {
+                "description": "May view settings for the workflow job template",
+                "name": "Read",
+                "id": 178
+            },
+            "approval_role": {
+                "description": "Can approve or deny a workflow approval node",
+                "name": "Approve",
+                "id": 179
+            }
+        },
+        "user_capabilities": {
+            "edit": true,
+            "delete": true,
+            "start": true,
+            "schedule": true,
+            "copy": true
+        },
+        "labels": {
+            "count": 0,
+            "results": []
+        },
+        "survey": {
+            "title": "",
+            "description": ""
+        },
+        "recent_jobs": [
+            {
+                "id": 148,
+                "status": "successful",
+                "finished": "2023-06-16T19:32:09.055368Z",
+                "canceled_on": null,
+                "type": "workflow_job"
+            },
+            {
+                "id": 141,
+                "status": "successful",
+                "finished": "2023-06-16T19:02:55.051629Z",
+                "canceled_on": null,
+                "type": "workflow_job"
+            },
+            {
+                "id": 135,
+                "status": "successful",
+                "finished": "2023-06-16T18:43:47.814491Z",
+                "canceled_on": null,
+                "type": "workflow_job"
+            },
+            {
+                "id": 129,
+                "status": "successful",
+                "finished": "2023-06-16T18:20:56.938235Z",
+                "canceled_on": null,
+                "type": "workflow_job"
+            },
+            {
+                "id": 122,
+                "status": "successful",
+                "finished": "2023-06-16T18:06:53.813138Z",
+                "canceled_on": null,
+                "type": "workflow_job"
+            },
+            {
+                "id": 115,
+                "status": "successful",
+                "finished": "2023-06-16T17:48:54.451831Z",
+                "canceled_on": null,
+                "type": "workflow_job"
+            },
+            {
+                "id": 108,
+                "status": "successful",
+                "finished": "2023-06-16T17:33:01.399978Z",
+                "canceled_on": null,
+                "type": "workflow_job"
+            },
+            {
+                "id": 101,
+                "status": "successful",
+                "finished": "2023-06-16T16:44:52.650848Z",
+                "canceled_on": null,
+                "type": "workflow_job"
+            },
+            {
+                "id": 94,
+                "status": "successful",
+                "finished": "2023-06-16T16:31:50.294128Z",
+                "canceled_on": null,
+                "type": "workflow_job"
+            },
+            {
+                "id": 79,
+                "status": "successful",
+                "finished": "2023-06-15T14:06:04.620971Z",
+                "canceled_on": null,
+                "type": "workflow_job"
+            }
+        ]
+    },
+    "created": "2023-06-15T12:36:09.829840Z",
+    "modified": "2023-06-16T16:28:52.153351Z",
+    "name": "Cloud / AWS / Patch Workflow",
+    "description": "",
+    "last_job_run": "2023-06-16T19:32:09.055368Z",
+    "last_job_failed": false,
+    "next_job_run": null,
+    "status": "successful",
+    "extra_vars": "---",
+    "organization": 1,
+    "survey_enabled": true,
+    "allow_simultaneous": false,
+    "ask_variables_on_launch": false,
+    "inventory": 2,
+    "limit": null,
+    "scm_branch": "",
+    "ask_inventory_on_launch": false,
+    "ask_scm_branch_on_launch": false,
+    "ask_limit_on_launch": false,
+    "webhook_service": "",
+    "webhook_credential": null,
+    "ask_labels_on_launch": false,
+    "ask_skip_tags_on_launch": false,
+    "ask_tags_on_launch": false,
+    "skip_tags": null,
+    "job_tags": null
+}

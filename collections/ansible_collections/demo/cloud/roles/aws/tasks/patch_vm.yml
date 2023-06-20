@@ -10,6 +10,9 @@
 - name: AWS | PATCH VM | wait for connection
   ansible.builtin.wait_for_connection:
 
+- name: AWS | PATCH VM | gather facts
+  ansible.builtin.setup:
+
 - name: AWS | PATCH VM | install yum-utils
   ansible.builtin.yum:
     name: yum-utils
