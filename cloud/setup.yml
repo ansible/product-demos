@@ -237,6 +237,7 @@ controller_templates:
             - rhel9
             - rhel8
             - rhel7
+            - al2023
         - question_name: Subnet
           type: text
           variable: aws_vpc_subnet_name
