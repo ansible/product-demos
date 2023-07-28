@@ -48,6 +48,6 @@ You will be prompted by a survey for the following information:
 At this point you should have a project url similar to this:
 https://gitlab.com/username/backups
 
-You can view and delete your config files from accessing your own url.
+You can view and delete your config files by accessing your own gitlab project url.
 
 
