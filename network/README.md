@@ -36,3 +36,18 @@ A **`Network Inventory`** is created when setting up these demos and a dynamic s
   - [prefix_lists](https://github.com/nleiva/ansible-net-modules/blob/main/prefix_lists.cfg)
   - [snmp](https://github.com/nleiva/ansible-net-modules/blob/main/snmp.cfg)
   - [user](https://github.com/nleiva/ansible-net-modules/blob/main/user.cfg)
+
+**NETWORK / Backups to Gitlab** - Use this job-template to backup network device configurations to a Gitlab repository.
+
+***This demo requires the following pre-requisite items!***
+You will be prompted by a survey for the following information:
+- [Create a Gitlab Account](https://gitlab.com)
+- [Create a new project named 'backups'](https://gitlab.com/projects/new)
+- Create a project token for your account. This requires your unique Gitlab username. https://gitlab.com/<username>/backups/-/settings/access_tokens
+
+At this point you should have a project url similar to this:
+https://gitlab.com/<username>/backups
+
+You can view and delete your config files from accessing your own url.
+
+
