@@ -46,7 +46,7 @@ You will be prompted by a survey for the following information:
 - Create a project token for your account. This step requires your own unique Gitlab username. https://gitlab.com/username/backups/-/settings/access_tokens
 
 At this point you should have a project url similar to this:
-https://gitlab.com/username/backups
+gitlab.com/username/backups
 
 You can view and delete your config files by accessing your own gitlab project url.
 
