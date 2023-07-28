@@ -1,0 +1,70 @@
+---
+- name: Backup Cisco Configs to GitLab
+  hosts: 
+  - localhost
+  - "{{ group }}" 
+  gather_facts: False
+  vars:
+    git_username: git config --global user.name {{ username }}
+    git_email: git config --global user.email {{ email }}
+    git_add: 'git add --all' 
+    git_commit: git commit --allow-empty -m "Changed by AAP2.4"
+    git_push: git push https://tdubiel1:{{ token }}@{{ url }}.git/ 
+  
+  tasks:
+    - name: Clone a Repo for backups
+      shell:
+        cmd: "git clone https://{{ url }}.git"
+        chdir: /tmp/
+      when: inventory_hostname == 'localhost'
+
+    - name: Backup ios configurations for selected devices
+      cisco.ios.ios_config:
+        backup: true
+        backup_options:
+          dir_path: /tmp/backups/
+      when: inventory_hostname in groups['ios']
+
+    - name: Backup iosxr configurations for selected devices
+      cisco.iosxr.iosxr_config:
+        backup: true
+        backup_options:
+          dir_path: /tmp/backups/
+      when: inventory_hostname in groups['iosxr']
+
+    - name: Backup iosxr configurations for selected devices
+      cisco.nxos.nxos_config:
+        backup: true
+        backup_options:
+          dir_path: /tmp/backups/
+      when: inventory_hostname in groups['nxos']
+
+    - name: This command list the files on the EE
+      shell:
+        cmd: ls
+        chdir: /tmp/backups/
+      when: inventory_hostname == 'localhost'
+      register: files
+
+    - name: Print Backup files on the screen
+      ansible.builtin.debug:
+        msg: "{{ files.stdout_lines }}"
+      when: inventory_hostname == 'localhost'
+
+    - name: Prepare GIT on EE for Credentials(vars/vault.yml)
+      ansible.builtin.shell:
+        cmd: "{{ item }}"
+        chdir: /tmp/backups/
+      when: inventory_hostname == 'localhost'
+      loop:
+        - "{{ git_username }}"
+        - "{{ git_email }}"
+        - "{{ git_add }}"
+        - "{{ git_commit }}"
+
+    - name: Push and Hide Token
+      ansible.builtin.shell:
+        cmd: "git push https://{{ username }}:{{ token }}@{{ url }}.git"
+        chdir: /tmp/backups/
+      when: inventory_hostname == 'localhost'
+      no_log: true

@@ -117,3 +117,79 @@ controller_templates:
     use_fact_cache: true
     ask_job_type_on_launch: true
     survey_enabled: true
+
+  - name: "NETWORK / Backups to Gitlab"
+    job_type: run
+    organization: Default
+    inventory: Network Inventory
+    project: "Ansible official demo project"
+    playbook: "network/backup.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    execution_environment: Networking Execution Environment
+    use_fact_cache: true
+    credentials:
+      - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - choices: ''
+          default: ''
+          max: 1024
+          min: 0
+          new_question: false
+          question_description: ''
+          question_name: Please enter your Gitlab username
+          required: true
+          type: text
+          variable: username
+        - choices: ''
+          default: ''
+          max: 1024
+          min: 0
+          new_question: true
+          question_description: ''
+          question_name: Please enter your Gitlab email address
+          required: true
+          type: text
+          variable: email
+        - choices: ''
+          default: ''
+          max: 1024
+          min: 0
+          new_question: false
+          question_description: ''
+          question_name: Please enter the url for your Gitlab backup repo -  Example.
+            gitlab.com/username/backups - Note, do not include https://
+          required: true
+          type: text
+          variable: url
+        - choices: ''
+          default: ''
+          max: 1024
+          min: 0
+          new_question: true
+          question_description: ''
+          question_name: Please enter your Gitlab project token for your backups repo
+          required: true
+          type: password
+          variable: token
+        - choices:
+          - ios
+          - iosxr
+          - nxos
+          - routers
+          default: routers
+          max: 1024
+          min: 0
+          new_question: false
+          question_description: ''
+          question_name: Which Device Groups would you like to backup?
+          required: true
+          type: multiplechoice
+          variable: group
+
+  
