@@ -43,10 +43,10 @@ A **`Network Inventory`** is created when setting up these demos and a dynamic s
 You will be prompted by a survey for the following information:
 - [Create a Gitlab Account](https://gitlab.com)
 - [Create a new project named 'backups'](https://gitlab.com/projects/new)
-- Create a project token for your account. This requires your unique Gitlab username. https://gitlab.com/<username>/backups/-/settings/access_tokens
+- Create a project token for your account. This requires your unique Gitlab username. https://gitlab.com/username/backups/-/settings/access_tokens
 
 At this point you should have a project url similar to this:
-https://gitlab.com/<username>/backups
+https://gitlab.com/username/backups
 
 You can view and delete your config files from accessing your own url.
 
