@@ -92,12 +92,11 @@ platform console virtual
 !
 hostname Cat8000V
 !
-```
-truncated
+``` truncated
 
-#### Run again ####
-If you run the "Backups to Gitea" agin it will create a new branch with the original and new files.
-It is possible to merge these with the main branch, if needed.
+#### What if you Run it again? ####
+If you run the "Backups to Gitea" again it will create a new branch that includes the original and new backup files.
+Note, It's possible to merge these with the main branch, if needed.
 
 - To see the new branch run the following 'similar' commands
 ```
