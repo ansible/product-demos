@@ -63,3 +63,4 @@
         -   git clone http://node1:3000/gitea/backups.git
         -   cd backups
         -   ls
+        when: inventory_hostname == 'localhost'
