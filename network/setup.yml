@@ -58,8 +58,8 @@ controller_templates:
     ask_limit_on_launch: true
     use_fact_cache: true
     survey:
-      name: ''
-      description: ''
+      name: ""
+      description: ""
       spec:
         - question_name: What resource would you like to configure?
           type: multiplechoice
@@ -93,8 +93,8 @@ controller_templates:
       - "Workshop Credential"
     survey_enabled: true
     survey:
-      name: ''
-      description: ''
+      name: ""
+      description: ""
       spec:
         - question_name: What devices do you want to include in the report?
           type: multiplechoice
@@ -135,16 +135,16 @@ controller_templates:
       - "Workshop Credential"
     survey_enabled: true
     survey:
-      name: ''
-      description: ''
+      name: ""
+      description: ""
       spec:
-        - choices: ''
-          default: ''
+        - choices: ""
+          default: ""
           max: 1024
           min: 0
           new_question: false
-          question_description: ''
-          question_name: Please create a simple password for Gitea with no special characters (#@!) 
+          question_description: ""
+          question_name: Please create a simple password for Gitea with no special characters (#@!)
           required: true
           type: password
           variable: password
@@ -164,17 +164,16 @@ controller_templates:
       - "Workshop Credential"
     survey_enabled: true
     survey:
-      name: ''
-      description: ''
+      name: ""
+      description: ""
       spec:
-        - choices: ''
-          default: ''
+        - choices: ""
+          default: ""
           max: 1024
           min: 0
           new_question: false
-          question_description: ''
-          question_name: Please enter the password you created for Gitea 
+          question_description: ""
+          question_name: Please enter the password you created for Gitea
           required: true
           type: password
           variable: password
-    
