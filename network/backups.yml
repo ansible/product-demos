@@ -5,7 +5,7 @@
     - routers
   gather_facts: False
   vars:
-    git_repo: "node1:3000/gitea/backups.git"
+    git_repo: 'node1:3000/gitea/backups.git'
     username: gitea
     email: gitea@example.com
 
