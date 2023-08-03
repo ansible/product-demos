@@ -44,7 +44,7 @@ Use the following job-templates (Deploy Gitea, and Backups to Gitea ) to backup 
 Note, only run this job-template once or you will observe ignored-errors for the existing user and repo.  
 
 This job-template will use the gitea.yml playbook to complete the following tasks on node1:
-- Prompts the user to create a password for Gitea (this password is needed later)
+- Prompts the user to create a simple password for Gitea (this password is needed later)
 - Installs Podman 
 - Runs the gitea container
 - Installs gitea with the admin user "gitea"
