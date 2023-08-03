@@ -133,6 +133,7 @@ controller_templates:
     use_fact_cache: true
     credentials:
       - "Workshop Credential"
+    survey_enabled: true
     survey:
       name: ''
       description: ''
@@ -161,6 +162,7 @@ controller_templates:
     use_fact_cache: true
     credentials:
       - "Workshop Credential"
+    survey_enabled: true
     survey:
       name: ''
       description: ''
