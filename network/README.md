@@ -41,7 +41,7 @@ A **`Network Inventory`** is created when setting up these demos and a dynamic s
 Use the following job-templates (Deploy Gitea, and Backups to Gitea ) to backup the router and switch configs to Gitea 
 
 **NETWORK / Deploy Gitea** Run this job-template first to deploy a Gitea container on node1.
-Note, only run this job-template once or you will observe ignored-errors for the existing user and repo.  
+Note, only run this job-template once or you will observe ignored-errors!
 
 This job-template will use the gitea.yml playbook to complete the following tasks on node1:
 - Prompts the user to create a simple password for Gitea (no special characters)
