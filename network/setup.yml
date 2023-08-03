@@ -173,7 +173,7 @@ controller_templates:
           min: 0
           new_question: false
           question_description: ""
-          question_name: Please enter the password you created for Gitea
+          question_name: Enter the previously created simple password for Gitea
           required: true
           type: password
           variable: password

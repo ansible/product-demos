@@ -42,6 +42,7 @@
         cmd: "podman exec gitea gitea admin user create --admin --username gitea --password {{ password }} --email admin@example.com"
       become: true
       ignore_errors: true
+      no_log: yes
 
     - name: Create gitea repo "backups"
       ansible.builtin.uri:
