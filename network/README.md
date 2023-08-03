@@ -39,7 +39,7 @@ A **`Network Inventory`** is created when setting up these demos and a dynamic s
   - [snmp](https://github.com/nleiva/ansible-net-modules/blob/main/snmp.cfg)
   - [user](https://github.com/nleiva/ansible-net-modules/blob/main/user.cfg)
 
-### NETWORK /Router Backups**
+### NETWORK /Router Backups
 Use the following job-templates (Deploy Gitea, and Backups to Gitea ) to backup the router and switch configs to Gitea 
 
 **NETWORK / Deploy Gitea** Run this job-template first to deploy a Gitea container on node1.
