@@ -5,7 +5,7 @@
     - routers
   gather_facts: False
   vars:
-    git_repo: 'node1:3000/gitea/backups.git'
+    git_repo: node1:3000/gitea/backups.git
     username: gitea
     email: gitea@example.com
 
@@ -41,7 +41,7 @@
 
     - name: Set Remote Origin
       ansible.builtin.shell:
-        cmd: "git remote set-url origin http://{{ username }}:'{{ password }}'@{{ git_repo }}"
+        cmd: "git remote set-url origin http://{{ username }}:{{ password }}@{{ git_repo }}"
         chdir: /tmp/backups/
       when: inventory_hostname == 'localhost'
       no_log: true
