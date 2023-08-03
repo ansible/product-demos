@@ -144,7 +144,7 @@ controller_templates:
           min: 0
           new_question: false
           question_description: ''
-          question_name: Please enter a password for Gitea 
+          question_name: Please enter a password for Gitea with no @ 
           required: true
           type: password
           variable: password
