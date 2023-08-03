@@ -51,7 +51,7 @@ This job-template will use the gitea.yml playbook to complete the following task
 - Creates a repo called "backups"
 
 **NETWORK / Backups to Gitea** - Run this job-template (Backups to Gitea) to backup the network device configurations to a Gitea repository.
-Note, the survey prompts for the gitea password created in the "deploy Gitea" job-template!
+Note, the survey prompts for the gitea password created in the "Deploy Gitea" job-template!
 
 ***Upon completing the above job-template, the demo requires the use of the vscode tab in to validate***
 
