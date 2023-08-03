@@ -36,3 +36,29 @@ A **`Network Inventory`** is created when setting up these demos and a dynamic s
   - [prefix_lists](https://github.com/nleiva/ansible-net-modules/blob/main/prefix_lists.cfg)
   - [snmp](https://github.com/nleiva/ansible-net-modules/blob/main/snmp.cfg)
   - [user](https://github.com/nleiva/ansible-net-modules/blob/main/user.cfg)
+
+### NETWORK /Router Backups**
+Use the following job-templates (Deploy Gitea, and Backups to Gitea ) to backup the router and switch configs to Gitea 
+
+**NETWORK / Deploy Gitea** Run this job-template first to deploy a Gitea container on node1.
+Note, only run this job-template once or you will observe ignored-errors for the existing user and repo.  
+
+This job-template will use the gitea.yml playbook to complete the following tasks on node1:
+- Prompts the user to create a password for Gitea (this password is needed later)
+- Installs Podman 
+- Runs the gitea container
+- Installs gitea with the admin user "gitea"
+- Creates a repo called "backups"
+
+**NETWORK / Backups to Gitea** - Run this job-template (Backups to Gitea) to backup the network device configurations to a Gitea repository.
+Note, the survey prompts for the gitea password created in the "deploy Gitea" job-template!
+
+***Upon completing the above job-template, the demo requires the use of the vscode tab in to validate***
+
+****From the VS Code terminal***
+Clone the "backups" repo from Gitea after running the "NETWORK / Backups to Gitea" Job-template
+
+```
+
+
+

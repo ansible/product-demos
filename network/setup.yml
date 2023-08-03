@@ -146,7 +146,7 @@ controller_templates:
           question_description: ''
           question_name: Please enter a password for Gitea 
           required: true
-          type: text
+          type: password
           variable: password
 
   - name: "NETWORK / Backups to Gitea"
@@ -175,6 +175,6 @@ controller_templates:
           question_description: ''
           question_name: Please enter the password you created for Gitea 
           required: true
-          type: text
+          type: password
           variable: password
     

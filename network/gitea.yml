@@ -39,7 +39,7 @@
 
     - name: Add gitea user
       ansible.builtin.shell:
-        cmd: podman exec gitea gitea admin user create --admin --username gitea --password {{ password }} --email admin@example.com
+        cmd: "podman exec gitea gitea admin user create --admin --username gitea --password '{{ password }}' --email admin@example.com"
       become: true
       ignore_errors: true
 
