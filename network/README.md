@@ -11,8 +11,8 @@
 ## About These Demos
 This category of demos shows examples of network operations and management with Ansible Automation Platform. The list of demos can be found below. See the [Suggested Usage](#suggested-usage) section of this document for recommendations on how to best use these demos.
 - [**NETWORK / Configuration**](https://github.com/nleiva/ansible-net-modules/blob/main/main.yml) - Deploy golden configurations for different resources to Cisco IOS, IOSXR, and NXOS.
-- [**NETWORK / Deploy Gitea**] - Deploy a Gitea repository container to save network backups.
-- [**NETWORK / Backups to Gitea**] - Collect Backups from Cisco IOS, IOSXR, and NXOSand save to Gitea. 
+- **NETWORK / Deploy Gitea** - Deploy a Gitea repository container to store network backups.
+- **NETWORK / Backups to Gitea** - Collect backups from Cisco IOS, IOSXR, and NXOS to save to Gitea. 
 
 ### Project
 
