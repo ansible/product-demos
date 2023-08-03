@@ -53,3 +53,13 @@
           name: "{{ username }}"
           email: "{{ email }}"
       when: inventory_hostname == 'localhost'
+
+    - name: Review the config files
+      ansible.builtin.debug:
+        msg: 
+        - ##########################################
+        -   To view the backups repo - Use the VS code tab
+        -   Open a new Terminal
+        -   git clone http://node1:3000/gitea/backups.git
+        -   cd backups
+        -   ls
