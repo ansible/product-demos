@@ -44,7 +44,7 @@ Use the following job-templates (Deploy Gitea, and Backups to Gitea ) to backup 
 Note, only run this job-template once or you will observe ignored-errors for the existing user and repo.  
 
 This job-template will use the gitea.yml playbook to complete the following tasks on node1:
-- Prompts the user to create a simple password for Gitea (this password is needed later)
+- Prompts the user to create a simple password for Gitea (no special characters)
 - Installs Podman 
 - Runs the gitea container
 - Installs gitea with the admin user "gitea"
@@ -55,10 +55,68 @@ Note, the survey prompts for the gitea password created in the "deploy Gitea" jo
 
 ***Upon completing the above job-template, the demo requires the use of the vscode tab in to validate***
 
-****From the VS Code terminal***
-Clone the "backups" repo from Gitea after running the "NETWORK / Backups to Gitea" Job-template
-
+#### From the VS Code terminal ####
+- Clone the "backups" repo from Gitea after running the "NETWORK / Backups to Gitea" Job-template
 ```
+[rhel@control ansible-files]$ git clone http://node1:3000/gitea/backups.git
+Cloning into 'backups'...
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Compressing objects: 100% (5/5), done.
+remote: Total 5 (delta 0), reused 0 (delta 0), pack-reused 0
+Receiving objects: 100% (5/5), 7.78 KiB | 7.78 MiB/s, done.
+```
+- To see the backups change directories into "backups" and list the files
+```
+rhel@control ansible-files]$ cd backups/
+[rhel@control backups]$ ls
+sandbox-iosxe-latest-1.cisco.com_config.2023-08-03@19:10:13  sandbox-nxos-1.cisco.com_config.2023-08-03@19:10:34
+sandbox-iosxr-1.cisco.com_config.2023-08-03@19:10:19
+```
+- Cat the files
+```
+[rhel@control backups]$ cat sandbox-iosxe-latest-1.cisco.com_config.2023-08-03\@19\:10\:13 
+Building configuration...
 
+Current configuration : 7167 bytes
+!
+! Last configuration change at 18:58:48 UTC Thu Aug 3 2023 by admin
+!
+version 17.9
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service call-home
+platform qfp utilization monitor load 80
+platform punt-keepalive disable-kernel-core
+platform console virtual
+!
+hostname Cat8000V
+!
+```
+truncated
+
+#### Run again ####
+If you run the "Backups to Gitea" agin it will create a new branch with the original and new files.
+It is possible to merge these with the main branch, if needed.
+
+- To see the new branch run the following 'similar' commands
+```
+ [rhel@control backups]$ git pull
+remote: Enumerating objects: 4, done.
+remote: Counting objects: 100% (4/4), done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (3/3), 2.52 KiB | 2.52 MiB/s, done.
+From http://node1:3000/gitea/backups
+ * [new branch]      ansible-backup_cisco_configs_to_gitea-2023-08-03T192936.882436+0000 -> origin/ansible-backup_cisco_configs_to_gitea-2023-08-03T192936.882436+0000
+Already up to date.
+[rhel@control backups]$ git checkout ansible-backup_cisco_configs_to_gitea-2023-08-03T192936.882436+0000
+Branch 'ansible-backup_cisco_configs_to_gitea-2023-08-03T192936.882436+0000' set up to track remote branch 'ansible-backup_cisco_configs_to_gitea-2023-08-03T192936.882436+0000' from 'origin'.
+Switched to a new branch 'ansible-backup_cisco_configs_to_gitea-2023-08-03T192936.882436+0000'
+[rhel@control backups]$ ls
+sandbox-iosxe-latest-1.cisco.com_config.2023-08-03@19:10:13  sandbox-iosxr-1.cisco.com_config.2023-08-03@19:29:48
+sandbox-iosxe-latest-1.cisco.com_config.2023-08-03@19:29:41  sandbox-nxos-1.cisco.com_config.2023-08-03@19:10:34
+sandbox-iosxr-1.cisco.com_config.2023-08-03@19:10:19         sandbox-nxos-1.cisco.com_config.2023-08-03@19:29:57
+```
 
 
