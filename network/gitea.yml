@@ -1,0 +1,68 @@
+---
+- name: Deploy gitea
+  hosts: node1
+  gather_facts: False
+  vars:
+    user: gitea
+    repo: backups
+
+  tasks:
+    - name: Install Podman
+      ansible.builtin.dnf:
+        name: podman
+        state: installed
+      become: true
+
+    - name: Run gitea container
+      containers.podman.podman_container:
+        name: gitea
+        image: docker.io/gitea/gitea:1.14.2
+        state: started
+        ports:
+          - "3000:3000"
+      become: true
+
+    - name: Create gitea database
+      ansible.builtin.shell:
+        cmd: podman exec --user git gitea touch /data/gitea/gitea.db
+      become: true
+   
+    - name: Lock app.ini
+      ansible.builtin.shell:
+        cmd: podman exec --user git gitea sed -i -e "s/^INSTALL_LOCK.*/INSTALL_LOCK=true/" /data/gitea/conf/app.ini
+      become: true
+
+    - name: Restart gitea
+      ansible.builtin.shell:
+        cmd: podman restart gitea
+      become: true
+
+    - name: Add gitea user
+      ansible.builtin.shell:
+        cmd: podman exec gitea gitea admin user create --admin --username gitea --password {{ passsword }} --email admin@example.com
+      become: true
+      ignore_errors: true
+
+    - name: Create gitea repo "backups"
+      ansible.builtin.uri:
+        url: 'http://node1:3000/api/v1/user/repos/'
+        user: "{{ user }}"
+        password: "{{ password }}"
+        force_basic_auth: true
+        force: false
+        method: POST
+        body_format: json
+        body:
+          name: "{{ repo }}"
+        status_code:
+        - 200
+        - 201
+      ignore_errors: true
+  
+
+        
+
+        
+
+      
+          

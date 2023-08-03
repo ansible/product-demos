@@ -1,0 +1,56 @@
+---
+- name: Backup Cisco Configs to gitea
+  hosts:
+    - localhost
+    - routers
+  gather_facts: False
+  vars:
+    git_repo: 'node1:3000/gitea/backups.git'
+    username: gitea
+    email: gitea@example.com
+
+  tasks:
+    - name: Retrieve a repository from a distant location and make it available to the local EE
+      ansible.scm.git_retrieve:
+        origin:
+          url: "http://{{ git_repo }}"
+        parent_directory: /tmp/
+      register: repository
+      when: inventory_hostname == 'localhost'
+
+    - name: Backup ios configurations for selected devices
+      cisco.ios.ios_config:
+        backup: true
+        backup_options:
+          dir_path: /tmp/backups/
+      when: inventory_hostname == 'sandbox-iosxe-latest-1.cisco.com'
+
+    - name: Backup iosxr configurations for selected devices
+      cisco.iosxr.iosxr_config:
+        backup: true
+        backup_options:
+          dir_path: /tmp/backups/
+      when: inventory_hostname == 'sandbox-iosxr-1.cisco.com'
+    
+
+    - name: Backup nxos configurations for selected devices
+      cisco.nxos.nxos_config:
+        backup: true
+        backup_options:
+          dir_path: /tmp/backups/
+      when: inventory_hostname == 'sandbox-nxos-1.cisco.com'
+     
+    - name: Set Remote Origin
+      ansible.builtin.shell:
+        cmd: "git remote set-url origin http://{{ username }}:{{ password }}@{{ git_repo }}"
+        chdir: /tmp/backups/
+      when: inventory_hostname == 'localhost'
+      no_log: true
+
+    - name: Publish the changes
+      ansible.scm.git_publish:
+        path: "{{ repository['path'] }}"
+        user:
+          name: "{{ username }}"
+          email: "{{ email }}"
+      when: inventory_hostname == 'localhost'
