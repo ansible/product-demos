@@ -448,6 +448,29 @@ controller_templates:
           variable: _hosts
           required: false
 
+  - name: "LINUX / Patching"
+    job_type: check
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/patching.yml"
+    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    use_fact_cache: true
+    ask_job_type_on_launch: true
+    credentials:
+      - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: true
+
 controller_workflows:
   - name: Deploy Cloud Stack in AWS
     description: A workflow to deploy a cloud stack
