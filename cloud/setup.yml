@@ -385,38 +385,6 @@ controller_templates:
           variable: _hosts
           required: false
 
-  - name: Cloud / AWS / Patch EC2
-    job_type: run
-    organization: Default
-    credentials:
-      - AWS
-      - Workshop Credential
-    project: Ansible official demo project
-    playbook: cloud/patch_ec2.yml
-    inventory: Workshop Inventory
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: AWS Region
-          type: multiplechoice
-          variable: aws_region
-          required: true
-          default: us-east-1
-          choices:
-            - us-east-1
-            - us-east-2
-            - us-west-1
-            - us-west-2
-        - question_name: Specify target hosts
-          type: text
-          variable: _hosts
-          required: false
-
   - name: Cloud / AWS / Restore EC2 from Snapshot
     job_type: run
     organization: Default
