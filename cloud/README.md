@@ -25,6 +25,9 @@ This category of demos shows examples of multi-cloud provisioning and management
 - [**Cloud / Snapshot EC2**](snapshot_ec2.yml) - Snapshot a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be snapshot.
 - [**Cloud / Patch EC2**](snapshot_ec2.yml) - Patch a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be patched.
 - [**Cloud / Restore EC2 from Snapshot**](snapshot_ec2.yml) - Restore a VM that has been created in a cloud provider.  By default, volumes will be restored from their latest snapshot. VM must be imported into dynamic inventory to be patched.
+- [**Cloud / Snapshot EC2**](snapshot_ec2.yml) - Snapshot a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be snapshot.
+- [**Cloud / Patch EC2**](snapshot_ec2.yml) - Patch a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be patched.
+- [**Cloud / Restore EC2 from Snapshot**](snapshot_ec2.yml) - Restore a VM that has been created in a cloud provider.  By default, volumes will be restored from their latest snapshot. VM must be imported into dynamic inventory to be patched.
 
 ### Inventory
 
