@@ -1,0 +1,42 @@
+---
+roles:
+  # RHEL 7 compliance roles from ComplianceAsCode
+  - name: redhatofficial.rhel7_cis
+    version: 0.1.69
+  - name: redhatofficial.rhel7_cui
+    version: 0.1.67
+  - name: redhatofficial.rhel7_hipaa
+    version: 0.1.69
+  - name: redhatofficial.rhel7_ospp
+    version: 0.1.69
+  - name: redhatofficial.rhel7_pci_dss
+    version: 0.1.69
+  - name: redhatofficial.rhel7_stig
+    version: 0.1.69
+  # RHEL 8 compliance roles from ComplianceAsCode
+  - name: redhatofficial.rhel8_cis
+    version: 0.1.69
+  - name: redhatofficial.rhel8_cui
+    version: 0.1.69
+  - name: redhatofficial.rhel8_hipaa
+    version: 0.1.69
+  - name: redhatofficial.rhel8_ospp
+    version: 0.1.69
+  - name: redhatofficial.rhel8_pci_dss
+    version: 0.1.69
+  - name: redhatofficial.rhel8_stig
+    version: 0.1.69
+  # RHEL 9 compliance roles from ComplianceAsCode
+  - name: redhatofficial.rhel9_cis
+    version: 0.1.68
+  - name: redhatofficial.rhel9_cui
+    version: 0.1.64
+  - name: redhatofficial.rhel9_hipaa
+    version: 0.1.68
+  - name: redhatofficial.rhel9_ospp
+    version: 0.1.68
+  - name: redhatofficial.rhel9_pci_dss
+    version: 0.1.68
+  - name: redhatofficial.rhel9_stig
+    version: 0.1.64
+...
