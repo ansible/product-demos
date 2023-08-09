@@ -578,7 +578,7 @@ controller_workflows:
           type: text
           variable: _hosts
           required: true
-          default: linux
+          default: os_linux
     simplified_workflow_nodes:
       - identifier: Project Sync
         unified_job_template: Ansible official demo project
