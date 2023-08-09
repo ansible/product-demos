@@ -610,7 +610,7 @@ controller_workflows:
           type: text
           variable: _hosts
           required: true
-          default: aws_ec2
+          default: linux
         - question_name: Demo "patch fail" and restore from snapshot?
           type: multiplechoice
           variable: aws_demo_patch_fail
@@ -633,7 +633,8 @@ controller_workflows:
         success_nodes:
           - Patch Instance
       - identifier: Patch Instance
-        unified_job_template: Cloud / AWS / Patch EC2
+        unified_job_template: LINUX / Patching
+        job_type: run
         failure_nodes:
           - Restore from Snapshot
       - identifier: Restore from Snapshot
