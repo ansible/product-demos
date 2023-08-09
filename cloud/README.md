@@ -20,13 +20,10 @@ This category of demos shows examples of multi-cloud provisioning and management
 ### Jobs
 
 - [**Cloud / Create Infra**](create_infra.yml) - Creates a VPC with required routing and firewall rules for provisioning VMs
+- [**Cloud / Create Keypair**](aws_key.yml) - Creates a keypair for connecting to EC2 instances
 - [**Cloud / Create VM**](create_vm.yml) - Create a VM based on a [blueprint](blueprints/) in the selected cloud provider
 - [**Cloud / Destroy VM**](destroy_vm.yml) - Destroy a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be deleted.
 - [**Cloud / Snapshot EC2**](snapshot_ec2.yml) - Snapshot a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be snapshot.
-- [**Cloud / Patch EC2**](snapshot_ec2.yml) - Patch a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be patched.
-- [**Cloud / Restore EC2 from Snapshot**](snapshot_ec2.yml) - Restore a VM that has been created in a cloud provider.  By default, volumes will be restored from their latest snapshot. VM must be imported into dynamic inventory to be patched.
-- [**Cloud / Snapshot EC2**](snapshot_ec2.yml) - Snapshot a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be snapshot.
-- [**Cloud / Patch EC2**](snapshot_ec2.yml) - Patch a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be patched.
 - [**Cloud / Restore EC2 from Snapshot**](snapshot_ec2.yml) - Restore a VM that has been created in a cloud provider.  By default, volumes will be restored from their latest snapshot. VM must be imported into dynamic inventory to be patched.
 
 ### Inventory
@@ -62,7 +59,7 @@ After running the setup job template, there are a few steps required to make the
 
 ## Suggested Usage
 
-**Cloud / Create Keypair** -The Create Keypair creates an EC2 keypair which can be used when creating EC2 instances to enable SSH access.
+**Cloud / Create Keypair** - The Create Keypair job creates an EC2 keypair which can be used when creating EC2 instances to enable SSH access.
 
 **Cloud / Create VM** - The Create VM job builds a VM in the given provider based on the included `demo.cloud` collection. VM [blueprints](blueprints/) define variables for each provider that override the defaults in the collection. When creating VMs it is recommended to follow naming conventions that can be used as host patterns. (eg. VM names: `win1`, `win2`, `win3`.  Host Pattern: `win*` )
 
