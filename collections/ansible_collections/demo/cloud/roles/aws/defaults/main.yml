@@ -21,3 +21,4 @@ aws_env_tag: prod
 aws_purpose_tag: ansible_demo
 aws_ansiblegroup_tag: cloud
 aws_ec2_wait: true
+aws_snapshots: {}

@@ -29,9 +29,22 @@
         - ansible_local.insights.system_id is defined
 
     - name: Deploy report server
+      when: not ansible_check_mode
       delegate_to: "{{ report_server }}"
       run_once: true # noqa: run-once[task]
       block:
+        - name: Install firewall dependencies
+          ansible.builtin.dnf:
+            name:
+              - firewalld
+              - python3-firewall
+            state: present
+
+        - name: Start firewalld
+          ansible.builtin.service:
+            name: firewalld
+            state: started
+
         - name: Build report server
           ansible.builtin.include_role:
             name: "{{ item }}"
