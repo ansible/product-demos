@@ -191,9 +191,6 @@ controller_templates:
     notification_templates_error: Telemetry
     survey_enabled: true
     allow_simultaneous: true
-    extra_vars:
-      aws_region: us-east-1
-      aws_keypair_name: aws-test-key
     survey:
       name: ''
       description: ''
@@ -247,6 +244,11 @@ controller_templates:
           variable: aws_securitygroup_name
           required: true
           default: aws-test-sg
+        - question_name: SSH Keypair
+          type: text
+          variable: aws_keypair_name
+          required: true
+          default: aws-test-key
 
   - name: Cloud / AWS / Delete VM
     job_type: run
