@@ -19,8 +19,7 @@ controller_projects:
     organization: Default
     scm_type: git
     wait: true
-    # scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
-    scm_url: https://github.com/willtome/aws.infrastructure_config_demos.git
+    scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
     default_environment: Cloud Services Execution Environment
 
 controller_credentials:
@@ -191,16 +190,13 @@ controller_templates:
     notification_templates_error: Telemetry
     survey_enabled: true
     allow_simultaneous: true
-    extra_vars:
-      aws_region: us-east-1
-      aws_keypair_name: aws-test-key
     survey:
       name: ''
       description: ''
       spec:
         - question_name: AWS Region
           type: multiplechoice
-          variable: aws_region
+          variable: create_vm_aws_region
           required: true
           choices:
             - us-east-1
@@ -209,19 +205,19 @@ controller_templates:
             - us-west-2
         - question_name: Name
           type: text
-          variable: vm_name
+          variable: create_vm_vm_name
           required: true
         - question_name: Owner
           type: text
-          variable: vm_owner
+          variable: create_vm_vm_owner
           required: true
         - question_name: Deployment
           type: text
-          variable: vm_deployment
+          variable: create_vm_vm_deployment
           required: true
         - question_name: Environment
           type: multiplechoice
-          variable: vm_environment
+          variable: create_vm_vm_environment
           required: true
           choices:
             - Dev
@@ -237,16 +233,22 @@ controller_templates:
             - rhel9
             - rhel8
             - rhel7
+            - al2023
         - question_name: Subnet
           type: text
-          variable: aws_vpc_subnet_name
+          variable: create_vm_aws_vpc_subnet_name
           required: true
           default: aws-test-subnet
         - question_name: Security Group
           type: text
-          variable: aws_securitygroup_name
+          variable: create_vm_aws_securitygroup_name
           required: true
           default: aws-test-sg
+        - question_name: SSH Keypair
+          type: text
+          variable: create_vm_aws_keypair_name
+          required: true
+          default: aws-test-key
 
   - name: Cloud / AWS / Delete VM
     job_type: run

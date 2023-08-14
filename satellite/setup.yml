@@ -112,7 +112,7 @@ controller_templates:
     project: Ansible official demo project
     playbook: satellite/server_openscap.yml
     inventory: Demo Inventory
-    #execution_environment: Ansible Engine 2.9 execution environment
+    # execution_environment: Ansible Engine 2.9 execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
