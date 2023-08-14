@@ -1,0 +1,6 @@
+---
+vm_providers:
+  - aws
+aws_instance_size: t3.micro
+aws_image_architecture: x86_64
+aws_image_filter: 'al2023-ami-2023*'

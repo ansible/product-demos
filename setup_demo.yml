@@ -30,7 +30,7 @@
         controller_templates:
           - name: "SUBMIT FEEDBACK"
             job_type: run
-            inventory: "Workshop Inventory"
+            inventory: "Demo Inventory"
             project: "Ansible official demo project"
             playbook: "feedback.yml"
             execution_environment: Default execution environment
