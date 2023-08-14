@@ -19,8 +19,7 @@ controller_projects:
     organization: Default
     scm_type: git
     wait: true
-    # scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
-    scm_url: https://github.com/willtome/aws.infrastructure_config_demos.git
+    scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
     default_environment: Cloud Services Execution Environment
 
 controller_credentials:
@@ -234,6 +233,7 @@ controller_templates:
             - rhel9
             - rhel8
             - rhel7
+            - al2023
         - question_name: Subnet
           type: text
           variable: aws_vpc_subnet_name

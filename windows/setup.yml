@@ -202,7 +202,7 @@ controller_templates:
           variable: _hosts
           required: false
 
-  - name: "WINDOWS / AD /Create Domain"
+  - name: "WINDOWS / AD / Create Domain"
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
@@ -221,6 +221,31 @@ controller_templates:
           type: text
           variable: _hosts
           required: false
+
+  - name: "WINDOWS / AD / Join Domain"
+    job_type: run
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/join_ad_domain.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: true
+        - question_name: Domain Controller Inventory Hostname
+          type: text
+          variable: domain_controller
+          required: true
+          description: Inventory hostname for domain controller previously established using the Create Domain template
 
   - name: "WINDOWS / AD / New User"
     job_type: run
