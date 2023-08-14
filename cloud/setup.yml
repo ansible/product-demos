@@ -196,7 +196,7 @@ controller_templates:
       spec:
         - question_name: AWS Region
           type: multiplechoice
-          variable: aws_region
+          variable: create_vm_aws_region
           required: true
           choices:
             - us-east-1
@@ -205,19 +205,19 @@ controller_templates:
             - us-west-2
         - question_name: Name
           type: text
-          variable: vm_name
+          variable: create_vm_vm_name
           required: true
         - question_name: Owner
           type: text
-          variable: vm_owner
+          variable: create_vm_vm_owner
           required: true
         - question_name: Deployment
           type: text
-          variable: vm_deployment
+          variable: create_vm_vm_deployment
           required: true
         - question_name: Environment
           type: multiplechoice
-          variable: vm_environment
+          variable: create_vm_vm_environment
           required: true
           choices:
             - Dev
@@ -236,17 +236,17 @@ controller_templates:
             - al2023
         - question_name: Subnet
           type: text
-          variable: aws_vpc_subnet_name
+          variable: create_vm_aws_vpc_subnet_name
           required: true
           default: aws-test-subnet
         - question_name: Security Group
           type: text
-          variable: aws_securitygroup_name
+          variable: create_vm_aws_securitygroup_name
           required: true
           default: aws-test-sg
         - question_name: SSH Keypair
           type: text
-          variable: aws_keypair_name
+          variable: create_vm_aws_keypair_name
           required: true
           default: aws-test-key
 
