@@ -4,7 +4,7 @@ controller_components:
   - job_templates
 
 controller_credentials:
-  - name: OpenShift Credentials
+  - name: OpenShift Credential
     organization: Default
     credential_type: OpenShift or Kubernetes API Bearer Token
     inputs:
@@ -22,4 +22,4 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "OpenShift"
+      - "OpenShift Credential"
