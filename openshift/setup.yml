@@ -4,7 +4,7 @@ controller_components:
   - job_templates
 
 controller_credentials:
-  - name: OpenShift
+  - name: OpenShift Credentials
     organization: Default
     credential_type: OpenShift or Kubernetes API Bearer Token
     inputs:
@@ -15,7 +15,7 @@ controller_credentials:
 controller_templates:
   - name: OpenShift / Dev Spaces
     job_type: run
-    inventory: "Workshop Inventory"
+    inventory: "Demo Inventory"
     project: "Ansible official demo project"
     playbook: "openshift/devspaces.yml"
     notification_templates_started: Telemetry
