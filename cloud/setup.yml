@@ -393,7 +393,7 @@ controller_workflows:
             - Prod
         - question_name: Keypair Public Key
           type: textarea
-          variable: create_vm_aws_public_key
+          variable: aws_public_key
           required: true
         - question_name: Email
           type: text
