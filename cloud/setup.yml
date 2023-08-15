@@ -427,7 +427,7 @@ controller_workflows:
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
           create_vm_vm_name: aws_win
-          create_vm_vm_blueprint: windows_full
+          vm_blueprint: windows_full
         success_nodes:
           - Update Inventory
         failure_nodes:
@@ -436,7 +436,7 @@ controller_workflows:
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
           create_vm_vm_name: aws_rhel8
-          create_vm_vm_blueprint: rhel8
+          vm_blueprint: rhel8
         success_nodes:
           - Update Inventory
         failure_nodes:
@@ -445,7 +445,7 @@ controller_workflows:
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
           create_vm_vm_name: aws_rhel9
-          create_vm_vm_blueprint: rhel9
+          vm_blueprint: rhel9
         success_nodes:
           - Update Inventory
         failure_nodes:
