@@ -381,7 +381,7 @@ controller_workflows:
             - us-west-2
         - question_name: Owner
           type: text
-          variable: aws_owner_tag
+          variable: create_vm_aws_owner_tag
           required: true
         - question_name: Environment
           type: multiplechoice
@@ -393,7 +393,7 @@ controller_workflows:
             - Prod
         - question_name: Keypair Public Key
           type: textarea
-          variable: aws_public_key
+          variable: create_vm_aws_public_key
           required: true
         - question_name: Email
           type: text
@@ -402,8 +402,6 @@ controller_workflows:
     simplified_workflow_nodes:
       - identifier: Create Keypair
         unified_job_template: Cloud / AWS / Create Keypair
-        extra_data:
-          aws_keypair_owner: !unsafe "{{ aws_owner_tag }}"
         success_nodes:
           - VPC Report
         failure_nodes:
@@ -428,9 +426,8 @@ controller_workflows:
       - identifier: Deploy Windows Blueprint
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
-          vm_name: aws_win
-          vm_blueprint: windows_full
-          vm_owner: !unsafe "{{ aws_owner_tag }}"
+          create_vm_vm_name: aws_win
+          create_vm_vm_blueprint: windows_full
         success_nodes:
           - Update Inventory
         failure_nodes:
@@ -438,9 +435,8 @@ controller_workflows:
       - identifier: Deploy RHEL8 Blueprint
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
-          vm_name: aws_rhel8
-          vm_blueprint: rhel8
-          vm_owner: !unsafe "{{ aws_owner_tag }}"
+          create_vm_vm_name: aws_rhel8
+          create_vm_vm_blueprint: rhel8
         success_nodes:
           - Update Inventory
         failure_nodes:
@@ -448,9 +444,8 @@ controller_workflows:
       - identifier: Deploy RHEL9 Blueprint
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
-          vm_name: aws_rhel9
-          vm_blueprint: rhel9
-          vm_owner: !unsafe "{{ aws_owner_tag }}"
+          create_vm_vm_name: aws_rhel9
+          create_vm_vm_blueprint: rhel9
         success_nodes:
           - Update Inventory
         failure_nodes:
