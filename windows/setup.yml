@@ -224,7 +224,7 @@ controller_templates:
 
   - name: "WINDOWS / AD / Join Domain"
     job_type: run
-    inventory: "Workshop Inventory"
+    inventory: "Demo Inventory"
     project: "Ansible official demo project"
     playbook: "windows/join_ad_domain.yml"
     notification_templates_started: Telemetry
