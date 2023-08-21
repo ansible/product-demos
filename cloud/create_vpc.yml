@@ -9,7 +9,6 @@
     aws_tenancy: default
     aws_vpc_cidr_block: 10.0.0.0/16
     aws_subnet_cidr: 10.0.1.0/24
-    create_vm_aws_region: us-east-1
     aws_sg_name: aws-test-sg
     aws_subnet_name: aws-test-subnet
     aws_rt_name: aws-test-rt
