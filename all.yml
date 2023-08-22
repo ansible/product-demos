@@ -1,0 +1,46 @@
+---
+- name: Setup (all) or just more than one demo
+  hosts: localhost
+  gather_facts: false
+  vars:
+    launch_jobs:
+      name: "SETUP"
+      wait: true
+
+  tasks:
+    - name: Find `setup.yml` for demos
+      ansible.builtin.find:
+        paths: "{{ playbook_dir }}"
+        recurse: true
+        depth: 2
+        file_type: file
+        patterns:
+          - "setup.yml"
+      register: find_demos
+      when: demos is undefined
+
+    - name: Turn demo into demos
+      ansible.builtin.set_fact:
+        demos:
+          - "{{ demo }}"
+      when:
+        - demo is defined
+        - demo|ansible.builtin.type_debug == 'str'
+
+    - name: Build list of demos
+      ansible.builtin.set_fact:
+        demos: "{{ demos|d([]) +
+          find_demos.files | d([]) | selectattr('path', 'defined')
+          | map(attribute='path') | map('dirname') | map('basename') }}"
+      when:
+        - demos is undefined
+
+    - name: Build controller launch jobs
+      ansible.builtin.set_fact:
+        controller_launch_jobs: "{{ (controller_launch_jobs | d([]))
+        + [launch_jobs | combine( {'extra_vars': { 'demo':  item }})] }}"
+      loop: "{{ demos }}"
+
+    - name: Default Components
+      ansible.builtin.include_role:
+        name: "redhat_cop.controller_configuration.job_launch"
