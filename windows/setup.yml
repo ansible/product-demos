@@ -224,14 +224,14 @@ controller_templates:
 
   - name: "WINDOWS / AD / Join Domain"
     job_type: run
-    inventory: "Workshop Inventory"
+    inventory: "Demo Inventory"
     project: "Ansible official demo project"
     playbook: "windows/join_ad_domain.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Workshop Credential"
+      - "Demo Credential"
     survey_enabled: true
     survey:
       name: ''

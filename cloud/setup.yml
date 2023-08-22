@@ -164,7 +164,7 @@ controller_templates:
       spec:
         - question_name: AWS Region
           type: multiplechoice
-          variable: aws_region
+          variable: create_vm_aws_region
           required: true
           choices:
             - us-east-1
@@ -263,8 +263,6 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     survey_enabled: true
-    extra_vars:
-      aws_region: us-east-1
     survey:
       name: ''
       description: ''
@@ -286,8 +284,21 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      aws_region: us-east-1
       aws_report: vpc
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
 
   - name: Cloud / AWS / Tags Report
     job_type: run
@@ -309,7 +320,7 @@ controller_templates:
       spec:
         - question_name: AWS Region
           type: multiplechoice
-          variable: aws_region
+          variable: create_vm_aws_region
           required: true
           choices:
             - us-east-1
@@ -335,7 +346,7 @@ controller_templates:
       spec:
         - question_name: AWS Region
           type: multiplechoice
-          variable: aws_region
+          variable: create_vm_aws_region
           required: true
           choices:
             - us-east-1
@@ -372,7 +383,7 @@ controller_workflows:
       spec:
         - question_name: AWS Region
           type: multiplechoice
-          variable: aws_region
+          variable: create_vm_aws_region
           required: true
           choices:
             - us-east-1
@@ -381,7 +392,7 @@ controller_workflows:
             - us-west-2
         - question_name: Owner
           type: text
-          variable: aws_owner_tag
+          variable: create_vm_aws_owner_tag
           required: true
         - question_name: Environment
           type: multiplechoice
@@ -402,8 +413,6 @@ controller_workflows:
     simplified_workflow_nodes:
       - identifier: Create Keypair
         unified_job_template: Cloud / AWS / Create Keypair
-        extra_data:
-          aws_keypair_owner: !unsafe "{{ aws_owner_tag }}"
         success_nodes:
           - VPC Report
         failure_nodes:
@@ -428,9 +437,8 @@ controller_workflows:
       - identifier: Deploy Windows Blueprint
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
-          vm_name: aws_win
+          create_vm_vm_name: aws_win
           vm_blueprint: windows_full
-          vm_owner: !unsafe "{{ aws_owner_tag }}"
         success_nodes:
           - Update Inventory
         failure_nodes:
@@ -438,9 +446,8 @@ controller_workflows:
       - identifier: Deploy RHEL8 Blueprint
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
-          vm_name: aws_rhel8
+          create_vm_vm_name: aws_rhel8
           vm_blueprint: rhel8
-          vm_owner: !unsafe "{{ aws_owner_tag }}"
         success_nodes:
           - Update Inventory
         failure_nodes:
@@ -448,9 +455,8 @@ controller_workflows:
       - identifier: Deploy RHEL9 Blueprint
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
-          vm_name: aws_rhel9
+          create_vm_vm_name: aws_rhel9
           vm_blueprint: rhel9
-          vm_owner: !unsafe "{{ aws_owner_tag }}"
         success_nodes:
           - Update Inventory
         failure_nodes:
