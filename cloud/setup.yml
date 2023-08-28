@@ -374,39 +374,7 @@ controller_templates:
       - AWS
     project: Ansible official demo project
     playbook: cloud/snapshot_ec2.yml
-    inventory: Workshop Inventory
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: AWS Region
-          type: multiplechoice
-          variable: aws_region
-          required: true
-          default: us-east-1
-          choices:
-            - us-east-1
-            - us-east-2
-            - us-west-1
-            - us-west-2
-        - question_name: Specify target hosts
-          type: text
-          variable: _hosts
-          required: false
-
-  - name: Cloud / AWS / Patch EC2
-    job_type: run
-    organization: Default
-    credentials:
-      - AWS
-      - Workshop Credential
-    project: Ansible official demo project
-    playbook: cloud/patch_ec2.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -432,7 +400,7 @@ controller_templates:
 
   - name: "LINUX / Patching"
     job_type: check
-    inventory: "Workshop Inventory"
+    inventory: "Demo Inventory"
     project: "Ansible official demo project"
     playbook: "linux/patching.yml"
     execution_environment: Default execution environment
@@ -442,7 +410,17 @@ controller_templates:
     use_fact_cache: true
     ask_job_type_on_launch: true
     credentials:
-      - "Workshop Credential"
+      - "Demo Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: false
+
   - name: Cloud / AWS / Restore EC2 from Snapshot
     job_type: run
     organization: Default
@@ -450,7 +428,7 @@ controller_templates:
       - AWS
     project: Ansible official demo project
     playbook: cloud/restore_ec2.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -473,7 +451,7 @@ controller_templates:
             - us-east-2
             - us-west-1
             - us-west-2
-        - question_name: Specify target hosts
+        - question_name: Server Name or Pattern
           type: text
           variable: _hosts
           required: false
@@ -608,7 +586,7 @@ controller_workflows:
             - us-east-2
             - us-west-1
             - us-west-2
-        - question_name: Specify target hosts
+        - question_name: Server Name or Pattern
           type: text
           variable: _hosts
           required: true
