@@ -44,3 +44,8 @@ This document aims to outline the requirements for the various forms of contribu
    - `controller_components` can be any of the roles defined [here](https://github.com/redhat-cop/controller_configuration/tree/devel/roles)
    - Add variables for each component listed
 3) Include a README.md in the subdirectory
+
+## Testing
+To run `ansible-lint` you will need to set an environment variable for the token to connect to Automation Hub. You can get a token from [here](https://console.redhat.com/ansible/automation-hub/token). 
+
+Copy the value of the token and run `export ANSIBLE_GALAXY_SERVER_AH_TOKEN=<token>`
