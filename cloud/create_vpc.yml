@@ -9,7 +9,6 @@
     aws_tenancy: default
     aws_vpc_cidr_block: 10.0.0.0/16
     aws_subnet_cidr: 10.0.1.0/24
-    aws_region: us-east-1
     aws_sg_name: aws-test-sg
     aws_subnet_name: aws-test-subnet
     aws_rt_name: aws-test-rt
@@ -21,7 +20,7 @@
         name: "{{ aws_vpc_name }}"
         cidr_block: "{{ aws_vpc_cidr_block }}"
         tenancy: "{{ aws_tenancy }}"
-        region: "{{ aws_region }}"
+        region: "{{ create_vm_aws_region }}"
         tags:
           owner: "{{ aws_owner_tag }}"
           purpose: "{{ aws_purpose_tag }}"
@@ -31,7 +30,7 @@
       amazon.aws.ec2_vpc_igw:
         state: present
         vpc_id: "{{ aws_vpc.vpc.id }}"
-        region: "{{ aws_region }}"
+        region: "{{ create_vm_aws_region }}"
         tags:
           Name: "{{ aws_vpc_name }}"
           owner: "{{ aws_owner_tag }}"
@@ -42,7 +41,7 @@
       amazon.aws.ec2_security_group:
         state: present
         name: "{{ aws_sg_name }}"
-        region: "{{ aws_region }}"
+        region: "{{ create_vm_aws_region }}"
         description: Inbound WinRM and RDP, http for demo servers and internal AD ports
         rules:
           - proto: tcp
@@ -101,7 +100,7 @@
         state: present
         vpc_id: "{{ aws_vpc.vpc.id }}"
         cidr: "{{ aws_subnet_cidr }}"
-        region: "{{ aws_region }}"
+        region: "{{ create_vm_aws_region }}"
         map_public: true
         tags:
           Name: "{{ aws_subnet_name }}"
@@ -113,7 +112,7 @@
       amazon.aws.ec2_vpc_route_table:
         state: present
         vpc_id: "{{ aws_vpc.vpc.id }}"
-        region: "{{ aws_region }}"
+        region: "{{ create_vm_aws_region }}"
         subnets:
           - "{{ aws_subnet.subnet.id }}"
         routes:
