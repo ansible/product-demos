@@ -1,3 +1,6 @@
+[![Lab](https://img.shields.io/badge/Try%20Me-EE0000?style=for-the-badge&logo=redhat&logoColor=white)](https://red.ht/aap-product-demos)
+[![Dev Spaces](https://img.shields.io/badge/Customize%20Here-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)](https://workspaces.openshift.com/f?url=https://github.com/ansible/product-demos)
+
 # Official Ansible Product Demos
 
 This is a centralized location for all Ansible Product Demos going forward. 
