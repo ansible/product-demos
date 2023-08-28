@@ -361,14 +361,14 @@ controller_templates:
 
   - name: "LINUX / Multi-profile Compliance"
     job_type: run
-    inventory: "Workshop Inventory"
+    inventory: "Demo Inventory"
     project: "Ansible official demo project"
     playbook: "linux/compliance-enforce.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Workshop Credential"
+      - "Demo Credential"
     extra_vars:
       # used by CIS profile role
       sudo_require_authentication: false
@@ -400,14 +400,14 @@ controller_templates:
 
   - name: "LINUX / Compliance Report"
     job_type: run
-    inventory: "Workshop Inventory"
+    inventory: "Demo Inventory"
     project: "Ansible official demo project"
     playbook: "linux/compliance-report.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Workshop Credential"
+      - "Demo Credential"
     survey_enabled: true
     survey:
       name: ''
