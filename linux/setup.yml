@@ -398,7 +398,7 @@ controller_templates:
             - pci_dss
             - stig
 
-  - name: "LINUX / Compliance Report"
+  - name: "LINUX / Multi-profile Compliance Report"
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
