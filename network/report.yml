@@ -26,10 +26,10 @@
         gather_network_resources: all
       when: ansible_network_os == 'cisco.iosxr.iosxr'
 
-    # The dig lookup requires the python 'dnspython' library
-    # - name: Resolve IP address
-    #   ansible.builtin.set_fact:
-    #     ansible_host: "{{ lookup('community.general.dig', inventory_hostname)}}"
+#   # The dig lookup requires the python 'dnspython' library
+#   - name: Resolve IP address
+#     ansible.builtin.set_fact:
+#       ansible_host: "{{ lookup('community.general.dig', inventory_hostname)}}"
 
 - name: Create network reports
   hosts: "{{ report_server }}"

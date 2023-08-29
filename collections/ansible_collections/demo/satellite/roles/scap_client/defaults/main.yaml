@@ -1,3 +1,4 @@
+---
 foreman_server_url: "{{ lookup('env', 'SATELLITE_SERVER') }}"
 foreman_username: "{{ lookup('env', 'SATELLITE_USERNAME') }}"
 foreman_password: "{{ lookup('env', 'SATELLITE_PASSWORD') }}"

@@ -1,3 +1,4 @@
+---
 - name: Create HTML report
   ansible.windows.win_template:
     src: report.j2

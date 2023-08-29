@@ -21,7 +21,7 @@
       register: result
       notify: Printing to terminal application information
 
-    - name: Printing to terminal application information # noqa: no-handler
+    - name: Printing to terminal application information  # noqa: no-handler
       ansible.builtin.debug:
         msg: "The application: {{ application }} was already installed"
       when: not result.changed | bool
@@ -30,4 +30,3 @@
     - name: Printing to terminal application information
       ansible.builtin.debug:
         msg: "The application: {{ application }} has been installed"
-      when: result.changed | bool

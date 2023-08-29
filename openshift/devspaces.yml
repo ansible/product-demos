@@ -4,14 +4,14 @@
   gather_facts: false
 
   tasks:
-    - name: create namespace
+    - name: Create namespace
       redhat.openshift.k8s:
         name: eclipse-che
         api_version: v1
         kind: Namespace
         state: present
 
-    - name: create dev spaces subscription
+    - name: Create dev spaces subscription
       redhat.openshift.k8s:
         state: present
         definition:
@@ -29,8 +29,8 @@
             source: redhat-operators
             sourceNamespace: openshift-marketplace
 
-    - name: wait for dev spaces operator to install
-      k8s_info:
+    - name: Wait for dev spaces operator to install
+      kubernetes.core.k8s_info:
         api_version: apiextensions.k8s.io/v1
         kind: CustomResourceDefinition
         name: checlusters.org.eclipse.che
@@ -40,17 +40,17 @@
       delay: 30
 
     - name: Wait until devspaces-operator is up
-      k8s_info:
+      kubernetes.core.k8s_info:
         api_version: v1
         kind: Deployment
         name: devspaces-operator
         namespace: openshift-operators
       register: pod_list
-      until: pod_list|json_query('resources[*].status.readyReplicas')|unique == [1]
+      until: pod_list | json_query('resources[*].status.readyReplicas') | unique == [1]
       retries: 10
       delay: 30
 
-    - name: deploy dev spaces
+    - name: Deploy dev spaces
       redhat.openshift.k8s:
         state: present
         definition:

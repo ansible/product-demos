@@ -22,7 +22,7 @@
       when:
         - ansible_local.insights.system_id is not defined
 
-    - name: Run the Insights Client Scan # noqa: no-changed-when
+    - name: Run the Insights Client Scan  # noqa: no-changed-when
       ansible.builtin.command: insights-client
       when:
         - not ansible_check_mode
@@ -31,7 +31,7 @@
     - name: Deploy report server
       when: not ansible_check_mode
       delegate_to: "{{ report_server }}"
-      run_once: true # noqa: run-once[task]
+      run_once: true  # noqa: run-once[task]
       block:
         - name: Install firewall dependencies
           ansible.builtin.dnf:

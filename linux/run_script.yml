@@ -11,7 +11,7 @@
       ansible.builtin.shell: "{{ shell_script }}"
       register: shell_output
       tags:
-        - skip_ansible_lint # provided variable could require shell modele
+        - skip_ansible_lint  # provided variable could require shell modele
 
     - name: Print script output
       ansible.builtin.debug:
