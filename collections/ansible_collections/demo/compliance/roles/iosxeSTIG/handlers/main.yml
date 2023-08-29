@@ -1,0 +1,4 @@
+- name: save configuration
+  ios_command:
+    commands: write memory
+  when: iosxeSTIG_save_configuration_Manage

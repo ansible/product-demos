@@ -19,11 +19,14 @@ This category of demos shows examples of Windows Server operations and managemen
 - [**WINDOWS / Arbitrary Powershell**](arbitrary_powershell.yml) - Run given Powershell script (default: retrieve cat fact from API)
 - [**WINDOWS / Powershell Script**](powershell_script.yml) - Run a Powershell script stored in source control to query services
 - [**WINDOWS / Powershell DSC configuring password requirements**](powershell_dsc.yml) - Configure password complexity with Powershell desired state config
-- [**WINDOWS / Create Active Directory Domain**](active_directory/create_ad_domain.yml) - Create a new AD Domain
-- [**WINDOWS / Helpdesk new user portal**](active_directory/helpdesk_new_user_portal.yml) - Create user in AD Domain
+- [**WINDOWS / Create Active Directory Domain**](create_ad_domain.yml) - Create a new AD Domain
+- [**WINDOWS / Helpdesk new user portal**](helpdesk_new_user_portal.yml) - Create user in AD Domain
+- [**WINDOWS / Join Active Directory Domain**](join_ad_domain.yml) - Join computer to AD Domain
 
 ## Suggested Usage
 
 **WINDOWS / Create Active Directory Domain** - This job can take some to complete. It is recommended to run ahead of time if you would like to demo creating a helpdesk user.
 
 **WINDOWS / Helpdesk new user portal** - This job is dependant on the Create Active Directory Domain completing before users can be created.
+
+**WINDOWS / Join Active Directory Domain** - This job is dependant on the Create Active Directory Domain completing before computers can be joined.

@@ -40,7 +40,7 @@ After running the setup job template, there are a few steps required to make the
 
 ### Add Workshop Credential Password
 
-1) Add the password used to login to Controller. This allows you to connect to Windows Servers provisioned with Create VM job. Required until [RFE](https://github.com/ansible/workshops/issues/1597]) is complete
+1) Add a password that meets the [default complexity requirements](https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-must-meet-complexity-requirements#reference). This allows you to connect to Windows Servers provisioned with Create VM job. Required until [RFE](https://github.com/ansible/workshops/issues/1597]) is complete
 
 ### Remove Inventory Variables
 

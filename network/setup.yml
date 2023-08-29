@@ -88,7 +88,7 @@ controller_templates:
     execution_environment: Networking Execution Environment
     use_fact_cache: true
     credentials:
-      - "Workshop Credential"
+      - "Demo Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -104,3 +104,16 @@ controller_templates:
             - sandbox-iosxr-1.cisco.com
             - sandbox-nxos-1.cisco.com
             - routers
+
+  - name: "NETWORK / DISA STIG"
+    job_type: check
+    organization: Default
+    inventory: Network Inventory
+    project: "Ansible official demo project"
+    playbook: "network/compliance.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    use_fact_cache: true
+    ask_job_type_on_launch: true
+    survey_enabled: true

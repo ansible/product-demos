@@ -10,6 +10,6 @@
       ansible.builtin.assert:
         that: "ansible_os_family == 'RedHat'"
 
-    - name: Run compliance profile
+    - name: Run Compliance Profile
       ansible.builtin.include_role:
-        name: "redhatofficial.rhel{{ ansible_distribution_major_version }}_{{ compliance_profile }}"
+        name: "demo.compliance.rhel{{ ansible_distribution_major_version }}STIG"

@@ -52,7 +52,7 @@ controller_credentials:
 
 controller_inventory_sources:
   - name: Satellite Inventory
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     credential: Satellite Inventory
     source: satellite6
     update_on_launch: false
@@ -81,12 +81,12 @@ controller_templates:
   - name: LINUX / Register with Satellite
     project: Ansible official demo project
     playbook: satellite/server_register.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - Workshop Credential
+      - Demo Credential
       - Satellite Credential
     extra_vars:
       org_id: "Default_Organization"
@@ -111,14 +111,14 @@ controller_templates:
   - name: LINUX / Compliance Scan with Satellite
     project: Ansible official demo project
     playbook: satellite/server_openscap.yml
-    inventory: Workshop Inventory
-    execution_environment: Ansible Engine 2.9 execution environment
+    inventory: Demo Inventory
+    # execution_environment: Ansible Engine 2.9 execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
       - Satellite Credential
-      - Workshop Credential
+      - Demo Credential
     extra_vars:
       policy_scan: all
     survey_enabled: true
@@ -134,7 +134,7 @@ controller_templates:
   - name: SATELLITE / Publish Content View Version
     project: Ansible official demo project
     playbook: satellite/satellite_publish.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -156,7 +156,7 @@ controller_templates:
   - name: SATELLITE / Promote Content View Version
     project: Ansible official demo project
     playbook: satellite/satellite_promote.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -186,7 +186,7 @@ controller_templates:
   - name: SETUP / Satellite
     project: Ansible official demo project
     playbook: satellite/setup_satellite.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
