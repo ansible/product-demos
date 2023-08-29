@@ -1,4 +1,12 @@
 ---
+profile: production
+offline: false
+
+skip_list:
+  - "galaxy[no-changelog]"
+
 exclude_paths:
+  # would be better to move the roles here to the top-level roles directory
   - collections/ansible_collections/demo/compliance/roles/
+  - roles/redhatofficial.*
   - .github/
