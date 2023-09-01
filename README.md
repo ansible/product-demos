@@ -12,9 +12,6 @@ This is a fork with changes made to allow the lab to function correctly.
 | [Cloud](cloud/README.md) | Demo for infrastructure and cloud provisioning automation |
 | [Network](network/README.md) | Ansible Network automation demos |
 
-## Contributions
-
-If you would like to contribute to this project please refer to [contribution guide](CONTRIBUTING.md) for best practices.
 
 ## Using this project
 
