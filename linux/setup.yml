@@ -339,14 +339,14 @@ controller_templates:
 
   - name: "LINUX / DISA STIG"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: "Workshop Inventory"
     project: "Ansible official demo project"
     playbook: "linux/compliance.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - "Workshop Credential"
     extra_vars:
       sudo_remove_nopasswd: false
     survey_enabled: true
