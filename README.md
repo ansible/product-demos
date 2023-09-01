@@ -1,4 +1,4 @@
-[![Lab](https://img.shields.io/badge/Try%20Me-EE0000?style=for-the-badge&logo=redhat&logoColor=white)](https://red.ht/aap-product-demos)
+[![Lab](https://img.shields.io/badge/Try%20Me-EE0000?style=for-the-badge&logo=redhat&logoColor=white)](https://play.instruqt.com/embed/redhat/tracks/dod-automated-compliance)
 [![Dev Spaces](https://img.shields.io/badge/Customize%20Here-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)](https://workspaces.openshift.com/f?url=https://github.com/ansible/product-demos)
 
 # Ansible Product Demos fork for DOD Automated Compliance Instruqt Lab
