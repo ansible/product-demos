@@ -33,6 +33,8 @@ This document aims to outline the requirements for the various forms of contribu
 5) Add any needed roles/collections to the [requirements.yml](/collections/requirements.yml)
 6) Test via [demo.redhat.com](https://demo.redhat.com/catalog?item=babylon-catalog-prod/sandboxes-gpte.aap-product-demos.prod&utm_source=webapp&utm_medium=share-link), specify your branch name within the project configuration.
 
+> NOTE: demo.redhat.com is available to Red Hat Associates and Partners with a valid account.
+
 ## New Demo Section/Category
 1) Create a new subdirectory with no spaces
 2) Create a new setup.yml copying appropriate elements from another
