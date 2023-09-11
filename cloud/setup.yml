@@ -374,7 +374,7 @@ controller_templates:
       - AWS
     project: Ansible official demo project
     playbook: cloud/snapshot_ec2.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -405,7 +405,7 @@ controller_templates:
       - AWS
     project: Ansible official demo project
     playbook: cloud/restore_ec2.yml
-    inventory: Workshop Inventory
+    inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -431,7 +431,7 @@ controller_templates:
 
   - name: "LINUX / Patching"
     job_type: check
-    inventory: "Workshop Inventory"
+    inventory: "Demo Inventory"
     project: "Ansible official demo project"
     playbook: "linux/patching.yml"
     execution_environment: Default execution environment
