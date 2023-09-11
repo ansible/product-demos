@@ -1,0 +1,10 @@
+---
+- name: Restore ec2 instance from snapshot
+  hosts: "{{ _hosts | default(omit) }}"
+  gather_facts: false
+
+  tasks:
+    - name: Include restore from snapshot role
+      ansible.builtin.include_role:
+        name: "demo.cloud.aws"
+        tasks_from: restore_vm
