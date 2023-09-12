@@ -40,4 +40,3 @@
   ansible.builtin.set_stats:
     data:
       aws_snapshots: "{{ snapshot_stat | items2dict }}"
-
