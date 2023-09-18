@@ -1,0 +1,10 @@
+# Set stat_snapshots with model:
+# [
+#   {
+#     "snapshot_id": "snap-0e981f05704e19ffd",
+#     "vol_id": "vol-0bd55f313bb7bcdd8",
+#     "device": "/dev/sda1"
+#   },
+#   ...
+# ]
+aws_ec2_snapshot_query: "[].{snapshot_id: snapshot_id, vol_id: volume.id, device: volume.attachment_set[?instance_id=='{{ instance_id }}'].device | [0]}"

@@ -1,0 +1,62 @@
+---
+- name: AWS | RESTORE VM
+  delegate_to: localhost
+  block:
+    - name: AWS | RESTORE VM | stop vm
+      amazon.aws.ec2_instance:
+        region: "{{ aws_region }}"
+        instance_ids: "{{ instance_id }}"
+        state: stopped
+        wait: true
+
+    - name: AWS | RESTORE VM | get volumes
+      register: r_vol_info
+      amazon.aws.ec2_vol_info:
+        region: "{{ aws_region }}"
+        filters:
+          attachment.instance-id: "{{ instance_id }}"
+
+    - name: AWS | RESTORE VM | detach volumes
+      loop: "{{ r_vol_info.volumes }}"
+      loop_control:
+        loop_var: volume
+        label: "{{ volume.id }}"
+      amazon.aws.ec2_vol:
+        region: "{{ aws_region }}"
+        id: "{{ volume.id }}"
+        instance: None
+
+    - name: AWS | RESTORE VM | attach snapshots from stat
+      when: inventory_hostname in aws_snapshots
+      loop: "{{ aws_snapshots[inventory_hostname] }}"
+      loop_control:
+        loop_var: snap
+        label: "{{ snap.snapshot_id }}"
+      amazon.aws.ec2_vol:
+        region: "{{ aws_region }}"
+        instance: "{{ instance_id }}"
+        snapshot: "{{ snap.snapshot_id }}"
+        device_name: "{{ snap.device }}"
+
+    - name: AWS | RESTORE VM | get all snapshots
+      when: inventory_hostname not in aws_snapshots
+      register: r_snapshots
+      amazon.aws.ec2_snapshot_info:
+        region: "{{ aws_region }}"
+        filters:
+          "tag:Name": "{{ inventory_hostname }}"
+
+    - name: AWS | RESTORE VM | create volume from latest snapshot
+      when: inventory_hostname not in aws_snapshots
+      amazon.aws.ec2_vol:
+        region: "{{ aws_region }}"
+        instance: "{{ instance_id }}"
+        snapshot: "{{ r_snapshots.snapshots[0].snapshot_id }}"
+        device_name: "/dev/sda1"
+
+    - name: AWS | RESTORE VM | start vm
+      amazon.aws.ec2_instance:
+        region: "{{ aws_region }}"
+        instance_ids: "{{ instance_id }}"
+        state: started
+        wait: true
