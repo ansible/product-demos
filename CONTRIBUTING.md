@@ -1,12 +1,18 @@
 # Contribution Guidelines
 This document aims to outline the requirements for the various forms of contribution for this project.
 
-**ALL** contributions are subject to review via pull request
+## Project Architecture
+
+![project-architecture](.github/images/project-architecture.png)
 
 ## Pull Requests
+
+**ALL** contributions are subject to review via pull request
+
+### Pull Requests
 1) Ensure the "base repository" is set to "ansible/product-demos".
 
-### Pull Request Guidelines
+#### Pull Request Guidelines
 - PRs should include the playbook/demo and required entry in corresponding `<demo>/setup.yml`.
 - PRs should include documentation in corresponding `<demo>/README.md`.
 - PRs should be rebased against the `main` branch to avoid conflicts.
@@ -19,13 +25,15 @@ This document aims to outline the requirements for the various forms of contribu
 3) Make any changes needed to match the existing standards in the directory.
    1) Ex: Parameterized hosts
    ```ansible
-   hosts: "{{ HOSTS | default('windows') }}"
+   hosts: "{{ _hosts | default('windows') }}"
    ```
 4) Create an entry for your playbook in your subdirectories `setup.yml`
    1) You can copy paste an existing one and edit it.
    2) Ensure you edit the name, playbook path, survey etc.
 5) Add any needed roles/collections to the [requirements.yml](/collections/requirements.yml)
-6) Test via RHPDS, specify your branch name within the project configuration.
+6) Test via [demo.redhat.com](https://demo.redhat.com/catalog?item=babylon-catalog-prod/sandboxes-gpte.aap-product-demos.prod&utm_source=webapp&utm_medium=share-link), specify your branch name within the project configuration.
+
+> NOTE: demo.redhat.com is available to Red Hat Associates and Partners with a valid account.
 
 ## New Demo Section/Category
 1) Create a new subdirectory with no spaces
