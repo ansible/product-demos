@@ -1,6 +1,6 @@
 ---
 profile: production
-offline: true
+offline: false
 
 skip_list:
   - "galaxy[no-changelog]"
