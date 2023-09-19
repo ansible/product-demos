@@ -249,6 +249,14 @@ controller_templates:
           variable: create_vm_aws_keypair_name
           required: true
           default: aws-test-key
+        - question_name: AWS Instance Type (defaults to blueprint value)
+          type: text
+          variable: create_vm_aws_instance_size
+          required: false
+        - question_name: AWS Image Filter (defaults to blueprint value)
+          type: text
+          variable: create_vm_aws_image_filter
+          required: false
 
   - name: Cloud / AWS / Delete VM
     job_type: run
