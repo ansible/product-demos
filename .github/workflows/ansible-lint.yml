@@ -9,13 +9,9 @@ env:
 
 jobs:
   build:
+    name: Ansible Lint
     runs-on: ubuntu-latest
-
     steps:
-      # Important: This sets up your GITHUB_WORKSPACE environment variable
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # needed for progressive mode to work
-
+      # this action implicitly calls actions/checkout
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v6.18.0
