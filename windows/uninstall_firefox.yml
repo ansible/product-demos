@@ -14,8 +14,3 @@
       ansible.windows.win_reboot:
         reboot_timeout: 3600
       when: windows_firefox_uninstall.changed
-
-    - name: Output windows_firefox_uninstall Changed results to text file 
-      ansible.windows.win_copy:
-        content: "{{ windows_firefox_uninstall.changed }}"
-        dest: C:\Users\ano-user-user\Downloads\firefox_uninstall.txt
