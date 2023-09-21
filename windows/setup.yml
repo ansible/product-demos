@@ -310,3 +310,24 @@ controller_templates:
           type: text
           variable: HOSTS
           required: false
+
+
+  - name: "WINDOWS / Uninstall Firefox"
+    job_type: check
+    inventory: "Workshop Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/uninstall_firefox.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Workshop Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: HOSTS
+          required: false
