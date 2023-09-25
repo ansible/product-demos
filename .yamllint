@@ -1,0 +1,19 @@
+---
+extends: default
+
+rules:
+  line-length: disable
+  trailing-spaces: enable
+  colons:
+    max-spaces-before: 0
+    max-spaces-after: -1
+  indentation:
+    level: error
+    indent-sequences: true  # consistent with ansible-lint
+  truthy:
+    level: error
+    allowed-values:
+      - 'true'
+      - 'false'
+
+...

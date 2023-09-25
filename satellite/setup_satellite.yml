@@ -7,7 +7,7 @@
     refresh_satellite_manifest: true
 
   tasks:
-    - name: Refresh manifest # noqa: args[module] - required parameters provided with environment vars
+    - name: Refresh manifest  # noqa: args[module] - required parameters provided with environment vars
       redhat.satellite.subscription_manifest:
         organization: "Default Organization"
         state: refreshed
@@ -20,7 +20,7 @@
     - name: Publish CV
       ansible.builtin.include_role:
         name: redhat.satellite.content_view_publish
-      vars:
+      vars:  # noqa var-naming[no-role-prefix]
         satellite_content_views:
           - RHEL7
           - RHEL8
@@ -29,7 +29,7 @@
       ansible.builtin.include_role:
         name: redhat.satellite.lifecycle_environments
 
-    - name: Content view publish # noqa: args[module] - required parameters provided with environment vars
+    - name: Content view publish  # noqa: args[module] - required parameters provided with environment vars
       redhat.satellite.content_view_version:
         organization: "{{ satellite_organization }}"
         content_view: "{{ item }}"
@@ -45,7 +45,7 @@
       ansible.builtin.include_role:
         name: redhat.satellite.activation_keys
 
-    - name: Add SCAP Tailoring File # noqa: args[module] - required parameters provided with environment vars
+    - name: Add SCAP Tailoring File  # noqa: args[module] - required parameters provided with environment vars
       redhat.satellite.scap_tailoring_file:
         name: RHEL7_STIG
         organizations: "{{ satellite_organization }}"

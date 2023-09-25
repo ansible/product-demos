@@ -1,3 +1,4 @@
+---
 - name: Create HTML report
   ansible.builtin.template:
     src: report.j2

@@ -5,6 +5,8 @@ collections:
   - name: redhat_cop.controller_configuration
     version: 2.3.1
   # linux
+  - name: ansible.posix
+    version: 1.5.4
   - name: redhat.insights
     version: 1.0.7
   - name: redhat.rhel_system_roles

@@ -4,15 +4,15 @@
   become: true
 
   tasks:
-    - name: Gather recent vmstat info # noqa: no-changed-when
+    - name: Gather recent vmstat info  # noqa: no-changed-when
       ansible.builtin.command: /bin/vmstat 1 5
       register: vmstat
 
-    - name: Gather top CPU hogs # noqa: no-changed-when
+    - name: Gather top CPU hogs  # noqa: no-changed-when
       ansible.builtin.command: ps -eo user,pid,size,pcpu,cmd --sort=-pcpu
       register: pscpu
 
-    - name: Gather top memory hogs # noqa: no-changed-when
+    - name: Gather top memory hogs  # noqa: no-changed-when
       ansible.builtin.command: ps -eo user,pid,size,pcpu,cmd --sort=-size
       register: pssize
 

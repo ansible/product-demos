@@ -18,7 +18,7 @@
       ansible.builtin.hostname:
         name: "{{ inventory_hostname | regex_replace('_', '-') }}"
 
-# Install subscription-manager if it's not there
+    # Install subscription-manager if it's not there
     - name: Install subscription-manager
       ansible.builtin.yum:
         name: subscription-manager
@@ -65,7 +65,7 @@
     - name: Configure Red Hat insights
       ansible.builtin.import_role:
         name: redhat.insights.insights_client
-      vars:
+      vars:  # noqa var-naming[no-role-prefix]
         insights_display_name: "{{ inventory_hostname }}"
         insights_tags:
           env: "{{ env }}"
