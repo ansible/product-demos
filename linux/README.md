@@ -26,8 +26,10 @@ This category of demos shows examples of linux operations and management with An
 - [**Linux / Fact Scan**](https://github.com/ansible/awx-facts-playbooks/blob/master/scan_facts.yml) - Run a fact, package, and service scan against a system and store in fact cache
 - [**Linux / Podman Webserver**](podman.yml) - Install and run a Podman webserver with given text on the home page
 - [**Linux / System Roles**](system_roles.yml) - Apply Linux system roles to servers. Must provide variables and role names.
-- [**Linux / Compliance Enforce**](compliance.yml) - Apply remediation to meet the requirements of a compliance baseline
-- [**Linux / Insights Compliance Scan**](insights_compliance_scan.yml) - Run a Compliance scan based on the configuration in [Red Hat Insights][https://console.redhat.com]
+- [**Linux / DISA STIG**](compliance.yml) - Apply the RHEL STIG supplemental content from DISA
+- [**Linux / Multi-profile compliance**](compliance-enforce.yml) - Apply remediation from [Compliance as Code](https://github.com/ComplianceAsCode/content) to enforce the requirements of a specified compliance profile
+- [**Linux / Report Compliance**](compliance-report.yml) - Run an OpenSCAP report against a specified compliance profile
+- [**Linux / Insights Compliance Scan**](insights_compliance_scan.yml) - Run a Compliance scan based on the configuration in [Red Hat Insights](https://console.redhat.com)
 
 ### Inventory
 
@@ -86,6 +88,10 @@ timesync_ntp_servers:
     pool: yes
     iburst: yes
 ```
-**Linux / Compliance** - Apply compliance profile hardening configuration from [here](https://galaxy.ansible.com/RedHatOfficial). BE AWARE: this could have unintended results based on the current state of your machine. Always test on a single machine before distributing at scale. For example, AWS instances have NOPASSWD allowed for sudo. Running STIG compliance without adding `sudo_remove_nopasswd: false` to extra_vars on the job template will lock you out of the machine. This variable is configured on the job template by default for this reason.
+**Linux / DISA STIG** - Apply the RHEL STIG security hardening configuration using the [DISA Supplemental Automation Content](https://public.cyber.mil/stigs/supplemental-automation-content/). BE AWARE: this could have unintended results based on the current state of your machine. Always test on a single machine before distributing at scale. For example, AWS instances have NOPASSWD allowed for sudo. Running STIG compliance without adding `sudo_remove_nopasswd: false` to extra_vars on the job template will lock you out of the machine. This variable is configured on the job template by default for this reason.
+
+**Linux / Multi-profile Compliance** - Apply security hardening configuration from a [supported compliance profile role](compliance_profiles.md). BE AWARE: this could have unintended results based on the current state of your machine. Always test on a single machine before distributing at scale. For example, AWS instances have NOPASSWD allowed for sudo. Applying certain compliance profiles without adding `sudo_remove_nopasswd: false` to extra_vars on the job template will lock you out of the machine. This variable is configured on the job template by default for this reason.
+
+**Linux / Report Compliance** - Run this template before running the "**Linux / Multi-profile Compliance**" template and again afterwards to highlight the changes made by the enforcement template.  By default, the reports are available by pointing a web browser to the system(s) where the report runs.  By setting the `use_httpd` variable to "false" in the template survey the reports will instead be stored on the target node in the /tmp/oscap-reports directory.
 
 **Linux / Insights Compliance Scan** - Scan the system according to the compliance profile configured via [Red Hat Insights](https://console.redhat.com). NOTE: This job will fail if the systems haven't been registered with Insights and associated with a relevant compliance profile. A survey when running the job will ask if you have configured all systems with a compliance profile, and effectively skip all tasks in the job template if the answer is "No".
