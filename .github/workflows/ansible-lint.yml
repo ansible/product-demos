@@ -1,8 +1,8 @@
 ---
 name: Ansible Lint
 on:
- push:
- pull_request_target:
+ - push
+ - pull_request_target
 
 env:
   ANSIBLE_GALAXY_SERVER_AH_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_AH_TOKEN }}
