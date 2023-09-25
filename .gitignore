@@ -7,3 +7,5 @@ choose_demo_example_aws.yml
 .ansible.cfg
 *.gz
 
+**/roles/*
+!**/roles/requirements.yml
