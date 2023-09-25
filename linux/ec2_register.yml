@@ -2,9 +2,12 @@
 - name: Register ec2 instance with subscription mangler
   hosts: "{{ _hosts | default(omit)  }}"
   become: true
+  vars:
+    registration_state: present
+    insights_state: present
 
   tasks:
-    - name: Check for vars
+    - name: Check for org_id and activation_key
       ansible.builtin.assert:
         that:
           - org_id is defined
@@ -56,18 +59,19 @@
         regexp: '^manage_repos'
         line: 'manage_repos = 1'
 
-    - name: Register subscription mangler
-      community.general.redhat_subscription:
-        state: present
-        activationkey: "{{ activation_key }}"
-        org_id: "{{ org_id }}"
-
-    - name: Configure Red Hat insights
-      ansible.builtin.import_role:
-        name: redhat.insights.insights_client
+    - name: Register with subscription mangler
+      ansible.builtin.include_role:
+        name: redhat.rhel_system_roles.rhc
       vars:
-        insights_display_name: "{{ inventory_hostname }}"
-        insights_tags:
-          env: "{{ env }}"
-          purpose: demo
-          group: "{{ insights_tag }}"
+        rhc_state: "{{ registration_state }}"
+        rhc_organization: "{{ org_id }}"
+        rhc_auth:
+          activation_keys:
+            keys:
+              - "{{ activation_key }}"
+        rhc_insights:
+          state: "{{ insights_state }}"
+          tags:
+            env: "{{ env }}"
+            purpose: demo
+            group: "{{ insights_tag }}"
