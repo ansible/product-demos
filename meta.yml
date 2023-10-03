@@ -1,0 +1,34 @@
+---
+controller_components:
+  - job_templates
+
+controller_templates:
+  - name: Multi-SETUP demos
+    project: Ansible official demo project
+    playbook: multi_select_setup.yml
+    inventory: Demo Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Which demos do you want to configure?
+          type: multiselect
+          variable: demos
+          required: true
+          default:
+            - cloud
+            - linux
+            - network
+            - openshift
+            - windows
+          choices:
+            - cloud
+            - linux
+            - network
+            - openshift
+            - satellite
+            - windows
+
