@@ -6,7 +6,6 @@
     launch_jobs:
       name: "SETUP"
       wait: true
-
   tasks:
     - name: Build controller launch jobs
       ansible.builtin.set_fact:
