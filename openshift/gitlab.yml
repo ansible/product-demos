@@ -97,7 +97,7 @@
         name: gitlab-controller-manager
         namespace: gitlab-system
       register: pod_list
-      until: pod_list|json_query('resources[*].status.readyReplicas')|unique >= [1]
+      until: pod_list | json_query('resources[*].status.readyReplicas') | unique >= [1]
       retries: 10
       delay: 30
 
