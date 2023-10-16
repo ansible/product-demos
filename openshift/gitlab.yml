@@ -101,6 +101,11 @@
       retries: 10
       delay: 30
 
+    - name: Grab url for Gitlab spec
+      ansible.builtin.set_fact:
+        cluster_domain: "apps{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') | regex_search('\\.[^:]*') }}"
+      when: cluster_domain is undefined
+
     - name: Deploy a GitLab instance
       redhat.openshift.k8s:
         state: present
