@@ -34,3 +34,4 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - "OpenShift Credential"
+
