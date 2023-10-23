@@ -34,13 +34,4 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - "OpenShift Credential"
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: Enter the base domain for your cluster
-          default: 'Example: apps.cluster-123ab.123ab.sandbox987.opentlc.com'
-          type: text
-          variable: cluster_domain
-          required: true
+
