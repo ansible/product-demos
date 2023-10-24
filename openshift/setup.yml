@@ -47,7 +47,7 @@ controller_templates:
     job_type: run
     inventory: "Demo Inventory"
     project: "USR App"
-    playbook: "ansible_playbooks/deploy.yml"
+    playbook: "ansible_playbooks/deploy.yaml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
