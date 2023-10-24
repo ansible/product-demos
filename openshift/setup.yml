@@ -1,7 +1,15 @@
 ---
 controller_components:
+  - projects
   - credentials
   - job_templates
+
+controller_projects:
+  - name: USR App
+    organization: Default
+    scm_type: git
+    wait: true
+    scm_url: https://github.com/willtome/usr-workshop
 
 controller_credentials:
   - name: OpenShift Credential
@@ -29,6 +37,17 @@ controller_templates:
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
     playbook: "openshift/gitlab.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "OpenShift Credential"
+
+  - name: OpenShift / USR App
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "USR App"
+    playbook: "ansible_playbooks/deploy.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
