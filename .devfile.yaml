@@ -14,7 +14,7 @@ components:
 commands:
   - id: oc-install
     exec:
-      commandLine: '/usr/local/bin/ansible-playbook ${PROJECT_SOURCE}/playbooks/install_oc.yml'
+      commandLine: '/usr/local/bin/ansible-playbook ${PROJECT_SOURCE}/.install_oc.yaml'
       workingDir: ${PROJECT_SOURCE}
       group:
         kind: build
