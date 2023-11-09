@@ -92,7 +92,7 @@ controller_templates:
     credentials:
       - AWS
     project: Ansible Cloud Content Lab - AWS
-    playbook: playbook_create_peer_network.yml
+    playbook: playbooks/create_peer_network.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -108,7 +108,7 @@ controller_templates:
     credentials:
       - AWS
     project: Ansible Cloud Content Lab - AWS
-    playbook: playbook_delete_peer_network.yml
+    playbook: playbooks/delete_peer_network.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -122,7 +122,7 @@ controller_templates:
     credentials:
       - AWS
     project: Ansible Cloud Content Lab - AWS
-    playbook: playbook_create_transit_network.yml
+    playbook: playbooks/create_transit_network.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -138,7 +138,7 @@ controller_templates:
     credentials:
       - AWS
     project: Ansible Cloud Content Lab - AWS
-    playbook: playbook_delete_transit_network.yml
+    playbook: playbooks/delete_transit_network.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -183,7 +183,7 @@ controller_templates:
       - AWS
       - Demo Credential
     project: Ansible Cloud Content Lab - AWS
-    playbook: playbook_create_vm.yml
+    playbook: playbooks/create_vm.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -265,7 +265,7 @@ controller_templates:
       - AWS
       - Demo Credential
     project: Ansible Cloud Content Lab - AWS
-    playbook: playbook_delete_inventory_vm.yml
+    playbook: playbooks/delete_inventory_vm.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -286,7 +286,7 @@ controller_templates:
     credentials:
       - AWS
     project: Ansible Cloud Content Lab - AWS
-    playbook: playbook_create_reports.yml
+    playbook: playbooks/create_reports.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -314,7 +314,7 @@ controller_templates:
     credentials:
       - AWS
     project: Ansible Cloud Content Lab - AWS
-    playbook: playbook_create_reports.yml
+    playbook: playbooks/create_reports.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
