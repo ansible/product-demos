@@ -3,11 +3,23 @@ schemaVersion: 2.2.0
 metadata:
   name: product-demos
 components:
-  - name: product-demos-ee
+  - name: tooling-container
     container:
-      image: quay.io/mloriedo/ansible-creator-ee:latest  # workaround for https://github.com/eclipse/che/issues/21778
+      image: quay.io/devspaces/ansible-creator-ee@sha256:04c7aa48f34ab28dc21f36acfe472b249f29c24d1a52d98b2c8da75dd6587d79
       memoryRequest: 256M
-      memoryLimit: 5Gi
+      memoryLimit: 6Gi
       cpuRequest: 250m
       cpuLimit: 2000m
       args: ['tail', '-f', '/dev/null']
+commands:
+  - id: oc-install
+    exec:
+      commandLine: '/usr/local/bin/ansible-playbook ${PROJECT_SOURCE}/.install_oc.yaml'
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: build
+        isDefault: true
+      component: tooling-container
+events:
+  postStart:
+    - "oc-install"
