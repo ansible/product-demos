@@ -1,5 +1,5 @@
 ---
-name: Ansible Lint
+name: ansible-lint
 on:
  - push
  - pull_request_target
@@ -12,6 +12,7 @@ jobs:
     name: Ansible Lint
     runs-on: ubuntu-latest
     steps:
-      # this action implicitly calls actions/checkout
+      - uses: actions/checkout@v4
+
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v6.20.3
