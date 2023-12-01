@@ -1,4 +1,4 @@
 ---
-rhsm_enabled_repos:
+rhsm_enabled_repos:  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
   - rhel-7-server-rpms
   # - rhel-7-server-satellite-maintenance-6.11-rpms

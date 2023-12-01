@@ -1,7 +1,7 @@
 ---
-exclude_packages:
+exclude_packages:  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
   - authselect
   - authselect-compat
   - authselect-libs
   - fprintd-pam
-allow_reboot: true
+allow_reboot: true  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way

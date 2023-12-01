@@ -13,23 +13,23 @@
       ansible.windows.win_domain:
         dns_domain_name: ansible.local
         safe_mode_password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
-      notify: 
+      notify:
         - Reboot host
         - Wait for AD services
         - Reboot again
         - Wait for AD services again
 
     - name: Flush handlers
-      meta: flush_handlers
+      ansible.builtin.meta: flush_handlers
 
     - name: Create some groups
       community.windows.win_domain_group:
         name: "{{ item.name }}"
         scope: global
       loop:
-        - { name: "GroupA" }
-        - { name: "GroupB" }
-        - { name: "GroupC" }
+        - name: "GroupA"
+        - name: "GroupB"
+        - name: "GroupC"
       retries: 5
       delay: 10
 
@@ -40,9 +40,12 @@
         password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
         update_password: on_create
       loop:
-        - { name: "UserA", groups: "GroupA" }
-        - { name: "UserB", groups: "GroupB" }
-        - { name: "UserC", groups: "GroupC" }
+        - name: "UserA"
+          groups: "GroupA"
+        - name: "UserB"
+          groups: "GroupB"
+        - name: "UserC"
+          groups: "GroupC"
       retries: 5
       delay: 10
 

@@ -1,2 +1,2 @@
 ---
-detailedreport: true
+detailedreport: true    # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
