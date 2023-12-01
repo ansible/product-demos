@@ -14,4 +14,4 @@ jobs:
     steps:
       # this action implicitly calls actions/checkout
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@v6.18.0
+        uses: ansible/ansible-lint@v6.20.3
