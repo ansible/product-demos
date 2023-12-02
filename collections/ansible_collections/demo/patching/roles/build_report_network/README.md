@@ -32,5 +32,5 @@ The role can be used to create an html report on any number of Linux hosts using
   - name: Run Network Report
     import_role:
       name: shadowman.reports.build_report_network
-      
+
 ```

@@ -32,5 +32,5 @@ The role can be used to create an html patching report on any number of Linux ho
   - name: Run Windows Patch Report
     import_role:
       name: shadowman.reports.build_report_windows_patch
-      
+
 ```
