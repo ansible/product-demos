@@ -1,5 +1,5 @@
 ---
-name: ansible-lint
+name: pre-commit
 on:
  - push
  - pull_request_target
@@ -8,11 +8,10 @@ env:
   ANSIBLE_GALAXY_SERVER_AH_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_AH_TOKEN }}
 
 jobs:
-  build:
-    name: Ansible Lint
+  pre-commit:
+    name: pre-commit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Run ansible-lint
-        uses: ansible/ansible-lint@v6.20.3
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+    - uses: pre-commit/action@v3.0.0
