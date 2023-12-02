@@ -54,6 +54,21 @@ This document aims to outline the requirements for the various forms of contribu
 3) Include a README.md in the subdirectory
 
 ## Testing
-To run `ansible-lint` you will need to set an environment variable for the token to connect to Automation Hub. You can get a token from [here](https://console.redhat.com/ansible/automation-hub/token).
 
-Copy the value of the token and run `export ANSIBLE_GALAXY_SERVER_AH_TOKEN=<token>`
+We utilize pre-commit to handle Git hooks, initiating a pre-commit check with each commit, both locally and on CI.
+
+To install pre-commit, use the following commands:
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+For further details, refer to the [pre-commit installation documentation](https://pre-commit.com/#installation).
+
+To execute ansible-lint (whether within pre-commit or independently), you must configure an environment variable for the token required to connect to Automation Hub. Obtain the token [here](https://console.redhat.com/ansible/automation-hub/token).
+
+Copy the token value and execute the following command:
+
+```bash
+export ANSIBLE_GALAXY_SERVER_AH_TOKEN=<token>
+```
