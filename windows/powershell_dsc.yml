@@ -8,6 +8,7 @@
       ansible.windows.win_powershell:
         script: |
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
           Install-Module -Name packagemanagement -Force
           Install-Module -Name powershellget -Force
 
