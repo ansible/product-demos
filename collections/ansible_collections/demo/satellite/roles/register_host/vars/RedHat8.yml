@@ -1,5 +1,5 @@
 ---
-rhsm_enabled_repos:
+rhsm_enabled_repos:  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
   - rhel-8-for-x86_64-baseos-rpms
   - rhel-8-for-x86_64-appstream-rpms
   - satellite-client-6-for-rhel-8-x86_64-rpms

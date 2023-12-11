@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
-from ansible.module_utils.basic import * # noqa
+from ansible.module_utils.basic import *  # noqa
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: scan_packages
 short_description: Return installed packages information as fact data
 description:
     - Return information about installed packages as fact data
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 # Example fact output:
 # host | success >> {
 #    "ansible_facts": {
@@ -34,21 +34,23 @@ EXAMPLES = '''
 #                  "name": "gcc-4.8-base"
 #                }
 #       ]
-'''
+"""
 
 
 def rpm_package_list():
     import rpm
+
     trans_set = rpm.TransactionSet()
     installed_packages = []
     for package in trans_set.dbMatch():
         package_details = {
-                               'name':package[rpm.RPMTAG_NAME],
-                               'version':package[rpm.RPMTAG_VERSION],
-                               'release':package[rpm.RPMTAG_RELEASE],
-                               'epoch':package[rpm.RPMTAG_EPOCH],
-                               'arch':package[rpm.RPMTAG_ARCH],
-                               'source':'rpm' }
+            "name": package[rpm.RPMTAG_NAME],
+            "version": package[rpm.RPMTAG_VERSION],
+            "release": package[rpm.RPMTAG_RELEASE],
+            "epoch": package[rpm.RPMTAG_EPOCH],
+            "arch": package[rpm.RPMTAG_ARCH],
+            "source": "rpm",
+        }
         if installed_packages == []:
             installed_packages = [package_details]
         else:
@@ -58,16 +60,20 @@ def rpm_package_list():
 
 def deb_package_list():
     import apt
+
     apt_cache = apt.Cache()
     installed_packages = []
-    apt_installed_packages = [pk for pk in apt_cache.keys() if apt_cache[pk].is_installed]
+    apt_installed_packages = [
+        pk for pk in apt_cache.keys() if apt_cache[pk].is_installed
+    ]
     for package in apt_installed_packages:
         ac_pkg = apt_cache[package].installed
         package_details = {
-                               'name':package,
-                               'version':ac_pkg.version,
-                               'arch':ac_pkg.architecture,
-                               'source':'apt'}
+            "name": package,
+            "version": ac_pkg.version,
+            "arch": ac_pkg.architecture,
+            "source": "apt",
+        }
         if installed_packages == []:
             installed_packages = [package_details]
         else:
@@ -76,13 +82,11 @@ def deb_package_list():
 
 
 def main():
-    module = AnsibleModule(
-        argument_spec = dict(os_family=dict(required=True))
-    )
-    ans_os = module.params['os_family']
-    if ans_os in ('RedHat', 'Suse', 'openSUSE Leap'):
+    module = AnsibleModule(argument_spec=dict(os_family=dict(required=True)))
+    ans_os = module.params["os_family"]
+    if ans_os in ("RedHat", "Suse", "openSUSE Leap"):
         packages = rpm_package_list()
-    elif ans_os == 'Debian':
+    elif ans_os == "Debian":
         packages = deb_package_list()
     else:
         packages = None

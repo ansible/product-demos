@@ -5,33 +5,33 @@ p.hostname {
     margin: auto;
     width: 50%;
   }
-  
+
   #subtable {
     background: #ebebeb;
     margin: 0px;
     width: 100%;
   }
-  
+
   #subtable tbody tr td {
     padding: 5px 5px 5px 5px;
   }
-  
+
   #subtable thead th {
     padding: 5px;
   }
-  
+
   * {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     font-family: "Open Sans", "Helvetica";
-  
+
   }
-  
+
   a {
     color: #ffffff;
   }
-  
+
   p {
     color: #ffffff;
   }
@@ -39,14 +39,14 @@ p.hostname {
     text-align: center;
     color: #ffffff;
   }
-  
+
   body {
     background:#353a40;
     padding: 0px;
     margin: 0px;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
-  
+
   table {
     border-collapse: separate;
     background:#fff;
@@ -57,11 +57,11 @@ p.hostname {
   .main_net_table {
     margin:50px auto;
   }
-  
+
   thead {
     @include border-radius(5px);
   }
-  
+
   thead th {
     font-size:16px;
     font-weight:400;
@@ -71,16 +71,16 @@ p.hostname {
     padding:20px;
     border-top:1px solid #858d99;
     background: #353a40;
-  
+
     &:first-child {
      @include border-top-left-radius(5px);
     }
-  
+
     &:last-child {
       @include border-top-right-radius(5px);
     }
   }
-  
+
   tbody tr td {
     font-weight:400;
     color:#5f6062;
@@ -88,11 +88,11 @@ p.hostname {
     padding:20px 20px 20px 20px;
     border-bottom:1px solid #e0e0e0;
   }
-  
+
   tbody tr:nth-child(2n) {
     background:#f0f3f5;
   }
-  
+
   tbody tr:last-child td {
     border-bottom:none;
     &:first-child {
@@ -102,7 +102,7 @@ p.hostname {
       @include border-bottom-right-radius(5px);
     }
   }
-  
+
   td {
     vertical-align: top;
   }
@@ -110,16 +110,16 @@ p.hostname {
   span.highlight {
       background-color: yellow;
   }
-  
+
   .expandclass {
     color: #5f6062;
   }
-  
+
   .content{
            display:none;
            margin: 10px;
   }
-  
+
   header {
     width: 100%;
     position: initial;
@@ -130,7 +130,7 @@ p.hostname {
     height: 88px;
     background-color: #171717;
   }
-  
+
   .header-container {
     margin: 0 auto;
     width: 100%;
@@ -141,14 +141,14 @@ p.hostname {
     display: flex;
     align-items: center;
   }
-  
+
   .header-logo {
     width: 137px;
     border: 0;
     margin: 0;
     margin-left: 15px;
   }
-  
+
   .header-link {
     margin-left: 40px;
     text-decoration: none;
@@ -158,12 +158,12 @@ p.hostname {
     font-family: 'Red Hat Text';
     font-weight: 500;
   }
-  
+
   .header-link:hover {
     text-shadow: 0 0 0.02px white;
     text-decoration: none;
   }
-  
+
   table.net_info td {
     padding: 5px;
 }

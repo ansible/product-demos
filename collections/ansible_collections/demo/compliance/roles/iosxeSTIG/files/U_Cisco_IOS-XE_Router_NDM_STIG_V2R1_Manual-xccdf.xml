@@ -69,20 +69,20 @@ archive
 
 Note: Configuration changes can be viewed using the show archive log config all command.
 
-If account removal is not automatically audited, this is a finding.</check-content></check></Rule></Group><Group id="V-215812"><title>SRG-APP-000038-NDM-000213</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215812r539421_rule" weight="10.0" severity="medium"><version>CISC-ND-000140</version><title>The Cisco router must be configured to enforce approved authorizations for controlling the flow of management information within the device based on control policies.</title><description>&lt;VulnDiscussion&gt;A mechanism to detect and prevent unauthorized communication flow must be configured or provided as part of the system design. If management information flow is not enforced based on approved authorizations, the network device may become compromised. Information flow control regulates where management information is allowed to travel within a network device. The flow of all management information must be monitored and controlled so it does not introduce any unacceptable risk to the network device or data. 
+If account removal is not automatically audited, this is a finding.</check-content></check></Rule></Group><Group id="V-215812"><title>SRG-APP-000038-NDM-000213</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215812r539421_rule" weight="10.0" severity="medium"><version>CISC-ND-000140</version><title>The Cisco router must be configured to enforce approved authorizations for controlling the flow of management information within the device based on control policies.</title><description>&lt;VulnDiscussion&gt;A mechanism to detect and prevent unauthorized communication flow must be configured or provided as part of the system design. If management information flow is not enforced based on approved authorizations, the network device may become compromised. Information flow control regulates where management information is allowed to travel within a network device. The flow of all management information must be monitored and controlled so it does not introduce any unacceptable risk to the network device or data.
 
 Application-specific examples of enforcement occur in systems that employ rule sets or establish configuration settings that restrict information system services or message-filtering capability based on message content (e.g., implementing key word searches or using document characteristics).
 
 Applications providing information flow control must be able to enforce approved authorizations for controlling the flow of management information within the system in accordance with applicable policy.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">V-96205</ident><ident system="http://cyber.mil/legacy">SV-105343</ident><ident system="http://cyber.mil/cci">CCI-001368</ident><fixtext fixref="F-17049r539420_fix">Configure the Cisco router to restrict management access to specific IP addresses via SSH as shown in the example below.
 
-SW2(config)#ip access-list standard MANAGEMENT_NET 
-SW2(config-std-nacl)#permit x.x.x.0 0.0.0.255 
-SW2(config-std-nacl)#exit 
-SW2(config)#line vty 0 4 
-SW2(config-line)#transport input ssh 
-SW2(config-line)#access-class MANAGEMENT_NET in 
+SW2(config)#ip access-list standard MANAGEMENT_NET
+SW2(config-std-nacl)#permit x.x.x.0 0.0.0.255
+SW2(config-std-nacl)#exit
+SW2(config)#line vty 0 4
+SW2(config-line)#transport input ssh
+SW2(config-line)#access-class MANAGEMENT_NET in
 SW2(config-line)#end
-</fixtext><fix id="F-17049r539420_fix" /><check system="C-17051r539419_chk"><check-content-ref href="Cisco_IOS_XE_Router_NDM_STIG.xml" name="M" /><check-content>Review the Cisco router configuration to verify that it is compliant with this requirement. 
+</fixtext><fix id="F-17049r539420_fix" /><check system="C-17051r539419_chk"><check-content-ref href="Cisco_IOS_XE_Router_NDM_STIG.xml" name="M" /><check-content>Review the Cisco router configuration to verify that it is compliant with this requirement.
 
 Step 1: Verify that the line vty has an ACL inbound applied as shown in the example below.
 
@@ -92,7 +92,7 @@ line vty 0 4
 
 Step 2: Verify that the ACL permits only hosts from the management network to access the router.
 
-ip access-list extended MANAGEMENT_NET 
+ip access-list extended MANAGEMENT_NET
 permit ip x.x.x.0 0.0.0.255 any
 deny   ip any any log-input
 
@@ -166,7 +166,7 @@ archive
 
 Note: The logging userinfo global configuration command will generate a log when a user increases his or her privilege level.
 
-If logging of administrator activity is not configured, this is a finding.</check-content></check></Rule></Group><Group id="V-215816"><title>SRG-APP-000091-NDM-000223</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215816r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-000250</version><title>The Cisco router must be configured to generate audit records when successful/unsuccessful attempts to log on with access privileges occur.</title><description>&lt;VulnDiscussion&gt;Without generating audit records that are specific to the security and mission needs of the organization, it would be difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible for one. 
+If logging of administrator activity is not configured, this is a finding.</check-content></check></Rule></Group><Group id="V-215816"><title>SRG-APP-000091-NDM-000223</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215816r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-000250</version><title>The Cisco router must be configured to generate audit records when successful/unsuccessful attempts to log on with access privileges occur.</title><description>&lt;VulnDiscussion&gt;Without generating audit records that are specific to the security and mission needs of the organization, it would be difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible for one.
 
 Audit records can be generated from various components within the information system (e.g., module or policy filter).&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">V-96221</ident><ident system="http://cyber.mil/legacy">SV-105359</ident><ident system="http://cyber.mil/cci">CCI-000172</ident><fixtext fixref="F-17053r287488_fix">Configure the Cisco router to log all logon attempts as shown in the example below.
 
@@ -193,7 +193,7 @@ R1(config-ext-nacl)#deny icmp any any log-input</fixtext><fix id="F-17055r287494
 ip access-list extended BLOCK_INBOUND
  deny  icmp any any log-input
 
-If the router is not configured with the log-input parameter after any deny statements to note where packets have been dropped via an ACL, this is a finding.</check-content></check></Rule></Group><Group id="V-215819"><title>SRG-APP-000101-NDM-000231</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215819r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-000330</version><title>The Cisco router must be configured to generate audit records containing the full-text recording of privileged commands.</title><description>&lt;VulnDiscussion&gt;Reconstruction of harmful events or forensic analysis is not possible if audit records do not contain enough information. 
+If the router is not configured with the log-input parameter after any deny statements to note where packets have been dropped via an ACL, this is a finding.</check-content></check></Rule></Group><Group id="V-215819"><title>SRG-APP-000101-NDM-000231</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215819r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-000330</version><title>The Cisco router must be configured to generate audit records containing the full-text recording of privileged commands.</title><description>&lt;VulnDiscussion&gt;Reconstruction of harmful events or forensic analysis is not possible if audit records do not contain enough information.
 
 Organizations consider limiting the additional audit information to only that information explicitly needed for specific audit requirements. The additional information required is dependent on the type of information (i.e., sensitivity of the data and the environment within which it resides). At a minimum, the organization must audit full-text recording of privileged commands. The organization must maintain audit trails in sufficient detail to reconstruct events to determine the cause and impact of compromise.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">V-96227</ident><ident system="http://cyber.mil/legacy">SV-105365</ident><ident system="http://cyber.mil/cci">CCI-000135</ident><fixtext fixref="F-17056r287497_fix">Configure the Cisco router to log all configuration changes as shown in the example below.
 
@@ -210,11 +210,11 @@ Note: Configuration changes can be viewed using the show archive log config all 
 
 If the Cisco router is not configured to generate audit records of configuration changes, this is a finding.</check-content></check></Rule></Group><Group id="V-215820"><title>SRG-APP-000119-NDM-000236</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215820r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-000380</version><title>The Cisco router must be configured to protect audit information from unauthorized modification.</title><description>&lt;VulnDiscussion&gt;Audit information includes all information (e.g., audit records, audit settings, and audit reports) needed to successfully audit network device activity.
 
-If audit data were to become compromised, then forensic analysis and discovery of the true source of potentially malicious system activity is impossible to achieve. 
+If audit data were to become compromised, then forensic analysis and discovery of the true source of potentially malicious system activity is impossible to achieve.
 
-To ensure the veracity of audit data, the network device must protect audit information from unauthorized modification. 
+To ensure the veracity of audit data, the network device must protect audit information from unauthorized modification.
 
-This requirement can be achieved through multiple methods, which will depend upon system architecture and design. Some commonly employed methods include ensuring log files receive the proper file system permissions and limiting log data locations. 
+This requirement can be achieved through multiple methods, which will depend upon system architecture and design. Some commonly employed methods include ensuring log files receive the proper file system permissions and limiting log data locations.
 
 Network devices providing a user interface to audit data will leverage user permissions and roles identifying the user accessing the data and the corresponding rights that the user enjoys in order to make access decisions regarding the modification of audit data.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">V-96231</ident><ident system="http://cyber.mil/legacy">SV-105369</ident><ident system="http://cyber.mil/cci">CCI-000163</ident><fixtext fixref="F-17057r287500_fix">If persistent logging is enabled, configure the router to only allow administrators with privilege level "15" access to the file system as shown in the example below.
 
@@ -226,15 +226,15 @@ logging persistent url disk0:/logfile size 134217728 filesize 16384
 
 Step 2: Verify that the router is not configured with a privilege level other than "15" to allow access to the file system as shown in the example below.
 
-file privilege 10 
+file privilege 10
 
 Note: The default privilege level required for access to the file system is "15"; hence, the command file privilege "15" will not be shown in the configuration.
 
 If the router is configured with a privilege level other than "15" to allow access to the file system, this is a finding.</check-content></check></Rule></Group><Group id="V-215821"><title>SRG-APP-000120-NDM-000237</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215821r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-000390</version><title>The Cisco router must be configured to protect audit information from unauthorized deletion.</title><description>&lt;VulnDiscussion&gt;Audit information includes all information (e.g., audit records, audit settings, and audit reports) needed to successfully audit information system activity.
 
-If audit data were to become compromised, then forensic analysis and discovery of the true source of potentially malicious system activity is impossible to achieve. 
+If audit data were to become compromised, then forensic analysis and discovery of the true source of potentially malicious system activity is impossible to achieve.
 
-To ensure the veracity of audit data, the network device must protect audit information from unauthorized deletion. This requirement can be achieved through multiple methods, which will depend upon system architecture and design. Some commonly employed methods include: ensuring log files receive the proper file system permissions utilizing file system protections, restricting access, and backing up log data to ensure log data is retained. 
+To ensure the veracity of audit data, the network device must protect audit information from unauthorized deletion. This requirement can be achieved through multiple methods, which will depend upon system architecture and design. Some commonly employed methods include: ensuring log files receive the proper file system permissions utilizing file system protections, restricting access, and backing up log data to ensure log data is retained.
 
 Network devices providing a user interface to audit data will leverage user permissions and roles identifying the user accessing the data and the corresponding rights the user enjoys in order to make access decisions regarding the deletion of audit data.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">V-96233</ident><ident system="http://cyber.mil/legacy">SV-105371</ident><ident system="http://cyber.mil/cci">CCI-000164</ident><fixtext fixref="F-17058r287503_fix">If persistent logging is enabled, configure the router to only allow administrators with privilege level "15" access to the file system as shown in the example below.
 
@@ -246,7 +246,7 @@ logging persistent url disk0:/logfile size 134217728 filesize 16384
 
 Step 2: Verify that the router is not configured with a privilege level other than "15" to allow access to the file system as shown in the example below.
 
-file privilege 10 
+file privilege 10
 
 Note: The default privilege level required for access to the file system is "15"; hence, the command file privilege "15" will not be shown in the configuration.
 
@@ -254,11 +254,11 @@ If the router is configured with a privilege level other than "15" to allow acce
 
 R4(config)#file privilege 15</fixtext><fix id="F-17059r287506_fix" /><check system="C-17061r287505_chk"><check-content-ref href="Cisco_IOS_XE_Router_NDM_STIG.xml" name="M" /><check-content>Verify that the router is not configured with a privilege level other than "15" to allow access to the file system as shown in the example below.
 
-file privilege 10 
+file privilege 10
 
 Note: The default privilege level required for access to the file system is "15"; hence, the command file privilege "15" will not be shown in the configuration.
 
-If the router is configured with a privilege level other than "15" to allow access to the file system, this is a finding.</check-content></check></Rule></Group><Group id="V-215823"><title>SRG-APP-000142-NDM-000245</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215823r531083_rule" weight="10.0" severity="high"><version>CISC-ND-000470</version><title>The Cisco router must be configured to prohibit the use of all unnecessary and nonsecure functions and services.</title><description>&lt;VulnDiscussion&gt;Network devices are capable of providing a wide variety of functions and services. Some of the functions and services provided by default may not be necessary to support essential organizational operations. Additionally, it is sometimes convenient to provide multiple services from a single component (e.g., email and web services); however, doing so increases risk over limiting the services provided by any one component. 
+If the router is configured with a privilege level other than "15" to allow access to the file system, this is a finding.</check-content></check></Rule></Group><Group id="V-215823"><title>SRG-APP-000142-NDM-000245</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215823r531083_rule" weight="10.0" severity="high"><version>CISC-ND-000470</version><title>The Cisco router must be configured to prohibit the use of all unnecessary and nonsecure functions and services.</title><description>&lt;VulnDiscussion&gt;Network devices are capable of providing a wide variety of functions and services. Some of the functions and services provided by default may not be necessary to support essential organizational operations. Additionally, it is sometimes convenient to provide multiple services from a single component (e.g., email and web services); however, doing so increases risk over limiting the services provided by any one component.
 
 To support the requirements and principles of least functionality, the network device must support the organizational requirements providing only essential capabilities and limiting the use of ports, protocols, and/or services to only those required, authorized, and approved. Some network devices have capabilities enabled by default; if these capabilities are not necessary, they must be disabled. If a particular capability is used, then it must be documented and approved.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">V-96239</ident><ident system="http://cyber.mil/legacy">SV-105377</ident><ident system="http://cyber.mil/cci">CCI-000382</ident><fixtext fixref="F-17060r287509_fix">Disable the following services if enabled as shown in the example below.
 
@@ -312,7 +312,7 @@ aaa authentication login default group tacacs+ local
 
 If the Cisco router is not configured with only one local account to be used as the account of last resort in the event the authentication server is unavailable, this is a finding.</check-content></check></Rule></Group><Group id="V-215825"><title>SRG-APP-000156-NDM-000250</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215825r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-000530</version><title>The Cisco router must be configured to implement replay-resistant authentication mechanisms for network access to privileged accounts.</title><description>&lt;VulnDiscussion&gt;A replay attack may enable an unauthorized user to gain access to the application. Authentication sessions between the authenticator and the application validating the user credentials must not be vulnerable to a replay attack.
 
-An authentication process resists replay attacks if it is impractical to achieve a successful authentication by recording and replaying a previous authentication message. 
+An authentication process resists replay attacks if it is impractical to achieve a successful authentication by recording and replaying a previous authentication message.
 
 Techniques used to address this include protocols using nonces (e.g., numbers generated for a specific one-time use) or challenges (e.g., TLS, WS_Security). Additional techniques include time-synchronous or challenge-response one-time authenticators.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">V-96249</ident><ident system="http://cyber.mil/legacy">SV-105387</ident><ident system="http://cyber.mil/cci">CCI-001941</ident><fixtext fixref="F-17062r287515_fix">Configure SSH to use FIPS-140-2 compliant HMACs as shown in the example below.
 
@@ -324,7 +324,7 @@ Note: An SSH configuration enables a server and client to authorize the negotiat
 ip ssh version 2
 ip ssh server algorithm encryption aes128-cbc aes192-cbc aes192-ctr
 
-Note: An SSH configuration enables a server and client to authorize the negotiation of only those algorithms that are configured from the allowed list. If a remote party tries to negotiate using an algorithm that is not part of the allowed list, the request is rejected and the session is not established. 
+Note: An SSH configuration enables a server and client to authorize the negotiation of only those algorithms that are configured from the allowed list. If a remote party tries to negotiate using an algorithm that is not part of the allowed list, the request is rejected and the session is not established.
 
 If the router is not configured to implement replay-resistant authentication mechanisms for network access to privileged accounts, this is a finding.</check-content></check></Rule></Group><Group id="V-215826"><title>SRG-APP-000164-NDM-000252</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215826r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-000550</version><title>The Cisco router must be configured to enforce a minimum 15-character password length.</title><description>&lt;VulnDiscussion&gt;Password complexity, or strength, is a measure of the effectiveness of a password in resisting attempts at guessing and brute-force attacks. Password length is one factor of several that helps to determine strength and how long it takes to crack a password.
 
@@ -428,12 +428,12 @@ Performance and time required to access are factors that must be considered, and
 
 In many instances, verifying the user knows a password is performed using a password verifier. In its simplest form, a password verifier is a computational function that is capable of creating a hash of a password and determining if the value provided by the user matches the stored hash.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">SV-105403</ident><ident system="http://cyber.mil/legacy">V-96265</ident><ident system="http://cyber.mil/cci">CCI-000196</ident><fixtext fixref="F-17069r287536_fix">Configure the router to encrypt all passwords.
 
-R4(config)#service password-encryption 
+R4(config)#service password-encryption
 R4(config)#end</fixtext><fix id="F-17069r287536_fix" /><check system="C-17071r287535_chk"><check-content-ref href="Cisco_IOS_XE_Router_NDM_STIG.xml" name="M" /><check-content>Review the router configuration to determine if passwords are encrypted as shown in the example below.
 
 service password-encryption
 
-If the router is not configured to encrypt passwords, this is a finding.</check-content></check></Rule></Group><Group id="V-215833"><title>SRG-APP-000190-NDM-000267</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215833r531083_rule" weight="10.0" severity="high"><version>CISC-ND-000720</version><title>The Cisco router must be configured to terminate all network connections associated with device management after 10 minutes of inactivity.</title><description>&lt;VulnDiscussion&gt;Terminating an idle session within a short time period reduces the window of opportunity for unauthorized personnel to take control of a management session enabled on the console or console port that has been left unattended. In addition, quickly terminating an idle session will also free up resources committed by the managed network element. 
+If the router is not configured to encrypt passwords, this is a finding.</check-content></check></Rule></Group><Group id="V-215833"><title>SRG-APP-000190-NDM-000267</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215833r531083_rule" weight="10.0" severity="high"><version>CISC-ND-000720</version><title>The Cisco router must be configured to terminate all network connections associated with device management after 10 minutes of inactivity.</title><description>&lt;VulnDiscussion&gt;Terminating an idle session within a short time period reduces the window of opportunity for unauthorized personnel to take control of a management session enabled on the console or console port that has been left unattended. In addition, quickly terminating an idle session will also free up resources committed by the managed network element.
 
 Terminating network connections associated with communications sessions includes, for example, de-allocating associated TCP/IP address/port pairs at the operating system level, or de-allocating networking assignments at the application level if multiple application sessions are using a single, operating system-level network connection. This does not mean that the device terminates all sessions or network access; it only ends the inactive session and releases the resources associated with that session.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">SV-105409</ident><ident system="http://cyber.mil/legacy">V-96271</ident><ident system="http://cyber.mil/cci">CCI-001133</ident><fixtext fixref="F-17070r287539_fix">Set the idle timeout value to "10" minutes or less on all configured login classes as shown in the example below.
 
@@ -490,7 +490,7 @@ archive
 
 Note: The logging userinfo global configuration command will generate a log when a user increases his or her privilege level.
 
-If the Cisco router is not configured to log all commands entered from the command line interface as well as log all configuration changes, this is a finding.</check-content></check></Rule></Group><Group id="V-215836"><title>SRG-APP-000357-NDM-000293</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215836r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-000980</version><title>The Cisco router must be configured to allocate audit record storage capacity in accordance with organization-defined audit record storage requirements.</title><description>&lt;VulnDiscussion&gt;In order to ensure network devices have a sufficient storage capacity in which to write the audit logs, they need to be able to allocate audit record storage capacity. The task of allocating audit record storage capacity is usually performed during initial device setup if it is modifiable. 
+If the Cisco router is not configured to log all commands entered from the command line interface as well as log all configuration changes, this is a finding.</check-content></check></Rule></Group><Group id="V-215836"><title>SRG-APP-000357-NDM-000293</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215836r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-000980</version><title>The Cisco router must be configured to allocate audit record storage capacity in accordance with organization-defined audit record storage requirements.</title><description>&lt;VulnDiscussion&gt;In order to ensure network devices have a sufficient storage capacity in which to write the audit logs, they need to be able to allocate audit record storage capacity. The task of allocating audit record storage capacity is usually performed during initial device setup if it is modifiable.
 
 The value for the organization-defined audit record storage requirement will depend on the amount of storage available on the network device, the anticipated volume of logs, the frequency of transfer from the network device to centralized log servers, and other factors.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">V-96297</ident><ident system="http://cyber.mil/legacy">SV-105435</ident><ident system="http://cyber.mil/cci">CCI-001849</ident><fixtext fixref="F-17073r287548_fix">Configure the buffer size for logging as shown in the example below.
 
@@ -500,7 +500,7 @@ logging buffered xxxxxxxx informational
 
 If a logging buffer size is not configured, this is a finding.
 
-If the Cisco router is not configured to allocate audit record storage capacity in accordance with organization-defined audit record storage requirements, this is a finding.</check-content></check></Rule></Group><Group id="V-215837"><title>SRG-APP-000360-NDM-000295</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215837r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-001000</version><title>The Cisco router must be configured to generate an alert for all audit failure events.</title><description>&lt;VulnDiscussion&gt;It is critical for the appropriate personnel to be aware if a system is at risk of failing to process audit logs as required. Without a real-time alert, security personnel may be unaware of an impending failure of the audit capability and system operation may be adversely affected. 
+If the Cisco router is not configured to allocate audit record storage capacity in accordance with organization-defined audit record storage requirements, this is a finding.</check-content></check></Rule></Group><Group id="V-215837"><title>SRG-APP-000360-NDM-000295</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215837r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-001000</version><title>The Cisco router must be configured to generate an alert for all audit failure events.</title><description>&lt;VulnDiscussion&gt;It is critical for the appropriate personnel to be aware if a system is at risk of failing to process audit logs as required. Without a real-time alert, security personnel may be unaware of an impending failure of the audit capability and system operation may be adversely affected.
 
 Alerts provide organizations with urgent messages. Real-time alerts provide these messages immediately (i.e., the time from event detection to alert occurs in seconds or less).&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">V-96301</ident><ident system="http://cyber.mil/legacy">SV-105439</ident><ident system="http://cyber.mil/cci">CCI-001858</ident><fixtext fixref="F-17074r287551_fix">Configure the Cisco router to send critical to emergency log messages to the syslog server as shown in the example below.
 
@@ -514,7 +514,7 @@ logging x.x.x.x
 
 Note: The parameter "critical" can replaced with a lesser severity level (i.e. error, warning, notice, informational). Informational is the default severity level; hence, if the severity level is configured to informational, the logging trap command will not be shown in the configuration.
 
-If the Cisco router is not configured to generate an alert for all audit failure events, this is a finding.</check-content></check></Rule></Group><Group id="V-215838"><title>SRG-APP-000373-NDM-000298</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215838r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-001030</version><title>The Cisco router must be configured to synchronize its clock with the primary and secondary time sources using redundant authoritative time sources.</title><description>&lt;VulnDiscussion&gt;The loss of connectivity to a particular authoritative time source will result in the loss of time synchronization (free-run mode) and increasingly inaccurate time stamps on audit events and other functions. 
+If the Cisco router is not configured to generate an alert for all audit failure events, this is a finding.</check-content></check></Rule></Group><Group id="V-215838"><title>SRG-APP-000373-NDM-000298</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215838r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-001030</version><title>The Cisco router must be configured to synchronize its clock with the primary and secondary time sources using redundant authoritative time sources.</title><description>&lt;VulnDiscussion&gt;The loss of connectivity to a particular authoritative time source will result in the loss of time synchronization (free-run mode) and increasingly inaccurate time stamps on audit events and other functions.
 
 Multiple time sources provide redundancy by including a secondary source. Time synchronization is usually a hierarchy; clients synchronize time to a local source while that source synchronizes its time to a more accurate source. The network device must utilize an authoritative time server and/or be configured to use redundant authoritative time sources. This requirement is related to the comparison done in CCI-001891.
 
@@ -530,7 +530,7 @@ If the Cisco router is not configured to synchronize its clock with redundant au
 
 R2(config)#service timestamps log datetime localtime</fixtext><fix id="F-17076r287557_fix" /><check system="C-17078r287556_chk"><check-content-ref href="Cisco_IOS_XE_Router_NDM_STIG.xml" name="M" /><check-content>Review the Cisco router configuration to verify that it is compliant with this requirement as shown in the example below.
 
-service timestamps log datetime 
+service timestamps log datetime
 
 If the router is not configured to record time stamps that meet a granularity of one second, this is a finding.</check-content></check></Rule></Group><Group id="V-215840"><title>SRG-APP-000374-NDM-000299</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215840r531083_rule" weight="10.0" severity="medium"><version>CISC-ND-001050</version><title>The Cisco router must be configured to record time stamps for log records that can be mapped to Coordinated Universal Time (UTC) or Greenwich Mean Time (GMT).</title><description>&lt;VulnDiscussion&gt;If time stamps are not consistently applied and there is no common time reference, it is difficult to perform forensic analysis.
 
@@ -562,7 +562,7 @@ R4(config)#snmp-server view V3READ iso included
 R4(config)#snmp-server view V3WRITE iso included
 R4(config)#snmp-server host x.x.x.x version 3 auth V3USER</fixtext><fix id="F-17078r287563_fix" /><check system="C-17080r287562_chk"><check-content-ref href="Cisco_IOS_XE_Router_NDM_STIG.xml" name="M" /><check-content>Review the Cisco router configuration to verify that it is compliant with this requirement as shown in the example below.
 
-snmp-server group V3GROUP v3 auth read V3READ write V3WRITE 
+snmp-server group V3GROUP v3 auth read V3READ write V3WRITE
 snmp-server view V3READ iso included
 snmp-server view V3WRITE iso included
 snmp-server host x.x.x.x version 3 auth V3USER
@@ -615,7 +615,7 @@ ntp server y.y.y.y key 1
 
 If the Cisco router is not configured to authenticate NTP sources using authentication that is cryptographically based, this is a finding.</check-content></check></Rule></Group><Group id="V-215844"><title>SRG-APP-000411-NDM-000330</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-215844r531083_rule" weight="10.0" severity="high"><version>CISC-ND-001200</version><title>The Cisco router must be configured to use FIPS-validated Keyed-Hash Message Authentication Code (HMAC) to protect the integrity of remote maintenance sessions.</title><description>&lt;VulnDiscussion&gt;Unapproved mechanisms that are used for authentication to the cryptographic module are not verified and therefore cannot be relied upon to provide confidentiality or integrity, and DoD data may be compromised.
 
-Nonlocal maintenance and diagnostic activities are those activities conducted by individuals communicating through a network, either an external network (e.g., the Internet) or an internal network. 
+Nonlocal maintenance and diagnostic activities are those activities conducted by individuals communicating through a network, either an external network (e.g., the Internet) or an internal network.
 
 Currently, HMAC is the only FIPS-approved algorithm for generating and verifying message/data authentication codes in accordance with FIPS 198-1. Products that are FIPS 140-2 validated will have an HMAC that meets specification; however, the option must be configured for use as the only message authentication code used for authentication to cryptographic modules.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">V-96327</ident><ident system="http://cyber.mil/legacy">SV-105465</ident><ident system="http://cyber.mil/cci">CCI-002890</ident><fixtext fixref="F-17081r287572_fix">The Cisco router is not compliant with this requirement. However, the risk associated with this requirement can be fully mitigated if the router is configured.
 
@@ -638,7 +638,7 @@ ip ssh server algorithm mac hmac-sha1-96
 HTTPS Example
 
 ip http secure-server
-ip http secure-ciphersuite aes-128-cbc-sha 
+ip http secure-ciphersuite aes-128-cbc-sha
 ip http secure-client-auth
 ip http secure-trustpoint CA_XXX
 
@@ -661,7 +661,7 @@ ip ssh server algorithm encryption aes128-cbc aes128-ctr aes192-cbc aes192-ctr
 HTTPS Example
 
 ip http secure-server
-ip http secure-ciphersuite aes-128-cbc-sha 
+ip http secure-ciphersuite aes-128-cbc-sha
 ip http secure-client-auth
 ip http secure-trustpoint CA_XXX
 
@@ -752,85 +752,85 @@ Step 4: Apply the policy map to the control plane.
 
 R1(config)#control-plane
 R1(config-cp)#service-policy input CONTROL_PLANE_POLICY
-R1(config-cp)#end</fixtext><fix id="F-17083r287578_fix" /><check system="C-17085r287577_chk"><check-content-ref href="Cisco_IOS_XE_Router_NDM_STIG.xml" name="M" /><check-content>Review the Cisco router configuration to verify that it is compliant with this requirement. 
+R1(config-cp)#end</fixtext><fix id="F-17083r287578_fix" /><check system="C-17085r287577_chk"><check-content-ref href="Cisco_IOS_XE_Router_NDM_STIG.xml" name="M" /><check-content>Review the Cisco router configuration to verify that it is compliant with this requirement.
 
 Step 1: Verify traffic types have been classified based on importance levels. The following is an example configuration:
 
-class-map match-all CoPP_CRITICAL 
-match access-group name CoPP_CRITICAL 
-class-map match-any CoPP_IMPORTANT 
-match access-group name CoPP_IMPORTANT 
-match protocol arp 
-class-map match-all CoPP_NORMAL 
-match access-group name CoPP_NORMAL 
-class-map match-any CoPP_UNDESIRABLE 
-match access-group name CoPP_UNDESIRABLE 
-class-map match-all CoPP_DEFAULT 
-match access-group name CoPP_DEFAULT 
+class-map match-all CoPP_CRITICAL
+match access-group name CoPP_CRITICAL
+class-map match-any CoPP_IMPORTANT
+match access-group name CoPP_IMPORTANT
+match protocol arp
+class-map match-all CoPP_NORMAL
+match access-group name CoPP_NORMAL
+class-map match-any CoPP_UNDESIRABLE
+match access-group name CoPP_UNDESIRABLE
+class-map match-all CoPP_DEFAULT
+match access-group name CoPP_DEFAULT
 
 Step 2: Review the ACLs referenced by the class maps to determine if the traffic is being classified appropriately. The following is an example configuration:
 
-ip access-list extended CoPP_CRITICAL 
-remark our control plane adjacencies are critical 
-permit ospf host [OSPF neighbor A] any 
-permit ospf host [OSPF neighbor B] any 
-permit pim host [PIM neighbor A] any 
-permit pim host [PIM neighbor B] any 
-permit pim host [RP addr] any 
-permit igmp any 224.0.0.0 15.255.255.255 
-permit tcp host [BGP neighbor] eq bgp host [local BGP addr] 
-permit tcp host [BGP neighbor] host [local BGP addr] eq bgp 
-deny ip any any 
+ip access-list extended CoPP_CRITICAL
+remark our control plane adjacencies are critical
+permit ospf host [OSPF neighbor A] any
+permit ospf host [OSPF neighbor B] any
+permit pim host [PIM neighbor A] any
+permit pim host [PIM neighbor B] any
+permit pim host [RP addr] any
+permit igmp any 224.0.0.0 15.255.255.255
+permit tcp host [BGP neighbor] eq bgp host [local BGP addr]
+permit tcp host [BGP neighbor] host [local BGP addr] eq bgp
+deny ip any any
 
-ip access-list extended CoPP_IMPORTANT 
-permit tcp host [TACACS server] eq tacacs any 
-permit tcp [management subnet] 0.0.0.255 any eq 22 
-permit udp host [SNMP manager] any eq snmp 
-permit udp host [NTP server] eq ntp any 
-deny ip any any 
+ip access-list extended CoPP_IMPORTANT
+permit tcp host [TACACS server] eq tacacs any
+permit tcp [management subnet] 0.0.0.255 any eq 22
+permit udp host [SNMP manager] any eq snmp
+permit udp host [NTP server] eq ntp any
+deny ip any any
 
-ip access-list extended CoPP_NORMAL 
-remark we will want to rate limit ICMP traffic 
-permit icmp any any echo 
-permit icmp any any echo-reply 
-permit icmp any any time-exceeded 
-permit icmp any any unreachable 
-deny ip any any 
+ip access-list extended CoPP_NORMAL
+remark we will want to rate limit ICMP traffic
+permit icmp any any echo
+permit icmp any any echo-reply
+permit icmp any any time-exceeded
+permit icmp any any unreachable
+deny ip any any
 
-ip access-list extended CoPP_UNDESIRABLE 
-remark other management plane traffic that should not be received 
-permit udp any any eq ntp 
+ip access-list extended CoPP_UNDESIRABLE
+remark other management plane traffic that should not be received
+permit udp any any eq ntp
 permit udp any any eq snmp
-permit tcp any any eq 22 
-permit tcp any any eq 23 
-remark other control plane traffic not configured on router 
-permit eigrp any any 
-permit udp any any eq rip 
-deny ip any any 
+permit tcp any any eq 22
+permit tcp any any eq 23
+remark other control plane traffic not configured on router
+permit eigrp any any
+permit udp any any eq rip
+deny ip any any
 
-ip access-list extended CoPP_DEFAULT 
-permit ip any any 
+ip access-list extended CoPP_DEFAULT
+permit ip any any
 
-Note: Explicitly defining undesirable traffic with ACL entries enables the network operator to collect statistics. Excessive ARP packets can potentially monopolize Route Processor resources, starving other important processes. Currently, ARP is the only Layer 2 protocol that can be specifically classified using the match protocol command. 
+Note: Explicitly defining undesirable traffic with ACL entries enables the network operator to collect statistics. Excessive ARP packets can potentially monopolize Route Processor resources, starving other important processes. Currently, ARP is the only Layer 2 protocol that can be specifically classified using the match protocol command.
 
 Step 3: Review the policy-map to determine if the traffic is being policed appropriately for each classification. The following is an example configuration:
 
-policy-map CONTROL_PLANE_POLICY 
-class CoPP_CRITICAL 
-police 512000 8000 conform-action transmit exceed-action transmit 
-class CoPP_IMPORTANT 
-police 256000 4000 conform-action transmit exceed-action drop 
-class CoPP_NORMAL 
-police 128000 2000 conform-action transmit exceed-action drop 
-class CoPP_UNDESIRABLE 
-police 8000 1000 conform-action drop exceed-action drop 
+policy-map CONTROL_PLANE_POLICY
+class CoPP_CRITICAL
+police 512000 8000 conform-action transmit exceed-action transmit
+class CoPP_IMPORTANT
+police 256000 4000 conform-action transmit exceed-action drop
+class CoPP_NORMAL
+police 128000 2000 conform-action transmit exceed-action drop
+class CoPP_UNDESIRABLE
+police 8000 1000 conform-action drop exceed-action drop
 class CoPP_DEFAULT
-police 64000 1000 conform-action transmit exceed-action drop 
+police 64000 1000 conform-action transmit exceed-action drop
 
 Step 4: Verify that the CoPP policy is enabled. The following is an example configuration:
 
-control-plane 
-service-policy input CONTROL_PLANE_POLICY 
+control-plane
+service-policy input CONTROL_PLANE_POLICY
 
 Note: Control Plane Protection (CPPr) can be used to filter as well as police control plane traffic destined to the RP. CPPr is very similar to CoPP and has the ability to filter and police traffic using finer granularity by dividing the aggregate control plane into three separate categories: (1) host, (2) transit, and (3) CEF-exception. Hence, a separate policy-map could be configured for each traffic category.
 
@@ -838,7 +838,7 @@ If the Cisco router is not configured to protect against known types of DoS atta
 
 Audit records can be generated from various components within the network device (e.g., module or policy filter).&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">SV-105471</ident><ident system="http://cyber.mil/legacy">V-96333</ident><ident system="http://cyber.mil/cci">CCI-000172</ident><fixtext fixref="F-17084r287581_fix">Configure the Cisco router to generate log records when account privileges are modified as shown in the example below.
 
-R4(config)#logging userinfo 
+R4(config)#logging userinfo
 R4(config)#archive
 R4(config-archive)#log config
 R4(config-archive-log-cfg)#logging enable
@@ -928,7 +928,7 @@ R4(config-line)#login authentication LOGIN_AUTHENTICATION
 R4(config-line)#exit
 R4(config)#line con 0
 R4(config-line)#login authentication LOGIN_AUTHENTICATION
-R4(config-line)#exit 
+R4(config-line)#exit
 R4(config)#ip http authentication aaa login-authentication LOGIN_AUTHENTICATION</fixtext><fix id="F-17091r287602_fix" /><check system="C-17093r287601_chk"><check-content-ref href="Cisco_IOS_XE_Router_NDM_STIG.xml" name="M" /><check-content>Review the Cisco router configuration to verify that the device is configured to use an authentication server as primary source for authentication as shown in the following example:
 
 aaa new-model
@@ -999,7 +999,7 @@ logging x.x.x.x
 
 Note: Default for sending log messages to the syslog server is informational (level 6); hence, the command logging trap informational will not be seen in the configuration. Level of log messages sent to the syslog server can be verified using the show logging command.
 
-If the router is not configured to send log data to the syslog server, this is a finding.</check-content></check></Rule></Group><Group id="V-220140"><title>SRG-APP-000516-NDM-000351</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-220140r531083_rule" weight="10.0" severity="high"><version>CISC-ND-001470</version><title>The Cisco router must be running an IOS release that is currently supported by Cisco Systems.</title><description>&lt;VulnDiscussion&gt;Network devices running an unsupported operating system lack current security fixes required to mitigate the risks associated with recent vulnerabilities. Running a supported release also enables operations to maintain a stable and reliable network provided by improved quality of service and security features.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">V-96369</ident><ident system="http://cyber.mil/legacy">SV-105507</ident><ident system="http://cyber.mil/cci">CCI-000366</ident><fixtext fixref="F-21847r388871_fix">Upgrade the router to a supported release.</fixtext><fix id="F-21847r388871_fix" /><check system="C-21855r388870_chk"><check-content-ref href="Cisco_IOS_XE_Router_NDM_STIG.xml" name="M" /><check-content>Verify that the router is in compliance with this requirement by having the router administrator enter the following command: 
+If the router is not configured to send log data to the syslog server, this is a finding.</check-content></check></Rule></Group><Group id="V-220140"><title>SRG-APP-000516-NDM-000351</title><description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description><Rule id="SV-220140r531083_rule" weight="10.0" severity="high"><version>CISC-ND-001470</version><title>The Cisco router must be running an IOS release that is currently supported by Cisco Systems.</title><description>&lt;VulnDiscussion&gt;Network devices running an unsupported operating system lack current security fixes required to mitigate the risks associated with recent vulnerabilities. Running a supported release also enables operations to maintain a stable and reliable network provided by improved quality of service and security features.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</description><reference><dc:title>DPMS Target Cisco IOS XE Router NDM</dc:title><dc:publisher>DISA</dc:publisher><dc:type>DPMS Target</dc:type><dc:subject>Cisco IOS XE Router NDM</dc:subject><dc:identifier>4020</dc:identifier></reference><ident system="http://cyber.mil/legacy">V-96369</ident><ident system="http://cyber.mil/legacy">SV-105507</ident><ident system="http://cyber.mil/cci">CCI-000366</ident><fixtext fixref="F-21847r388871_fix">Upgrade the router to a supported release.</fixtext><fix id="F-21847r388871_fix" /><check system="C-21855r388870_chk"><check-content-ref href="Cisco_IOS_XE_Router_NDM_STIG.xml" name="M" /><check-content>Verify that the router is in compliance with this requirement by having the router administrator enter the following command:
 
 show version
 
