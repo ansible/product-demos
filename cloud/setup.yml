@@ -523,7 +523,7 @@ controller_workflows:
       - identifier: VPC Report
         unified_job_template: Cloud / AWS / VPC Report
         all_parents_must_converge: true
-        success_nodes:
+        always_nodes:
           - Deploy Windows Blueprint
           - Deploy RHEL8 Blueprint
           - Deploy RHEL9 Blueprint
