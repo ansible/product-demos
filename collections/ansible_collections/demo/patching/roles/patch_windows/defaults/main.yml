@@ -1,5 +1,5 @@
 ---
-win_update_categories:
+win_update_categories:  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
   - Application
   - Connectors
   - CriticalUpdates
@@ -11,4 +11,4 @@ win_update_categories:
   - Tools
   - UpdateRollups
   - Updates
-allow_reboot: true
+allow_reboot: true  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way

@@ -1,3 +1,3 @@
 ---
-doc_root: /var/www/html
-reports_dir: reports
+doc_root: /var/www/html  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
+reports_dir: reports  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way

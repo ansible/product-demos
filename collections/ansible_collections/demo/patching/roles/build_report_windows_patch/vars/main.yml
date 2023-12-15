@@ -1,2 +1,2 @@
 ---
-file_path: /var/www/html
+file_path: /var/www/html  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
