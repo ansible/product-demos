@@ -524,14 +524,24 @@ controller_workflows:
         unified_job_template: Cloud / AWS / VPC Report
         all_parents_must_converge: true
         always_nodes:
-          - Deploy Windows Blueprint
+          - Deploy Windows GUI Blueprint
           - Deploy RHEL8 Blueprint
           - Deploy RHEL9 Blueprint
-      - identifier: Deploy Windows Blueprint
+          - Deploy Windows Core Blueprint 
+      - identifier: Deploy Windows GUI Blueprint
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
-          create_vm_vm_name: aws_win
+          create_vm_vm_name: aws_dc
           vm_blueprint: windows_full
+        success_nodes:
+          - Update Inventory
+        failure_nodes:
+          - Ticket - Instance Failed
+      - identifier: Deploy Windows Core Blueprint
+        unified_job_template: Cloud / AWS / Create VM
+        extra_data:
+          create_vm_vm_name: aws_win1
+          vm_blueprint: windows_core
         success_nodes:
           - Update Inventory
         failure_nodes:
