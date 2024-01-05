@@ -527,7 +527,7 @@ controller_workflows:
           - Deploy Windows GUI Blueprint
           - Deploy RHEL8 Blueprint
           - Deploy RHEL9 Blueprint
-          - Deploy Windows Core Blueprint 
+          - Deploy Windows Core Blueprint
       - identifier: Deploy Windows GUI Blueprint
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
