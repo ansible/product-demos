@@ -117,7 +117,7 @@
             namespace: gitlab-system
           spec:
             chart:
-              version: "7.6.0" 
+              version: "7.6.2" 
               values:
                 nginx-ingress:
                   enabled: false
