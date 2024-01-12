@@ -117,7 +117,7 @@
             namespace: gitlab-system
           spec:
             chart:
-              version: "6.11.0"
+              version: "{{ openshift_gitlab_chart_version | default('7.6.2') }}"
               values:
                 nginx-ingress:
                   enabled: false
