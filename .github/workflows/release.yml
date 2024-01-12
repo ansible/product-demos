@@ -1,0 +1,34 @@
+---
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+  workflow_run:
+    workflows: ["pre-commit"]
+    branches: [main]
+    types:
+      - completed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install go (required for Changelog parsing)
+        uses: actions/setup-go@v4
+
+      - name: Parse CHANGELOG.md
+        run: |
+          GO111MODULE=on go install github.com/rcmachado/changelog@0.7.0
+          changelog show "$GITHUB_REF_NAME" > ${{ github.workspace }}-CHANGELOG.txt
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body_path: ${{ github.workspace }}-CHANGELOG.txt
