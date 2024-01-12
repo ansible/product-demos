@@ -72,3 +72,76 @@ Copy the token value and execute the following command:
 ```bash
 export ANSIBLE_GALAXY_SERVER_AH_TOKEN=<token>
 ```
+
+## Release Process
+
+We follow a structured release process for this project. Here are the steps involved:
+
+1. **Create a Release Branch:**
+   - Start by creating a new release branch from the `main` branch.
+
+   ```bash
+   git checkout -b release/v-<version>
+   ```
+
+2. **Update Changelog:**
+   - Open the `CHANGELOG.md` file to manually add your change to the appropriate section.
+   - Our changelog follows the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format and includes the following categories of changes:
+
+     - `Added` for new features.
+     - `Changed` for changes in existing functionality.
+     - `Deprecated` for features that will be removed in upcoming releases.
+     - `Fixed` for bug fixes.
+     - `Removed` for deprecated features that were removed.
+     - `Security` for security-related changes.
+
+   - Add a new entry under the relevant category. Include a brief summary of the change and the merge request commit tag.
+
+     ```markdown
+     ## [Unreleased]
+
+     ### Added
+
+     - New feature or enhancement ([Merge Request Commit](https://github.com/ansible/product-demos/-/commit/<commit-hash>))
+     ```
+
+   - Replace `<commit-hash>` with the actual commit hash from the merge request.
+
+3. **Commit Changes:**
+   - Commit the changes made to the `CHANGELOG.md` file.
+
+   ```bash
+   git add CHANGELOG.md
+   git commit -m "Update CHANGELOG for release <version>"
+   ```
+
+4. **Create a Pull Request:**
+   - Open a pull request from the release branch to the `main` branch.
+
+5. **Review and Merge:**
+   - Review the pull request and merge it into the `main` branch.
+
+6. **Tag the Release:**
+   - Once the pull request is merged, tag the release with the version number.
+
+   ```bash
+   git tag -a v-<version> -m "Release <version>"
+   git push origin v-<version>
+   ```
+
+7. **Publish the Release:**
+   - After the successful completion of the pull request and merging into the `main` branch, an automatic GitHub Action will be triggered to publish the release.
+
+     The GitHub Action will perform the following steps:
+     - Parse the `CHANGELOG.md` file.
+     - Generate a release note based on the changes.
+     - Attach relevant files (such as `LICENSE`, `CHANGELOG.md`, and the generated `CHANGELOG.txt`) to the GitHub Release.
+
+     No manual intervention is required for this step; the GitHub Action will handle the release process automatically.
+
+8. **Cleanup:**
+   - Delete the release branch.
+
+   ```bash
+   git branch -d release/v-<version>
+   ```
