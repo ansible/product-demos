@@ -29,8 +29,13 @@ jobs:
         run: |
           GO111MODULE=on go install github.com/rcmachado/changelog@0.7.0
           changelog show "$GITHUB_REF_NAME" > ${{ github.workspace }}-CHANGELOG.txt
+          echo "Release note for $GITHUB_REF_NAME :"
+          cat ${{ github.workspace }}-CHANGELOG.txt
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           body_path: ${{ github.workspace }}-CHANGELOG.txt
+          files: |
+            LICENSE
+            CHANGELOG.md
