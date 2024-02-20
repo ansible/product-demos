@@ -1,0 +1,22 @@
+---
+# The CJIS role seems to assume these packages are installed and the
+# services are started, otherwise an error is encountered.
+
+- name: Install packages
+  ansible.builtin.package:
+    name:
+      - "NetworkManager"
+      - "firewalld"
+    state: present
+
+- name: Start services
+  ansible.builtin.service:
+    name: "NetworkManager"
+    enabled: true
+    state: started
+
+- name: Start services
+  ansible.builtin.service:
+    name: "firewalld"
+    enabled: true
+    state: started

@@ -5,6 +5,7 @@ The following compliance profiles are supported by the [**Linux / Enforce Compli
 | **Profile** | **Role Repository** |
 |-------------|---------------------|
 | CIS | https://galaxy.ansible.com/RedHatOfficial/ansible-role-rhel8-cis |
+| CJIS | https://galaxy.ansible.com/RedHatOfficial/ansible-role-rhel8-cjis |
 | CUI | https://galaxy.ansible.com/RedHatOfficial/ansible-role-rhel8-cui |
 | HIPAA | https://galaxy.ansible.com/RedHatOfficial/ansible-role-rhel8-hipaa |
 | OSPP | https://galaxy.ansible.com/RedHatOfficial/ansible-role-rhel8-ospp |

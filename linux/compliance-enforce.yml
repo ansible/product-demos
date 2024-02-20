@@ -10,6 +10,11 @@
       ansible.builtin.assert:
         that: "ansible_os_family == 'RedHat'"
 
+    - name: Include prerequisites for cjis profile
+      ansible.builtin.include_tasks:
+        file: cjis-prerequisites.yml
+      when: compliance_profile == 'cjis'
+
     - name: Run Compliance Profile
       ansible.builtin.include_role:
         name: "redhatofficial.rhel{{ ansible_distribution_major_version }}_{{ compliance_profile }}"
