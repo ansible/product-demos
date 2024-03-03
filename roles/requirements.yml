@@ -3,6 +3,8 @@ roles:
   # RHEL 7 compliance roles from ComplianceAsCode
   - name: redhatofficial.rhel7_cis
     version: 0.1.69
+  - name: redhatofficial.rhel7_cjis
+    version: 0.1.69
   - name: redhatofficial.rhel7_cui
     version: 0.1.67
   - name: redhatofficial.rhel7_hipaa
@@ -15,6 +17,8 @@ roles:
     version: 0.1.69
   # RHEL 8 compliance roles from ComplianceAsCode
   - name: redhatofficial.rhel8_cis
+    version: 0.1.69
+  - name: redhatofficial.rhel8_cjis
     version: 0.1.69
   - name: redhatofficial.rhel8_cui
     version: 0.1.69
