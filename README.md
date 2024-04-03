@@ -34,8 +34,8 @@ This project is tested for compatibility with the [demo.redhat.com Product Demos
 2. If it is not already created for you, add an Execution Environment called `product-demos`
 
      - Name: product-demos
-       Image: quay.io/acme_corp/product-demos-ee:latest
-       Pull: Only pull the image if not present before running
+     - Image: quay.io/acme_corp/product-demos-ee:latest
+     - Pull: Only pull the image if not present before running
 
 3. If it is not already created for you, create a Project called `Ansible official demo project` with this repo as a source. NOTE: if you are using a fork, be sure that you have the correct URL. Update the project.
 
