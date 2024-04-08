@@ -1,0 +1,61 @@
+---
+- name: Deploy OpenShift CNV Operator and create the Hyperconverged object
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Create Namespace, OperatorGroup, and Subscription
+      redhat.openshift.k8s:
+        wait: true
+        definition:
+          - apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-cnv
+          - apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: kubevirt-hyperconverged-group
+              namespace: openshift-cnv
+            spec:
+              targetNamespaces:
+                - openshift-cnv
+          - apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: hco-operatorhub
+              namespace: openshift-cnv
+            spec:
+              source: redhat-operators
+              sourceNamespace: openshift-marketplace
+              name: kubevirt-hyperconverged
+              startingCSV: kubevirt-hyperconverged-operator.v4.13.3
+              channel: "stable"
+
+    - name: Wait 60 seconds to install because anything else is hard
+      ansible.builtin.pause:
+        seconds: 60
+
+    - name: Deploy the OpenShift Virtualization Operator
+      redhat.openshift.k8s:
+        definition:
+          apiVersion: hco.kubevirt.io/v1beta1
+          kind: HyperConverged
+          metadata:
+            name: kubevirt-hyperconverged
+            namespace: openshift-cnv
+          spec:
+
+    - name: Wait 150 seconds to install because anything else is hard
+      ansible.builtin.pause:
+        seconds: 150
+
+#   - name: Wait for operator to finish installing
+#      kubernetes.core.k8s_info:
+#        namespace: openshift-cnv
+#        api_version: operators.coreos.com/v1alpha1
+#        kind: ClusterServiceVersion
+#      register: csv_output
+#      retries: 45
+#      delay: 10
+#      until: "'Succeeded' in (csv_output.resources[0].status.conditions|map(attribute='phase')|list)"
