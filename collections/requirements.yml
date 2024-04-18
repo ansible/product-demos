@@ -1,9 +1,7 @@
 ---
 collections:
   - name: ansible.controller
-    version: 4.4.0
   - name: redhat_cop.controller_configuration
-    version: 2.3.1
   # linux
   - name: ansible.posix
     version: 1.5.4
