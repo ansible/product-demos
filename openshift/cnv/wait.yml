@@ -1,6 +1,7 @@
 ---
 - name: Wait for VMs to start and become ready
   hosts: "{{ _hosts | default(omit) }}"
+  gather_facts: false
   tasks:
     - name: Wait for
       ansible.builtin.wait_for:
@@ -9,4 +10,5 @@
         search_regex: OpenSSH
         delay: 10
         retries: 10
-      delegate_to: localhost
+      vars:
+        ansible_connection: local
