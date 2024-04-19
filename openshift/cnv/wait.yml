@@ -1,9 +1,6 @@
 ---
-# vars:
-#   wait_hosts:
-#
 - name: Wait for VMs to start and become ready
-  host: "{{ _hosts }}"
+  hosts: "{{ _hosts | default(omit) }}"
   tasks:
     - name: Wait for
       ansible.builtin.wait_for:
