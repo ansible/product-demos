@@ -9,4 +9,4 @@
         search_regex: OpenSSH
         delay: 10
         retries: 10
-      connection: local
+      delegate_to: localhost
