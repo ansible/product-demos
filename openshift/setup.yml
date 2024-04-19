@@ -18,22 +18,22 @@ controller_credential_types:
     kind: cloud
     inputs:
       fields:
-        - id: auth_host
+        - id: host
           type: string
-          label: auth_host
+          label: OpenShift or Kubernetes API Endpoint
           secret: false
-        - id: auth_api_key
+        - id: bearer_token
           type: string
-          label: auth_api_key
+          label: API authentication bearer token
           secret: true
-        - id: auth_verify_ssl
+        - id: verify_ssl
           type: boolean
-          label: auth_verify_ssl
+          label: Verify SSL
     injectors:
       env:
-        K8S_AUTH_HOST: "{% raw %}{  { auth_host  }}{% endraw %}"
-        K8S_AUTH_API_KEY: "{% raw %}{  { auth_api_key  }}{% endraw %}"
-        K8S_AUTH_VERIFY_SSL: "{% raw %}{  { auth_verify_ssl  }}{% endraw %}"
+        K8S_AUTH_HOST: "{% raw %}{  { host  }}{% endraw %}"
+        K8S_AUTH_API_KEY: "{% raw %}{  { bearer_token  }}{% endraw %}"
+        K8S_AUTH_VERIFY_SSL: "{% raw %}{  { verify_ssl  }}{% endraw %}"
 
 controller_credentials:
   - name: OpenShift Credential
@@ -50,17 +50,9 @@ controller_credentials:
     credential_type: OCPV inventory credential
     state: exists
     inputs:
-      auth_host: CHANGEME
-      auth_api_key: CHANGEME
-      auth_verify_ssl: false
-
-  - name: OpenShift CNV Machine Credential
-    organization: Default
-    credential_type: Machine
-    state: exists
-    inputs:
-      username: CHANGEME
-      password: CHANGEME
+      host: CHANGEME
+      bearer_token: CHANGEME
+      verify_ssl: false
 
 controller_inventory_sources:
   - name: OpenShift CNV Inventory
@@ -95,6 +87,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     survey_enabled: true
+    allow_simultaneous: true
     survey:
       name: ''
       description: ''
@@ -168,13 +161,31 @@ controller_templates:
     ask_job_type_on_launch: true
     credentials:
       - "OpenShift Credential"
-      - "OpenShift CNV Machine Credential"
+      - "Demo Credential"
     survey_enabled: true
     survey:
       name: ''
       description: ''
       spec:
         - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          default: "openshift-cnv-rhel*"
+          required: true
+
+  - name: OpenShift / CNV / Wait Hosts
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/cnv/wait.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Wait hosts
           type: text
           variable: _hosts
           default: "openshift-cnv-rhel*"
@@ -247,6 +258,12 @@ controller_workflows:
           - Ticket - Instance Failed
       - identifier: Update Inventory
         unified_job_template: OpenShift CNV Inventory
+        failure_nodes:
+          - wait_hosts
+      - identifier: wait_hosts
+        unified_job_template: OpenShift / CNV / Wait Hosts
+        failure_nodes:
+          - Update Inventory
       - identifier: Ticket - Instance Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
