@@ -1,44 +1,30 @@
 ---
 collections:
   - name: ansible.controller
-    version: 4.4.0
+  - name: infra.ah_configuration
+  - name: infra.controller_configuration
   - name: redhat_cop.controller_configuration
-    version: 2.3.1
   # linux
   - name: ansible.posix
-    version: 1.5.4
-  - name: redhat.insights
-    version: 1.0.7
-  - name: redhat.rhel_system_roles
-    version: 1.20.0
   - name: community.general
-    version: 6.3.0
+    version: ">=8.0.0"
   - name: containers.podman
+  - name: redhat.insights
+  - name: redhat.rhel_system_roles
   # windows
+  - name: ansible.windows
   - name: chocolatey.chocolatey
   - name: community.windows
-    version: 1.12.0
-  - name: ansible.windows
-    version: 1.13.0
   # cloud
-  - name: azure.azcollection
-    version: 1.14.0
   - name: amazon.aws
-    version: 5.2.0
   # satellite
   - name: redhat.satellite
-    version: 3.8.0
   # network
-  - name: cisco.ios
-    version: 4.4.0
-  - name: cisco.nxos
-    version: 4.1.0
-  - name: cisco.iosxr
-    version: 5.0.0
   - name: ansible.netcommon
-    version: 5.0.0
+  - name: cisco.ios
+  - name: cisco.iosxr
+  - name: cisco.nxos
   # openshift
-  - name: redhat.openshift
-    version: 2.3.0
   - name: kubernetes.core
-    version: 2.4.0
+  - name: redhat.openshift
+  - name: redhat.openshift_virtualization
