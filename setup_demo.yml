@@ -10,7 +10,7 @@
       vars:  # noqa var-naming[no-role-prefix]
         controller_execution_environments:
           - name: product-demos
-            image: http://quay.io/acme_corp/product-demos-ee:latest
+            image: quay.io/acme_corp/product-demos-ee:latest
         controller_organizations:
           - name: Default
             default_environment: product-demos
