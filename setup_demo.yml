@@ -6,16 +6,11 @@
   tasks:
     - name: Default Components
       ansible.builtin.include_role:
-        name: "redhat_cop.controller_configuration.{{ item }}"
-      loop: "{{ controller_components }}"
+        name: infra.controller_configuration.dispatch
       vars:  # noqa var-naming[no-role-prefix]
-        controller_components:
-          - notification_templates
-          - job_templates
-          - settings
         controller_execution_environments:
           - name: product-demos
-            image: http://quay.io/acme_corp/product-demos-ee:latest
+            image: quay.io/acme_corp/product-demos-ee:latest
         controller_organizations:
           - name: Default
             default_environment: product-demos
@@ -59,10 +54,7 @@
 
     - name: Demo Components
       ansible.builtin.include_role:
-        name: "redhat_cop.controller_configuration.{{ item }}"
-      loop: "{{ controller_components }}"
-      when:
-        - controller_components | d("") | length > 0
+        name: "infra.controller_configuration.dispatch"
 
     - name: Log Demo
       ansible.builtin.uri:

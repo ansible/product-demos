@@ -1,15 +1,6 @@
 ---
 user_message:
 
-controller_components:
-  - execution_environments
-  - projects
-  - credentials
-  - inventory_sources
-  - groups
-  - job_templates
-  - workflow_job_templates
-
 controller_execution_environments:
   - name: Cloud Services Execution Environment
     image: quay.io/scottharwell/cloud-ee:latest

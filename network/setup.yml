@@ -1,15 +1,6 @@
 ---
 user_message:
 
-controller_components:
-  - execution_environments
-  - projects
-  - inventories
-  - hosts
-  - inventory_sources
-  - inventory_source_update
-  - job_templates
-
 controller_execution_environments:
   - name: Networking Execution Environment
     image: quay.io/nleiva/ee-network-image
