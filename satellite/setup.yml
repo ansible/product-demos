@@ -1,14 +1,6 @@
 ---
 user_message:
 
-controller_components:
-  - credential_types
-  - credentials
-  - inventory_sources
-  - job_templates
-  - job_launch
-  - workflow_job_templates
-
 controller_credential_types:
   - name: Satellite Collection
     kind: cloud

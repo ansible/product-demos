@@ -1,8 +1,4 @@
 ---
-controller_components:
-  - credentials
-  - job_templates
-
 controller_credentials:
   - name: OpenShift Credential
     organization: Default

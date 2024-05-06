@@ -15,4 +15,4 @@
 
     - name: Default Components
       ansible.builtin.include_role:
-        name: "redhat_cop.controller_configuration.job_launch"
+        name: "infra.controller_configuration.job_launch"
