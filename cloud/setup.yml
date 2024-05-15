@@ -1,4 +1,6 @@
 ---
+_deployment_id: "{{ lookup('file', playbook_dir + '/.deployment_id') }}"
+
 user_message:
 
 controller_execution_environments:
@@ -284,7 +286,7 @@ controller_templates:
     notification_templates_error: Telemetry
     extra_vars:
       aws_report: vpc
-      reports_aws_bucket_name: reports-pd-{{ lookup('file', playbook_dir + '/.deployment_id') }}
+      reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
     survey_enabled: true
     survey:
       name: ''
@@ -313,6 +315,7 @@ controller_templates:
     notification_templates_error: Telemetry
     extra_vars:
       aws_report: tags
+      reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
     survey_enabled: true
     survey:
       name: ''
