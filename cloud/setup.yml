@@ -284,6 +284,7 @@ controller_templates:
     notification_templates_error: Telemetry
     extra_vars:
       aws_report: vpc
+      reports_aws_bucket_name: reports-pd-{{ lookup('file', playbook_dir + '/.deployment_id') }}
     survey_enabled: true
     survey:
       name: ''

@@ -49,6 +49,10 @@
           - name: "SESSION_COOKIE_AGE"
             value: 180000
 
+    - name: Create reusable deployment ID
+      ansible.builtin.set_fact:
+        _deployment_id: '{{ lookup("ansible.builtin.password", "{{ playbook_dir }}/.deployment_id", chars=["ascii_letters", "digits"], length=5) }}'
+
     - name: "Include configuration for {{ demo }}"
       ansible.builtin.include_vars: "{{ demo }}/setup.yml"
 
