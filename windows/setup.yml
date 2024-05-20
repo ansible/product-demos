@@ -2,10 +2,6 @@
 user_message: |
   ''
 
-controller_components:
-  - projects
-  - job_templates
-
 controller_projects:
   - name: Fact Scan
     organization: Default
