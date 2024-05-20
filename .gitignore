@@ -9,3 +9,4 @@ choose_demo_example_aws.yml
 *artifact*.json
 **/roles/*
 !**/roles/requirements.yml
+.deployment_id
