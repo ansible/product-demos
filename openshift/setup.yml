@@ -254,18 +254,8 @@ controller_workflows:
           - Update Inventory
         failure_nodes:
           - Ticket - Instance Failed
-      - identifier: Wait for hosts
-        unified_job_template: OpenShift / CNV / Wait Hosts
-        failure_nodes:
-          - Update Inventory 2
       - identifier: Update Inventory
         unified_job_template: OpenShift CNV Inventory
-        always_nodes:
-          - Wait for hosts
-      - identifier: Update Inventory 2
-        unified_job_template: OpenShift CNV Inventory
-        failure_nodes:
-          - Ticket - Instance Failed
       - identifier: Ticket - Instance Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
