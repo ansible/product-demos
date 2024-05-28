@@ -1,0 +1,14 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ _operator.subscription.name }}
+  namespace: "{{ _operator.subscription.namespace | d(_operator.namespace.name, true) }}"
+spec:
+  channel: {{ _operator.subscription.channel | d('stable', true) }}
+  installPlanApproval: {{ _operator.subscription.install_plan_approval | d('Automatic', true) }}
+  name: {{ _operator.subscription.spec_name | d(_operator.subscription.name, true) }}
+  source: {{ _operator.subscription.source | d('redhat-operators', true) }}
+  sourceNamespace: {{ _operator.subscription.source_namespace | d('openshift-marketplace', true) }}
+{% if _operator.subscription.starting_csv is defined %}
+  startingCSV: {{ _operator.subscription.starting_csv }}
+{% endif -%}

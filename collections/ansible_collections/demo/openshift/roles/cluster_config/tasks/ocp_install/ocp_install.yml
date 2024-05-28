@@ -1,0 +1,9 @@
+---
+- name: Run IPI Installer
+  command: openshift-baremetal-install --dir={{ cluster_deploy_dir }}/{{ cluster_name }} create cluster
+  register: cluster_deploy
+  become_user: kni
+
+- debug:
+    var: cluster_deploy
+...

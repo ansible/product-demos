@@ -4,6 +4,14 @@
   gather_facts: false
   tasks:
     - name: Include role
-      ansible.builtin.incdlue_role:
+      ansible.builtin.include_role:
         name: demo.openshift.cluster_config
+
+    - name: Display message to user
+      ansible.builtin.debug:
+        msg: "Note: wait for the operator to be installed"
+
+    - name: Wait for the operator to be installed
+      ansible.builtin.pause:
+        seconds: 90
 
