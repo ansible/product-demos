@@ -13,7 +13,7 @@ spec:
   priority: {{ item.priority }}
   {% endif -%}
   {% if item.grpc_pod_config is defined -%}
-  grpcPodConfig: 
+  grpcPodConfig:
     {{ item.grpc_pod_config | indent(4) }}
   {% endif -%}
   {% if item.icon is defined -%}
@@ -32,4 +32,3 @@ spec:
     registryPoll:
       interval: {{ item.registry_poll_interval }}
   {% endif -%}
-

@@ -58,7 +58,7 @@ The task `operators/operator_config.yaml` needs following variables:
 - **Variable Name**: `cluster_config_operators`
   - **Type**: List
   - **Description**: A list of operators to be installed on OCP cluster
-- **Variable Name**: `cluster_config_[OPERATOR_NAME]`  
+- **Variable Name**: `cluster_config_[OPERATOR_NAME]`
   - **Type**: Dict
   - **Description**: Configuration specific to each operator listed in `cluster_config_operators`. Includes settings for namespace, operator group, subscription, and any extra resources
   - **Example**: Assume the `cluster_config_operators` specifies these operators:
@@ -71,11 +71,11 @@ The task `operators/operator_config.yaml` needs following variables:
   ```yaml
   cluster_config_cnv_namespace: openshift-cnv
   cluster_config_cnv:
-  namespace: 
+  namespace:
     name: "{{ cluster_config_cnv_namespace }}"
   operator_group:
     name: kubevirt-hyperconverged-group
-    target_namespaces: 
+    target_namespaces:
       - "{{ cluster_config_cnv_namespace }}"
   subscription:
     name: kubevirt-hyperconverged
@@ -88,18 +88,18 @@ The task `operators/operator_config.yaml` needs following variables:
         namespace: "{{ cluster_config_cnv_namespace }}"
       spec:
         BareMetalPlatform: true
-  
+
   cluster_config_oadp_namespace: openshift-adp
   cluster_config_oadp:
-  namespace: 
+  namespace:
     name: "{{ cluster_config_oadp_namespace }}"
   operator_group:
     name: redhat-oadp-operator-group
-    target_namespaces: 
+    target_namespaces:
       - "{{ cluster_config_oadp_namespace }}"
   subscription:
     name: redhat-oadp-operator-subscription
-    spec_name: redhat-oadp-operator 
+    spec_name: redhat-oadp-operator
   ```
 Dependencies
 ------------
@@ -115,7 +115,7 @@ An example of configuring a CatalogSource resource:
   hosts: localhost
   gather_facts: false
   tasks:
-    - ansible.builtin.include_role: 
+    - ansible.builtin.include_role:
         name: cluster_config
         tasks_from: operators/catalog_sources
 ```

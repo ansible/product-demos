@@ -3,7 +3,7 @@ kind: Namespace
 metadata:
     name: {{ _operator.namespace.name }}
 {% if _operator.namespace.labels is defined %}
-    labels: 
+    labels:
       {% for key, value in _operator.namespace.labels.items() -%}
       {{ key }}: "{{ value }}"
       {% endfor -%}
