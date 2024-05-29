@@ -1,3 +1,4 @@
+---
 - name: Retrieve Operator name
   ansible.builtin.set_fact:
     _operator: "{{ vars['cluster_config_' + _operator_name] }}"
@@ -20,8 +21,8 @@
     - r_install_plans.resources | default([]) | length > 0
     - r_install_plans.resources[0].status is defined
     - r_install_plans.resources[0].status.phase == "Complete"
-  when: 
-    - _operator.checkplan is defined 
+  when:
+    - _operator.checkplan is defined
     - _operator.checkplan | bool
 
 - name: Configure extra resources for Operator {{ _operator_name }}

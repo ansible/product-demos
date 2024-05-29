@@ -1,11 +1,10 @@
 ---
-
 - name: Create node-health-check operator namespace
   redhat.openshift.k8s:
     name:  openshift-workload-availability
     api_version: v1
     kind: Namespace
-    state: present  
+    state: present
 
 - name: Create node-health-check operator group
   redhat.openshift.k8s:
@@ -39,7 +38,7 @@
         name: node-healthcheck-operator
         source: redhat-operators
         sourceNamespace: openshift-marketplace
-        
+
 - name: Create Self Node Remediation subscription
   redhat.openshift.k8s:
     state: present

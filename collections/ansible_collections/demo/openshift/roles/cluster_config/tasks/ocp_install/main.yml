@@ -1,5 +1,0 @@
----
-- import_tasks: prep.yml
-
-- import_tasks: ocp_install.yml
-...

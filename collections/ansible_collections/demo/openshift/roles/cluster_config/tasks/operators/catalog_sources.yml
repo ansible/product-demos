@@ -1,3 +1,4 @@
+---
 - name: Configure custom CatalogSource for Operators
   redhat.openshift.k8s:
     state: present

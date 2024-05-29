@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Include cluster_config role
+  hosts: localhost
   remote_user: root
   roles:
     - cluster_config

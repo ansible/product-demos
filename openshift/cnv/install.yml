@@ -14,4 +14,3 @@
     - name: Wait for the operator to be installed
       ansible.builtin.pause:
         seconds: 90
-
