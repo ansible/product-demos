@@ -12,7 +12,7 @@
     wait: true
     state: present
     namespace: patching-report
-    definition: "{{ lookup('ansible.builtin.template', 'resources.yaml') }}"
+    definition: "{{ lookup('ansible.builtin.template', 'resources.yaml.j2') }}"
   register: resources_output
 
 - name: Display link to patching report
