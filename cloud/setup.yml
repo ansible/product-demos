@@ -524,6 +524,7 @@ controller_workflows:
           - Deploy RHEL8 Blueprint
           - Deploy RHEL9 Blueprint
           - Deploy Windows Core Blueprint
+          - Deploy Report Server
       - identifier: Deploy Windows GUI Blueprint
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
@@ -555,6 +556,15 @@ controller_workflows:
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
           create_vm_vm_name: aws_rhel9
+          vm_blueprint: rhel9
+        success_nodes:
+          - Update Inventory
+        failure_nodes:
+          - Ticket - Instance Failed
+      - identifier: Deploy Report Server
+        unified_job_template: Cloud / AWS / Create VM
+        extra_data:
+          create_vm_vm_name: reports
           vm_blueprint: rhel9
         success_nodes:
           - Update Inventory
