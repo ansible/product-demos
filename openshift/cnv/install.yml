@@ -1,21 +1,16 @@
 ---
-- name: Deploy OpenShift CNV Operator and create the Hyperconverged object
+- name: Deploy OpenShift CNV Operator and create the Hyperconverged object, provision VM to prove funciontality
   hosts: localhost
   gather_facts: false
   vars:
     vm_name: ocpvtest
     vm_namespace: openshift-cnv
-    os_version: fedora36
   tasks:
     - name: Include role
       ansible.builtin.include_role:
         name: demo.openshift.cluster_config
 
-    - name: Provision a VM to ensure the installation finishes
-      ansible.builtin.debug:
-        msg: "Note: wait for the operator to be installed"
-
-    - name: Define resources until success.
+    - name: Attempt to Provision a VM
       kubernetes.core.k8s:
         wait: true
         state: "{{ instance_state | default('present') }}"
@@ -38,7 +33,7 @@
                 spec:
                   sourceRef:
                     kind: DataSource
-                    name: "{{ os_version | default('fedora36') }}"
+                    name: "{{ os_version | default('fedora') }}"
                     namespace: openshift-virtualization-os-images
                   storage:
                     resources:
@@ -49,7 +44,7 @@
               metadata:
                 annotations:
                   vm.kubevirt.io/flavor: small
-                  vm.kubevirt.io/os: "{{ os_version | default('fedora36') }}"
+                  vm.kubevirt.io/os: "{{ os_version | default('fedora') }}"
                   vm.kubevirt.io/workload: server
                 creationTimestamp: null
                 labels:
@@ -66,9 +61,6 @@
                       - disk:
                           bus: virtio
                         name: rootdisk
-                      - disk:
-                          bus: virtio
-                        name: cloudinitdisk
                     interfaces:
                       - masquerade: {}
                         model: virtio
@@ -89,7 +81,7 @@
                   - dataVolume:
                       name: "{{ vm_name }}"
                     name: rootdisk
-      retries: 30
+      retries: 60
       delay: 5
       register: provision
-      until: provision.rc == 0
+      until: provision.changed
