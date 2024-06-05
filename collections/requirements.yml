@@ -40,3 +40,5 @@ collections:
     version: 2.3.0
   - name: kubernetes.core
     version: 2.4.0
+  - name: kubevirt.core
+    version: 1.4.0

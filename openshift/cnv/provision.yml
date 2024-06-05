@@ -54,9 +54,6 @@
                       - disk:
                           bus: virtio
                         name: rootdisk
-                      - disk:
-                          bus: virtio
-                        name: cloudinitdisk
                     interfaces:
                       - masquerade: {}
                         model: virtio
@@ -77,6 +74,3 @@
                   - dataVolume:
                       name: "{{ vm_name }}"
                     name: rootdisk
-                  - name: cloudinitdisk
-                    cloudInitNoCloud:
-                      userData:  "{{ cloud_init_userdata | default(omit) }}"
