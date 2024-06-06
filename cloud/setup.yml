@@ -20,7 +20,6 @@ controller_credentials:
     credential_type: Amazon Web Services
     organization: Default
     update_secrets: false
-    state: exists
     inputs:
       username: REPLACEME
       password: REPLACEME

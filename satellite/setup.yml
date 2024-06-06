@@ -31,7 +31,6 @@ controller_credentials:
   - name: Satellite Inventory
     credential_type: Red Hat Satellite 6
     organization: Default
-    state: exists
     inputs:
       host: https://satellite.example.com
       username: admin
@@ -39,7 +38,6 @@ controller_credentials:
   - name: Satellite Credential
     credential_type: Satellite Collection
     organization: Default
-    state: exists
     inputs:
       host: https://satellite.example.com
       username: admin
