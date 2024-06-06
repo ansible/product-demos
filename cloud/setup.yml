@@ -1,14 +1,7 @@
 ---
-user_message:
+_deployment_id: "{{ lookup('file', playbook_dir + '/.deployment_id') }}"
 
-controller_components:
-  - execution_environments
-  - projects
-  - credentials
-  - inventory_sources
-  - groups
-  - job_templates
-  - workflow_job_templates
+user_message:
 
 controller_execution_environments:
   - name: Cloud Services Execution Environment
@@ -293,6 +286,7 @@ controller_templates:
     notification_templates_error: Telemetry
     extra_vars:
       aws_report: vpc
+      reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
     survey_enabled: true
     survey:
       name: ''
@@ -321,6 +315,7 @@ controller_templates:
     notification_templates_error: Telemetry
     extra_vars:
       aws_report: tags
+      reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
     survey_enabled: true
     survey:
       name: ''

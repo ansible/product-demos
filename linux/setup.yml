@@ -3,13 +3,9 @@ user_message:
   - Update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register with Insights'. https://access.redhat.com/management/activation_keys
   - Update Credential for Insights Inventory with Red Hat account.
   - Add variables for system_roles. https://console.redhat.com/ansible/automation-hub/repo/published/redhat/rhel_system_roles
-controller_components:
-  - projects
-  - credential_types
-  - credentials
-  - inventory_sources
-  - job_templates
 
+# "!unsafe" used to pass raw jinja2 through to the injector definition, see
+# https://github.com/redhat-cop/controller_configuration/tree/devel/roles/credential_types#formating-injectors
 controller_credential_types:
   - name: Insights Collection
     kind: cloud
@@ -24,8 +20,8 @@ controller_credential_types:
           secret: true
     injectors:
       env:
-        INSIGHTS_USER: "{% raw %}{  { insights_user  }}{% endraw %}"
-        INSIGHTS_PASSWORD: "{% raw %}{  { insights_password  }}{% endraw %}"
+        INSIGHTS_USER: !unsafe '{{ insights_user }}'
+        INSIGHTS_PASSWORD: !unsafe '{{ insights_password }}'
 
 controller_credentials:
   - name: Insights Inventory

@@ -31,13 +31,19 @@ This project is tested for compatibility with the [demo.redhat.com Product Demos
 
       > You can also use an execution environment for disconnected environments. To do this, you must disable collection downloads in the Controller. This can be done in `Settings` > `Job Settings`. This setting prevents the controller from downloading collections listed in the [collections/requirements.yml](collections/requirements.yml) file.
 
-2. If it is not already created for you, create a Project called `Ansible official demo project` with this repo as a source. NOTE: if you are using a fork, be sure that you have the correct URL. Update the project.
+2. If it is not already created for you, add an Execution Environment called `product-demos`
 
-3. Finally, Create a Job Template called `Setup` with the following configuration:
+     - Name: product-demos
+     - Image: quay.io/acme_corp/product-demos-ee:latest
+     - Pull: Only pull the image if not present before running
+
+3. If it is not already created for you, create a Project called `Ansible official demo project` with this repo as a source. NOTE: if you are using a fork, be sure that you have the correct URL. Update the project.
+
+4. Finally, Create a Job Template called `Setup` with the following configuration:
 
      - Name: Setup
      - Inventory: Demo Inventory
-     - Exec Env: Control Plane EE
+     - Exec Env: product-demos
      - Playbook: setup_demo.yml
      - Credentials:
         - Type: Red Hat Ansible Automation Platform

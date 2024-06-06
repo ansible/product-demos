@@ -1,4 +1,4 @@
-
+ansible-navigator.log
 sean_login_info.yml
 .DS_Store
 choose_demo.yml
@@ -6,6 +6,7 @@ choose_demo_example_azure.yml
 choose_demo_example_aws.yml
 .ansible.cfg
 *.gz
-
+*artifact*.json
 **/roles/*
 !**/roles/requirements.yml
+.deployment_id
