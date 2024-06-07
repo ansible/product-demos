@@ -3,7 +3,7 @@
   hosts: localhost
   tasks:
     - name: Define resources
-      kubernetes.core.k8s:
+      redhat.openshift.k8s:
         wait: true
         state: "{{ instance_state | default('present') }}"
         definition:
@@ -90,7 +90,7 @@
                           org: "{{ rh_subscription_org }}"
 
     - name: Wait for VM to be running
-      kubevirt.core.kubevirt_vm_info:
+      redhat.openshift_virtualization.kubevirt_vm_info:
         name: "{{ vm_name }}"
         namespace: "{{ vm_namespace }}"
         wait: true
