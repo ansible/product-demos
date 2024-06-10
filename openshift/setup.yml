@@ -7,11 +7,6 @@ controller_components:
   - job_templates
   - workflow_job_templates
 
-# Might need another EE due to dependency conflicts, but probably host it in amce not matferna
-controller_execution_environments:
-  - name: OCPV Execution Environment
-    image: quay.io/matferna/kubevirt:latest
-
 controller_credential_types:
   # Ideally, we would not need to use this and could just re-use the OCP credential for the inventory plugin
   - name: OCPV inventory credential
@@ -61,7 +56,6 @@ controller_inventory_sources:
     source_project: Ansible official demo project
     source_path: openshift/inventory.kubevirt.yml
     credential: OCP-V Inventory Credential
-    execution_environment: OCPV Execution Environment
 
 controller_templates:
   - name: OpenShift / CNV / Install
@@ -69,7 +63,6 @@ controller_templates:
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
     playbook: "openshift/cnv/install.yml"
-    execution_environment: OCPV Execution Environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -82,7 +75,6 @@ controller_templates:
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
     playbook: "openshift/cnv/provision_rhel.yml"
-    execution_environment: OCPV Execution Environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -127,7 +119,6 @@ controller_templates:
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
     playbook: "openshift/cnv/provision.yml"
-    execution_environment: OCPV Execution Environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
