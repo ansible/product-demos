@@ -27,6 +27,7 @@ controller_credentials:
   - name: Insights Inventory
     credential_type: Insights Collection
     organization: Default
+    state: exists
     inputs:
       insights_user: REPLACEME
       insights_password: REPLACEME

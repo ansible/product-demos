@@ -3,6 +3,7 @@ controller_credentials:
   - name: OpenShift Credential
     organization: Default
     credential_type: OpenShift or Kubernetes API Bearer Token
+    state: exists
     inputs:
       host: CHANGEME
       bearer_token: CHANGEME
