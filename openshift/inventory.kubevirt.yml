@@ -5,7 +5,7 @@ connections:
   - namespaces:
       - openshift-cnv
 compose:
-  ansible_user: "'cloud-user' if 'rhel' in vmi_guest_os_info.id"
+  ansible_user: "'cloud-user' if 'rhel' in annotations['vm.kubevirt.io/os']"
   annotations: "annotations | ansible.utils.replace_keys(target=[
                 {'before':'vm.kubevirt.io/os', 'after':'os'},
                 {'before':'vm.kubevirt.io/flavor', 'after':'flavor'},
