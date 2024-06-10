@@ -85,3 +85,17 @@
       delay: 5
       register: provision
       until: provision.changed
+
+    - name: Clean up test VM
+      kubernetes.core.k8s:
+        wait: true
+        state: absent
+        definition:
+          apiVersion: kubevirt.io/v1
+          kind: VirtualMachine
+          metadata:
+            name: "{{ vm_name }}"
+            namespace: "{{ vm_namespace }}"
+            labels:
+              app: "{{ vm_name }}"
+              vm.kubevirt.io/name: "{{ vm_name }}"
