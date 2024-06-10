@@ -17,8 +17,7 @@ compose:
                 {'before':'kubevirt.io/nodeName', 'after':'nodeName'},
                 {'before':'kubevirt.io/size', 'after':'size'},
                 {'before':'kubevirt.io/domain', 'after':'domain' }] )"
-
-
 keyed_groups:
   - key: annotations.os
-    separator: ""
+    prefix: "cnv"
+    separator: "_"

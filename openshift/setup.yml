@@ -95,7 +95,7 @@ controller_templates:
           default: openshift-cnv
           required: true
         - question_name: SSH Authorized Key
-          type: text
+          type: textarea
           variable: ssh_authorized_key
           required: true
         - question_name: OS Version
@@ -103,11 +103,11 @@ controller_templates:
           variable: os_version
           default: rhel9
           required: true
-        - question_name: RHEL Subscription Key
+        - question_name: RHEL Activation Key
           type: text
           variable: rh_subscription_key
           required: true
-        - question_name: RHEL Subscription Org
+        - question_name: RHEL Organization ID
           type: text
           variable: rh_subscription_org
           required: true
@@ -217,14 +217,14 @@ controller_workflows:
       description: ''
       spec:
         - question_name: SSH Authorized Key
-          type: text
+          type: textarea
           variable: ssh_authorized_key
           required: true
-        - question_name: RHEL Subscription Key
+        - question_name: RHEL Activation Key
           type: text
           variable: rh_subscription_key
           required: true
-        - question_name: RHEL Subscription Org
+        - question_name: RHEL Organization ID
           type: text
           variable: rh_subscription_org
           required: true
