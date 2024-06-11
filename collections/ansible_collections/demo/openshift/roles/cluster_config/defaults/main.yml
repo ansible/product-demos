@@ -1,0 +1,23 @@
+---
+# defaults file for cluster_config
+cluster_config_operators:
+  - cnv
+
+cluster_config_cnv:
+  checkplan: true
+  namespace:
+    name: &cluster_config_cnv_namespace openshift-cnv
+  operator_group:
+    name: kubevirt-hyperconverged-group
+    target_namespaces:
+      - *cluster_config_cnv_namespace
+  subscription:
+    name: kubevirt-hyperconverged
+  extra_resources:
+    - apiVersion: hco.kubevirt.io/v1beta1
+      kind: HyperConverged
+      metadata:
+        name: kubevirt-hyperconverged
+        namespace: *cluster_config_cnv_namespace
+      spec:
+        BareMetalPlatform: true

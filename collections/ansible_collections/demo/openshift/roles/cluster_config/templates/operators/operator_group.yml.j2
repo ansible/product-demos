@@ -1,0 +1,12 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: {{ _operator.operator_group.name }}
+  namespace: {{ _operator.operator_group.namespace | d(_operator.namespace.name, true) }}
+spec:
+  {% if _operator.operator_group.target_namespaces is defined -%}
+  targetNamespaces:
+  {% for item in _operator.operator_group.target_namespaces %}
+    - {{ item }}
+  {% endfor %}
+  {% endif -%}

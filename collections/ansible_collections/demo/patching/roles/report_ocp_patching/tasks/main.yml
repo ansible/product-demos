@@ -1,0 +1,22 @@
+---
+- name: Define namespace
+  redhat.openshift.k8s:
+    wait: true
+    state: present
+    api_version: v1
+    kind: Namespace
+    name: patching-report
+
+- name: Define deployment resources
+  redhat.openshift.k8s:
+    wait: true
+    state: present
+    namespace: patching-report
+    definition: "{{ lookup('ansible.builtin.template', 'resources.yaml.j2') }}"
+  register: resources_output
+
+- name: Display link to patching report
+  ansible.builtin.debug:
+    msg:
+      - "Patching report availbable at:"
+      - "{{ resources_output.result.results[3].result.spec.port.targetPort }}://{{ resources_output.result.results[3].result.spec.host }}"

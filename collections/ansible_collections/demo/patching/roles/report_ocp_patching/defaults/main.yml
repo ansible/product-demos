@@ -1,0 +1,8 @@
+---
+email_from: tower@shadowman.dev  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
+to_emails: alex@shadowman.dev,tower@shadowman.dev  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
+to_emails_list: "{{ to_emails.split(',') }}"  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
+detailedreport: true  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
+reports:  # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
+  - linux.html
+  - linuxpatch.html

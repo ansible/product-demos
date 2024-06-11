@@ -1,0 +1,37 @@
+---
+- name: Linux server patching for OpenShift Virtalized Hosts
+  hosts: "{{ _hosts | default(omit) }}"
+  become: true
+  tasks:
+    # Install yum-utils if it's not there
+    - name: Install yum-utils
+      ansible.builtin.yum:
+        name: yum-utils
+        state: installed
+
+    - name: Include patching role
+      ansible.builtin.include_role:
+        name: demo.patching.patch_linux
+
+    - name: Tell user when Insights Client is not configured
+      ansible.builtin.debug:
+        msg: "Insights client does not appear to be configured. Scan will be skipped"
+      when:
+        - ansible_local.insights.system_id is not defined
+
+    - name: Run the Insights Client Scan  # noqa: no-changed-when
+      ansible.builtin.command: insights-client
+      when:
+        - not ansible_check_mode
+        - ansible_local.insights.system_id is defined
+
+    - name: Create nginx container
+      when: not ansible_check_mode
+      delegate_to: localhost
+      become: false
+      connection: local
+      run_once: true  # noqa: run-once[task]
+      block:
+        - name: Publish landing page
+          ansible.builtin.include_role:
+            name: demo.patching.report_ocp_patching

@@ -1,0 +1,7 @@
+---
+- name: Configure custom CatalogSource for Operators
+  redhat.openshift.k8s:
+    state: present
+    template: operators/catalog_source.j2
+  loop: "{{ cluster_config_catalog_sources }}"
+  when: cluster_config_catalog_sources is defined

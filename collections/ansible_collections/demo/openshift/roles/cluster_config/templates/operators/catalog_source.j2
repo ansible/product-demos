@@ -1,0 +1,34 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: {{ item.name }}
+  namespace: openshift-marketplace
+spec:
+  sourceType: {{ item.source_type | d('grpc',true) }}
+  image: {{ item.image_path }}
+  {% if item.display_name is defined -%}
+  displayName: {{ item.display_name }}
+  {% endif -%}
+  {% if item.priority is defined -%}
+  priority: {{ item.priority }}
+  {% endif -%}
+  {% if item.grpc_pod_config is defined -%}
+  grpcPodConfig:
+    {{ item.grpc_pod_config | indent(4) }}
+  {% endif -%}
+  {% if item.icon is defined -%}
+  icon:
+    base64data: '{{ item.icon.base64data or ''  }}'
+    mediatype: '{{ item.icon.mediatype or '' }}'
+  {% endif -%}
+  {% if item.publisher is defined -%}
+  publisher: {{ item.publisher }}
+  {% endif -%}
+  {% if item.address is defined -%}
+  address: {{ item.address }}
+  {% endif -%}
+  {% if item.registry_poll_interval is defined -%}
+  updateStrategy:
+    registryPoll:
+      interval: {{ item.registry_poll_interval }}
+  {% endif -%}
