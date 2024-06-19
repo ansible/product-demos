@@ -1,3 +1,4 @@
+---
 plugin: nmake.inventory.csv
 source: devices.csv
 

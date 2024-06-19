@@ -8,7 +8,7 @@ import csv
 
 
 DOCUMENTATION = """
-    name: name.inventory.csv
+    name: nmake.inventory.csv
     plugin_type: inventory
     short_description: Use a CSV file as an inventory source
     description:
