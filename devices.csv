@@ -1,7 +1,7 @@
-host,os,ansible_user,ansible_password,ansible_become_pass,site,groups
-nxos101,nxos,vars:ansible_user,vars:ansible_password,vars:ansible_become_pass,my_lab,red blue
-nxos102,nxos,vars:ansible_user,vars:ansible_password,vars:ansible_become_pass,my_lab,blue yellow
-nxos103,nxos,vars:ansible_user,vars:ansible_password,vars:ansible_become_pass,my_lab,red blue
-nxos104,nxos,vars:ansible_user,vars:ansible_password,vars:ansible_become_pass,my_lab,blue yellow
-eos10[1:4],eos,vars:ansible_user,vars:ansible_password,vars:ansible_become_pass,my_lab,orange red
-vyos10[1:4],vyos,vars:ansible_user,vars:ansible_password,vars:ansible_become_pass,my_lab,orange red
+host,os,site,groups
+nxos101,nxos,my_lab,red blue
+nxos102,nxos,my_lab,blue yellow
+nxos103,nxos,my_lab,red blue
+nxos104,nxos,my_lab,blue yellow
+eos10[1:4],eos,my_lab,orange red
+vyos10[1:4],vyos,my_lab,orange red
