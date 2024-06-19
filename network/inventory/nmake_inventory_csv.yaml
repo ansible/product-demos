@@ -1,0 +1,9 @@
+plugin: nmake.inventory.csv
+source: devices.csv
+
+keyed_groups:
+  - key: site
+    prefix: site
+  - key: ansible_network_os
+    prefix: ""
+    separator: ""
