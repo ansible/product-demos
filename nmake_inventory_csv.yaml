@@ -6,5 +6,12 @@ keyed_groups:
   - key: site
     prefix: site
   - key: ansible_network_os
-    prefix: ""
-    separator: ""
+    prefix: group
+
+column_replace:
+  os: ansible_network_os
+
+vars:
+  ansible_user: omit
+  ansible_password: "{{omit}}"
+  ansible_become_pass: "omit"
