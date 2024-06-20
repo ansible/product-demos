@@ -496,16 +496,39 @@ controller_templates:
           variable: _hosts
           required: true
 
-  - name: "Cloud / Azure / Inventory Output"
+  - name: "Cloud / Azure / Create Instance"
     job_type: run
     inventory: "Demo Inventory"
     project: "Shadowman Lab - Azure"
-    playbook: "inventory_output.yml"
+    playbook: "azure_create_instance.yml"
     credentials:
       - AWS
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+
+  - name: "Cloud / Azure / Create Storage Account"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Shadowman Lab - Azure"
+    playbook: "azure_create_instance.yml"
+    credentials:
+      - AWS
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    extra_vars:
+      storage_account_names: demorh
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Resource Group Name
+          type: text
+          variable: resource_group_name
+          required: false
+
 
 controller_workflows:
   - name: Deploy Cloud Stack in AWS
