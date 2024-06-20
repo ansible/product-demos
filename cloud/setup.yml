@@ -499,7 +499,7 @@ controller_templates:
   - name: "Cloud / Azure / Inventory Output"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Shadowman Lab - Azure"
     playbook: "inventory_output.yml"
     credentials:
       - AWS
