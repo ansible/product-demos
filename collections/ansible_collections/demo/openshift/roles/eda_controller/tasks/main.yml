@@ -46,3 +46,9 @@
         state: present
         definition: "{{ lookup('template', 'cluster_rolebinding.j2') }}"
 
+    - name: Display EDA Controller URL
+      ansible.builtin.debug:
+        msg:
+          - "EDA Controller URL: https://{{ eda_controller_hostname }}"
+          - "EDA Controller Admin Login: admin"
+          - "EDA Controller Admin Password: <same as the Controller Admin password>
