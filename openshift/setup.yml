@@ -56,10 +56,23 @@ controller_inventory_sources:
     source_project: Ansible official demo project
     source_path: openshift/inventory.kubevirt.yml
     credential: OCP-V Inventory Credential
-    update_on_launch: true
+    update_on_launch: false
 
 controller_templates:
-  - name: OpenShift / CNV / Install
+  - name: OpenShift / EDA / Install Controller
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/eda/install.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    credentials:
+      - "OpenShift Credential"
+      - "Controller Credential"
+
+  - name: OpenShift / CNV / Install Operator
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
