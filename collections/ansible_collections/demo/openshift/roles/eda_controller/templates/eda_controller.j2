@@ -22,5 +22,5 @@ spec:
   loadbalancer_protocol: http
   worker:
     replicas: 3
-  automation_server_url: '{{ eda_controller_aap_controller_url }}'
+  automation_server_url: '{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST' }}'
   admin_password_secret: {{ eda_controller_project_app_name }}-admin-password
