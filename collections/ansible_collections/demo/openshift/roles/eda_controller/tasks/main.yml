@@ -51,4 +51,4 @@
         msg:
           - "EDA Controller URL: https://{{ eda_controller_hostname }}"
           - "EDA Controller Admin Login: admin"
-          - "EDA Controller Admin Password: <same as the Controller Admin password>
+          - "EDA Controller Admin Password: <same as the Controller Admin password>"
