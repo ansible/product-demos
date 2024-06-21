@@ -2,8 +2,8 @@
 apiVersion: eda.ansible.com/v1alpha1
 kind: EDA
 metadata:
-  name: {{ ocp4_workload_eda_controller_project_app_name }}
-  namespace: {{ ocp4_workload_eda_controller_project }}
+  name: {{ eda_controller_project_app_name }}
+  namespace: {{ eda_controller_project }}
 spec:
   route_tls_termination_mechanism: Edge
   ingress_type: Route
@@ -22,5 +22,5 @@ spec:
   loadbalancer_protocol: http
   worker:
     replicas: 3
-  automation_server_url: '{{ ocp4_workload_eda_controller_aap_controller_url }}'
-  admin_password_secret: {{ ocp4_workload_eda_controller_project_app_name }}-admin-password
+  automation_server_url: '{{ eda_controller_aap_controller_url }}'
+  admin_password_secret: {{ eda_controller_project_app_name }}-admin-password

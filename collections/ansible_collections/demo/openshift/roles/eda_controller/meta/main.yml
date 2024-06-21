@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  role_name: ocp4_workload_eda_controller
+  role_name: eda_controller
   author: Mitesh Sharma (mitsharm@redhat.com)
   description: |
     Installs EDA on OpenShift
