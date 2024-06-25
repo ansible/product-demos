@@ -1,6 +1,6 @@
 ---
 # This file is mainly used by product-demos CI,
-# See cloin/ee-builds/product-demos-ee/requirements.yml 
+# See cloin/ee-builds/product-demos-ee/requirements.yml
 # for configuring collections and collection versions.
 collections:
   - name: ansible.controller
