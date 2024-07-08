@@ -3,4 +3,4 @@
 This role installs EDA on OpenShift, mostly copied from https://github.com/redhat-cop/agnosticd/.
 
 == Dependencies
-Role: automation_controller_platform 
+Role: automation_controller_platform
