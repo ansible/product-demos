@@ -36,6 +36,7 @@
     tags:
       blueprint: "{{ aws_blueprint }}"
       purpose: "{{ aws_purpose_tag }}"
+      role: "{{ aws_role_tag | default('demo') }}"
       env: "{{ aws_env_tag }}"
       ansible_group: "{{ aws_ansiblegroup_tag }}"
       owner: "{{ aws_vm_owner }}"
