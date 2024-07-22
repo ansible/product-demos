@@ -19,7 +19,7 @@ If you would like to contribute to this project please refer to [contribution gu
 
 ## Using this project
 
-This project is tested for compatibility with the [demo.redhat.com Product Demos Sandbox]([red.ht/aap-product-demos](https://demo.redhat.com/catalog?item=babylon-catalog-prod/sandboxes-gpte.aap-product-demos.prod&utm_source=webapp&utm_medium=share-link)) lab environment. To use with other Ansible Controller installations, review the [prerequisite documentation](https://github.com/RedHatGov/ansible-tower-samples).
+This project is tested for compatibility with the [demo.redhat.com Product Demos Sandbox](https://demo.redhat.com/catalog?search=product+demos&item=babylon-catalog-prod%2Fopenshift-cnv.aap-product-demos-cnv.prod) lab environment. To use with other Ansible Controller installations, review the [prerequisite documentation](https://github.com/RedHatGov/ansible-tower-samples).
 
 > NOTE: demo.redhat.com is available to Red Hat Associates and Partners with a valid account.
 
