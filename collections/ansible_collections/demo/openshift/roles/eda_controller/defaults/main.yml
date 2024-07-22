@@ -1,0 +1,16 @@
+---
+# --------------------------------------------------------
+# Ansible Automation Platform Controller URL
+# --------------------------------------------------------
+# eda_controller_aap_controller_url: [Required]
+
+# --------------------------------------------------------
+# Workload: eda_controller
+# --------------------------------------------------------
+eda_controller_project: "aap"
+eda_controller_project_app_name: "eda-controller"
+
+# eda_controller_admin_password: "{{ common_password }}"
+
+eda_controller_cluster_rolebinding_name: eda_default
+eda_controller_cluster_rolebinding_role: cluster-admin
