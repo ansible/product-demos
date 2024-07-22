@@ -5,19 +5,19 @@ connections:
   - namespaces:
       - openshift-cnv
 compose:
-  ansible_user: "'cloud-user' if 'rhel' in annotations['vm.kubevirt.io/os']"
-  annotations: "annotations | ansible.utils.replace_keys(target=[
+  ansible_user: "'cloud-user' if 'rhel' in vmi_annotations['vm.kubevirt.io/os']"
+  vmi_annotations: "vmi_annotations | ansible.utils.replace_keys(target=[
                 {'before':'vm.kubevirt.io/os', 'after':'os'},
                 {'before':'vm.kubevirt.io/flavor', 'after':'flavor'},
                 {'before':'vm.kubevirt.io/workload', 'after':'workload'},
                 {'before':'kubevirt.io/vm-generation', 'after':'vm-generation'},
                 {'before':'kubevirt.io/latest-observed-api-version', 'after':'latest-observed-api-version'},
                 {'before':'kubevirt.io/storage-observed-api-version', 'after':'storage-observed-api-version' }] )"
-  labels: "labels | ansible.utils.replace_keys(target=[
+  labels: "vmi_labels | ansible.utils.replace_keys(target=[
                 {'before':'kubevirt.io/nodeName', 'after':'nodeName'},
                 {'before':'kubevirt.io/size', 'after':'size'},
                 {'before':'kubevirt.io/domain', 'after':'domain' }] )"
 keyed_groups:
-  - key: annotations.os
+  - key: vmi_annotations.os
     prefix: "cnv"
     separator: "_"
