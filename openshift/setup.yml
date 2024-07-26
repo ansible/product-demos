@@ -7,42 +7,10 @@ controller_components:
   - job_templates
   - workflow_job_templates
 
-controller_credential_types:
-  # Ideally, we would not need to use this and could just re-use the OCP credential for the inventory plugin
-  - name: OCPV inventory credential
-    kind: cloud
-    inputs:
-      fields:
-        - id: host
-          type: string
-          label: OpenShift or Kubernetes API Endpoint
-          secret: false
-        - id: bearer_token
-          type: string
-          label: API authentication bearer token
-          secret: true
-        - id: verify_ssl
-          type: boolean
-          label: Verify SSL
-    injectors:
-      env:
-        K8S_AUTH_HOST: "{% raw %}{  { host  }}{% endraw %}"
-        K8S_AUTH_API_KEY: "{% raw %}{  { bearer_token  }}{% endraw %}"
-        K8S_AUTH_VERIFY_SSL: "{% raw %}{  { verify_ssl  }}{% endraw %}"
-
 controller_credentials:
   - name: OpenShift Credential
     organization: Default
     credential_type: OpenShift or Kubernetes API Bearer Token
-    state: exists
-    inputs:
-      host: CHANGEME
-      bearer_token: CHANGEME
-      verify_ssl: false
-
-  - name: OCP-V Inventory Credential
-    organization: Default
-    credential_type: OCPV inventory credential
     state: exists
     inputs:
       host: CHANGEME
@@ -55,7 +23,7 @@ controller_inventory_sources:
     source: scm
     source_project: Ansible official demo project
     source_path: openshift/inventory.kubevirt.yml
-    credential: OCP-V Inventory Credential
+    credential: OpenShift Credential
     update_on_launch: false
 
 controller_templates:
@@ -138,7 +106,7 @@ controller_templates:
     notification_templates_error: Telemetry
     survey_enabled: true
     extra_vars:
-      state: absent
+      instance_state: absent
     survey:
       name: ''
       description: ''
