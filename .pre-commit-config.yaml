@@ -4,7 +4,10 @@ repos:
     rev: v4.4.0
     hooks:
       - id: end-of-file-fixer
+        exclude: rhel[89]STIG/.*$
+
       - id: trailing-whitespace
+        exclude: rhel[89]STIG/.*$
 
       - id: check-yaml
         exclude: \.j2.(yaml|yml)$|\.(yaml|yml).j2$
@@ -26,4 +29,5 @@ repos:
     rev: 23.11.0
     hooks:
       - id: black
+        exclude: rhel[89]STIG/.*$
 ...

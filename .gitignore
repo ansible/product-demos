@@ -7,6 +7,6 @@ choose_demo_example_aws.yml
 .ansible.cfg
 *.gz
 *artifact*.json
-**/roles/*
-!**/roles/requirements.yml
+roles/*
+!roles/requirements.yml
 .deployment_id
