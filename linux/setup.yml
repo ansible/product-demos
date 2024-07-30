@@ -396,7 +396,7 @@ controller_templates:
             - cui
             - hipaa
             - ospp
-            - pci_dss
+            - pci-dss
             - stig
 
   - name: "LINUX / Multi-profile Compliance Report"
