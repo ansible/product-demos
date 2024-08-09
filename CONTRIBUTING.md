@@ -70,4 +70,3 @@ Copy the token value and execute the following command:
 ```bash
 export ANSIBLE_GALAXY_SERVER_AH_TOKEN=<token>
 ```
-
