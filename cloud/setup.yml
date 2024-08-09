@@ -3,6 +3,82 @@ _deployment_id: "{{ lookup('file', playbook_dir + '/.deployment_id') }}"
 
 user_message:
 
+controller_execution_environments:
+  - name: Cloud Services Execution Environment
+    image: quay.io/scottharwell/cloud-ee:latest
+
+controller_projects:
+  - name: Ansible Cloud Content Lab - AWS
+    organization: Default
+    scm_type: git
+    wait: true
+    scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
+    default_environment: Cloud Services Execution Environment
+
+controller_credentials:
+  - name: AWS
+    credential_type: Amazon Web Services
+    organization: Default
+    update_secrets: false
+    state: exists
+    inputs:
+      username: REPLACEME
+      password: REPLACEME
+
+#  - name: Azure
+#    credential_type: Microsoft Azure Resource Manager
+#    organization: Default
+#    update_secrets: false
+#    inputs:
+#      subscription: REPLACEME
+
+controller_inventory_sources:
+  - name: AWS Inventory
+    organization: Default
+    source: ec2
+    inventory: Demo Inventory
+    credential: AWS
+    overwrite: true
+    source_vars:
+      hostnames:
+        - tag:Name
+      compose:
+        ansible_host: public_ip_address
+        ansible_user: 'ec2-user'
+      groups:
+        cloud_aws: true
+        os_linux: tags.blueprint.startswith('rhel')
+      keyed_groups:
+        - key: platform
+          prefix: os
+        - key: tags.blueprint
+          prefix: blueprint
+        - key: tags.owner
+          prefix: owner
+
+#  - name: Azure Inventory
+#    organization: Default
+#    source: azure_rm
+#   inventory: Demo Inventory
+#    credential: Azure
+#    execution_environment: Ansible Engine 2.9 execution environment
+#    overwrite: true
+#    source_vars:
+#      hostnames:
+#        - tags.Name
+#        - default
+#      keyed_groups:
+#        - key: os_profile.system
+#          prefix: os
+#      conditional_groups:
+#        cloud_azure: true
+
+controller_groups:
+  - name: cloud_aws
+    inventory: Demo Inventory
+    variables:
+      ansible_user: ec2-user
+
 controller_templates:
   - name: Cloud / AWS / Create Peer Infrastructure
     job_type: run
@@ -69,29 +145,29 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_reports.yml
+    project: Ansible Cloud AWS Demos
+    playbook: playbooks/cloud_report.yml
     inventory: Demo Inventory
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-    extra_vars:
-      aws_report: vpc
-      reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: AWS Region
-          type: multiplechoice
-          variable: create_vm_aws_region
-          required: true
-          choices:
-            - us-east-1
-            - us-east-2
-            - us-west-1
-            - us-west-2
+    # notification_templates_started: Telemetry
+    # notification_templates_success: Telemetry
+    # notification_templates_error: Telemetry
+    # extra_vars:
+    #   aws_report: vpc
+    #   reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
+    # survey_enabled: true
+    # survey:
+    #   name: ''
+    #   description: ''
+    #   spec:
+    #     - question_name: AWS Region
+    #       type: multiplechoice
+    #       variable: create_vm_aws_region
+    #       required: true
+    #       choices:
+    #         - us-east-1
+    #         - us-east-2
+    #         - us-west-1
+    #         - us-west-2
 
   - name: Cloud / AWS / Tags Report
     job_type: run
