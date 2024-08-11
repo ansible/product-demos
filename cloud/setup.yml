@@ -213,6 +213,11 @@ controller_templates:
           type: text
           variable: create_vm_vm_deployment
           required: true
+        - question_name: Purpose
+          type: text
+          variable: create_vm_vm_purpose
+          required: true
+          default: demo
         - question_name: Environment
           type: multiplechoice
           variable: create_vm_vm_environment
