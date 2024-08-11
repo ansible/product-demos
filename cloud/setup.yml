@@ -161,6 +161,7 @@ controller_templates:
           variable: create_vm_aws_region
           required: true
           choices:
+            - ap-southeast-2
             - us-east-1
             - us-east-2
             - us-west-1
@@ -193,6 +194,7 @@ controller_templates:
           variable: create_vm_aws_region
           required: true
           choices:
+            - ap-southeast-2
             - us-east-1
             - us-east-2
             - us-west-1
@@ -298,6 +300,7 @@ controller_templates:
           variable: create_vm_aws_region
           required: true
           choices:
+            - ap-southeast-2
             - us-east-1
             - us-east-2
             - us-west-1
@@ -327,6 +330,7 @@ controller_templates:
           variable: create_vm_aws_region
           required: true
           choices:
+            - ap-southeast-2
             - us-east-1
             - us-east-2
             - us-west-1
@@ -353,6 +357,7 @@ controller_templates:
           variable: create_vm_aws_region
           required: true
           choices:
+            - ap-southeast-2
             - us-east-1
             - us-east-2
             - us-west-1
@@ -393,6 +398,7 @@ controller_templates:
           required: true
           default: us-east-1
           choices:
+            - ap-southeast-2
             - us-east-1
             - us-east-2
             - us-west-1
@@ -424,6 +430,7 @@ controller_templates:
           required: true
           default: us-east-1
           choices:
+            - ap-southeast-2
             - us-east-1
             - us-east-2
             - us-west-1
@@ -475,6 +482,7 @@ controller_workflows:
           variable: create_vm_aws_region
           required: true
           choices:
+            - ap-southeast-2
             - us-east-1
             - us-east-2
             - us-west-1
@@ -602,6 +610,7 @@ controller_workflows:
           required: true
           default: us-east-1
           choices:
+            - ap-southeast-2
             - us-east-1
             - us-east-2
             - us-west-1
