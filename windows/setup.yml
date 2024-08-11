@@ -321,7 +321,7 @@ controller_workflows:
       spec:
         - question_name: AWS Region
           type: multiplechoice
-          variable: aws_region
+          variable: create_vm_aws_region
           required: true
           default: us-east-2
           choices:
