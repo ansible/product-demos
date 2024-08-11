@@ -12,7 +12,7 @@ controller_projects:
     organization: Default
     scm_type: git
     wait: true
-    scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
+    scm_url: https://github.com/sonstar2/aws.infrastructure_config_demos.git
     default_environment: Cloud Services Execution Environment
 
 controller_credentials:
