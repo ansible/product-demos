@@ -329,6 +329,25 @@ controller_workflows:
             - us-east-2
             - us-west-1
             - us-west-2
+        - question_name: Keypair Public Key
+          type: textarea
+          variable: aws_public_key
+          required: true
+        # Create VM variables
+        - question_name: Owner
+          type: text
+          variable: create_vm_vm_owner
+          required: true
+        - question_name: Subnet
+          type: text
+          variable: create_vm_aws_vpc_subnet_name
+          required: true
+          default: aws-test-subnet
+        - question_name: Security Group
+          type: text
+          variable: create_vm_aws_securitygroup_name
+          required: true
+          default: aws-test-sg
     simplified_workflow_nodes:
       - identifier: Project Sync
         unified_job_template: Ansible official demo project
@@ -349,13 +368,16 @@ controller_workflows:
         job_type: run
         extra_data:
           create_vm_vm_name: dc01.ansible.local
+          vm_blueprint: windows_full
       - identifier: Create Computer (1)
         unified_job_template: Cloud / AWS / Create VM
         job_type: run
         extra_data:
           create_vm_vm_name: winston.ansible.local
+          vm_blueprint: windows_core
       - identifier: Create Computer (2)
         unified_job_template: Cloud / AWS / Create VM
         job_type: run
         extra_data:
           create_vm_vm_name: winthrop.ansible.local
+          vm_blueprint: windows_core
