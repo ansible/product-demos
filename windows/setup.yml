@@ -308,7 +308,7 @@ controller_templates:
           required: false
 
 controller_workflows:
-  - name: "WINDOWS / Setup Domain"
+  - name: "WINDOWS / AD / Setup Demo Domain"
     description: A workflow to create a domain controller with two domain-joined Windows hosts.
     organization: Default
     notification_templates_started: Telemetry
