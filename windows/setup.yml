@@ -357,10 +357,6 @@ controller_workflows:
           required: true
           default: aws-test-sg
     simplified_workflow_nodes:
-      - identifier: Project Sync
-        unified_job_template: Ansible official demo project
-        success_nodes:
-          - Create Keypair
       - identifier: Create Keypair
         unified_job_template: Cloud / AWS / Create Keypair
         success_nodes:
@@ -376,16 +372,27 @@ controller_workflows:
         job_type: run
         extra_data:
           create_vm_vm_name: dc01.ansible.local
+          create_vm_vm_purpose: domain_controller
           vm_blueprint: windows_full
+        success_nodes:
+          - Inventory Sync
       - identifier: Create Computer (1)
         unified_job_template: Cloud / AWS / Create VM
         job_type: run
         extra_data:
           create_vm_vm_name: winston.ansible.local
+          create_vm_vm_purpose: domain_computer
           vm_blueprint: windows_core
+        success_nodes:
+          - Inventory Sync
       - identifier: Create Computer (2)
         unified_job_template: Cloud / AWS / Create VM
         job_type: run
         extra_data:
           create_vm_vm_name: winthrop.ansible.local
+          create_vm_vm_purpose: domain_computer
           vm_blueprint: windows_core
+        success_nodes:
+          - Inventory Sync
+      - identifier: Inventory Sync
+        unified_job_template: AWS Inventory

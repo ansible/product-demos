@@ -48,6 +48,7 @@ controller_inventory_sources:
       groups:
         cloud_aws: true
         os_linux: tags.blueprint.startswith('rhel')
+        os_windows: tags.blueprint.startswith('win')
       keyed_groups:
         - key: platform
           prefix: os
@@ -55,6 +56,9 @@ controller_inventory_sources:
           prefix: blueprint
         - key: tags.owner
           prefix: owner
+        - key: tags.purpose
+          prefix: purpose
+
 
 #  - name: Azure Inventory
 #    organization: Default
