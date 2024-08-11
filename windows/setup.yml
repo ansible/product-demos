@@ -338,6 +338,14 @@ controller_workflows:
           type: text
           variable: create_vm_vm_owner
           required: true
+        - question_name: Environment
+          type: multiplechoice
+          variable: create_vm_vm_environment
+          required: true
+          choices:
+            - Dev
+            - QA
+            - Prod
         - question_name: Subnet
           type: text
           variable: create_vm_aws_vpc_subnet_name
