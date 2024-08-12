@@ -406,3 +406,11 @@ controller_workflows:
         job_type: run
         extra_data:
           _hosts: purpose_domain_controller
+        success_nodes:
+          - Join Domain
+      - identifier: Join Domain
+        unified_job_template: WINDOWS / AD / Join Domain
+        job_type: run
+        extra_data:
+          _hosts: purpose_domain_computer
+          domain_controller: dc01.ansible.local
