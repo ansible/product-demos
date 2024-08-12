@@ -1,0 +1,54 @@
+---
+- name: Setup environment vars
+  block:
+    - name: Create secret and Install EDA
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', __definition) }}"
+      loop:
+        - eda_admin_secret.j2
+        - eda_controller.j2
+      loop_control:
+        loop_var: __definition
+
+    - name: Retrieve created route
+      kubernetes.core.k8s_info:
+        api_version: "route.openshift.io/v1"
+        kind: Route
+        name: "{{ eda_controller_project_app_name }}"
+        namespace: "{{ eda_controller_project }}"
+      register: r_eda_route
+      until: r_eda_route.resources[0].spec.host is defined
+      retries: 30
+      delay: 45
+
+    - name: Get eda-controller route hostname
+      ansible.builtin.set_fact:
+        eda_controller_hostname: "{{ r_eda_route.resources[0].spec.host }}"
+
+    - name: Wait for eda_controller to be running
+      ansible.builtin.uri:
+        url: https://{{ eda_controller_hostname }}/api/eda/v1/users/me/awx-tokens/
+        user: "admin"
+        password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+        method: GET
+        force_basic_auth: true
+        validate_certs: false
+        body_format: json
+        status_code: 200
+      register: r_result
+      until: not r_result.failed
+      retries: 60
+      delay: 45
+
+    - name: Create Rolebinding for Rulebook Activations
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', 'cluster_rolebinding.j2') }}"
+
+    - name: Display EDA Controller URL
+      ansible.builtin.debug:
+        msg:
+          - "EDA Controller URL: https://{{ eda_controller_hostname }}"
+          - "EDA Controller Admin Login: admin"
+          - "EDA Controller Admin Password: <same as the Controller Admin password>"
