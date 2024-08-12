@@ -81,6 +81,48 @@ controller_templates:
             - 'Yes'
             - 'No'
 
+  - name: "WINDOWS / Rollback"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/rollback.yml"
+    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Demo Credential"
+    survey_enabled: true
+    survey:
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: false
+        - question_name: Rollback Message
+          type: text
+          variable: rollback_msg
+          required: false
+
+  - name: "WINDOWS / Connectivity Test"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/connect.yml"
+    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Demo Credential"
+    survey_enabled: true
+    survey:
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: false
+
   - name: "WINDOWS / Chocolatey install multiple"
     job_type: run
     inventory: "Demo Inventory"
@@ -399,6 +441,14 @@ controller_workflows:
           - Inventory Sync
       - identifier: Inventory Sync
         unified_job_template: AWS Inventory
+        all_parents_must_converge: true
+        success_nodes:
+          - Test Connectivity
+      - identifier: Test Connectivity
+        unified_job_template: WINDOWS / Connectivity Test
+        job_type: run
+        extra_data:
+          _hosts: os_windows
         success_nodes:
           - Create Domain
       - identifier: Create Domain
@@ -406,11 +456,27 @@ controller_workflows:
         job_type: run
         extra_data:
           _hosts: purpose_domain_controller
+        failure_nodes:
+          - Rollback Create Domain
         success_nodes:
           - Join Domain
+      - identifier: Rollback Create Domain
+        unified_job_template: WINDOWS / Rollback
+        job_type: run
+        extra_data:
+          _hosts: purpose_domain_controller
+          rollback_msg: "Create domain failed. Rolling back..."
       - identifier: Join Domain
         unified_job_template: WINDOWS / AD / Join Domain
         job_type: run
         extra_data:
           _hosts: purpose_domain_computer
           domain_controller: dc01.ansible.local
+        failure_nodes:
+          - Rollback Join Domain
+      - identifier: Rollback Join Domain
+        unified_job_template: WINDOWS / Rollback
+        job_type: run
+        extra_data:
+          _hosts: purpose_domain_computer
+          rollback_msg: "Join domain failed. Rolling back..."
