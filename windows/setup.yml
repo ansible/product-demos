@@ -373,6 +373,7 @@ controller_workflows:
         extra_data:
           create_vm_vm_name: dc01.ansible.local
           create_vm_vm_purpose: domain_controller
+          create_vm_vm_deployment: domain_ansible_local
           vm_blueprint: windows_full
         success_nodes:
           - Inventory Sync
@@ -382,6 +383,7 @@ controller_workflows:
         extra_data:
           create_vm_vm_name: winston.ansible.local
           create_vm_vm_purpose: domain_computer
+          create_vm_vm_deployment: domain_ansible_local
           vm_blueprint: windows_core
         success_nodes:
           - Inventory Sync
@@ -391,6 +393,7 @@ controller_workflows:
         extra_data:
           create_vm_vm_name: winthrop.ansible.local
           create_vm_vm_purpose: domain_computer
+          create_vm_vm_deployment: domain_ansible_local
           vm_blueprint: windows_core
         success_nodes:
           - Inventory Sync

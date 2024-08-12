@@ -58,7 +58,8 @@ controller_inventory_sources:
           prefix: owner
         - key: tags.purpose
           prefix: purpose
-
+        - key: tags.deployment
+          prefix: deployment
 
 #  - name: Azure Inventory
 #    organization: Default
