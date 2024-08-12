@@ -94,6 +94,8 @@ controller_templates:
       - "Demo Credential"
     survey_enabled: true
     survey:
+      name: ''
+      description: ''
       spec:
         - question_name: Server Name or Pattern
           type: text
@@ -117,6 +119,8 @@ controller_templates:
       - "Demo Credential"
     survey_enabled: true
     survey:
+      name: ''
+      description: ''
       spec:
         - question_name: Server Name or Pattern
           type: text
