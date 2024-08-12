@@ -396,3 +396,10 @@ controller_workflows:
           - Inventory Sync
       - identifier: Inventory Sync
         unified_job_template: AWS Inventory
+        success_nodes:
+          - Create Domain
+      - identifier: Create Domain
+        unified_job_template: WINDOWS / AD / Create Domain
+        job_type: run
+        extra_data:
+          _hosts: purpose_domain_controller
