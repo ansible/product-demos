@@ -106,7 +106,7 @@ controller_templates:
           variable: rollback_msg
           required: false
 
-  - name: "WINDOWS / Connectivity Test"
+  - name: "WINDOWS / Test Connectivity"
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
@@ -354,7 +354,7 @@ controller_templates:
           required: false
 
 controller_workflows:
-  - name: "WINDOWS / AD / Setup Demo Domain"
+  - name: Setup Active Directory Domain
     description: A workflow to create a domain controller with two domain-joined Windows hosts.
     organization: Default
     notification_templates_started: Telemetry
@@ -449,10 +449,10 @@ controller_workflows:
         success_nodes:
           - Test Connectivity
       - identifier: Test Connectivity
-        unified_job_template: WINDOWS / Connectivity Test
+        unified_job_template: WINDOWS / Test Connectivity
         job_type: run
         extra_data:
-          _hosts: os_windows
+          _hosts: deployment_domain_ansible_local
         success_nodes:
           - Create Domain
       - identifier: Create Domain
@@ -478,9 +478,17 @@ controller_workflows:
           domain_controller: dc01.ansible.local
         failure_nodes:
           - Rollback Join Domain
+        success_nodes:
+          - PowerShell Validation
       - identifier: Rollback Join Domain
         unified_job_template: WINDOWS / Rollback
         job_type: run
         extra_data:
           _hosts: purpose_domain_computer
           rollback_msg: "Join domain failed. Rolling back..."
+      - identifier: PowerShell Validation
+        unified_job_template: WINDOWS / Run PowerShell
+        job_type: run
+        extra_data:
+          _hosts: purpose_domain_controller
+          ps_script: "Get-ADComputer -Filter * | Select-Object -Property 'Name'"
