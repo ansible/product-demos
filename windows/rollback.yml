@@ -1,6 +1,8 @@
 ---
 - name: Rollback playbook
   hosts: "{{ _hosts | default('os_windows') }}"
+  gather_facts: false
+
   tasks:
     - name: Rollback this step
       ansible.builtin.debug:

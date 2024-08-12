@@ -83,6 +83,11 @@ controller_groups:
     inventory: Demo Inventory
     variables:
       ansible_user: ec2-user
+  - name: os_windows
+    inventory: Demo Inventory
+    variables:
+      ansible_connection: winrm
+      ansible_winrm_transport: credssp
 
 controller_templates:
   - name: Cloud / AWS / Create Peer Infrastructure
