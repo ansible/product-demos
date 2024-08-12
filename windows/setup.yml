@@ -453,6 +453,8 @@ controller_workflows:
         job_type: run
         extra_data:
           _hosts: deployment_domain_ansible_local
+        failure_nodes:
+          - Cleanup Resources
         success_nodes:
           - Create Domain
       - identifier: Create Domain
@@ -461,15 +463,9 @@ controller_workflows:
         extra_data:
           _hosts: purpose_domain_controller
         failure_nodes:
-          - Rollback Create Domain
+          - Cleanup Resources
         success_nodes:
           - Join Domain
-      - identifier: Rollback Create Domain
-        unified_job_template: WINDOWS / Rollback
-        job_type: run
-        extra_data:
-          _hosts: purpose_domain_controller
-          rollback_msg: "Create domain failed. Rolling back..."
       - identifier: Join Domain
         unified_job_template: WINDOWS / AD / Join Domain
         job_type: run
@@ -477,15 +473,15 @@ controller_workflows:
           _hosts: purpose_domain_computer
           domain_controller: dc01.ansible.local
         failure_nodes:
-          - Rollback Join Domain
+          - Cleanup Resources
         success_nodes:
           - PowerShell Validation
-      - identifier: Rollback Join Domain
+      - identifier: Cleanup Resources
         unified_job_template: WINDOWS / Rollback
         job_type: run
         extra_data:
-          _hosts: purpose_domain_computer
-          rollback_msg: "Join domain failed. Rolling back..."
+          _hosts: localhost
+          rollback_msg: "Domain setup failed. Cleaning up resources..."
       - identifier: PowerShell Validation
         unified_job_template: WINDOWS / Run PowerShell
         job_type: run
