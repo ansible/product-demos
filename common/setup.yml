@@ -43,6 +43,7 @@ controller_inventory_sources:
       groups:
         cloud_aws: true
         os_linux: tags.blueprint.startswith('rhel')
+        os_windows: tags.blueprint.startswith('win')
       keyed_groups:
         - key: platform
           prefix: os
@@ -50,12 +51,21 @@ controller_inventory_sources:
           prefix: blueprint
         - key: tags.owner
           prefix: owner
+        - key: tags.purpose
+          prefix: purpose
+        - key: tags.deployment
+          prefix: deployment
 
 controller_groups:
   - name: cloud_aws
     inventory: Demo Inventory
     variables:
       ansible_user: ec2-user
+  - name: os_windows
+    inventory: Demo Inventory
+    variables:
+      ansible_connection: winrm
+      ansible_winrm_transport: credssp
 
 controller_templates:
   - name: SUBMIT FEEDBACK
@@ -189,6 +199,11 @@ controller_templates:
           type: text
           variable: create_vm_vm_deployment
           required: true
+        - question_name: Purpose
+          type: text
+          variable: create_vm_vm_purpose
+          required: true
+          default: demo
         - question_name: Environment
           type: multiplechoice
           variable: create_vm_vm_environment
