@@ -14,8 +14,8 @@ There are additional groups created in the **Demo Inventory** for interacting wi
 - **purpose_domain_controller**: domain controller instances (1)
 - **purpose_domain_computer**: domain computers (2)
 
-_... graphic to come ..._
+![Inventory](../.github/images/setup_domain_workflow_inventory.png)
 
 ## Domain (ansible.local)
 
-_... graphic to come ..._
+![Domain Topology](../.github/images/setup_domain_workflow_domain.png)
