@@ -5,6 +5,7 @@
   - [Table of Contents](#table-of-contents)
   - [About These Demos](#about-these-demos)
     - [Jobs](#jobs)
+    - [Workflows](#workflows)
   - [Suggested Usage](#suggested-usage)
 
 ## About These Demos
@@ -23,7 +24,12 @@ This category of demos shows examples of Windows Server operations and managemen
 - [**WINDOWS / Helpdesk new user portal**](helpdesk_new_user_portal.yml) - Create user in AD Domain
 - [**WINDOWS / Join Active Directory Domain**](join_ad_domain.yml) - Join computer to AD Domain
 
+### Workflows
+- [**Setup Active Directory Domain**](setup_domain_workflow.md) - A workflow to create a domain controller with two domain-joined Windows hosts
+
 ## Suggested Usage
+
+**Setup Active Directory Domain** - One-click domain setup, infrastructure included.
 
 **WINDOWS / Create Active Directory Domain** - This job can take some to complete. It is recommended to run ahead of time if you would like to demo creating a helpdesk user.
 
