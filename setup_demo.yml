@@ -14,7 +14,7 @@
         _deployment_id: '{{ lookup("ansible.builtin.password", "{{ playbook_dir }}/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
 
     - name: Include configuration for common demo resources
-      ansible.builtin.include_vars: "{{ demo }}/setup.yml"
+      ansible.builtin.include_vars: common/setup.yml
 
     - name: Create common demo resources
       ansible.builtin.include_role:
