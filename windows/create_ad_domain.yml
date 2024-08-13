@@ -9,6 +9,10 @@
         name: Administrator
         password: "{{ ansible_password }}"
 
+    - name: Update the hostname
+      ansible.windows.win_hostname:
+        name: "{{ inventory_hostname.split('.')[0] }}"
+
     - name: Create new domain in a new forest on the target host
       ansible.windows.win_domain:
         dns_domain_name: ansible.local
