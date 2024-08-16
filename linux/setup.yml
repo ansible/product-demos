@@ -398,6 +398,7 @@ controller_templates:
             - ospp
             - pci_dss
             - stig
+            - e8
 
   - name: "LINUX / Multi-profile Compliance Report"
     job_type: run
@@ -430,6 +431,7 @@ controller_templates:
             - ospp
             - pci_dss
             - stig
+            - e8
         - question_name: Use httpd on the target host(s) to access reports locally?
           type: multiplechoice
           variable: use_httpd
