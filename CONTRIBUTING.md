@@ -18,6 +18,7 @@ This document aims to outline the requirements for the various forms of contribu
 - PRs should be rebased against the `main` branch to avoid conflicts.
 - PRs should not impact more than a single directory/demo section.
 - PRs should not rely on external infrastructure or configuration unless the dependency is automated or specified in the `user_message` of `setup.yml`.
+- PR titles should describe the work done in the PR.  Titles should not be generic ("Added new demo") and should not refer to an issue number ("Fix for issue #123").
 
 ## Adding a New Demo
 1) Create a new branch based on main. (eg. `git checkout -b <branch name>`)
@@ -31,7 +32,7 @@ This document aims to outline the requirements for the various forms of contribu
    1) You can copy paste an existing one and edit it.
    2) Ensure you edit the name, playbook path, survey etc.
 5) Add any needed roles/collections to the [requirements.yml](/collections/requirements.yml)
-6) Test via [demo.redhat.com](https://demo.redhat.com/catalog?item=babylon-catalog-prod/sandboxes-gpte.aap-product-demos.prod&utm_source=webapp&utm_medium=share-link), specify your branch name within the project configuration.
+6) Test via [demo.redhat.com](https://demo.redhat.com/catalog?search=product&item=babylon-catalog-prod%2Fopenshift-cnv.aap-product-demos-cnv.prod), specifying your branch name within the project configuration.
 
 > NOTE: demo.redhat.com is available to Red Hat Associates and Partners with a valid account.
 
@@ -43,13 +44,10 @@ This document aims to outline the requirements for the various forms of contribu
     ---
     user_message: ''
 
-    controller_components:
-    - job_templates
-
     controller_templates:
     ...
     ```
-   - `controller_components` can be any of the roles defined [here](https://github.com/redhat-cop/controller_configuration/tree/devel/roles)
+   - Configuration variables can be from any of the roles defined in the [infra.controller_configuration collection](https://github.com/redhat-cop/controller_configuration/tree/devel/roles)
    - Add variables for each component listed
 3) Include a README.md in the subdirectory
 
@@ -72,76 +70,3 @@ Copy the token value and execute the following command:
 ```bash
 export ANSIBLE_GALAXY_SERVER_AH_TOKEN=<token>
 ```
-
-## Release Process
-
-We follow a structured release process for this project. Here are the steps involved:
-
-1. **Create a Release Branch:**
-   - Start by creating a new release branch from the `main` branch.
-
-   ```bash
-   git checkout -b release/v-<version>
-   ```
-
-2. **Update Changelog:**
-   - Open the `CHANGELOG.md` file to manually add your change to the appropriate section.
-   - Our changelog follows the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format and includes the following categories of changes:
-
-     - `Added` for new features.
-     - `Changed` for changes in existing functionality.
-     - `Deprecated` for features that will be removed in upcoming releases.
-     - `Fixed` for bug fixes.
-     - `Removed` for deprecated features that were removed.
-     - `Security` for security-related changes.
-
-   - Add a new entry under the relevant category. Include a brief summary of the change and the merge request commit tag.
-
-     ```markdown
-     ## [Unreleased]
-
-     ### Added
-
-     - New feature or enhancement ([Merge Request Commit](https://github.com/ansible/product-demos/-/commit/<commit-hash>))
-     ```
-
-   - Replace `<commit-hash>` with the actual commit hash from the merge request.
-
-3. **Commit Changes:**
-   - Commit the changes made to the `CHANGELOG.md` file.
-
-   ```bash
-   git add CHANGELOG.md
-   git commit -m "Update CHANGELOG for release <version>"
-   ```
-
-4. **Create a Pull Request:**
-   - Open a pull request from the release branch to the `main` branch.
-
-5. **Review and Merge:**
-   - Review the pull request and merge it into the `main` branch.
-
-6. **Tag the Release:**
-   - Once the pull request is merged, tag the release with the version number.
-
-   ```bash
-   git tag -a v-<version> -m "Release <version>"
-   git push origin v-<version>
-   ```
-
-7. **Publish the Release:**
-   - After the successful completion of the pull request and merging into the `main` branch, an automatic GitHub Action will be triggered to publish the release.
-
-     The GitHub Action will perform the following steps:
-     - Parse the `CHANGELOG.md` file.
-     - Generate a release note based on the changes.
-     - Attach relevant files (such as `LICENSE`, `CHANGELOG.md`, and the generated `CHANGELOG.txt`) to the GitHub Release.
-
-     No manual intervention is required for this step; the GitHub Action will handle the release process automatically.
-
-8. **Cleanup:**
-   - Delete the release branch.
-
-   ```bash
-   git branch -d release/v-<version>
-   ```
