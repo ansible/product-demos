@@ -10,6 +10,7 @@
         dns_servers: "{{ hostvars[domain_controller]['private_ip_address'] }}"
 
     - name: Ensure Demo OU exists
+      run_once: true
       delegate_to: "{{ domain_controller }}"
       community.windows.win_domain_ou:
         name: Demo
