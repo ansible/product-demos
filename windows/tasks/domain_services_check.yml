@@ -30,7 +30,7 @@
         state: present
         timeout: 600
         sleep: 10
-  resuce:
+  rescue:
     - name: Note secondary failure
       failed_when: true
       ansible.builtin.debug:
