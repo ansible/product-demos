@@ -5,13 +5,13 @@
     restore_snapshot_name: "{{ default(omit) }}"
   tasks:
   - name: Get state of VirtualMachine
-    kubevirt.core.kubevirt_vm_info:
+    redhat.openshift_virtualization.kubevirt_vm_info:
       name: "{{ vm_name }}"
       namespace: "{{ vm_namespace }}"
     register: state
 
   - name: Stop VirtualMachine
-    kubevirt.core.kubevirt_vm:
+    redhat.openshift_virtualization.kubevirt_vm:
       name: "{{ vm_name }}"
       namespace: "{{ vm_namespace }}"
       running: no
@@ -37,7 +37,7 @@
         type: Ready
 
   - name: Start VirtualMachine
-    kubevirt.core.kubevirt_vm:
+    redhat.openshift_virtualization.kubevirt_vm:
       name: "{{ vm_name }}"
       namespace: "{{ vm_namespace }}"
       running: yes
