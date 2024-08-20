@@ -305,7 +305,7 @@ controller_workflows:
           type: text
           variable: _hosts
           required: true
-          default: os_linux
+          default: "openshift-cnv-rhel*"
     simplified_workflow_nodes:
       - identifier: Project Sync
         unified_job_template: Ansible official demo project
@@ -322,7 +322,7 @@ controller_workflows:
       - identifier: Patch Instance
         unified_job_template: OpenShift / CNV / Patch
         job_type: run
-        failure_nodes:
+        ailure_nodes:
           - Restore from Snapshot
       - identifier: Restore from Snapshot
         unified_job_template: OpenShift / CNV / Restore VM Snapshot
