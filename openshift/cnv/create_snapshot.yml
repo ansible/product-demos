@@ -3,13 +3,13 @@
   hosts: localhost
   tasks:
   - name: Get state of VirtualMachine
-    redhat.openshift.kubevirt_vm_info:
+    redhat.openshift_virtualization.kubevirt_vm_info:
       name: "{{ vm_name }}"
       namespace: "{{ vm_namespace }}"
     register: state
 
   - name: Stop VirtualMachine
-    redhat.openshift.kubevirt_vm:
+    redhat.openshift_virtualization.kubevirt_vm:
       name: "{{ vm_namespace }}"
       namespace: "{{ vm_namespace }}"
       running: false
@@ -35,7 +35,7 @@
     register: snapshot
 
   - name: Start VirtualMachine
-    redhat.openshift.kubevirt_vm:
+    redhat.openshift_virtualization.kubevirt_vm:
       name: "{{ vm_name }}"
       namespace: "{{ vm_namesace }}"
       running: yes
