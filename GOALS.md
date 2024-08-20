@@ -1,6 +1,6 @@
 # GOALS
 
-## Why does Ansible Product Demos (APD) project exist?
+## Why does the Ansible Product Demos (APD) project exist?
 
 The Ansible Product Demos (APD) project is a field-driven repository of common, reusable AAP config-as-code content meant to be used for demos and proof-of-concept scenarios.
 
@@ -27,4 +27,3 @@ Customer personas include:
 ### Secondary Goals
 - target environment of a customer environment where installation and configuration may be slightly different than demo.redhat.com
 - Create additional impactful demos that can be reused across multiple customer accounts
-
