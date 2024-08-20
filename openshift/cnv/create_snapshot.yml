@@ -4,6 +4,7 @@
   tasks:
   - name: Get name of VirtualMachine
     ansible.builtin.debug: "{{ ansible_hostname }}"
+    delegate_to: localhost
 
 - name: Create a VM snapshot
   hosts: localhost
