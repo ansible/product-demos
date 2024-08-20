@@ -5,8 +5,9 @@
   tasks:
   - name: Get name of VirtualMachine
     ansible.builtin.set_stats: 
+      per_host: true
       data:
-        my_var: "{{ ansible_ssh_host|default(ansible_host)|default(inventory_hostname) }}"
+        my_var: "{{ inventory_hostname }}"
     vars:
       ansible_connection: local
 
