@@ -13,6 +13,10 @@
       ansible.windows.win_hostname:
         name: "{{ inventory_hostname.split('.')[0] }}"
 
+    - name: Reboot to apply new hostname
+      ansible.windows.win_reboot:
+        reboot_timeout: 3600
+
     - name: Create new domain in a new forest on the target host
       register: r_create_domain
       ansible.windows.win_domain:
