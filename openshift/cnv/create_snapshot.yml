@@ -1,6 +1,7 @@
 ---
 - name: Lookup VM names to be snapshotted
   hosts: "{{ _hosts }}"
+  gather_facts: false
   tasks:
   - name: Get name of VirtualMachine
     ansible.builtin.debug: "{{ ansible_hostname }}"
