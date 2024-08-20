@@ -1,4 +1,10 @@
 ---
+- name: Lookup VM names to be snapshotted
+  hosts: "{{ _hosts }}"
+  tasks:
+  - name: Get name of VirtualMachine
+    ansible.builtin.debug: "{{ ansible_hostname }}"
+
 - name: Create a VM snapshot
   hosts: localhost
   tasks:
