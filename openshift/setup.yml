@@ -96,11 +96,66 @@ controller_templates:
     credentials:
       - "OpenShift Credential"
 
+  - name: OpenShift / CNV / Create VM Snapshot
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/cnv/create_snapshot.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: VM name
+          type: text
+          variable: vm_name
+          required: true
+        - question_name: VM NameSpace
+          type: text
+          variable: vm_namespace
+          default: openshift-cnv
+          required: true
+    credentials:
+      - "OpenShift Credential"
+
+  - name: OpenShift / CNV / Restore VM Snapshot
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/cnv/create_snapshot.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: VM name
+          type: text
+          variable: vm_name
+          required: true
+        - question_name: VM NameSpace
+          type: text
+          variable: vm_namespace
+          default: openshift-cnv
+          required: true
+        - question_name: Snapshot Name
+          type: text
+          variable: vm_namespace
+          default: openshift-cnv
+          required: true
+    credentials:
+      - "OpenShift Credential"
+
   - name: OpenShift / CNV / Delete VM
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
-    playbook: "openshift/cnv/provision.yml"
+    playbook: "openshift/cnv/delete.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -123,7 +178,7 @@ controller_templates:
     credentials:
       - "OpenShift Credential"
 
-  - name: OpenShift / CNV / Patching
+  - name: OpenShift / CNV / Patch
     job_type: check
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
@@ -235,3 +290,46 @@ controller_workflows:
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to create CNV instance
+
+  - name: OpenShift / CNV / Patch CNV Workflow
+    description: A workflow to patch CNV instances with snapshot and restore on failure.
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Specify target hosts
+          type: text
+          variable: _hosts
+          required: true
+          default: os_linux
+    simplified_workflow_nodes:
+      - identifier: Project Sync
+        unified_job_template: Ansible official demo project
+        success_nodes:
+          - Take Snapshot
+      - identifier: Inventory Sync
+        unified_job_template: OpenShift CNV Inventory
+        success_nodes:
+          - Take Snapshot
+      - identifier: Take Snapshot
+        unified_job_template: OpenShift / CNV / Create VM Snapshot
+        success_nodes:
+          - Patch Instance
+      - identifier: Patch Instance
+        unified_job_template: OpenShift / CNV / Patch
+        job_type: run
+        failure_nodes:
+          - Restore from Snapshot
+      - identifier: Restore from Snapshot
+        unified_job_template: OpenShift / CNV / Restore VM Snapshot
+        failure_nodes:
+          - Ticket - Restore Failed
+      - identifier: Ticket - Restore Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: OpenShift / CNV / Patch CNV Workflow | Failed to restore CNV VM from snapshot
