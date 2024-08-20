@@ -42,5 +42,10 @@
       wait: yes
     when: state.resources.0.spec.running
 
+  - name: Export snapshot name
+    ansible.builtin.set_stats:
+      data:
+        restore_snapshot_name: "{{ snapshot.result.metadata.name }}"
+
   - debug:
       msg: "Successfully created snapshot {{ snapshot.result.metadata.name }}"

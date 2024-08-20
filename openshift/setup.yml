@@ -145,8 +145,7 @@ controller_templates:
           required: true
         - question_name: Snapshot Name
           type: text
-          variable: vm_namespace
-          default: openshift-cnv
+          variable: restore_snapshot_name
           required: true
     credentials:
       - "OpenShift Credential"
