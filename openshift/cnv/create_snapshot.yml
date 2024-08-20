@@ -13,6 +13,10 @@
 - name: Create a VM snapshot
   hosts: localhost
   tasks:
+  - name: Debug
+    ansible.builtin.debug:
+      msg: "{{ my_var }}"
+
   - name: Get state of VirtualMachine
     redhat.openshift_virtualization.kubevirt_vm_info:
       name: "{{ vm_name }}"
@@ -60,6 +64,3 @@
 
   - debug:
       msg: "Successfully created snapshot {{ snapshot.result.metadata.name }}"
-
-      ERROR! this task 'ansible.builtin.debug' has extra params, which is only allowed in the following modules: ansible.builtin.add_host, ansible.builtin.shell, ansible.legacy.group_by, ansible.legacy.command, ansible.builtin.include_vars, ansible.builtin.win_command, ansible.legacy.raw, include_role, ansible.builtin.include_tasks, include_vars, ansible.builtin.win_shell, ansible.builtin.import_tasks, ansible.legacy.include_role, ansible.builtin.include, ansible.builtin.include_role, ansible.windows.win_shell, script, ansible.legacy.win_shell, win_shell, ansible.builtin.import_role, shell, add_host, ansible.legacy.import_tasks, ansible.legacy.set_fact, set_fact, raw, import_role, ansible.legacy.include_vars, win_command, meta, ansible.builtin.group_by, ansible.legacy.script, ansible.legacy.include_tasks, ansible.builtin.meta, include_tasks, ansible.builtin.script, command, ansible.legacy.shell, ansible.legacy.add_host, ansible.legacy.import_role, group_by, include, ansible.windows.win_command, import_tasks…
-
