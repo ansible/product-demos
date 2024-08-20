@@ -4,7 +4,9 @@
   gather_facts: false
   tasks:
   - name: Get name of VirtualMachine
-    ansible.builtin.debug: "{{ ansible_ssh_host|default(ansible_host))|default(inventory_hostname }}"
+    ansible.builtin.set_stats: 
+      data:
+        my_var: "{{ ansible_ssh_host|default(ansible_host))|default(inventory_hostname }}"
     vars:
       ansible_connection: local
 
