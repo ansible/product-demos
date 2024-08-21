@@ -96,11 +96,11 @@ controller_templates:
     credentials:
       - "OpenShift Credential"
 
-  - name: OpenShift / CNV / Create VM Snapshot
+  - name: OpenShift / CNV / Create VM Snapshots
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
-    playbook: "openshift/cnv/create_snapshot.yml"
+    playbook: "openshift/cnv/snapshot.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -109,9 +109,10 @@ controller_templates:
       name: ''
       description: ''
       spec:
-        - question_name: VM name
+        - question_name: Server Name or Pattern
           type: text
-          variable: vm_name
+          variable: _hosts
+          default: "openshift-cnv-rhel*"
           required: true
         - question_name: VM NameSpace
           type: text
@@ -121,11 +122,11 @@ controller_templates:
     credentials:
       - "OpenShift Credential"
 
-  - name: OpenShift / CNV / Restore VM Snapshot
+  - name: OpenShift / CNV / Restore Latest VM Snapshots
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
-    playbook: "openshift/cnv/create_snapshot.yml"
+    playbook: "openshift/cnv/snapshot.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -134,18 +135,15 @@ controller_templates:
       name: ''
       description: ''
       spec:
-        - question_name: VM name
+        - question_name: Server Name or Pattern
           type: text
-          variable: vm_name
+          variable: _hosts
+          default: "openshift-cnv-rhel*"
           required: true
         - question_name: VM NameSpace
           type: text
           variable: vm_namespace
           default: openshift-cnv
-          required: true
-        - question_name: Snapshot Name
-          type: text
-          variable: restore_snapshot_name
           required: true
     credentials:
       - "OpenShift Credential"
@@ -316,16 +314,16 @@ controller_workflows:
         success_nodes:
           - Take Snapshot
       - identifier: Take Snapshot
-        unified_job_template: OpenShift / CNV / Create VM Snapshot
+        unified_job_template: OpenShift / CNV / Create VM Snapshots
         success_nodes:
           - Patch Instance
       - identifier: Patch Instance
         unified_job_template: OpenShift / CNV / Patch
         job_type: run
-        ailure_nodes:
+        failure_nodes:
           - Restore from Snapshot
       - identifier: Restore from Snapshot
-        unified_job_template: OpenShift / CNV / Restore VM Snapshot
+        unified_job_template: OpenShift / CNV / Restore Latest VM Snapshots
         failure_nodes:
           - Ticket - Restore Failed
       - identifier: Ticket - Restore Failed
