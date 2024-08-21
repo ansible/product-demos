@@ -104,6 +104,8 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      snapshot_operation: create
     survey_enabled: true
     survey:
       name: ''
@@ -130,6 +132,8 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      snapshot_operation: restore
     survey_enabled: true
     survey:
       name: ''
