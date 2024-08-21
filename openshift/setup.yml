@@ -312,15 +312,17 @@ controller_workflows:
       - identifier: Project Sync
         unified_job_template: Ansible official demo project
         success_nodes:
-          - Take Snapshot
+          - Patch Instance
+      # We need to do an invnetory sync *after* creating snapshots, as turning VMs on/off changes their IP
       - identifier: Inventory Sync
         unified_job_template: OpenShift CNV Inventory
         success_nodes:
-          - Take Snapshot
+          - Patch Instance
       - identifier: Take Snapshot
         unified_job_template: OpenShift / CNV / Create VM Snapshots
         success_nodes:
-          - Patch Instance
+          - Project Sync
+          - Inventory Sync
       - identifier: Patch Instance
         unified_job_template: OpenShift / CNV / Patch
         job_type: run

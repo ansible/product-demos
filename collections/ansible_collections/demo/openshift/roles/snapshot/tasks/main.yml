@@ -3,7 +3,7 @@
 # snapshot_opeation: <ceate/restore>
 - name: Show hostnames we care about
   ansible.builtin.debug:
-    msg: "About to {{ snapshot_operation }} snapshot for the following hosts:
+    msg: "About to {{ snapshot_operation }} snapshot(s) for the following hosts:
 {{ lookup('ansible.builtin.inventory_hostnames', 'all') | split(',') | difference(['localhost'])}}"
 
 - name: Manage snapshots based on operation
