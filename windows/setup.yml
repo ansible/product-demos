@@ -7,6 +7,15 @@ controller_projects:
     organization: Default
     scm_type: git
     scm_url: 'https://github.com/ansible/awx-facts-playbooks.git'
+  - name: ansible-windows-0-day-bsod-recovery-fix
+    organization: Default
+    scm_type: git
+    scm_url: https://github.com/oatakan/ansible-windows-0-day-bsod-recovery.git
+    scm_branch: main
+
+controller_execution_environments:
+  - name: ansible-base-ee-dev
+    image: quay.io/oatakan/ansible-base-ee-dev:latest
 
 controller_templates:
   - name: "WINDOWS / Install IIS"
@@ -306,3 +315,40 @@ controller_templates:
           type: text
           variable: HOSTS
           required: false
+
+  - name: WINDOWS / Provision BSOD Infra
+    description: Provisions the required infrastructure
+    organization: Default
+    project: ansible-windows-0-day-bsod-recovery-fix
+    playbook: provision_infra_multi.yml
+    inventory: Demo Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      provider: kubevirt
+      scenario: winpe
+      infra_template_name: windows-2022-standard
+    execution_environment: ansible-base-ee-dev
+    ask_variables_on_launch: true
+    credentials:
+      - "OpenShift Credential"
+
+  - name: WINDOWS / Remove BSOD Infrastructure
+    description: Removes the provisioned systems
+    organization: Default
+    project: ansible-windows-0-day-bsod-recovery-fix
+    playbook: remove_infra_multi.yml
+    inventory: Demo Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      provider: kubevirt
+      scenario: winpe
+    execution_environment: ansible-base-ee-dev
+    #ask_inventory_on_launch: true
+    ask_limit_on_launch: true
+    ask_variables_on_launch: true
+    credentials:
+      - "OpenShift Credential"
