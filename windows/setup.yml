@@ -12,10 +12,27 @@ controller_projects:
     scm_type: git
     scm_url: https://github.com/oatakan/ansible-windows-0-day-bsod-recovery.git
     scm_branch: main
+  - name: aap-openshift-inventory-source
+    organization: Default
+    scm_type: git
+    scm_url: https://github.com/oatakan/ansible-openshift-virtualization-inventory-source.git
+    scm_branch: main
 
 controller_execution_environments:
   - name: ansible-base-ee-dev
     image: quay.io/oatakan/ansible-base-ee-dev:latest
+
+controller_inventory_sources:
+  - name: OpenShift Dynamic Inventory
+    inventory: Demo Inventory
+    organization: Default
+    source: scm
+    source_project: aap-openshift-inventory-source
+    source_path: kubevirt.yml
+    credential: OpenShift Credential
+    update_on_launch: true
+    overwrite_vars: true
+    overwrite: true
 
 controller_templates:
   - name: "WINDOWS / Install IIS"
@@ -316,7 +333,7 @@ controller_templates:
           variable: HOSTS
           required: false
 
-  - name: WINDOWS / Provision BSOD Infra
+  - name: WINDOWS / BSOD / Provision Infrastructure
     description: Provisions the required infrastructure
     organization: Default
     project: ansible-windows-0-day-bsod-recovery-fix
@@ -330,11 +347,10 @@ controller_templates:
       scenario: winpe
       infra_template_name: windows-2022-standard
     execution_environment: ansible-base-ee-dev
+    ask_credential_on_launch: true
     ask_variables_on_launch: true
-    credentials:
-      - "OpenShift Credential"
 
-  - name: WINDOWS / Remove BSOD Infrastructure
+  - name: WINDOWS / BSOD / Remove Infrastructure
     description: Removes the provisioned systems
     organization: Default
     project: ansible-windows-0-day-bsod-recovery-fix
@@ -347,8 +363,104 @@ controller_templates:
       provider: kubevirt
       scenario: winpe
     execution_environment: ansible-base-ee-dev
-    #ask_inventory_on_launch: true
+    ask_credential_on_launch: true
+    ask_inventory_on_launch: true
     ask_limit_on_launch: true
     ask_variables_on_launch: true
-    credentials:
-      - "OpenShift Credential"
+
+  - name: WINDOWS / BSOD / Generate WinPE
+    description: Generates WinPE image on the provisioned Windows system
+    organization: Default
+    project: ansible-windows-0-day-bsod-recovery-fix
+    playbook: generate_winpe.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      create_winpe_destination_file_location: iso_upload
+      create_winpe_enable_autostart: true
+      create_winpe_enable_powershell_modules: false
+      create_winpe_enable_script_debug: false
+      create_winpe_load_drivers: false
+    execution_environment: ansible-base-ee-dev
+    ask_credential_on_launch: true
+    ask_inventory_on_launch: true
+    ask_limit_on_launch: true
+    ask_variables_on_launch: true
+
+  - name: WINDOWS / BSOD / Upload WinPE ISO
+    description: Uploads the generated WinPE ISO to VMware/OpenShift Virtualization
+    organization: Default
+    project: ansible-windows-0-day-bsod-recovery-fix
+    playbook: upload_winpe_iso.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      provider: vmware
+    execution_environment: ansible-base-ee-dev
+    ask_credential_on_launch: true
+    ask_inventory_on_launch: true
+    ask_limit_on_launch: true
+    ask_variables_on_launch: true
+
+controller_workflows:
+  - name: WINDOWS / BSOD / Generate WinPE Image Scenario
+    description: >
+      This workflow provisions a Windows system, generates a WinPE image,
+      uploads it to OpenShift Virtualization, and then removes the provisioned VM.
+      It demonstrates the process of creating and deploying a WinPE image
+      in an OpenShift Virtualization Environment.
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      infra_template_name: windows-2022-standard
+    simplified_workflow_nodes:
+      - identifier: Provision Infrastructure
+        unified_job_template: WINDOWS / BSOD / Provision Infrastructure
+        credentials:
+          - OpenShift Credential
+          - Demo Credential
+        extra_data:
+          provider: kubevirt
+          scenario: winpe
+          infra_template_name: windows-2022-standard
+        success_nodes:
+          - Generate WinPE
+      - identifier: Generate WinPE
+        unified_job_template: WINDOWS / BSOD / Generate WinPE
+        inventory: OpenShift Inventory
+        credentials:
+          - OpenShift Credential
+          - Demo Credential
+        limit: label_app_name_winpe
+        extra_data:
+          create_winpe_destination_file_location: iso_upload
+          create_winpe_enable_autostart: true
+          create_winpe_enable_powershell_modules: false
+          create_winpe_enable_script_debug: false
+          create_winpe_load_drivers: true
+        success_nodes:
+          - Upload WinPE ISO
+      - identifier: Upload WinPE ISO
+        unified_job_template: Upload WinPE ISO
+        inventory: Demo Inventory
+        credentials:
+          - OpenShift Credential
+          - Windows Machine Credential
+        limit: label_app_name_winpe
+        extra_data:
+          provider: kubevirt
+        success_nodes:
+          - Remove Infrastructure
+      - identifier: Remove Infrastructure
+        unified_job_template: WINDOWS / BSOD / Remove Infrastructure
+        inventory: Demo Inventory
+        credentials:
+          - OpenShift Credential
+          - Demo  Credential
+        limit: label_app_name_winpe
+        extra_data:
+          provider: kubevirt
