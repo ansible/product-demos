@@ -433,7 +433,7 @@ controller_workflows:
         success_nodes:
           - Upload WinPE ISO
       - identifier: Upload WinPE ISO
-        unified_job_template: Upload WinPE ISO
+        unified_job_template: WINDOWS / BSOD / Upload WinPE ISO
         inventory: Demo Inventory
         credentials:
           - OpenShift Credential
