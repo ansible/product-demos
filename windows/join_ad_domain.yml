@@ -7,7 +7,7 @@
     - name: Set a single address on the adapter named Ethernet
       ansible.windows.win_dns_client:
         adapter_names: 'Ethernet*'
-        dns_servers: "{{ hostvars[domain_controller]['private_ip_address'] }}"
+        dns_servers: "{{ groups['purpose_domain_controller'][0]['private_ip_address'] }}"
 
     - name: Ensure Demo OU exists
       run_once: true
