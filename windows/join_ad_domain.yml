@@ -4,6 +4,10 @@
   gather_facts: false
 
   tasks:
+    - name: temp
+      ansible.builtin.debug:
+        msg: "{{ groups['purpose_domain_controller'] }}"
+
     - name: Set a single address on the adapter named Ethernet
       ansible.windows.win_dns_client:
         adapter_names: 'Ethernet*'
