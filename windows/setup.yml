@@ -431,7 +431,7 @@ controller_workflows:
           - Generate WinPE
       - identifier: Generate WinPE
         unified_job_template: WINDOWS / BSOD / Generate WinPE
-        inventory: OpenShift Inventory
+        inventory: Demo Inventory
         credentials:
           - OpenShift Credential
           - Demo Credential
