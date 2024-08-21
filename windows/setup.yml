@@ -22,18 +22,6 @@ controller_execution_environments:
   - name: ansible-base-ee-dev
     image: quay.io/oatakan/ansible-base-ee-dev:latest
 
-controller_inventory_sources:
-  - name: OpenShift Dynamic Inventory
-    inventory: Demo Inventory
-    organization: Default
-    source: scm
-    source_project: aap-openshift-inventory-source
-    source_path: kubevirt.yml
-    credential: OpenShift Credential
-    update_on_launch: true
-    overwrite_vars: true
-    overwrite: true
-
 controller_templates:
   - name: "WINDOWS / Install IIS"
     job_type: run
