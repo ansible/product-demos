@@ -449,7 +449,7 @@ controller_workflows:
         inventory: Demo Inventory
         credentials:
           - OpenShift Credential
-          - Windows Machine Credential
+          - Demo Credential
         limit: label_app_name_winpe
         extra_data:
           provider: kubevirt
@@ -460,7 +460,7 @@ controller_workflows:
         inventory: Demo Inventory
         credentials:
           - OpenShift Credential
-          - Demo  Credential
+          - Demo Credential
         limit: label_app_name_winpe
         extra_data:
           provider: kubevirt
