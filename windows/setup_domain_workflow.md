@@ -19,3 +19,9 @@ There are additional groups created in the **Demo Inventory** for interacting wi
 ## Domain (ansible.local)
 
 ![Domain Topology](../.github/images/setup_domain_workflow_domain.png)
+
+## PowerShell Validation
+
+In the validation step, you can expect to see the following output based on querying AD computers:
+
+![Expected Output](../.github/images/setup_domain_end_state.png)
