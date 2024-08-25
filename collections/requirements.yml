@@ -18,7 +18,7 @@ collections:
     version: ">=8.0.0"
   - name: containers.podman
     version: ">=1.12.1"
-  - name: redhat.insights
+  - name: redhatinsights.insights
     version: ">=1.2.2"
   - name: redhat.rhel_system_roles
     version: ">=1.23.0"
