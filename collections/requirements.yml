@@ -3,8 +3,8 @@
 # See cloin/ee-builds/product-demos-ee/requirements.yml
 # for configuring collections and collection versions.
 collections:
-  # - name: ansible.controller
-  #   version: ">=4.5.5"
+  - name: ansible.controller
+    version: ">=4.5.5"
   - name: infra.ah_configuration
     version: ">=2.0.6"
   - name: infra.controller_configuration
@@ -18,7 +18,7 @@ collections:
     version: ">=8.0.0"
   - name: containers.podman
     version: ">=1.12.1"
-  - name: redhatinsights.insights
+  - name: redhat.insights
     version: ">=1.2.2"
   - name: redhat.rhel_system_roles
     version: ">=1.23.0"
