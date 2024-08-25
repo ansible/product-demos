@@ -3,8 +3,8 @@
 # See cloin/ee-builds/product-demos-ee/requirements.yml
 # for configuring collections and collection versions.
 collections:
-  - name: ansible.controller
-    version: ">=4.5.5"
+  # - name: ansible.controller
+  #   version: ">=4.5.5"
   - name: infra.ah_configuration
     version: ">=2.0.6"
   - name: infra.controller_configuration
