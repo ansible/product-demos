@@ -51,3 +51,4 @@ collections:
     version: ">=3.0.1"
   - name: redhat.openshift_virtualization
     version: ">=1.4.0"
+  - name: ansible.eda

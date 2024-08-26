@@ -28,16 +28,16 @@ cluster_config_kafka:
   namespace:
     name: &cluster_config_kafka_namespace openshift-kafka
   operator_group:
-    name: kubevirt-hyperconverged-group
+    name: global-operators
     target_namespaces:
       - *cluster_config_kafka_namespace
   subscription:
-    name: kubevirt-hyperconverged
+    name: amp-streams
   extra_resources:
-    - apiVersion: hco.kubevirt.io/v1beta1
-      kind: HyperConverged
+    - apiVersion: kafka.strimzi.io/v1beta2
+      kind: kafka
       metadata:
-        name: kubevirt-hyperconverged
+        name: my_cluster
         namespace: *cluster_config_kafka_namespace
       spec:
         BareMetalPlatform: true
