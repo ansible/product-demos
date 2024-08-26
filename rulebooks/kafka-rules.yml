@@ -2,7 +2,7 @@
 - name: Demo rules with kafka as source
   hosts: localhost
   sources:
-    - name: kafka
+    - name: ansible.eda.kafka
       kafka:
         topic: eda
         host: my-cluster-kafka-listener-bootstrap-kafka.apps.rosa-rnlzm.0fo8.p1.openshiftapps.com
