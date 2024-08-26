@@ -1,0 +1,18 @@
+---
+- name: Display EC2 stats
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Display stats for EC2 VPC and key pair
+      ansible.builtin.debug:
+        var: '{{ item }}'
+      loop:
+        - stat_aws_region
+        - stat_aws_key_pair
+        - stat_aws_vpc_id
+        - stat_aws_vpc_cidr
+        - stat_aws_subnet_id
+        - stat_aws_subnet_cidr
+
+...

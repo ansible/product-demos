@@ -184,6 +184,18 @@ controller_templates:
           variable: _hosts
           required: false
 
+  - name: Cloud / AWS / Display EC2 Stats
+    job_type: run
+    organization: Default
+    credentials:
+      - AWS
+    project: Ansible official demo project
+    playbook: cloud/display-ec2-stats.yml
+    inventory: Demo Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+
   - name: "LINUX / Patching"
     job_type: check
     inventory: "Demo Inventory"
@@ -254,19 +266,24 @@ controller_workflows:
       - identifier: Create Keypair
         unified_job_template: Cloud / AWS / Create Keypair
         success_nodes:
-          - VPC Report
+          - EC2 Stats
         failure_nodes:
           - Ticket - Keypair Failed
       - identifier: Create VPC
         unified_job_template: Cloud / AWS / Create VPC
         success_nodes:
-          - VPC Report
+          - EC2 Stats
         failure_nodes:
           - Ticket - VPC Failed
       - identifier: Ticket - Keypair Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to create AWS keypair
+      - identifier: EC2 Stats
+        unified_job_template: Cloud / AWS / Display EC2 Stats
+        all_parents_must_converge: true
+        always_nodes:
+          - VPC Report
       - identifier: VPC Report
         unified_job_template: Cloud / AWS / VPC Report
         all_parents_must_converge: true
@@ -321,10 +338,6 @@ controller_workflows:
           - Update Inventory
         failure_nodes:
           - Ticket - Instance Failed
-      - identifier: Ticket - VPC Failed
-        unified_job_template: 'SUBMIT FEEDBACK'
-        extra_data:
-          feedback: Failed to create AWS VPC
       - identifier: Update Inventory
         unified_job_template: AWS Inventory
         success_nodes:
@@ -335,6 +348,10 @@ controller_workflows:
           feedback: Failed to create AWS instance
       - identifier: Tag Report
         unified_job_template: Cloud / AWS / Tags Report
+      - identifier: Ticket - VPC Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to create AWS VPC
 
   - name: Cloud / AWS / Patch EC2 Workflow
     description: A workflow to patch ec2 instances with snapshot and restore on failure.
