@@ -1,0 +1,35 @@
+---
+- name: Setup environment vars
+  block:
+    - name: Create Secret and Install AutomationHub
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', __definition) }}"
+      loop:
+        - admin_secret.yml.j2
+        - hub.yml.j2
+      loop_control:
+        loop_var: __definition
+
+    - name: Retrieve created hub route
+      kubernetes.core.k8s_info:
+        api_version: "route.openshift.io/v1"
+        kind: Route
+        name: hub
+        namespace: "{{ simple_ah_namespace }}"
+      register: r_ah_route
+      until: r_ah_route.resources[0].spec.host is defined
+      retries: 300
+      delay: 30
+
+    - name: Get automation_hub route hostname
+      ansible.builtin.set_fact:
+        automation_hub_hostname: "{{ r_ah_route.resources[0].spec.host }}"
+        automation_hub_admin_password: "{{ r_ah_secret.resources[0].data.password |string |b64decode }}"
+
+    - name: Display AH Instance URL
+      ansible.builtin.debug:
+        msg:
+          - "AH URL: https://{{ automation_hub_hostname }}"
+          - "AH Admin Login: admin"
+          - "AH Admin Password: <same as the Controller Admin password>"
