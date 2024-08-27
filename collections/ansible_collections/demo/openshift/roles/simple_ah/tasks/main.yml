@@ -19,8 +19,8 @@
         namespace: "{{ simple_ah_namespace }}"
       register: r_ah_route
       until: r_ah_route.resources[0].spec.host is defined
-      retries: 300
-      delay: 30
+      retries: 120
+      delay: 2
 
     - name: Get automation_hub route hostname
       ansible.builtin.set_stats:
