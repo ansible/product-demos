@@ -40,7 +40,7 @@ controller_templates:
       - "OpenShift Credential"
       - "Controller Credential"
 
-  - name: OpenShift / Hub / Install Controller
+  - name: OpenShift / Hub / Install Automation Hub
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
