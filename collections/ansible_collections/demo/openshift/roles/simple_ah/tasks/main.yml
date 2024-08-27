@@ -23,12 +23,13 @@
       delay: 30
 
     - name: Get automation_hub route hostname
-      ansible.builtin.set_fact:
-        automation_hub_hostname: "{{ r_ah_route.resources[0].spec.host }}"
+      ansible.builtin.set_stats:
+        data:
+          automation_hub_url: "https://{{ r_ah_route.resources[0].spec.host }}"
 
     - name: Display AH Instance URL
       ansible.builtin.debug:
         msg:
-          - "AH URL: https://{{ automation_hub_hostname }}"
+          - "AH URL: https://{{ r_ah_route.resources[0].spec.host }}"
           - "AH Admin Login: admin"
           - "AH Admin Password: <same as the Controller Admin password>"
