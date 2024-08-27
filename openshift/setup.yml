@@ -1,11 +1,17 @@
 ---
 controller_components:
-  - execution_environments
-  - credential_types
+  - projects
   - credentials
   - inventory_sources
   - job_templates
   - workflow_job_templates
+
+controller_projects:
+  - name: USR App
+    organization: Default
+    scm_type: git
+    wait: true
+    scm_url: https://github.com/willtome/usr-workshop
 
 controller_credentials:
   - name: OpenShift Credential
@@ -186,6 +192,17 @@ controller_templates:
     credentials:
       - "OpenShift Credential"
 
+  - name: OpenShift / USR App
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "USR App"
+    playbook: "ansible_playbooks/deploy.yaml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "OpenShift Credential"
+
 controller_workflows:
   - name: OpenShift / CNV / Infra Stack
     description: A workflow to deploy Virtualized infra in OCP Virtalization
@@ -235,3 +252,4 @@ controller_workflows:
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to create CNV instance
+
