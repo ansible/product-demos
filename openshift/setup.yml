@@ -168,15 +168,16 @@ controller_templates:
       name: ''
       description: ''
       spec:
-        - question_name: VM name
+        - question_name: VM host string
           type: text
-          variable: vm_name
+          variable: vm_host_string
           required: true
         - question_name: VM NameSpace
           type: text
           variable: vm_namespace
           default: openshift-cnv
           required: true
+
     credentials:
       - "OpenShift Credential"
 
