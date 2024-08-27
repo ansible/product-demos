@@ -25,7 +25,6 @@
     - name: Get automation_hub route hostname
       ansible.builtin.set_fact:
         automation_hub_hostname: "{{ r_ah_route.resources[0].spec.host }}"
-        automation_hub_admin_password: "{{ r_ah_secret.resources[0].data.password |string |b64decode }}"
 
     - name: Display AH Instance URL
       ansible.builtin.debug:
