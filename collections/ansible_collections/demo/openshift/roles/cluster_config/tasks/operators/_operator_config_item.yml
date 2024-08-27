@@ -1,0 +1,37 @@
+---
+- name: Retrieve Operator name
+  ansible.builtin.set_fact:
+    _operator: "{{ vars['cluster_config_' + _operator_name] }}"
+- name: Configure Operator {{ _operator_name }}
+  redhat.openshift.k8s:
+    state: present
+    template:
+      - operators/namespace.yml.j2
+      - operators/operator_group.yml.j2
+      - operators/subscription.yml.j2
+- name: Query for install plan
+  kubernetes.core.k8s_info:
+    api_version: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    namespace: "{{ _operator.namespace.name }}"
+  register: r_install_plans
+  retries: 30
+  delay: 5
+  until:
+    - r_install_plans.resources | default([]) | length > 0
+    - r_install_plans.resources[0].status is defined
+    - r_install_plans.resources[0].status.phase == "Complete"
+  when:
+    - _operator.checkplan is defined
+    - _operator.checkplan | bool
+
+- name: Configure extra resources for Operator {{ _operator_name }}
+  redhat.openshift.k8s:
+    state: present
+    definition: "{{ item }}"
+  register: creation_result
+  loop: "{{ _operator.extra_resources }}"
+  retries: 30
+  delay: 5
+  until: creation_result is success
+  when: _operator.extra_resources is defined

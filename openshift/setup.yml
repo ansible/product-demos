@@ -2,7 +2,9 @@
 controller_components:
   - projects
   - credentials
+  - inventory_sources
   - job_templates
+  - workflow_job_templates
 
 controller_projects:
   - name: USR App
@@ -15,12 +17,159 @@ controller_credentials:
   - name: OpenShift Credential
     organization: Default
     credential_type: OpenShift or Kubernetes API Bearer Token
+    state: exists
     inputs:
       host: CHANGEME
       bearer_token: CHANGEME
       verify_ssl: false
 
+controller_inventory_sources:
+  - name: OpenShift CNV Inventory
+    inventory: Demo Inventory
+    source: scm
+    source_project: Ansible official demo project
+    source_path: openshift/inventory.kubevirt.yml
+    credential: OpenShift Credential
+    update_on_launch: false
+
 controller_templates:
+  - name: OpenShift / EDA / Install Controller
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/eda/install.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    credentials:
+      - "OpenShift Credential"
+      - "Controller Credential"
+
+  - name: OpenShift / CNV / Install Operator
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/cnv/install.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    credentials:
+      - "OpenShift Credential"
+
+  - name: OpenShift / CNV / Create RHEL VM
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/cnv/provision_rhel.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    allow_simultaneous: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: VM name
+          type: text
+          variable: vm_name
+          default: rhel9
+          required: true
+        - question_name: VM NameSpace
+          type: text
+          variable: vm_namespace
+          default: openshift-cnv
+          required: true
+        - question_name: SSH Authorized Key
+          type: textarea
+          variable: ssh_authorized_key
+          required: true
+        - question_name: OS Version
+          type: text
+          variable: os_version
+          default: rhel9
+          required: true
+        - question_name: RHEL Activation Key
+          type: text
+          variable: rh_subscription_key
+          required: true
+        - question_name: RHEL Organization ID
+          type: text
+          variable: rh_subscription_org
+          required: true
+    credentials:
+      - "OpenShift Credential"
+
+  - name: OpenShift / CNV / Delete VM
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/cnv/provision.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    extra_vars:
+      instance_state: absent
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: VM name
+          type: text
+          variable: vm_name
+          required: true
+        - question_name: VM NameSpace
+          type: text
+          variable: vm_namespace
+          default: openshift-cnv
+          required: true
+    credentials:
+      - "OpenShift Credential"
+
+  - name: OpenShift / CNV / Patching
+    job_type: check
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/cnv/patch.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    ask_job_type_on_launch: true
+    credentials:
+      - "OpenShift Credential"
+      - "Demo Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          default: "openshift-cnv-rhel*"
+          required: true
+
+  - name: OpenShift / CNV / Wait Hosts
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/cnv/wait.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Wait hosts
+          type: text
+          variable: _hosts
+          default: "openshift-cnv-rhel*"
+          required: true
+
   - name: OpenShift / Dev Spaces
     job_type: run
     inventory: "Demo Inventory"
@@ -53,4 +202,54 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - "OpenShift Credential"
+
+controller_workflows:
+  - name: OpenShift / CNV / Infra Stack
+    description: A workflow to deploy Virtualized infra in OCP Virtalization
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: SSH Authorized Key
+          type: textarea
+          variable: ssh_authorized_key
+          required: true
+        - question_name: RHEL Activation Key
+          type: text
+          variable: rh_subscription_key
+          required: true
+        - question_name: RHEL Organization ID
+          type: text
+          variable: rh_subscription_org
+          required: true
+    simplified_workflow_nodes:
+      - identifier: Deploy RHEL8 VM
+        unified_job_template: OpenShift / CNV / Create RHEL VM
+        extra_data:
+          vm_name: rhel8
+          os_version: rhel8
+        success_nodes:
+          - Update Inventory
+        failure_nodes:
+          - Ticket - Instance Failed
+      - identifier: Deploy RHEL9 VM
+        unified_job_template: OpenShift / CNV / Create RHEL VM
+        extra_data:
+          vm_name: rhel9
+          os_version: rhel9
+        success_nodes:
+          - Update Inventory
+        failure_nodes:
+          - Ticket - Instance Failed
+      - identifier: Update Inventory
+        unified_job_template: OpenShift CNV Inventory
+      - identifier: Ticket - Instance Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to create CNV instance
 

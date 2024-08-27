@@ -1,0 +1,96 @@
+---
+- name: Provision OCP-CNV RHEL VM
+  hosts: localhost
+  tasks:
+    - name: Define resources
+      redhat.openshift.k8s:
+        wait: true
+        state: "{{ instance_state | default('present') }}"
+        definition:
+          apiVersion: kubevirt.io/v1
+          kind: VirtualMachine
+          metadata:
+            name: "{{ vm_name }}"
+            namespace: "{{ vm_namespace }}"
+            labels:
+              app: "{{ vm_name }}"
+              os.template.kubevirt.io/fedora36: 'true'
+              vm.kubevirt.io/name: "{{ vm_name }}"
+          spec:
+            dataVolumeTemplates:
+              - apiVersion: cdi.kubevirt.io/v1beta1
+                kind: DataVolume
+                metadata:
+                  creationTimestamp: null
+                  name: "{{ vm_name }}"
+                spec:
+                  sourceRef:
+                    kind: DataSource
+                    name: "{{ os_version }}"
+                    namespace: openshift-virtualization-os-images
+                  storage:
+                    resources:
+                      requests:
+                        storage: 30Gi
+            running: true
+            template:
+              metadata:
+                annotations:
+                  vm.kubevirt.io/flavor: small
+                  vm.kubevirt.io/os: "{{ os_version }}"
+                  vm.kubevirt.io/workload: server
+                creationTimestamp: null
+                labels:
+                  kubevirt.io/domain: "{{ vm_name }}"
+                  kubevirt.io/size: small
+              spec:
+                domain:
+                  cpu:
+                    cores: 4
+                    sockets: 1
+                    threads: 1
+                  devices:
+                    disks:
+                      - disk:
+                          bus: virtio
+                        name: rootdisk
+                      - disk:
+                          bus: virtio
+                        name: cloudinitdisk
+                    interfaces:
+                      - masquerade: {}
+                        model: virtio
+                        name: default
+                    networkInterfaceMultiqueue: true
+                    rng: {}
+                  machine:
+                    type: pc-q35-rhel9.2.0
+                  resources:
+                    requests:
+                      memory: 8Gi
+                evictionStrategy: LiveMigrate
+                networks:
+                  - name: default
+                    pod: {}
+                terminationGracePeriodSeconds: 180
+                volumes:
+                  - dataVolume:
+                      name: "{{ vm_name }}"
+                    name: rootdisk
+                  - name: cloudinitdisk
+                    cloudInitNoCloud:
+                      userData: |-
+                        #cloud-config
+                        chpasswd: { expire: False }
+                        ssh_pwauth: False
+                        ssh_authorized_keys:
+                            - "{{ ssh_authorized_key }}"
+                        rh_subscription:
+                          activation-key: "{{ rh_subscription_key }}"
+                          org: "{{ rh_subscription_org }}"
+
+    - name: Wait for VM to be running
+      redhat.openshift_virtualization.kubevirt_vm_info:
+        name: "{{ vm_name }}"
+        namespace: "{{ vm_namespace }}"
+        wait: true

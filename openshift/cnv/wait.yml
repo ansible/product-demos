@@ -1,0 +1,14 @@
+---
+- name: Wait for VMs to start and become ready
+  hosts: "{{ _hosts | default(omit) }}"
+  gather_facts: false
+  tasks:
+    - name: Wait for
+      ansible.builtin.wait_for:
+        port: 22
+        host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+        search_regex: OpenSSH
+        delay: 10
+      retries: 10
+      vars:
+        ansible_connection: local

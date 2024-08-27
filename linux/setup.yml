@@ -3,13 +3,9 @@ user_message:
   - Update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register with Insights'. https://access.redhat.com/management/activation_keys
   - Update Credential for Insights Inventory with Red Hat account.
   - Add variables for system_roles. https://console.redhat.com/ansible/automation-hub/repo/published/redhat/rhel_system_roles
-controller_components:
-  - projects
-  - credential_types
-  - credentials
-  - inventory_sources
-  - job_templates
 
+# "!unsafe" used to pass raw jinja2 through to the injector definition, see
+# https://github.com/redhat-cop/controller_configuration/tree/devel/roles/credential_types#formating-injectors
 controller_credential_types:
   - name: Insights Collection
     kind: cloud
@@ -24,13 +20,14 @@ controller_credential_types:
           secret: true
     injectors:
       env:
-        INSIGHTS_USER: "{% raw %}{  { insights_user  }}{% endraw %}"
-        INSIGHTS_PASSWORD: "{% raw %}{  { insights_password  }}{% endraw %}"
+        INSIGHTS_USER: !unsafe '{{ insights_user }}'
+        INSIGHTS_PASSWORD: !unsafe '{{ insights_password }}'
 
 controller_credentials:
   - name: Insights Inventory
     credential_type: Insights Collection
     organization: Default
+    state: exists
     inputs:
       insights_user: REPLACEME
       insights_password: REPLACEME
@@ -377,6 +374,12 @@ controller_templates:
       sudo_remove_no_authenticate: false
       # used by CIS and STIG profile role
       accounts_password_set_max_life_existing: false
+      # used by the CJIS profile role
+      service_firewalld_enabled: false
+      firewalld_sshd_port_enabled: false
+      # used by the PCI-DSS profile role
+      firewalld_loopback_traffic_restricted: false
+      firewalld_loopback_traffic_trusted: false
     survey_enabled: true
     survey:
       name: ''
@@ -392,10 +395,11 @@ controller_templates:
           required: true
           choices:
             - cis
+            - cjis
             - cui
             - hipaa
             - ospp
-            - pci_dss
+            - pci-dss
             - stig
 
   - name: "LINUX / Multi-profile Compliance Report"
@@ -423,6 +427,7 @@ controller_templates:
           required: true
           choices:
             - cis
+            - cjis
             - cui
             - hipaa
             - ospp

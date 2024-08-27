@@ -1,0 +1,6 @@
+---
+- name: Configure Operators
+  ansible.builtin.include_tasks: _operator_config_item.yml
+  loop: "{{ cluster_config_operators }}"
+  loop_control:
+    loop_var: _operator_name

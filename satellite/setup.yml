@@ -1,14 +1,6 @@
 ---
 user_message:
 
-controller_components:
-  - credential_types
-  - credentials
-  - inventory_sources
-  - job_templates
-  - job_launch
-  - workflow_job_templates
-
 controller_credential_types:
   - name: Satellite Collection
     kind: cloud
@@ -39,6 +31,7 @@ controller_credentials:
   - name: Satellite Inventory
     credential_type: Red Hat Satellite 6
     organization: Default
+    state: exists
     inputs:
       host: https://satellite.example.com
       username: admin
@@ -46,6 +39,7 @@ controller_credentials:
   - name: Satellite Credential
     credential_type: Satellite Collection
     organization: Default
+    state: exists
     inputs:
       host: https://satellite.example.com
       username: admin

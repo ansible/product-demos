@@ -1,0 +1,8 @@
+---
+- name: Deploy EDA Controller attached to the same AAP
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Include role
+      ansible.builtin.include_role:
+        name: demo.openshift.eda_controller

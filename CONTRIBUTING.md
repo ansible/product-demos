@@ -18,6 +18,7 @@ This document aims to outline the requirements for the various forms of contribu
 - PRs should be rebased against the `main` branch to avoid conflicts.
 - PRs should not impact more than a single directory/demo section.
 - PRs should not rely on external infrastructure or configuration unless the dependency is automated or specified in the `user_message` of `setup.yml`.
+- PR titles should describe the work done in the PR.  Titles should not be generic ("Added new demo") and should not refer to an issue number ("Fix for issue #123").
 
 ## Adding a New Demo
 1) Create a new branch based on main. (eg. `git checkout -b <branch name>`)
@@ -31,7 +32,7 @@ This document aims to outline the requirements for the various forms of contribu
    1) You can copy paste an existing one and edit it.
    2) Ensure you edit the name, playbook path, survey etc.
 5) Add any needed roles/collections to the [requirements.yml](/collections/requirements.yml)
-6) Test via [demo.redhat.com](https://demo.redhat.com/catalog?item=babylon-catalog-prod/sandboxes-gpte.aap-product-demos.prod&utm_source=webapp&utm_medium=share-link), specify your branch name within the project configuration.
+6) Test via [demo.redhat.com](https://demo.redhat.com/catalog?search=product&item=babylon-catalog-prod%2Fopenshift-cnv.aap-product-demos-cnv.prod), specifying your branch name within the project configuration.
 
 > NOTE: demo.redhat.com is available to Red Hat Associates and Partners with a valid account.
 
@@ -43,17 +44,29 @@ This document aims to outline the requirements for the various forms of contribu
     ---
     user_message: ''
 
-    controller_components:
-    - job_templates
-
     controller_templates:
     ...
     ```
-   - `controller_components` can be any of the roles defined [here](https://github.com/redhat-cop/controller_configuration/tree/devel/roles)
+   - Configuration variables can be from any of the roles defined in the [infra.controller_configuration collection](https://github.com/redhat-cop/controller_configuration/tree/devel/roles)
    - Add variables for each component listed
 3) Include a README.md in the subdirectory
 
 ## Testing
-To run `ansible-lint` you will need to set an environment variable for the token to connect to Automation Hub. You can get a token from [here](https://console.redhat.com/ansible/automation-hub/token). 
 
-Copy the value of the token and run `export ANSIBLE_GALAXY_SERVER_AH_TOKEN=<token>`
+We utilize pre-commit to handle Git hooks, initiating a pre-commit check with each commit, both locally and on CI.
+
+To install pre-commit, use the following commands:
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+For further details, refer to the [pre-commit installation documentation](https://pre-commit.com/#installation).
+
+To execute ansible-lint (whether within pre-commit or independently), you must configure an environment variable for the token required to connect to Automation Hub. Obtain the token [here](https://console.redhat.com/ansible/automation-hub/token).
+
+Copy the token value and execute the following command:
+
+```bash
+export ANSIBLE_GALAXY_SERVER_AH_TOKEN=<token>
+```

@@ -4,14 +4,14 @@
   gather_facts: false
 
   tasks:
-    - name: create cert-manager-operator namespace
+    - name: Create cert-manager-operator namespace
       redhat.openshift.k8s:
         name: cert-manager-operator
         api_version: v1
         kind: Namespace
         state: present
 
-    - name: create OperatorGroup object for cert-manager-operator
+    - name: Create OperatorGroup object for cert-manager-operator
       redhat.openshift.k8s:
         state: present
         definition:
@@ -22,9 +22,9 @@
             namespace: cert-manager-operator
           spec:
             targetNamespaces:
-            - cert-manager-operator
+              - cert-manager-operator
 
-    - name: create cert-manager-operator subscription
+    - name: Create cert-manager-operator subscription
       redhat.openshift.k8s:
         state: present
         definition:
@@ -42,14 +42,14 @@
             source: redhat-operators
             sourceNamespace: openshift-marketplace
 
-    - name: create gitlab-system namespace
+    - name: Create gitlab-system namespace
       redhat.openshift.k8s:
         name: gitlab-system
         api_version: v1
         kind: Namespace
         state: present
 
-    - name: create OperatorGroup object for gitlab-operator-kubernetes
+    - name: Create OperatorGroup object for gitlab-operator-kubernetes
       redhat.openshift.k8s:
         state: present
         definition:
@@ -60,9 +60,9 @@
             namespace: gitlab-system
           spec:
             targetNamespaces:
-            - gitlab-system
+              - gitlab-system
 
-    - name: create gitlab subscription
+    - name: Create gitlab subscription
       redhat.openshift.k8s:
         state: present
         definition:
@@ -80,8 +80,8 @@
             source: community-operators
             sourceNamespace: openshift-marketplace
 
-    - name: wait for gitlab operator to install
-      k8s_info:
+    - name: Wait for gitlab operator to install
+      kubernetes.core.k8s_info:
         api_version: apiextensions.k8s.io/v1
         kind: CustomResourceDefinition
         name: gitlabs.apps.gitlab.com
@@ -91,7 +91,7 @@
       delay: 30
 
     - name: Wait until gitlab-operator is up
-      k8s_info:
+      kubernetes.core.k8s_info:
         api_version: v1
         kind: Deployment
         name: gitlab-controller-manager
@@ -117,7 +117,7 @@
             namespace: gitlab-system
           spec:
             chart:
-              version: "6.11.0" 
+              version: "{{ gitlab_chart_version }}"
               values:
                 nginx-ingress:
                   enabled: false
@@ -125,7 +125,7 @@
                   install: false
                 global:
                   hosts:
-                    domain: "{{ cluster_domain }}" # apps.cluster-9xrlv.9xrlv.sandbox644.opentlc.com
+                    domain: "{{ cluster_domain }}"   # apps.cluster-9xrlv.9xrlv.sandbox644.opentlc.com
                   ingress:
                     class: none
                     configureCertmanager: true

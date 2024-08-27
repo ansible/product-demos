@@ -1,0 +1,59 @@
+---
+- name: Create node-health-check operator namespace
+  redhat.openshift.k8s:
+    name:  openshift-workload-availability
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Create node-health-check operator group
+  redhat.openshift.k8s:
+    state: present
+    definition:
+      apiVersion: operators.coreos.com/v1
+      kind: OperatorGroup
+      metadata:
+        generateName: openshift-workload-availability-
+        annotations:
+          olm.providedAPIs: >-
+            NodeHealthCheck.v1alpha1.remediation.medik8s.io,SelfNodeRemediation.v1alpha1.self-node-remediation.medik8s.io,SelfNodeRemediationConfig.v1alpha1.self-node-remediation.medik8s.io,SelfNodeRemediationTemplate.v1alpha1.self-node-remediation.medik8s.io
+        namespace: openshift-workload-availability
+      spec:
+        upgradeStrategy: Default
+
+- name: Create node-health-check operator subscription
+  redhat.openshift.k8s:
+    state: present
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        labels:
+          operators.coreos.com/node-healthcheck-operator.openshift-workload-availability: ''
+        name: node-health-check-operator
+        namespace: openshift-workload-availability
+      spec:
+        channel: stable
+        installPlanApproval: Automatic
+        name: node-healthcheck-operator
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+
+- name: Create Self Node Remediation subscription
+  redhat.openshift.k8s:
+    state: present
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: self-node-remediation-stable-redhat-operators-openshift-marketplace
+        namespace: openshift-workload-availability
+        labels:
+          operators.coreos.com/self-node-remediation.openshift-workload-availability: ''
+      spec:
+        channel: stable
+        installPlanApproval: Automatic
+        name: self-node-remediation
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+        startingCSV: self-node-remediation.v0.8.0

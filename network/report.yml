@@ -35,7 +35,7 @@
   hosts: "{{ report_server }}"
   become: true
   vars:
-    report_server: node1
+    report_server: reports
     web_path: /var/www/html/reports/
 
   tasks:

@@ -4,13 +4,30 @@ repos:
     rev: v4.4.0
     hooks:
       - id: end-of-file-fixer
+        exclude: rhel[89]STIG/.*$
+
       - id: trailing-whitespace
+        exclude: rhel[89]STIG/.*$
+
+      - id: check-yaml
+        exclude: \.j2.(yaml|yml)$|\.(yaml|yml).j2$
+        args: [--unsafe]   # see https://github.com/pre-commit/pre-commit-hooks/issues/273
+
+      - id: check-toml
+      - id: check-json
+      - id: check-symlinks
+
   - repo: https://github.com/ansible/ansible-lint.git
     # get latest release tag from https://github.com/ansible/ansible-lint/releases/
-    rev: v6.18.0
+    rev: v6.20.3
     hooks:
       - id: ansible-lint
         additional_dependencies:
           - jmespath
 
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 23.11.0
+    hooks:
+      - id: black
+        exclude: rhel[89]STIG/.*$
 ...

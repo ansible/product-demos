@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: linux-patching-report
+  labels:
+    app: linux-patching-report
+data:
+  index.html: |
+    {% filter indent(width=4) %}
+    {%- include 'landing.j2' %}
+    {% endfilter %}
+
+  linux.html: |
+    {% filter indent(width=4) %}
+    {%- include 'report.j2' %}
+    {% endfilter %}
+
+  linuxpatch.html: |
+    {% filter indent(width=4) %}
+    {%- include 'patch.j2' %}
+    {% endfilter %}
+
+  new.css: |
+    {% filter indent(width=4) %}
+    {%- include 'new.css.j2' %}
+    {% endfilter %}
+
+binaryData:
+  server.png: {{ lookup('ansible.builtin.file', 'server.png') | b64encode }}
+  report.png: {{ lookup('ansible.builtin.file', 'report.png') | b64encode }}
+  webpage_logo.png: {{ lookup('file', 'webpage_logo.png') | b64encode }}
+  redhat-ansible-logo.svg: {{ lookup('ansible.builtin.file', 'redhat-ansible-logo.svg') | b64encode }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: linux-patching-report
+  labels:
+    app: linux-patching-report
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linux-patching-report
+  template:
+    metadata:
+      labels:
+        app: linux-patching-report
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - image: registry.redhat.io/rhel8/httpd-24
+        name: report-server
+        volumeMounts:
+        - name: html
+          mountPath: /var/www/html
+      volumes:
+      - name: html
+        configMap:
+          name: linux-patching-report
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: linux-patching-report
+  name: linux-patching-report
+spec:
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: linux-patching-report
+  type: ClusterIP
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  labels:
+    app: linux-patching-report
+  name: linux-patching-report
+spec:
+  to:
+    kind: Service
+    name: linux-patching-report
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

@@ -4,6 +4,18 @@
   gather_facts: false
 
   tasks:
+    - name: Setup PsGallery
+      ansible.windows.win_powershell:
+        script: |
+          $nuget_version = (Get-PackageProvider -Name NuGet -ListAvailable).version
+          $nuget_target_version = [Version]::new('2.8.5.201')
+          if( $nuget_version -lt $nuget_target_version ){
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Install-PackageProvider -Name NuGet -MinimumVersion $nuget_target_version -Force
+            Install-Module -Name packagemanagement -Force
+            Install-Module -Name powershellget -Force
+          }
+
     - name: Setup the SecurityPolicyDSC module
       community.windows.win_psmodule:
         name: SecurityPolicyDSC

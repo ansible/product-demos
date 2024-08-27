@@ -1,12 +1,12 @@
 ---
-file_path: "{{ web_path | default('/var/www/html/reports') }}"
-vendor:
+file_path: "{{ web_path | default('/var/www/html/reports') }}"   # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
+vendor:    # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
   ios: &my_value 'Cisco'
   nxos: *my_value
   iosxr: *my_value
   junos: "Juniper"
   eos: "Arista"
-transport:
+transport:    # noqa var-naming[no-role-prefix] - TODO : we should rework roles to use variable prefix, until scope is defined, silence is the way
   cliconf: "Network_CLI"
   netconf: "NETCONF"
   nxapi: "NX-API"
