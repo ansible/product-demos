@@ -25,6 +25,7 @@ controller_inventory_sources:
     source_path: openshift/inventory.kubevirt.yml
     credential: OpenShift Credential
     update_on_launch: false
+    overwrite: true
 
 controller_templates:
   - name: OpenShift / EDA / Install Controller
