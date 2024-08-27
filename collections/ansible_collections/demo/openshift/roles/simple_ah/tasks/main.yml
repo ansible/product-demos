@@ -15,7 +15,7 @@
       kubernetes.core.k8s_info:
         api_version: "route.openshift.io/v1"
         kind: Route
-        name: hub
+        name: "{{ simple_ah_name }}"
         namespace: "{{ simple_ah_namespace }}"
       register: r_ah_route
       until: r_ah_route.resources[0].spec.host is defined
