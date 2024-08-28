@@ -15,4 +15,4 @@
       debug:
         msg:
           - "first: {{ events.payload }}"
-          - "second: {{ events.payload.message }}"
+          - "second: {{ event }}"
