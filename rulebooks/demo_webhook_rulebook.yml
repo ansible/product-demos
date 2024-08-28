@@ -11,7 +11,7 @@
         print_event:
           pretty: true
     - name: Debug
-      condition: event.payload is defined
+      condition: true
       action:
         print_event:
           pretty: true
