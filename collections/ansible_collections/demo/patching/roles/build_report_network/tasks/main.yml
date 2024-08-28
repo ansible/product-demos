@@ -21,17 +21,20 @@
   check_mode: false
 
 - name: Copy logos over
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: "{{ file_path }}"
-    directory_mode: true
-    mode: "0644"
   loop:
     - "webpage_logo.png"
     - "redhat-ansible-logo.svg"
     - "router.png"
+  loop_control:
+    loop_var: logo
+  ansible.builtin.copy:
+    src: "{{ logo }}"
+    dest: "{{ file_path }}"
+    directory_mode: true
+    mode: "0644"
+
   check_mode: false
 
-# - name: Display link to Linux patch report
-#   ansible.builtin.debug:
-#     msg: "Please go to http://{{ hostvars[report_server]['ansible_host'] }}/reports/network.html"
+- name: Display link to Linux patch report
+  ansible.builtin.debug:
+    msg: "Please go to http://{{ hostvars[report_server]['ansible_host'] }}/reports/network.html"
