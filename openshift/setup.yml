@@ -71,9 +71,14 @@ controller_templates:
       spec:
         - question_name: Automation Hub Token
           type: text
-          description: See https://console.redhat.com/ansible/automation-hub/token
           variable: ah_token
           required: true
+    extra_vars:
+      ah_collection_remotes:
+        - name: rh-certified
+          url: https://console.redhat.com/api/automation-hub/content/published/
+          auth_url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+
 
   - name: OpenShift / CNV / Install Operator
     job_type: run
@@ -270,3 +275,34 @@ controller_workflows:
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to create CNV instance
+
+  - name: OpenShift / Hub / Deploy Automation Hub and sync repositories
+    description: A workflow to deploy Automation Hub and sync repositories
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Automation Hub Token
+          type: text
+          variable: ah_token
+          required: true
+    simplified_workflow_nodes:
+      - identifier: Install AH using AAP Operator
+        unified_job_template: OpenShift / Hub / Install Automation Hub
+        success_nodes:
+          - Sync Repos
+        failure_nodes:
+          - Ticket - Instance Failed
+      - identifier: Sync Repos
+        unified_job_template: OpenShift / Hub / Sync Repositories
+        failure_nodes:
+          - Ticket - Instance Failed
+      - identifier: Ticket - Instance Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to deploy Automation Hub on OCP

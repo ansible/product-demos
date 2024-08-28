@@ -5,19 +5,21 @@
   tasks:
     - name: Add AH token
       infra.ah_configuration.collection_remote:
-        name: rh-certified
+        name: "{{ item.name }}"
+        url: "{{ item.url }}"
+        auth_url: "{{ item.auth_url }}"
         token: "{{ ah_token }}"
-        url: https://console.redhat.com/api/automation-hub/content/published/
-        auth_url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+      loop: "{{ ah_collection_remotes }}"
 
     - name: Sync repositories in AH (this can take a while)
       infra.ah_configuration.collection_repository_sync:
-        name: rh-certified
+        name: "{{ item.name }}"
         wait: true
         timeout: 1500
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+      loop: "{{ ah_collection_remotes }}"
