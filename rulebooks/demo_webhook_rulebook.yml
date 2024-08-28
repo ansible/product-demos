@@ -6,7 +6,7 @@
         host: 0.0.0.0
   rules:
     - name: Webhook rule
-      condition: events contains 'fapolicyd.service'
+      condition: event contains 'fapolicyd.service'
       action:
         print_event:
           pretty: true
@@ -14,5 +14,4 @@
       condition: true
       debug:
         msg:
-          - "first: {{ events.payload }}"
-          - "second: {{ event }}"
+          - "first: {{ event }}"
