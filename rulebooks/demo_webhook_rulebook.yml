@@ -22,7 +22,7 @@
           name: 'LINUX / Multi-profile Compliance'
           job_args:
             compliance_profile: "e8"
-            _hosts: "{{ payload[0].host }}"
+            _hosts: "{{ event.payload[0].host }}"
             job_tags: "enable_strategy"
 
 
