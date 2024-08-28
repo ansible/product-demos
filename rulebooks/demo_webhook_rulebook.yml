@@ -6,12 +6,12 @@
         host: 0.0.0.0
   rules:
     - name: Webhook rule
-      condition: event.payload contains 'fapolicyd.service'
+      condition: event.payload[0].message contains 'fapolicyd.service'
       action:
         print_event:
           pretty: true
-    - name: Debug
-      condition: true
-      action:
-        print_event:
-          pretty: true
+    # - name: Debug
+    #   condition: true
+    #   action:
+    #     print_event:
+    #       pretty: true
