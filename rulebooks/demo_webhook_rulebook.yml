@@ -10,8 +10,9 @@
       action:
         print_event:
           pretty: true
-    # - name: Debug
-    #   condition: true
-    #   action:
-    #     print_event:
-    #       pretty: true
+    - name: debug
+      condition: true
+      debug:
+        msg:
+          - "first: {{ events.payload }}"
+          - "second: {{ events.payload.message }}"
