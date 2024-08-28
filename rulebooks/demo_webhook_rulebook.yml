@@ -6,6 +6,6 @@
         host: 0.0.0.0
   rules:
     - name: Webhook rule
-      condition: event.payload is defined
+      condition: event.payload.message is regex("fapolicyd")
       action:
         debug:
