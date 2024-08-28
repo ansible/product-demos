@@ -30,8 +30,12 @@
     mode: "0644"
   check_mode: false
 
-- name: Install httpd service
+- name: Start httpd service
   ansible.builtin.service:
     name: httpd
     state: started
   check_mode: false
+
+- name: Print out where to go for the network report
+  ansible.builtin.debug:
+    msg: "Please go here for the network report: http://{{ inventory_host }}/reports/network.html"
