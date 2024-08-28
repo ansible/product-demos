@@ -21,9 +21,10 @@
         run_job_template:
           name: 'LINUX / Multi-profile Compliance'
           organization: Default
-          extra_vars:
-            compliance_profile: "e8"
-            _hosts: "aws_rhel9"
-            job_tags: "enable_strategy"
+          job_args:
+            extra_vars:
+              compliance_profile: "e8"
+              _hosts: "aws_rhel9"
+              job_tags: "enable_strategy"
 
 
