@@ -1,0 +1,3055 @@
+- name: populate package facts
+  package_facts:
+# R-257779 RHEL-09-211020
+- name: stigrule_257779__etc_issue
+  copy:
+    dest: "{{ rhel9STIG_stigrule_257779__etc_issue_Dest }}"
+    content: "{{ rhel9STIG_stigrule_257779__etc_issue_Content }}"
+  when:
+    - rhel9STIG_stigrule_257779_Manage
+# R-257783 RHEL-09-211040
+- name: check if systemd-journald.service is installed
+  shell: ! systemctl list-unit-files | grep "^systemd-journald.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257783_systemd_journald_enable
+  service:
+    name: systemd-journald.service
+    enabled: "{{ rhel9STIG_stigrule_257783_systemd_journald_enable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_257783_Manage
+    - result.rc == 0
+# R-257783 RHEL-09-211040
+- name: check if systemd-journald.service is installed
+  shell: ! systemctl list-unit-files | grep "^systemd-journald.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257783_systemd_journald_start
+  service:
+    name: systemd-journald.service
+    state: "{{ rhel9STIG_stigrule_257783_systemd_journald_start_State }}"
+  when:
+    - rhel9STIG_stigrule_257783_Manage
+    - result.rc == 0
+# R-257784 RHEL-09-211045
+- name: stigrule_257784__etc_systemd_system_conf
+  ini_file:
+    path: /etc/systemd/system.conf
+    section: Manager
+    option: CtrlAltDelBurstAction
+    value: "{{ rhel9STIG_stigrule_257784__etc_systemd_system_conf_Value }}"
+    no_extra_spaces: yes
+  notify: daemon_reload
+  when:
+    - rhel9STIG_stigrule_257784_Manage
+# R-257785 RHEL-09-211050
+- name: check if ctrl-alt-del.target is installed
+  shell: ! systemctl list-unit-files | grep "^ctrl-alt-del.target[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257785_ctrl_alt_del_target_disable
+  systemd_service:
+    name: ctrl-alt-del.target
+    enabled : "{{ rhel9STIG_stigrule_257785_ctrl_alt_del_target_disable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_257785_Manage
+    - result.rc == 0
+# R-257785 RHEL-09-211050
+- name: check if ctrl-alt-del.target is installed
+  shell: ! systemctl list-unit-files | grep "^ctrl-alt-del.target[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257785_ctrl_alt_del_target_mask
+  systemd_service:
+    name: ctrl-alt-del.target
+    masked: "{{ rhel9STIG_stigrule_257785_ctrl_alt_del_target_mask_Masked }}"
+  when:
+    - rhel9STIG_stigrule_257785_Manage
+    - result.rc == 0
+# R-257786 RHEL-09-211055
+- name: check if debug-shell.service is installed
+  shell: ! systemctl list-unit-files | grep "^debug-shell.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257786_debug_shell_service_disable
+  systemd_service:
+    name: debug-shell.service
+    enabled : "{{ rhel9STIG_stigrule_257786_debug_shell_service_disable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_257786_Manage
+    - result.rc == 0
+# R-257786 RHEL-09-211055
+- name: check if debug-shell.service is installed
+  shell: ! systemctl list-unit-files | grep "^debug-shell.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257786_debug_shell_service_mask
+  systemd_service:
+    name: debug-shell.service
+    masked: "{{ rhel9STIG_stigrule_257786_debug_shell_service_mask_Masked }}"
+  when:
+    - rhel9STIG_stigrule_257786_Manage
+    - result.rc == 0
+# R-257790 RHEL-09-212025
+- name: stigrule_257790__boot_grub2_grub_cfg_group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257790__boot_grub2_grub_cfg_group_owner_Dest }}"
+    group: "{{ rhel9STIG_stigrule_257790__boot_grub2_grub_cfg_group_owner_Group }}"
+  when:
+    - rhel9STIG_stigrule_257790_Manage
+# R-257791 RHEL-09-212030
+- name: stigrule_257791__boot_grub2_grub_cfg_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257791__boot_grub2_grub_cfg_owner_Dest }}"
+    owner: "{{ rhel9STIG_stigrule_257791__boot_grub2_grub_cfg_owner_Owner }}"
+  when:
+    - rhel9STIG_stigrule_257791_Manage
+# R-257797 RHEL-09-213010
+- name: stigrule_257797_kernel_dmesg_restrict
+  sysctl:
+    name: kernel.dmesg_restrict
+    value: "{{ rhel9STIG_stigrule_257797_kernel_dmesg_restrict_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257797_kernel_dmesg_restrict_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257797_Manage
+# R-257798 RHEL-09-213015
+- name: stigrule_257798_kernel_perf_event_paranoid
+  sysctl:
+    name: kernel.perf_event_paranoid
+    value: "{{ rhel9STIG_stigrule_257798_kernel_perf_event_paranoid_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257798_kernel_perf_event_paranoid_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257798_Manage
+# R-257799 RHEL-09-213020
+- name: stigrule_257799_kernel_kexec_load_disabled
+  sysctl:
+    name: kernel.kexec_load_disabled
+    value: "{{ rhel9STIG_stigrule_257799_kernel_kexec_load_disabled_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257799_kernel_kexec_load_disabled_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257799_Manage
+# R-257800 RHEL-09-213025
+- name: stigrule_257800_kernel_kptr_restrict
+  sysctl:
+    name: kernel.kptr_restrict
+    value: "{{ rhel9STIG_stigrule_257800_kernel_kptr_restrict_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257800_kernel_kptr_restrict_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257800_Manage
+# R-257801 RHEL-09-213030
+- name: stigrule_257801_fs_protected_hardlinks
+  sysctl:
+    name: fs.protected_hardlinks
+    value: "{{ rhel9STIG_stigrule_257801_fs_protected_hardlinks_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257801_fs_protected_hardlinks_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257801_Manage
+# R-257802 RHEL-09-213035
+- name: stigrule_257802_fs_protected_symlinks
+  sysctl:
+    name: fs.protected_symlinks
+    value: "{{ rhel9STIG_stigrule_257802_fs_protected_symlinks_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257802_fs_protected_symlinks_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257802_Manage
+# R-257803 RHEL-09-213040
+- name: stigrule_257803_kernel_core_pattern
+  sysctl:
+    name: kernel.core_pattern
+    value: "{{ rhel9STIG_stigrule_257803_kernel_core_pattern_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257803_kernel_core_pattern_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257803_Manage
+# R-257804 RHEL-09-213045
+- name: stigrule_257804__etc_modprobe_d_atm_conf_install_atm__bin_false
+  lineinfile:
+    path: /etc/modprobe.d/atm.conf
+    line: "{{ rhel9STIG_stigrule_257804__etc_modprobe_d_atm_conf_install_atm__bin_false_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257804_Manage
+# R-257804 RHEL-09-213045
+- name: stigrule_257804__etc_modprobe_d_atm_conf_blacklist_atm
+  lineinfile:
+    path: /etc/modprobe.d/atm.conf
+    line: "{{ rhel9STIG_stigrule_257804__etc_modprobe_d_atm_conf_blacklist_atm_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257804_Manage
+# R-257805 RHEL-09-213050
+- name: stigrule_257805__etc_modprobe_d_can_conf_install_can__bin_false
+  lineinfile:
+    path: /etc/modprobe.d/can.conf
+    line: "{{ rhel9STIG_stigrule_257805__etc_modprobe_d_can_conf_install_can__bin_false_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257805_Manage
+# R-257805 RHEL-09-213050
+- name: stigrule_257805__etc_modprobe_d_can_conf_blacklist_can
+  lineinfile:
+    path: /etc/modprobe.d/can.conf
+    line: "{{ rhel9STIG_stigrule_257805__etc_modprobe_d_can_conf_blacklist_can_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257805_Manage
+# R-257806 RHEL-09-213055
+- name: stigrule_257806__etc_modprobe_d_firewire_core_conf_install_firewire_core__bin_false
+  lineinfile:
+    path: /etc/modprobe.d/firewire-core.conf
+    line: "{{ rhel9STIG_stigrule_257806__etc_modprobe_d_firewire_core_conf_install_firewire_core__bin_false_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257806_Manage
+# R-257806 RHEL-09-213055
+- name: stigrule_257806__etc_modprobe_d_firewire_core_conf_blacklist_firewire_core
+  lineinfile:
+    path: /etc/modprobe.d/firewire-core.conf
+    line: "{{ rhel9STIG_stigrule_257806__etc_modprobe_d_firewire_core_conf_blacklist_firewire_core_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257806_Manage
+# R-257807 RHEL-09-213060
+- name: stigrule_257807__etc_modprobe_d_sctp_conf_install_sctp__bin_false
+  lineinfile:
+    path: /etc/modprobe.d/sctp.conf
+    line: "{{ rhel9STIG_stigrule_257807__etc_modprobe_d_sctp_conf_install_sctp__bin_false_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257807_Manage
+# R-257807 RHEL-09-213060
+- name: stigrule_257807__etc_modprobe_d_sctp_conf_blacklist_sctp
+  lineinfile:
+    path: /etc/modprobe.d/sctp.conf
+    line: "{{ rhel9STIG_stigrule_257807__etc_modprobe_d_sctp_conf_blacklist_sctp_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257807_Manage
+# R-257808 RHEL-09-213065
+- name: stigrule_257808__etc_modprobe_d_tipc_conf_install_tipc__bin_false
+  lineinfile:
+    path: /etc/modprobe.d/tipc.conf
+    line: "{{ rhel9STIG_stigrule_257808__etc_modprobe_d_tipc_conf_install_tipc__bin_false_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257808_Manage
+# R-257808 RHEL-09-213065
+- name: stigrule_257808__etc_modprobe_d_tipc_conf_blacklist_tipc
+  lineinfile:
+    path: /etc/modprobe.d/tipc.conf
+    line: "{{ rhel9STIG_stigrule_257808__etc_modprobe_d_tipc_conf_blacklist_tipc_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257808_Manage
+# R-257809 RHEL-09-213070
+- name: stigrule_257809_kernel_randomize_va_space
+  sysctl:
+    name: kernel.randomize_va_space
+    value: "{{ rhel9STIG_stigrule_257809_kernel_randomize_va_space_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257809_kernel_randomize_va_space_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257809_Manage
+# R-257810 RHEL-09-213075
+- name: stigrule_257810_kernel_unprivileged_bpf_disabled
+  sysctl:
+    name: kernel.unprivileged_bpf_disabled
+    value: "{{ rhel9STIG_stigrule_257810_kernel_unprivileged_bpf_disabled_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257810_kernel_unprivileged_bpf_disabled_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257810_Manage
+# R-257811 RHEL-09-213080
+- name: stigrule_257811_kernel_yama_ptrace_scope
+  sysctl:
+    name: kernel.yama.ptrace_scope
+    value: "{{ rhel9STIG_stigrule_257811_kernel_yama_ptrace_scope_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257811_kernel_yama_ptrace_scope_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257811_Manage
+# R-257812 RHEL-09-213085
+- name: stigrule_257812__etc_systemd_coredump_conf
+  lineinfile:
+    path: /etc/systemd/coredump.conf
+    regexp: '^\s*ProcessSizeMax\s*='
+    line: "{{ rhel9STIG_stigrule_257812__etc_systemd_coredump_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_257812_Manage
+# R-257813 RHEL-09-213090
+- name: stigrule_257813__etc_systemd_coredump_conf
+  lineinfile:
+    path: /etc/systemd/coredump.conf
+    regexp: '^\s*Storage\s*='
+    line: "{{ rhel9STIG_stigrule_257813__etc_systemd_coredump_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_257813_Manage
+# R-257814 RHEL-09-213095
+- name: stigrule_257814__etc_security_limits_conf
+  lineinfile:
+    path: /etc/security/limits.conf
+    regexp: '^\s*\*\s+hard\s+core\b'
+    line: "{{ rhel9STIG_stigrule_257814__etc_security_limits_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_257814_Manage
+# R-257815 RHEL-09-213100
+- name: check if systemd-coredump.socket is installed
+  shell: ! systemctl list-unit-files | grep "^systemd-coredump.socket[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257815_systemd_coredump_socket_disable
+  systemd_service:
+    name: systemd-coredump.socket
+    enabled : "{{ rhel9STIG_stigrule_257815_systemd_coredump_socket_disable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_257815_Manage
+    - result.rc == 0
+# R-257815 RHEL-09-213100
+- name: check if systemd-coredump.socket is installed
+  shell: ! systemctl list-unit-files | grep "^systemd-coredump.socket[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257815_systemd_coredump_socket_mask
+  systemd_service:
+    name: systemd-coredump.socket
+    daemon_reload: "{{ rhel9STIG_stigrule_257815_systemd_coredump_socket_mask_Daemon_Reload }}"
+    masked: "{{ rhel9STIG_stigrule_257815_systemd_coredump_socket_mask_Masked }}"
+  when:
+    - rhel9STIG_stigrule_257815_Manage
+    - result.rc == 0
+# R-257816 RHEL-09-213105
+- name: stigrule_257816_user_max_user_namespaces
+  sysctl:
+    name: user.max_user_namespaces
+    value: "{{ rhel9STIG_stigrule_257816_user_max_user_namespaces_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257816_user_max_user_namespaces_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257816_Manage
+# R-257818 RHEL-09-213115
+- name: check if kdump.service is installed
+  shell: ! systemctl list-unit-files | grep "^kdump.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257818_kdump_disable
+  systemd_service:
+    name: kdump.service
+    enabled : "{{ rhel9STIG_stigrule_257818_kdump_disable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_257818_Manage
+    - result.rc == 0
+# R-257818 RHEL-09-213115
+- name: check if kdump.service is installed
+  shell: ! systemctl list-unit-files | grep "^kdump.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257818_kdump_mask
+  systemd_service:
+    name: kdump.service
+    masked: "{{ rhel9STIG_stigrule_257818_kdump_mask_Masked }}"
+  when:
+    - rhel9STIG_stigrule_257818_Manage
+    - result.rc == 0
+# R-257820 RHEL-09-214015
+- name: stigrule_257820__etc_dnf_dnf_conf
+  ini_file:
+    path: /etc/dnf/dnf.conf
+    section: main
+    option: gpgcheck
+    value: "{{ rhel9STIG_stigrule_257820__etc_dnf_dnf_conf_Value }}"
+    no_extra_spaces: yes
+  when:
+    - rhel9STIG_stigrule_257820_Manage
+# R-257821 RHEL-09-214020
+- name: stigrule_257821__etc_dnf_dnf_conf
+  ini_file:
+    path: /etc/dnf/dnf.conf
+    section: main
+    option: localpkg_gpgcheck
+    value: "{{ rhel9STIG_stigrule_257821__etc_dnf_dnf_conf_Value }}"
+    no_extra_spaces: yes
+  when:
+    - rhel9STIG_stigrule_257821_Manage
+# R-257824 RHEL-09-214035
+- name: stigrule_257824__etc_dnf_dnf_conf
+  ini_file:
+    path: /etc/dnf/dnf.conf
+    section: main
+    option: clean_requirements_on_remove
+    value: "{{ rhel9STIG_stigrule_257824__etc_dnf_dnf_conf_Value }}"
+    no_extra_spaces: yes
+  when:
+    - rhel9STIG_stigrule_257824_Manage
+# R-257825 RHEL-09-215010
+- name: stigrule_257825_subscription_manager
+  yum:
+    name: subscription-manager
+    state: "{{ rhel9STIG_stigrule_257825_subscription_manager_State }}"
+  when: rhel9STIG_stigrule_257825_Manage
+# R-257827 RHEL-09-215020
+- name: stigrule_257827_sendmail
+  yum:
+    name: sendmail
+    state: "{{ rhel9STIG_stigrule_257827_sendmail_State }}"
+  when: rhel9STIG_stigrule_257827_Manage
+# R-257828 RHEL-09-215025
+- name: stigrule_257828_nfs_utils
+  yum:
+    name: nfs-utils
+    state: "{{ rhel9STIG_stigrule_257828_nfs_utils_State }}"
+  when: rhel9STIG_stigrule_257828_Manage
+# R-257829 RHEL-09-215030
+- name: stigrule_257829_ypserv
+  yum:
+    name: ypserv
+    state: "{{ rhel9STIG_stigrule_257829_ypserv_State }}"
+  when: rhel9STIG_stigrule_257829_Manage
+# R-257830 RHEL-09-215035
+- name: stigrule_257830_rsh_server
+  yum:
+    name: rsh-server
+    state: "{{ rhel9STIG_stigrule_257830_rsh_server_State }}"
+  when: rhel9STIG_stigrule_257830_Manage
+# R-257831 RHEL-09-215040
+- name: stigrule_257831_telnet_server
+  yum:
+    name: telnet-server
+    state: "{{ rhel9STIG_stigrule_257831_telnet_server_State }}"
+  when: rhel9STIG_stigrule_257831_Manage
+# R-257832 RHEL-09-215045
+- name: stigrule_257832_gssproxy
+  yum:
+    name: gssproxy
+    state: "{{ rhel9STIG_stigrule_257832_gssproxy_State }}"
+  when: rhel9STIG_stigrule_257832_Manage
+# R-257833 RHEL-09-215050
+- name: stigrule_257833_iprutils
+  yum:
+    name: iprutils
+    state: "{{ rhel9STIG_stigrule_257833_iprutils_State }}"
+  when: rhel9STIG_stigrule_257833_Manage
+# R-257834 RHEL-09-215055
+- name: stigrule_257834_tuned
+  yum:
+    name: tuned
+    state: "{{ rhel9STIG_stigrule_257834_tuned_State }}"
+  when: rhel9STIG_stigrule_257834_Manage
+# R-257835 RHEL-09-215060
+- name: stigrule_257835_tftp
+  yum:
+    name: tftp
+    state: "{{ rhel9STIG_stigrule_257835_tftp_State }}"
+  when: rhel9STIG_stigrule_257835_Manage
+# R-257836 RHEL-09-215065
+- name: stigrule_257836_quagga
+  yum:
+    name: quagga
+    state: "{{ rhel9STIG_stigrule_257836_quagga_State }}"
+  when: rhel9STIG_stigrule_257836_Manage
+# R-257838 RHEL-09-215075
+- name: stigrule_257838_openssl_pkcs11
+  yum:
+    name: openssl-pkcs11
+    state: "{{ rhel9STIG_stigrule_257838_openssl_pkcs11_State }}"
+  when: rhel9STIG_stigrule_257838_Manage
+# R-257839 RHEL-09-215080
+- name: stigrule_257839_gnutls_utils
+  yum:
+    name: gnutls-utils
+    state: "{{ rhel9STIG_stigrule_257839_gnutls_utils_State }}"
+  when: rhel9STIG_stigrule_257839_Manage
+# R-257840 RHEL-09-215085
+- name: stigrule_257840_nss_tools
+  yum:
+    name: nss-tools
+    state: "{{ rhel9STIG_stigrule_257840_nss_tools_State }}"
+  when: rhel9STIG_stigrule_257840_Manage
+# R-257841 RHEL-09-215090
+- name: stigrule_257841_rng_tools
+  yum:
+    name: rng-tools
+    state: "{{ rhel9STIG_stigrule_257841_rng_tools_State }}"
+  when: rhel9STIG_stigrule_257841_Manage
+# R-257842 RHEL-09-215095
+- name: stigrule_257842_s_nail
+  yum:
+    name: s-nail
+    state: "{{ rhel9STIG_stigrule_257842_s_nail_State }}"
+  when: rhel9STIG_stigrule_257842_Manage
+# R-257849 RHEL-09-231040
+- name: check if autofs.service is installed
+  shell: ! systemctl list-unit-files | grep "^autofs.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257849_autofs_service_disable
+  systemd_service:
+    name: autofs.service
+    enabled : "{{ rhel9STIG_stigrule_257849_autofs_service_disable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_257849_Manage
+    - result.rc == 0
+# R-257849 RHEL-09-231040
+- name: check if autofs.service is installed
+  shell: ! systemctl list-unit-files | grep "^autofs.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257849_autofs_service_mask
+  systemd_service:
+    name: autofs.service
+    masked: "{{ rhel9STIG_stigrule_257849_autofs_service_mask_Masked }}"
+  when:
+    - rhel9STIG_stigrule_257849_Manage
+    - result.rc == 0
+# R-257880 RHEL-09-231195
+- name: stigrule_257880__etc_modprobe_d_cramfs_conf_install_cramfs__bin_false
+  lineinfile:
+    path: /etc/modprobe.d/cramfs.conf
+    line: "{{ rhel9STIG_stigrule_257880__etc_modprobe_d_cramfs_conf_install_cramfs__bin_false_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257880_Manage
+# R-257880 RHEL-09-231195
+- name: stigrule_257880__etc_modprobe_d_cramfs_conf_blacklist_cramfs
+  lineinfile:
+    path: /etc/modprobe.d/cramfs.conf
+    line: "{{ rhel9STIG_stigrule_257880__etc_modprobe_d_cramfs_conf_blacklist_cramfs_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257880_Manage
+# R-257885 RHEL-09-232025
+- name: stigrule_257885__var_log_mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_257885__var_log_mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_257885__var_log_mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_257885_Manage
+# R-257886 RHEL-09-232030
+- name: stigrule_257886__var_log_messages_mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_257886__var_log_messages_mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_257886__var_log_messages_mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_257886_Manage
+# R-257891 RHEL-09-232055
+- name: stigrule_257891__etc_group_mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_257891__etc_group_mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_257891__etc_group_mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_257891_Manage
+# R-257892 RHEL-09-232060
+- name: stigrule_257892__etc_group__mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_257892__etc_group__mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_257892__etc_group__mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_257892_Manage
+# R-257893 RHEL-09-232065
+- name: stigrule_257893__etc_gshadow_mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_257893__etc_gshadow_mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_257893__etc_gshadow_mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_257893_Manage
+# R-257894 RHEL-09-232070
+- name: stigrule_257894__etc_gshadow__mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_257894__etc_gshadow__mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_257894__etc_gshadow__mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_257894_Manage
+# R-257895 RHEL-09-232075
+- name: stigrule_257895__etc_passwd_mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_257895__etc_passwd_mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_257895__etc_passwd_mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_257895_Manage
+# R-257896 RHEL-09-232080
+- name: stigrule_257896__etc_passwd__mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_257896__etc_passwd__mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_257896__etc_passwd__mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_257896_Manage
+# R-257897 RHEL-09-232085
+- name: stigrule_257897__etc_shadow__mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_257897__etc_shadow__mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_257897__etc_shadow__mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_257897_Manage
+# R-257898 RHEL-09-232090
+- name: stigrule_257898__etc_group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257898__etc_group_owner_Dest }}"
+    owner: "{{ rhel9STIG_stigrule_257898__etc_group_owner_Owner }}"
+  when:
+    - rhel9STIG_stigrule_257898_Manage
+# R-257899 RHEL-09-232095
+- name: stigrule_257899__etc_group_group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257899__etc_group_group_owner_Dest }}"
+    group: "{{ rhel9STIG_stigrule_257899__etc_group_group_owner_Group }}"
+  when:
+    - rhel9STIG_stigrule_257899_Manage
+# R-257900 RHEL-09-232100
+- name: stigrule_257900__etc_group__owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257900__etc_group__owner_Dest }}"
+    owner: "{{ rhel9STIG_stigrule_257900__etc_group__owner_Owner }}"
+  when:
+    - rhel9STIG_stigrule_257900_Manage
+# R-257901 RHEL-09-232105
+- name: stigrule_257901__etc_group__group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257901__etc_group__group_owner_Dest }}"
+    group: "{{ rhel9STIG_stigrule_257901__etc_group__group_owner_Group }}"
+  when:
+    - rhel9STIG_stigrule_257901_Manage
+# R-257902 RHEL-09-232110
+- name: stigrule_257902__etc_gshadow_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257902__etc_gshadow_owner_Dest }}"
+    owner: "{{ rhel9STIG_stigrule_257902__etc_gshadow_owner_Owner }}"
+  when:
+    - rhel9STIG_stigrule_257902_Manage
+# R-257903 RHEL-09-232115
+- name: stigrule_257903__etc_gshadow_group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257903__etc_gshadow_group_owner_Dest }}"
+    group: "{{ rhel9STIG_stigrule_257903__etc_gshadow_group_owner_Group }}"
+  when:
+    - rhel9STIG_stigrule_257903_Manage
+# R-257904 RHEL-09-232120
+- name: stigrule_257904__etc_gshadow__owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257904__etc_gshadow__owner_Dest }}"
+    owner: "{{ rhel9STIG_stigrule_257904__etc_gshadow__owner_Owner }}"
+  when:
+    - rhel9STIG_stigrule_257904_Manage
+# R-257905 RHEL-09-232125
+- name: stigrule_257905__etc_gshadow__group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257905__etc_gshadow__group_owner_Dest }}"
+    group: "{{ rhel9STIG_stigrule_257905__etc_gshadow__group_owner_Group }}"
+  when:
+    - rhel9STIG_stigrule_257905_Manage
+# R-257906 RHEL-09-232130
+- name: stigrule_257906__etc_passwd_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257906__etc_passwd_owner_Dest }}"
+    owner: "{{ rhel9STIG_stigrule_257906__etc_passwd_owner_Owner }}"
+  when:
+    - rhel9STIG_stigrule_257906_Manage
+# R-257907 RHEL-09-232135
+- name: stigrule_257907__etc_passwd_group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257907__etc_passwd_group_owner_Dest }}"
+    group: "{{ rhel9STIG_stigrule_257907__etc_passwd_group_owner_Group }}"
+  when:
+    - rhel9STIG_stigrule_257907_Manage
+# R-257908 RHEL-09-232140
+- name: stigrule_257908__etc_passwd__owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257908__etc_passwd__owner_Dest }}"
+    owner: "{{ rhel9STIG_stigrule_257908__etc_passwd__owner_Owner }}"
+  when:
+    - rhel9STIG_stigrule_257908_Manage
+# R-257909 RHEL-09-232145
+- name: stigrule_257909__etc_passwd__group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257909__etc_passwd__group_owner_Dest }}"
+    group: "{{ rhel9STIG_stigrule_257909__etc_passwd__group_owner_Group }}"
+  when:
+    - rhel9STIG_stigrule_257909_Manage
+# R-257910 RHEL-09-232150
+- name: stigrule_257910__etc_shadow_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257910__etc_shadow_owner_Dest }}"
+    owner: "{{ rhel9STIG_stigrule_257910__etc_shadow_owner_Owner }}"
+  when:
+    - rhel9STIG_stigrule_257910_Manage
+# R-257911 RHEL-09-232155
+- name: stigrule_257911__etc_shadow_group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257911__etc_shadow_group_owner_Dest }}"
+    group: "{{ rhel9STIG_stigrule_257911__etc_shadow_group_owner_Group }}"
+  when:
+    - rhel9STIG_stigrule_257911_Manage
+# R-257912 RHEL-09-232160
+- name: stigrule_257912__etc_shadow__owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257912__etc_shadow__owner_Dest }}"
+    owner: "{{ rhel9STIG_stigrule_257912__etc_shadow__owner_Owner }}"
+  when:
+    - rhel9STIG_stigrule_257912_Manage
+# R-257913 RHEL-09-232165
+- name: stigrule_257913__etc_shadow__group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257913__etc_shadow__group_owner_Dest }}"
+    group: "{{ rhel9STIG_stigrule_257913__etc_shadow__group_owner_Group }}"
+  when:
+    - rhel9STIG_stigrule_257913_Manage
+# R-257914 RHEL-09-232170
+- name: stigrule_257914__var_log_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257914__var_log_owner_Dest }}"
+    owner: "{{ rhel9STIG_stigrule_257914__var_log_owner_Owner }}"
+  when:
+    - rhel9STIG_stigrule_257914_Manage
+# R-257915 RHEL-09-232175
+- name: stigrule_257915__var_log_group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257915__var_log_group_owner_Dest }}"
+    group: "{{ rhel9STIG_stigrule_257915__var_log_group_owner_Group }}"
+  when:
+    - rhel9STIG_stigrule_257915_Manage
+# R-257916 RHEL-09-232180
+- name: stigrule_257916__var_log_messages_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257916__var_log_messages_owner_Dest }}"
+    owner: "{{ rhel9STIG_stigrule_257916__var_log_messages_owner_Owner }}"
+  when:
+    - rhel9STIG_stigrule_257916_Manage
+# R-257917 RHEL-09-232185
+- name: stigrule_257917__var_log_messages_group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257917__var_log_messages_group_owner_Dest }}"
+    group: "{{ rhel9STIG_stigrule_257917__var_log_messages_group_owner_Group }}"
+  when:
+    - rhel9STIG_stigrule_257917_Manage
+# R-257933 RHEL-09-232265
+- name: stigrule_257933__etc_crontab_mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_257933__etc_crontab_mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_257933__etc_crontab_mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_257933_Manage
+# R-257934 RHEL-09-232270
+- name: stigrule_257934__etc_shadow_mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_257934__etc_shadow_mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_257934__etc_shadow_mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_257934_Manage
+# R-257935 RHEL-09-251010
+- name: stigrule_257935_firewalld
+  yum:
+    name: firewalld
+    state: "{{ rhel9STIG_stigrule_257935_firewalld_State }}"
+  when: rhel9STIG_stigrule_257935_Manage
+# R-257936 RHEL-09-251015
+- name: check if firewalld.service is installed
+  shell: ! systemctl list-unit-files | grep "^firewalld.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257936_firewalld_enable
+  service:
+    name: firewalld.service
+    enabled: "{{ rhel9STIG_stigrule_257936_firewalld_enable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_257936_Manage
+    - result.rc == 0
+# R-257936 RHEL-09-251015
+- name: check if firewalld.service is installed
+  shell: ! systemctl list-unit-files | grep "^firewalld.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257936_firewalld_start
+  service:
+    name: firewalld.service
+    state: "{{ rhel9STIG_stigrule_257936_firewalld_start_State }}"
+  when:
+    - rhel9STIG_stigrule_257936_Manage
+    - result.rc == 0
+# R-257939 RHEL-09-251030
+- name: stigrule_257939__etc_firewalld_firewalld_conf
+  lineinfile:
+    path: /etc/firewalld/firewalld.conf
+    regexp: '^\s*FirewallBackend\s*='
+    line: "{{ rhel9STIG_stigrule_257939__etc_firewalld_firewalld_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_257939_Manage
+# R-257942 RHEL-09-251045
+- name: stigrule_257942_net_core_bpf_jit_harden
+  sysctl:
+    name: net.core.bpf_jit_harden
+    value: "{{ rhel9STIG_stigrule_257942_net_core_bpf_jit_harden_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257942_net_core_bpf_jit_harden_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257942_Manage
+# R-257943 RHEL-09-252010
+- name: stigrule_257943_chrony
+  yum:
+    name: chrony
+    state: "{{ rhel9STIG_stigrule_257943_chrony_State }}"
+  when: rhel9STIG_stigrule_257943_Manage
+# R-257944 RHEL-09-252015
+- name: check if chronyd.service is installed
+  shell: ! systemctl list-unit-files | grep "^chronyd.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257944_chronyd_enable
+  service:
+    name: chronyd.service
+    enabled: "{{ rhel9STIG_stigrule_257944_chronyd_enable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_257944_Manage
+    - result.rc == 0
+# R-257944 RHEL-09-252015
+- name: check if chronyd.service is installed
+  shell: ! systemctl list-unit-files | grep "^chronyd.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257944_chronyd_start
+  service:
+    name: chronyd.service
+    state: "{{ rhel9STIG_stigrule_257944_chronyd_start_State }}"
+  when:
+    - rhel9STIG_stigrule_257944_Manage
+    - result.rc == 0
+# R-257946 RHEL-09-252025
+- name: stigrule_257946__etc_chrony_conf
+  lineinfile:
+    path: /etc/chrony.conf
+    regexp: '^\s*port\s+\d+'
+    line: "{{ rhel9STIG_stigrule_257946__etc_chrony_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_257946_Manage
+# R-257947 RHEL-09-252030
+- name: stigrule_257947__etc_chrony_conf
+  lineinfile:
+    path: /etc/chrony.conf
+    regexp: '^\s*cmdport\s+\d+'
+    line: "{{ rhel9STIG_stigrule_257947__etc_chrony_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_257947_Manage
+# R-257949 RHEL-09-252040
+- name: stigrule_257949__etc_NetworkManager_NetworkManager_conf
+  ini_file:
+    path: /etc/NetworkManager/NetworkManager.conf
+    section: main
+    option: dns
+    value: "{{ rhel9STIG_stigrule_257949__etc_NetworkManager_NetworkManager_conf_Value }}"
+    no_extra_spaces: yes
+  notify: networkmanager_reload
+  when:
+    - rhel9STIG_stigrule_257949_Manage
+# R-257954 RHEL-09-252065
+- name: stigrule_257954_libreswan
+  yum:
+    name: libreswan
+    state: "{{ rhel9STIG_stigrule_257954_libreswan_State }}"
+  when: rhel9STIG_stigrule_257954_Manage
+# R-257957 RHEL-09-253010
+- name: stigrule_257957_net_ipv4_tcp_syncookies
+  sysctl:
+    name: net.ipv4.tcp_syncookies
+    value: "{{ rhel9STIG_stigrule_257957_net_ipv4_tcp_syncookies_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257957_net_ipv4_tcp_syncookies_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257957_Manage
+# R-257958 RHEL-09-253015
+- name: stigrule_257958_net_ipv4_conf_all_accept_redirects
+  sysctl:
+    name: net.ipv4.conf.all.accept_redirects
+    value: "{{ rhel9STIG_stigrule_257958_net_ipv4_conf_all_accept_redirects_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257958_net_ipv4_conf_all_accept_redirects_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257958_Manage
+# R-257959 RHEL-09-253020
+- name: stigrule_257959_net_ipv4_conf_all_accept_source_route
+  sysctl:
+    name: net.ipv4.conf.all.accept_source_route
+    value: "{{ rhel9STIG_stigrule_257959_net_ipv4_conf_all_accept_source_route_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257959_net_ipv4_conf_all_accept_source_route_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257959_Manage
+# R-257960 RHEL-09-253025
+- name: stigrule_257960_net_ipv4_conf_all_log_martians
+  sysctl:
+    name: net.ipv4.conf.all.log_martians
+    value: "{{ rhel9STIG_stigrule_257960_net_ipv4_conf_all_log_martians_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257960_net_ipv4_conf_all_log_martians_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257960_Manage
+# R-257961 RHEL-09-253030
+- name: stigrule_257961_net_ipv4_conf_default_log_martians
+  sysctl:
+    name: net.ipv4.conf.default.log_martians
+    value: "{{ rhel9STIG_stigrule_257961_net_ipv4_conf_default_log_martians_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257961_net_ipv4_conf_default_log_martians_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257961_Manage
+# R-257962 RHEL-09-253035
+- name: stigrule_257962_net_ipv4_conf_all_rp_filter
+  sysctl:
+    name: net.ipv4.conf.all.rp_filter
+    value: "{{ rhel9STIG_stigrule_257962_net_ipv4_conf_all_rp_filter_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257962_net_ipv4_conf_all_rp_filter_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257962_Manage
+# R-257963 RHEL-09-253040
+- name: stigrule_257963_net_ipv4_conf_default_accept_redirects
+  sysctl:
+    name: net.ipv4.conf.default.accept_redirects
+    value: "{{ rhel9STIG_stigrule_257963_net_ipv4_conf_default_accept_redirects_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257963_net_ipv4_conf_default_accept_redirects_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257963_Manage
+# R-257964 RHEL-09-253045
+- name: stigrule_257964_net_ipv4_conf_default_accept_source_route
+  sysctl:
+    name: net.ipv4.conf.default.accept_source_route
+    value: "{{ rhel9STIG_stigrule_257964_net_ipv4_conf_default_accept_source_route_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257964_net_ipv4_conf_default_accept_source_route_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257964_Manage
+# R-257965 RHEL-09-253050
+- name: stigrule_257965_net_ipv4_conf_default_rp_filter
+  sysctl:
+    name: net.ipv4.conf.default.rp_filter
+    value: "{{ rhel9STIG_stigrule_257965_net_ipv4_conf_default_rp_filter_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257965_net_ipv4_conf_default_rp_filter_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257965_Manage
+# R-257966 RHEL-09-253055
+- name: stigrule_257966_net_ipv4_icmp_echo_ignore_broadcasts
+  sysctl:
+    name: net.ipv4.icmp_echo_ignore_broadcasts
+    value: "{{ rhel9STIG_stigrule_257966_net_ipv4_icmp_echo_ignore_broadcasts_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257966_net_ipv4_icmp_echo_ignore_broadcasts_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257966_Manage
+# R-257967 RHEL-09-253060
+- name: stigrule_257967_net_ipv4_icmp_ignore_bogus_error_responses
+  sysctl:
+    name: net.ipv4.icmp_ignore_bogus_error_responses
+    value: "{{ rhel9STIG_stigrule_257967_net_ipv4_icmp_ignore_bogus_error_responses_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257967_net_ipv4_icmp_ignore_bogus_error_responses_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257967_Manage
+# R-257968 RHEL-09-253065
+- name: stigrule_257968_net_ipv4_conf_all_send_redirects
+  sysctl:
+    name: net.ipv4.conf.all.send_redirects
+    value: "{{ rhel9STIG_stigrule_257968_net_ipv4_conf_all_send_redirects_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257968_net_ipv4_conf_all_send_redirects_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257968_Manage
+# R-257969 RHEL-09-253070
+- name: stigrule_257969_net_ipv4_conf_default_send_redirects
+  sysctl:
+    name: net.ipv4.conf.default.send_redirects
+    value: "{{ rhel9STIG_stigrule_257969_net_ipv4_conf_default_send_redirects_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257969_net_ipv4_conf_default_send_redirects_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257969_Manage
+# R-257970 RHEL-09-253075
+- name: stigrule_257970_net_ipv4_conf_all_forwarding
+  sysctl:
+    name: net.ipv4.conf.all.forwarding
+    value: "{{ rhel9STIG_stigrule_257970_net_ipv4_conf_all_forwarding_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257970_net_ipv4_conf_all_forwarding_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257970_Manage
+# R-257971 RHEL-09-254010
+- name: check if ipv6 is enabled
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  changed_when: False
+  check_mode: no
+  register: cmd_result
+  failed_when: cmd_result.rc > 1
+- name: stigrule_257971_net_ipv6_conf_all_accept_ra
+  sysctl:
+    name: net.ipv6.conf.all.accept_ra
+    value: "{{ rhel9STIG_stigrule_257971_net_ipv6_conf_all_accept_ra_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257971_net_ipv6_conf_all_accept_ra_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257971_Manage
+    - cmd_result.rc == 0
+# R-257972 RHEL-09-254015
+- name: check if ipv6 is enabled
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  changed_when: False
+  check_mode: no
+  register: cmd_result
+  failed_when: cmd_result.rc > 1
+- name: stigrule_257972_net_ipv6_conf_all_accept_redirects
+  sysctl:
+    name: net.ipv6.conf.all.accept_redirects
+    value: "{{ rhel9STIG_stigrule_257972_net_ipv6_conf_all_accept_redirects_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257972_net_ipv6_conf_all_accept_redirects_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257972_Manage
+    - cmd_result.rc == 0
+# R-257973 RHEL-09-254020
+- name: check if ipv6 is enabled
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  changed_when: False
+  check_mode: no
+  register: cmd_result
+  failed_when: cmd_result.rc > 1
+- name: stigrule_257973_net_ipv6_conf_all_accept_source_route
+  sysctl:
+    name: net.ipv6.conf.all.accept_source_route
+    value: "{{ rhel9STIG_stigrule_257973_net_ipv6_conf_all_accept_source_route_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257973_net_ipv6_conf_all_accept_source_route_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257973_Manage
+    - cmd_result.rc == 0
+# R-257974 RHEL-09-254025
+- name: check if ipv6 is enabled
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  changed_when: False
+  check_mode: no
+  register: cmd_result
+  failed_when: cmd_result.rc > 1
+- name: stigrule_257974_net_ipv6_conf_all_forwarding
+  sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: "{{ rhel9STIG_stigrule_257974_net_ipv6_conf_all_forwarding_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257974_net_ipv6_conf_all_forwarding_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257974_Manage
+    - cmd_result.rc == 0
+# R-257975 RHEL-09-254030
+- name: check if ipv6 is enabled
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  changed_when: False
+  check_mode: no
+  register: cmd_result
+  failed_when: cmd_result.rc > 1
+- name: stigrule_257975_net_ipv6_conf_default_accept_ra
+  sysctl:
+    name: net.ipv6.conf.default.accept_ra
+    value: "{{ rhel9STIG_stigrule_257975_net_ipv6_conf_default_accept_ra_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257975_net_ipv6_conf_default_accept_ra_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257975_Manage
+    - cmd_result.rc == 0
+# R-257976 RHEL-09-254035
+- name: check if ipv6 is enabled
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  changed_when: False
+  check_mode: no
+  register: cmd_result
+  failed_when: cmd_result.rc > 1
+- name: stigrule_257976_net_ipv6_conf_default_accept_redirects
+  sysctl:
+    name: net.ipv6.conf.default.accept_redirects
+    value: "{{ rhel9STIG_stigrule_257976_net_ipv6_conf_default_accept_redirects_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257976_net_ipv6_conf_default_accept_redirects_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257976_Manage
+    - cmd_result.rc == 0
+# R-257977 RHEL-09-254040
+- name: check if ipv6 is enabled
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  changed_when: False
+  check_mode: no
+  register: cmd_result
+  failed_when: cmd_result.rc > 1
+- name: stigrule_257977_net_ipv6_conf_default_accept_source_route
+  sysctl:
+    name: net.ipv6.conf.default.accept_source_route
+    value: "{{ rhel9STIG_stigrule_257977_net_ipv6_conf_default_accept_source_route_Value }}"
+    sysctl_file: "{{ rhel9STIG_stigrule_257977_net_ipv6_conf_default_accept_source_route_File }}"
+  notify: sysctl_load_settings
+  when:
+    - rhel9STIG_stigrule_257977_Manage
+    - cmd_result.rc == 0
+# R-257978 RHEL-09-255010
+- name: stigrule_257978_openssh_server
+  yum:
+    name: openssh-server
+    state: "{{ rhel9STIG_stigrule_257978_openssh_server_State }}"
+  when: rhel9STIG_stigrule_257978_Manage
+# R-257979 RHEL-09-255015
+- name: check if sshd.service is installed
+  shell: ! systemctl list-unit-files | grep "^sshd.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257979_sshd_enable
+  service:
+    name: sshd.service
+    enabled: "{{ rhel9STIG_stigrule_257979_sshd_enable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_257979_Manage
+    - result.rc == 0
+# R-257979 RHEL-09-255015
+- name: check if sshd.service is installed
+  shell: ! systemctl list-unit-files | grep "^sshd.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_257979_sshd_start
+  service:
+    name: sshd.service
+    state: "{{ rhel9STIG_stigrule_257979_sshd_start_State }}"
+  when:
+    - rhel9STIG_stigrule_257979_Manage
+    - result.rc == 0
+# R-257980 RHEL-09-255020
+- name: stigrule_257980_openssh_clients
+  yum:
+    name: openssh-clients
+    state: "{{ rhel9STIG_stigrule_257980_openssh_clients_State }}"
+  when: rhel9STIG_stigrule_257980_Manage
+# R-257981 RHEL-09-255025
+- name: stigrule_257981_Banner
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*Banner\s+'
+    line: "{{ rhel9STIG_stigrule_257981_Banner_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_257981_Manage
+    - "'openssh-server' in packages"
+# R-257982 RHEL-09-255030
+- name: stigrule_257982_LogLevel
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*LogLevel\s+'
+    line: "{{ rhel9STIG_stigrule_257982_LogLevel_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_257982_Manage
+    - "'openssh-server' in packages"
+# R-257983 RHEL-09-255035
+- name: stigrule_257983_PubkeyAuthentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*PubkeyAuthentication\s+'
+    line: "{{ rhel9STIG_stigrule_257983_PubkeyAuthentication_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_257983_Manage
+    - "'openssh-server' in packages"
+# R-257984 RHEL-09-255040
+- name: stigrule_257984_PermitEmptyPasswords
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*PermitEmptyPasswords\s+'
+    line: "{{ rhel9STIG_stigrule_257984_PermitEmptyPasswords_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_257984_Manage
+    - "'openssh-server' in packages"
+# R-257985 RHEL-09-255045
+- name: stigrule_257985_PermitRootLogin
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*PermitRootLogin\s+'
+    line: "{{ rhel9STIG_stigrule_257985_PermitRootLogin_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_257985_Manage
+    - "'openssh-server' in packages"
+# R-257986 RHEL-09-255050
+- name: stigrule_257986_UsePAM
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*UsePAM\s+'
+    line: "{{ rhel9STIG_stigrule_257986_UsePAM_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_257986_Manage
+    - "'openssh-server' in packages"
+# R-257989 RHEL-09-255065
+- name: stigrule_257989__etc_crypto_policies_back_ends_openssh_config
+  lineinfile:
+    path: /etc/crypto-policies/back-ends/openssh.config
+    regexp: '^\s*Ciphers\s+\S+\s*$'
+    line: "{{ rhel9STIG_stigrule_257989__etc_crypto_policies_back_ends_openssh_config_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_257989_Manage
+# R-257992 RHEL-09-255080
+- name: stigrule_257992_HostbasedAuthentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*HostbasedAuthentication\s+'
+    line: "{{ rhel9STIG_stigrule_257992_HostbasedAuthentication_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_257992_Manage
+    - "'openssh-server' in packages"
+# R-257993 RHEL-09-255085
+- name: stigrule_257993_PermitUserEnvironment
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*PermitUserEnvironment\s+'
+    line: "{{ rhel9STIG_stigrule_257993_PermitUserEnvironment_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_257993_Manage
+    - "'openssh-server' in packages"
+# R-257994 RHEL-09-255090
+- name: stigrule_257994_RekeyLimit
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*RekeyLimit\s+'
+    line: "{{ rhel9STIG_stigrule_257994_RekeyLimit_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_257994_Manage
+    - "'openssh-server' in packages"
+# R-257995 RHEL-09-255095
+- name: stigrule_257995_ClientAliveCountMax
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*ClientAliveCountMax\s+'
+    line: "{{ rhel9STIG_stigrule_257995_ClientAliveCountMax_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_257995_Manage
+    - "'openssh-server' in packages"
+# R-257996 RHEL-09-255100
+- name: stigrule_257996_ClientAliveInterval
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*ClientAliveInterval\s+'
+    line: "{{ rhel9STIG_stigrule_257996_ClientAliveInterval_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_257996_Manage
+    - "'openssh-server' in packages"
+# R-257997 RHEL-09-255105
+- name: stigrule_257997__etc_ssh_sshd_config_group_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257997__etc_ssh_sshd_config_group_owner_Dest }}"
+    group: "{{ rhel9STIG_stigrule_257997__etc_ssh_sshd_config_group_owner_Group }}"
+  when:
+    - rhel9STIG_stigrule_257997_Manage
+# R-257998 RHEL-09-255110
+- name: stigrule_257998__etc_ssh_sshd_config_owner
+  file:
+    dest: "{{ rhel9STIG_stigrule_257998__etc_ssh_sshd_config_owner_Dest }}"
+    owner: "{{ rhel9STIG_stigrule_257998__etc_ssh_sshd_config_owner_Owner }}"
+  when:
+    - rhel9STIG_stigrule_257998_Manage
+# R-257999 RHEL-09-255115
+- name: stigrule_257999__etc_ssh_sshd_config_mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_257999__etc_ssh_sshd_config_mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_257999__etc_ssh_sshd_config_mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_257999_Manage
+# R-258002 RHEL-09-255130
+- name: stigrule_258002_Compression
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*Compression\s+'
+    line: "{{ rhel9STIG_stigrule_258002_Compression_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_258002_Manage
+    - "'openssh-server' in packages"
+# R-258003 RHEL-09-255135
+- name: stigrule_258003_GSSAPIAuthentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*GSSAPIAuthentication\s+'
+    line: "{{ rhel9STIG_stigrule_258003_GSSAPIAuthentication_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_258003_Manage
+    - "'openssh-server' in packages"
+# R-258004 RHEL-09-255140
+- name: stigrule_258004_KerberosAuthentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*KerberosAuthentication\s+'
+    line: "{{ rhel9STIG_stigrule_258004_KerberosAuthentication_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_258004_Manage
+    - "'openssh-server' in packages"
+# R-258005 RHEL-09-255145
+- name: stigrule_258005_IgnoreRhosts
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*IgnoreRhosts\s+'
+    line: "{{ rhel9STIG_stigrule_258005_IgnoreRhosts_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_258005_Manage
+    - "'openssh-server' in packages"
+# R-258006 RHEL-09-255150
+- name: stigrule_258006_IgnoreUserKnownHosts
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*IgnoreUserKnownHosts\s+'
+    line: "{{ rhel9STIG_stigrule_258006_IgnoreUserKnownHosts_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_258006_Manage
+    - "'openssh-server' in packages"
+# R-258007 RHEL-09-255155
+- name: stigrule_258007_X11Forwarding
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*X11Forwarding\s+'
+    line: "{{ rhel9STIG_stigrule_258007_X11Forwarding_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_258007_Manage
+    - "'openssh-server' in packages"
+# R-258008 RHEL-09-255160
+- name: stigrule_258008_StrictModes
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*StrictModes\s+'
+    line: "{{ rhel9STIG_stigrule_258008_StrictModes_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_258008_Manage
+    - "'openssh-server' in packages"
+# R-258009 RHEL-09-255165
+- name: stigrule_258009_PrintLastLog
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*PrintLastLog\s+'
+    line: "{{ rhel9STIG_stigrule_258009_PrintLastLog_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_258009_Manage
+    - "'openssh-server' in packages"
+# R-258010 RHEL-09-255170
+- name: stigrule_258010_UsePrivilegeSeparation
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*UsePrivilegeSeparation\s+'
+    line: "{{ rhel9STIG_stigrule_258010_UsePrivilegeSeparation_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_258010_Manage
+    - "'openssh-server' in packages"
+# R-258011 RHEL-09-255175
+- name: stigrule_258011_X11UseLocalhost
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^\s*X11UseLocalhost\s+'
+    line: "{{ rhel9STIG_stigrule_258011_X11UseLocalhost_Line }}"
+  notify: ssh_restart
+  when:
+    - rhel9STIG_stigrule_258011_Manage
+    - "'openssh-server' in packages"
+# R-258012 RHEL-09-271010
+- name: stigrule_258012__etc_dconf_db_local_d_01_banner_message
+  ini_file:
+    path: /etc/dconf/db/local.d/01-banner-message
+    section: org/gnome/login-screen
+    option: banner-message-enable
+    value: "{{ rhel9STIG_stigrule_258012__etc_dconf_db_local_d_01_banner_message_Value }}"
+    no_extra_spaces: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258012_Manage
+    - "'dconf' in packages"
+# R-258013 RHEL-09-271015
+- name: stigrule_258013__etc_dconf_db_local_d_locks_session_banner_message_enable
+  lineinfile:
+    path: /etc/dconf/db/local.d/locks/session
+    line: "{{ rhel9STIG_stigrule_258013__etc_dconf_db_local_d_locks_session_banner_message_enable_Line }}"
+    create: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258013_Manage
+    - "'dconf' in packages"
+# R-258014 RHEL-09-271020
+- name: stigrule_258014__etc_dconf_db_local_d_00_security_settings
+  ini_file:
+    path: /etc/dconf/db/local.d/00-security-settings
+    section: org/gnome/desktop/media-handling
+    option: automount-open
+    value: "{{ rhel9STIG_stigrule_258014__etc_dconf_db_local_d_00_security_settings_Value }}"
+    no_extra_spaces: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258014_Manage
+    - "'dconf' in packages"
+# R-258015 RHEL-09-271025
+- name: stigrule_258015__etc_dconf_db_local_d_locks_00_security_settings_lock_automount_open
+  lineinfile:
+    path: /etc/dconf/db/local.d/locks/00-security-settings-lock
+    line: "{{ rhel9STIG_stigrule_258015__etc_dconf_db_local_d_locks_00_security_settings_lock_automount_open_Line }}"
+    create: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258015_Manage
+    - "'dconf' in packages"
+# R-258016 RHEL-09-271030
+- name: stigrule_258016__etc_dconf_db_local_d_00_security_settings
+  ini_file:
+    path: /etc/dconf/db/local.d/00-security-settings
+    section: org/gnome/desktop/media-handling
+    option: autorun-never
+    value: "{{ rhel9STIG_stigrule_258016__etc_dconf_db_local_d_00_security_settings_Value }}"
+    no_extra_spaces: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258016_Manage
+    - "'dconf' in packages"
+# R-258017 RHEL-09-271035
+- name: stigrule_258017__etc_dconf_db_local_d_locks_00_security_settings_lock_autorun_never
+  lineinfile:
+    path: /etc/dconf/db/local.d/locks/00-security-settings-lock
+    line: "{{ rhel9STIG_stigrule_258017__etc_dconf_db_local_d_locks_00_security_settings_lock_autorun_never_Line }}"
+    create: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258017_Manage
+    - "'dconf' in packages"
+# R-258019 RHEL-09-271045
+- name: stigrule_258019__etc_dconf_db_local_d_00_security_settings
+  ini_file:
+    path: /etc/dconf/db/local.d/00-security-settings
+    section: org/gnome/settings-daemon/peripherals/smartcard
+    option: removal-action
+    value: "{{ rhel9STIG_stigrule_258019__etc_dconf_db_local_d_00_security_settings_Value }}"
+    no_extra_spaces: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258019_Manage
+    - "'dconf' in packages"
+# R-258020 RHEL-09-271050
+- name: stigrule_258020__etc_dconf_db_local_d_locks_00_security_settings_lock_removal_action
+  lineinfile:
+    path: /etc/dconf/db/local.d/locks/00-security-settings-lock
+    line: "{{ rhel9STIG_stigrule_258020__etc_dconf_db_local_d_locks_00_security_settings_lock_removal_action_Line }}"
+    create: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258020_Manage
+    - "'dconf' in packages"
+# R-258021 RHEL-09-271055
+- name: stigrule_258021__etc_dconf_db_local_d_00_screensaver
+  ini_file:
+    path: /etc/dconf/db/local.d/00-screensaver
+    section: org/gnome/desktop/screensaver
+    option: lock-enabled
+    value: "{{ rhel9STIG_stigrule_258021__etc_dconf_db_local_d_00_screensaver_Value }}"
+    no_extra_spaces: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258021_Manage
+    - "'dconf' in packages"
+# R-258022 RHEL-09-271060
+- name: stigrule_258022__etc_dconf_db_local_d_locks_session_lock_enabled
+  lineinfile:
+    path: /etc/dconf/db/local.d/locks/session
+    line: "{{ rhel9STIG_stigrule_258022__etc_dconf_db_local_d_locks_session_lock_enabled_Line }}"
+    create: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258022_Manage
+    - "'dconf' in packages"
+# R-258023 RHEL-09-271065
+- name: stigrule_258023__etc_dconf_db_local_d_00_screensaver
+  ini_file:
+    path: /etc/dconf/db/local.d/00-screensaver
+    section: org/gnome/desktop/session
+    option: idle-delay
+    value: "{{ rhel9STIG_stigrule_258023__etc_dconf_db_local_d_00_screensaver_Value }}"
+    no_extra_spaces: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258023_Manage
+    - "'dconf' in packages"
+# R-258024 RHEL-09-271070
+- name: stigrule_258024__etc_dconf_db_local_d_locks_session_idle_delay
+  lineinfile:
+    path: /etc/dconf/db/local.d/locks/session
+    line: "{{ rhel9STIG_stigrule_258024__etc_dconf_db_local_d_locks_session_idle_delay_Line }}"
+    create: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258024_Manage
+    - "'dconf' in packages"
+# R-258025 RHEL-09-271075
+- name: stigrule_258025__etc_dconf_db_local_d_00_screensaver
+  ini_file:
+    path: /etc/dconf/db/local.d/00-screensaver
+    section: org/gnome/desktop/screensaver
+    option: lock-delay
+    value: "{{ rhel9STIG_stigrule_258025__etc_dconf_db_local_d_00_screensaver_Value }}"
+    no_extra_spaces: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258025_Manage
+    - "'dconf' in packages"
+# R-258026 RHEL-09-271080
+- name: stigrule_258026__etc_dconf_db_local_d_locks_session_lock_delay
+  lineinfile:
+    path: /etc/dconf/db/local.d/locks/session
+    line: "{{ rhel9STIG_stigrule_258026__etc_dconf_db_local_d_locks_session_lock_delay_Line }}"
+    create: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258026_Manage
+    - "'dconf' in packages"
+# R-258027 RHEL-09-271085
+- name: stigrule_258027__etc_dconf_db_local_d_00_security_settings
+  ini_file:
+    path: /etc/dconf/db/local.d/00-security-settings
+    section: org/gnome/desktop/screensaver
+    option: picture-uri
+    value: "{{ rhel9STIG_stigrule_258027__etc_dconf_db_local_d_00_security_settings_Value }}"
+    no_extra_spaces: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258027_Manage
+    - "'dconf' in packages"
+# R-258027 RHEL-09-271085
+- name: stigrule_258027__etc_dconf_db_local_d_locks_00_security_settings_lock_picture_uri
+  lineinfile:
+    path: /etc/dconf/db/local.d/locks/00-security-settings-lock
+    line: "{{ rhel9STIG_stigrule_258027__etc_dconf_db_local_d_locks_00_security_settings_lock_picture_uri_Line }}"
+    create: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258027_Manage
+    - "'dconf' in packages"
+# R-258029 RHEL-09-271095
+- name: stigrule_258029__etc_dconf_db_local_d_00_security_settings
+  ini_file:
+    path: /etc/dconf/db/local.d/00-security-settings
+    section: org/gnome/login-screen
+    option: disable-restart-buttons
+    value: "{{ rhel9STIG_stigrule_258029__etc_dconf_db_local_d_00_security_settings_Value }}"
+    no_extra_spaces: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258029_Manage
+    - "'dconf' in packages"
+# R-258030 RHEL-09-271100
+- name: stigrule_258030__etc_dconf_db_local_d_locks_session_disable_restart_buttons
+  lineinfile:
+    path: /etc/dconf/db/local.d/locks/session
+    line: "{{ rhel9STIG_stigrule_258030__etc_dconf_db_local_d_locks_session_disable_restart_buttons_Line }}"
+    create: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258030_Manage
+    - "'dconf' in packages"
+# R-258031 RHEL-09-271105
+- name: stigrule_258031__etc_dconf_db_local_d_00_security_settings
+  ini_file:
+    path: /etc/dconf/db/local.d/00-security-settings
+    section: org/gnome/settings-daemon/plugins/media-keys
+    option: logout
+    value: "{{ rhel9STIG_stigrule_258031__etc_dconf_db_local_d_00_security_settings_Value }}"
+    no_extra_spaces: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258031_Manage
+    - "'dconf' in packages"
+# R-258032 RHEL-09-271110
+- name: stigrule_258032__etc_dconf_db_local_d_locks_session_logout
+  lineinfile:
+    path: /etc/dconf/db/local.d/locks/session
+    line: "{{ rhel9STIG_stigrule_258032__etc_dconf_db_local_d_locks_session_logout_Line }}"
+    create: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258032_Manage
+    - "'dconf' in packages"
+# R-258033 RHEL-09-271115
+- name: stigrule_258033__etc_dconf_db_local_d_02_login_screen
+  ini_file:
+    path: /etc/dconf/db/local.d/02-login-screen
+    section: org/gnome/login-screen
+    option: disable-user-list
+    value: "{{ rhel9STIG_stigrule_258033__etc_dconf_db_local_d_02_login_screen_Value }}"
+    no_extra_spaces: yes
+  notify: dconf_update
+  when:
+    - rhel9STIG_stigrule_258033_Manage
+    - "'dconf' in packages"
+# R-258034 RHEL-09-291010
+- name: stigrule_258034__etc_modprobe_d_usb_storage_conf_install_usb_storage__bin_false
+  lineinfile:
+    path: /etc/modprobe.d/usb-storage.conf
+    line: "{{ rhel9STIG_stigrule_258034__etc_modprobe_d_usb_storage_conf_install_usb_storage__bin_false_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_258034_Manage
+# R-258034 RHEL-09-291010
+- name: stigrule_258034__etc_modprobe_d_usb_storage_conf_blacklist_usb_storage
+  lineinfile:
+    path: /etc/modprobe.d/usb-storage.conf
+    line: "{{ rhel9STIG_stigrule_258034__etc_modprobe_d_usb_storage_conf_blacklist_usb_storage_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_258034_Manage
+# R-258035 RHEL-09-291015
+- name: stigrule_258035_usbguard
+  yum:
+    name: usbguard
+    state: "{{ rhel9STIG_stigrule_258035_usbguard_State }}"
+  when: rhel9STIG_stigrule_258035_Manage
+# R-258036 RHEL-09-291020
+- name: check if usbguard.service is installed
+  shell: ! systemctl list-unit-files | grep "^usbguard.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_258036_usbguard_enable
+  service:
+    name: usbguard.service
+    enabled: "{{ rhel9STIG_stigrule_258036_usbguard_enable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_258036_Manage
+    - result.rc == 0
+# R-258036 RHEL-09-291020
+- name: check if usbguard.service is installed
+  shell: ! systemctl list-unit-files | grep "^usbguard.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_258036_usbguard_start
+  service:
+    name: usbguard.service
+    state: "{{ rhel9STIG_stigrule_258036_usbguard_start_State }}"
+  when:
+    - rhel9STIG_stigrule_258036_Manage
+    - result.rc == 0
+# R-258037 RHEL-09-291025
+- name: stigrule_258037__etc_usbguard_usbguard_daemon_conf
+  lineinfile:
+    path: /etc/usbguard/usbguard-daemon.conf
+    regexp: '^\s*AuditBackend\s*='
+    line: "{{ rhel9STIG_stigrule_258037__etc_usbguard_usbguard_daemon_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258037_Manage
+# R-258039 RHEL-09-291035
+- name: stigrule_258039__etc_modprobe_d_bluetooth_conf_install_bluetooth__bin_false
+  lineinfile:
+    path: /etc/modprobe.d/bluetooth.conf
+    line: "{{ rhel9STIG_stigrule_258039__etc_modprobe_d_bluetooth_conf_install_bluetooth__bin_false_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_258039_Manage
+# R-258039 RHEL-09-291035
+- name: stigrule_258039__etc_modprobe_d_bluetooth_conf_blacklist_bluetooth
+  lineinfile:
+    path: /etc/modprobe.d/bluetooth.conf
+    line: "{{ rhel9STIG_stigrule_258039__etc_modprobe_d_bluetooth_conf_blacklist_bluetooth_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_258039_Manage
+# R-258040 RHEL-09-291040
+- name: check if wireless network adapters are disabled
+  shell: "[[ $(nmcli radio wifi)  == 'enabled' ]]"
+  changed_when: False
+  check_mode: no
+  register: cmd_result
+  failed_when: cmd_result.rc > 1
+- name: stigrule_258040_nmcli_radio_wifi_off
+  shell: "{{ rhel9STIG_stigrule_258040_nmcli_radio_wifi_off_Command }}"
+  when:
+    - rhel9STIG_stigrule_258040_Manage
+    - cmd_result.rc == 0
+# R-258041 RHEL-09-411010
+- name: stigrule_258041__etc_login_defs
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^PASS_MAX_DAYS'
+    line: "{{ rhel9STIG_stigrule_258041__etc_login_defs_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258041_Manage
+# R-258043 RHEL-09-411020
+- name: stigrule_258043__etc_login_defs
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^CREATE_HOME'
+    line: "{{ rhel9STIG_stigrule_258043__etc_login_defs_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258043_Manage
+# R-258049 RHEL-09-411050
+- name: "run [[ $(sudo grep -i inactive /etc/default/useradd) != 'INACTIVE=35' ]] and register the result"
+  shell: "[[ $(sudo grep -i inactive /etc/default/useradd) != 'INACTIVE=35' ]]"
+  changed_when: False
+  check_mode: no
+  register: cmd_result
+  failed_when: cmd_result.rc > 1
+- name: stigrule_258049_sudo_useradd__D__f_35
+  shell: "{{ rhel9STIG_stigrule_258049_sudo_useradd__D__f_35_Command }}"
+  when:
+    - rhel9STIG_stigrule_258049_Manage
+    - cmd_result.rc == 0
+# R-258054 RHEL-09-411075
+- name: stigrule_258054__etc_security_faillock_conf
+  lineinfile:
+    path: /etc/security/faillock.conf
+    regexp: '^[\s#]*deny\s*=\s*\d+'
+    line: "{{ rhel9STIG_stigrule_258054__etc_security_faillock_conf_Line }}"
+    create: yes
+  notify: with_faillock_enable
+  when:
+    - rhel9STIG_stigrule_258054_Manage
+# R-258055 RHEL-09-411080
+- name: stigrule_258055__etc_security_faillock_conf
+  lineinfile:
+    path: /etc/security/faillock.conf
+    regexp: '^[\s#]*even_deny_root\b'
+    line: "{{ rhel9STIG_stigrule_258055__etc_security_faillock_conf_Line }}"
+    create: yes
+  notify: with_faillock_enable
+  when:
+    - rhel9STIG_stigrule_258055_Manage
+# R-258056 RHEL-09-411085
+- name: stigrule_258056__etc_security_faillock_conf
+  lineinfile:
+    path: /etc/security/faillock.conf
+    regexp: '^[\s#]*fail_interval\s*=\s*\d+'
+    line: "{{ rhel9STIG_stigrule_258056__etc_security_faillock_conf_Line }}"
+    create: yes
+  notify: with_faillock_enable
+  when:
+    - rhel9STIG_stigrule_258056_Manage
+# R-258057 RHEL-09-411090
+- name: stigrule_258057__etc_security_faillock_conf
+  lineinfile:
+    path: /etc/security/faillock.conf
+    regexp: '^[\s#]*unlock_time\s*=\s*\d+'
+    line: "{{ rhel9STIG_stigrule_258057__etc_security_faillock_conf_Line }}"
+    create: yes
+  notify: with_faillock_enable
+  when:
+    - rhel9STIG_stigrule_258057_Manage
+# R-258060 RHEL-09-411105
+- name: stigrule_258060__etc_security_faillock_conf
+  lineinfile:
+    path: /etc/security/faillock.conf
+    regexp: '^[\s#]*dir\s*=\s*\S+'
+    line: "{{ rhel9STIG_stigrule_258060__etc_security_faillock_conf_Line }}"
+    create: yes
+  notify: with_faillock_enable
+  when:
+    - rhel9STIG_stigrule_258060_Manage
+# R-258063 RHEL-09-412010
+- name: stigrule_258063_tmux
+  yum:
+    name: tmux
+    state: "{{ rhel9STIG_stigrule_258063_tmux_State }}"
+  when: rhel9STIG_stigrule_258063_Manage
+# R-258066 RHEL-09-412025
+- name: stigrule_258066__etc_tmux_conf
+  lineinfile:
+    path: /etc/tmux.conf
+    line: "{{ rhel9STIG_stigrule_258066__etc_tmux_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258066_Manage
+# R-258069 RHEL-09-412040
+- name: stigrule_258069__etc_security_limits_conf
+  lineinfile:
+    path: /etc/security/limits.conf
+    regexp: '^\s*\*\s+hard\s+maxlogins\b'
+    line: "{{ rhel9STIG_stigrule_258069__etc_security_limits_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258069_Manage
+# R-258070 RHEL-09-412045
+- name: stigrule_258070__etc_security_faillock_conf
+  lineinfile:
+    path: /etc/security/faillock.conf
+    regexp: '^[\s#]*audit\b'
+    line: "{{ rhel9STIG_stigrule_258070__etc_security_faillock_conf_Line }}"
+    create: yes
+  notify: with_faillock_enable
+  when:
+    - rhel9STIG_stigrule_258070_Manage
+# R-258071 RHEL-09-412050
+- name: stigrule_258071__etc_login_defs
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^[#\s]*FAIL_DELAY\s*\d+\s*$'
+    line: "{{ rhel9STIG_stigrule_258071__etc_login_defs_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258071_Manage
+# R-258072 RHEL-09-412055
+- name: stigrule_258072__etc_bashrc
+  lineinfile:
+    path: /etc/bashrc
+    regexp: '^umask\s+\d+'
+    line: "{{ rhel9STIG_stigrule_258072__etc_bashrc_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258072_Manage
+# R-258073 RHEL-09-412060
+- name: stigrule_258073__etc_csh_cshrc
+  lineinfile:
+    path: /etc/csh.cshrc
+    regexp: '^umask\s+\d+'
+    line: "{{ rhel9STIG_stigrule_258073__etc_csh_cshrc_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258073_Manage
+# R-258074 RHEL-09-412065
+- name: stigrule_258074__etc_login_defs
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^UMASK'
+    line: "{{ rhel9STIG_stigrule_258074__etc_login_defs_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258074_Manage
+# R-258075 RHEL-09-412070
+- name: stigrule_258075__etc_profile
+  lineinfile:
+    path: /etc/profile
+    regexp: '^umask\s+\d+'
+    line: "{{ rhel9STIG_stigrule_258075__etc_profile_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258075_Manage
+# R-258078 RHEL-09-431010
+- name: stigrule_258078__etc_selinux_config
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: '^\s*SELINUX\s*='
+    line: "{{ rhel9STIG_stigrule_258078__etc_selinux_config_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_258078_Manage
+# R-258079 RHEL-09-431015
+- name: stigrule_258079__etc_selinux_config
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: '^\s*SELINUXTYPE\s*='
+    line: "{{ rhel9STIG_stigrule_258079__etc_selinux_config_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_258079_Manage
+# R-258081 RHEL-09-431025
+- name: stigrule_258081_policycoreutils
+  yum:
+    name: policycoreutils
+    state: "{{ rhel9STIG_stigrule_258081_policycoreutils_State }}"
+  when: rhel9STIG_stigrule_258081_Manage
+# R-258082 RHEL-09-431030
+- name: stigrule_258082_policycoreutils_python_utils
+  yum:
+    name: policycoreutils-python-utils
+    state: "{{ rhel9STIG_stigrule_258082_policycoreutils_python_utils_State }}"
+  when: rhel9STIG_stigrule_258082_Manage
+# R-258083 RHEL-09-432010
+- name: stigrule_258083_sudo
+  yum:
+    name: sudo
+    state: "{{ rhel9STIG_stigrule_258083_sudo_State }}"
+  when: rhel9STIG_stigrule_258083_Manage
+# R-258084 RHEL-09-432015
+- name: stigrule_258084__etc_sudoers
+  lineinfile:
+    path: /etc/sudoers
+    regexp: '^\s*Defaults\s+timestamp_timeout\s*='
+    line: "{{ rhel9STIG_stigrule_258084__etc_sudoers_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258084_Manage
+# R-258089 RHEL-09-433010
+- name: stigrule_258089_fapolicyd
+  yum:
+    name: fapolicyd
+    state: "{{ rhel9STIG_stigrule_258089_fapolicyd_State }}"
+  when: rhel9STIG_stigrule_258089_Manage
+# R-258090 RHEL-09-433015
+- name: check if fapolicyd.service is installed
+  shell: ! systemctl list-unit-files | grep "^fapolicyd.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_258090_fapolicyd_enable
+  service:
+    name: fapolicyd.service
+    enabled: "{{ rhel9STIG_stigrule_258090_fapolicyd_enable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_258090_Manage
+    - result.rc == 0
+# R-258090 RHEL-09-433015
+- name: check if fapolicyd.service is installed
+  shell: ! systemctl list-unit-files | grep "^fapolicyd.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_258090_fapolicyd_start
+  service:
+    name: fapolicyd.service
+    state: "{{ rhel9STIG_stigrule_258090_fapolicyd_start_State }}"
+  when:
+    - rhel9STIG_stigrule_258090_Manage
+    - result.rc == 0
+# R-258101 RHEL-09-611060
+- name: stigrule_258101__etc_security_pwquality_conf
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^\s*enforce_for_root'
+    line: "{{ rhel9STIG_stigrule_258101__etc_security_pwquality_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258101_Manage
+# R-258102 RHEL-09-611065
+- name: stigrule_258102__etc_security_pwquality_conf
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^\s*lcredit'
+    line: "{{ rhel9STIG_stigrule_258102__etc_security_pwquality_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258102_Manage
+# R-258103 RHEL-09-611070
+- name: stigrule_258103__etc_security_pwquality_conf
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^\s*dcredit'
+    line: "{{ rhel9STIG_stigrule_258103__etc_security_pwquality_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258103_Manage
+# R-258104 RHEL-09-611075
+- name: stigrule_258104__etc_login_defs
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^PASS_MIN_DAYS'
+    line: "{{ rhel9STIG_stigrule_258104__etc_login_defs_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258104_Manage
+# R-258107 RHEL-09-611090
+- name: stigrule_258107__etc_security_pwquality_conf
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^\s*minlen'
+    line: "{{ rhel9STIG_stigrule_258107__etc_security_pwquality_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258107_Manage
+# R-258108 RHEL-09-611095
+- name: stigrule_258108__etc_login_defs
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^PASS_MIN_LEN'
+    line: "{{ rhel9STIG_stigrule_258108__etc_login_defs_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258108_Manage
+# R-258109 RHEL-09-611100
+- name: stigrule_258109__etc_security_pwquality_conf
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^\s*ocredit'
+    line: "{{ rhel9STIG_stigrule_258109__etc_security_pwquality_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258109_Manage
+# R-258110 RHEL-09-611105
+- name: stigrule_258110__etc_security_pwquality_conf
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^\s*dictcheck'
+    line: "{{ rhel9STIG_stigrule_258110__etc_security_pwquality_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258110_Manage
+# R-258111 RHEL-09-611110
+- name: stigrule_258111__etc_security_pwquality_conf
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^\s*ucredit'
+    line: "{{ rhel9STIG_stigrule_258111__etc_security_pwquality_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258111_Manage
+# R-258112 RHEL-09-611115
+- name: stigrule_258112__etc_security_pwquality_conf
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^\s*difok'
+    line: "{{ rhel9STIG_stigrule_258112__etc_security_pwquality_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258112_Manage
+# R-258113 RHEL-09-611120
+- name: stigrule_258113__etc_security_pwquality_conf
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^\s*maxclassrepeat'
+    line: "{{ rhel9STIG_stigrule_258113__etc_security_pwquality_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258113_Manage
+# R-258114 RHEL-09-611125
+- name: stigrule_258114__etc_security_pwquality_conf
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^\s*maxrepeat'
+    line: "{{ rhel9STIG_stigrule_258114__etc_security_pwquality_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258114_Manage
+# R-258115 RHEL-09-611130
+- name: stigrule_258115__etc_security_pwquality_conf
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^\s*minclass'
+    line: "{{ rhel9STIG_stigrule_258115__etc_security_pwquality_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258115_Manage
+# R-258116 RHEL-09-611135
+- name: stigrule_258116__etc_libuser_conf
+  ini_file:
+    path: /etc/libuser.conf
+    section: defaults
+    option: crypt_style
+    value: "{{ rhel9STIG_stigrule_258116__etc_libuser_conf_Value }}"
+    no_extra_spaces: yes
+  when:
+    - rhel9STIG_stigrule_258116_Manage
+# R-258117 RHEL-09-611140
+- name: stigrule_258117__etc_login_defs
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^ENCRYPT_METHOD'
+    line: "{{ rhel9STIG_stigrule_258117__etc_login_defs_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258117_Manage
+# R-258119 RHEL-09-611150
+- name: stigrule_258119__etc_login_defs
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^SHA_CRYPT_MIN_ROUNDS'
+    line: "{{ rhel9STIG_stigrule_258119__etc_login_defs_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258119_Manage
+# R-258121 RHEL-09-611160
+- name: stigrule_258121__etc_opensc_conf
+  lineinfile:
+    path: /etc/opensc.conf
+    regexp: '^\s*card_drivers\s*='
+    line: "{{ rhel9STIG_stigrule_258121__etc_opensc_conf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258121_Manage
+# R-258122 RHEL-09-611165
+- name: stigrule_258122__etc_sssd_sssd_conf
+  ini_file:
+    path: /etc/sssd/sssd.conf
+    section: pam
+    option: pam_cert_auth
+    value: "{{ rhel9STIG_stigrule_258122__etc_sssd_sssd_conf_Value }}"
+    no_extra_spaces: yes
+  when:
+    - rhel9STIG_stigrule_258122_Manage
+# R-258124 RHEL-09-611175
+- name: stigrule_258124_pcsc_lite
+  yum:
+    name: pcsc-lite
+    state: "{{ rhel9STIG_stigrule_258124_pcsc_lite_State }}"
+  when: rhel9STIG_stigrule_258124_Manage
+# R-258125 RHEL-09-611180
+- name: check if pcscd.service is installed
+  shell: ! systemctl list-unit-files | grep "^pcscd.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_258125_pcscd_enable
+  service:
+    name: pcscd.service
+    enabled: "{{ rhel9STIG_stigrule_258125_pcscd_enable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_258125_Manage
+    - result.rc == 0
+# R-258125 RHEL-09-611180
+- name: check if pcscd.service is installed
+  shell: ! systemctl list-unit-files | grep "^pcscd.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_258125_pcscd_start
+  service:
+    name: pcscd.service
+    state: "{{ rhel9STIG_stigrule_258125_pcscd_start_State }}"
+  when:
+    - rhel9STIG_stigrule_258125_Manage
+    - result.rc == 0
+# R-258126 RHEL-09-611185
+- name: stigrule_258126_opensc
+  yum:
+    name: opensc
+    state: "{{ rhel9STIG_stigrule_258126_opensc_State }}"
+  when: rhel9STIG_stigrule_258126_Manage
+# R-258128 RHEL-09-611195
+- name: stigrule_258128__usr_lib_systemd_system_emergency_service
+  ini_file:
+    path: /usr/lib/systemd/system/emergency.service
+    section: Service
+    option: ExecStart
+    value: "{{ rhel9STIG_stigrule_258128__usr_lib_systemd_system_emergency_service_Value }}"
+    no_extra_spaces: yes
+  when:
+    - rhel9STIG_stigrule_258128_Manage
+# R-258129 RHEL-09-611200
+- name: stigrule_258129__usr_lib_systemd_system_rescue_service
+  ini_file:
+    path: /usr/lib/systemd/system/rescue.service
+    section: Service
+    option: ExecStart
+    value: "{{ rhel9STIG_stigrule_258129__usr_lib_systemd_system_rescue_service_Value }}"
+    no_extra_spaces: yes
+  when:
+    - rhel9STIG_stigrule_258129_Manage
+# R-258133 RHEL-09-631020
+- name: stigrule_258133__etc_sssd_sssd_conf
+  ini_file:
+    path: /etc/sssd/sssd.conf
+    section: pam
+    option: offline_credentials_expiration
+    value: "{{ rhel9STIG_stigrule_258133__etc_sssd_sssd_conf_Value }}"
+    no_extra_spaces: yes
+  when:
+    - rhel9STIG_stigrule_258133_Manage
+# R-258140 RHEL-09-652010
+- name: stigrule_258140_rsyslog
+  yum:
+    name: rsyslog
+    state: "{{ rhel9STIG_stigrule_258140_rsyslog_State }}"
+  when: rhel9STIG_stigrule_258140_Manage
+# R-258141 RHEL-09-652015
+- name: stigrule_258141_rsyslog_gnutls
+  yum:
+    name: rsyslog-gnutls
+    state: "{{ rhel9STIG_stigrule_258141_rsyslog_gnutls_State }}"
+  when: rhel9STIG_stigrule_258141_Manage
+# R-258142 RHEL-09-652020
+- name: check if rsyslog.service is installed
+  shell: ! systemctl list-unit-files | grep "^rsyslog.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_258142_rsyslog_enable
+  service:
+    name: rsyslog.service
+    enabled: "{{ rhel9STIG_stigrule_258142_rsyslog_enable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_258142_Manage
+    - result.rc == 0
+# R-258142 RHEL-09-652020
+- name: check if rsyslog.service is installed
+  shell: ! systemctl list-unit-files | grep "^rsyslog.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_258142_rsyslog_start
+  service:
+    name: rsyslog.service
+    state: "{{ rhel9STIG_stigrule_258142_rsyslog_start_State }}"
+  when:
+    - rhel9STIG_stigrule_258142_Manage
+    - result.rc == 0
+# R-258144 RHEL-09-652030
+- name: stigrule_258144__etc_rsyslog_conf
+  lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^(?:(?:auth|authpriv|daemon)\.\*;?)+\s+\S+'
+    line: "{{ rhel9STIG_stigrule_258144__etc_rsyslog_conf_Line }}"
+    create: yes
+  notify: rsyslog_restart
+  when:
+    - rhel9STIG_stigrule_258144_Manage
+# R-258145 RHEL-09-652035
+- name: stigrule_258145__etc_audit_plugins_d_syslog_conf
+  lineinfile:
+    path: /etc/audit/plugins.d/syslog.conf
+    regexp: '^\s*active\s*='
+    line: "{{ rhel9STIG_stigrule_258145__etc_audit_plugins_d_syslog_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258145_Manage
+# R-258146 RHEL-09-652040
+- name: stigrule_258146__etc_rsyslog_conf
+  lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^\s*\$ActionSendStreamDriverAuthMode\s+\S+'
+    line: "{{ rhel9STIG_stigrule_258146__etc_rsyslog_conf_Line }}"
+    create: yes
+  notify: rsyslog_restart
+  when:
+    - rhel9STIG_stigrule_258146_Manage
+# R-258147 RHEL-09-652045
+- name: stigrule_258147__etc_rsyslog_conf
+  lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^\s*\$ActionSendStreamDriverMode\s+\d+'
+    line: "{{ rhel9STIG_stigrule_258147__etc_rsyslog_conf_Line }}"
+    create: yes
+  notify: rsyslog_restart
+  when:
+    - rhel9STIG_stigrule_258147_Manage
+# R-258148 RHEL-09-652050
+- name: stigrule_258148__etc_rsyslog_conf
+  lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^\s*\$DefaultNetstreamDriver\s+\w+'
+    line: "{{ rhel9STIG_stigrule_258148__etc_rsyslog_conf_Line }}"
+    create: yes
+  notify: rsyslog_restart
+  when:
+    - rhel9STIG_stigrule_258148_Manage
+# R-258150 RHEL-09-652060
+- name: stigrule_258150__etc_rsyslog_conf
+  lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^cron\.\*\s+\S+'
+    line: "{{ rhel9STIG_stigrule_258150__etc_rsyslog_conf_Line }}"
+    create: yes
+  notify: rsyslog_restart
+  when:
+    - rhel9STIG_stigrule_258150_Manage
+# R-258151 RHEL-09-653010
+- name: stigrule_258151_audit
+  yum:
+    name: audit
+    state: "{{ rhel9STIG_stigrule_258151_audit_State }}"
+  when: rhel9STIG_stigrule_258151_Manage
+# R-258152 RHEL-09-653015
+- name: check if auditd.service is installed
+  shell: ! systemctl list-unit-files | grep "^auditd.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_258152_auditd_enable
+  service:
+    name: auditd.service
+    enabled: "{{ rhel9STIG_stigrule_258152_auditd_enable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_258152_Manage
+    - result.rc == 0
+# R-258152 RHEL-09-653015
+- name: check if auditd.service is installed
+  shell: ! systemctl list-unit-files | grep "^auditd.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_258152_auditd_start
+  service:
+    name: auditd.service
+    state: "{{ rhel9STIG_stigrule_258152_auditd_start_State }}"
+  when:
+    - rhel9STIG_stigrule_258152_Manage
+    - result.rc == 0
+# R-258153 RHEL-09-653020
+- name: stigrule_258153__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^disk_error_action = '
+    line: "{{ rhel9STIG_stigrule_258153__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258153_Manage
+# R-258154 RHEL-09-653025
+- name: stigrule_258154__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^disk_full_action = '
+    line: "{{ rhel9STIG_stigrule_258154__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258154_Manage
+# R-258156 RHEL-09-653035
+- name: stigrule_258156__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^space_left = '
+    line: "{{ rhel9STIG_stigrule_258156__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258156_Manage
+# R-258157 RHEL-09-653040
+- name: stigrule_258157__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^space_left_action = '
+    line: "{{ rhel9STIG_stigrule_258157__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258157_Manage
+# R-258158 RHEL-09-653045
+- name: stigrule_258158__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^admin_space_left = '
+    line: "{{ rhel9STIG_stigrule_258158__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258158_Manage
+# R-258159 RHEL-09-653050
+- name: stigrule_258159__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^admin_space_left_action = '
+    line: "{{ rhel9STIG_stigrule_258159__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258159_Manage
+# R-258160 RHEL-09-653055
+- name: stigrule_258160__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^max_log_file_action = '
+    line: "{{ rhel9STIG_stigrule_258160__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258160_Manage
+# R-258161 RHEL-09-653060
+- name: stigrule_258161__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^name_format = '
+    line: "{{ rhel9STIG_stigrule_258161__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258161_Manage
+# R-258162 RHEL-09-653065
+- name: stigrule_258162__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^overflow_action = '
+    line: "{{ rhel9STIG_stigrule_258162__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258162_Manage
+# R-258163 RHEL-09-653070
+- name: stigrule_258163__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^action_mail_acct = '
+    line: "{{ rhel9STIG_stigrule_258163__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258163_Manage
+# R-258164 RHEL-09-653075
+- name: stigrule_258164__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^local_events = '
+    line: "{{ rhel9STIG_stigrule_258164__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258164_Manage
+# R-258168 RHEL-09-653095
+- name: stigrule_258168__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^freq = '
+    line: "{{ rhel9STIG_stigrule_258168__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258168_Manage
+# R-258169 RHEL-09-653100
+- name: stigrule_258169__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^log_format = '
+    line: "{{ rhel9STIG_stigrule_258169__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258169_Manage
+# R-258170 RHEL-09-653105
+- name: stigrule_258170__etc_audit_auditd_conf
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^write_logs = '
+    line: "{{ rhel9STIG_stigrule_258170__etc_audit_auditd_conf_Line }}"
+    create: yes
+  notify: auditd_restart
+  when:
+    - rhel9STIG_stigrule_258170_Manage
+# R-258172 RHEL-09-653115
+- name: stigrule_258172__etc_audit_auditd_conf_mode
+  file:
+    dest: "{{ rhel9STIG_stigrule_258172__etc_audit_auditd_conf_mode_Dest }}"
+    mode: "{{ rhel9STIG_stigrule_258172__etc_audit_auditd_conf_mode_Mode }}"
+  when:
+    - rhel9STIG_stigrule_258172_Manage
+# R-258175 RHEL-09-653130
+- name: stigrule_258175_audispd_plugins
+  yum:
+    name: audispd-plugins
+    state: "{{ rhel9STIG_stigrule_258175_audispd_plugins_State }}"
+  when: rhel9STIG_stigrule_258175_Manage
+# R-258176 RHEL-09-654010
+- name : stigrule_258176__etc_audit_rules_d_audit_rules_execve_euid_b32
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv$'
+    line: "{{ rhel9STIG_stigrule_258176__etc_audit_rules_d_audit_rules_execve_euid_b32_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258176_Manage
+# R-258176 RHEL-09-654010
+- name : stigrule_258176__etc_audit_rules_d_audit_rules_execve_euid_b64
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv$'
+    line: "{{ rhel9STIG_stigrule_258176__etc_audit_rules_d_audit_rules_execve_euid_b64_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258176_Manage
+# R-258176 RHEL-09-654010
+- name : stigrule_258176__etc_audit_rules_d_audit_rules_execve_egid_b32
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv$'
+    line: "{{ rhel9STIG_stigrule_258176__etc_audit_rules_d_audit_rules_execve_egid_b32_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258176_Manage
+# R-258176 RHEL-09-654010
+- name : stigrule_258176__etc_audit_rules_d_audit_rules_execve_egid_b64
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv$'
+    line: "{{ rhel9STIG_stigrule_258176__etc_audit_rules_d_audit_rules_execve_egid_b64_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258176_Manage
+# R-258177 RHEL-09-654015
+- name : stigrule_258177__etc_audit_rules_d_audit_rules_chmod_b32
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b32 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=unset -k perm_mod$'
+    line: "{{ rhel9STIG_stigrule_258177__etc_audit_rules_d_audit_rules_chmod_b32_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258177_Manage
+# R-258177 RHEL-09-654015
+- name : stigrule_258177__etc_audit_rules_d_audit_rules_chmod_b64
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=unset -k perm_mod$'
+    line: "{{ rhel9STIG_stigrule_258177__etc_audit_rules_d_audit_rules_chmod_b64_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258177_Manage
+# R-258178 RHEL-09-654020
+- name : stigrule_258178__etc_audit_rules_d_audit_rules_chown_b32
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b32 -S chown,fchown,fchownat,lchown -F auid>=1000 -F auid!=unset -k perm_mod$'
+    line: "{{ rhel9STIG_stigrule_258178__etc_audit_rules_d_audit_rules_chown_b32_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258178_Manage
+# R-258178 RHEL-09-654020
+- name : stigrule_258178__etc_audit_rules_d_audit_rules_chown_b64
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b64 -S chown,fchown,fchownat,lchown -F auid>=1000 -F auid!=unset -k perm_mod$'
+    line: "{{ rhel9STIG_stigrule_258178__etc_audit_rules_d_audit_rules_chown_b64_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258178_Manage
+# R-258179 RHEL-09-654025
+- name : stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b32_unset
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b32 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid>=1000 -F auid!=unset -k perm_mod$'
+    line: "{{ rhel9STIG_stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b32_unset_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258179_Manage
+# R-258179 RHEL-09-654025
+- name : stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b64_unset
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b64 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid>=1000 -F auid!=unset -k perm_mod$'
+    line: "{{ rhel9STIG_stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b64_unset_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258179_Manage
+# R-258179 RHEL-09-654025
+- name : stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b32
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b32 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid=0 -k perm_mod$'
+    line: "{{ rhel9STIG_stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b32_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258179_Manage
+# R-258179 RHEL-09-654025
+- name : stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b64
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b64 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid=0 -k perm_mod$'
+    line: "{{ rhel9STIG_stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b64_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258179_Manage
+# R-258180 RHEL-09-654030
+- name : stigrule_258180__etc_audit_rules_d_audit_rules__usr_bin_umount
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/umount -F perm=x -F auid>=1000 -F auid!=unset -k privileged-mount$'
+    line: "{{ rhel9STIG_stigrule_258180__etc_audit_rules_d_audit_rules__usr_bin_umount_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258180_Manage
+# R-258181 RHEL-09-654035
+- name : stigrule_258181__etc_audit_rules_d_audit_rules__usr_bin_chacl
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/chacl -F perm=x -F auid>=1000 -F auid!=unset -k perm_mod$'
+    line: "{{ rhel9STIG_stigrule_258181__etc_audit_rules_d_audit_rules__usr_bin_chacl_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258181_Manage
+# R-258182 RHEL-09-654040
+- name : stigrule_258182__etc_audit_rules_d_audit_rules__usr_bin_setfacl
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/setfacl -F perm=x -F auid>=1000 -F auid!=unset -k perm_mod$'
+    line: "{{ rhel9STIG_stigrule_258182__etc_audit_rules_d_audit_rules__usr_bin_setfacl_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258182_Manage
+# R-258183 RHEL-09-654045
+- name : stigrule_258183__etc_audit_rules_d_audit_rules__usr_bin_chcon
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>=1000 -F auid!=unset -k perm_mod$'
+    line: "{{ rhel9STIG_stigrule_258183__etc_audit_rules_d_audit_rules__usr_bin_chcon_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258183_Manage
+# R-258184 RHEL-09-654050
+- name : stigrule_258184__etc_audit_rules_d_audit_rules__usr_sbin_semanage
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/semanage -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
+    line: "{{ rhel9STIG_stigrule_258184__etc_audit_rules_d_audit_rules__usr_sbin_semanage_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258184_Manage
+# R-258185 RHEL-09-654055
+- name : stigrule_258185__etc_audit_rules_d_audit_rules__usr_sbin_setfiles
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/setfiles -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
+    line: "{{ rhel9STIG_stigrule_258185__etc_audit_rules_d_audit_rules__usr_sbin_setfiles_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258185_Manage
+# R-258186 RHEL-09-654060
+- name : stigrule_258186__etc_audit_rules_d_audit_rules__usr_sbin_setsebool
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/setsebool -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged$'
+    line: "{{ rhel9STIG_stigrule_258186__etc_audit_rules_d_audit_rules__usr_sbin_setsebool_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258186_Manage
+# R-258187 RHEL-09-654065
+- name : stigrule_258187__etc_audit_rules_d_audit_rules_rename_b32
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b32 -S rename,unlink,rmdir,renameat,unlinkat -F auid>=1000 -F auid!=unset -k delete$'
+    line: "{{ rhel9STIG_stigrule_258187__etc_audit_rules_d_audit_rules_rename_b32_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258187_Manage
+# R-258187 RHEL-09-654065
+- name : stigrule_258187__etc_audit_rules_d_audit_rules_rename_b64
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b64 -S rename,unlink,rmdir,renameat,unlinkat -F auid>=1000 -F auid!=unset -k delete$'
+    line: "{{ rhel9STIG_stigrule_258187__etc_audit_rules_d_audit_rules_rename_b64_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258187_Manage
+# R-258188 RHEL-09-654070
+- name : stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EPERM_b32
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=unset -k perm_access$'
+    line: "{{ rhel9STIG_stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EPERM_b32_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258188_Manage
+# R-258188 RHEL-09-654070
+- name : stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EPERM_b64
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=unset -k perm_access$'
+    line: "{{ rhel9STIG_stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EPERM_b64_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258188_Manage
+# R-258188 RHEL-09-654070
+- name : stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EACCES_b32
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access$'
+    line: "{{ rhel9STIG_stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EACCES_b32_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258188_Manage
+# R-258188 RHEL-09-654070
+- name : stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EACCES_b64
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access$'
+    line: "{{ rhel9STIG_stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EACCES_b64_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258188_Manage
+# R-258189 RHEL-09-654075
+- name : stigrule_258189__etc_audit_rules_d_audit_rules_delete_module_b32
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b32 -S delete_module -F auid>=1000 -F auid!=unset -k module_chng$'
+    line: "{{ rhel9STIG_stigrule_258189__etc_audit_rules_d_audit_rules_delete_module_b32_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258189_Manage
+# R-258189 RHEL-09-654075
+- name : stigrule_258189__etc_audit_rules_d_audit_rules_delete_module_b64
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b64 -S delete_module -F auid>=1000 -F auid!=unset -k module_chng$'
+    line: "{{ rhel9STIG_stigrule_258189__etc_audit_rules_d_audit_rules_delete_module_b64_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258189_Manage
+# R-258190 RHEL-09-654080
+- name : stigrule_258190__etc_audit_rules_d_audit_rules_init_module_b32
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b32 -S init_module,finit_module -F auid>=1000 -F auid!=unset -k module_chng$'
+    line: "{{ rhel9STIG_stigrule_258190__etc_audit_rules_d_audit_rules_init_module_b32_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258190_Manage
+# R-258190 RHEL-09-654080
+- name : stigrule_258190__etc_audit_rules_d_audit_rules_init_module_b64
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F arch=b64 -S init_module,finit_module -F auid>=1000 -F auid!=unset -k module_chng$'
+    line: "{{ rhel9STIG_stigrule_258190__etc_audit_rules_d_audit_rules_init_module_b64_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258190_Manage
+# R-258191 RHEL-09-654085
+- name : stigrule_258191__etc_audit_rules_d_audit_rules__usr_bin_chage
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/chage -F perm=x -F auid>=1000 -F auid!=unset -k privileged-chage$'
+    line: "{{ rhel9STIG_stigrule_258191__etc_audit_rules_d_audit_rules__usr_bin_chage_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258191_Manage
+# R-258192 RHEL-09-654090
+- name : stigrule_258192__etc_audit_rules_d_audit_rules__usr_bin_chsh
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/chsh -F perm=x -F auid>=1000 -F auid!=unset -k priv_cmd$'
+    line: "{{ rhel9STIG_stigrule_258192__etc_audit_rules_d_audit_rules__usr_bin_chsh_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258192_Manage
+# R-258193 RHEL-09-654095
+- name : stigrule_258193__etc_audit_rules_d_audit_rules__usr_bin_crontab
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/crontab -F perm=x -F auid>=1000 -F auid!=unset -k privileged-crontab$'
+    line: "{{ rhel9STIG_stigrule_258193__etc_audit_rules_d_audit_rules__usr_bin_crontab_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258193_Manage
+# R-258194 RHEL-09-654100
+- name : stigrule_258194__etc_audit_rules_d_audit_rules__usr_bin_gpasswd
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/gpasswd -F perm=x -F auid>=1000 -F auid!=unset -k privileged-gpasswd$'
+    line: "{{ rhel9STIG_stigrule_258194__etc_audit_rules_d_audit_rules__usr_bin_gpasswd_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258194_Manage
+# R-258195 RHEL-09-654105
+- name : stigrule_258195__etc_audit_rules_d_audit_rules__usr_bin_kmod
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/kmod -F perm=x -F auid>=1000 -F auid!=unset -k modules$'
+    line: "{{ rhel9STIG_stigrule_258195__etc_audit_rules_d_audit_rules__usr_bin_kmod_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258195_Manage
+# R-258196 RHEL-09-654110
+- name : stigrule_258196__etc_audit_rules_d_audit_rules__usr_bin_newgrp
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/newgrp -F perm=x -F auid>=1000 -F auid!=unset -k priv_cmd$'
+    line: "{{ rhel9STIG_stigrule_258196__etc_audit_rules_d_audit_rules__usr_bin_newgrp_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258196_Manage
+# R-258197 RHEL-09-654115
+- name : stigrule_258197__etc_audit_rules_d_audit_rules__usr_sbin_pam_timestamp_check
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/pam_timestamp_check -F perm=x -F auid>=1000 -F auid!=unset -k privileged-pam_timestamp_check$'
+    line: "{{ rhel9STIG_stigrule_258197__etc_audit_rules_d_audit_rules__usr_sbin_pam_timestamp_check_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258197_Manage
+# R-258198 RHEL-09-654120
+- name : stigrule_258198__etc_audit_rules_d_audit_rules__usr_bin_passwd
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/passwd -F perm=x -F auid>=1000 -F auid!=unset -k privileged-passwd$'
+    line: "{{ rhel9STIG_stigrule_258198__etc_audit_rules_d_audit_rules__usr_bin_passwd_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258198_Manage
+# R-258199 RHEL-09-654125
+- name : stigrule_258199__etc_audit_rules_d_audit_rules__usr_sbin_postdrop
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/postdrop -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
+    line: "{{ rhel9STIG_stigrule_258199__etc_audit_rules_d_audit_rules__usr_sbin_postdrop_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258199_Manage
+# R-258200 RHEL-09-654130
+- name : stigrule_258200__etc_audit_rules_d_audit_rules__usr_sbin_postqueue
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/postqueue -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
+    line: "{{ rhel9STIG_stigrule_258200__etc_audit_rules_d_audit_rules__usr_sbin_postqueue_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258200_Manage
+# R-258201 RHEL-09-654135
+- name : stigrule_258201__etc_audit_rules_d_audit_rules__usr_bin_ssh_agent
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/ssh-agent -F perm=x -F auid>=1000 -F auid!=unset -k privileged-ssh$'
+    line: "{{ rhel9STIG_stigrule_258201__etc_audit_rules_d_audit_rules__usr_bin_ssh_agent_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258201_Manage
+# R-258202 RHEL-09-654140
+- name : stigrule_258202__etc_audit_rules_d_audit_rules__usr_libexec_openssh_ssh_keysign
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/libexec/openssh/ssh-keysign -F perm=x -F auid>=1000 -F auid!=unset -k privileged-ssh$'
+    line: "{{ rhel9STIG_stigrule_258202__etc_audit_rules_d_audit_rules__usr_libexec_openssh_ssh_keysign_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258202_Manage
+# R-258203 RHEL-09-654145
+- name : stigrule_258203__etc_audit_rules_d_audit_rules__usr_bin_su
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset -k privileged-priv_change$'
+    line: "{{ rhel9STIG_stigrule_258203__etc_audit_rules_d_audit_rules__usr_bin_su_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258203_Manage
+# R-258204 RHEL-09-654150
+- name : stigrule_258204__etc_audit_rules_d_audit_rules__usr_bin_sudo
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/sudo -F perm=x -F auid>=1000 -F auid!=unset -k priv_cmd$'
+    line: "{{ rhel9STIG_stigrule_258204__etc_audit_rules_d_audit_rules__usr_bin_sudo_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258204_Manage
+# R-258205 RHEL-09-654155
+- name : stigrule_258205__etc_audit_rules_d_audit_rules__usr_bin_sudoedit
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/sudoedit -F perm=x -F auid>=1000 -F auid!=unset -k priv_cmd$'
+    line: "{{ rhel9STIG_stigrule_258205__etc_audit_rules_d_audit_rules__usr_bin_sudoedit_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258205_Manage
+# R-258206 RHEL-09-654160
+- name : stigrule_258206__etc_audit_rules_d_audit_rules__usr_sbin_unix_chkpwd
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/unix_chkpwd -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
+    line: "{{ rhel9STIG_stigrule_258206__etc_audit_rules_d_audit_rules__usr_sbin_unix_chkpwd_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258206_Manage
+# R-258207 RHEL-09-654165
+- name : stigrule_258207__etc_audit_rules_d_audit_rules__usr_sbin_unix_update
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/unix_update -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
+    line: "{{ rhel9STIG_stigrule_258207__etc_audit_rules_d_audit_rules__usr_sbin_unix_update_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258207_Manage
+# R-258208 RHEL-09-654170
+- name : stigrule_258208__etc_audit_rules_d_audit_rules__usr_sbin_userhelper
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/userhelper -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
+    line: "{{ rhel9STIG_stigrule_258208__etc_audit_rules_d_audit_rules__usr_sbin_userhelper_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258208_Manage
+# R-258209 RHEL-09-654175
+- name : stigrule_258209__etc_audit_rules_d_audit_rules__usr_sbin_usermod
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/usermod -F perm=x -F auid>=1000 -F auid!=unset -k privileged-usermod$'
+    line: "{{ rhel9STIG_stigrule_258209__etc_audit_rules_d_audit_rules__usr_sbin_usermod_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258209_Manage
+# R-258210 RHEL-09-654180
+- name : stigrule_258210__etc_audit_rules_d_audit_rules__usr_bin_mount
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/bin/mount -F perm=x -F auid>=1000 -F auid!=unset -k privileged-mount$'
+    line: "{{ rhel9STIG_stigrule_258210__etc_audit_rules_d_audit_rules__usr_bin_mount_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258210_Manage
+# R-258211 RHEL-09-654185
+- name : stigrule_258211__etc_audit_rules_d_audit_rules__usr_sbin_init
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/init -F perm=x -F auid>=1000 -F auid!=unset -k privileged-init$'
+    line: "{{ rhel9STIG_stigrule_258211__etc_audit_rules_d_audit_rules__usr_sbin_init_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258211_Manage
+# R-258212 RHEL-09-654190
+- name : stigrule_258212__etc_audit_rules_d_audit_rules__usr_sbin_poweroff
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/poweroff -F perm=x -F auid>=1000 -F auid!=unset -k privileged-poweroff$'
+    line: "{{ rhel9STIG_stigrule_258212__etc_audit_rules_d_audit_rules__usr_sbin_poweroff_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258212_Manage
+# R-258213 RHEL-09-654195
+- name : stigrule_258213__etc_audit_rules_d_audit_rules__usr_sbin_reboot
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/reboot -F perm=x -F auid>=1000 -F auid!=unset -k privileged-reboot$'
+    line: "{{ rhel9STIG_stigrule_258213__etc_audit_rules_d_audit_rules__usr_sbin_reboot_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258213_Manage
+# R-258214 RHEL-09-654200
+- name : stigrule_258214__etc_audit_rules_d_audit_rules__usr_sbin_shutdown
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-a always,exit -F path=/usr/sbin/shutdown -F perm=x -F auid>=1000 -F auid!=unset -k privileged-shutdown$'
+    line: "{{ rhel9STIG_stigrule_258214__etc_audit_rules_d_audit_rules__usr_sbin_shutdown_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258214_Manage
+# R-258217 RHEL-09-654215
+- name : stigrule_258217__etc_audit_rules_d_audit_rules__etc_sudoers
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-w /etc/sudoers -p wa -k identity$'
+    line: "{{ rhel9STIG_stigrule_258217__etc_audit_rules_d_audit_rules__etc_sudoers_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258217_Manage
+# R-258218 RHEL-09-654220
+- name : stigrule_258218__etc_audit_rules_d_audit_rules__etc_sudoers_d_
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-w /etc/sudoers.d/ -p wa -k identity$'
+    line: "{{ rhel9STIG_stigrule_258218__etc_audit_rules_d_audit_rules__etc_sudoers_d__Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258218_Manage
+# R-258219 RHEL-09-654225
+- name : stigrule_258219__etc_audit_rules_d_audit_rules__etc_group
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-w /etc/group -p wa -k identity$'
+    line: "{{ rhel9STIG_stigrule_258219__etc_audit_rules_d_audit_rules__etc_group_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258219_Manage
+# R-258220 RHEL-09-654230
+- name : stigrule_258220__etc_audit_rules_d_audit_rules__etc_gshadow
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-w /etc/gshadow -p wa -k identity$'
+    line: "{{ rhel9STIG_stigrule_258220__etc_audit_rules_d_audit_rules__etc_gshadow_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258220_Manage
+# R-258221 RHEL-09-654235
+- name : stigrule_258221__etc_audit_rules_d_audit_rules__etc_security_opasswd
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-w /etc/security/opasswd -p wa -k identity$'
+    line: "{{ rhel9STIG_stigrule_258221__etc_audit_rules_d_audit_rules__etc_security_opasswd_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258221_Manage
+# R-258222 RHEL-09-654240
+- name : stigrule_258222__etc_audit_rules_d_audit_rules__etc_passwd
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-w /etc/passwd -p wa -k identity$'
+    line: "{{ rhel9STIG_stigrule_258222__etc_audit_rules_d_audit_rules__etc_passwd_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258222_Manage
+# R-258223 RHEL-09-654245
+- name : stigrule_258223__etc_audit_rules_d_audit_rules__etc_shadow
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-w /etc/shadow -p wa -k identity$'
+    line: "{{ rhel9STIG_stigrule_258223__etc_audit_rules_d_audit_rules__etc_shadow_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258223_Manage
+# R-258224 RHEL-09-654250
+- name : stigrule_258224__etc_audit_rules_d_audit_rules__var_log_faillock
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-w /var/log/faillock -p wa -k logins$'
+    line: "{{ rhel9STIG_stigrule_258224__etc_audit_rules_d_audit_rules__var_log_faillock_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258224_Manage
+# R-258225 RHEL-09-654255
+- name : stigrule_258225__etc_audit_rules_d_audit_rules__var_log_lastlog
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-w /var/log/lastlog -p wa -k logins$'
+    line: "{{ rhel9STIG_stigrule_258225__etc_audit_rules_d_audit_rules__var_log_lastlog_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258225_Manage
+# R-258226 RHEL-09-654260
+- name : stigrule_258226__etc_audit_rules_d_audit_rules__var_log_tallylog
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-w /var/log/tallylog -p wa -k logins$'
+    line: "{{ rhel9STIG_stigrule_258226__etc_audit_rules_d_audit_rules__var_log_tallylog_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258226_Manage
+# R-258227 RHEL-09-654265
+- name : stigrule_258227__etc_audit_rules_d_audit_rules_f2
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-f 2$'
+    line: "{{ rhel9STIG_stigrule_258227__etc_audit_rules_d_audit_rules_f2_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258227_Manage
+# R-258228 RHEL-09-654270
+- name : stigrule_258228__etc_audit_rules_d_audit_rules_loginuid_immutable
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^--loginuid-immutable$'
+    line: "{{ rhel9STIG_stigrule_258228__etc_audit_rules_d_audit_rules_loginuid_immutable_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258228_Manage
+# R-258229 RHEL-09-654275
+- name : stigrule_258229__etc_audit_rules_d_audit_rules_e2
+  lineinfile:
+    path: /etc/audit/rules.d/audit.rules
+    regexp: '^-e 2$'
+    line: "{{ rhel9STIG_stigrule_258229__etc_audit_rules_d_audit_rules_e2_Line }}"
+  notify: auditd_restart
+  when: rhel9STIG_stigrule_258229_Manage
+# R-258234 RHEL-09-672010
+- name: stigrule_258234_crypto_policies
+  yum:
+    name: crypto-policies
+    state: "{{ rhel9STIG_stigrule_258234_crypto_policies_State }}"
+  when: rhel9STIG_stigrule_258234_Manage
+# R-258239 RHEL-09-672035
+- name: stigrule_258239__etc_pki_tls_openssl_cnf
+  lineinfile:
+    path: /etc/pki/tls/openssl.cnf
+    line: "{{ rhel9STIG_stigrule_258239__etc_pki_tls_openssl_cnf_Line }}"
+    create: yes
+  when:
+    - rhel9STIG_stigrule_258239_Manage
+# R-258240 RHEL-09-672040
+- name: stigrule_258240__etc_crypto_policies_back_ends_opensslcnf_config
+  lineinfile:
+    path: /etc/crypto-policies/back-ends/opensslcnf.config
+    regexp: '^\s*TLS.MinProtocol\s*='
+    line: "{{ rhel9STIG_stigrule_258240__etc_crypto_policies_back_ends_opensslcnf_config_Line }}"
+    create: yes
+  notify: do_reboot
+  when:
+    - rhel9STIG_stigrule_258240_Manage

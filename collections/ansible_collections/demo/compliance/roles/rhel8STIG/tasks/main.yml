@@ -4,7 +4,7 @@
 - name: stigrule_230225_banner
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)banner\s+'
+    regexp: '(?i)^\s*banner\s+'
     line: "{{ rhel8STIG_stigrule_230225_banner_Line }}"
   notify: ssh_restart
   when:
@@ -82,7 +82,7 @@
 - name: stigrule_230244_ClientAliveCountMax
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)ClientAliveCountMax\s+'
+    regexp: '(?i)^\s*ClientAliveCountMax\s+'
     line: "{{ rhel8STIG_stigrule_230244_ClientAliveCountMax_Line }}"
   notify: ssh_restart
   when:
@@ -249,7 +249,7 @@
 - name: stigrule_230288_StrictModes
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)StrictModes\s+'
+    regexp: '(?i)^\s*StrictModes\s+'
     line: "{{ rhel8STIG_stigrule_230288_StrictModes_Line }}"
   notify: ssh_restart
   when:
@@ -259,7 +259,7 @@
 - name: stigrule_230290_IgnoreUserKnownHosts
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)IgnoreUserKnownHosts\s+'
+    regexp: '(?i)^\s*IgnoreUserKnownHosts\s+'
     line: "{{ rhel8STIG_stigrule_230290_IgnoreUserKnownHosts_Line }}"
   notify: ssh_restart
   when:
@@ -269,7 +269,7 @@
 - name: stigrule_230291_KerberosAuthentication
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)KerberosAuthentication\s+'
+    regexp: '(?i)^\s*KerberosAuthentication\s+'
     line: "{{ rhel8STIG_stigrule_230291_KerberosAuthentication_Line }}"
   notify: ssh_restart
   when:
@@ -279,7 +279,7 @@
 - name: stigrule_230296_PermitRootLogin
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)PermitRootLogin\s+'
+    regexp: '(?i)^\s*PermitRootLogin\s+'
     line: "{{ rhel8STIG_stigrule_230296_PermitRootLogin_Line }}"
   notify: ssh_restart
   when:
@@ -395,7 +395,7 @@
 - name: stigrule_230330_PermitUserEnvironment
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)PermitUserEnvironment\s+'
+    regexp: '(?i)^\s*PermitUserEnvironment\s+'
     line: "{{ rhel8STIG_stigrule_230330_PermitUserEnvironment_Line }}"
   notify: ssh_restart
   when:
@@ -436,14 +436,6 @@
     create: yes
   when:
     - rhel8STIG_stigrule_230348_Manage
-# R-230349 RHEL-08-020041
-- name: stigrule_230349__etc_bashrc
-  lineinfile:
-    path: /etc/bashrc
-    line: "{{ rhel8STIG_stigrule_230349__etc_bashrc_Line }}"
-    create: yes
-  when:
-    - rhel8STIG_stigrule_230349_Manage
 # R-230352 RHEL-08-020060
 - name: stigrule_230352__etc_dconf_db_local_d_00_screensaver
   ini_file:
@@ -602,7 +594,7 @@
 - name: stigrule_230382_PrintLastLog
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)PrintLastLog\s+'
+    regexp: '(?i)^\s*PrintLastLog\s+'
     line: "{{ rhel8STIG_stigrule_230382_PrintLastLog_Line }}"
   notify: ssh_restart
   when:
@@ -726,16 +718,6 @@
   notify: auditd_restart
   when:
     - rhel8STIG_stigrule_230395_Manage
-# R-230396 RHEL-08-030070
-- name: stigrule_230396__etc_audit_auditd_conf
-  lineinfile:
-    path: /etc/audit/auditd.conf
-    regexp: '^log_group = '
-    line: "{{ rhel8STIG_stigrule_230396__etc_audit_auditd_conf_Line }}"
-    create: yes
-  notify: auditd_restart
-  when:
-    - rhel8STIG_stigrule_230396_Manage
 # R-230402 RHEL-08-030121
 - name : stigrule_230402__etc_audit_rules_d_audit_rules_e2
   lineinfile:
@@ -1348,7 +1330,7 @@
 - name: stigrule_230527_RekeyLimit
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)RekeyLimit\s+'
+    regexp: '(?i)^\s*RekeyLimit\s+'
     line: "{{ rhel8STIG_stigrule_230527_RekeyLimit_Line }}"
   notify: ssh_restart
   when:
@@ -1569,7 +1551,7 @@
 - name: stigrule_230555_X11Forwarding
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)X11Forwarding\s+'
+    regexp: '(?i)^\s*X11Forwarding\s+'
     line: "{{ rhel8STIG_stigrule_230555_X11Forwarding_Line }}"
   notify: ssh_restart
   when:
@@ -1579,7 +1561,7 @@
 - name: stigrule_230556_X11UseLocalhost
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)X11UseLocalhost\s+'
+    regexp: '(?i)^\s*X11UseLocalhost\s+'
     line: "{{ rhel8STIG_stigrule_230556_X11UseLocalhost_Line }}"
   notify: ssh_restart
   when:
@@ -1635,7 +1617,7 @@
 - name: stigrule_244525_ClientAliveInterval
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)ClientAliveInterval\s+'
+    regexp: '(?i)^\s*ClientAliveInterval\s+'
     line: "{{ rhel8STIG_stigrule_244525_ClientAliveInterval_Line }}"
   notify: ssh_restart
   when:
@@ -1651,7 +1633,7 @@
 - name: stigrule_244528_GSSAPIAuthentication
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*(?i)GSSAPIAuthentication\s+'
+    regexp: '(?i)^\s*GSSAPIAuthentication\s+'
     line: "{{ rhel8STIG_stigrule_244528_GSSAPIAuthentication_Line }}"
   notify: ssh_restart
   when:
@@ -1798,3 +1780,9 @@
     create: yes
   when:
     - rhel8STIG_stigrule_244554_Manage
+# R-256974 RHEL-08-010358
+- name: stigrule_256974_mailx
+  yum:
+    name: mailx
+    state: "{{ rhel8STIG_stigrule_256974_mailx_State }}"
+  when: rhel8STIG_stigrule_256974_Manage
