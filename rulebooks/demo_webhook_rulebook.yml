@@ -13,8 +13,8 @@
     - name: Condition rule
       condition:
         all:
-          - event.payload is defined
-          - event.payload is regex("fapolicyd")
+          - event.message is defined
+          - event.message is regex("fapolicyd")
       action:
         debug:
   
