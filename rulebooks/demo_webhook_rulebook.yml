@@ -5,13 +5,13 @@
         port: "{{ port | default(5555) }}"
         host: 0.0.0.0
   rules:
-    - name: Webhook rule
-      # condition: event.payload.message is select("==", "fapolicyd")
-      condition: true
-      action:
-        debug:
-          msg:
-            - "{{ event }}" 
+    # - name: Webhook rule
+    #   # condition: event.payload.message is select("==", "fapolicyd")
+    #   condition: true
+    #   action:
+    #     debug:
+    #       msg:
+    #         - "{{ event }}" 
     - name: Condition rule
       condition:
         all:
