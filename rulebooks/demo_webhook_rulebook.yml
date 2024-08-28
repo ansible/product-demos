@@ -18,5 +18,11 @@
           - event.payload is defined
           - event.payload[0]["message"] is regex("fapolicyd")
       action:
-        debug:
-  
+        run_job_template:
+          name: 'LINUX / Multi-profile Compliance'
+          job_args:
+            compliance_profile: "e8"
+            _hosts: "{{ payload[0].host }}"
+            job_tags: "enable_strategy"
+
+
