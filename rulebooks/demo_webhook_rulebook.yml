@@ -17,6 +17,7 @@
         all:
           - event.payload is defined
           - event.payload[0]["message"] is regex("fapolicyd")
+          - event.payload[0]["message"] is regex("shutting down")
       action:
         run_job_template:
           name: 'E8 Application Control'
