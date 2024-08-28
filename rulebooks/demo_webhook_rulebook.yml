@@ -9,8 +9,7 @@
       # condition: event.payload.message is select("==", "fapolicyd")
       condition: true
       action:
-        print_event:
-          pretty: true
+        debug:
     - name: Condition rule
       condition: >-
         event.payload.message is defined and
