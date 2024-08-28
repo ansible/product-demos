@@ -38,4 +38,4 @@
 
 - name: Print out where to go for the network report
   ansible.builtin.debug:
-    msg: "Please go here for the network report: http://{{ inventory_host }}/reports/network.html"
+    msg: "Please go here for the network report: http://{{ inventory_hostname }}/reports/network.html"
