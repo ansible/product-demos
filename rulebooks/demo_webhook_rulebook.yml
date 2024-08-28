@@ -16,19 +16,15 @@
       condition:
         all:
           - event.payload is defined
-          - event.payload[0]["message"] is regex("fapolicyd")
-          - event.payload[0]["message"] is regex("shutting down")
+          - event.payload[0]["message"] is regex("systemctl stop fapolicyd")
       action:
-        debug:
-          msg:
-            - "{{ event }}"
-        # run_job_template:
-        #   name: 'E8 Application Control'
-        #   organization: Default
-        #   job_args:
-        #     extra_vars:
-        #       compliance_profile: "e8"
-        #       _hosts: "aws_rhel9"
-        #       job_tags: "enable_strategy"
+        run_job_template:
+          name: 'E8 Application Control'
+          organization: Default
+          job_args:
+            extra_vars:
+              compliance_profile: "e8"
+              _hosts: "aws_rhel9"
+              job_tags: "enable_strategy"
 
 
