@@ -14,4 +14,4 @@
       condition: true
       debug:
         msg:
-          - "first: {{ event }}"
+          - "first: {{ event[0] }}"
