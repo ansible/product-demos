@@ -20,6 +20,7 @@
       action:
         run_job_template:
           name: 'LINUX / Multi-profile Compliance'
+          organization: Default
           job_args:
             compliance_profile: "e8"
             _hosts: "aws_rhel9"
