@@ -6,7 +6,7 @@
         host: 0.0.0.0
   rules:
     - name: Webhook rule
-      condition: event.payload.message == 'fapolicyd.service: Deactivated successfully.'
+      condition: event.payload.message contains 'fapolicyd.service'
       action:
         print_event:
           pretty: true
