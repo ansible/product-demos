@@ -15,8 +15,8 @@
     - name: Condition rule
       condition:
         all:
-          - payload[0] is defined
-          - payload[0].message is regex("fapolicyd")
+          - payload is defined
+          - payload[0]["message"] is regex("fapolicyd")
       action:
         debug:
   
