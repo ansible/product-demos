@@ -9,11 +9,12 @@
       # condition: event.payload.message is select("==", "fapolicyd")
       condition: true
       action:
-        debug:
+        print_event:
     - name: Condition rule
-      condition: >-
-        event.payload.message is defined and
-        event.payload.message is regex("fapolicyd")
+      condition:
+        all:
+          - event.payload is defined and
+          - event.payload is regex("fapolicyd")
       action:
         debug:
   
