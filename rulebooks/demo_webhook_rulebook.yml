@@ -6,6 +6,8 @@
         host: 0.0.0.0
   rules:
     - name: Webhook rule
-      condition: event.payload.message is select("==", "fapolicyd")
+      # condition: event.payload.message is select("==", "fapolicyd")
+      condition: true
       action:
-        debug:
+        print_event:
+          pretty: true
