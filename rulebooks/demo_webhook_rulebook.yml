@@ -14,4 +14,4 @@
       condition: true
       debug:
         msg:
-          - "first: {{ event.payload }}"
+          - "first: {{ event }}"
