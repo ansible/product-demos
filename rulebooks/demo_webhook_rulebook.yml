@@ -13,7 +13,7 @@
           pretty: true
     - name: Condition rule
       condition: >-
-        event.payload.message is defined
+        event.payload.message is defined and
         event.payload.message is regex("fapolicyd")
       action:
         debug:
