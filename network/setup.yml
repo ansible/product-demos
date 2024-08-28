@@ -15,28 +15,21 @@ controller_projects:
     default_environment: Networking Execution Environment
 
 controller_inventories:
-  - name: Network Inventory
+  - name: Demo Inventory
     organization: Default
 
 controller_inventory_sources:
   - name: DevNet always-on sandboxes
     source: scm
-    inventory: Network Inventory
+    inventory: Demo Inventory
     overwrite: true
     source_project: Network Golden Configs
     source_path: hosts
 
-controller_hosts:
-  - name: node1
-    inventory: Network Inventory
-    variables:
-      ansible_user: rhel
-      ansible_host: node1
-
 controller_templates:
   - name: NETWORK / Configuration
     organization: Default
-    inventory: Network Inventory
+    inventory: Demo Inventory
     survey_enabled: true
     project: Network Golden Configs
     playbook: main.yml
@@ -70,7 +63,7 @@ controller_templates:
   - name: "NETWORK / Report"
     job_type: check
     organization: Default
-    inventory: Network Inventory
+    inventory: Demo Inventory
     project: "Ansible official demo project"
     playbook: "network/report.yml"
     notification_templates_started: Telemetry
@@ -99,7 +92,7 @@ controller_templates:
   - name: "NETWORK / DISA STIG"
     job_type: check
     organization: Default
-    inventory: Network Inventory
+    inventory: Demo Inventory
     project: "Ansible official demo project"
     playbook: "network/compliance.yml"
     notification_templates_started: Telemetry
