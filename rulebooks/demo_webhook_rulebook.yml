@@ -9,7 +9,9 @@
       # condition: event.payload.message is select("==", "fapolicyd")
       condition: true
       action:
-        print_event:
+        debug:
+          msg:
+            - "{{ event }}" 
     - name: Condition rule
       condition:
         all:
