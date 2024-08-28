@@ -22,7 +22,7 @@
           name: 'LINUX / Multi-profile Compliance'
           job_args:
             compliance_profile: "e8"
-            _hosts: "{{ event.payload[0].host }}"
+            _hosts: "aws_rhel9"
             job_tags: "enable_strategy"
 
 
