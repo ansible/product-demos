@@ -10,3 +10,8 @@
       action:
         print_event:
           pretty: true
+    - name: Debug
+      condition: 1
+      action:
+        print_event:
+          pretty: true
