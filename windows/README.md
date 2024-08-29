@@ -4,7 +4,7 @@
 - [Windows Demos](#windows-demos)
   - [Table of Contents](#table-of-contents)
   - [About These Demos](#about-these-demos)
-  - [Known Issues](#known-issues)
+    - [Known Issues](#known-issues)
     - [Jobs](#jobs)
     - [Workflows](#workflows)
   - [Suggested Usage](#suggested-usage)
@@ -12,7 +12,7 @@
 ## About These Demos
 This category of demos shows examples of Windows Server operations and management with Ansible Automation Platform. The list of demos can be found below. See the [Suggested Usage](#suggested-usage) section of this document for recommendations on how to best use these demos.
 
-## Known Issues
+### Known Issues
 We are currently investigating an intermittent connectivity issue related to the credentials for Windows hosts. If encountered, re-provision your demo environment. You can track the issue and related work [here](https://github.com/ansible/product-demos/issues/176).
 
 ### Jobs
