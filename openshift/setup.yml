@@ -7,7 +7,39 @@ controller_components:
   - job_templates
   - workflow_job_templates
 
+controller_credential_types:
+  - name: Usable Automation Hub Credential
+    kind: cloud
+    description: A credential we can use from a playbook to interact with Automation Hub
+    inputs:
+      fields:
+        - id: registry_username
+          type: string
+          label: Registry Username
+        - id: registry_password
+          type: string
+          label: Registry Password
+          secret: true
+        - id: ah_token
+          type: string
+          label: Automation Hub Token
+          secret: true
+    injectors:
+      env:
+        REGISTRY_USERNAME: !unsafe '{{ registry_username }}'
+        REGISTRY_PASSWORD: !unsafe '{{ registry_password }}'
+        AH_TOKEN: !unsafe '{{ ah_token }}'
+
 controller_credentials:
+  - name: Usable Hub Credential
+    organization: Default
+    credential_type: Usable Automation Hub Credential
+    state: exists
+    inputs:
+      registry_username: CHANGEME
+      registry_password: CHANGEME
+      ah_token: CHANGEME
+
   - name: OpenShift Credential
     organization: Default
     credential_type: OpenShift or Kubernetes API Bearer Token
@@ -63,16 +95,8 @@ controller_templates:
     notification_templates_error: Telemetry
     survey_enabled: true
     credentials:
-      - "OpenShift Credential"
       - "Controller Credential"
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: Automation Hub Token
-          type: text
-          variable: ah_token
-          required: true
+      - "Usable Hub Credential"
     extra_vars:
       ah_collection_remotes:
         - name: rh-certified
@@ -89,24 +113,14 @@ controller_templates:
     notification_templates_error: Telemetry
     survey_enabled: true
     credentials:
-      - "OpenShift Credential"
       - "Controller Credential"
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: EE Registry username
-          type: text
-          variable: ee_registry_username
-          required: true
-        - question_name: EE Registry password
-          type: text
-          variable: ee_registry_password
-          required: true
+      - "Usable Hub Credential"
     extra_vars:
       ah_ee_registries:
         - name: rh-registry
           url: https://registry.redhat.io
+      ah_ee_images:
+        - name: "ansible-automation-platform-24/ee-supported-rhel9"
 
   - name: OpenShift / CNV / Install Operator
     job_type: run
@@ -311,22 +325,6 @@ controller_workflows:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: Automation Hub Token
-          type: text
-          variable: ah_token
-          required: true
-        - question_name: EE Registry username
-          type: text
-          variable: ee_registry_username
-          required: true
-        - question_name: EE Registry password
-          type: text
-          variable: ee_registry_password
-          required: true
     simplified_workflow_nodes:
       - identifier: Install AH using AAP Operator
         unified_job_template: OpenShift / Hub / Install Automation Hub

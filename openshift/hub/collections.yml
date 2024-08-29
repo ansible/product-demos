@@ -8,7 +8,7 @@
         name: "{{ item.name }}"
         url: "{{ item.url }}"
         auth_url: "{{ item.auth_url }}"
-        token: "{{ ah_token }}"
+        token: "{{ lookup('ansible.builtin.env', 'AH_TOKEN') }}"
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"

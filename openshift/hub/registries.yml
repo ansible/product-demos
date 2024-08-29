@@ -3,6 +3,12 @@
   hosts: localhost
   gather_facts: false
   tasks:
+    - name: Assert non-default credentials
+      ansible.builtin.assert:
+        that:
+          - lookup('ansible.builtin.env', 'REGISTRY_USERNAME') != 'CHANGEME'
+        fail_msg: "Please provide `Usable Automation Hub Credential`"
+
     - name: Add Console EE credential
       infra.ah_configuration.ah_ee_registry:
         name: "{{ item.name }}"
@@ -10,12 +16,12 @@
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
-        username: "{{ ee_registry_username }}"
-        password: "{{ ee_registry_password }}"
+        username: "{{ lookup('ansible.builtin.env', 'REGISTRY_USERNAME') }}"
+        password: "{{ lookup('ansible.builtin.env', 'REGISTRY_PASSWORD') }}"
       loop: "{{ ah_ee_registries }}"
 
-    - name: Sync AH registries
-      infra.ah_configuration.ah_ee_registry_sync:
+    - name: Index AH registries
+      infra.ah_configuration.ah_ee_registry_index:
         name: "{{ item.name }}"
         wait: true
         timeout: 300
@@ -24,12 +30,26 @@
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
       loop: "{{ ah_ee_registries }}"
 
-    - name: Index AH registries
-      infra.ah_configuration.ah_ee_registry_index:
+    # Not sure if this is a limitation of our AH deployment, or a bug,
+    # but the wait feature does not succeed, see the regries/until for 'Sync images'
+    - name: Sync AH registries
+      infra.ah_configuration.ah_ee_registry_sync:
         name: "{{ item.name }}"
         wait: false
-        timeout: 300
+        timeout: 1500
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
       loop: "{{ ah_ee_registries }}"
+
+    - name: Sync images
+      infra.ah_configuration.ah_ee_image:
+        name: "{{ item.name }}"
+        ah_host: "{{ automation_hub_url }}"
+        ah_username: 'admin'
+        ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+      loop: "{{ ah_ee_images }}"
+      retries: 50
+      register: sync_image
+      delay: 5
+      until: sync_image is succeeded
