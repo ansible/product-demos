@@ -1,0 +1,9 @@
+---
+- name: Rollback playbook
+  hosts: "{{ _hosts | default('os_windows') }}"
+  gather_facts: false
+
+  tasks:
+    - name: Rollback this step
+      ansible.builtin.debug:
+        msg: "{{ rollback_msg | default('rolling back this step') }}"

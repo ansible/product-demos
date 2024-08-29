@@ -9,18 +9,24 @@
         name: Administrator
         password: "{{ ansible_password }}"
 
+    - name: Update the hostname
+      ansible.windows.win_hostname:
+        name: "{{ inventory_hostname.split('.')[0] }}"
+
+    - name: Reboot to apply new hostname
+      ansible.windows.win_reboot:
+        reboot_timeout: 3600
+
     - name: Create new domain in a new forest on the target host
+      register: r_create_domain
       ansible.windows.win_domain:
         dns_domain_name: ansible.local
         safe_mode_password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
-      notify:
-        - Reboot host
-        - Wait for AD services
-        - Reboot again
-        - Wait for AD services again
 
-    - name: Flush handlers
-      ansible.builtin.meta: flush_handlers
+    - name: Verify domain services running
+      when: r_create_domain is changed
+      ansible.builtin.include_tasks:
+        file: tasks/domain_services_check.yml
 
     - name: Create some groups
       community.windows.win_domain_group:
@@ -48,28 +54,3 @@
           groups: "GroupC"
       retries: 5
       delay: 10
-
-  handlers:
-    - name: Reboot host
-      ansible.windows.win_reboot:
-        reboot_timeout: 3600
-
-    - name: Wait for AD services
-      community.windows.win_wait_for_process:
-        process_name_exact: Microsoft.ActiveDirectory.WebServices
-        pre_wait_delay: 60
-        state: present
-        timeout: 600
-        sleep: 10
-
-    - name: Reboot again
-      ansible.windows.win_reboot:
-        reboot_timeout: 3600
-
-    - name: Wait for AD services again
-      community.windows.win_wait_for_process:
-        process_name_exact: Microsoft.ActiveDirectory.WebServices
-        pre_wait_delay: 60
-        state: present
-        timeout: 600
-        sleep: 10
