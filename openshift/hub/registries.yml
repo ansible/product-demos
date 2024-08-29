@@ -29,8 +29,6 @@
         name: "{{ item.name }}"
         state: present
         tags: "{{ item.tags }}"
-        wait: true
-        timeout: 300
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
