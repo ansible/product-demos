@@ -18,7 +18,7 @@
       infra.ah_configuration.collection_repository_sync:
         name: "{{ item.name }}"
         wait: true
-        timeout: 1500
+        timeout: 2500
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"

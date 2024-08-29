@@ -329,12 +329,13 @@ controller_workflows:
       - identifier: Install AH using AAP Operator
         unified_job_template: OpenShift / Hub / Install Automation Hub
         success_nodes:
-          - Sync Collections
           - Sync EEs
         failure_nodes:
           - Ticket - Instance Failed
       - identifier: Sync EEs
         unified_job_template: OpenShift / Hub / Sync EE Registries
+        success_nodes:
+          - Sync Collections
         failure_nodes:
           - Ticket - Instance Failed
       - identifier: Sync Collections
