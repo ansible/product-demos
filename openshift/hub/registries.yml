@@ -27,7 +27,7 @@
     - name: Index AH registries
       infra.ah_configuration.ah_ee_registry_index:
         name: "{{ item.name }}"
-        wait: true
+        wait: false
         timeout: 300
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
