@@ -49,7 +49,7 @@
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
       loop: "{{ ah_ee_images }}"
-      retries: 50
+      retries: 120
       register: sync_image
       delay: 5
       until: sync_image is succeeded
