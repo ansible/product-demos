@@ -107,13 +107,6 @@ controller_templates:
       ah_ee_registries:
         - name: rh-registry
           url: https://registry.redhat.io
-      ah_ee_images:
-        - name: registry.redhat.io/ansible-automation-platform-24/ee-supported-rhel9
-          tags:
-            - latest
-        - name: registry.redhat.io/ansible-automation-platform-24/ee-minimal-rhel9
-          tags:
-            - latest
 
   - name: OpenShift / CNV / Install Operator
     job_type: run

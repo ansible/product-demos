@@ -24,12 +24,12 @@
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
       loop: "{{ ah_ee_registries }}"
 
-    - name: Pull EE images
-      infra.ah_configuration.ah_ee_image:
+    - name: Index AH registries
+      infra.ah_configuration.ah_ee_registry_index:
         name: "{{ item.name }}"
-        state: present
-        tags: "{{ item.tags }}"
+        wait: true
+        timeout: 300
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
-      loop: "{{ ah_ee_images }}"
+      loop: "{{ ah_ee_registries }}"
