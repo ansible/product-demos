@@ -1,0 +1,9 @@
+---
+- name: Manage CNV snapshots
+  hosts: localhost
+  tasks:
+    - name: Include snapshot role
+      ansible.builtin.include_role:
+        name: "demo.openshift.snapshot"
+      vars:
+        snapshot_hosts: "{{ _hosts }}"
