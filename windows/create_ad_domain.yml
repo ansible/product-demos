@@ -24,6 +24,7 @@
         safe_mode_password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
 
     - name: Verify domain services running
+      # noqa no-handler
       when: r_create_domain is changed
       ansible.builtin.include_tasks:
         file: tasks/domain_services_check.yml

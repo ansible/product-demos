@@ -12,4 +12,4 @@
         timeout: "{{ wait_for_timeout_sec | default(300) }}"
 
     - name: Ping the windows host
-      ansible.builtin.win_ping:
+      ansible.windows.win_ping:
