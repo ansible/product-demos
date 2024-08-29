@@ -1,0 +1,283 @@
+---
+controller_execution_environments:
+  - name: product-demos
+    image: quay.io/acme_corp/product-demos-ee:latest
+  - name: Cloud Services Execution Environment
+    image: quay.io/scottharwell/cloud-ee:latest
+
+controller_organizations:
+  - name: Default
+    default_environment: product-demos
+
+controller_projects:
+  - name: Ansible Cloud Content Lab - AWS
+    organization: Default
+    scm_type: git
+    wait: true
+    scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
+    default_environment: Cloud Services Execution Environment
+
+controller_credentials:
+  - name: AWS
+    credential_type: Amazon Web Services
+    organization: Default
+    update_secrets: false
+    state: exists
+    inputs:
+      username: REPLACEME
+      password: REPLACEME
+
+controller_inventory_sources:
+  - name: AWS Inventory
+    organization: Default
+    source: ec2
+    inventory: Demo Inventory
+    credential: AWS
+    overwrite: true
+    source_vars:
+      hostnames:
+        - tag:Name
+      compose:
+        ansible_host: public_ip_address
+        ansible_user: 'ec2-user'
+      groups:
+        cloud_aws: true
+        os_linux: tags.blueprint.startswith('rhel')
+        os_windows: tags.blueprint.startswith('win')
+      keyed_groups:
+        - key: platform
+          prefix: os
+        - key: tags.blueprint
+          prefix: blueprint
+        - key: tags.owner
+          prefix: owner
+        - key: tags.purpose
+          prefix: purpose
+        - key: tags.deployment
+          prefix: deployment
+
+controller_groups:
+  - name: cloud_aws
+    inventory: Demo Inventory
+    variables:
+      ansible_user: ec2-user
+  - name: os_windows
+    inventory: Demo Inventory
+    variables:
+      ansible_connection: winrm
+      ansible_winrm_transport: credssp
+
+controller_templates:
+  - name: SUBMIT FEEDBACK
+    job_type: run
+    inventory: Demo Inventory
+    project: Ansible official demo project
+    playbook: feedback.yml
+    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Name/Email/Contact
+          type: text
+          variable: email
+          required: true
+        - question_name: Issue or Feedback
+          type: textarea
+          variable: feedback
+          required: true
+
+  - name: Cloud / AWS / Create VPC
+    job_type: run
+    organization: Default
+    credentials:
+      - AWS
+    project: Ansible official demo project
+    playbook: cloud/create_vpc.yml
+    inventory: Demo Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Owner
+          type: text
+          variable: aws_owner_tag
+          required: true
+
+  - name: Cloud / AWS / Create Keypair
+    job_type: run
+    organization: Default
+    credentials:
+      - AWS
+    project: Ansible official demo project
+    playbook: cloud/aws_key.yml
+    inventory: Demo Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Keypair Name
+          type: text
+          variable: aws_key_name
+          required: true
+          default: aws-test-key
+        - question_name: Keypair Public Key
+          type: textarea
+          variable: aws_public_key
+          required: true
+        - question_name: Owner
+          type: text
+          variable: aws_keypair_owner
+          required: true
+
+  - name: Cloud / AWS / Create VM
+    job_type: run
+    organization: Default
+    credentials:
+      - AWS
+      - Demo Credential
+    project: Ansible Cloud Content Lab - AWS
+    playbook: playbooks/create_vm.yml
+    inventory: Demo Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    allow_simultaneous: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Name
+          type: text
+          variable: create_vm_vm_name
+          required: true
+        - question_name: Owner
+          type: text
+          variable: create_vm_vm_owner
+          required: true
+        - question_name: Deployment
+          type: text
+          variable: create_vm_vm_deployment
+          required: true
+        - question_name: Purpose
+          type: text
+          variable: create_vm_vm_purpose
+          required: true
+          default: demo
+        - question_name: Environment
+          type: multiplechoice
+          variable: create_vm_vm_environment
+          required: true
+          choices:
+            - Dev
+            - QA
+            - Prod
+        - question_name: Blueprint
+          type: multiplechoice
+          variable: vm_blueprint
+          required: true
+          choices:
+            - windows_core
+            - windows_full
+            - rhel9
+            - rhel8
+            - rhel7
+            - al2023
+        - question_name: Subnet
+          type: text
+          variable: create_vm_aws_vpc_subnet_name
+          required: true
+          default: aws-test-subnet
+        - question_name: Security Group
+          type: text
+          variable: create_vm_aws_securitygroup_name
+          required: true
+          default: aws-test-sg
+        - question_name: SSH Keypair
+          type: text
+          variable: create_vm_aws_keypair_name
+          required: true
+          default: aws-test-key
+        - question_name: AWS Instance Type (defaults to blueprint value)
+          type: text
+          variable: create_vm_aws_instance_size
+          required: false
+        - question_name: AWS Image Filter (defaults to blueprint value)
+          type: text
+          variable: create_vm_aws_image_filter
+          required: false
+
+  - name: Cloud / AWS / Delete VM
+    job_type: run
+    organization: Default
+    credentials:
+      - AWS
+      - Demo Credential
+    project: Ansible Cloud Content Lab - AWS
+    playbook: playbooks/delete_inventory_vm.yml
+    inventory: Demo Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Name or Pattern
+          type: text
+          variable: _hosts
+          required: true
+
+controller_notifications:
+  - name: Telemetry
+    organization: Default
+    notification_type: webhook
+    notification_configuration:
+      url: https://script.google.com/macros/s/AKfycbzxUObvCJ6ZbzfJyicw4RvxlGE3AZdrK4AR5-TsedCYd7O-rtTOVjvsRvqyb3rx6B0g8g/exec
+      http_method: POST
+      headers: {}
+
+controller_settings:
+  - name: SESSION_COOKIE_AGE
+    value: 180000

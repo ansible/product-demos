@@ -142,9 +142,6 @@ rhel8STIG_stigrule_230347__etc_dconf_db_local_d_00_screensaver_Value: 'true'
 rhel8STIG_stigrule_230348_Manage: True
 rhel8STIG_stigrule_230348_ensure_tmux_is_installed_State: installed
 rhel8STIG_stigrule_230348__etc_tmux_conf_Line: 'set -g lock-command vlock'
-# R-230349 RHEL-08-020041
-rhel8STIG_stigrule_230349_Manage: True
-rhel8STIG_stigrule_230349__etc_bashrc_Line: '[ -n "$PS1" -a -z "$TMUX" ] && exec tmux'
 # R-230352 RHEL-08-020060
 rhel8STIG_stigrule_230352_Manage: True
 rhel8STIG_stigrule_230352__etc_dconf_db_local_d_00_screensaver_Value: 'uint32 900'
@@ -232,9 +229,6 @@ rhel8STIG_stigrule_230394__etc_audit_auditd_conf_Line: 'name_format = hostname'
 # R-230395 RHEL-08-030063
 rhel8STIG_stigrule_230395_Manage: True
 rhel8STIG_stigrule_230395__etc_audit_auditd_conf_Line: 'log_format = ENRICHED'
-# R-230396 RHEL-08-030070
-rhel8STIG_stigrule_230396_Manage: True
-rhel8STIG_stigrule_230396__etc_audit_auditd_conf_Line: 'log_group = root'
 # R-230398 RHEL-08-030090
 # A duplicate of 230396
 # duplicate of 230396
@@ -569,3 +563,6 @@ rhel8STIG_stigrule_244553_net_ipv4_conf_all_accept_redirects_Value: 0
 # R-244554 RHEL-08-040286
 rhel8STIG_stigrule_244554_Manage: True
 rhel8STIG_stigrule_244554__etc_sysctl_d_99_sysctl_conf_Line: 'net.core.bpf_jit_harden = 2'
+# R-256974 RHEL-08-010358
+rhel8STIG_stigrule_256974_Manage: True
+rhel8STIG_stigrule_256974_mailx_State: installed
