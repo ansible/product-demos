@@ -53,11 +53,11 @@ controller_templates:
       - "OpenShift Credential"
       - "Controller Credential"
 
-  - name: OpenShift / Hub / Sync Repositories
+  - name: OpenShift / Hub / Sync Collection Repositories
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
-    playbook: "openshift/hub/sync.yml"
+    playbook: "openshift/hub/collections.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -79,6 +79,41 @@ controller_templates:
           url: https://console.redhat.com/api/automation-hub/content/published/
           auth_url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
 
+  - name: OpenShift / Hub / Sync EE Registries
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/hub/registries.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    credentials:
+      - "OpenShift Credential"
+      - "Controller Credential"
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: EE Registry username
+          type: text
+          variable: ee_registry_username
+          required: true
+        - question_name: EE Registry password
+          type: text
+          variable: ee_registry_password
+          required: true
+    extra_vars:
+      ah_ee_registries:
+        - name: rh-registry
+          url: https://registry.redhat.io
+      ah_ee_images:
+        - name: registry.redhat.io/ansible-automation-platform-24/ee-supported-rhel9
+          tags:
+            - latest
+        - name: registry.redhat.io/ansible-automation-platform-24/ee-minimal-rhel9
+          tags:
+            - latest
 
   - name: OpenShift / CNV / Install Operator
     job_type: run
@@ -276,7 +311,7 @@ controller_workflows:
         extra_data:
           feedback: Failed to create CNV instance
 
-  - name: OpenShift / Hub / Deploy Automation Hub and sync repositories
+  - name: OpenShift / Hub / Deploy Automation Hub and sync EEs and Collections
     description: A workflow to deploy Automation Hub and sync repositories
     organization: Default
     notification_templates_started: Telemetry
@@ -291,15 +326,28 @@ controller_workflows:
           type: text
           variable: ah_token
           required: true
+        - question_name: EE Registry username
+          type: text
+          variable: ee_registry_username
+          required: true
+        - question_name: EE Registry password
+          type: text
+          variable: ee_registry_password
+          required: true
     simplified_workflow_nodes:
       - identifier: Install AH using AAP Operator
         unified_job_template: OpenShift / Hub / Install Automation Hub
         success_nodes:
-          - Sync Repos
+          - Sync Collections
+          - Sync EEs
         failure_nodes:
           - Ticket - Instance Failed
-      - identifier: Sync Repos
-        unified_job_template: OpenShift / Hub / Sync Repositories
+      - identifier: Sync EEs
+        unified_job_template: OpenShift / Hub / Sync EE Registries
+        failure_nodes:
+          - Ticket - Instance Failed
+      - identifier: Sync Collections
+        unified_job_template: OpenShift / Hub / Sync Collection Repositories
         failure_nodes:
           - Ticket - Instance Failed
       - identifier: Ticket - Instance Failed

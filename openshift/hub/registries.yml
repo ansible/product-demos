@@ -1,0 +1,37 @@
+---
+- name: Configure AH credential for registry and sync EEs
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Add Console EE credential
+      infra.ah_configuration.ah_ee_registry:
+        name: "{{ item.name }}"
+        url: "{{ item.url }}"
+        ah_host: "{{ automation_hub_url }}"
+        ah_username: 'admin'
+        ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+        username: "{{ ee_registry_username }}"
+        password: "{{ ee_registry_password }}"
+      loop: "{{ ah_ee_registries }}"
+
+    - name: Sync AH registries
+      infra.ah_configuration.ah_ee_registry_sync:
+        name: "{{ item.name }}"
+        wait: true
+        timeout: 300
+        ah_host: "{{ automation_hub_url }}"
+        ah_username: 'admin'
+        ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+      loop: "{{ ah_ee_registries }}"
+
+    - name: Pull EE images
+      infra.ah_configuration.ah_ee_image:
+        name: "{{ item.name }}"
+        state: present
+        tags: "{{ item.tags }}"
+        wait: true
+        timeout: 300
+        ah_host: "{{ automation_hub_url }}"
+        ah_username: 'admin'
+        ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+      loop: "{{ ah_ee_images }}"

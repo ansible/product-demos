@@ -1,9 +1,9 @@
 ---
-- name: Add AH token to repo and Sync AutomationHub
+- name: Add AH collection token to repo and sync repository
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Add AH token
+    - name: Add Console AH token
       infra.ah_configuration.collection_remote:
         name: "{{ item.name }}"
         url: "{{ item.url }}"
