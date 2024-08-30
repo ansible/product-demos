@@ -52,7 +52,7 @@
       changed_when: false
 
     - name: Output
-        ansible.builtin.debug:
-          msg:
-            - "Contents of web page:"
-            - "{{ web_output.content }}"
+      ansible.builtin.debug:
+        msg:
+          - "Contents of web page:"
+          - "{{ web_output.content }}"
