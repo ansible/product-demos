@@ -1,7 +1,7 @@
 - name: check web server
   ansible.eda.url_check:
     urls:
-      - http://"{{ web_url }}"
+      - http://3.25.96.110
     delay: 10
   rules:
     # - name: restart web server
