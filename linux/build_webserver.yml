@@ -1,6 +1,7 @@
 ---
 - name: Setup webserver and copy custom webpage
   hosts: "{{ _hosts | default(omit) }}"
+  become: true
   vars:
     volume_path: podman
     message: undef
