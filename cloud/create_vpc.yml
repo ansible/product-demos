@@ -126,8 +126,8 @@
     - name: Set VPC stats
       ansible.builtin.set_stats:
         data:
-          __aws_region: '{{ create_vm_aws_region }}'
-          __aws_vpc_id: '{{ aws_vpc.vpc.id }}'
-          __aws_vpc_cidr: '{{ aws_vpc_cidr_block }}'
-          __aws_subnet_id: '{{ aws_subnet.subnet.id }}'
-          __aws_subnet_cidr: '{{ aws_subnet_cidr }}'
+          stat_aws_region: '{{ create_vm_aws_region }}'
+          stat_aws_vpc_id: '{{ aws_vpc.vpc.id }}'
+          stat_aws_vpc_cidr: '{{ aws_vpc_cidr_block }}'
+          stat_aws_subnet_id: '{{ aws_subnet.subnet.id }}'
+          stat_aws_subnet_cidr: '{{ aws_subnet_cidr }}'

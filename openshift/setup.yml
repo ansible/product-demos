@@ -57,6 +57,7 @@ controller_inventory_sources:
     source_path: openshift/inventory.kubevirt.yml
     credential: OpenShift Credential
     update_on_launch: false
+    overwrite: true
 
 controller_templates:
   - name: OpenShift / EDA / Install Controller
@@ -178,11 +179,67 @@ controller_templates:
     credentials:
       - "OpenShift Credential"
 
+  - name: OpenShift / CNV / Create VM Snapshots
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/cnv/snapshot.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      snapshot_operation: create
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          default: "openshift-cnv-rhel*"
+          required: true
+        - question_name: VM NameSpace
+          type: text
+          variable: vm_namespace
+          default: openshift-cnv
+          required: true
+    credentials:
+      - "OpenShift Credential"
+
+  - name: OpenShift / CNV / Restore Latest VM Snapshots
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/cnv/snapshot.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      snapshot_operation: restore
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          default: "openshift-cnv-rhel*"
+          required: true
+        - question_name: VM NameSpace
+          type: text
+          variable: vm_namespace
+          default: openshift-cnv
+          required: true
+    credentials:
+      - "OpenShift Credential"
+
   - name: OpenShift / CNV / Delete VM
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
-    playbook: "openshift/cnv/provision.yml"
+    playbook: "openshift/cnv/delete.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -193,19 +250,20 @@ controller_templates:
       name: ''
       description: ''
       spec:
-        - question_name: VM name
+        - question_name: VM host string
           type: text
-          variable: vm_name
+          variable: vm_host_string
           required: true
         - question_name: VM NameSpace
           type: text
           variable: vm_namespace
           default: openshift-cnv
           required: true
+
     credentials:
       - "OpenShift Credential"
 
-  - name: OpenShift / CNV / Patching
+  - name: OpenShift / CNV / Patch
     job_type: check
     inventory: "Demo Inventory"
     project: "Ansible official demo project"
@@ -324,7 +382,6 @@ controller_workflows:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    survey_enabled: true
     simplified_workflow_nodes:
       - identifier: Install AH using AAP Operator
         unified_job_template: OpenShift / Hub / Install Automation Hub
@@ -346,3 +403,48 @@ controller_workflows:
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to deploy Automation Hub on OCP
+
+  - name: OpenShift / CNV / Patch CNV Workflow
+    description: A workflow to patch CNV instances with snapshot and restore on failure.
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Specify target hosts
+          type: text
+          variable: _hosts
+          required: true
+          default: "openshift-cnv-rhel*"
+    simplified_workflow_nodes:
+      - identifier: Project Sync
+        unified_job_template: Ansible official demo project
+        success_nodes:
+          - Patch Instance
+      # We need to do an invnetory sync *after* creating snapshots, as turning VMs on/off changes their IP
+      - identifier: Inventory Sync
+        unified_job_template: OpenShift CNV Inventory
+        success_nodes:
+          - Patch Instance
+      - identifier: Take Snapshot
+        unified_job_template: OpenShift / CNV / Create VM Snapshots
+        success_nodes:
+          - Project Sync
+          - Inventory Sync
+      - identifier: Patch Instance
+        unified_job_template: OpenShift / CNV / Patch
+        job_type: run
+        failure_nodes:
+          - Restore from Snapshot
+      - identifier: Restore from Snapshot
+        unified_job_template: OpenShift / CNV / Restore Latest VM Snapshots
+        failure_nodes:
+          - Ticket - Restore Failed
+      - identifier: Ticket - Restore Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: OpenShift / CNV / Patch CNV Workflow | Failed to restore CNV VM from snapshot

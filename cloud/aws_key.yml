@@ -23,3 +23,8 @@
         state: present
         tags:
           owner: "{{ aws_keypair_owner }}"
+
+    - name: Set VPC stats
+      ansible.builtin.set_stats:
+        data:
+          stat_aws_key_pair: '{{ aws_key_name }}'
