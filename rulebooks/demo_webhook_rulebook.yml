@@ -1,3 +1,4 @@
+---
 - name: Webhook demo prints all incoming events
   hosts: all
   sources:

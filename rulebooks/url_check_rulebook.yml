@@ -1,11 +1,12 @@
+---
 - name: check web server
-  hosts: all
+  hosts: localhost
   sources:
     - ansible.eda.url_check:
       urls:
         - http://3.25.96.110
       delay: 10
-    rules:
+  rules:
     # - name: restart web server
     #   condition: event.alert.labels.job == "fastapi" and event.alert.status == "firing"
     #   action:
@@ -13,10 +14,10 @@
     #       name: ansible.eda.start_app
     #       copy_files: true
     #       post_events: true
-      - name: debug
-        condition: true
-        action:
-          debug:
+    - name: debug
+      condition: true
+      action:
+        debug:
 
 
 
