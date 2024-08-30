@@ -1,0 +1,58 @@
+---
+- name: Setup webserver and copy custom webpage
+  hosts: "{{ _hosts | default(omit) }}"
+  vars:
+    volume_path: podman
+    message: undef
+
+  tasks:
+    - name: Update apt package cache (Ubuntu) / Update yum package cache (CentOS)
+      when: ansible_os_family == 'Debian'
+      apt:
+        update_cache: yes
+
+    - name: Update yum package cache (CentOS) / Update apt package cache (Ubuntu)
+      when: ansible_os_family == 'RedHat'
+      yum:
+        update_cache: yes
+
+    - name: Install Apache (Ubuntu) / Install Httpd (CentOS)
+      package:
+        name: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+        state: latest
+
+    - name: Enable and start Apache/Httpd
+      ansible.builtin.service:
+        name: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+        enabled: yes
+        state: started
+
+    # - name: Copy custom webpage files
+    #   ansible.builtin.copy:
+    #     src: "~/ansible/webpage/assignment-03-WP-Pusher/"
+    #     dest: "/var/www/html/"
+    #     mode: '0755'
+
+    - name: Create index.html
+      ansible.builtin.copy:
+        dest: "/var/www/html/index.html"
+        content: "{{ message }}"
+        mode: "0664"
+
+    - name: Restart Apache2 (Ubuntu) / Httpd (CentOS)
+      ansible.builtin.service:
+        name: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+        state: restarted
+
+    - name: Check Web Page
+      ansible.builtin.uri:
+        url: http://127.0.0.1
+        return_content: true
+      register: web_output
+      changed_when: false
+
+    - name: Output
+        ansible.builtin.debug:
+          msg:
+            - "Contents of web page:"
+            - "{{ web_output.content }}"
