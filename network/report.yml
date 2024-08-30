@@ -20,16 +20,12 @@
         gather_network_resources: all
       when: ansible_network_os == 'cisco.nxos.nxos'
 
-    # - name: Gather all network resource and minimal legacy facts [Cisco IOS XR]
-    #   cisco.iosxr.iosxr_facts:
-    #     gather_subset: min
-    #     gather_network_resources: all
-    #   when: ansible_network_os == 'cisco.iosxr.iosxr'
-
-#   # The dig lookup requires the python 'dnspython' library
-#   - name: Resolve IP address
-#     ansible.builtin.set_fact:
-#       ansible_host: "{{ lookup('community.general.dig', inventory_hostname)}}"
+    - name: Gather all network resource and minimal legacy facts [Cisco IOS XR]
+      ignore_errors: true
+      cisco.iosxr.iosxr_facts:
+        gather_subset: min
+        gather_network_resources: all
+      when: ansible_network_os == 'cisco.iosxr.iosxr'
 
 - name: Create network reports
   hosts: "{{ report_server }}"
