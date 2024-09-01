@@ -18,7 +18,7 @@
       condition: event.alert.labels.job == "selinux" and event.alert.status == "firing"
       action:
         run_job_template:
-          name: 'E8 Application Control'
+          name: 'E8 SELinux Enforcement'
           organization: Default
           job_args:
             extra_vars:
