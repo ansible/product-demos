@@ -15,7 +15,7 @@
     #       copy_files: true
     #       post_events: true
     - name: debug
-      # condition: event.alert.labels.job == "fastapi"
+      condition: event.alert.labels.job == "selinux"
       condition: true
       action:
-        debug:
+        print_event: 
