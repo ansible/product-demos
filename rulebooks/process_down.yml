@@ -15,7 +15,15 @@
     #       copy_files: true
     #       post_events: true
     - name: debug
-      # condition: event.alert.labels.job == "selinux"
-      condition: true
+      condition: event.alert.labels.job == "selinux" and event.alert.status == "firing"
       action:
-        print_event: 
+        run_job_template:
+          name: 'E8 Application Control'
+          organization: Default
+          job_args:
+            extra_vars:
+              compliance_profile: "e8"
+              _hosts: "aws_rhel92"
+              job_tags:
+                - selinux_policytype
+                - selinux_state"
