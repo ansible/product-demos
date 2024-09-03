@@ -21,8 +21,13 @@
     - name: Create index.html
       ansible.builtin.copy:
         dest: "{{ volume_path }}/index.html"
-        content: "{{ message }}"
+        content: "<img  src="benz_racing.jpg" alt="My picture" />"
         mode: "0664"
+
+    - name: Create image file
+      ansible.builtin.copy:
+        dest: "{{ volume_path }}/"
+        src: templates/benz_racing.jpg
 
     - name: Run httpd container
       containers.podman.podman_container:
