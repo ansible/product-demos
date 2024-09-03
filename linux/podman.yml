@@ -1,6 +1,7 @@
 ---
 - name: Podman
   hosts: "{{ _hosts | default(omit) }}"
+  gather_facts: false
   vars:
     volume_path: podman
     message: undef
@@ -21,7 +22,7 @@
     - name: Create index.html
       ansible.builtin.copy:
         dest: "{{ volume_path }}/index.html"
-        content: "<img src='benz_racing.jpg' alt='my picture' width='200' height='90'/>"
+        content: "<img src='benz_racing.jpg' alt='my picture' style='width: 50%; height: 50%'/>"
         mode: "0664"
 
     - name: Create image file
