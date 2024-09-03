@@ -14,7 +14,7 @@
     #       name: ansible.eda.start_app
     #       copy_files: true
     #       post_events: true
-    - name: debug
+    - name: SELinux Down
       condition: event.alert.labels.job == "selinux" and event.alert.status == "firing"
       action:
         run_job_template:
@@ -27,3 +27,9 @@
               job_tags:
                 - selinux_policytype
                 - selinux_state"
+
+    - name: WebSite Down
+      condition: event.alert.labels.job == "httpd" and event.alert.status == "firing"
+      action:
+        debug:
+
