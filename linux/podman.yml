@@ -28,7 +28,7 @@
     - name: Create image file
       ansible.builtin.copy:
         dest: "{{ volume_path }}/"
-        src: templates/benz_racing.jpg
+        src: templates/benz_racing_redhat.jpg
 
     - name: Run httpd container
       containers.podman.podman_container:
