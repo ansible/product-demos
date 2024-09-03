@@ -31,12 +31,8 @@
     - name: WebSite Down
       condition: event.alert.labels.job == "httpd" and event.alert.status == "firing"
       action:
-        run_job_template:
-          name: 'Fix Webserver'
+        run_workflow_template:
+          name: 'digital_twin_remediation'
           organization: Default
-          job_args:
-            extra_vars:
-              compliance_profile: "e8"
-              _hosts: "aws_rhel92"
-              message: "This is Apache webserver running in a container with podman"
+
 
