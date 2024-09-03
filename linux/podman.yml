@@ -21,7 +21,7 @@
     - name: Create index.html
       ansible.builtin.copy:
         dest: "{{ volume_path }}/index.html"
-        content: "<img  src='benz_racing.jpg' alt='my picture' />"
+        content: "<img src='benz_racing.jpg' alt='my picture' width='200' height='90'/>"
         mode: "0664"
 
     - name: Create image file
