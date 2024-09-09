@@ -3,16 +3,16 @@
   hosts: localhost
   vars:
     remove_ee_repositories:
-      - ansible-automation-platform-24/ee-29-rhel8
-      - ansible-automation-platform-24/ee-minimal-rhel8	
-      - ansible-automation-platform-24/ee-minimal-rhel9
-      - ansible-automation-platform-24/ee-supported-rhel8
-      - ansible-automation-platform-24/ee-supported-rhel9
-      - ansible-automation-platform/ee-29-rhel8
-      - ansible-automation-platform/ee-minimal-rhel8
-      - ansible-automation-platform/ee-minimal-rhel9
-      - rhoso-edpm-beta/ee-openstack-ansible-ee-rhel9
-      - rhoso-operators/ee-openstack-ansible-ee-rhel9
+      - name: ansible-automation-platform-24/ee-29-rhel8
+      - name: ansible-automation-platform-24/ee-minimal-rhel8	
+      - name: ansible-automation-platform-24/ee-minimal-rhel9
+      - name: ansible-automation-platform-24/ee-supported-rhel8
+      - name: ansible-automation-platform-24/ee-supported-rhel9
+      - name: ansible-automation-platform/ee-29-rhel8
+      - name: ansible-automation-platform/ee-minimal-rhel8
+      - name: ansible-automation-platform/ee-minimal-rhel9
+      - name: rhoso-edpm-beta/ee-openstack-ansible-ee-rhel9
+      - name: rhoso-operators/ee-openstack-ansible-ee-rhel9
 
   gather_facts: false
   tasks:
@@ -23,16 +23,16 @@
         fail_msg: "Please provide `Usable Automation Hub Credential`"
 
     # This should not be necessary, but for some reason, superfulious repositories have led to sync failures
-    - name: Remove default EE repository
+    - name: Remove default EE repositories
       infra.ah_configuration.ah_ee_repository:
         name: "{{ item }}"
         state: absent
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
-      loop: "{{ remove_ee_repositories }}"
+      loop: "{{ remove_ee_repositories | map(attribute='name' | difference(ah_ee_repositories | map(attribute='name')) }}"
 
-    - name: Add Console EE credential
+    - name: Add Console EE credential to EE Registry
       infra.ah_configuration.ah_ee_registry:
         name: "{{ item.name }}"
         url: "{{ item.url }}"
@@ -42,6 +42,16 @@
         username: "{{ lookup('ansible.builtin.env', 'REGISTRY_USERNAME') }}"
         password: "{{ lookup('ansible.builtin.env', 'REGISTRY_PASSWORD') }}"
       loop: "{{ ah_ee_registries }}"
+
+    - name: Create EE repository
+      infra.ah_configuration.ah_ee_repository:
+        name: "{{ item.name }}"
+        registry: "{{ item.registry }}"
+        state: present
+        ah_host: "{{ automation_hub_url }}"
+        ah_username: 'admin'
+        ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+      loop: "{{ ah_ee_repositories }}"
 
 
 #    - name: Index AH registries
@@ -72,7 +82,7 @@
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
-      loop: "{{ ah_ee_images }}"
+      loop: "{{ ah_ee_repositories }}"
       retries: 80
       register: sync_image
       delay: 10
