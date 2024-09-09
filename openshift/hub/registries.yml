@@ -44,15 +44,15 @@
       loop: "{{ ah_ee_registries }}"
 
 
-    - name: Index AH registries
-      infra.ah_configuration.ah_ee_registry_index:
-        name: "{{ item.name }}"
-        wait: true
-        timeout: 300
-        ah_host: "{{ automation_hub_url }}"
-        ah_username: 'admin'
-        ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
-      loop: "{{ ah_ee_registries }}"
+#    - name: Index AH registries
+#      infra.ah_configuration.ah_ee_registry_index:
+#        name: "{{ item.name }}"
+#        wait: true
+#        timeout: 300
+#        ah_host: "{{ automation_hub_url }}"
+#        ah_username: 'admin'
+#        ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+#      loop: "{{ ah_ee_registries }}"
 
     # Not sure if this is a limitation of our AH deployment, or a bug,
     # but the wait feature does not succeed, see the regries/until for 'Sync images'
