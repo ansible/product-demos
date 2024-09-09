@@ -1,0 +1,42 @@
+---
+- name: Capture POSTs from gitlab
+  hosts: all
+  sources:
+    - ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+      filters:
+        - ansible.eda.json_filter:
+            # exclude_keys: ['sender', 'owner']
+        - ansible.eda.dashes_to_underscores:
+
+  rules:
+  # Capture push events on main
+    # - name: Get push event details
+    #   condition: event.payload is defined # event.meta.headers.X_Gitlab_Event == "push"
+    #   action:
+    #     post_event:
+    #       event:
+    #         type: "{{ event.meta.headers.X_Gitlab_Event }}"
+    #         gitref: "{{ event['payload']['ref'] }}"
+    #         repo_name: "{{ event['payload']['repository']['name'] }}"
+    #         author: "{{ event['payload']['user_email'] }}"
+    #         clone_url: "{{ event['payload']['repository']['url'] }}"
+    #         pre_commit: "{{ event['payload']['before'] }}"
+    #         post_commit: "{{ event['payload']['after'] }}"
+    #         commit_add: "{{ event['payload']['commits'][0]['added'] }}"
+    #         commit_mod: "{{ event['payload']['commits'][0]['modified'] }}"
+    #         commit_del: "{{ event['payload']['commits'][0]['removed'] }}"
+
+    - name: Update repo
+      condition: event.meta.headers.X_Gitlab_Event == "Push Hook" # event['payload']['repository']['name'] == "config" and event.meta.headers.X_Gitlab_Event == "push" # event.payload is defined # event.repo_name == "config" and event.type == "push"
+      action:
+        run_job_template:
+          name: controller_config
+          organization: config_as_code
+          # post_events: true
+
+    # - name: test
+    #   condition: event.payload is defined
+    #   action:
+    #     debug:
