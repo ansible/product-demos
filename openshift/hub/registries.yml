@@ -4,7 +4,7 @@
   vars:
     remove_ee_repositories:
       - name: ansible-automation-platform-24/ee-29-rhel8
-      - name: ansible-automation-platform-24/ee-minimal-rhel8	
+      - name: ansible-automation-platform-24/ee-minimal-rhel8
       - name: ansible-automation-platform-24/ee-minimal-rhel9
       - name: ansible-automation-platform-24/ee-supported-rhel8
       - name: ansible-automation-platform-24/ee-supported-rhel9
@@ -47,22 +47,22 @@
       infra.ah_configuration.ah_ee_repository:
         name: "{{ item.name }}"
         registry: "{{ item.registry }}"
+        upstream_name: "{{ item.name }}"
         state: present
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
       loop: "{{ ah_ee_repositories }}"
 
-
-#    - name: Index AH registries
-#      infra.ah_configuration.ah_ee_registry_index:
-#        name: "{{ item.name }}"
-#        wait: true
-#        timeout: 300
-#        ah_host: "{{ automation_hub_url }}"
-#        ah_username: 'admin'
-#        ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
-#      loop: "{{ ah_ee_registries }}"
+    # - name: Index AH registries
+    #   infra.ah_configuration.ah_ee_registry_index:
+    #     name: "{{ item.name }}"
+    #     wait: true
+    #     timeout: 300
+    #     ah_host: "{{ automation_hub_url }}"
+    #     ah_username: 'admin'
+    #     ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+    #   loop: "{{ ah_ee_registries }}"
 
     # Not sure if this is a limitation of our AH deployment, or a bug,
     # but the wait feature does not succeed, see the regries/until for 'Sync images'
