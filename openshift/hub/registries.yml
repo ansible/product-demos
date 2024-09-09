@@ -1,6 +1,19 @@
 ---
 - name: Configure AH credential for registry and sync EEs
   hosts: localhost
+  vars:
+    remove_ee_registries:
+      - ansible-automation-platform-24/ee-29-rhel8
+      - ansible-automation-platform-24/ee-minimal-rhel8	
+      - ansible-automation-platform-24/ee-minimal-rhel9
+      - ansible-automation-platform-24/ee-supported-rhel8
+      - ansible-automation-platform-24/ee-supported-rhel9
+      - ansible-automation-platform/ee-29-rhel8
+      - ansible-automation-platform/ee-minimal-rhel8
+      - ansible-automation-platform/ee-minimal-rhel9
+      - rhoso-edpm-beta/ee-openstack-ansible-ee-rhel9
+      - rhoso-operators/ee-openstack-ansible-ee-rhel9
+
   gather_facts: false
   tasks:
     - name: Assert non-default credentials
@@ -8,6 +21,19 @@
         that:
           - lookup('ansible.builtin.env', 'REGISTRY_USERNAME') != 'CHANGEME'
         fail_msg: "Please provide `Usable Automation Hub Credential`"
+
+    # This should not be necessary, but for some reason, superfulious registries have led to sync failures
+    - name: Remove default registries
+      infra.ah_configuration.ah_ee_registry:
+        name: "{{ item }}"
+        state: absent
+        ah_host: "{{ automation_hub_url }}"
+        ah_username: 'admin'
+        ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+        username: "{{ lookup('ansible.builtin.env', 'REGISTRY_USERNAME') }}"
+        password: "{{ lookup('ansible.builtin.env', 'REGISTRY_PASSWORD') }}"
+      loop: "{{ remove_ee_registries }}"
+
 
     - name: Add Console EE credential
       infra.ah_configuration.ah_ee_registry:
@@ -19,6 +45,7 @@
         username: "{{ lookup('ansible.builtin.env', 'REGISTRY_USERNAME') }}"
         password: "{{ lookup('ansible.builtin.env', 'REGISTRY_PASSWORD') }}"
       loop: "{{ ah_ee_registries }}"
+
 
     - name: Index AH registries
       infra.ah_configuration.ah_ee_registry_index:
