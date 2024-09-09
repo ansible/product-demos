@@ -48,6 +48,8 @@
         name: "{{ item.name }}"
         registry: "{{ item.registry }}"
         upstream_name: "{{ item.name }}"
+        include_tags:
+          - latest
         state: present
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
