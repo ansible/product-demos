@@ -30,10 +30,7 @@
         ah_host: "{{ automation_hub_url }}"
         ah_username: 'admin'
         ah_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
-        username: "{{ lookup('ansible.builtin.env', 'REGISTRY_USERNAME') }}"
-        password: "{{ lookup('ansible.builtin.env', 'REGISTRY_PASSWORD') }}"
       loop: "{{ remove_ee_repositories }}"
-
 
     - name: Add Console EE credential
       infra.ah_configuration.ah_ee_registry:
