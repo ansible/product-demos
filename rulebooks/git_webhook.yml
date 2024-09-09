@@ -36,7 +36,7 @@
           organization: config_as_code
           # post_events: true
 
-    - name: test debug
+    - name: test
       condition: event.payload is defined
       action:
         debug:
