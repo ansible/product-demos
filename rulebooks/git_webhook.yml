@@ -1,5 +1,5 @@
 ---
-- name: Capture POSTs from gitlab
+- name: Capture POSTs from github
   hosts: all
   sources:
     - ansible.eda.webhook:
