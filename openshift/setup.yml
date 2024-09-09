@@ -122,7 +122,7 @@ controller_templates:
           url: https://registry.redhat.io
       ah_ee_repositories:
         - name: "ansible-automation-platform-24/ee-supported-rhel9"
-          registrY: "rh-registry"
+          registry: "rh-registry"
 
   - name: OpenShift / CNV / Install Operator
     job_type: run
