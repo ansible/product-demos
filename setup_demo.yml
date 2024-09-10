@@ -13,44 +13,9 @@
         controller_organizations:
           - name: Default
             default_environment: product-demos
-        controller_notifications:
-          - name: Telemetry
-            organization: Default
-            notification_type: webhook
-            notification_configuration:
-              url: https://script.google.com/macros/s/AKfycbzxUObvCJ6ZbzfJyicw4RvxlGE3AZdrK4AR5-TsedCYd7O-rtTOVjvsRvqyb3rx6B0g8g/exec
-              http_method: POST
-              headers: {}
-        controller_templates:
-          - name: "SUBMIT FEEDBACK"
-            job_type: run
-            inventory: "Demo Inventory"
-            project: "Ansible official demo project"
-            playbook: "feedback.yml"
-            execution_environment: Default execution environment
-            notification_templates_started: Telemetry
-            notification_templates_success: Telemetry
-            notification_templates_error: Telemetry
-            survey_enabled: true
-            survey:
-              name: ''
-              description: ''
-              spec:
-                - question_name: Name/Email/Contact
-                  type: text
-                  variable: email
-                  required: true
-                - question_name: Issue or Feedback
-                  type: textarea
-                  variable: feedback
-                  required: true
         controller_settings:
           - name: "SESSION_COOKIE_AGE"
             value: 180000
-
-    - name: Create reusable deployment ID
-      ansible.builtin.set_fact:
-        _deployment_id: '{{ lookup("ansible.builtin.password", "{{ playbook_dir }}/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
 
     - name: "Include configuration for {{ demo }}"
       ansible.builtin.include_vars: "{{ demo }}/setup.yml"
@@ -58,15 +23,3 @@
     - name: Demo Components
       ansible.builtin.include_role:
         name: "infra.controller_configuration.dispatch"
-
-    - name: Log Demo
-      ansible.builtin.uri:
-        url: https://docs.google.com/forms/d/e/1FAIpQLSdIZ77YpETjEfGOoYlXtMnQiU-6M7QFlb2hJA4ujo25QYb2jw/formResponse
-        method: POST
-        body: "ifq&entry.1569353616={{ demo }} &entry.498055740={{ lookup('ansible.builtin.env', 'AWX_HOST') }}&sumbit=Submit"
-      ignore_errors: true  # noqa: ignore-errors - connectivity should not fail play
-
-    - name: Print Message
-      ansible.builtin.debug:
-        msg: "{{ user_message }}"
-      when: user_message is defined
