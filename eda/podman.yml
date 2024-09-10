@@ -1,0 +1,64 @@
+---
+- name: Podman
+  hosts: "{{ _hosts | default(omit) }}"
+  gather_facts: false
+  vars:
+    volume_path: podman
+    message: undef
+
+  tasks:
+    - name: Install Podman
+      ansible.builtin.dnf:
+        name: podman
+        state: installed
+      become: true
+
+    - name: Create volume dir
+      ansible.builtin.file:
+        path: "{{ volume_path }}"
+        state: directory
+        mode: "0775"
+
+    - name: Create index.html
+      ansible.builtin.copy:
+        dest: "{{ volume_path }}/index.html"
+        content: "<img src='benz_racing_redhat.jpg' alt='my picture' style='width: 2000px; height: 1300px;'/>"
+        mode: "0664"
+
+    - name: Create image file
+      ansible.builtin.copy:
+        dest: "{{ volume_path }}/"
+        src: templates/benz_racing_redhat.jpg
+
+    - name: Run httpd container
+      containers.podman.podman_container:
+        name: apache
+        image: docker.io/httpd
+        state: started
+        volume:
+          - "./{{ volume_path }}/:/usr/local/apache2/htdocs:z"
+        ports:
+          - "8081:80"
+        expose:
+          - 80
+          - 8081
+
+    - name: Check Web Page
+      ansible.builtin.uri:
+        url: http://127.0.0.1:8081
+        return_content: true
+      register: web_output
+      changed_when: false
+
+    - name: Podman ps
+      ansible.builtin.command: podman ps
+      register: podman_output
+      changed_when: false
+
+    - name: Output
+      ansible.builtin.debug:
+        msg:
+          - "Output of podman ps command:"
+          - "{{ podman_output.stdout_lines }}"
+          - "Contents of web page:"
+          - "{{ web_output.content }}"

@@ -1,0 +1,278 @@
+---
+user_message:
+  - Update the 'activation_key' and 'org_id' extra variables for 'LINUX / Register with Insights'. https://access.redhat.com/management/activation_keys
+  - Update Credential for Insights Inventory with Red Hat account.
+  - Add variables for system_roles. https://console.redhat.com/ansible/automation-hub/repo/published/redhat/rhel_system_roles
+
+# "!unsafe" used to pass raw jinja2 through to the injector definition, see
+# https://github.com/redhat-cop/controller_configuration/tree/devel/roles/credential_types#formating-injectors
+
+controller_templates:
+  - name: "LINUX / Podman Webserver"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/podman.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Demo Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: true
+        - question_name: Web Page Message
+          type: textarea
+          variable: message
+          required: true
+          default: "This is Apache webserver running in a container with podman"
+
+  - name: "LINUX / Multi-profile Compliance"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/compliance-enforce.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Demo Credential"
+    extra_vars:
+      # used by CIS profile role
+      sudo_require_authentication: false
+      # used by STIG profile role
+      sudo_remove_nopasswd: false
+      sudo_remove_no_authenticate: false
+      # used by CIS and STIG profile role
+      accounts_password_set_max_life_existing: false
+      # used by the CJIS profile role
+      service_firewalld_enabled: false
+      firewalld_sshd_port_enabled: false
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: true
+        - question_name: Compliance Profile
+          type: multiplechoice
+          variable: compliance_profile
+          required: true
+          choices:
+            - cis
+            - cjis
+            - cui
+            - hipaa
+            - ospp
+            - pci_dss
+            - stig
+            - e8
+
+  - name: "LINUX / Multi-profile Compliance Report"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "linux/compliance-report.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Demo Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: true
+        - question_name: Compliance Profile
+          type: multiplechoice
+          variable: compliance_profile
+          required: true
+          choices:
+            - cis
+            - cjis
+            - cui
+            - hipaa
+            - ospp
+            - pci_dss
+            - stig
+            - e8
+        - question_name: Use httpd on the target host(s) to access reports locally?
+          type: multiplechoice
+          variable: use_httpd
+          required: true
+          choices:
+            - "true"
+            - "false"
+          default: "true"
+
+
+  - name: Cloud / AWS / Create VM
+    job_type: run
+    organization: Default
+    credentials:
+      - AWS
+      - Demo Credential
+    project: Ansible Cloud Content Lab - AWS
+    playbook: playbooks/create_vm.yml
+    inventory: Demo Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    allow_simultaneous: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - ap-southeast-2
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Name
+          type: text
+          variable: create_vm_vm_name
+          required: true
+        - question_name: Owner
+          type: text
+          variable: create_vm_vm_owner
+          required: true
+        - question_name: Deployment
+          type: text
+          variable: create_vm_vm_deployment
+          required: true
+        - question_name: Environment
+          type: multiplechoice
+          variable: create_vm_vm_environment
+          required: true
+          choices:
+            - Dev
+            - QA
+            - Prod
+        - question_name: Blueprint
+          type: multiplechoice
+          variable: vm_blueprint
+          required: true
+          choices:
+            - windows_core
+            - windows_full
+            - rhel9
+            - rhel8
+            - rhel7
+            - al2023
+        - question_name: Subnet
+          type: text
+          variable: create_vm_aws_vpc_subnet_name
+          required: true
+          default: aws-test-subnet
+        - question_name: Security Group
+          type: text
+          variable: create_vm_aws_securitygroup_name
+          required: true
+          default: aws-test-sg
+        - question_name: SSH Keypair
+          type: text
+          variable: create_vm_aws_keypair_name
+          required: true
+          default: aws-test-key
+        - question_name: AWS Instance Type (defaults to blueprint value)
+          type: text
+          variable: create_vm_aws_instance_size
+          required: false
+        - question_name: AWS Image Filter (defaults to blueprint value)
+          type: text
+          variable: create_vm_aws_image_filter
+          required: false
+
+  - name: Cloud / AWS / Delete VM
+    job_type: run
+    organization: Default
+    credentials:
+      - AWS
+      - Demo Credential
+    project: Ansible Cloud Content Lab - AWS
+    playbook: playbooks/delete_inventory_vm.yml
+    inventory: Demo Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Name or Pattern
+          type: text
+          variable: _hosts
+          required: true
+
+controller_execution_environments:
+  - name: Cloud Services Execution Environment
+    image: quay.io/scottharwell/cloud-ee:latest
+
+controller_projects:
+  - name: Ansible Cloud Content Lab - AWS
+    organization: Default
+    scm_type: git
+    wait: true
+    scm_url: https://github.com/sonstar2/aws.infrastructure_config_demos.git
+    default_environment: Cloud Services Execution Environment
+
+controller_credentials:
+  - name: AWS
+    credential_type: Amazon Web Services
+    organization: Default
+    update_secrets: false
+    state: exists
+    inputs:
+      username: REPLACEME
+      password: REPLACEME
+
+controller_inventory_sources:
+  - name: AWS Inventory
+    organization: Default
+    source: ec2
+    inventory: Demo Inventory
+    credential: AWS
+    overwrite: true
+    source_vars:
+      hostnames:
+        - tag:Name
+      compose:
+        ansible_host: public_ip_address
+        ansible_user: 'ec2-user'
+      groups:
+        cloud_aws: true
+        os_linux: tags.blueprint.startswith('rhel')
+      keyed_groups:
+        - key: platform
+          prefix: os
+        - key: tags.blueprint
+          prefix: blueprint
+        - key: tags.owner
+          prefix: owner
+
+controller_groups:
+  - name: cloud_aws
+    inventory: Demo Inventory
+    variables:
+      ansible_user: ec2-user
+...

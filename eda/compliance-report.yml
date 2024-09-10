@@ -1,0 +1,90 @@
+---
+- name: Generate OpenSCAP compliance report
+  hosts: '{{ _hosts | default(omit) }}'
+  become: true
+
+  vars:
+    openscap_packages:
+      - openscap-scanner
+      - openscap-utils
+      - scap-security-guide
+    compliance_profile: ospp
+    use_httpd: true
+
+  tasks:
+    - name: Get our facts straight
+      ansible.builtin.set_fact:
+        _profile: '{{ compliance_profile | replace("pci_dss", "pci-dss") }}'
+        _report_dir: /tmp/oscap-reports
+
+    - name: Ensure OpenSCAP tools are installed
+      ansible.builtin.dnf:
+        name: '{{ openscap_packages }}'
+        state: present
+
+    - name: Configure httpd
+      when: use_httpd | bool
+      block:
+        - name: Install httpd
+          ansible.builtin.dnf:
+            name: httpd
+            state: present
+          notify: Restart httpd
+
+        - name: Override report directory
+          ansible.builtin.set_fact:
+            _report_dir: /var/www/html/oscap-reports
+
+        - name: Gather service facts
+          ansible.builtin.service_facts:
+
+        - name: Enable firewall http service
+          ansible.posix.firewalld:
+            service: http
+            state: enabled
+            immediate: true
+            permanent: true
+          when: "'firewalld.service' in ansible_facts.services"
+
+        - name: Disable httpd welcome page
+          ansible.builtin.file:
+            path: /etc/httpd/conf.d/welcome.conf
+            state: absent
+          notify: Restart httpd
+
+    - name: Ensure report directory exists
+      ansible.builtin.file:
+        path: '{{ _report_dir }}/{{ _profile }}'
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Set report name
+      ansible.builtin.set_fact:
+        _report: '{{ _report_dir }}/{{ _profile }}/report-{{ ansible_date_time.iso8601 }}.html'
+
+    - name: Generate compliance report
+      ansible.builtin.command: >-
+        oscap xccdf eval --profile {{ _profile }} --report {{ _report }}
+        /usr/share/xml/scap/ssg/content/ssg-rhel{{ ansible_distribution_major_version }}-ds.xml
+      args:
+        creates: '{{ _report }}'
+      register: _oscap
+      failed_when: _oscap.rc not in [0, 2]
+
+    - name: Set report permissions
+      ansible.builtin.file:
+        path: '{{ _report }}'
+        owner: root
+        group: root
+        mode: 0644
+
+  handlers:
+    - name: Restart httpd
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+        enabled: true
+
+...
