@@ -360,6 +360,9 @@ controller_workflows:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_aws_image_owners:
+        - amazon
     survey_enabled: true
     survey:
       name: ''
