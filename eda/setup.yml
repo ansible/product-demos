@@ -11,7 +11,7 @@ controller_templates:
   - name: "LINUX / Podman Webserver"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Fred demo project"
     playbook: "linux/podman.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -36,7 +36,7 @@ controller_templates:
   - name: "LINUX / Multi-profile Compliance"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Fred demo project"
     playbook: "linux/compliance-enforce.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -80,7 +80,7 @@ controller_templates:
   - name: "LINUX / Multi-profile Compliance Report"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Fred demo project"
     playbook: "linux/compliance-report.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
