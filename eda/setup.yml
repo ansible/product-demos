@@ -365,6 +365,13 @@ controller_workflows:
           - Update Inventory
       - identifier: Update Inventory
         unified_job_template: AWS Inventory
-
-
-...
+      - identifier: Install Webserver
+        unified_job_template: LINUX / Podman Webserver
+        success_nodes:
+          - E8 Application Control
+      - identifier: E8 Application Control
+        unified_job_template: E8 Application Control
+        success_nodes:
+          - Update Inventory
+      - identifier: Cloud / AWS / Delete VM
+        unified_job_template: Cloud / AWS / Delete VM
