@@ -369,6 +369,8 @@ controller_workflows:
           - Update Inventory
       - identifier: Update Inventory
         unified_job_template: AWS Inventory
+        success_nodes:
+          - Install Webserver
       - identifier: Install Webserver
         unified_job_template: LINUX / Podman Webserver
         success_nodes:
