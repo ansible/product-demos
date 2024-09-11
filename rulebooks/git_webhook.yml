@@ -29,7 +29,7 @@
     #         commit_del: "{{ event['payload']['commits'][0]['removed'] }}"
 
     - name: Update repo
-      condition: event.meta.headers.X_GitHub_Event == "push" and event['payload']['repository']['name'] == "e8_security_harden" # event.payload is defined # event.repo_name == "config" and event.type == "push"
+      condition: event.meta.headers.X_GitHub_Event == "push" and event['payload']['repository']['name'] == "product-demos" # event.payload is defined # event.repo_name == "config" and event.type == "push"
       action:
         run_job_template:
           name: controller_config
