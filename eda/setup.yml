@@ -229,7 +229,7 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
-    project: Ansible official demo project
+    project: Fred demo project
     playbook: cloud/create_vpc.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
