@@ -275,4 +275,65 @@ controller_groups:
     inventory: Demo Inventory
     variables:
       ansible_user: ec2-user
+
+controller_workflows:
+  - name: Deploy Digital Twin in AWS
+    description: A workflow to deploy a cloud stack
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      vm_deployment: cloud_stack
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - ap-southeast-2
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Owner
+          type: text
+          variable: create_vm_aws_owner_tag
+          required: true
+        - question_name: Environment
+          type: multiplechoice
+          variable: vm_environment
+          required: true
+          choices:
+            - Dev
+            - QA
+            - Prod
+        - question_name: Keypair Public Key
+          type: textarea
+          variable: aws_public_key
+          required: true
+        - question_name: Email
+          type: text
+          variable: email
+          required: true
+    simplified_workflow_nodes:
+      - identifier: Create VPC
+        unified_job_template: Cloud / AWS / Create VPC
+        success_nodes:
+          - Deploy RHEL9 Blueprint
+      - identifier: Deploy RHEL9 Blueprint
+        unified_job_template: Cloud / AWS / Create VM
+        extra_data:
+          create_vm_vm_name: aws_rhel9
+          vm_blueprint: rhel9
+        success_nodes:
+          - Update Inventory
+      - identifier: Update Inventory
+        unified_job_template: AWS Inventory
+
+
 ...
