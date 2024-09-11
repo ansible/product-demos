@@ -331,6 +331,10 @@ controller_workflows:
             - us-east-2
             - us-west-1
             - us-west-2
+        - question_name: Name
+          type: text
+          variable: _hosts
+          required: true
         - question_name: Owner
           type: text
           variable: create_vm_aws_owner_tag
