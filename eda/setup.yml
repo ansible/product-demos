@@ -343,9 +343,9 @@ controller_workflows:
             - Dev
             - QA
             - Prod
-        - question_name: Keypair Public Key
-          type: textarea
-          variable: aws_public_key
+        - question_name: Keypair Name
+          type: text
+          variable: create_vm_aws_keypair_name
           required: true
         - question_name: Email
           type: text
