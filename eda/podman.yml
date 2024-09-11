@@ -38,10 +38,9 @@
         volume:
           - "./{{ volume_path }}/:/usr/local/apache2/htdocs:z"
         ports:
-          - "8081:80"
+          - "8081:443"
         expose:
-          - 80
-          - 8081
+          - 443
 
     - name: Check Web Page
       ansible.builtin.uri:
