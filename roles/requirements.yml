@@ -44,5 +44,3 @@ roles:
   - name: redhatofficial.rhel9_stig
     version: 0.1.64
   - name: redhatofficial.rhel9_e8
-    version: 0.1.71
-...
