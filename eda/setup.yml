@@ -343,6 +343,10 @@ controller_workflows:
             - Dev
             - QA
             - Prod
+        - question_name: Deployment
+          type: text
+          variable: create_vm_vm_deployment
+          required: true
         - question_name: Keypair Name
           type: text
           variable: create_vm_aws_keypair_name
