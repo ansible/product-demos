@@ -31,7 +31,7 @@
     - name: Push for Digital Twin
       condition: event.meta.headers.X_GitHub_Event == "push" and event['payload']['repository']['name'] == "product-demos" # event.payload is defined # event.repo_name == "config" and event.type == "push"
       action:
-        run_job_template:
+        run_workflow_template:
           name: Deploy Digital Twin in AWS
           organization: Default
           # post_events: true
