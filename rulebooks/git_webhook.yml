@@ -36,7 +36,9 @@
           organization: Default
           # post_events: true
 
-    - name: test 
-      condition: event.payload is defined
+    - name: Merge to Apply Prod
+      condition: event.meta.headers.X_GitHub_Event == "push" and event['payload']['head_commit']['message'] == "Merge pull "
       action:
-        debug:
+        run_job_template:
+          name: E8 Application Control
+          organization: Default
