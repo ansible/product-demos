@@ -6,4 +6,4 @@
   tasks:
     - name: Dummy
       ansible.builtin.debug:
-        msg: "Test done!!"
+        msg: "Test done!"
