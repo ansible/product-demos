@@ -11,48 +11,40 @@
         - ansible.eda.dashes_to_underscores:
 
   rules:
-  # Capture push events on main
-    # - name: Get push event details
-    #   condition: event.payload is defined # event.meta.headers.X_Gitlab_Event == "push"
-    #   action:
-    #     post_event:
-    #       event:
-    #         type: "{{ event.meta.headers.X_Gitlab_Event }}"
-    #         gitref: "{{ event['payload']['ref'] }}"
-    #         repo_name: "{{ event['payload']['repository']['name'] }}"
-    #         author: "{{ event['payload']['user_email'] }}"
-    #         clone_url: "{{ event['payload']['repository']['url'] }}"
-    #         pre_commit: "{{ event['payload']['before'] }}"
-    #         post_commit: "{{ event['payload']['after'] }}"
-    #         commit_add: "{{ event['payload']['commits'][0]['added'] }}"
-    #         commit_mod: "{{ event['payload']['commits'][0]['modified'] }}"
-    #         commit_del: "{{ event['payload']['commits'][0]['removed'] }}"
-
-    # - name: Merge to Apply Prod
-    #   condition: event.meta.headers.X_GitHub_Event == "push" and event['payload']['head_commit']['message'] contains "Merge pull "
-    #   action:
-    #     run_job_template:
-    #       name: E8 Application Control
-    #       organization: Default
-
-    # - name: Push for Digital Twin
-    #   condition: event.meta.headers.X_GitHub_Event == "push" and event['payload']['repository']['name'] == "product-demos" and event['payload']['head_commit']['message'] not contains "Merge pull " # event.payload is defined # event.repo_name == "config" and event.type == "push"
-    #   action:
-    #     run_workflow_template:
-    #       name: Deploy Digital Twin in AWS
-    #       organization: Default
-    #       job_args:
-    #         extra_vars:
-    #           create_vm_aws_region: "us-east-2"
-    #           create_vm_aws_owner_tag: "frederick"
-    #           vm_environment: "Dev"
-    #           create_vm_vm_deployment: "fred_race_demo"
-    #           create_vm_aws_keypair_name: "fred_labtop"
-    #           email: "fredson@redhat.com"
-    #           _hosts: dt_car
-    #       # post_events: true
-    - name: debug
-      condition: event.payload is defined
+    - name: Pull Request
+      condition: 
+        all:
+          - event.meta.headers.X_GitHub_Event == "pull_request"
+          - event['payload']['repository']['name'] == "product-demos"
+          - event['payload']['action'] == "opened" 
       action:
-        debug:
+        run_workflow_template:
+          name: '[Final] Deploy Digital Twins'
+          organization: Default
+          job_args:
+            extra_vars:- event['payload']['action'] == "opened" 
+              create_vm_aws_region: "us-east-2"
+              create_vm_aws_owner_tag: "frederick"
+              vm_environment: "Dev"
+              create_vm_vm_deployment: "fred_race_demo"
+              create_vm_aws_keypair_name: "fred_labtop"
+              email: "fredson@redhat.com"
+              _hosts: dt_car
+          # post_events: true
+
+    - name: Merge Approved
+      condition:
+        all:
+          - event.meta.headers.X_GitHub_Event == "pull_request"
+          - event['payload']['repository']['name'] == "product-demos"
+          - event['payload']['action'] == "closed" 
+      action:
+        run_job_template:
+          name: E8 Application Control
+          organization: Default
+
+    # - name: debug
+    #   condition: event.payload is defined
+    #   action:
+    #     debug:
 
