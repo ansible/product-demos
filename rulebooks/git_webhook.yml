@@ -12,11 +12,7 @@
 
   rules:
     - name: Pull Request
-      condition: 
-        all:
-          - event.meta.headers.X_GitHub_Event == "pull_request"
-          - event['payload']['repository']['name'] == "product-demos"
-          - event['payload']['action'] == "opened" 
+      condition: event.meta.headers.X_GitHub_Event == "pull_request" and event['payload']['repository']['name'] == "product-demos" and event['payload']['action'] == "opened" 
       action:
         run_workflow_template:
           name: '[Final] Deploy Digital Twins'
@@ -32,11 +28,7 @@
               _hosts: dt_car
 
     - name: Merge Approved
-      condition:
-        all:
-          - event.meta.headers.X_GitHub_Event == "pull_request"
-          - event['payload']['repository']['name'] == "product-demos"
-          - event['payload']['action'] == "closed" 
+      condition: event.meta.headers.X_GitHub_Event == "pull_request" and event['payload']['repository']['name'] == "product-demos" and event['payload']['action'] == "closed" 
       action:
         run_job_template:
           name: E8 Application Control
