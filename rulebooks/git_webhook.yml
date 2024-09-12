@@ -43,8 +43,3 @@
           name: E8 Application Control
           organization: Default
 
-    # - name: debug
-    #   condition: event.payload is defined
-    #   action:
-    #     debug:
-
