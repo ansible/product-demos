@@ -28,13 +28,13 @@
     #         commit_mod: "{{ event['payload']['commits'][0]['modified'] }}"
     #         commit_del: "{{ event['payload']['commits'][0]['removed'] }}"
 
-    # - name: Update repo
-    #   condition: event.meta.headers.X_GitHub_Event == "push" and event['payload']['repository']['name'] == "product-demos" # event.payload is defined # event.repo_name == "config" and event.type == "push"
-    #   action:
-    #     run_job_template:
-    #       name: E8 Application Control
-    #       organization: Default
-    #       # post_events: true
+    - name: Push for Digital Twin
+      condition: event.meta.headers.X_GitHub_Event == "push" and event['payload']['repository']['name'] == "product-demos" # event.payload is defined # event.repo_name == "config" and event.type == "push"
+      action:
+        run_job_template:
+          name: Deploy Digital Twin in AWS
+          organization: Default
+          # post_events: true
 
     - name: test 
       condition: event.payload is defined
