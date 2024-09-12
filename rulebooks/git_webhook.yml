@@ -22,7 +22,7 @@
           name: '[Final] Deploy Digital Twins'
           organization: Default
           job_args:
-            extra_vars:- event['payload']['action'] == "opened" 
+            extra_vars:
               create_vm_aws_region: "us-east-2"
               create_vm_aws_owner_tag: "frederick"
               vm_environment: "Dev"
@@ -30,7 +30,6 @@
               create_vm_aws_keypair_name: "fred_labtop"
               email: "fredson@redhat.com"
               _hosts: dt_car
-          # post_events: true
 
     - name: Merge Approved
       condition:
@@ -42,4 +41,9 @@
         run_job_template:
           name: E8 Application Control
           organization: Default
+
+    # - name: debug
+    #   condition: event.payload is defined
+    #   action:
+    #     debug:
 
