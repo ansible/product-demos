@@ -28,6 +28,13 @@
     #         commit_mod: "{{ event['payload']['commits'][0]['modified'] }}"
     #         commit_del: "{{ event['payload']['commits'][0]['removed'] }}"
 
+    - name: Merge to Apply Prod
+      condition: event.meta.headers.X_GitHub_Event == "push" and event['payload']['head_commit']['message'] contains "Merge pull "
+      action:
+        run_job_template:
+          name: E8 Application Control
+          organization: Default
+
     - name: Push for Digital Twin
       condition: event.meta.headers.X_GitHub_Event == "push" and event['payload']['repository']['name'] == "product-demos" and event['payload']['head_commit']['message'] not contains "Merge pull " # event.payload is defined # event.repo_name == "config" and event.type == "push"
       action:
@@ -45,9 +52,4 @@
               _hosts: dt_car
           # post_events: true
 
-    - name: Merge to Apply Prod
-      condition: event.meta.headers.X_GitHub_Event == "push" and event['payload']['head_commit']['message'] == "Merge pull "
-      action:
-        run_job_template:
-          name: E8 Application Control
-          organization: Default
+
