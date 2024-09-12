@@ -34,6 +34,15 @@
         run_workflow_template:
           name: Deploy Digital Twin in AWS
           organization: Default
+          job_args:
+            extra_vars:
+              create_vm_aws_region: "us-east-2"
+              create_vm_aws_owner_tag: "frederick"
+              vm_environment: "Dev"
+              create_vm_vm_deployment: "fred_race_demo"
+              create_vm_aws_keypair_name: "fred_labtop"
+              email: "fredson@redhat.com"
+              _hosts: dt_car
           # post_events: true
 
     - name: Merge to Apply Prod
