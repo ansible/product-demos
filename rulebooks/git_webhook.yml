@@ -15,7 +15,7 @@
       condition: event.meta.headers.X_GitHub_Event == "pull_request" and event['payload']['repository']['name'] == "product-demos" and event['payload']['action'] == "opened" 
       action:
         run_workflow_template:
-          name: '[Final] Deploy Digital Twins'
+          name: 'Deploy Digital Twins in AWS'
           organization: Default
           job_args:
             extra_vars:
@@ -25,13 +25,13 @@
               create_vm_vm_deployment: "fred_race_demo"
               create_vm_aws_keypair_name: "fred_labtop"
               email: "fredson@redhat.com"
-              _hosts: dt_car
+              _hosts: dt_rhel9
 
     - name: Merge Approved
       condition: event.meta.headers.X_GitHub_Event == "pull_request" and event['payload']['repository']['name'] == "product-demos" and event['payload']['action'] == "closed" 
       action:
         run_job_template:
-          name: E8 Application Control
+          name: [Prod]Apply E8 Security Harden
           organization: Default
 
     - name: debug
