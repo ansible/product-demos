@@ -11,7 +11,7 @@
         that: "ansible_os_family == 'RedHat'"
       tags: always
 
-    - name: Run Security Compliance Profile
+    - name: Run Security Compliance Profile!
       ansible.builtin.include_role:
         name: "redhatofficial.rhel{{ ansible_distribution_major_version }}_{{ compliance_profile }}"
       vars:
