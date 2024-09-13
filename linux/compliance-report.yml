@@ -31,6 +31,17 @@
             state: present
           notify: Restart httpd
 
+        - name: Create index.html
+          ansible.builtin.copy:
+            dest: "/var/www/html/index.html"
+            src: templates/index.html
+            mode: "0664"
+
+        - name: Create image file
+          ansible.builtin.copy:
+            dest: "/var/www/html/"
+            src: templates/benz_racing_redhat.jpg
+
         - name: Override report directory
           ansible.builtin.set_fact:
             _report_dir: /var/www/html/oscap-reports
