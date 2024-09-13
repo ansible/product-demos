@@ -26,6 +26,7 @@
               create_vm_aws_keypair_name: "fred_labtop"
               email: "fredson@redhat.com"
               _hosts: dt_rhel9
+          post_events: true
 
     - name: Merge Approved
       condition: event.meta.headers.X_GitHub_Event == "pull_request" and event['payload']['repository']['name'] == "product-demos" and event['payload']['action'] == "closed" 
