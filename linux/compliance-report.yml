@@ -77,9 +77,15 @@
       ansible.builtin.set_fact:
         _report: '{{ _report_dir }}/{{ _profile }}/report-{{ ansible_date_time.iso8601 }}.html'
 
+    - name: Copy tailor file
+      ansible.builtin.copy:
+        dest: "/usr/share/xml/scap/e8_tailor.xml"
+        src: templates/e8_tailor.xml
+        mode: "0664"
+
     - name: Generate compliance report
       ansible.builtin.command: >-
-        oscap xccdf eval --profile {{ _profile }} --report {{ _report }}
+        oscap xccdf eval --profile {{ _profile }} --tailoring-file /usr/share/xml/scap/e8_tailor.xml --report {{ _report }}
         /usr/share/xml/scap/ssg/content/ssg-rhel{{ ansible_distribution_major_version }}-ds.xml
       args:
         creates: '{{ _report }}'
