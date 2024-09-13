@@ -57,7 +57,7 @@
             permanent: true
           when:
             - "'firewalld.service' in ansible_facts.services"
-            - ansible_facts.services.firewalld.service.state == 'running'
+            - ansible_facts.services['firewalld.service']['state'] == 'running'
 
         - name: Disable httpd welcome page
           ansible.builtin.file:
