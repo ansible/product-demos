@@ -1,11 +1,11 @@
 ---
 plugin: redhat.openshift_virtualization.kubevirt
-strict: true
+strict: false
 connections:
   - namespaces:
       - openshift-cnv
 compose:
-  ansible_user: "'cloud-user' if 'rhel' in vmi_annotations['vm.kubevirt.io/os']"
+  ansible_user: "'cloud-user' if 'rhel' in vmi_annotations['vm.kubevirt.io/os'] else 'admin'"
   vmi_annotations: "vmi_annotations | ansible.utils.replace_keys(target=[
                 {'before':'vm.kubevirt.io/os', 'after':'os'},
                 {'before':'vm.kubevirt.io/flavor', 'after':'flavor'},
@@ -20,4 +20,10 @@ compose:
 keyed_groups:
   - key: vmi_annotations.os
     prefix: "cnv"
+    separator: "_"
+  - key: vmi_labels.app_name
+    prefix: "label_app_name"
+    separator: "_"
+  - key: vmi_labels.role
+    prefix: "label_role"
     separator: "_"
