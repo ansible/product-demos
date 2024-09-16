@@ -39,7 +39,6 @@
         group: root
         mode: 0755
       delegate_to: security_report
-      delegate_facts: true
 
     - name: Set report name
       ansible.builtin.set_fact:
