@@ -69,7 +69,7 @@
     - name: Copy the file from master to mwiapp02
       ansible.builtin.copy: 
         src: '/tmp/report-{{ ansible_date_time.iso8601 }}.html'
-        dest: '{{ _report_server_dir }}/{{ environment | default('production') }}/{{ _profile }}/report-{{ ansible_date_time.iso8601 }}.html'
+        dest: "{{ _report_server_dir }}/{{ environment | default('production') }}/{{ _profile }}/report-{{ ansible_date_time.iso8601 }}.html"
       delegate_to: security_report
        
     - name: Set report permissions
