@@ -14,7 +14,7 @@
   - name: Create index.html
     ansible.builtin.copy:
       dest: "/var/www/html/index.html"
-      src: templates/index.html
+      src: "templates/{{ web_server_type | default('web') }}_server.html"
       mode: "0664"
 
   - name: Create image file
