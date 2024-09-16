@@ -40,6 +40,9 @@
         mode: 0755
       delegate_to: security_report
 
+    - mame: debug
+      debug: var=server_environment
+      
     - name: Set report name
       ansible.builtin.set_fact:
         _report: '{{ _report_dir }}/{{ _profile }}/report-{{ ansible_date_time.iso8601 }}.html'
