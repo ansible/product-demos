@@ -33,15 +33,12 @@
 
     - name: Ensure report directory exists in Report Server
       ansible.builtin.file:
-        path: "{{ _report_server_dir }}/{{ environment | default('production') }}/{{ _profile }}"
+        path: "{{ _report_server_dir }}/{{ server_environment | default('production') }}/{{ _profile }}"
         state: directory
         owner: root
         group: root
         mode: 0755
       delegate_to: security_report
-
-    - name: debug
-      debug: var=server_environment
 
     - name: Set report name
       ansible.builtin.set_fact:
