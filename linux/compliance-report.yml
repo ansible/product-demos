@@ -43,7 +43,7 @@
     - name: Set report name
       ansible.builtin.set_fact:
         _report: '{{ _report_dir }}/{{ _profile }}/report-{{ ansible_date_time.iso8601 }}.html'
-        _report_server_report: "{{ _report_server_dir }}/{{ environment | default('production') }}/{{ _profile }}/report-{{ ansible_date_time.iso8601 }}.html"
+        _report_server_report: "{{ _report_server_dir }}/{{ server_environment | default('production') }}/{{ _profile }}/report-{{ ansible_date_time.iso8601 }}.html"
 
     - name: Copy tailor file
       ansible.builtin.copy:
@@ -62,7 +62,7 @@
 
     - name: Fetch the file
       ansible.builtin.fetch:
-        src: '{{ _ report }}'
+        src: '{{ _report }}'
         dest: '/tmp/report-{{ ansible_date_time.iso8601 }}.html'
         flat: true
 
