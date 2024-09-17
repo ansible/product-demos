@@ -1,9 +1,10 @@
 ---
 - name: Scan host for facts
-  hosts: localhost
+  hosts: all
+  connection: local
   gather_facts: false
   tasks:
-
+  blocK:
   - name: Make sure slack token is provided
     ansible.builtin.assert:
       that: 
@@ -26,3 +27,5 @@
     when: 
       - change_type is defined
       - change_type == 'standard'
+
+  run_once: true
