@@ -1,5 +1,5 @@
 ---
-- name: Scan host for facts
+- name: Slack Notification
   hosts: all
   connection: local
   gather_facts: false
@@ -23,9 +23,5 @@
         channel: '#{{ slack_channel_name }}'
         username: 'Ansible_Digital_Twin'
         parse: 'none'
-      delegate_to: localhost
-      when: 
-        - change_type is defined
-        - change_type == 'standard'
       run_once: true
     
