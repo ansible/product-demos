@@ -3,9 +3,13 @@
   gather_facts: false
 
   tasks:
+    - name: Assert public_ip
+      ansible.builtin.assert:
+        that: public_ip is defined
+
     - name: Check Web Page
       ansible.builtin.uri:
-        url: "{{ public_ip | default(webserver_url) }}"
+        url: "http://{{ public_ip }}"
         return_content: true
       register: web_output
       changed_when: false
