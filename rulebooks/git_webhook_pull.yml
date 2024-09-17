@@ -28,12 +28,12 @@
               _hosts: dt_rhel9
           post_events: true
 
-    - name: Merge Approved
-      condition: event.meta.headers.X_GitHub_Event == "pull_request" and event['payload']['repository']['name'] == "product-demos" and event['payload']['action'] == "closed" 
-      action:
-        run_workflow_template:
-          name: '[Prod]Apply E8 Security Harden'
-          organization: Default
+    # - name: Merge Approved
+    #   condition: event.meta.headers.X_GitHub_Event == "pull_request" and event['payload']['repository']['name'] == "product-demos" and event['payload']['action'] == "closed" 
+    #   action:
+    #     run_workflow_template:
+    #       name: '[Prod]Apply E8 Security Harden'
+    #       organization: Default
 
     - name: debug
       condition: event.payload is defined

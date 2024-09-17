@@ -1,0 +1,42 @@
+---
+- name: Capture POSTs from github
+  hosts: all
+  sources:
+    - ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5001
+      filters:
+        - ansible.eda.json_filter:
+            # exclude_keys: ['sender', 'owner']
+        - ansible.eda.dashes_to_underscores:
+
+  rules:
+    # - name: Pull Request
+    #   condition: event.meta.headers.X_GitHub_Event == "pull_request" and event['payload']['repository']['name'] == "product-demos" and event['payload']['action'] == "opened" 
+    #   action:
+    #     run_workflow_template:
+    #       name: 'Deploy Digital Twins in AWS'
+    #       organization: Default
+    #       job_args:
+    #         extra_vars:
+    #           create_vm_aws_region: "us-east-2"
+    #           create_vm_aws_owner_tag: "frederick"
+    #           vm_environment: "Dev"
+    #           create_vm_vm_deployment: "fred_race_demo"
+    #           create_vm_aws_keypair_name: "fred_labtop"
+    #           email: "fredson@redhat.com"
+    #           _hosts: dt_rhel9
+    #       post_events: true
+
+    - name: Merge Approved
+      condition: event.meta.headers.X_GitHub_Event == "pull_request" and event['payload']['repository']['name'] == "product-demos" and event['payload']['action'] == "closed" 
+      action:
+        run_workflow_template:
+          name: '[Prod]Apply E8 Security Harden'
+          organization: Default
+
+    - name: debug
+      condition: event.payload is defined
+      action:
+        debug:
+
