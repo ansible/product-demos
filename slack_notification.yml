@@ -1,0 +1,28 @@
+---
+- name: Scan host for facts
+  hosts: localhost
+  gather_facts: false
+  tasks:
+
+  - name: Make sure slack token is provided
+    ansible.builtin.assert:
+      that: 
+        - slack_token is defined
+        - aap_base_url is defined
+        - slack_channel_name is defined
+
+  - name: Send notification message via Slack
+    community.general.slack:
+      token: "{{ slack_token }}"
+      msg: >-
+        A change request has been raised. 
+        Please click on this URL to review the Digital Twin workflow: <{{ aap_base_url }}/templates/workflow_job_template/{{ tower_workflow_job_id }}/visualizer>
+
+        Please click on this URL to release the code change: < {{ ansible_eda.event.payload.pull_request.html_url }}>
+      channel: '#{{ slack_channel_name }}'
+      username: 'Ansible_Digital_Twin'
+      parse: 'none'
+    delegate_to: localhost
+    when: 
+      - change_type is defined
+      - change_type == 'standard'
