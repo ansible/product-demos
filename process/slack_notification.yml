@@ -24,4 +24,3 @@
         username: 'Ansible_Digital_Twin'
         parse: 'none'
       run_once: true
-    
