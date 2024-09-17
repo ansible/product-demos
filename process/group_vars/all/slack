@@ -11,3 +11,6 @@ slack_token: !vault |
 slack_channel_name: digital-twin
 
 aap_base_url: https://aap-infrastructure-kimjgcev-lb-1511221467.us-east-1.elb.amazonaws.com
+slack_message_type: pull_request
+
+prod_app_url: http://ec2-18-234-89-166.compute-1.amazonaws.com

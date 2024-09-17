@@ -10,9 +10,10 @@
           - slack_token is defined
           - aap_base_url is defined
           - slack_channel_name is defined
+          - slack_message_type is defined
       run_once: true
 
-    - name: Send notification message via Slack
+    - name: Send Pull Request notification message via Slack
       community.general.slack:
         token: "{{ slack_token }}"
         msg: >-
@@ -24,3 +25,18 @@
         username: 'Ansible_Digital_Twin'
         parse: 'none'
       run_once: true
+      when: slack_message_type == 'pull_request'
+
+    - name: Send Result notification message via Slack
+      community.general.slack:
+        token: "{{ slack_token }}"
+        msg: >-
+          The production code has been successfully released. 
+          Please click on this URL to review the Production Change Workflow: <{{ aap_base_url }}/#/jobs/workflow/{{ tower_workflow_job_id | default(omit) }}/output>
+
+          Please click on this URL to validate the application functionality: <{{ prod_app_url }}>
+        channel: '#{{ slack_channel_name }}'
+        username: 'Ansible_Digital_Twin'
+        parse: 'none'
+      run_once: true
+      when: slack_message_type == 'merge_approval'
