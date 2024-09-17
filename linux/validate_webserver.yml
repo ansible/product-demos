@@ -1,0 +1,17 @@
+- name: Validate Webserver
+  hosts: "{{ _hosts | default(omit) }}"
+  gather_facts: false
+
+  tasks:
+    - name: Check Web Page
+      ansible.builtin.uri:
+        url: "{{ webserver_url }}"
+        return_content: true
+      register: web_output
+      changed_when: false
+
+    - name: Output
+      ansible.builtin.debug:
+        msg:
+          - "Contents of web page:"
+          - "{{ web_output.content }}"
