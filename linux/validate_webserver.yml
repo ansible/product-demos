@@ -1,3 +1,4 @@
+---
 - name: Validate Webserver
   hosts: "{{ _hosts | default(omit) }}"
   gather_facts: false
