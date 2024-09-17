@@ -9,7 +9,7 @@
         - ansible.eda.json_filter:
             # exclude_keys: ['sender', 'owner']
         - ansible.eda.dashes_to_underscores:
-  execution:strategy: parallel
+  execution_strategy: parallel
 
   rules:
     - name: Pull Request
