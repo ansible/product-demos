@@ -5,7 +5,7 @@
   tasks:
     - name: Check Web Page
       ansible.builtin.uri:
-        url: "{{ webserver_url }}"
+        url: "{{ public_ip | default(webserver_url) }}"
         return_content: true
       register: web_output
       changed_when: false
