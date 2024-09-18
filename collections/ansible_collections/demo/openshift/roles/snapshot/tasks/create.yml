@@ -1,0 +1,49 @@
+---
+- name: Get state of VirtualMachine
+  redhat.openshift_virtualization.kubevirt_vm_info:
+    name: "{{ item }}"
+    namespace: "{{ vm_namespace }}"
+  register: state
+
+- name: Stop VirtualMachine
+  redhat.openshift_virtualization.kubevirt_vm:
+    name: "{{ item }}"
+    namespace: "{{ vm_namespace }}"
+    running: false
+    wait: true
+  when: state.resources.0.spec.running
+
+- name: Create a VirtualMachineSnapshot
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: snapshot.kubevirt.io/v1alpha1
+      kind: VirtualMachineSnapshot
+      metadata:
+        generateName: "{{ item }}-{{ ansible_date_time.epoch }}"
+        namespace: "{{ vm_namespace }}"
+      spec:
+        source:
+          apiGroup: kubevirt.io
+          kind: VirtualMachine
+          name: "{{ item }}"
+    wait: true
+    wait_condition:
+      type: Ready
+  register: snapshot
+
+- name: Start VirtualMachine
+  redhat.openshift_virtualization.kubevirt_vm:
+    name: "{{ item }}"
+    namespace: "{{ vm_namespace }}"
+    running: true
+    wait: true
+  when: state.resources.0.spec.running
+
+- name: Export snapshot name
+  ansible.builtin.set_stats:
+    data:
+      restore_snapshot_name: "{{ snapshot.result.metadata.name }}"
+
+- name: Output snapshot name
+  ansible.builtin.debug:
+    msg: "Successfully created snapshot {{ snapshot.result.metadata.name }}"

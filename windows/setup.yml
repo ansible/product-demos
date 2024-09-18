@@ -81,6 +81,52 @@ controller_templates:
             - 'Yes'
             - 'No'
 
+  - name: "WINDOWS / Rollback"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/rollback.yml"
+    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Demo Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: false
+        - question_name: Rollback Message
+          type: text
+          variable: rollback_msg
+          required: false
+
+  - name: "WINDOWS / Test Connectivity"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "windows/connect.yml"
+    execution_environment: Default execution environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Demo Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: false
+
   - name: "WINDOWS / Chocolatey install multiple"
     job_type: run
     inventory: "Demo Inventory"
@@ -306,3 +352,142 @@ controller_templates:
           type: text
           variable: HOSTS
           required: false
+
+controller_workflows:
+  - name: Setup Active Directory Domain
+    description: A workflow to create a domain controller with two domain-joined Windows hosts.
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_aws_image_owners:
+        - amazon
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Keypair Public Key
+          type: textarea
+          variable: aws_public_key
+          required: true
+        # Create VM variables
+        - question_name: Owner
+          type: text
+          variable: create_vm_vm_owner
+          required: true
+        - question_name: Environment
+          type: multiplechoice
+          variable: create_vm_vm_environment
+          required: true
+          choices:
+            - Dev
+            - QA
+            - Prod
+        - question_name: Subnet
+          type: text
+          variable: create_vm_aws_vpc_subnet_name
+          required: true
+          default: aws-test-subnet
+        - question_name: Security Group
+          type: text
+          variable: create_vm_aws_securitygroup_name
+          required: true
+          default: aws-test-sg
+    simplified_workflow_nodes:
+      - identifier: Create Keypair
+        unified_job_template: Cloud / AWS / Create Keypair
+        success_nodes:
+          - Create VPC
+      - identifier: Create VPC
+        unified_job_template: Cloud / AWS / Create VPC
+        success_nodes:
+          - Create Domain Controller
+          - Create Computer (1)
+          - Create Computer (2)
+      - identifier: Create Domain Controller
+        unified_job_template: Cloud / AWS / Create VM
+        job_type: run
+        extra_data:
+          create_vm_vm_name: dc01.ansible.local
+          create_vm_vm_purpose: domain_controller
+          create_vm_vm_deployment: domain_ansible_local
+          vm_blueprint: windows_full
+        success_nodes:
+          - Inventory Sync
+      - identifier: Create Computer (1)
+        unified_job_template: Cloud / AWS / Create VM
+        job_type: run
+        extra_data:
+          create_vm_vm_name: winston.ansible.local
+          create_vm_vm_purpose: domain_computer
+          create_vm_vm_deployment: domain_ansible_local
+          vm_blueprint: windows_core
+        success_nodes:
+          - Inventory Sync
+      - identifier: Create Computer (2)
+        unified_job_template: Cloud / AWS / Create VM
+        job_type: run
+        extra_data:
+          create_vm_vm_name: winthrop.ansible.local
+          create_vm_vm_purpose: domain_computer
+          create_vm_vm_deployment: domain_ansible_local
+          vm_blueprint: windows_core
+        success_nodes:
+          - Inventory Sync
+      - identifier: Inventory Sync
+        unified_job_template: AWS Inventory
+        all_parents_must_converge: true
+        success_nodes:
+          - Test Connectivity
+      - identifier: Test Connectivity
+        unified_job_template: WINDOWS / Test Connectivity
+        job_type: run
+        extra_data:
+          _hosts: deployment_domain_ansible_local
+        failure_nodes:
+          - Cleanup Resources
+        success_nodes:
+          - Create Domain
+      - identifier: Create Domain
+        unified_job_template: WINDOWS / AD / Create Domain
+        job_type: run
+        extra_data:
+          _hosts: purpose_domain_controller
+        failure_nodes:
+          - Cleanup Resources
+        success_nodes:
+          - Join Domain
+      - identifier: Join Domain
+        unified_job_template: WINDOWS / AD / Join Domain
+        job_type: run
+        extra_data:
+          _hosts: purpose_domain_computer
+          domain_controller: dc01.ansible.local
+        failure_nodes:
+          - Cleanup Resources
+        success_nodes:
+          - PowerShell Validation
+      - identifier: Cleanup Resources
+        unified_job_template: WINDOWS / Rollback
+        job_type: run
+        extra_data:
+          _hosts: localhost
+          rollback_msg: "Domain setup failed. Cleaning up resources..."
+      - identifier: PowerShell Validation
+        unified_job_template: WINDOWS / Run PowerShell
+        job_type: run
+        extra_data:
+          _hosts: purpose_domain_controller
+          ps_script: "Get-ADComputer -Filter * | Select-Object -Property 'Name'"

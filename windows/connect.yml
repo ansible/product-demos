@@ -1,0 +1,15 @@
+---
+- name: Connectivity test
+  hosts: "{{ _hosts | default('os_windows') }}"
+  gather_facts: false
+
+  tasks:
+    - name: Wait 600 seconds for target connection to become reachable/usable
+      ansible.builtin.wait_for_connection:
+        connect_timeout: "{{ wait_for_timeout_sec | default(5) }}"
+        delay: "{{ wait_for_delay_sec | default(0) }}"
+        sleep: "{{ wait_for_sleep_sec | default(1) }}"
+        timeout: "{{ wait_for_timeout_sec | default(300) }}"
+
+    - name: Ping the windows host
+      ansible.windows.win_ping:
