@@ -14,7 +14,7 @@
 
 - name: Set snapshot name for {{ item }}
   ansible.builtin.set_fact:
-    latest_snapshot: "{{ snapshot.resources|selectattr('spec.source.name', 'equalto', item)|sort(attribute='metadata.creationTimestamp')|first}}"
+    latest_snapshot: "{{ snapshot.resources | selectattr('spec.source.name', 'equalto', item) | sort(attribute='metadata.creationTimestamp') | first }}"
 
 - name: Stop VirtualMachine
   redhat.openshift_virtualization.kubevirt_vm:
