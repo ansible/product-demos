@@ -2,14 +2,6 @@
 - name: Include system variables
   ansible.builtin.include_vars: "{{ ansible_system }}.yml"
 
-- name: Permit traffic in default zone for http service
-  ansible.posix.firewalld:
-    service: http
-    permanent: true
-    state: enabled
-    immediate: true
-  check_mode: false
-
 - name: Install httpd package
   ansible.builtin.yum:
     name: httpd
@@ -30,8 +22,10 @@
     mode: "0644"
   check_mode: false
 
-- name: Install httpd service
+- name: Start httpd service
   ansible.builtin.service:
     name: httpd
     state: started
   check_mode: false
+
+...
