@@ -32,13 +32,6 @@ controller_credentials:
       username: REPLACEME
       password: REPLACEME
 
-#  - name: Azure
-#    credential_type: Microsoft Azure Resource Manager
-#    organization: Default
-#    update_secrets: false
-#    inputs:
-#      subscription: REPLACEME
-
 controller_inventory_sources:
   - name: AWS Inventory
     organization: Default
@@ -62,23 +55,6 @@ controller_inventory_sources:
           prefix: blueprint
         - key: tags.owner
           prefix: owner
-
-#  - name: Azure Inventory
-#    organization: Default
-#    source: azure_rm
-#   inventory: Demo Inventory
-#    credential: Azure
-#    execution_environment: Ansible Engine 2.9 execution environment
-#    overwrite: true
-#    source_vars:
-#      hostnames:
-#        - tags.Name
-#        - default
-#      keyed_groups:
-#        - key: os_profile.system
-#          prefix: os
-#      conditional_groups:
-#        cloud_azure: true
 
 controller_groups:
   - name: cloud_aws
