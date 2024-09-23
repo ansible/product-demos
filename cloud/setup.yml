@@ -3,14 +3,6 @@ _deployment_id: "{{ lookup('file', playbook_dir + '/.deployment_id') }}"
 
 user_message:
 
-controller_projects:
-  - name: Ansible Cloud AWS Demos
-    organization: Default
-    scm_type: git
-    wait: true
-    scm_url: https://github.com/ansible-cloud/aws_demos.git
-    default_environment: Cloud Services Execution Environment
-
 controller_templates:
   - name: Cloud / AWS / Create Peer Infrastructure
     job_type: run
