@@ -17,6 +17,13 @@ controller_projects:
     scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
     default_environment: Cloud Services Execution Environment
 
+  - name: Ansible Cloud AWS Demos
+    organization: Default
+    scm_type: git
+    wait: true
+    scm_url: https://github.com/ansible-cloud/aws_demos.git
+    default_environment: Cloud Services Execution Environment
+
 controller_credentials:
   - name: AWS
     credential_type: Amazon Web Services
