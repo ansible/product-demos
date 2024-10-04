@@ -4,9 +4,9 @@
 - name: Show hostnames we care about
   ansible.builtin.debug:
     msg: "About to {{ snapshot_operation }} snapshot(s) for the following hosts:
-{{ lookup('ansible.builtin.inventory_hostnames', snapshot_hosts) | split(',') | difference(['localhost'])}}"
+{{ lookup('ansible.builtin.inventory_hostnames', snapshot_hosts) | split(',') | difference(['localhost']) }}"
 
 - name: Manage snapshots based on operation
   ansible.builtin.include_tasks:
     file: "{{ snapshot_operation }}.yml"
-  loop: "{{ lookup('ansible.builtin.inventory_hostnames', snapshot_hosts) | regex_replace(vm_namespace+'-', '') | split(',') | difference(['localhost']) }}"
+  loop: "{{ lookup('ansible.builtin.inventory_hostnames', snapshot_hosts) | regex_replace(vm_namespace + '-', '') | split(',') | difference(['localhost']) }}"

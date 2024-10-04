@@ -5,7 +5,7 @@
     - name: Show VM(s) we are about to make {{ instance_state }}
       ansible.builtin.debug:
         msg: "Setting the following hosts to {{ instance_state }}
-{{ lookup('ansible.builtin.inventory_hostnames', vm_host_string) | split(',') | difference(['localhost'])}}"
+{{ lookup('ansible.builtin.inventory_hostnames', vm_host_string) | split(',') | difference(['localhost']) }}"
 
     - name: Define resources
       kubernetes.core.k8s:
@@ -31,7 +31,7 @@
                 spec:
                   sourceRef:
                     kind: DataSource
-                    name: "{{ os_version |default('rhel9') }}"
+                    name: "{{ os_version | default('rhel9') }}"
                     namespace: openshift-virtualization-os-images
                   storage:
                     resources:
@@ -79,4 +79,4 @@
                   - dataVolume:
                       name: "{{ item }}"
                     name: rootdisk
-      loop: "{{ lookup('ansible.builtin.inventory_hostnames', vm_host_string) | regex_replace(vm_namespace+'-', '') | split(',') | difference(['localhost']) }}"
+      loop: "{{ lookup('ansible.builtin.inventory_hostnames', vm_host_string) | regex_replace(vm_namespace + '-', '') | split(',') | difference(['localhost']) }}"
