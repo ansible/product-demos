@@ -7,7 +7,39 @@ controller_components:
   - job_templates
   - workflow_job_templates
 
+controller_credential_types:
+  - name: Usable Automation Hub Credential
+    kind: cloud
+    description: A credential we can use from a playbook to interact with Automation Hub
+    inputs:
+      fields:
+        - id: registry_username
+          type: string
+          label: Registry Username
+        - id: registry_password
+          type: string
+          label: Registry Password
+          secret: true
+        - id: ah_token
+          type: string
+          label: Automation Hub Token
+          secret: true
+    injectors:
+      env:
+        REGISTRY_USERNAME: !unsafe '{{ registry_username }}'
+        REGISTRY_PASSWORD: !unsafe '{{ registry_password }}'
+        AH_TOKEN: !unsafe '{{ ah_token }}'
+
 controller_credentials:
+  - name: Usable Hub Credential
+    organization: Default
+    credential_type: Usable Automation Hub Credential
+    state: exists
+    inputs:
+      registry_username: CHANGEME
+      registry_password: CHANGEME
+      ah_token: CHANGEME
+
   - name: OpenShift Credential
     organization: Default
     credential_type: OpenShift or Kubernetes API Bearer Token
@@ -40,6 +72,57 @@ controller_templates:
     credentials:
       - "OpenShift Credential"
       - "Controller Credential"
+
+  - name: OpenShift / Hub / Install Automation Hub
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/hub/install.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    credentials:
+      - "OpenShift Credential"
+      - "Controller Credential"
+
+  - name: OpenShift / Hub / Sync Collection Repositories
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/hub/collections.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    credentials:
+      - "Controller Credential"
+      - "Usable Hub Credential"
+    extra_vars:
+      ah_collection_remotes:
+        - name: rh-certified
+          url: https://console.redhat.com/api/automation-hub/content/published/
+          auth_url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+
+  - name: OpenShift / Hub / Sync EE Registries
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible official demo project"
+    playbook: "openshift/hub/registries.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    credentials:
+      - "Controller Credential"
+      - "Usable Hub Credential"
+    extra_vars:
+      ah_ee_registries:
+        - name: rh-registry
+          url: https://registry.redhat.io
+      ah_ee_repositories:
+        - name: "ansible-automation-platform-24/ee-supported-rhel9"
+          registry: "rh-registry"
 
   - name: OpenShift / CNV / Install Operator
     job_type: run
@@ -293,6 +376,34 @@ controller_workflows:
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to create CNV instance
+
+  - name: OpenShift / Hub / Deploy Automation Hub and sync EEs and Collections
+    description: A workflow to deploy Automation Hub and sync repositories
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    simplified_workflow_nodes:
+      - identifier: Install AH using AAP Operator
+        unified_job_template: OpenShift / Hub / Install Automation Hub
+        success_nodes:
+          - Sync EEs
+        failure_nodes:
+          - Ticket - Instance Failed
+      - identifier: Sync EEs
+        unified_job_template: OpenShift / Hub / Sync EE Registries
+        success_nodes:
+          - Sync Collections
+        failure_nodes:
+          - Ticket - Instance Failed
+      - identifier: Sync Collections
+        unified_job_template: OpenShift / Hub / Sync Collection Repositories
+        failure_nodes:
+          - Ticket - Instance Failed
+      - identifier: Ticket - Instance Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to deploy Automation Hub on OCP
 
   - name: OpenShift / CNV / Patch CNV Workflow
     description: A workflow to patch CNV instances with snapshot and restore on failure.

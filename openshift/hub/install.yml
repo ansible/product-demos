@@ -1,0 +1,8 @@
+---
+- name: Deploy simple Automation Hub instance
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Include role
+      ansible.builtin.include_role:
+        name: demo.openshift.simple_ah
