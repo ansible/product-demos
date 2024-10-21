@@ -5,7 +5,65 @@ images:
     name: registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9:latest
 
 dependencies:
-  galaxy: requirements.yml
+  system:
+    - "python3-devel"
+    - "python3-requests"
+    - "python3-pyyaml"
+  python_interpreter:
+    package_system: "python311"
+    python_path: "/usr/bin/python3.11"
+  galaxy:
+    collections:
+      - name: ansible.controller
+        version: 4.6.1
+      - name: infra.controller_configuration
+        version: 2.11.0
+      - name: infra.ah_configuration
+        version: ">=2.0.6"
+      - name: redhat_cop.controller_configuration
+        version: ">=2.3.1"
+      # linux
+      - name: ansible.posix
+        version: ">=1.5.4"
+      - name: community.general
+        version: ">=8.0.0"
+      - name: containers.podman
+        version: ">=1.12.1"
+      - name: redhat.insights
+        version: ">=1.2.2"
+      - name: redhat.rhel_system_roles
+        version: ">=1.23.0"
+      # windows
+      - name: ansible.windows
+        version: ">=2.3.0"
+      - name: chocolatey.chocolatey
+        version: ">=1.5.1"
+      - name: community.windows
+        version: ">=2.2.0"
+      # cloud
+      - name: amazon.aws
+        version: ">=7.5.0"
+      # satellite
+      - name: redhat.satellite
+        version: ">=4.0.0"
+      # network
+      - name: ansible.netcommon
+        version: ">=6.0.0"
+      - name: cisco.ios
+        version: ">=7.0.0"
+      - name: cisco.iosxr
+        version: ">=8.0.0"
+      - name: cisco.nxos
+        version: ">=7.0.0"
+#      - name: infoblox.nios_modules
+#        version: ">=1.6.1"
+      # openshift
+      - name: kubernetes.core
+        version: ">=4.0.0"
+      - name: redhat.openshift
+        version: ">=3.0.1"
+      - name: redhat.openshift_virtualization
+        version: ">=1.4.0"
 
 additional_build_files:
   # https://access.redhat.com/solutions/7024259
@@ -19,6 +77,8 @@ options:
   package_manager_path: /usr/bin/microdnf
 
 additional_build_steps:
+  append_base:
+    - RUN alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 0
   prepend_base:
     - RUN $PYCMD -m pip install --upgrade pip setuptools
     - COPY _build/rpms/openshift-clients*.rpm /tmp/openshift-clients.rpm
@@ -28,5 +88,5 @@ additional_build_steps:
     - ADD _build/configs/ansible.cfg /etc/ansible/ansible.cfg
     - ARG ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN
     - ARG ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN
+#    - RUN alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 0
 
-...
