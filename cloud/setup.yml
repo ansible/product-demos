@@ -69,29 +69,16 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_reports.yml
+    project: Ansible Cloud AWS Demos
+    playbook: playbooks/cloud_report.yml
     inventory: Demo Inventory
+    execution_environment: Cloud Services Execution Environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      aws_report: vpc
       reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: AWS Region
-          type: multiplechoice
-          variable: create_vm_aws_region
-          required: true
-          choices:
-            - us-east-1
-            - us-east-2
-            - us-west-1
-            - us-west-2
+      reports_aws_region: "us-east-1"
 
   - name: Cloud / AWS / Tags Report
     job_type: run
