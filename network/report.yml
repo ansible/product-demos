@@ -20,8 +20,9 @@
         gather_network_resources: all
       when: ansible_network_os == 'cisco.nxos.nxos'
 
+    # TODO figure out why this keeps failing
     - name: Gather all network resource and minimal legacy facts [Cisco IOS XR]
-      ignore_errors: true
+      ignore_errors: true  # noqa: ignore-errors
       cisco.iosxr.iosxr_facts:
         gather_subset: min
         gather_network_resources: all
