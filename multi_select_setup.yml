@@ -9,8 +9,7 @@
   tasks:
     - name: Build controller launch jobs
       ansible.builtin.set_fact:
-        controller_launch_jobs: "{{ (controller_launch_jobs | d([]))
-        + [launch_jobs | combine( {'extra_vars': { 'demo':  item }})] }}"
+        controller_launch_jobs: "{{ (controller_launch_jobs | d([])) + [launch_jobs | combine({'extra_vars': {'demo': item}})] }}"
       loop: "{{ demos }}"
 
     - name: Default Components
