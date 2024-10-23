@@ -1,7 +1,5 @@
 ---
 controller_execution_environments:
-  - name: product-demos
-    image: quay.io/acme_corp/product-demos-ee:latest
   - name: Cloud Services Execution Environment
     image: quay.io/scottharwell/cloud-ee:latest
 
