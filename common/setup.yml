@@ -284,7 +284,7 @@ controller_notifications:
       url: https://script.google.com/macros/s/AKfycbzxUObvCJ6ZbzfJyicw4RvxlGE3AZdrK4AR5-TsedCYd7O-rtTOVjvsRvqyb3rx6B0g8g/exec
       http_method: POST
       headers: {}
-
-controller_settings:
-  - name: SESSION_COOKIE_AGE
-    value: 180000
+# Has this moved out of controller?
+#controller_settings:
+#  - name: SESSION_COOKIE_AGE
+#    value: 180000
