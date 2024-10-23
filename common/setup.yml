@@ -285,6 +285,6 @@ controller_notifications:
       http_method: POST
       headers: {}
 # Has this moved out of controller?
-#controller_settings:
-#  - name: SESSION_COOKIE_AGE
-#    value: 180000
+# controller_settings:
+#   - name: SESSION_COOKIE_AGE
+#     value: 180000
