@@ -78,7 +78,7 @@ controller_templates:
   - name: SUBMIT FEEDBACK
     job_type: run
     inventory: Demo Inventory
-    project: Ansible official demo project
+    project: Ansible Product Demos
     playbook: feedback.yml
     execution_environment: Default execution environment
     notification_templates_started: Telemetry
@@ -103,7 +103,7 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
-    project: Ansible official demo project
+    project: Ansible Product Demos
     playbook: cloud/create_vpc.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
@@ -133,7 +133,7 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
-    project: Ansible official demo project
+    project: Ansible Product Demos
     playbook: cloud/aws_key.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry

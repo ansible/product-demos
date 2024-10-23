@@ -21,7 +21,7 @@ controller_inventory_sources:
   - name: OpenShift CNV Inventory
     inventory: Demo Inventory
     source: scm
-    source_project: Ansible official demo project
+    source_project: Ansible Product Demos
     source_path: openshift/inventory.kubevirt.yml
     credential: OpenShift Credential
     update_on_launch: false
@@ -31,7 +31,7 @@ controller_templates:
   - name: OpenShift / EDA / Install Controller
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "openshift/eda/install.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -44,7 +44,7 @@ controller_templates:
   - name: OpenShift / CNV / Install Operator
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "openshift/cnv/install.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -56,7 +56,7 @@ controller_templates:
   - name: OpenShift / CNV / Create RHEL VM
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "openshift/cnv/provision_rhel.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -100,7 +100,7 @@ controller_templates:
   - name: OpenShift / CNV / Create VM Snapshots
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "openshift/cnv/snapshot.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -128,7 +128,7 @@ controller_templates:
   - name: OpenShift / CNV / Restore Latest VM Snapshots
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "openshift/cnv/snapshot.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -156,7 +156,7 @@ controller_templates:
   - name: OpenShift / CNV / Delete VM
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "openshift/cnv/delete.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -184,7 +184,7 @@ controller_templates:
   - name: OpenShift / CNV / Patch
     job_type: check
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "openshift/cnv/patch.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -206,7 +206,7 @@ controller_templates:
 
   - name: OpenShift / CNV / Wait Hosts
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "openshift/cnv/wait.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -225,7 +225,7 @@ controller_templates:
   - name: OpenShift / Dev Spaces
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "openshift/devspaces.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -236,7 +236,7 @@ controller_templates:
   - name: OpenShift / GitLab
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "openshift/gitlab.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -312,7 +312,7 @@ controller_workflows:
           default: "openshift-cnv-rhel*"
     simplified_workflow_nodes:
       - identifier: Project Sync
-        unified_job_template: Ansible official demo project
+        unified_job_template: Ansible Product Demos
         success_nodes:
           - Patch Instance
       # We need to do an invnetory sync *after* creating snapshots, as turning VMs on/off changes their IP
