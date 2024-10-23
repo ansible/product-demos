@@ -77,4 +77,3 @@ A **`Demo Inventory`** is created when setting up these demos and a dynamic sour
   },
   "_ansible_no_log": false
 }
-
