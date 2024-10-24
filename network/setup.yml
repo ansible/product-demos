@@ -64,7 +64,7 @@ controller_templates:
     job_type: check
     organization: Default
     inventory: Demo Inventory
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "network/report.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -93,7 +93,7 @@ controller_templates:
     job_type: check
     organization: Default
     inventory: Demo Inventory
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "network/compliance.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry

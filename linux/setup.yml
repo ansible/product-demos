@@ -36,7 +36,7 @@ controller_inventory_sources:
   - name: Insights Inventory
     inventory: Demo Inventory
     source: scm
-    source_project: Ansible official demo project
+    source_project: Ansible Product Demos
     source_path: linux/inventory.insights.yml
     credential: Insights Inventory
 
@@ -44,7 +44,7 @@ controller_templates:
   - name: "LINUX / Register with Insights"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/ec2_register.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -83,7 +83,7 @@ controller_templates:
   - name: "LINUX / Troubleshoot"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/tshoot.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -104,7 +104,7 @@ controller_templates:
   - name: "LINUX / Temporary Sudo"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/temp_sudo.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -133,7 +133,7 @@ controller_templates:
   - name: "LINUX / Patching"
     job_type: check
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/patching.yml"
     execution_environment: Default execution environment
     notification_templates_started: Telemetry
@@ -156,7 +156,7 @@ controller_templates:
   - name: "LINUX / Start Service"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/service_start.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -181,7 +181,7 @@ controller_templates:
   - name: "LINUX / Stop Service"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/service_stop.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -206,7 +206,7 @@ controller_templates:
   - name: "LINUX / Run Shell Script"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/run_script.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -228,7 +228,7 @@ controller_templates:
           required: true
 
   - name: "LINUX / Fact Scan"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: linux/fact_scan.yml
     inventory: Demo Inventory
     execution_environment: Default execution environment
@@ -251,7 +251,7 @@ controller_templates:
   - name: "LINUX / Podman Webserver"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/podman.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -276,7 +276,7 @@ controller_templates:
   - name: "LINUX / System Roles"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/system_roles.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -303,7 +303,7 @@ controller_templates:
   - name: "LINUX / Install Web Console (cockpit)"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/system_roles.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -337,7 +337,7 @@ controller_templates:
   - name: "LINUX / DISA STIG"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/compliance.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -359,7 +359,7 @@ controller_templates:
   - name: "LINUX / Multi-profile Compliance"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/compliance-enforce.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -405,7 +405,7 @@ controller_templates:
   - name: "LINUX / Multi-profile Compliance Report"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/compliance-report.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -445,7 +445,7 @@ controller_templates:
   - name: "LINUX / Insights Compliance Scan"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/insights_compliance_scan.yml"
     credentials:
       - "Demo Credential"
@@ -470,7 +470,7 @@ controller_templates:
   - name: "LINUX / Deploy Application"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/deploy_application.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
