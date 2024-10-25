@@ -10,3 +10,4 @@ exclude_paths:
   - collections/ansible_collections/demo/compliance/roles/
   - roles/redhatofficial.*
   - .github/
+  - execution_environments/ee_contexts/
