@@ -15,3 +15,5 @@
     - name: Default Components
       ansible.builtin.include_role:
         name: "infra.controller_configuration.job_launch"
+      vars:
+        controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
