@@ -12,7 +12,7 @@ controller_templates:
   - name: "WINDOWS / Install IIS"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/install_iis.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -38,7 +38,7 @@ controller_templates:
     job_type: check
     ask_job_type_on_launch: true
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/patching.yml"
     execution_environment: Default execution environment
     notification_templates_started: Telemetry
@@ -84,7 +84,7 @@ controller_templates:
   - name: "WINDOWS / Rollback"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/rollback.yml"
     execution_environment: Default execution environment
     notification_templates_started: Telemetry
@@ -109,7 +109,7 @@ controller_templates:
   - name: "WINDOWS / Test Connectivity"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/connect.yml"
     execution_environment: Default execution environment
     notification_templates_started: Telemetry
@@ -130,7 +130,7 @@ controller_templates:
   - name: "WINDOWS / Chocolatey install multiple"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/windows_choco_multiple.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -150,7 +150,7 @@ controller_templates:
   - name: "WINDOWS / Chocolatey install specific"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/windows_choco_specific.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -174,7 +174,7 @@ controller_templates:
   - name: "WINDOWS / Run PowerShell"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/powershell.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -199,7 +199,7 @@ controller_templates:
   - name: "WINDOWS / Query Services"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/powershell_script.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -227,7 +227,7 @@ controller_templates:
   - name: "WINDOWS / Configuring Password Requirements"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/powershell_dsc.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -247,7 +247,7 @@ controller_templates:
   - name: "WINDOWS / AD / Create Domain"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/create_ad_domain.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -267,7 +267,7 @@ controller_templates:
   - name: "WINDOWS / AD / Join Domain"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/join_ad_domain.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -292,7 +292,7 @@ controller_templates:
   - name: "WINDOWS / AD / New User"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/helpdesk_new_user_portal.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -336,7 +336,7 @@ controller_templates:
   - name: "WINDOWS / DISA STIG"
     job_type: run
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "windows/compliance.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry

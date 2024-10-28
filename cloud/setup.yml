@@ -114,7 +114,7 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
-    project: Ansible official demo project
+    project: Ansible Product Demos
     playbook: cloud/snapshot_ec2.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
@@ -145,7 +145,7 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
-    project: Ansible official demo project
+    project: Ansible Product Demos
     playbook: cloud/restore_ec2.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
@@ -176,7 +176,7 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
-    project: Ansible official demo project
+    project: Ansible Product Demos
     playbook: cloud/display-ec2-stats.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
@@ -186,7 +186,7 @@ controller_templates:
   - name: "LINUX / Patching"
     job_type: check
     inventory: "Demo Inventory"
-    project: "Ansible official demo project"
+    project: "Ansible Product Demos"
     playbook: "linux/patching.yml"
     execution_environment: Default execution environment
     notification_templates_started: Telemetry
@@ -368,7 +368,7 @@ controller_workflows:
           default: os_linux
     simplified_workflow_nodes:
       - identifier: Project Sync
-        unified_job_template: Ansible official demo project
+        unified_job_template: Ansible Product Demos
         success_nodes:
           - Take Snapshot
       - identifier: Inventory Sync
