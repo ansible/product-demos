@@ -5,7 +5,9 @@ images:
     name: registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9:latest
 
 dependencies:
-  galaxy: requirements.yml
+  galaxy: requirements-25.yml
+  python_interpreter:
+    python_path: /usr/bin/python3.11
 
 additional_build_files:
   # https://access.redhat.com/solutions/7024259
