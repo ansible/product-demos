@@ -3,10 +3,13 @@
 # array of images to build
 ee_images=(
     "apd-ee-24"
+    "apd-ee-25"
 )
 
 for ee in "${ee_images[@]}"
 do
+    echo "Building EE image ${ee}"
+
     # build EE image
     ansible-builder build \
         --file ${ee}.yml \

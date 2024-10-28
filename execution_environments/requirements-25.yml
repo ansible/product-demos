@@ -1,14 +1,21 @@
 ---
 collections:
+  # AAP config as code
   - name: ansible.controller
-    version: "<4.6.0"
+    version: ">=4.6.0"
+  # TODO this fails trying to install a different version of
+  # the python-systemd package
+  # - name: ansible.eda  # fails trying to install systemd-python package
+  #   version: ">=2.1.0"
+  - name: ansible.hub
+    version: ">=1.0.0"
+  - name: ansible.platform
+    version: ">=2.5.0"
   - name: infra.ah_configuration
     version: ">=2.0.6"
   - name: infra.controller_configuration
-    version: ">=2.9.0"
-  - name: redhat_cop.controller_configuration
-    version: ">=2.3.1"
-  # linux
+    version: ">=2.11.0"
+  # linux demos
   - name: ansible.posix
     version: ">=1.5.4"
   - name: community.general
@@ -19,20 +26,20 @@ collections:
     version: ">=1.2.2"
   - name: redhat.rhel_system_roles
     version: ">=1.23.0"
-  # windows
+  # windows demos
   - name: ansible.windows
     version: ">=2.3.0"
   - name: chocolatey.chocolatey
     version: ">=1.5.1"
   - name: community.windows
     version: ">=2.2.0"
-  # cloud
+  # cloud demos
   - name: amazon.aws
     version: ">=7.5.0"
-  # satellite
+  # satellite demos
   - name: redhat.satellite
     version: ">=4.0.0"
-  # network
+  # network demos
   - name: ansible.netcommon
     version: ">=6.0.0"
   - name: cisco.ios
@@ -41,12 +48,16 @@ collections:
     version: ">=8.0.0"
   - name: cisco.nxos
     version: ">=7.0.0"
-  - name: infoblox.nios_modules
-    version: ">=1.6.1"
-  # openshift
+  # TODO on 2.5 ee-minimal-rhel9 this tries to build and install
+  # a different version of python netifaces, which fails
+  # - name: infoblox.nios_modules
+  #   version: ">=1.6.1"
+  # openshift demos
   - name: kubernetes.core
     version: ">=4.0.0"
   - name: redhat.openshift
     version: ">=3.0.1"
   - name: redhat.openshift_virtualization
     version: ">=1.4.0"
+
+...
