@@ -5,7 +5,7 @@ controller_execution_environments:
 
 controller_organizations:
   - name: Default
-    default_environment: product-demos
+    default_environment: Product Demos EE
 
 controller_projects:
   - name: Ansible Cloud Content Lab - AWS
