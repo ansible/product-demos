@@ -74,7 +74,7 @@ controller_inventory_sources:
 
 controller_templates:
   - name: LINUX / Register with Satellite
-    project: Ansible official demo project
+    project: Ansible Product Demos
     playbook: satellite/server_register.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
@@ -104,7 +104,7 @@ controller_templates:
           required: true
 
   - name: LINUX / Compliance Scan with Satellite
-    project: Ansible official demo project
+    project: Ansible Product Demos
     playbook: satellite/server_openscap.yml
     inventory: Demo Inventory
     # execution_environment: Ansible Engine 2.9 execution environment
@@ -127,7 +127,7 @@ controller_templates:
           required: false
 
   - name: SATELLITE / Publish Content View Version
-    project: Ansible official demo project
+    project: Ansible Product Demos
     playbook: satellite/satellite_publish.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
@@ -149,7 +149,7 @@ controller_templates:
           required: true
 
   - name: SATELLITE / Promote Content View Version
-    project: Ansible official demo project
+    project: Ansible Product Demos
     playbook: satellite/satellite_promote.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
@@ -179,7 +179,7 @@ controller_templates:
           required: true
 
   - name: SETUP / Satellite
-    project: Ansible official demo project
+    project: Ansible Product Demos
     playbook: satellite/setup_satellite.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
