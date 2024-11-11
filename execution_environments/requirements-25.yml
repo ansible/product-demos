@@ -11,10 +11,8 @@ collections:
     version: ">=1.0.0"
   - name: ansible.platform
     version: ">=2.5.0"
-  - name: infra.ah_configuration
-    version: ">=2.0.6"
-  - name: infra.controller_configuration
-    version: ">=2.11.0"
+  - name: infra.aap_configuration
+    version: ">=3.0.0"
   # linux demos
   - name: ansible.posix
     version: ">=1.5.4"

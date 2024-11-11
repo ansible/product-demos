@@ -10,3 +10,4 @@ choose_demo_example_aws.yml
 roles/*
 !roles/requirements.yml
 .deployment_id
+execution_environments/ee_contexts
