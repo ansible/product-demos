@@ -45,6 +45,16 @@
             name: firewalld
             state: started
 
+        - name: Enable firewall http service
+          ansible.posix.firewalld:
+            service: '{{ item }}'
+            state: enabled
+            immediate: true
+            permanent: true
+          loop:
+            - http
+            - https
+
         - name: Build report server
           ansible.builtin.include_role:
             name: "{{ item }}"
