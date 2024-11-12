@@ -94,3 +94,4 @@
         name: "{{ vm_name }}"
         namespace: "{{ vm_namespace }}"
         wait: true
+        wait_timeout: 240
