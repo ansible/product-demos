@@ -268,6 +268,10 @@ controller_workflows:
           type: text
           variable: rh_subscription_org
           required: true
+        - question_name: Email
+          type: text
+          variable: email
+          required: true
     simplified_workflow_nodes:
       - identifier: Deploy RHEL8 VM
         unified_job_template: OpenShift / CNV / Create RHEL VM
