@@ -1,3 +1,4 @@
 {
-    "editor.renderWhitespace": "all"
+    "editor.renderWhitespace": "all",
+    "ansible.python.interpreterPath": "/usr/local/bin/python3"
 }
