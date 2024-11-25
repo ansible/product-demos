@@ -1,0 +1,4 @@
+# install these as a workaround for issues with ansible.eda
+# collection being installed in ee-minimal-rhel9
+python3.11-devel
+systemd-devel

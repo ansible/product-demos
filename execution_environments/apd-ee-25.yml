@@ -6,6 +6,7 @@ images:
 
 dependencies:
   galaxy: requirements-25.yml
+  system: bindep-25.txt
   python_interpreter:
     python_path: /usr/bin/python3.11
 

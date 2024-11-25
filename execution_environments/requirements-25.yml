@@ -5,16 +5,16 @@ collections:
     version: ">=4.6.0"
   # TODO this fails trying to install a different version of
   # the python-systemd package
-  # - name: ansible.eda  # fails trying to install systemd-python package
-  #   version: ">=2.1.0"
+  - name: ansible.eda  # fails trying to install systemd-python package
+    version: ">=2.1.0"
   - name: ansible.hub
     version: ">=1.0.0"
   - name: ansible.platform
     version: ">=2.5.0"
-  - name: infra.ah_configuration
-    version: ">=2.0.6"
   - name: infra.controller_configuration
     version: ">=2.11.0"
+  - name: infra.aap_configuration
+    version: ">=3.1.0"
   # linux demos
   - name: ansible.posix
     version: ">=1.5.4"
@@ -59,15 +59,5 @@ collections:
     version: ">=3.0.1"
   - name: redhat.openshift_virtualization
     version: ">=1.4.0"
-  # for RHDP
-  - name: ansible.utils
-    version: ">=5.1.0"
-  - name: kubevirt.core
-    version: ">=2.1.0"
-  - name: community.okd
-    version: ">=4.0.0"
-  - name: https://github.com/rhpds/assisted_installer.git
-    type: git
-    version: "v0.0.1"
 
 ...
