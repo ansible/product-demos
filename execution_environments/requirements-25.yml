@@ -3,9 +3,7 @@ collections:
   # AAP config as code
   - name: ansible.controller
     version: ">=4.6.0"
-  # TODO this fails trying to install a different version of
-  # the python-systemd package
-  - name: ansible.eda  # fails trying to install systemd-python package
+  - name: ansible.eda
     version: ">=2.1.0"
   - name: ansible.hub
     version: ">=1.0.0"
