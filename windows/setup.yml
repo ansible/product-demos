@@ -474,7 +474,7 @@ controller_workflows:
         job_type: run
         extra_data:
           _hosts: purpose_domain_computer
-          domain_controller: dc01.ansible.local
+          domain_controller: dc01
         failure_nodes:
           - Cleanup Resources
         success_nodes:
