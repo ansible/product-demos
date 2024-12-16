@@ -43,4 +43,5 @@ roles:
     version: 0.1.72
   - name: redhatofficial.rhel9-stig
     version: 0.1.72
+  - name: network.backup
 ...

@@ -1,0 +1,65 @@
+---
+- name: Backup Devices
+  hosts: routers
+  gather_facts: false
+  vars:
+    report_server: reports
+    # web_path: /tmp/backup
+    backup_path: /var/www/html/backups/network/
+    troubleshooting: false
+
+  tasks:
+    - name: Network Backup and Resource Manager
+      ansible.builtin.include_role:
+        name: network.backup.run
+      vars:
+        operation: backup
+        type: full
+        data_store:
+          local: "/tmp/network_local_backup"
+
+
+    # This task removes the Current configuration... from the top of IOS routers show run
+    - name: Remove non config lines - regexp
+      delegate_to: localhost
+      ansible.builtin.lineinfile:
+        path: "/tmp/network_local_backup/{{ inventory_hostname }}.txt"
+        line: "Building configuration..."
+        state: absent
+
+    - name: list files in /tmp
+      when: troubleshooting == True
+      delegate_to: localhost
+      run_once: true
+      ansible.builtin.command:
+        cmd: ls /tmp/network_local_backup
+
+    - name: Create backup server
+      become: true
+      delegate_to: "{{ report_server }}"
+      block:
+        - name: Get facts
+          run_once: true
+          ansible.builtin.setup:
+
+        - name: Build report server
+          run_once: true
+          ansible.builtin.include_role:
+            name: "{{ item }}"
+          loop:
+            - demo.patching.report_server
+            # - demo.patching.build_report_network
+
+        - name: Create a backup directory if it does not exist
+          run_once: true
+          ansible.builtin.file:
+            path: "{{ backup_path }}"
+            state: directory
+            mode: '0755'
+
+        - name: Copy backup file
+          ansible.builtin.copy:
+            src: "/tmp/network_local_backup/{{ inventory_hostname }}.txt"
+            dest: "{{ backup_path }}"
+
+...
