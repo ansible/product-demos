@@ -6,6 +6,8 @@ images:
 
 dependencies:
   galaxy: requirements-25.yml
+  python:
+    - pywinrm>=0.4.3
   python_interpreter:
     python_path: /usr/bin/python3.11
 
