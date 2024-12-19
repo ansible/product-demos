@@ -48,6 +48,8 @@ collections:
     version: ">=8.0.0"
   - name: cisco.nxos
     version: ">=7.0.0"
+  - name: network.backup
+    version: ">=3.0.0"
   # TODO on 2.5 ee-minimal-rhel9 this tries to build and install
   # a different version of python netifaces, which fails
   # - name: infoblox.nios_modules
