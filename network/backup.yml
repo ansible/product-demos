@@ -21,7 +21,7 @@
         group: ec2-user
         mode: '0755'
 
-- name: Backup Devices
+- name: Play to Backup Cisco Always-On Network Devices
   hosts: routers
   gather_facts: false
   vars:
@@ -30,7 +30,6 @@
     backup_dir: "/tmp/network_backups"
 
   tasks:
-
     - name: Network Backup and Resource Manager
       ansible.builtin.include_role:
         name: network.backup.run
@@ -62,7 +61,6 @@
       delegate_to: "{{ report_server }}"
       run_once: true
       ansible.builtin.debug:
-        msg: "Go to http://{{ ansible_host }}/backups/"
-      
-...
+        msg: "To review backed up configurations, go to http://{{ ansible_host }}/backups/"
 
+...
