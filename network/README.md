@@ -12,6 +12,8 @@
 This category of demos shows examples of network operations and management with Ansible Automation Platform. The list of demos can be found below. See the [Suggested Usage](#suggested-usage) section of this document for recommendations on how to best use these demos.
 - [**NETWORK / Configuration**](https://github.com/nleiva/ansible-net-modules/blob/main/main.yml) - Deploy golden configurations for different resources to Cisco IOS, IOSXR, and NXOS.
 
+To run the demos, deploy them using Infrastructure as Code, run either the "Product Demos | Multi-demo setup" or the "Product Demos | Single demo setup" and select 'Network' in the "Product Demos" deployment, or utilize the steps in the repo level README.
+
 ### Project
 
 These demos leverage playbooks from a [git repo](https://github.com/nleiva/ansible-net-modules) that is added as the **`Network Golden Configs`** Project in your Ansible Controller. Review this repo for the playbooks to configure different resources and network config templates that will be configured.
@@ -77,3 +79,9 @@ A **`Demo Inventory`** is created when setting up these demos and a dynamic sour
   },
   "_ansible_no_log": false
 }
+
+**NETWORK / BACKUP** - Use this job to show how Ansible can be used to backup network devices. Job Template will create a backup file on the reports server where they can be viewed.  This is just an example - backups can also be sent to other repositories such as a Git repo (Github, Gitlab, etc).
+
+To run this demo, you will need to complete a couple of prerequisites:
+- Run the "Deploy Cloud Stack in AWS" job template.  This will create (among other things) a reports server.
+- You may need to update the "Demo Credential".
