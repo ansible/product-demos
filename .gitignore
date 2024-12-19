@@ -10,3 +10,5 @@ choose_demo_example_aws.yml
 roles/*
 !roles/requirements.yml
 .deployment_id
+.cache/
+.ansible/

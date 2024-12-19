@@ -420,7 +420,7 @@ controller_workflows:
         unified_job_template: Cloud / AWS / Create VM
         job_type: run
         extra_data:
-          create_vm_vm_name: dc01.ansible.local
+          create_vm_vm_name: dc01
           create_vm_vm_purpose: domain_controller
           create_vm_vm_deployment: domain_ansible_local
           vm_blueprint: windows_full
@@ -430,7 +430,7 @@ controller_workflows:
         unified_job_template: Cloud / AWS / Create VM
         job_type: run
         extra_data:
-          create_vm_vm_name: winston.ansible.local
+          create_vm_vm_name: winston
           create_vm_vm_purpose: domain_computer
           create_vm_vm_deployment: domain_ansible_local
           vm_blueprint: windows_core
@@ -440,7 +440,7 @@ controller_workflows:
         unified_job_template: Cloud / AWS / Create VM
         job_type: run
         extra_data:
-          create_vm_vm_name: winthrop.ansible.local
+          create_vm_vm_name: winthrop
           create_vm_vm_purpose: domain_computer
           create_vm_vm_deployment: domain_ansible_local
           vm_blueprint: windows_core
@@ -474,7 +474,7 @@ controller_workflows:
         job_type: run
         extra_data:
           _hosts: purpose_domain_computer
-          domain_controller: dc01.ansible.local
+          domain_controller: dc01
         failure_nodes:
           - Cleanup Resources
         success_nodes:
