@@ -57,7 +57,7 @@
         group: ec2-user
         mode: '0644'
 
-    - name: Review backs on report server
+    - name: Review backup on report server
       delegate_to: "{{ report_server }}"
       run_once: true
       ansible.builtin.debug:
