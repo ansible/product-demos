@@ -83,5 +83,6 @@ A **`Demo Inventory`** is created when setting up these demos and a dynamic sour
 **NETWORK / BACKUP** - Use this job to show how Ansible can be used to backup network devices. Job Template will create a backup file on the reports server where they can be viewed.  This is just an example - backups can also be sent to other repositories such as a Git repo (Github, Gitlab, etc).
 
 To run this demo, you will need to complete a couple of prerequisites:
-- Run the "Deploy Cloud Stack in AWS" job template.  This will create (among other things) a reports server.
-- You may need to update the "Demo Credential".
+- Run the "Deploy Cloud Stack in AWS" job template.  This will create (among other things) a reports server.  You will want to use the public key from the "Product Demos" page.
+- You may need to update the "Demo Credential"; the latest product demos for 2.5 did not require this when
+using the public key from the "Product Demos" deployment page.
