@@ -30,7 +30,7 @@
     - name: Network Backup and Resource Manager
       ansible.builtin.include_role:
         name: network.backup.run
-      vars:
+      vars:  # noqa var-naming[no-role-prefix]
         operation: backup
         type: full
         data_store:
