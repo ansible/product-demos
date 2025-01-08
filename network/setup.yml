@@ -25,8 +25,8 @@ controller_inventory_sources:
     source: scm
     inventory: Demo Inventory
     overwrite: true
-    source_project: Network Golden Configs
-    source_path: hosts
+    source_project: Ansible Product Demos
+    source_path: network/hosts
 
 controller_templates:
   - name: NETWORK / Configuration
@@ -119,4 +119,3 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    use_fact_cache: true
