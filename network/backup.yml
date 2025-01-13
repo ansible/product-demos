@@ -1,0 +1,63 @@
+---
+- name: Create network reports server
+  hosts: reports
+  become: true
+
+  tasks:
+    - name: Build report server
+      ansible.builtin.include_role:
+        name: "{{ item }}"
+      loop:
+        - demo.patching.report_server
+
+    - name: Create a backup directory if it does not exist
+      run_once: true
+      ansible.builtin.file:
+        path: "/var/www/html/backups"
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+
+- name: Play to Backup Cisco Always-On Network Devices
+  hosts: routers
+  gather_facts: false
+  vars:
+    report_server: reports
+    backup_dir: "/tmp/network_backups"
+
+  tasks:
+    - name: Network Backup and Resource Manager
+      ansible.builtin.include_role:
+        name: network.backup.run
+      vars:  # noqa var-naming[no-role-prefix]
+        operation: backup
+        type: full
+        data_store:
+          local: "{{ backup_dir }}"
+
+    # This task removes the Current configuration... from the top of IOS routers show run
+    - name: Remove non config lines - regexp
+      delegate_to: localhost
+      ansible.builtin.lineinfile:
+        path: "{{ backup_dir }}/{{ inventory_hostname }}.txt"
+        line: "Building configuration..."
+        state: absent
+
+    - name: Copy backup file
+      delegate_to: "{{ report_server }}"
+      ansible.builtin.copy:
+        src: "{{ backup_dir }}/{{ inventory_hostname }}.txt"
+        dest: "/var/www/html/backups/{{ inventory_hostname }}.cfg"
+        backup: true
+        owner: ec2-user
+        group: ec2-user
+        mode: '0644'
+
+    - name: Review backup on report server
+      delegate_to: "{{ report_server }}"
+      run_once: true
+      ansible.builtin.debug:
+        msg: "To review backed up configurations, go to http://{{ ansible_host }}/backups/"
+
+...
