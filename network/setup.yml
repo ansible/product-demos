@@ -11,7 +11,9 @@ controller_projects:
     scm_type: git
     scm_url: https://github.com/nleiva/ansible-net-modules
     update_project: true
-    wait: true
+    wait: false
+    controller_request_timeout: 20
+    controller_configuration_async_retries: 40
     default_environment: Networking Execution Environment
 
 controller_inventories:
@@ -23,8 +25,8 @@ controller_inventory_sources:
     source: scm
     inventory: Demo Inventory
     overwrite: true
-    source_project: Network Golden Configs
-    source_path: hosts
+    source_project: Ansible Product Demos
+    source_path: network/hosts
 
 controller_templates:
   - name: NETWORK / Configuration
@@ -33,6 +35,8 @@ controller_templates:
     survey_enabled: true
     project: Network Golden Configs
     playbook: main.yml
+    credentials:
+      - "Demo Credential"
     execution_environment: Networking Execution Environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -95,9 +99,23 @@ controller_templates:
     inventory: Demo Inventory
     project: "Ansible Product Demos"
     playbook: "network/compliance.yml"
+    credentials:
+      - "Demo Credential"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
     ask_job_type_on_launch: true
     survey_enabled: true
+
+  - name: "NETWORK / Backup"
+    job_type: run
+    organization: Default
+    inventory: Demo Inventory
+    project: "Ansible Product Demos"
+    playbook: "network/backup.yml"
+    credentials:
+      - "Demo Credential"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
