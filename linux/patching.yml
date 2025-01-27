@@ -11,6 +11,7 @@
       ansible.builtin.yum:
         name: yum-utils
         state: installed
+      check_mode: false
 
     - name: Include patching role
       ansible.builtin.include_role:
