@@ -494,6 +494,7 @@ controller_templates:
           variable: application
           required: true
 
+controller_workflows:
   - name: "Compliance Workflow"
     description: A workflow to generate a SCAP report and run enforce on findings
     organization: Default
