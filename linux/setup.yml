@@ -536,5 +536,4 @@ controller_workflows:
           - Update Inventory
       - identifier: Update Inventory
         unified_job_template: AWS Inventory
-
 ...
