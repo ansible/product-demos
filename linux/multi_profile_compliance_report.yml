@@ -98,6 +98,10 @@
         group: root
         mode: 0644
 
+    - name: Debug output for report
+      ansible.builtin.debug:
+        msg: "http://{{ ansible_host }}/oscap-reports/{{ _profile }}/report-{{ ansible_date_time.iso8601 }}.html"
+
   handlers:
     - name: Restart httpd
       ansible.builtin.service:
