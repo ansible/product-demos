@@ -81,7 +81,7 @@
       register: _oscap
       failed_when: _oscap.rc not in [0, 2]
 
-    - name: Tag instance as {{ compliance_profile }} 
+    - name: Tag instance as OUT_OF_COMPLIANCE_{{ compliance_profile | upper}} 
       amazon.aws.ec2_tag:
         region: "{{ placement.region }}"
         resource: "{{ instance_id }}"
@@ -89,6 +89,7 @@
         tags:
           Compliance: OUT_OF_COMPLIANCE
       when: _oscap.rc == 2
+      become: false
       delegate_to: localhost
 
     - name: Set report permissions
