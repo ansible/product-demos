@@ -9,10 +9,11 @@
       - openscap-utils
       - scap-security-guide
     compliance_profile: ospp
-    use_httpd: true
+    # use local httpd, opposed to using the designated report server
+    local_httpd: true
 
   tasks:
-    - name: Assert total RAM is 
+    - name: Assert memory meets minimum requirements
       ansible.builtin.assert:
        that: 
          - ansible_memfree_mb >= 1000
@@ -30,7 +31,7 @@
         state: present
 
     - name: Configure httpd
-      when: use_httpd | bool
+      when: local_httpd | bool
       block:
         - name: Install httpd
           ansible.builtin.dnf:
@@ -79,6 +80,16 @@
         creates: '{{ _report }}'
       register: _oscap
       failed_when: _oscap.rc not in [0, 2]
+
+    - name: Tag instance as {{ compliance_profile }} 
+      amazon.aws.ec2_tag:
+        region: "{{ placement.region }}"
+        resource: "{{ instance_id }}"
+        state: present
+        tags:
+          Compliance: OUT_OF_COMPLIANCE
+      when: _oscap.rc == 2
+      delegate_to: localhost
 
     - name: Set report permissions
       ansible.builtin.file:
