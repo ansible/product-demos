@@ -12,6 +12,13 @@
     use_httpd: true
 
   tasks:
+    - name: Assert total RAM is 
+      ansible.builtin.assert:
+       that: 
+         - ansible_memfree_mb >= 1000
+         - ansible_memtotal_mb >= 2000
+       fail_msg: "OpenSCAP is a memory intensive operation, the specified enepoint does not meet minimum requirements. See https://access.redhat.com/articles/6999111 for details."
+
     - name: Get our facts straight
       ansible.builtin.set_fact:
         _profile: '{{ compliance_profile | replace("pci_dss", "pci-dss") }}'

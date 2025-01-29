@@ -360,7 +360,7 @@ controller_templates:
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible Product Demos"
-    playbook: "linux/compliance-enforce.yml"
+    playbook: "linux/compliance_enforce.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -406,7 +406,7 @@ controller_templates:
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible Product Demos"
-    playbook: "linux/compliance-report.yml"
+    playbook: "linux/compliance_report.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -492,4 +492,41 @@ controller_templates:
           variable: application
           required: true
 
+  - name: Compliance Workflow
+    description: A workflow to generate a SCAP report and run enforce on findings
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: true
+        - question_name: Compliance Profile
+          type: multiplechoice
+          variable: compliance_profile
+          required: true
+          choices:
+            - cis
+            - cjis
+            - cui
+            - hipaa
+            - ospp
+            - pci_dss
+            - stig
+        - question_name: Use httpd on the target host(s) to access reports locally?
+          type: multiplechoice
+          variable: use_httpd
+          required: true
+          choices:
+            - "true"
+            - "false"
+          default: "true"
+    simplified_workflow_nodes:
+      - identifier: Compliance Report
+        unified_job_template: "LINUX / Multi-profile Compliance Report"
 ...
