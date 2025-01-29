@@ -494,7 +494,7 @@ controller_templates:
           variable: application
           required: true
 
-  - name: Compliance Workflow
+  - name: "Compliance Workflow"
     description: A workflow to generate a SCAP report and run enforce on findings
     organization: Default
     notification_templates_started: Telemetry
@@ -531,4 +531,9 @@ controller_templates:
     simplified_workflow_nodes:
       - identifier: Compliance Report
         unified_job_template: "LINUX / Multi-profile Compliance Report"
+        success_nodes:
+          - Update Inventory
+      - identifier: Update Inventory
+        unified_job_template: AWS Inventory
+
 ...
