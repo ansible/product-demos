@@ -81,20 +81,6 @@
       register: _oscap
       failed_when: _oscap.rc not in [0, 2]
 
-    - name: Tag instance as {{ compliance_profile | upper }}_OUT_OF_COMPLIANCE
-      delegate_to: localhost
-      amazon.aws.ec2_tag:
-        region: "{{ placement.region }}"
-        resource: "{{ instance_id }}"
-        state: present
-        tags:
-          Compliance: "{{ compliance_profile | upper }}-OUT_OF_COMPLIANCE"
-      when: 
-        - _oscap.rc == 2
-        - instance_id is defined
-        
-      become: false
-
     - name: Set report permissions
       ansible.builtin.file:
         path: '{{ _report }}'
@@ -106,6 +92,19 @@
       ansible.builtin.debug:
         msg: "http://{{ ansible_host }}/oscap-reports/{{ _profile }}/report-{{ ansible_date_time.iso8601 }}.html"
 
+    - name: Tag instance as {{ compliance_profile | upper }}_OUT_OF_COMPLIANCE
+      delegate_to: localhost
+      amazon.aws.ec2_tag:
+        region: "{{ placement.region }}"
+        resource: "{{ instance_id }}"
+        state: present
+        tags:
+          Compliance: "{{ compliance_profile | upper }}-OUT_OF_COMPLIANCE"
+      when: 
+        - _oscap.rc == 2
+        - instance_id is defined
+      become: false
+ 
   handlers:
     - name: Restart httpd
       ansible.builtin.service:

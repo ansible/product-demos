@@ -60,7 +60,8 @@ controller_inventory_sources:
           prefix: purpose
         - key: tags.deployment
           prefix: deployment
-
+        - key: tags.Compliance
+          separator: ''
 controller_groups:
   - name: cloud_aws
     inventory: Demo Inventory

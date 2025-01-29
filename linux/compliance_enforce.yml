@@ -1,10 +1,7 @@
 ---
-- name: Apply compliance profile
-  hosts: "{{ _hosts | default(omit) }}"
+- name: Apply compliance profile as part of workflow.
+  hosts: "{{ compliance_profile | upper }}-OUT_OF_COMPLIANCE"
   become: true
-  vars:
-    compliance_profile: undef
-
   tasks:
     - name: Check os type
       ansible.builtin.assert:

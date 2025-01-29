@@ -334,11 +334,11 @@ controller_templates:
             - full
           required: true
 
-  - name: "LINUX / DISA STIG"
+  - name: "LINUX / Compliance Enforce"
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible Product Demos"
-    playbook: "linux/compliance.yml"
+    playbook: "linux/compliance_enforce.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -360,7 +360,7 @@ controller_templates:
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible Product Demos"
-    playbook: "linux/compliance_enforce.yml"
+    playbook: "linux/multi_profile_compliance.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -495,7 +495,7 @@ controller_templates:
           required: true
 
 controller_workflows:
-  - name: "Compliance Workflow"
+  - name: "Linux / Compliance Workflow"
     description: A workflow to generate a SCAP report and run enforce on findings
     organization: Default
     notification_templates_started: Telemetry
@@ -536,4 +536,8 @@ controller_workflows:
           - Update Inventory
       - identifier: Update Inventory
         unified_job_template: AWS Inventory
+        success_nodes:
+          - Compliance Enforce
+      - identifier: Compliance Enforce
+        unified_job_template: "LINUX / Compliance Enforce"
 ...
