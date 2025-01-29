@@ -435,7 +435,7 @@ controller_templates:
             - ospp
             - pci_dss
             - stig
-        - question_name: Use httpd on the target host(s) to access reports locally? 
+        - question_name: Use httpd on the target host(s) to access reports locally?
           type: multiplechoice
           variable: local_httpd
           required: true
