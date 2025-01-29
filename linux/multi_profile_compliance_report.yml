@@ -9,8 +9,8 @@
       - openscap-utils
       - scap-security-guide
     compliance_profile: ospp
-    # use local httpd, opposed to using the designated report server
-    local_httpd: true
+    # install httpd and use it to host compliance report
+    use_httpd: true
 
   tasks:
     - name: Assert memory meets minimum requirements
@@ -31,7 +31,7 @@
         state: present
 
     - name: Configure httpd
-      when: local_httpd | bool
+      when: use_httpd | bool
       block:
         - name: Install httpd
           ansible.builtin.dnf:
@@ -99,7 +99,7 @@
         resource: "{{ instance_id }}"
         state: present
         tags:
-          Compliance: "{{ compliance_profile | upper }}-OUT_OF_COMPLIANCE"
+          Compliance: "{{ compliance_profile | upper }}_OUT_OF_COMPLIANCE"
       when: 
         - _oscap.rc == 2
         - instance_id is defined
