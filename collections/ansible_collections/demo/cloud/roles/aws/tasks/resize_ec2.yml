@@ -13,7 +13,7 @@
 
     - name: AWS | RESIZE EC2 | shutdown instance
       amazon.aws.ec2_instance:
-        instance_id: "{{ instance_id }}"
+        instance_ids: "{{ instance_id }}"
         region: "{{ aws_region }}"
         state: stopped
         wait: true
@@ -21,13 +21,13 @@
     - name: AWS | RESIZE EC2 | update instance type
       amazon.aws.ec2_instance:
         region: "{{ aws_region }}"
-        instance_id: "{{ instance_id }}"
+        instance_ids: "{{ instance_id }}"
         instance_type: "{{ instance_type }}"
         wait: true
 
     - name: AWS | RESIZE EC2 | shutdown instance
       amazon.aws.ec2_instance:
-        instance_id: "{{ instance_id }}"
+        instance_ids: "{{ instance_id }}"
         region: "{{ aws_region }}"
         state: started
         wait: true
