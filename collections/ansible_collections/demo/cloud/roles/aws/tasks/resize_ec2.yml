@@ -1,0 +1,33 @@
+---
+# parameters
+# instance_type: new instance type, e.g. t3.large
+- name: AWS | RESIZE VM
+  delegate_to: localhost
+  block:
+    - name: AWS | RESIZE EC2 | assert required vars
+      ansible.builtin.assert:
+        that: 
+          - instance_id is defined
+          - aws_region is defined
+        fail_msg: "instance_id, aws_region is required for resize operations"
+
+    - name: AWS | RESIZE EC2 | shutdown instance
+      amazon.aws.ec2:
+        instance_id: "{{ instance_id }}"
+        region: "{{ aws_region }}"
+        state: stopped
+        wait: true
+
+    - name: AWS | RESIZE EC2 | update instance type
+      amazon.aws.ec2:
+        region: "{{ aws_region }}"
+        instance_id: "{{ instance_id }}"
+        instance_type: "{{ instance_type }}"
+        wait: true
+
+    - name: AWS | RESIZE EC2 | shutdown instance
+      amazon.aws.ec2:
+        instance_id: "{{ instance_id }}"
+        region: "{{ aws_region }}"
+        state: started
+        wait: true
