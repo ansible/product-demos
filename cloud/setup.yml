@@ -174,8 +174,8 @@ controller_templates:
         - question_name: Specify target instance type
           type: text
           variable: instance_type
+          default: t3a.medium
           required: true
-
 
   - name: Cloud / AWS / Restore EC2 from Snapshot
     job_type: run

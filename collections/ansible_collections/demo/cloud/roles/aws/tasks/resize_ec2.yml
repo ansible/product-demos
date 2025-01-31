@@ -6,7 +6,7 @@
   block:
     - name: AWS | RESIZE EC2 | assert required vars
       ansible.builtin.assert:
-        that: 
+        that:
           - instance_id is defined
           - aws_region is defined
         fail_msg: "instance_id, aws_region is required for resize operations"
