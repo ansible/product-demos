@@ -169,12 +169,12 @@ controller_templates:
         - question_name: Specify target hosts
           type: text
           variable: _hosts
-          required: false
+          required: true
 
         - question_name: Specify target instance type
           type: text
           variable: instance_type
-          required: false
+          required: true
 
 
   - name: Cloud / AWS / Restore EC2 from Snapshot
