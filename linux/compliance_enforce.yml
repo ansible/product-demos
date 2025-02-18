@@ -1,0 +1,13 @@
+---
+- name: Apply compliance profile as part of workflow.
+  hosts: "{{ compliance_profile | default('stig') | upper }}_OUT_OF_COMPLIANCE"
+  become: true
+  tasks:
+    - name: Check os type
+      ansible.builtin.assert:
+        that: "ansible_os_family == 'RedHat'"
+
+    - name: Run Compliance Profile
+      ansible.builtin.include_role:
+        name: "redhatofficial.rhel{{ ansible_distribution_major_version }}-{{ compliance_profile }}"
+...
