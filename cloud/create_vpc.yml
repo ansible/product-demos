@@ -2,6 +2,7 @@
 - name: Create Cloud Infra
   hosts: localhost
   gather_facts: false
+
   vars:
     aws_vpc_name: aws-test-vpc
     aws_owner_tag: default
@@ -12,6 +13,27 @@
     aws_sg_name: aws-test-sg
     aws_subnet_name: aws-test-subnet
     aws_rt_name: aws-test-rt
+
+    # map of availability zones to use per region, added since not all
+    # instance types are available in all AZs.  must match the drop-down
+    # list for the create_vm_aws_region variable described in cloud/setup.yml
+    _azs:
+      us-east-1:
+        - us-east-1a
+        - us-east-1b
+        - us-east-1c
+      us-east-2:
+        - us-east-2a
+        - us-east-2b
+        - us-east-2c
+      us-west-1:
+        # us-west-1a not available when last checked 20250218
+        - us-west-1b
+        - us-west-1c
+      us-west-2:
+        - us-west-2a
+        - us-west-2b
+        - us-west-2c
 
   tasks:
     - name: Create VPC
@@ -95,12 +117,13 @@
           owner: "{{ aws_owner_tag }}"
           purpose: "{{ aws_purpose_tag }}"
 
-    - name: Create a subnet on the VPC
+    - name: Create a subnet in the VPC
       amazon.aws.ec2_vpc_subnet:
         state: present
         vpc_id: "{{ aws_vpc.vpc.id }}"
         cidr: "{{ aws_subnet_cidr }}"
         region: "{{ create_vm_aws_region }}"
+        az: "{{ _azs[create_vm_aws_region] | shuffle | first }}"
         map_public: true
         tags:
           Name: "{{ aws_subnet_name }}"
