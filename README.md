@@ -34,10 +34,15 @@ This project is tested for compatibility with the [demo.redhat.com Ansible Produ
       > You can also use an execution environment for disconnected environments. To do this, you must disable collection downloads in the Controller. This can be done in `Settings` > `Job Settings`. This setting prevents the controller from downloading collections listed in the [collections/requirements.yml](collections/requirements.yml) file.
 
 2. If it is not already created for you, add an Execution Environment called `product-demos`
-
+   - AAP 2.4
      - Name: product-demos
      - Image: quay.io/acme_corp/product-demos-ee:latest
      - Pull: Only pull the image if not present before running
+   - AAP 2.5
+     - name: Product Demos EE
+       Image: quay.io/ansible-product-demos/apd-ee-25:latest
+     - Pull: Only pull the image if not present before running
+
 
 3. If it is not already created for you, create a Project called `Ansible Product Demos` with this repo as a source. NOTE: if you are using a fork, be sure that you have the correct URL. Update the project.
 
