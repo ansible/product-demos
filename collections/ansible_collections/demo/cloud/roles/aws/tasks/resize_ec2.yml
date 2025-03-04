@@ -4,6 +4,7 @@
 - name: AWS | RESIZE VM
   delegate_to: localhost
   vars:
+    controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
     inventory_sources:
       - name: AWS Inventory
         inventory: Demo Inventory
