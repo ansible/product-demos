@@ -10,7 +10,6 @@
         inventory: Demo Inventory
         organization: Default
         wait: true
-        
   block:
     - name: AWS | RESIZE EC2 | assert required vars
       ansible.builtin.assert:
