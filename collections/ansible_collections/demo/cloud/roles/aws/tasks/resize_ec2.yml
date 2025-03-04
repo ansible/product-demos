@@ -5,7 +5,7 @@
   delegate_to: localhost
   vars:
     controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
-    inventory_sources:
+    controller_inventory_sources:
       - name: AWS Inventory
         inventory: Demo Inventory
         organization: Default
@@ -41,5 +41,6 @@
         wait: true
 
     - name: Synchronize inventory
+      run_once: true
       ansible.builtin.include_role:
         name: infra.controller_configuration.inventory_source_update
