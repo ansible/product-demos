@@ -39,4 +39,4 @@
 
     - name: Synchronize inventory
       ansible.builtin.include_role:
-        name: infra.aap_configuration.inventory_source_update
+        name: infra.controller_configuration.inventory_source_update
