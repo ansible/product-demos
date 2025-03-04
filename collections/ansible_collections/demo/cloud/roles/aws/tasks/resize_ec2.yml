@@ -3,6 +3,11 @@
 # instance_type: new instance type, e.g. t3.large
 - name: AWS | RESIZE VM
   delegate_to: localhost
+  vars:
+    inventory_sources:
+      - name: AWS Inventory
+        inventory: Demo Inventory
+        
   block:
     - name: AWS | RESIZE EC2 | assert required vars
       ansible.builtin.assert:
@@ -25,9 +30,13 @@
         instance_type: "{{ instance_type }}"
         wait: true
 
-    - name: AWS | RESIZE EC2 | shutdown instance
+    - name: AWS | RESIZE EC2 | start instance
       amazon.aws.ec2_instance:
         instance_ids: "{{ instance_id }}"
         region: "{{ aws_region }}"
         state: started
         wait: true
+
+    - name: Synchronize inventory
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.inventory_source_update

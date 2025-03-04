@@ -338,7 +338,7 @@ controller_templates:
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible Product Demos"
-    playbook: "linux/compliance_enforce.yml"
+    playbook: "linux/remediate_out_of_compliance.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -459,7 +459,7 @@ controller_templates:
             - stig
         - question_name: Use httpd on the target host(s) to access reports locally?
           type: multiplechoice
-          variable: local_httpd
+          variable: use_httpd
           required: true
           choices:
             - "true"
