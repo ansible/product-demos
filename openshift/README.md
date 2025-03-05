@@ -41,7 +41,8 @@ These demos require an OpenShift cluster to deploy to. Luckily the default Ansib
 > - The "OpenShift / CNV / Install Operator" job template must be run before using any of the other CNV (Virtual Machine) job templates.
 > - There is a fairly consistent outage after deploying CNV VMs as part of the Infra Stack job template that users need to be aware of, "caused by the resource limitations of the cluster". Sometimes this requires stopping a VM before it settles.
 >- The inventory update requires that all VMs are running or it fails - the error msg is a bit of a red herring.
->- Currently an inability consistently to deploy more than 2 CNV VMs (WIP)
+>- Currently an inability consistently to deploy more than 2 CNV VMs [WIP](https://github.com/ansible/product-demos/issues/226)
+>- Activation Org ID and Activation Keys can be obtained [here](https://console.redhat.com/insights/connector/activation-keys#SIDs=&tags=).
 
 **OpenShift / CNV / Install Operator** - This job takes no parameters, to ensure the CNV operator is fully operational it provisions a VM in CNV which is cleaned up upon success.
 
