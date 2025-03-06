@@ -58,7 +58,7 @@ After running the setup job template, there are a few steps required to make the
 
 ## Suggested Usage
 
-**Cloud / Deploy Cloud Stack in AWS** - This workflow builds out many helpful and convient resources in AWS. Given an AWS region, key, and some organizational paremetres for tagging it builds a default VPC, keypair, five VMs (three RHEL and two Windows), and even provides a report for cloud stats. It is the typical starting point for using Ansible Product-Demos in AWS.
+**Deploy Cloud Stack in AWS** - This workflow builds out many helpful and convient resources in AWS. Given an AWS region, key, and some organizational paremetres for tagging it builds a default VPC, keypair, five VMs (three RHEL and two Windows), and even provides a report for cloud stats. It is the typical starting point for using Ansible Product-Demos in AWS.
 
 **Cloud / Create VM** - The Create VM job builds a VM in the given provider based on the included `demo.cloud` collection. VM [blueprints](blueprints/) define variables for each provider that override the defaults in the collection. When creating VMs it is recommended to follow naming conventions that can be used as host patterns. (eg. VM names: `win1`, `win2`, `win3`.  Host Pattern: `win*` )
 
