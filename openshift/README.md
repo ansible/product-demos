@@ -38,11 +38,12 @@ These demos require an OpenShift cluster to deploy to. Luckily the default Ansib
 - **OpenShift / Hub / Sync Collection Repositories** - The collections can be configured via `extra_vars` and conforms roughly to those described in [infra.ah_configuration.collection_repository_sync](https://console.redhat.com/ansible/automation-hub/repo/validated/infra/ah_configuration/content/role/collection_repository_sync/).
 
 > ** NOTE ** There are a couple of things to keep in mind for the CNV Job Templates
-> - The "OpenShift / CNV / Install Operator" job template must be run before using any of the other CNV (Virtual Machine) job templates.
-> - There is a fairly consistent outage after deploying CNV VMs as part of the Infra Stack job template that users need to be aware of, "caused by the resource limitations of the cluster". Sometimes this requires stopping a VM before it settles.
->- The inventory update requires that all VMs are running or it fails - the error msg is a bit of a red herring.
+> - For Red Hat employees, there is a walk-through of this demo available: [google slides](https://docs.google.com/presentation/d/113f_Q38Iuhjtw_v06R6dMvpyEW7BevrNlrfnF3m0Kbs/edit#slide=id.g2f1af5494f1_0_20) and [video](https://drive.google.com/file/d/1mGZcI9mdYKZa_Gpb84yTipQwSf71mx90/view?usp=sharing)
+> - The "OpenShift / CNV / Install Operator" job template must be run before using any of the other CNV (Virtual Machine) job templates
+> - Sometimes after deploying CNV VMs as part of the Infra Stack job template there is a short outage that users need to be aware of, where you will sometimes need to stop one of the VMs before it settles (WIP)
+>- The inventory update requires that all VMs are running or it fails - the error msg is a bit of a red herring
 >- Currently an inability consistently to deploy more than 2 CNV VMs [WIP](https://github.com/ansible/product-demos/issues/226)
->- Activation Org ID and Activation Keys can be obtained [here](https://console.redhat.com/insights/connector/activation-keys#SIDs=&tags=).
+>- Activation Org ID and Activation Keys can be obtained [here](https://console.redhat.com/insights/connector/activation-keys#SIDs=&tags=)
 
 **OpenShift / CNV / Install Operator** - This job takes no parameters, to ensure the CNV operator is fully operational it provisions a VM in CNV which is cleaned up upon success.
 
