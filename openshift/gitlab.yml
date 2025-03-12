@@ -101,6 +101,21 @@
       retries: 10
       delay: 30
 
+    - name: Get available charts from gitlab operator repo
+      register: gitlab_chart_versions
+      ansible.builtin.uri:
+        url: https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/raw/master/CHART_VERSIONS?ref_type=heads
+        method: GET
+        return_content: true
+
+    - name: debug gitlab_chart_versions
+      ansible.builtin.debug:
+        var: gitlab_chart_versions.content | from_yaml
+
+    - name: Get latest chart from available_chart_versions
+      ansible.builtin.set_fact:
+        gitlab_chart_version: "{{ (gitlab_chart_versions.content | split())[0] }}"
+
     - name: Grab url for Gitlab spec
       ansible.builtin.set_fact:
         cluster_domain: "apps{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') | regex_search('\\.[^:]*') }}"
@@ -133,3 +148,20 @@
                       route.openshift.io/termination: "edge"
                 certmanager-issuer:
                   email: "{{ cert_email | default('nobody@nowhere.nosite') }}"
+
+    - name: Print out warning and initial details about deployment
+      vars:
+        msg: |
+          If not immediately successful be aware that the Gitlab instance can take
+          a couple minutes to come up, so be patient.
+
+          URL for Gitlab instance:
+          https://gitlab.{{ cluster_domain }}
+
+          The initial login user is 'root', and the password can be found by logging
+          into the OpenShift cluster portal, and on the left hand side of the administrator
+          portal, under workloads, select Secrets and look for 'gitlab-gitlab-initial-root-password'
+      ansible.builtin.debug:
+        msg: "{{ msg.split('\n') }}"
+
+...
