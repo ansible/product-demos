@@ -152,11 +152,11 @@
     - name: Print out warning and initial details about deployment
       vars:
         msg: |
-          If not immediate successful be aware that the Gitlab instance can take
+          If not immediately successful be aware that the Gitlab instance can take
           a couple minutes to come up, so be patient.
 
           URL for Gitlab instance:
-            https://gitlab.{{ cluster_domain }}
+          https://gitlab.{{ cluster_domain }}
 
           The initial login user is 'root', and the password can be found by logging
           into the OpenShift cluster portal, and on the left hand side of the administrator
