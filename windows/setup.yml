@@ -111,7 +111,7 @@ controller_templates:
     inventory: "Demo Inventory"
     project: "Ansible Product Demos"
     playbook: "windows/connect.yml"
-    execution_environment: Default execution environment
+    execution_environment: Product Demos EE
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
