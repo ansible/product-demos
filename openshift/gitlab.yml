@@ -156,7 +156,7 @@
           a couple minutes to come up, so be patient.
 
           URL for Gitlab instance:
-            https://gitlab.{{ domain }}
+            https://gitlab.{{ cluster_domain }}
 
           The initial login user is 'root', and the password can be found by logging
           into the OpenShift cluster portal, and on the left hand side of the administrator
