@@ -334,11 +334,33 @@ controller_templates:
             - full
           required: true
 
+  - name: "LINUX / Compliance Enforce"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible Product Demos"
+    playbook: "linux/remediate_out_of_compliance.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Demo Credential"
+    extra_vars:
+      sudo_remove_nopasswd: false
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: true
+
   - name: "LINUX / DISA STIG"
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible Product Demos"
-    playbook: "linux/compliance.yml"
+    playbook: "linux/disa_stig.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -360,12 +382,13 @@ controller_templates:
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible Product Demos"
-    playbook: "linux/compliance-enforce.yml"
+    playbook: "linux/multi_profile_compliance.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
       - "Demo Credential"
+      - "AWS"
     extra_vars:
       # used by CIS profile role
       sudo_require_authentication: false
@@ -406,12 +429,13 @@ controller_templates:
     job_type: run
     inventory: "Demo Inventory"
     project: "Ansible Product Demos"
-    playbook: "linux/compliance-report.yml"
+    playbook: "linux/multi_profile_compliance_report.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
       - "Demo Credential"
+      - "AWS"
     survey_enabled: true
     survey:
       name: ''
@@ -492,4 +516,52 @@ controller_templates:
           variable: application
           required: true
 
+controller_workflows:
+  - name: "Linux / Compliance Workflow"
+    description: A workflow to generate a SCAP report and run enforce on findings
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          default: aws_rhel*
+          variable: _hosts
+          required: true
+        - question_name: Compliance Profile
+          type: multiplechoice
+          variable: compliance_profile
+          required: true
+          choices:
+            - cis
+            - cjis
+            - cui
+            - hipaa
+            - ospp
+            - pci_dss
+            - stig
+        - question_name: Use httpd on the target host(s) to access reports locally?
+          type: multiplechoice
+          variable: use_httpd
+          required: true
+          choices:
+            - "true"
+            - "false"
+          default: "true"
+    simplified_workflow_nodes:
+      - identifier: Compliance Report
+        unified_job_template: "LINUX / Multi-profile Compliance Report"
+        success_nodes:
+          - Update Inventory
+      - identifier: Update Inventory
+        unified_job_template: AWS Inventory
+        success_nodes:
+          - Compliance Enforce
+      - identifier: Compliance Enforce
+        unified_job_template: "LINUX / Compliance Enforce"
 ...

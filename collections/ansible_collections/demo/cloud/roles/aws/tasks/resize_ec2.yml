@@ -1,0 +1,45 @@
+---
+# parameters
+# instance_type: new instance type, e.g. t3.large
+- name: AWS | RESIZE VM
+  delegate_to: localhost
+  vars:
+    controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
+    controller_inventory_sources:
+      - name: AWS Inventory
+        inventory: Demo Inventory
+        organization: Default
+        wait: true
+  block:
+    - name: AWS | RESIZE EC2 | assert required vars
+      ansible.builtin.assert:
+        that:
+          - instance_id is defined
+          - aws_region is defined
+        fail_msg: "instance_id, aws_region is required for resize operations"
+
+    - name: AWS | RESIZE EC2 | shutdown instance
+      amazon.aws.ec2_instance:
+        instance_ids: "{{ instance_id }}"
+        region: "{{ aws_region }}"
+        state: stopped
+        wait: true
+
+    - name: AWS | RESIZE EC2 | update instance type
+      amazon.aws.ec2_instance:
+        region: "{{ aws_region }}"
+        instance_ids: "{{ instance_id }}"
+        instance_type: "{{ instance_type }}"
+        wait: true
+
+    - name: AWS | RESIZE EC2 | start instance
+      amazon.aws.ec2_instance:
+        instance_ids: "{{ instance_id }}"
+        region: "{{ aws_region }}"
+        state: started
+        wait: true
+
+    - name: Synchronize inventory
+      run_once: true
+      ansible.builtin.include_role:
+        name: infra.controller_configuration.inventory_source_update
