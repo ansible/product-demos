@@ -108,7 +108,7 @@
         method: GET
         return_content: true
 
-    - name: debug gitlab_chart_versions
+    - name: Debug gitlab_chart_versions
       ansible.builtin.debug:
         var: gitlab_chart_versions.content | from_yaml
 
