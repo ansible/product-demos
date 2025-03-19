@@ -12,7 +12,7 @@
 
     - name: Assert that host is in webservers group
       ansible.builtin.assert:
-        that: "{{ report_server }} in groups.os_windows"
+        that: "'{{ report_server }}' in groups.os_windows"
         msg: "Please run the 'Deploy Cloud Stack in AWS' Workflow Job Template first"
 
     - name: Patch windows server
