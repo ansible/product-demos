@@ -6,10 +6,6 @@
 
   tasks:
 
-    - name: Debug webservers group
-      ansible.builtin.debug:
-        var: groups.os_windows
-
     - name: Assert that host is in webservers group
       ansible.builtin.assert:
         that: "'{{ report_server }}' in groups.os_windows"
