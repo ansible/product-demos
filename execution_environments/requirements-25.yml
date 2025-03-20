@@ -33,6 +33,8 @@ collections:
     version: ">=1.5.1"
   - name: community.windows
     version: ">=2.2.0"
+  - name: microsoft.ad
+    version: ">=1.8.0"
   # cloud demos
   - name: amazon.aws
     version: ">=7.5.0"
