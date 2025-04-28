@@ -12,8 +12,11 @@
     - name: Update the hostname
       ansible.windows.win_hostname:
         name: "{{ inventory_hostname.split('.')[0] }}"
+      register: r_rename_hostname
 
     - name: Reboot to apply new hostname
+      # noqa no-handler
+      when: r_rename_hostname is changed
       ansible.windows.win_reboot:
         reboot_timeout: 3600
 
