@@ -283,7 +283,7 @@ controller_workflows:
       - identifier: Deploy Windows GUI Blueprint
         unified_job_template: Cloud / AWS / Create VM
         extra_data:
-          create_vm_vm_name: aws_dc
+          create_vm_vm_name: aws-dc
           vm_blueprint: windows_full
         success_nodes:
           - Update Inventory

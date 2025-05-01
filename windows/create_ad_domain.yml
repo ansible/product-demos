@@ -12,14 +12,17 @@
     - name: Update the hostname
       ansible.windows.win_hostname:
         name: "{{ inventory_hostname.split('.')[0] }}"
+      register: r_rename_hostname
 
     - name: Reboot to apply new hostname
+      # noqa no-handler
+      when: r_rename_hostname is changed
       ansible.windows.win_reboot:
         reboot_timeout: 3600
 
     - name: Create new domain in a new forest on the target host
       register: r_create_domain
-      ansible.windows.win_domain:
+      microsoft.ad.domain:
         dns_domain_name: ansible.local
         safe_mode_password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
 
@@ -30,7 +33,7 @@
         file: tasks/domain_services_check.yml
 
     - name: Create some groups
-      community.windows.win_domain_group:
+      microsoft.ad.group:
         name: "{{ item.name }}"
         scope: global
       loop:
@@ -41,7 +44,7 @@
       delay: 10
 
     - name: Create some users
-      community.windows.win_domain_user:
+      microsoft.ad.user:
         name: "{{ item.name }}"
         groups: "{{ item.groups }}"
         password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"

@@ -5,6 +5,12 @@
     report_server: aws_win1
 
   tasks:
+
+    - name: Assert that host is in webservers group
+      ansible.builtin.assert:
+        that: "'{{ report_server }}' in groups.os_windows"
+        msg: "Please run the 'Deploy Cloud Stack in AWS' Workflow Job Template first"
+
     - name: Patch windows server
       ansible.builtin.include_role:
         name: demo.patching.patch_windows
