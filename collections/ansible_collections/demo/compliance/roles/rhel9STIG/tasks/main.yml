@@ -56,7 +56,7 @@
 - name: stigrule_257785_ctrl_alt_del_target_disable
   systemd_service:
     name: ctrl-alt-del.target
-    enabled : "{{ rhel9STIG_stigrule_257785_ctrl_alt_del_target_disable_Enabled }}"
+    enabled: "{{ rhel9STIG_stigrule_257785_ctrl_alt_del_target_disable_Enabled }}"
   when:
     - rhel9STIG_stigrule_257785_Manage
     - result.rc == 0
@@ -84,7 +84,7 @@
 - name: stigrule_257786_debug_shell_service_disable
   systemd_service:
     name: debug-shell.service
-    enabled : "{{ rhel9STIG_stigrule_257786_debug_shell_service_disable_Enabled }}"
+    enabled: "{{ rhel9STIG_stigrule_257786_debug_shell_service_disable_Enabled }}"
   when:
     - rhel9STIG_stigrule_257786_Manage
     - result.rc == 0
@@ -333,7 +333,7 @@
 - name: stigrule_257815_systemd_coredump_socket_disable
   systemd_service:
     name: systemd-coredump.socket
-    enabled : "{{ rhel9STIG_stigrule_257815_systemd_coredump_socket_disable_Enabled }}"
+    enabled: "{{ rhel9STIG_stigrule_257815_systemd_coredump_socket_disable_Enabled }}"
   when:
     - rhel9STIG_stigrule_257815_Manage
     - result.rc == 0
@@ -371,7 +371,7 @@
 - name: stigrule_257818_kdump_disable
   systemd_service:
     name: kdump.service
-    enabled : "{{ rhel9STIG_stigrule_257818_kdump_disable_Enabled }}"
+    enabled: "{{ rhel9STIG_stigrule_257818_kdump_disable_Enabled }}"
   when:
     - rhel9STIG_stigrule_257818_Manage
     - result.rc == 0
@@ -474,10 +474,10 @@
     state: "{{ rhel9STIG_stigrule_257834_tuned_State }}"
   when: rhel9STIG_stigrule_257834_Manage
 # R-257835 RHEL-09-215060
-- name: stigrule_257835_tftp
+- name: stigrule_257835_tftp_server
   yum:
-    name: tftp
-    state: "{{ rhel9STIG_stigrule_257835_tftp_State }}"
+    name: tftp-server
+    state: "{{ rhel9STIG_stigrule_257835_tftp_server_State }}"
   when: rhel9STIG_stigrule_257835_Manage
 # R-257836 RHEL-09-215065
 - name: stigrule_257836_quagga
@@ -525,7 +525,7 @@
 - name: stigrule_257849_autofs_service_disable
   systemd_service:
     name: autofs.service
-    enabled : "{{ rhel9STIG_stigrule_257849_autofs_service_disable_Enabled }}"
+    enabled: "{{ rhel9STIG_stigrule_257849_autofs_service_disable_Enabled }}"
   when:
     - rhel9STIG_stigrule_257849_Manage
     - result.rc == 0
@@ -764,13 +764,6 @@
     group: "{{ rhel9STIG_stigrule_257917__var_log_messages_group_owner_Group }}"
   when:
     - rhel9STIG_stigrule_257917_Manage
-# R-257933 RHEL-09-232265
-- name: stigrule_257933__etc_crontab_mode
-  file:
-    dest: "{{ rhel9STIG_stigrule_257933__etc_crontab_mode_Dest }}"
-    mode: "{{ rhel9STIG_stigrule_257933__etc_crontab_mode_Mode }}"
-  when:
-    - rhel9STIG_stigrule_257933_Manage
 # R-257934 RHEL-09-232270
 - name: stigrule_257934__etc_shadow_mode
   file:
@@ -1027,7 +1020,7 @@
     - rhel9STIG_stigrule_257970_Manage
 # R-257971 RHEL-09-254010
 - name: check if ipv6 is enabled
-  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable) == '0' ]]"
   changed_when: False
   check_mode: no
   register: cmd_result
@@ -1043,7 +1036,7 @@
     - cmd_result.rc == 0
 # R-257972 RHEL-09-254015
 - name: check if ipv6 is enabled
-  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable) == '0' ]]"
   changed_when: False
   check_mode: no
   register: cmd_result
@@ -1059,7 +1052,7 @@
     - cmd_result.rc == 0
 # R-257973 RHEL-09-254020
 - name: check if ipv6 is enabled
-  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable) == '0' ]]"
   changed_when: False
   check_mode: no
   register: cmd_result
@@ -1075,7 +1068,7 @@
     - cmd_result.rc == 0
 # R-257974 RHEL-09-254025
 - name: check if ipv6 is enabled
-  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable) == '0' ]]"
   changed_when: False
   check_mode: no
   register: cmd_result
@@ -1091,7 +1084,7 @@
     - cmd_result.rc == 0
 # R-257975 RHEL-09-254030
 - name: check if ipv6 is enabled
-  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable) == '0' ]]"
   changed_when: False
   check_mode: no
   register: cmd_result
@@ -1107,7 +1100,7 @@
     - cmd_result.rc == 0
 # R-257976 RHEL-09-254035
 - name: check if ipv6 is enabled
-  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable) == '0' ]]"
   changed_when: False
   check_mode: no
   register: cmd_result
@@ -1123,7 +1116,7 @@
     - cmd_result.rc == 0
 # R-257977 RHEL-09-254040
 - name: check if ipv6 is enabled
-  shell: "[[ $(cat /sys/module/ipv6/parameters/disable)  == '0' ]]"
+  shell: "[[ $(cat /sys/module/ipv6/parameters/disable) == '0' ]]"
   changed_when: False
   check_mode: no
   register: cmd_result
@@ -1237,16 +1230,6 @@
   when:
     - rhel9STIG_stigrule_257986_Manage
     - "'openssh-server' in packages"
-# R-257989 RHEL-09-255065
-- name: stigrule_257989__etc_crypto_policies_back_ends_openssh_config
-  lineinfile:
-    path: /etc/crypto-policies/back-ends/openssh.config
-    regexp: '^\s*Ciphers\s+\S+\s*$'
-    line: "{{ rhel9STIG_stigrule_257989__etc_crypto_policies_back_ends_openssh_config_Line }}"
-    create: yes
-  notify: do_reboot
-  when:
-    - rhel9STIG_stigrule_257989_Manage
 # R-257992 RHEL-09-255080
 - name: stigrule_257992_HostbasedAuthentication
   lineinfile:
@@ -1397,16 +1380,6 @@
   notify: ssh_restart
   when:
     - rhel9STIG_stigrule_258009_Manage
-    - "'openssh-server' in packages"
-# R-258010 RHEL-09-255170
-- name: stigrule_258010_UsePrivilegeSeparation
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '(?i)^\s*UsePrivilegeSeparation\s+'
-    line: "{{ rhel9STIG_stigrule_258010_UsePrivilegeSeparation_Line }}"
-  notify: ssh_restart
-  when:
-    - rhel9STIG_stigrule_258010_Manage
     - "'openssh-server' in packages"
 # R-258011 RHEL-09-255175
 - name: stigrule_258011_X11UseLocalhost
@@ -1594,18 +1567,6 @@
   when:
     - rhel9STIG_stigrule_258027_Manage
     - "'dconf' in packages"
-# R-258029 RHEL-09-271095
-- name: stigrule_258029__etc_dconf_db_local_d_00_security_settings
-  ini_file:
-    path: /etc/dconf/db/local.d/00-security-settings
-    section: org/gnome/login-screen
-    option: disable-restart-buttons
-    value: "{{ rhel9STIG_stigrule_258029__etc_dconf_db_local_d_00_security_settings_Value }}"
-    no_extra_spaces: yes
-  notify: dconf_update
-  when:
-    - rhel9STIG_stigrule_258029_Manage
-    - "'dconf' in packages"
 # R-258030 RHEL-09-271100
 - name: stigrule_258030__etc_dconf_db_local_d_locks_session_disable_restart_buttons
   lineinfile:
@@ -1674,6 +1635,34 @@
     name: usbguard
     state: "{{ rhel9STIG_stigrule_258035_usbguard_State }}"
   when: rhel9STIG_stigrule_258035_Manage
+# R-258035 RHEL-09-291015
+- name: check if usbguard.service is installed
+  shell: ! systemctl list-unit-files | grep "^usbguard.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_258035_usbguard_enable
+  service:
+    name: usbguard.service
+    enabled: "{{ rhel9STIG_stigrule_258035_usbguard_enable_Enabled }}"
+  when:
+    - rhel9STIG_stigrule_258035_Manage
+    - result.rc == 0
+# R-258035 RHEL-09-291015
+- name: check if usbguard.service is installed
+  shell: ! systemctl list-unit-files | grep "^usbguard.service[ \t]\+"
+  changed_when: False
+  check_mode: no
+  register: result
+  failed_when: result.rc > 1
+- name: stigrule_258035_usbguard_start
+  service:
+    name: usbguard.service
+    state: "{{ rhel9STIG_stigrule_258035_usbguard_start_State }}"
+  when:
+    - rhel9STIG_stigrule_258035_Manage
+    - result.rc == 0
 # R-258036 RHEL-09-291020
 - name: check if usbguard.service is installed
   shell: ! systemctl list-unit-files | grep "^usbguard.service[ \t]\+"
@@ -1731,7 +1720,7 @@
     - rhel9STIG_stigrule_258039_Manage
 # R-258040 RHEL-09-291040
 - name: check if wireless network adapters are disabled
-  shell: "[[ $(nmcli radio wifi)  == 'enabled' ]]"
+  shell: "[[ $(nmcli radio wifi) == 'enabled' ]]"
   changed_when: False
   check_mode: no
   register: cmd_result
@@ -1821,20 +1810,6 @@
   notify: with_faillock_enable
   when:
     - rhel9STIG_stigrule_258060_Manage
-# R-258063 RHEL-09-412010
-- name: stigrule_258063_tmux
-  yum:
-    name: tmux
-    state: "{{ rhel9STIG_stigrule_258063_tmux_State }}"
-  when: rhel9STIG_stigrule_258063_Manage
-# R-258066 RHEL-09-412025
-- name: stigrule_258066__etc_tmux_conf
-  lineinfile:
-    path: /etc/tmux.conf
-    line: "{{ rhel9STIG_stigrule_258066__etc_tmux_conf_Line }}"
-    create: yes
-  when:
-    - rhel9STIG_stigrule_258066_Manage
 # R-258069 RHEL-09-412040
 - name: stigrule_258069__etc_security_limits_conf
   lineinfile:
@@ -2025,15 +2000,6 @@
     create: yes
   when:
     - rhel9STIG_stigrule_258107_Manage
-# R-258108 RHEL-09-611095
-- name: stigrule_258108__etc_login_defs
-  lineinfile:
-    path: /etc/login.defs
-    regexp: '^PASS_MIN_LEN'
-    line: "{{ rhel9STIG_stigrule_258108__etc_login_defs_Line }}"
-    create: yes
-  when:
-    - rhel9STIG_stigrule_258108_Manage
 # R-258109 RHEL-09-611100
 - name: stigrule_258109__etc_security_pwquality_conf
   lineinfile:
@@ -2116,15 +2082,6 @@
     create: yes
   when:
     - rhel9STIG_stigrule_258117_Manage
-# R-258119 RHEL-09-611150
-- name: stigrule_258119__etc_login_defs
-  lineinfile:
-    path: /etc/login.defs
-    regexp: '^SHA_CRYPT_MIN_ROUNDS'
-    line: "{{ rhel9STIG_stigrule_258119__etc_login_defs_Line }}"
-    create: yes
-  when:
-    - rhel9STIG_stigrule_258119_Manage
 # R-258121 RHEL-09-611160
 - name: stigrule_258121__etc_opensc_conf
   lineinfile:
@@ -2264,16 +2221,6 @@
   notify: rsyslog_restart
   when:
     - rhel9STIG_stigrule_258144_Manage
-# R-258145 RHEL-09-652035
-- name: stigrule_258145__etc_audit_plugins_d_syslog_conf
-  lineinfile:
-    path: /etc/audit/plugins.d/syslog.conf
-    regexp: '^\s*active\s*='
-    line: "{{ rhel9STIG_stigrule_258145__etc_audit_plugins_d_syslog_conf_Line }}"
-    create: yes
-  notify: auditd_restart
-  when:
-    - rhel9STIG_stigrule_258145_Manage
 # R-258146 RHEL-09-652040
 - name: stigrule_258146__etc_rsyslog_conf
   lineinfile:
@@ -2502,7 +2449,7 @@
     state: "{{ rhel9STIG_stigrule_258175_audispd_plugins_State }}"
   when: rhel9STIG_stigrule_258175_Manage
 # R-258176 RHEL-09-654010
-- name : stigrule_258176__etc_audit_rules_d_audit_rules_execve_euid_b32
+- name: stigrule_258176__etc_audit_rules_d_audit_rules_execve_euid_b32
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv$'
@@ -2510,7 +2457,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258176_Manage
 # R-258176 RHEL-09-654010
-- name : stigrule_258176__etc_audit_rules_d_audit_rules_execve_euid_b64
+- name: stigrule_258176__etc_audit_rules_d_audit_rules_execve_euid_b64
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv$'
@@ -2518,7 +2465,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258176_Manage
 # R-258176 RHEL-09-654010
-- name : stigrule_258176__etc_audit_rules_d_audit_rules_execve_egid_b32
+- name: stigrule_258176__etc_audit_rules_d_audit_rules_execve_egid_b32
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv$'
@@ -2526,7 +2473,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258176_Manage
 # R-258176 RHEL-09-654010
-- name : stigrule_258176__etc_audit_rules_d_audit_rules_execve_egid_b64
+- name: stigrule_258176__etc_audit_rules_d_audit_rules_execve_egid_b64
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv$'
@@ -2534,7 +2481,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258176_Manage
 # R-258177 RHEL-09-654015
-- name : stigrule_258177__etc_audit_rules_d_audit_rules_chmod_b32
+- name: stigrule_258177__etc_audit_rules_d_audit_rules_chmod_b32
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b32 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=unset -k perm_mod$'
@@ -2542,7 +2489,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258177_Manage
 # R-258177 RHEL-09-654015
-- name : stigrule_258177__etc_audit_rules_d_audit_rules_chmod_b64
+- name: stigrule_258177__etc_audit_rules_d_audit_rules_chmod_b64
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=unset -k perm_mod$'
@@ -2550,7 +2497,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258177_Manage
 # R-258178 RHEL-09-654020
-- name : stigrule_258178__etc_audit_rules_d_audit_rules_chown_b32
+- name: stigrule_258178__etc_audit_rules_d_audit_rules_chown_b32
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b32 -S chown,fchown,fchownat,lchown -F auid>=1000 -F auid!=unset -k perm_mod$'
@@ -2558,7 +2505,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258178_Manage
 # R-258178 RHEL-09-654020
-- name : stigrule_258178__etc_audit_rules_d_audit_rules_chown_b64
+- name: stigrule_258178__etc_audit_rules_d_audit_rules_chown_b64
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b64 -S chown,fchown,fchownat,lchown -F auid>=1000 -F auid!=unset -k perm_mod$'
@@ -2566,7 +2513,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258178_Manage
 # R-258179 RHEL-09-654025
-- name : stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b32_unset
+- name: stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b32_unset
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b32 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid>=1000 -F auid!=unset -k perm_mod$'
@@ -2574,7 +2521,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258179_Manage
 # R-258179 RHEL-09-654025
-- name : stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b64_unset
+- name: stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b64_unset
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b64 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid>=1000 -F auid!=unset -k perm_mod$'
@@ -2582,7 +2529,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258179_Manage
 # R-258179 RHEL-09-654025
-- name : stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b32
+- name: stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b32
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b32 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid=0 -k perm_mod$'
@@ -2590,7 +2537,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258179_Manage
 # R-258179 RHEL-09-654025
-- name : stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b64
+- name: stigrule_258179__etc_audit_rules_d_audit_rules_lremovexattr_b64
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b64 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid=0 -k perm_mod$'
@@ -2598,7 +2545,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258179_Manage
 # R-258180 RHEL-09-654030
-- name : stigrule_258180__etc_audit_rules_d_audit_rules__usr_bin_umount
+- name: stigrule_258180__etc_audit_rules_d_audit_rules__usr_bin_umount
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/umount -F perm=x -F auid>=1000 -F auid!=unset -k privileged-mount$'
@@ -2606,7 +2553,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258180_Manage
 # R-258181 RHEL-09-654035
-- name : stigrule_258181__etc_audit_rules_d_audit_rules__usr_bin_chacl
+- name: stigrule_258181__etc_audit_rules_d_audit_rules__usr_bin_chacl
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/chacl -F perm=x -F auid>=1000 -F auid!=unset -k perm_mod$'
@@ -2614,7 +2561,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258181_Manage
 # R-258182 RHEL-09-654040
-- name : stigrule_258182__etc_audit_rules_d_audit_rules__usr_bin_setfacl
+- name: stigrule_258182__etc_audit_rules_d_audit_rules__usr_bin_setfacl
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/setfacl -F perm=x -F auid>=1000 -F auid!=unset -k perm_mod$'
@@ -2622,7 +2569,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258182_Manage
 # R-258183 RHEL-09-654045
-- name : stigrule_258183__etc_audit_rules_d_audit_rules__usr_bin_chcon
+- name: stigrule_258183__etc_audit_rules_d_audit_rules__usr_bin_chcon
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>=1000 -F auid!=unset -k perm_mod$'
@@ -2630,7 +2577,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258183_Manage
 # R-258184 RHEL-09-654050
-- name : stigrule_258184__etc_audit_rules_d_audit_rules__usr_sbin_semanage
+- name: stigrule_258184__etc_audit_rules_d_audit_rules__usr_sbin_semanage
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/semanage -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
@@ -2638,7 +2585,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258184_Manage
 # R-258185 RHEL-09-654055
-- name : stigrule_258185__etc_audit_rules_d_audit_rules__usr_sbin_setfiles
+- name: stigrule_258185__etc_audit_rules_d_audit_rules__usr_sbin_setfiles
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/setfiles -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
@@ -2646,7 +2593,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258185_Manage
 # R-258186 RHEL-09-654060
-- name : stigrule_258186__etc_audit_rules_d_audit_rules__usr_sbin_setsebool
+- name: stigrule_258186__etc_audit_rules_d_audit_rules__usr_sbin_setsebool
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/setsebool -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged$'
@@ -2654,7 +2601,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258186_Manage
 # R-258187 RHEL-09-654065
-- name : stigrule_258187__etc_audit_rules_d_audit_rules_rename_b32
+- name: stigrule_258187__etc_audit_rules_d_audit_rules_rename_b32
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b32 -S rename,unlink,rmdir,renameat,unlinkat -F auid>=1000 -F auid!=unset -k delete$'
@@ -2662,7 +2609,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258187_Manage
 # R-258187 RHEL-09-654065
-- name : stigrule_258187__etc_audit_rules_d_audit_rules_rename_b64
+- name: stigrule_258187__etc_audit_rules_d_audit_rules_rename_b64
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b64 -S rename,unlink,rmdir,renameat,unlinkat -F auid>=1000 -F auid!=unset -k delete$'
@@ -2670,7 +2617,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258187_Manage
 # R-258188 RHEL-09-654070
-- name : stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EPERM_b32
+- name: stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EPERM_b32
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=unset -k perm_access$'
@@ -2678,7 +2625,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258188_Manage
 # R-258188 RHEL-09-654070
-- name : stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EPERM_b64
+- name: stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EPERM_b64
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=unset -k perm_access$'
@@ -2686,7 +2633,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258188_Manage
 # R-258188 RHEL-09-654070
-- name : stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EACCES_b32
+- name: stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EACCES_b32
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access$'
@@ -2694,7 +2641,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258188_Manage
 # R-258188 RHEL-09-654070
-- name : stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EACCES_b64
+- name: stigrule_258188__etc_audit_rules_d_audit_rules_truncate_EACCES_b64
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access$'
@@ -2702,7 +2649,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258188_Manage
 # R-258189 RHEL-09-654075
-- name : stigrule_258189__etc_audit_rules_d_audit_rules_delete_module_b32
+- name: stigrule_258189__etc_audit_rules_d_audit_rules_delete_module_b32
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b32 -S delete_module -F auid>=1000 -F auid!=unset -k module_chng$'
@@ -2710,7 +2657,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258189_Manage
 # R-258189 RHEL-09-654075
-- name : stigrule_258189__etc_audit_rules_d_audit_rules_delete_module_b64
+- name: stigrule_258189__etc_audit_rules_d_audit_rules_delete_module_b64
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b64 -S delete_module -F auid>=1000 -F auid!=unset -k module_chng$'
@@ -2718,7 +2665,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258189_Manage
 # R-258190 RHEL-09-654080
-- name : stigrule_258190__etc_audit_rules_d_audit_rules_init_module_b32
+- name: stigrule_258190__etc_audit_rules_d_audit_rules_init_module_b32
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b32 -S init_module,finit_module -F auid>=1000 -F auid!=unset -k module_chng$'
@@ -2726,7 +2673,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258190_Manage
 # R-258190 RHEL-09-654080
-- name : stigrule_258190__etc_audit_rules_d_audit_rules_init_module_b64
+- name: stigrule_258190__etc_audit_rules_d_audit_rules_init_module_b64
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F arch=b64 -S init_module,finit_module -F auid>=1000 -F auid!=unset -k module_chng$'
@@ -2734,7 +2681,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258190_Manage
 # R-258191 RHEL-09-654085
-- name : stigrule_258191__etc_audit_rules_d_audit_rules__usr_bin_chage
+- name: stigrule_258191__etc_audit_rules_d_audit_rules__usr_bin_chage
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/chage -F perm=x -F auid>=1000 -F auid!=unset -k privileged-chage$'
@@ -2742,7 +2689,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258191_Manage
 # R-258192 RHEL-09-654090
-- name : stigrule_258192__etc_audit_rules_d_audit_rules__usr_bin_chsh
+- name: stigrule_258192__etc_audit_rules_d_audit_rules__usr_bin_chsh
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/chsh -F perm=x -F auid>=1000 -F auid!=unset -k priv_cmd$'
@@ -2750,7 +2697,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258192_Manage
 # R-258193 RHEL-09-654095
-- name : stigrule_258193__etc_audit_rules_d_audit_rules__usr_bin_crontab
+- name: stigrule_258193__etc_audit_rules_d_audit_rules__usr_bin_crontab
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/crontab -F perm=x -F auid>=1000 -F auid!=unset -k privileged-crontab$'
@@ -2758,7 +2705,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258193_Manage
 # R-258194 RHEL-09-654100
-- name : stigrule_258194__etc_audit_rules_d_audit_rules__usr_bin_gpasswd
+- name: stigrule_258194__etc_audit_rules_d_audit_rules__usr_bin_gpasswd
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/gpasswd -F perm=x -F auid>=1000 -F auid!=unset -k privileged-gpasswd$'
@@ -2766,7 +2713,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258194_Manage
 # R-258195 RHEL-09-654105
-- name : stigrule_258195__etc_audit_rules_d_audit_rules__usr_bin_kmod
+- name: stigrule_258195__etc_audit_rules_d_audit_rules__usr_bin_kmod
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/kmod -F perm=x -F auid>=1000 -F auid!=unset -k modules$'
@@ -2774,7 +2721,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258195_Manage
 # R-258196 RHEL-09-654110
-- name : stigrule_258196__etc_audit_rules_d_audit_rules__usr_bin_newgrp
+- name: stigrule_258196__etc_audit_rules_d_audit_rules__usr_bin_newgrp
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/newgrp -F perm=x -F auid>=1000 -F auid!=unset -k priv_cmd$'
@@ -2782,7 +2729,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258196_Manage
 # R-258197 RHEL-09-654115
-- name : stigrule_258197__etc_audit_rules_d_audit_rules__usr_sbin_pam_timestamp_check
+- name: stigrule_258197__etc_audit_rules_d_audit_rules__usr_sbin_pam_timestamp_check
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/pam_timestamp_check -F perm=x -F auid>=1000 -F auid!=unset -k privileged-pam_timestamp_check$'
@@ -2790,7 +2737,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258197_Manage
 # R-258198 RHEL-09-654120
-- name : stigrule_258198__etc_audit_rules_d_audit_rules__usr_bin_passwd
+- name: stigrule_258198__etc_audit_rules_d_audit_rules__usr_bin_passwd
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/passwd -F perm=x -F auid>=1000 -F auid!=unset -k privileged-passwd$'
@@ -2798,7 +2745,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258198_Manage
 # R-258199 RHEL-09-654125
-- name : stigrule_258199__etc_audit_rules_d_audit_rules__usr_sbin_postdrop
+- name: stigrule_258199__etc_audit_rules_d_audit_rules__usr_sbin_postdrop
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/postdrop -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
@@ -2806,7 +2753,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258199_Manage
 # R-258200 RHEL-09-654130
-- name : stigrule_258200__etc_audit_rules_d_audit_rules__usr_sbin_postqueue
+- name: stigrule_258200__etc_audit_rules_d_audit_rules__usr_sbin_postqueue
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/postqueue -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
@@ -2814,7 +2761,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258200_Manage
 # R-258201 RHEL-09-654135
-- name : stigrule_258201__etc_audit_rules_d_audit_rules__usr_bin_ssh_agent
+- name: stigrule_258201__etc_audit_rules_d_audit_rules__usr_bin_ssh_agent
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/ssh-agent -F perm=x -F auid>=1000 -F auid!=unset -k privileged-ssh$'
@@ -2822,7 +2769,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258201_Manage
 # R-258202 RHEL-09-654140
-- name : stigrule_258202__etc_audit_rules_d_audit_rules__usr_libexec_openssh_ssh_keysign
+- name: stigrule_258202__etc_audit_rules_d_audit_rules__usr_libexec_openssh_ssh_keysign
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/libexec/openssh/ssh-keysign -F perm=x -F auid>=1000 -F auid!=unset -k privileged-ssh$'
@@ -2830,7 +2777,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258202_Manage
 # R-258203 RHEL-09-654145
-- name : stigrule_258203__etc_audit_rules_d_audit_rules__usr_bin_su
+- name: stigrule_258203__etc_audit_rules_d_audit_rules__usr_bin_su
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset -k privileged-priv_change$'
@@ -2838,7 +2785,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258203_Manage
 # R-258204 RHEL-09-654150
-- name : stigrule_258204__etc_audit_rules_d_audit_rules__usr_bin_sudo
+- name: stigrule_258204__etc_audit_rules_d_audit_rules__usr_bin_sudo
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/sudo -F perm=x -F auid>=1000 -F auid!=unset -k priv_cmd$'
@@ -2846,7 +2793,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258204_Manage
 # R-258205 RHEL-09-654155
-- name : stigrule_258205__etc_audit_rules_d_audit_rules__usr_bin_sudoedit
+- name: stigrule_258205__etc_audit_rules_d_audit_rules__usr_bin_sudoedit
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/sudoedit -F perm=x -F auid>=1000 -F auid!=unset -k priv_cmd$'
@@ -2854,7 +2801,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258205_Manage
 # R-258206 RHEL-09-654160
-- name : stigrule_258206__etc_audit_rules_d_audit_rules__usr_sbin_unix_chkpwd
+- name: stigrule_258206__etc_audit_rules_d_audit_rules__usr_sbin_unix_chkpwd
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/unix_chkpwd -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
@@ -2862,7 +2809,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258206_Manage
 # R-258207 RHEL-09-654165
-- name : stigrule_258207__etc_audit_rules_d_audit_rules__usr_sbin_unix_update
+- name: stigrule_258207__etc_audit_rules_d_audit_rules__usr_sbin_unix_update
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/unix_update -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
@@ -2870,7 +2817,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258207_Manage
 # R-258208 RHEL-09-654170
-- name : stigrule_258208__etc_audit_rules_d_audit_rules__usr_sbin_userhelper
+- name: stigrule_258208__etc_audit_rules_d_audit_rules__usr_sbin_userhelper
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/userhelper -F perm=x -F auid>=1000 -F auid!=unset -k privileged-unix-update$'
@@ -2878,7 +2825,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258208_Manage
 # R-258209 RHEL-09-654175
-- name : stigrule_258209__etc_audit_rules_d_audit_rules__usr_sbin_usermod
+- name: stigrule_258209__etc_audit_rules_d_audit_rules__usr_sbin_usermod
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/usermod -F perm=x -F auid>=1000 -F auid!=unset -k privileged-usermod$'
@@ -2886,7 +2833,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258209_Manage
 # R-258210 RHEL-09-654180
-- name : stigrule_258210__etc_audit_rules_d_audit_rules__usr_bin_mount
+- name: stigrule_258210__etc_audit_rules_d_audit_rules__usr_bin_mount
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/bin/mount -F perm=x -F auid>=1000 -F auid!=unset -k privileged-mount$'
@@ -2894,7 +2841,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258210_Manage
 # R-258211 RHEL-09-654185
-- name : stigrule_258211__etc_audit_rules_d_audit_rules__usr_sbin_init
+- name: stigrule_258211__etc_audit_rules_d_audit_rules__usr_sbin_init
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/init -F perm=x -F auid>=1000 -F auid!=unset -k privileged-init$'
@@ -2902,7 +2849,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258211_Manage
 # R-258212 RHEL-09-654190
-- name : stigrule_258212__etc_audit_rules_d_audit_rules__usr_sbin_poweroff
+- name: stigrule_258212__etc_audit_rules_d_audit_rules__usr_sbin_poweroff
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/poweroff -F perm=x -F auid>=1000 -F auid!=unset -k privileged-poweroff$'
@@ -2910,7 +2857,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258212_Manage
 # R-258213 RHEL-09-654195
-- name : stigrule_258213__etc_audit_rules_d_audit_rules__usr_sbin_reboot
+- name: stigrule_258213__etc_audit_rules_d_audit_rules__usr_sbin_reboot
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/reboot -F perm=x -F auid>=1000 -F auid!=unset -k privileged-reboot$'
@@ -2918,7 +2865,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258213_Manage
 # R-258214 RHEL-09-654200
-- name : stigrule_258214__etc_audit_rules_d_audit_rules__usr_sbin_shutdown
+- name: stigrule_258214__etc_audit_rules_d_audit_rules__usr_sbin_shutdown
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-a always,exit -F path=/usr/sbin/shutdown -F perm=x -F auid>=1000 -F auid!=unset -k privileged-shutdown$'
@@ -2926,7 +2873,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258214_Manage
 # R-258217 RHEL-09-654215
-- name : stigrule_258217__etc_audit_rules_d_audit_rules__etc_sudoers
+- name: stigrule_258217__etc_audit_rules_d_audit_rules__etc_sudoers
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-w /etc/sudoers -p wa -k identity$'
@@ -2934,7 +2881,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258217_Manage
 # R-258218 RHEL-09-654220
-- name : stigrule_258218__etc_audit_rules_d_audit_rules__etc_sudoers_d_
+- name: stigrule_258218__etc_audit_rules_d_audit_rules__etc_sudoers_d_
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-w /etc/sudoers.d/ -p wa -k identity$'
@@ -2942,7 +2889,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258218_Manage
 # R-258219 RHEL-09-654225
-- name : stigrule_258219__etc_audit_rules_d_audit_rules__etc_group
+- name: stigrule_258219__etc_audit_rules_d_audit_rules__etc_group
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-w /etc/group -p wa -k identity$'
@@ -2950,7 +2897,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258219_Manage
 # R-258220 RHEL-09-654230
-- name : stigrule_258220__etc_audit_rules_d_audit_rules__etc_gshadow
+- name: stigrule_258220__etc_audit_rules_d_audit_rules__etc_gshadow
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-w /etc/gshadow -p wa -k identity$'
@@ -2958,7 +2905,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258220_Manage
 # R-258221 RHEL-09-654235
-- name : stigrule_258221__etc_audit_rules_d_audit_rules__etc_security_opasswd
+- name: stigrule_258221__etc_audit_rules_d_audit_rules__etc_security_opasswd
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-w /etc/security/opasswd -p wa -k identity$'
@@ -2966,7 +2913,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258221_Manage
 # R-258222 RHEL-09-654240
-- name : stigrule_258222__etc_audit_rules_d_audit_rules__etc_passwd
+- name: stigrule_258222__etc_audit_rules_d_audit_rules__etc_passwd
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-w /etc/passwd -p wa -k identity$'
@@ -2974,7 +2921,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258222_Manage
 # R-258223 RHEL-09-654245
-- name : stigrule_258223__etc_audit_rules_d_audit_rules__etc_shadow
+- name: stigrule_258223__etc_audit_rules_d_audit_rules__etc_shadow
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-w /etc/shadow -p wa -k identity$'
@@ -2982,7 +2929,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258223_Manage
 # R-258224 RHEL-09-654250
-- name : stigrule_258224__etc_audit_rules_d_audit_rules__var_log_faillock
+- name: stigrule_258224__etc_audit_rules_d_audit_rules__var_log_faillock
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-w /var/log/faillock -p wa -k logins$'
@@ -2990,7 +2937,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258224_Manage
 # R-258225 RHEL-09-654255
-- name : stigrule_258225__etc_audit_rules_d_audit_rules__var_log_lastlog
+- name: stigrule_258225__etc_audit_rules_d_audit_rules__var_log_lastlog
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-w /var/log/lastlog -p wa -k logins$'
@@ -2998,7 +2945,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258225_Manage
 # R-258226 RHEL-09-654260
-- name : stigrule_258226__etc_audit_rules_d_audit_rules__var_log_tallylog
+- name: stigrule_258226__etc_audit_rules_d_audit_rules__var_log_tallylog
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-w /var/log/tallylog -p wa -k logins$'
@@ -3006,7 +2953,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258226_Manage
 # R-258227 RHEL-09-654265
-- name : stigrule_258227__etc_audit_rules_d_audit_rules_f2
+- name: stigrule_258227__etc_audit_rules_d_audit_rules_f2
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-f 2$'
@@ -3014,7 +2961,7 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258227_Manage
 # R-258228 RHEL-09-654270
-- name : stigrule_258228__etc_audit_rules_d_audit_rules_loginuid_immutable
+- name: stigrule_258228__etc_audit_rules_d_audit_rules_loginuid_immutable
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^--loginuid-immutable$'
@@ -3022,34 +2969,22 @@
   notify: auditd_restart
   when: rhel9STIG_stigrule_258228_Manage
 # R-258229 RHEL-09-654275
-- name : stigrule_258229__etc_audit_rules_d_audit_rules_e2
+- name: stigrule_258229__etc_audit_rules_d_audit_rules_e2
   lineinfile:
     path: /etc/audit/rules.d/audit.rules
     regexp: '^-e 2$'
     line: "{{ rhel9STIG_stigrule_258229__etc_audit_rules_d_audit_rules_e2_Line }}"
   notify: auditd_restart
   when: rhel9STIG_stigrule_258229_Manage
-# R-258234 RHEL-09-672010
+# R-258234 RHEL-09-215100
 - name: stigrule_258234_crypto_policies
   yum:
     name: crypto-policies
     state: "{{ rhel9STIG_stigrule_258234_crypto_policies_State }}"
   when: rhel9STIG_stigrule_258234_Manage
-# R-258239 RHEL-09-672035
-- name: stigrule_258239__etc_pki_tls_openssl_cnf
-  lineinfile:
-    path: /etc/pki/tls/openssl.cnf
-    line: "{{ rhel9STIG_stigrule_258239__etc_pki_tls_openssl_cnf_Line }}"
-    create: yes
-  when:
-    - rhel9STIG_stigrule_258239_Manage
-# R-258240 RHEL-09-672040
-- name: stigrule_258240__etc_crypto_policies_back_ends_opensslcnf_config
-  lineinfile:
-    path: /etc/crypto-policies/back-ends/opensslcnf.config
-    regexp: '^\s*TLS.MinProtocol\s*='
-    line: "{{ rhel9STIG_stigrule_258240__etc_crypto_policies_back_ends_opensslcnf_config_Line }}"
-    create: yes
-  notify: do_reboot
-  when:
-    - rhel9STIG_stigrule_258240_Manage
+# R-272488 RHEL-09-215101
+- name: stigrule_272488_postfix
+  yum:
+    name: postfix
+    state: "{{ rhel9STIG_stigrule_272488_postfix_State }}"
+  when: rhel9STIG_stigrule_272488_Manage
