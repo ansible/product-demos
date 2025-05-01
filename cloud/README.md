@@ -19,12 +19,11 @@ This category of demos shows examples of multi-cloud provisioning and management
 
 ### Jobs
 
-- [**Cloud / Create Infra**](create_infra.yml) - Creates a VPC with required routing and firewall rules for provisioning VMs
-- [**Cloud / Create Keypair**](aws_key.yml) - Creates a keypair for connecting to EC2 instances
-- [**Cloud / Create VM**](create_vm.yml) - Create a VM based on a [blueprint](blueprints/) in the selected cloud provider
-- [**Cloud / Destroy VM**](destroy_vm.yml) - Destroy a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be deleted.
-- [**Cloud / Snapshot EC2**](snapshot_ec2.yml) - Snapshot a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be snapshot.
-- [**Cloud / Restore EC2 from Snapshot**](snapshot_ec2.yml) - Restore a VM that has been created in a cloud provider.  By default, volumes will be restored from their latest snapshot. VM must be imported into dynamic inventory to be patched.
+- [**Cloud / AWS / Create VM**](create_vm.yml) - Create a VM based on a [blueprint](blueprints/) in the selected cloud provider
+- [**Cloud / AWS / Destroy VM**](destroy_vm.yml) - Destroy a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be deleted.
+- [**Cloud / AWS / Snapshot EC2**](snapshot_ec2.yml) - Snapshot a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be snapshot.
+- [**Cloud / AWS / Restore EC2 from Snapshot**](snapshot_ec2.yml) - Restore a VM that has been created in a cloud provider.  By default, volumes will be restored from their latest snapshot. VM must be imported into dynamic inventory to be patched.
+- [**Cloud / Resize EC2**](resize_ec2.yml) - Re-size an EC2 instance.
 
 ### Inventory
 
@@ -59,11 +58,13 @@ After running the setup job template, there are a few steps required to make the
 
 ## Suggested Usage
 
-**Cloud / Create Keypair** - The Create Keypair job creates an EC2 keypair which can be used when creating EC2 instances to enable SSH access.
+**Deploy Cloud Stack in AWS** - This workflow builds out many helpful and convient resources in AWS. Given an AWS region, key, and some organizational paremetres for tagging it builds a default VPC, keypair, five VMs (three RHEL and two Windows), and even provides a report for cloud stats. It is the typical starting point for using Ansible Product-Demos in AWS.
 
 **Cloud / Create VM** - The Create VM job builds a VM in the given provider based on the included `demo.cloud` collection. VM [blueprints](blueprints/) define variables for each provider that override the defaults in the collection. When creating VMs it is recommended to follow naming conventions that can be used as host patterns. (eg. VM names: `win1`, `win2`, `win3`.  Host Pattern: `win*` )
 
 **Cloud / AWS / Patch EC2 Workflow** - Create a VPC and one or more linux VM(s) in AWS using the `Cloud / Create VPC` and `Cloud / Create VM` templates. Run the workflow and observe the instance snapshots followed by patching operation. Optionally, use the survey to force a patch failure in order to demonstrate the restore path. At this time, the workflow does not support patching Windows instances.
+
+**Cloud / AWS / Resize EC2** - Given an EC2 instance, change its size. This takes an AWS region, target host pattern, and a target instance size as parameters. As a final step, this job refreshes the AWS inventory so the re-created instance is accessible from AAP.
 
 ## Known Issues
 Azure does not work without a custom execution environment that includes the Azure dependencies.
