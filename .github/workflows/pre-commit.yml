@@ -12,7 +12,7 @@ jobs:
   pre-commit-24:
     name: pre-commit
     container:
-      image: quay.io/ansible-product-demos/apd-ee-24
+      image: quay.io/ansible-product-demos/apd-ee-25
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
