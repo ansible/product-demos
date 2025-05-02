@@ -11,7 +11,8 @@ env:
 jobs:
   pre-commit-25:
     container:
-      image: fedora:latest
+      image: quay.io/ansible-product-demos/apd-ee-25
+      options: --user root
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
