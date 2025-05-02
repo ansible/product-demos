@@ -2,6 +2,9 @@
 
 PYTHON_VARIANT="${USE_PYTHON:-python3.11}"
 
+# intsall pip
+eval "${PYTHON_VARIANT} -m pip install pip"
+
 # intsall pre-commit
 eval "${PYTHON_VARIANT} -m pip install pre-commit"
 
