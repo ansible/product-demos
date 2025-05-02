@@ -17,7 +17,7 @@ repos:
   - repo: local
     hooks:
       - id: ansible-lint
-        name: ansible-navigator lint --eei quay.io/ansible-product-demos/apd-ee-25
+        name: ansible-navigator lint --eei quay.io/ansible-product-demos/apd-ee-25 --mode stdout
         language: python
         entry: bash -c "ansible-navigator lint --eei quay.io/ansible-product-demos/apd-ee-25"
         additional_dependencies:
