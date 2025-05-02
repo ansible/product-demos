@@ -20,7 +20,9 @@ jobs:
       shell: bash
     - run: python3.11 -m pip freeze --local
       shell: bash
-    - run: ls
+    - run: git config --global --add safe.directory $(pwd)
+      shell: bash
+    - run: ls -lah
       shell: bash
     - run: git status
       shell: bash
