@@ -1,5 +1,5 @@
 ---
-name: pre-commit
+name: pre-commit-24
 on:
  - push
  - pull_request_target
@@ -9,8 +9,10 @@ env:
   ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN }}
 
 jobs:
-  pre-commit:
+  pre-commit-24:
     name: pre-commit
+    container:
+      image: quay.io/ansible-product-demos/apd-ee-24
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
