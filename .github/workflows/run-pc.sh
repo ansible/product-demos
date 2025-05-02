@@ -18,4 +18,4 @@ eval "${PYTHON_VARIANT} -m pip freeze --local"
 git config --global --add safe.directory $(pwd)
 
 # run pre-commit
-pre-commit run --config $(pwd)/.pre-commit-gh.yml --show-diff-on-failure --color=always -c 
+pre-commit run --config $(pwd)/.pre-commit-gh.yml --show-diff-on-failure --color=always 
