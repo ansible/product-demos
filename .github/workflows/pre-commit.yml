@@ -9,14 +9,22 @@ env:
   ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN }}
 
 jobs:
-  pre-commit-24:
-    name: pre-commit
+  pre-commit-25:
     container:
-      image: quay.io/ansible-product-demos/apd-ee-25
+      image: fedora:latest
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
     - uses: pre-commit/action@v3.0.1
 
+#  pre-commit-25:
+#    container:
+#      image: quay.io/ansible-product-demos/apd-ee-25
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v4
+#    - uses: actions/setup-python@v5
+#    - uses: pre-commit/action@v3.0.1
+#
 ...
