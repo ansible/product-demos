@@ -1,12 +1,8 @@
 ---
-name: pre-commit-24
+name: pre-commit
 on:
  - push
  - pull_request_target
-
-env:
-  ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN }}
-  ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN }}
 
 jobs:
   pre-commit-25:
@@ -16,31 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - run: python3.11 -m pip install pre-commit
-      shell: bash
-    - run: python3.11 -m pip freeze --local
-      shell: bash
-    - run: git config --global --add safe.directory $(pwd)
-      shell: bash
-    - run: ls -lah
-      shell: bash
-    - run: git status
-      shell: bash
-    - run: pre-commit run --show-diff-on-failure --color=always
+    - run: ./.github/workflows/run-pc.sh
       shell: bash
 
-#    - uses: actions/setup-python@v5
-#      with:
-#        python-version: '3.11'
-#    - uses: pre-commit/action@v3.0.1
+jobs:
+  pre-commit-24:
+    container:
+      image: quay.io/ansible-product-demos/apd-ee-25
+      options: --user root
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - run: USE_PYTHON=python3.9 ./.github/workflows/run-pc.sh
+      shell: bash
 
-#  pre-commit-25:
-#    container:
-#      image: quay.io/ansible-product-demos/apd-ee-25
-#    runs-on: ubuntu-latest
-#    steps:
-#    - uses: actions/checkout@v4
-#    - uses: actions/setup-python@v5
-#    - uses: pre-commit/action@v3.0.1
-#
-...
