@@ -12,3 +12,4 @@ roles/*
 .deployment_id
 .cache/
 .ansible/
+**/tmp/
