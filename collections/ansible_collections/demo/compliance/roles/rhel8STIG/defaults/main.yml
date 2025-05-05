@@ -3,7 +3,7 @@ rhel8STIG_stigrule_230225_Manage: True
 rhel8STIG_stigrule_230225_banner_Line: banner /etc/issue
 # R-230226 RHEL-08-010050
 rhel8STIG_stigrule_230226_Manage: True
-rhel8STIG_stigrule_230226__etc_dconf_db_local_d_01_banner_message_Value: '''You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\nBy using this IS (which includes any device attached to this IS), you consent to the following conditions:\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n-At any time, the USG may inspect and seize data stored on this IS.\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'''
+rhel8STIG_stigrule_230226__etc_dconf_db_local_d_01_banner_message_Value: "''You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\nBy using this IS (which includes any device attached to this IS), you consent to the following conditions:\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n-At any time, the USG may inspect and seize data stored on this IS.\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.''"
 # R-230227 RHEL-08-010060
 rhel8STIG_stigrule_230227_Manage: True
 rhel8STIG_stigrule_230227__etc_issue_Dest: /etc/issue
@@ -43,9 +43,6 @@ rhel8STIG_stigrule_230241_policycoreutils_State: installed
 # R-230244 RHEL-08-010200
 rhel8STIG_stigrule_230244_Manage: True
 rhel8STIG_stigrule_230244_ClientAliveCountMax_Line: ClientAliveCountMax 1
-# R-230252 RHEL-08-010291
-rhel8STIG_stigrule_230252_Manage: True
-rhel8STIG_stigrule_230252__etc_sysconfig_sshd_Line: '# CRYPTO_POLICY='
 # R-230255 RHEL-08-010294
 rhel8STIG_stigrule_230255_Manage: True
 rhel8STIG_stigrule_230255__etc_crypto_policies_back_ends_opensslcnf_config_Line: 'MinProtocol = TLSv1.2'
@@ -138,16 +135,9 @@ rhel8STIG_stigrule_230346__etc_security_limits_conf_Line: '* hard maxlogins 10'
 # R-230347 RHEL-08-020030
 rhel8STIG_stigrule_230347_Manage: True
 rhel8STIG_stigrule_230347__etc_dconf_db_local_d_00_screensaver_Value: 'true'
-# R-230348 RHEL-08-020040
-rhel8STIG_stigrule_230348_Manage: True
-rhel8STIG_stigrule_230348_ensure_tmux_is_installed_State: installed
-rhel8STIG_stigrule_230348__etc_tmux_conf_Line: 'set -g lock-command vlock'
 # R-230352 RHEL-08-020060
 rhel8STIG_stigrule_230352_Manage: True
 rhel8STIG_stigrule_230352__etc_dconf_db_local_d_00_screensaver_Value: 'uint32 900'
-# R-230353 RHEL-08-020070
-rhel8STIG_stigrule_230353_Manage: True
-rhel8STIG_stigrule_230353__etc_tmux_conf_Line: 'set -g lock-after-time 900'
 # R-230354 RHEL-08-020080
 rhel8STIG_stigrule_230354_Manage: True
 rhel8STIG_stigrule_230354__etc_dconf_db_local_d_locks_session_Line: '/org/gnome/desktop/screensaver/lock-delay'
@@ -335,8 +325,8 @@ rhel8STIG_stigrule_230438__etc_audit_rules_d_audit_rules_init_module_b32_Line: '
 rhel8STIG_stigrule_230438__etc_audit_rules_d_audit_rules_init_module_b64_Line: '-a always,exit -F arch=b64 -S init_module,finit_module -F auid>=1000 -F auid!=unset -k module_chng'
 # R-230439 RHEL-08-030361
 rhel8STIG_stigrule_230439_Manage: True
-rhel8STIG_stigrule_230439__etc_audit_rules_d_audit_rules_rename_b32_Line: '-a always,exit -F arch=b32 -S rename -F auid>=1000 -F auid!=unset -k module_chng'
-rhel8STIG_stigrule_230439__etc_audit_rules_d_audit_rules_rename_b64_Line: '-a always,exit -F arch=b64 -S rename -F auid>=1000 -F auid!=unset -k module_chng'
+rhel8STIG_stigrule_230439__etc_audit_rules_d_audit_rules_rename_b32_Line: '-a always,exit -F arch=b32 -S rename,unlink,rmdir,renameat,unlinkat -F auid>=1000 -F auid!=unset -k delete'
+rhel8STIG_stigrule_230439__etc_audit_rules_d_audit_rules_rename_b64_Line: '-a always,exit -F arch=b64 -S rename,unlink,rmdir,renameat,unlinkat -F auid>=1000 -F auid!=unset -k delete'
 # R-230444 RHEL-08-030370
 rhel8STIG_stigrule_230444_Manage: True
 rhel8STIG_stigrule_230444__etc_audit_rules_d_audit_rules__usr_bin_gpasswd_Line: '-a always,exit -F path=/usr/bin/gpasswd -F perm=x -F auid>=1000 -F auid!=unset -k privileged-gpasswd'
@@ -432,7 +422,8 @@ rhel8STIG_stigrule_230527_Manage: True
 rhel8STIG_stigrule_230527_RekeyLimit_Line: RekeyLimit 1G 1h
 # R-230529 RHEL-08-040170
 rhel8STIG_stigrule_230529_Manage: True
-rhel8STIG_stigrule_230529_systemctl_mask_ctrl_alt_del_target_Command: systemctl mask ctrl-alt-del.target
+rhel8STIG_stigrule_230529_ctrl_alt_del_target_disable_Enabled: false
+rhel8STIG_stigrule_230529_ctrl_alt_del_target_mask_Masked: true
 # R-230531 RHEL-08-040172
 rhel8STIG_stigrule_230531_Manage: True
 rhel8STIG_stigrule_230531__etc_systemd_system_conf_Value: 'none'
@@ -514,6 +505,9 @@ rhel8STIG_stigrule_244523__usr_lib_systemd_system_emergency_service_Value: '-/us
 # R-244525 RHEL-08-010201
 rhel8STIG_stigrule_244525_Manage: True
 rhel8STIG_stigrule_244525_ClientAliveInterval_Line: ClientAliveInterval 600
+# R-244526 RHEL-08-010287
+rhel8STIG_stigrule_244526_Manage: True
+rhel8STIG_stigrule_244526__etc_sysconfig_sshd_Line: '# CRYPTO_POLICY='
 # R-244527 RHEL-08-010472
 rhel8STIG_stigrule_244527_Manage: True
 rhel8STIG_stigrule_244527_rng_tools_State: installed
@@ -526,9 +520,6 @@ rhel8STIG_stigrule_244535__etc_dconf_db_local_d_00_screensaver_Value: 'uint32 5'
 # R-244536 RHEL-08-020032
 rhel8STIG_stigrule_244536_Manage: True
 rhel8STIG_stigrule_244536__etc_dconf_db_local_d_02_login_screen_Value: 'true'
-# R-244537 RHEL-08-020039
-rhel8STIG_stigrule_244537_Manage: True
-rhel8STIG_stigrule_244537_tmux_State: installed
 # R-244538 RHEL-08-020081
 rhel8STIG_stigrule_244538_Manage: True
 rhel8STIG_stigrule_244538__etc_dconf_db_local_d_locks_session_idle_delay_Line: '/org/gnome/desktop/session/idle-delay'

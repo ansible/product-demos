@@ -159,7 +159,7 @@ rhel9STIG_stigrule_257834_Manage: True
 rhel9STIG_stigrule_257834_tuned_State: removed
 # R-257835 RHEL-09-215060
 rhel9STIG_stigrule_257835_Manage: True
-rhel9STIG_stigrule_257835_tftp_State: removed
+rhel9STIG_stigrule_257835_tftp_server_State: removed
 # R-257836 RHEL-09-215065
 rhel9STIG_stigrule_257836_Manage: True
 rhel9STIG_stigrule_257836_quagga_State: removed
@@ -302,10 +302,6 @@ rhel9STIG_stigrule_257916__var_log_messages_owner_Owner: root
 rhel9STIG_stigrule_257917_Manage: True
 rhel9STIG_stigrule_257917__var_log_messages_group_owner_Dest: /var/log/messages
 rhel9STIG_stigrule_257917__var_log_messages_group_owner_Group: root
-# R-257933 RHEL-09-232265
-rhel9STIG_stigrule_257933_Manage: True
-rhel9STIG_stigrule_257933__etc_crontab_mode_Dest: /etc/crontab
-rhel9STIG_stigrule_257933__etc_crontab_mode_Mode: '0600'
 # R-257934 RHEL-09-232270
 rhel9STIG_stigrule_257934_Manage: True
 rhel9STIG_stigrule_257934__etc_shadow_mode_Dest: /etc/shadow
@@ -455,9 +451,6 @@ rhel9STIG_stigrule_257985_PermitRootLogin_Line: PermitRootLogin no
 # R-257986 RHEL-09-255050
 rhel9STIG_stigrule_257986_Manage: True
 rhel9STIG_stigrule_257986_UsePAM_Line: UsePAM yes
-# R-257989 RHEL-09-255065
-rhel9STIG_stigrule_257989_Manage: True
-rhel9STIG_stigrule_257989__etc_crypto_policies_back_ends_openssh_config_Line: 'Ciphers aes256-gcm@openssh.com,chacha20-poly1305@openssh.com,aes256-ctr,aes128-gcm@openssh.com,aes128-ctr'
 # R-257992 RHEL-09-255080
 rhel9STIG_stigrule_257992_Manage: True
 rhel9STIG_stigrule_257992_HostbasedAuthentication_Line: HostbasedAuthentication no
@@ -509,9 +502,6 @@ rhel9STIG_stigrule_258008_StrictModes_Line: StrictModes yes
 # R-258009 RHEL-09-255165
 rhel9STIG_stigrule_258009_Manage: True
 rhel9STIG_stigrule_258009_PrintLastLog_Line: PrintLastLog yes
-# R-258010 RHEL-09-255170
-rhel9STIG_stigrule_258010_Manage: True
-rhel9STIG_stigrule_258010_UsePrivilegeSeparation_Line: UsePrivilegeSeparation sandbox
 # R-258011 RHEL-09-255175
 rhel9STIG_stigrule_258011_Manage: True
 rhel9STIG_stigrule_258011_X11UseLocalhost_Line: X11UseLocalhost yes
@@ -560,10 +550,9 @@ rhel9STIG_stigrule_258026__etc_dconf_db_local_d_locks_session_lock_delay_Line: '
 # R-258027 RHEL-09-271085
 rhel9STIG_stigrule_258027_Manage: True
 rhel9STIG_stigrule_258027__etc_dconf_db_local_d_00_security_settings_Value: "''"
+# R-258027 RHEL-09-271085
+rhel9STIG_stigrule_258027_Manage: True
 rhel9STIG_stigrule_258027__etc_dconf_db_local_d_locks_00_security_settings_lock_picture_uri_Line: '/org/gnome/desktop/screensaver/picture-uri'
-# R-258029 RHEL-09-271095
-rhel9STIG_stigrule_258029_Manage: True
-rhel9STIG_stigrule_258029__etc_dconf_db_local_d_00_security_settings_Value: "'true'"
 # R-258030 RHEL-09-271100
 rhel9STIG_stigrule_258030_Manage: True
 rhel9STIG_stigrule_258030__etc_dconf_db_local_d_locks_session_disable_restart_buttons_Line: '/org/gnome/login-screen/disable-restart-buttons'
@@ -583,6 +572,8 @@ rhel9STIG_stigrule_258034__etc_modprobe_d_usb_storage_conf_blacklist_usb_storage
 # R-258035 RHEL-09-291015
 rhel9STIG_stigrule_258035_Manage: True
 rhel9STIG_stigrule_258035_usbguard_State: installed
+rhel9STIG_stigrule_258035_usbguard_enable_Enabled: yes
+rhel9STIG_stigrule_258035_usbguard_start_State: started
 # R-258036 RHEL-09-291020
 rhel9STIG_stigrule_258036_Manage: True
 rhel9STIG_stigrule_258036_usbguard_enable_Enabled: yes
@@ -621,12 +612,6 @@ rhel9STIG_stigrule_258057__etc_security_faillock_conf_Line: 'unlock_time = 0'
 # R-258060 RHEL-09-411105
 rhel9STIG_stigrule_258060_Manage: True
 rhel9STIG_stigrule_258060__etc_security_faillock_conf_Line: 'dir = /var/log/faillock'
-# R-258063 RHEL-09-412010
-rhel9STIG_stigrule_258063_Manage: True
-rhel9STIG_stigrule_258063_tmux_State: installed
-# R-258066 RHEL-09-412025
-rhel9STIG_stigrule_258066_Manage: True
-rhel9STIG_stigrule_258066__etc_tmux_conf_Line: 'set -g lock-after-time 900'
 # R-258069 RHEL-09-412040
 rhel9STIG_stigrule_258069_Manage: True
 rhel9STIG_stigrule_258069__etc_security_limits_conf_Line: '* hard maxlogins 10'
@@ -688,9 +673,6 @@ rhel9STIG_stigrule_258104__etc_login_defs_Line: 'PASS_MIN_DAYS 1'
 # R-258107 RHEL-09-611090
 rhel9STIG_stigrule_258107_Manage: True
 rhel9STIG_stigrule_258107__etc_security_pwquality_conf_Line: 'minlen = 15'
-# R-258108 RHEL-09-611095
-rhel9STIG_stigrule_258108_Manage: True
-rhel9STIG_stigrule_258108__etc_login_defs_Line: 'PASS_MIN_LEN 15'
 # R-258109 RHEL-09-611100
 rhel9STIG_stigrule_258109_Manage: True
 rhel9STIG_stigrule_258109__etc_security_pwquality_conf_Line: 'ocredit = -1'
@@ -718,9 +700,6 @@ rhel9STIG_stigrule_258116__etc_libuser_conf_Value: 'sha512'
 # R-258117 RHEL-09-611140
 rhel9STIG_stigrule_258117_Manage: True
 rhel9STIG_stigrule_258117__etc_login_defs_Line: 'ENCRYPT_METHOD SHA512'
-# R-258119 RHEL-09-611150
-rhel9STIG_stigrule_258119_Manage: True
-rhel9STIG_stigrule_258119__etc_login_defs_Line: 'SHA_CRYPT_MIN_ROUNDS 5000'
 # R-258121 RHEL-09-611160
 rhel9STIG_stigrule_258121_Manage: True
 rhel9STIG_stigrule_258121__etc_opensc_conf_Line: 'card_drivers = cac;'
@@ -759,9 +738,6 @@ rhel9STIG_stigrule_258142_rsyslog_start_State: started
 # R-258144 RHEL-09-652030
 rhel9STIG_stigrule_258144_Manage: True
 rhel9STIG_stigrule_258144__etc_rsyslog_conf_Line: 'auth.*;authpriv.*;daemon.*                              /var/log/secure'
-# R-258145 RHEL-09-652035
-rhel9STIG_stigrule_258145_Manage: True
-rhel9STIG_stigrule_258145__etc_audit_plugins_d_syslog_conf_Line: 'active = yes'
 # R-258146 RHEL-09-652040
 rhel9STIG_stigrule_258146_Manage: True
 rhel9STIG_stigrule_258146__etc_rsyslog_conf_Line: '$ActionSendStreamDriverAuthMode x509/name'
@@ -1000,12 +976,9 @@ rhel9STIG_stigrule_258228__etc_audit_rules_d_audit_rules_loginuid_immutable_Line
 # R-258229 RHEL-09-654275
 rhel9STIG_stigrule_258229_Manage: True
 rhel9STIG_stigrule_258229__etc_audit_rules_d_audit_rules_e2_Line: '-e 2'
-# R-258234 RHEL-09-672010
+# R-258234 RHEL-09-215100
 rhel9STIG_stigrule_258234_Manage: True
 rhel9STIG_stigrule_258234_crypto_policies_State: installed
-# R-258239 RHEL-09-672035
-rhel9STIG_stigrule_258239_Manage: True
-rhel9STIG_stigrule_258239__etc_pki_tls_openssl_cnf_Line: '.include = /etc/crypto-policies/back-ends/opensslcnf.config'
-# R-258240 RHEL-09-672040
-rhel9STIG_stigrule_258240_Manage: True
-rhel9STIG_stigrule_258240__etc_crypto_policies_back_ends_opensslcnf_config_Line: 'TLS.MinProtocol = TLSv1.2'
+# R-272488 RHEL-09-215101
+rhel9STIG_stigrule_272488_Manage: True
+rhel9STIG_stigrule_272488_postfix_State: installed
