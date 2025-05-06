@@ -19,7 +19,7 @@ repos:
       - id: ansible-lint
         name: ansible-navigator lint --eei quay.io/ansible-product-demos/apd-ee-25:latest --mode stdout
         language: python
-        entry: bash -c "ansible-navigator lint --eei quay.io/ansible-product-demos/apd-ee-25"
+        entry: bash -c "ansible-navigator lint --eei quay.io/ansible-product-demos/apd-ee-25 -v --force-color"
 
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 23.11.0
