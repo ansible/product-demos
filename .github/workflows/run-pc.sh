@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
 PYTHON_VARIANT="${USE_PYTHON:-python3.11}"
-PATH="$PATH:$HOME/.cache"
+PATH="$PATH:$HOME/.local/bin"
 
 # intsall pip
 eval "${PYTHON_VARIANT} -m pip install --user --upgrade pip"
