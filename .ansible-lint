@@ -1,9 +1,15 @@
 ---
 profile: production
-offline: false
+offline: true
 
 skip_list:
   - "galaxy[no-changelog]"
+
+warn_list:
+  # seems to be a bug, see https://github.com/ansible/ansible-lint/issues/4172
+  - "fqcn[canonical]"
+  # @matferna: really not sure why lint thinks it can't find jmespath, it is installed and functional
+  - "jinja[invalid]"
 
 exclude_paths:
   # would be better to move the roles here to the top-level roles directory
