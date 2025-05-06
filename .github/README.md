@@ -9,17 +9,17 @@ These images are built given the structure defined in their respective EE [defin
 ## Troubleshooting GitHub Actions
 
 ### Interactive
-It is likely the most straight-forward approach to interactively debug issues. The following podman command tries to replicate what our GitHub action is configured to do:
+It is likely the most straight-forward approach to interactively debug issues. The following podman command can be run from the project root directory to replicate the GitHub action:
 ```
 podman run \
            --user root  \
            -v $(pwd):/runner:Z \
            -it \
-           <image>
+           <image> \
            /bin/bash
 ```
-
-where `<image>` is one of `quay.io/ansible-product-demos/apd-ee-25:latest`, `quay.io/ansible-product-demos/apd-ee-24:latest`  
+`<image>` is one of `quay.io/ansible-product-demos/apd-ee-25:latest`, `quay.io/ansible-product-demos/apd-ee-24:latest`  
+It is not exact because GitHub seems to run closer to a sidecar container paradigm, and uses docker instead of podman, but hopefully it's close enough.
 
 For the 24 EE, the python interpreriter verions is set for our pre-commit script like so: `USE_PYTHON=python3.9 ./.github/workflows/run-pc.sh`
 The 25 EE is similary run but without the need for this variable: `./.github/workflows/run-pc.sh`
