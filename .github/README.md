@@ -1,6 +1,6 @@
 # GitHub Actions
 ## Background
-We want to make attempts to run our integration tests in the same manner wether using GitHub actions or on a developers's machine locally. For this reason, the tests are curated to run using conatiner images. As of this writing, two images exist which we would like to test against:
+We want to make attempts to run our integration tests in the same manner wether using GitHub actions or on a developers's machine locally. For this reason, the tests are curated to run using container images. As of this writing, two images exist which we would like to test against:
   - quay.io/ansible-product-demos/apd-ee-24:latest
   - quay.io/ansible-product-demos/apd-ee-25:latest
 
