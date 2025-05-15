@@ -16,7 +16,7 @@
     - name: Ensure Demo OU exists
       run_once: true
       delegate_to: "{{ domain_controller }}"
-      community.windows.win_domain_ou:
+      microsoft.ad.ou:
         name: Demo
         state: present
 
@@ -26,7 +26,7 @@
 
     - name: Join ansible.local domain
       register: r_domain_membership
-      ansible.windows.win_domain_membership:
+      microsoft.ad.membership:
         dns_domain_name: ansible.local
         hostname: "{{ inventory_hostname.split('.')[0] }}"
         domain_admin_user: "{{ ansible_user }}@ansible.local"

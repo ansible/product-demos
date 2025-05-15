@@ -20,6 +20,8 @@ collections:
   - name: redhat.rhel_system_roles
     version: ">=1.23.0"
   # windows
+  - name: microsoft.ad
+    version: "1.9"
   - name: ansible.windows
     version: ">=2.3.0"
   - name: chocolatey.chocolatey
