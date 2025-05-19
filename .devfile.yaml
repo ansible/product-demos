@@ -5,7 +5,7 @@ metadata:
 components:
   - name: tooling-container
     container:
-      image: quay.io/ansible-product-demos/apd-ee-25 #ghcr.io/ansible/ansible-devspaces:latest
+      image: quay.io/ansible-product-demos/apd-ee-25  # ghcr.io/ansible/ansible-devspaces:latest
       memoryRequest: 256M
       memoryLimit: 5Gi
       cpuRequest: 250m
