@@ -13,4 +13,4 @@ components:
       args:
        - 'tail'
        - '-f'
-       - '/dev/null']
+       - '/dev/null'
