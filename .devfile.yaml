@@ -1,13 +1,16 @@
 ---
-schemaVersion: 2.2.0
+schemaVersion: 2.2.2
 metadata:
   name: product-demos
 components:
-  - name: product-demos-ee
+  - name: tooling-container
     container:
       image: ghcr.io/ansible/ansible-devspaces:latest
       memoryRequest: 256M
       memoryLimit: 5Gi
       cpuRequest: 250m
       cpuLimit: 2000m
-      #args: ['tail', '-f', '/dev/null']
+      args:
+       - 'tail'
+       - '-f'
+       - '/dev/null']
