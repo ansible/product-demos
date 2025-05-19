@@ -90,13 +90,6 @@
               containerBuildConfiguration:
                 openShiftSecurityContextConstraint: container-build
               disableContainerBuildCapabilities: true
-              defaultEditor: che-incubator/che-code/insiders
-              defaultComponents:
-                - container:
-                    image: >-
-                      registry.redhat.io/devspaces/udi-rhel8@sha256:aa39ede33bcbda6aa2723d271c79ab8d8fd388c7dfcbc3d4ece745b7e9c84193
-                    sourceMapping: /projects
-                  name: universal-developer-image
               defaultNamespace:
                 autoProvision: true
                 template: <username>-devspaces
