@@ -46,7 +46,9 @@
     - name: Create some users
       microsoft.ad.user:
         name: "{{ item.name }}"
-        groups: "{{ item.groups }}"
+        groups:
+          set:
+            - "{{ item.groups }}"
         password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
         update_password: on_create
       loop:
