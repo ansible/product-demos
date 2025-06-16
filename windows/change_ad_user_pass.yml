@@ -1,0 +1,16 @@
+---
+- name: Create Active Directory domain
+  hosts: "{{ _hosts | default('os_windows') }}"
+  gather_facts: false
+  vars:
+    ad_user_name: "UserA"  # Specify the user whose password you want to change
+    new_password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
+
+  tasks:
+    - name: Update user password in Active Directory
+      microsoft.ad.user:
+        name: "{{ ad_user_name }}"
+        password: "{{ new_password }}"
+        update_password: always
+      retries: 5
+      delay: 10
