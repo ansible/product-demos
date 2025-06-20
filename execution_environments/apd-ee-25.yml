@@ -4,7 +4,7 @@ images:
   base_image:
     name: registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9:latest
 dependencies:
-  galaxy: requirements-25.yml
+  galaxy: requirements.yml
   system:
     - python3.11-devel [platform:rpm]
   python:
@@ -13,10 +13,6 @@ dependencies:
     python_path: /usr/bin/python3.11
 
 additional_build_files:
-  # https://access.redhat.com/solutions/7024259
-  # download from access.redhat.com -> Downloads -> OpenShift Container Platform -> Packages
-  - src: openshift-clients-4.16.0-202408021139.p0.ge8fb3c0.assembly.stream.el9.x86_64.rpm
-    dest: rpms
   - src: ansible.cfg
     dest: configs
 
@@ -25,16 +21,17 @@ options:
 
 additional_build_steps:
   prepend_base:
-    # AgnosticD can use this to deterine it is running from an EE
-    # see https://github.com/redhat-cop/agnosticd/blob/development/ansible/install_galaxy_roles.yml
-    - ENV LAUNCHED_BY_RUNNER=1
+    - ARG OPENSHIFT_CLIENT_RPM
     - RUN $PYCMD -m pip install --upgrade pip setuptools
-    - COPY _build/rpms/openshift-clients*.rpm /tmp/openshift-clients.rpm
     - RUN $PKGMGR -y update && $PKGMGR -y install bash-completion && $PKGMGR clean all
-    - RUN rpm -ivh /tmp/openshift-clients.rpm && rm /tmp/openshift-clients.rpm
+    # microdnf doesn't support URL or local file paths to RPMs, use rpm as a workaround
+    - RUN curl -o /tmp/openshift-clients.rpm $OPENSHIFT_CLIENT_RPM && rpm -Uvh /tmp/openshift-clients.rpm && rm -f /tmp/openshift-clients.rpm
   prepend_galaxy:
     - ADD _build/configs/ansible.cfg /etc/ansible/ansible.cfg
     - ARG ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN
     - ARG ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN
+  append_final:
+    - RUN curl -o /etc/yum.repos.d/hasicorp.repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo &&
+      microdnf install -y terraform
 
 ...

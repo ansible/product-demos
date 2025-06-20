@@ -2,45 +2,65 @@
 roles:
   # RHEL 7 compliance roles from ComplianceAsCode
   - name: redhatofficial.rhel7-cis
+    src: https://github.com/RedHatOfficial/ansible-role-rhel7-cis
     version: 0.1.72
   - name: redhatofficial.rhel7-cjis
+    src: https://github.com/RedHatOfficial/ansible-role-rhel7-cjis
     version: 0.1.72
   - name: redhatofficial.rhel7-cui
+    src: https://github.com/RedHatOfficial/ansible-role-rhel7-cui
     version: 0.1.72
   - name: redhatofficial.rhel7-hipaa
+    src: https://github.com/RedHatOfficial/ansible-role-rhel7-hipaa
     version: 0.1.72
   - name: redhatofficial.rhel7-ospp
+    src: https://github.com/RedHatOfficial/ansible-role-rhel7-ospp
     version: 0.1.72
   - name: redhatofficial.rhel7-pci-dss
+    src: https://github.com/RedHatOfficial/ansible-role-rhel7-pci-dss
     version: 0.1.72
   - name: redhatofficial.rhel7-stig
+    src: https://github.com/RedHatOfficial/ansible-role-rhel7-stig
     version: 0.1.72
   # RHEL 8 compliance roles from ComplianceAsCode
   - name: redhatofficial.rhel8-cis
+    src: https://github.com/RedHatOfficial/ansible-role-rhel8-cis
     version: 0.1.72
   - name: redhatofficial.rhel8-cjis
+    src: https://github.com/RedHatOfficial/ansible-role-rhel8-cjis
     version: 0.1.72
   - name: redhatofficial.rhel8-cui
+    src: https://github.com/RedHatOfficial/ansible-role-rhel8-cui
     version: 0.1.72
   - name: redhatofficial.rhel8-hipaa
+    src: https://github.com/RedHatOfficial/ansible-role-rhel8-hipaa
     version: 0.1.72
   - name: redhatofficial.rhel8-ospp
+    src: https://github.com/RedHatOfficial/ansible-role-rhel8-ospp
     version: 0.1.72
   - name: redhatofficial.rhel8-pci-dss
+    src: https://github.com/RedHatOfficial/ansible-role-rhel8-pci-dss
     version: 0.1.72
   - name: redhatofficial.rhel8-stig
+    src: https://github.com/RedHatOfficial/ansible-role-rhel8-stig
     version: 0.1.72
   # RHEL 9 compliance roles from ComplianceAsCode
   - name: redhatofficial.rhel9-cis
+    src: https://github.com/RedHatOfficial/ansible-role-rhel9-cis
     version: 0.1.72
   - name: redhatofficial.rhel9-cui
+    src: https://github.com/RedHatOfficial/ansible-role-rhel9-cui
     version: 0.1.72
   - name: redhatofficial.rhel9-hipaa
+    src: https://github.com/RedHatOfficial/ansible-role-rhel9-hipaa
     version: 0.1.72
   - name: redhatofficial.rhel9-ospp
+    src: https://github.com/RedHatOfficial/ansible-role-rhel9-ospp
     version: 0.1.72
   - name: redhatofficial.rhel9-pci-dss
+    src: https://github.com/RedHatOfficial/ansible-role-rhel9-pci-dss
     version: 0.1.72
   - name: redhatofficial.rhel9-stig
+    src: https://github.com/RedHatOfficial/ansible-role-rhel9-stig
     version: 0.1.72
 ...
