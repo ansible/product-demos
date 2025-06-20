@@ -14,3 +14,5 @@
         update_password: always
       retries: 5
       delay: 10
+      register: ad_user_update
+      until: ad_user_update is succeeded
