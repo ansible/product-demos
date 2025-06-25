@@ -44,14 +44,13 @@ controller_inventory_sources:
         - tag:Name
       compose:
         ansible_host: public_ip_address
-        ansible_user: 'ec2-user'
+        ansible_user: ec2-user
       groups:
         cloud_aws: true
-        os_linux: tags.blueprint.startswith('rhel')
-        os_windows: tags.blueprint.startswith('win')
+        os_linux: "platform_details == 'Red Hat Enterprise Linux'"
+        os_windows: "platform_details == 'Windows'"
+
       keyed_groups:
-        - key: platform
-          prefix: os
         - key: tags.blueprint
           prefix: blueprint
         - key: tags.owner
@@ -62,6 +61,7 @@ controller_inventory_sources:
           prefix: deployment
         - key: tags.Compliance
           separator: ''
+
 controller_groups:
   - name: cloud_aws
     inventory: Demo Inventory
