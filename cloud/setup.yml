@@ -490,15 +490,22 @@ controller_workflows:
       - identifier: Delete AWS Instances
         unified_job_template: Cloud / AWS / Delete VM
         success_nodes:
-          - Delete AWS Keypair
+          - Inventory Sync
         failure_nodes:
           - Ticket - Delete AWS Instances Failed
+      - identifier: Inventory Sync
+        unified_job_template: AWS Inventory
+        success_nodes:
+          - Delete AWS Keypair
+          - Delete AWS VPC
       - identifier: Delete AWS Keypair
         unified_job_template: Cloud / AWS / Delete Keypair
-        success_nodes:
-          - Delete AWS VPC
         failure_nodes:
           - Ticket - Delete AWS Keypair Failed
+      - identifier: Delete AWS VPC
+        unified_job_template: Cloud / AWS / Delete VPC
+        failure_nodes:
+          - Ticket - Delete AWS VPC Failed
       - identifier: Ticket - Delete AWS Instances Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
@@ -507,10 +514,6 @@ controller_workflows:
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to delete AWS keypair
-      - identifier: Delete AWS VPC
-        unified_job_template: Cloud / AWS / Delete VPC
-        failure_nodes:
-          - Ticket - Delete AWS VPC Failed
       - identifier: Ticket - Delete AWS VPC Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
