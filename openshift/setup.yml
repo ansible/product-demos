@@ -270,7 +270,7 @@ controller_workflows:
         unified_job_template: OpenShift / CNV / Wait Hosts
         failure_nodes:
           - Inventory Sync
-    - identifier: Inventory Sync
+      - identifier: Inventory Sync
         unified_job_template: OpenShift CNV Inventory
 
   - name: OpenShift / CNV / Infra Stack
