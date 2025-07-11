@@ -245,6 +245,34 @@ controller_templates:
       - "OpenShift Credential"
 
 controller_workflows:
+  - name: OpenShift / CNV / Sync Hosts
+    description: A workflow to update dynamic CNV inventory and wait for hosts to become avilable
+    organization: Default
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Specify target hosts
+          type: text
+          variable: _hosts
+          required: true
+          default: "openshift-cnv-rhel*"
+    simplified_workflow_nodes:
+      - identifier: Inventory Sync
+        unified_job_template: OpenShift CNV Inventory
+        success_nodes:
+          - Wait Hosts
+      - identifier: Wait Hosts
+        unified_job_template: OpenShift / CNV / Wait Hosts
+        failure_nodes:
+          - Inventory Sync
+    - identifier: Inventory Sync
+        unified_job_template: OpenShift CNV Inventory
+
   - name: OpenShift / CNV / Infra Stack
     description: A workflow to deploy Virtualized infra in OCP Virtalization
     organization: Default
@@ -320,15 +348,15 @@ controller_workflows:
         success_nodes:
           - Patch Instance
       # We need to do an invnetory sync *after* creating snapshots, as turning VMs on/off changes their IP
-      - identifier: Inventory Sync
-        unified_job_template: OpenShift CNV Inventory
+      - identifier: Sync Hosts
+        unified_job_template: OpenShift / CNV / Sync Hosts
         success_nodes:
           - Patch Instance
       - identifier: Take Snapshot
         unified_job_template: OpenShift / CNV / Create VM Snapshots
         success_nodes:
           - Project Sync
-          - Inventory Sync
+          - Sync Hosts
       - identifier: Patch Instance
         unified_job_template: OpenShift / CNV / Patch
         job_type: run
