@@ -2,6 +2,15 @@
 - name: Provision OCP-CNV RHEL VM
   hosts: localhost
   tasks:
+    - name: Create vm_namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ vm_namespace }}"
+
     - name: Define resources
       redhat.openshift.k8s:
         wait: true
