@@ -17,10 +17,7 @@
           apiVersion: v1
           kind: Namespace
           metadata:
-            name: my-new-namespace
-            labels:
-              app: my-cool-app
-              team: dev-team
+            name: "{{ vm_namespace }}"
 
     - name: Attempt to Provision a VM
       kubernetes.core.k8s:
