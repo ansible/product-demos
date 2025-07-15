@@ -12,7 +12,7 @@
 
     - name: Create vm_namespace
       kubernetes.core.k8s:
-            state: present
+        state: present
         definition:
           apiVersion: v1
           kind: Namespace
