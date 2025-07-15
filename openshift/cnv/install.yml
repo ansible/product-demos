@@ -1,14 +1,26 @@
 ---
-- name: Deploy OpenShift CNV Operator and create the Hyperconverged object, provision VM to prove funciontality
+- name: Deploy OpenShift CNV Operator and create the Hyperconverged object, provision VM to prove functionality
   hosts: localhost
   gather_facts: false
   vars:
     vm_name: ocpvtest
-    vm_namespace: openshift-cnv
+    vm_namespace: apd-vms
   tasks:
     - name: Include role
       ansible.builtin.include_role:
         name: demo.openshift.cluster_config
+
+    - name: Create vm_namespace
+      kubernetes.core.k8s:
+            state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: my-new-namespace
+            labels:
+              app: my-cool-app
+              team: dev-team
 
     - name: Attempt to Provision a VM
       kubernetes.core.k8s:

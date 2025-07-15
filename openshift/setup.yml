@@ -68,7 +68,7 @@ controller_templates:
         - question_name: VM NameSpace
           type: text
           variable: vm_namespace
-          default: openshift-cnv
+          default: apd-vms
           required: true
         - question_name: SSH Authorized Key
           type: textarea
@@ -108,12 +108,12 @@ controller_templates:
         - question_name: Server Name or Pattern
           type: text
           variable: _hosts
-          default: "openshift-cnv-rhel*"
+          default: "apd-vms-rhel*"
           required: true
         - question_name: VM NameSpace
           type: text
           variable: vm_namespace
-          default: openshift-cnv
+          default: apd-vms
           required: true
     credentials:
       - OpenShift Credential
@@ -136,12 +136,12 @@ controller_templates:
         - question_name: Server Name or Pattern
           type: text
           variable: _hosts
-          default: "openshift-cnv-rhel*"
+          default: "apd-vms-rhel*"
           required: true
         - question_name: VM NameSpace
           type: text
           variable: vm_namespace
-          default: openshift-cnv
+          default: apd-vms
           required: true
     credentials:
       - OpenShift Credential
@@ -168,7 +168,7 @@ controller_templates:
         - question_name: VM NameSpace
           type: text
           variable: vm_namespace
-          default: openshift-cnv
+          default: apd-vms
           required: true
 
     credentials:
@@ -194,7 +194,7 @@ controller_templates:
         - question_name: Server Name or Pattern
           type: text
           variable: _hosts
-          default: "openshift-cnv-rhel*"
+          default: "apd-vms-rhel*"
           required: true
 
   - name: OpenShift | CNV | Wait Hosts
@@ -212,7 +212,7 @@ controller_templates:
         - question_name: Wait hosts
           type: text
           variable: _hosts
-          default: "openshift-cnv-rhel*"
+          default: "apd-vms-rhel*"
           required: true
 
   - name: OpenShift | Dev Spaces
@@ -278,7 +278,7 @@ controller_workflows:
           type: text
           variable: _hosts
           required: true
-          default: "openshift-cnv-rhel*"
+          default: "apd-vms-rhel*"
     simplified_workflow_nodes:
       - identifier: Inventory Sync
         unified_job_template: OpenShift CNV Inventory
@@ -359,7 +359,7 @@ controller_workflows:
           type: text
           variable: _hosts
           required: true
-          default: "openshift-cnv-rhel*"
+          default: "apd-vms-rhel*"
     simplified_workflow_nodes:
       - identifier: Project Sync
         unified_job_template: Ansible Product Demos
