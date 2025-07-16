@@ -72,6 +72,7 @@
               - 443  # HTTPS
               - 22  # SSH
               - 5986  # WinRM
+              - 88  # Kerberos Authentication
               - 3389  # RDP
               - 9090  # Cockpit
             cidr_ip: 0.0.0.0/0
@@ -85,7 +86,6 @@
               - 5986  # WinRM
               - 3389  # RDP
               - 53  # DNS
-              - 88  # Kerberos Authentication
               - 135  # RPC
               - 139  # Netlogon
               - 389  # LDAP

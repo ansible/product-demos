@@ -176,6 +176,7 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    ask_credential_on_launch: true
     credentials:
       - "Demo Credential"
     survey_enabled: true
@@ -487,4 +488,12 @@ controller_workflows:
         job_type: run
         extra_data:
           _hosts: purpose_domain_controller
+          ps_script: "Get-ADComputer -Filter * | Select-Object -Property 'Name'"
+      - identifier: Kerberos Validation
+        unified_job_template: WINDOWS / Run PowerShell
+        job_type: run
+        credentials:
+          - Kerberos Credential
+        extra_data:
+          _hosts: kerberos
           ps_script: "Get-ADComputer -Filter * | Select-Object -Property 'Name'"
