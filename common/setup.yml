@@ -107,6 +107,7 @@ controller_inventory_sources:
         cloud_aws: true
         os_linux: "platform_details == 'Red Hat Enterprise Linux'"
         os_windows: "platform_details == 'Windows'"
+        kerberos: "platform_details == 'Windows'"
 
       keyed_groups:
         - key: tags.blueprint
