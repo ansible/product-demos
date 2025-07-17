@@ -176,9 +176,33 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    ask_credential_on_launch: true
     credentials:
       - "Demo Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: false
+        - question_name: PowerShell Script
+          type: textarea
+          variable: ps_script
+          default: "Get-Service | Where-Object -FilterScript {$_.Status -eq 'running'} | Select-Object -Property 'Name'"
+          required: true
+
+  - name: "WINDOWS / Run PowerShell / Kerberos"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible Product Demos"
+    playbook: "windows/powershell.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Kerberos Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -251,8 +275,8 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - Demo Credential
-      - Controller Credential
+      - "Demo Credential"
+      - "Controller Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -492,10 +516,8 @@ controller_workflows:
           _hosts: purpose_domain_controller
           ps_script: "Get-ADComputer -Filter * | Select-Object -Property 'Name'"
       - identifier: Kerberos Validation
-        unified_job_template: WINDOWS / Run PowerShell
+        unified_job_template: WINDOWS / Run PowerShell / Kerberos
         job_type: run
-        credentials:
-          - Kerberos Credential
         extra_data:
           _hosts: kerberos
           ps_script: "Get-ADComputer -Filter * | Select-Object -Property 'Name'"
