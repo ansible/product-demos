@@ -477,6 +477,7 @@ controller_workflows:
           - Cleanup Resources
         success_nodes:
           - PowerShell Validation
+          - Kerberos Validation
       - identifier: Cleanup Resources
         unified_job_template: WINDOWS / Rollback
         job_type: run
