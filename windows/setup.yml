@@ -251,7 +251,8 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - Demo Credential
+      - Controller Credential
     survey_enabled: true
     survey:
       name: ''
