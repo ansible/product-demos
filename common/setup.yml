@@ -22,53 +22,6 @@ controller_projects:
     scm_url: https://github.com/ansible-cloud/aws_demos.git
     default_environment: Cloud Services Execution Environment
 
-controller_credential_types:
-  - name: Kerberos
-    description: Credential to inject krb5 conf and supply username/password for generating a ticket
-    kind: cloud
-    inputs:
-      fields:
-        - id: username
-          type: string
-          label: Username
-        - id: password
-          type: string
-          label: Password
-          secret: true
-        - id: default_realm
-          type: string
-          label: Default Realm
-        - id: kdc
-          type: string
-          label: KDC
-          help_text: Optional KDC, use only if KDC DNS lookup not working
-      required:
-        - username
-        - password
-        - default_realm
-    injectors:
-      env:
-        KRB5_CONFIG: !unsafe '{{ tower.filename }}'
-      file:
-        template: !unsafe |-
-          [libdefaults]
-          default_realm = {{ default_realm | upper }}
-          dns_canonicalize_hostname = fallback
-          dns_lookup_kdc = {% if kdc %}false{% else %}true{% endif %}
-          dns_lookup_realm = true
-          forwardable = true
-          rdns = false
-          #udp_preference_limit = 1
-          [realms]
-          {{ default_realm | upper }} = {
-            {% if kdc %}kdc = {{ kdc }}{% endif %}
-          }
-          [domain_realm]
-            {{ default_realm | lower }} = {{ default_realm | upper }}
-      extra_vars:
-        ansible_user: !unsafe '{{ username }}'
-        ansible_password: !unsafe '{{ password }}'
-
 controller_credentials:
   - name: AWS
     credential_type: Amazon Web Services
@@ -78,16 +31,6 @@ controller_credentials:
     inputs:
       username: REPLACEME
       password: REPLACEME
-  - name: Kerberos Credential
-    credential_type: Kerberos
-    organization: Default
-    update_secrets: false
-    state: exists
-    inputs:
-      username: ec2-user@ANSIBLE.LOCAL
-      password: REPLACEME
-      default_realm: ANSIBLE.LOCAL
-      kdc: REPLACEME
 
 controller_inventory_sources:
   - name: AWS Inventory
