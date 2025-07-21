@@ -83,3 +83,4 @@ During setup, a Job Template called **WINDOWS / Run PowerShell / Kerberos** is c
 
 - If you encounter "no hosts matched", then you have not run the **Setup Active Directory Domain** Workflow. Examine the Demo Inventory and review the keberos group. There should be 3 hosts - dc01, winston, and winthrop.
 - If you receive an error similar to `cannot find kdc for realm`, then you have an invalid **Kerberos Credential**. Ensure the kdc input matches the public ip address of your dc01 virtual machine.
+  - The deployed ec2 instances do not have reserved ip addresses. If the dc01 instance is restarted for any reason, then you will likely observe this issue which can be resolved by updating the kdc input to match the new public ip address.
