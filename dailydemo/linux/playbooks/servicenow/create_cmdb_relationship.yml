@@ -1,0 +1,7 @@
+---
+- name: Relating newly built server to the business application it supports
+  hosts: localhost
+
+  roles:
+
+    - role: create_cmdb_relationship

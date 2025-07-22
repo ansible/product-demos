@@ -1,0 +1,36 @@
+---
+# - name: UN-Registering system with Red Hat Subscription Management and Red Hat Insights
+#   hosts: rheldemo
+#   become: true
+
+#   tasks:
+
+#     - name: Red Hat Subscription Manager
+#       tags:
+#         - remove
+#       ansible.builtin.include_role:
+#         name: rhsm
+
+- name: Delete aap daily demo linux server
+  hosts: localhost
+  connection: local
+
+  tasks:
+
+    # - name: Include the vm role
+    #   tags:
+    #     - remove
+    #   ansible.builtin.include_role:
+    #     name: vm
+
+    # - name: Include the inventory role
+    #   tags:
+    #     - remove
+    #   ansible.builtin.include_role:
+    #     name: inventory
+
+    - name: Include the vpc role
+      tags:
+        - remove
+      ansible.builtin.include_role:
+        name: vpc

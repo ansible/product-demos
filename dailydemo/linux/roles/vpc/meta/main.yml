@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  role_name: vpc
+  author: Eric Ames (ericcames)
+  description: Creates and removes the VPC
+  license: MIT License
+  min_ansible_version: "2.12"
