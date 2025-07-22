@@ -1,0 +1,29 @@
+---
+- name: Stuff we are always going to do
+  tags:
+    - always
+  block:
+
+    - name: Retrieve requested item ticket sysid
+      register: result
+      servicenow.itsm.api_info:
+        resource: sc_req_item
+        sysparm_query: numberSTARTSWITH{{ ticket_number }}
+
+    - name: Print the result
+      ansible.builtin.debug:
+        var: result
+
+    - name: Update the requested item work notes and state in ServiceNow
+      servicenow.itsm.api:
+        action: patch
+        resource: sc_req_item
+        sys_id: "{{ result.record[0].sys_id }}"
+        data:
+          request_state: "{{ update_requested_item_state | default(omit) }}"
+          comments: "{{ update_requested_item_comments }}"
+          state: "{{ update_requested_item_state }}"
+
+    - name: Print out hostvars
+      ansible.builtin.debug:
+        var: hostvars[inventory_hostname]
