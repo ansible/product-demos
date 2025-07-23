@@ -1,0 +1,7 @@
+---
+- name: Creating an Incident Ticket because something went wrong
+  hosts: localhost
+
+  roles:
+
+    - role: create_incident

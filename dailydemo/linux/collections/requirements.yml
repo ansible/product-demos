@@ -1,0 +1,30 @@
+---
+collections:
+  - name: amazon.aws
+    version: 7.2.0
+  - name: ansible.posix
+    version: 1.6.2
+  - name: ansible.utils
+    version: 5.1.2
+  - name: ansible.platform
+    version: 2.5.3
+  - name: ansible.hub
+    version: 1.0.0
+  - name: ansible.controller
+    version: 4.6.2
+  - name: ansible.eda
+    version: 2.2.0
+  - name: infra.aap_configuration
+    version: 3.1.0
+  - name: servicenow.itsm
+    version: 2.4.0
+  - name: servicenow.servicenow
+    version: 1.0.6
+  - name: community.mysql
+    version: 3.8.0
+  - name: community.general
+    version: 8.1.0
+  - name: redhat.rhel_system_roles
+    version: 1.88.9
+  - name: redhat.satellite
+    version: 5.1.0

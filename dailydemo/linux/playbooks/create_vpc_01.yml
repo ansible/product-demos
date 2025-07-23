@@ -1,0 +1,33 @@
+---
+- name: Create daily demo linux vpc
+  hosts: localhost
+  connection: local
+
+  tasks:
+
+    - name: Ticket start for vpc creation
+      tags:
+        - always
+      vars:
+        update_requested_item_comments: |-
+          Starting VPC creation.  Ansible Automation Platform Rocks! :-)
+          The job id is {{ tower_job_id }}
+          The template name is {{ tower_job_template_name }}
+        update_requested_item_state: 2
+      ansible.builtin.include_role:
+        name: update_requested_item
+
+    - name: Include the vpc role
+      tags:
+        - create
+      ansible.builtin.include_role:
+        name: vpc
+
+    - name: Ticket update vpc creation is complete.  Hoo-yah! Automation Rocks!
+      tags:
+        - always
+      vars:
+        update_requested_item_comments: Your new virtual private cloud has been created
+        update_requested_item_state: 2
+      ansible.builtin.include_role:
+        name: update_requested_item

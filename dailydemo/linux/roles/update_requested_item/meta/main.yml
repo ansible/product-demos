@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  role_name: update_requested_item
+  author: Eric Ames (ericcames)
+  description: Update Servicenow requests
+  license: MIT License
+  min_ansible_version: "2.12"

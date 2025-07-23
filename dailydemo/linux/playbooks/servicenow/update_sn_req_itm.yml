@@ -1,0 +1,8 @@
+---
+- name: Update requested item ticket in ServiceNow
+  hosts: localhost
+  gather_facts: true
+
+  roles:
+
+    - role: update_requested_item
