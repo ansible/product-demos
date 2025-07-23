@@ -27,7 +27,7 @@
       tags:
         - always
       vars:
-        update_requested_item_comments: Your new virtual machine has been created
+        update_requested_item_comments: Your new virtual private cloud has been created
         update_requested_item_state: 2
       ansible.builtin.include_role:
         name: update_requested_item
