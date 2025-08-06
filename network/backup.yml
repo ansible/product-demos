@@ -34,8 +34,12 @@
         type: full
         data_store:
           local:
-            path: "/tmp/network_backups/{{ inventory_hostname }}.txt"
+            path: "/tmp/"
             # filename: "{{ inventory_hostname }}.txt"
+
+    - name: List backup files
+      delegate_to: localhost
+      ansible.builtin.command: ls -al /tmp
 
     # This task removes the Current configuration... from the top of IOS routers show run
     - name: Remove non config lines - regexp
