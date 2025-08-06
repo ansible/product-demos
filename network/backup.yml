@@ -33,7 +33,7 @@
         data_store:
           local:
             path: "/tmp/network_backups/"
-            filename: "{{ ansible_date_time.date }}_{{ inventory_hostname }}.txt"
+            filename: "{{ inventory_hostname }}.txt"
 
     # This task removes the Current configuration... from the top of IOS routers show run
     - name: Remove non config lines - regexp
@@ -47,7 +47,7 @@
       delegate_to: "{{ report_server }}"
       ansible.builtin.copy:
         src: "{{ backup_dir }}/{{ inventory_hostname }}.txt"
-        dest: "/var/www/html/backups/{{ inventory_hostname }}_{{ ansible_date_time.date }}.cfg"
+        dest: "/var/www/html/backups/{{ inventory_hostname }}.cfg"
         backup: true
         owner: ec2-user
         group: ec2-user
