@@ -30,6 +30,8 @@
       ansible.builtin.include_role:
         name: network.backup.backup
       vars:
+        operation: backup
+        type: full
         data_store:
           local:
             path: "/tmp/network_backups/"
