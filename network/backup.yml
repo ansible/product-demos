@@ -34,8 +34,8 @@
         type: full
         data_store:
           local:
-            path: "/tmp/network_backups/"
-            filename: "{{ inventory_hostname }}.txt"
+            path: "/tmp/network_backups/{{ inventory_hostname }}.txt"
+            # filename: "{{ inventory_hostname }}.txt"
 
     # This task removes the Current configuration... from the top of IOS routers show run
     - name: Remove non config lines - regexp
