@@ -33,7 +33,9 @@
         operation: backup
         type: full
         data_store:
-          local: "/tmp/"
+          local: 
+            path: "/tmp/"
+            filename: "{{ inventory_hostname }}.txt"
 
     - name: List backup files
       delegate_to: localhost
