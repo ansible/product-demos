@@ -21,7 +21,7 @@
 
 - name: Play to Backup Cisco Always-On Network Devices
   hosts: routers
-  gather_facts: false
+  gather_facts: true
   vars:
     report_server: reports
 
