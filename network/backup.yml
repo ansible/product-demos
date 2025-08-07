@@ -27,31 +27,24 @@
 
   tasks:
     - name: Create Network Backup
-      ansible.builtin.include_role:
-        name: network.backup.backup
-      vars:
-        operation: backup
-        type: full
-        data_store:
-          local:
-            path: "/tmp/"
-
-    - name: List backup files
-      delegate_to: localhost
-      ansible.builtin.command: ls -al /tmp
+      cisco.ios.ios_config:
+        backup: true
+        backup_options:
+          filename: "{{ inventory_hostname }}.cfg"
+          dir_path: /tmp/
 
     # This task removes the Current configuration... from the top of IOS routers show run
     - name: Remove non config lines - regexp
       delegate_to: localhost
       ansible.builtin.lineinfile:
-        path: "{{ backup_dir }}/{{ inventory_hostname }}.txt"
+        path: "/tmp/{{ inventory_hostname }}.txt"
         line: "Building configuration..."
         state: absent
 
     - name: Copy backup file
       delegate_to: "{{ report_server }}"
       ansible.builtin.copy:
-        src: "{{ backup_dir }}/{{ inventory_hostname }}.txt"
+        src: "/tmp/{{ inventory_hostname }}.txt"
         dest: "/var/www/html/backups/{{ inventory_hostname }}.cfg"
         backup: true
         owner: ec2-user
