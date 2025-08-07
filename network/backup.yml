@@ -26,8 +26,25 @@
     report_server: reports
 
   tasks:
-    - name: Create Network Backup
+    - name: Create Network Backup (IOS-XE)
+      when: ansible_network_os == 'cisco.ios.ios'
       cisco.ios.ios_config:
+        backup: true
+        backup_options:
+          filename: "{{ inventory_hostname }}.txt"
+          dir_path: /tmp/
+
+    - name: Create Network Backup (IOS-XR)
+      when: ansible_network_os == 'cisco.iosxr.iosxr'
+      cisco.iosxr.iosxr_config:
+        backup: true
+        backup_options:
+          filename: "{{ inventory_hostname }}.txt"
+          dir_path: /tmp/
+
+    - name: Create Network Backup (NX-OS)
+      when: ansible_network_os == 'cisco.nxos.nxos'
+      cisco.nxos.nxos_config:
         backup: true
         backup_options:
           filename: "{{ inventory_hostname }}.txt"
