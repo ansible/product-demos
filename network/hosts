@@ -33,6 +33,3 @@ sandbox-iosxr-1.cisco.com
 
 [routers:vars]
 ansible_connection=ansible.netcommon.network_cli
-
-[webservers]
-reports ansible_host=ec2-18-118-189-162.us-east-2.compute.amazonaws.com ansible_user=ec2-user
