@@ -12,6 +12,7 @@ sandbox-iosxr-1.cisco.com
 
 [iosxr:vars]
 ansible_network_os=cisco.iosxr.iosxr
+ansible_user=admin
 ansible_password=C1sco12345
 ansible_ssh_pass=C1sco12345
 ansible_port=22
@@ -21,6 +22,7 @@ sandbox-nxos-1.cisco.com
 
 [nxos:vars]
 ansible_network_os=cisco.nxos.nxos
+ansible_user=admin
 ansible_password=Admin_1234!
 ansible_ssh_pass=Admin_1234!
 ansible_port=22
