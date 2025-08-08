@@ -36,14 +36,6 @@
     web_path: /var/www/html/reports/
 
   tasks:
-    - name: Print out things
-      ansible.builtin.debug:
-        var: hostvars[network_switch]
-      loop: "{{ groups['routers'] | sort }}"
-      loop_control:
-        loop_var: network_switch
-      when: hostvars[network_switch] is defined
-
 
     - name: Build report server
       ansible.builtin.include_role:
