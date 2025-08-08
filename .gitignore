@@ -13,3 +13,4 @@ roles/*
 .cache/
 .ansible/
 **/tmp/
+execution_environments/context/
