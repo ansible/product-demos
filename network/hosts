@@ -1,12 +1,11 @@
-[ios]
-sandbox-iosxe-latest-1.cisco.com
+; [ios]
+; sandbox-iosxe-latest-1.cisco.com
 
-[ios:vars]
-ansible_network_os=cisco.ios.ios
-ansible_password=C1sco12345
-ansible_ssh_password=C1sco12345
-ansible_port=22
-ansible_user=admin
+; [ios:vars]
+; ansible_network_os=cisco.ios.ios
+; ansible_password=C1sco12345
+; ansible_ssh_password=C1sco12345
+; ansible_port=22
 
 [iosxr]
 sandbox-iosxr-1.cisco.com
@@ -16,10 +15,8 @@ ansible_network_os=cisco.iosxr.iosxr
 ansible_password=C1sco12345
 ansible_ssh_pass=C1sco12345
 ansible_port=22
-ansible_user=admin
 
 [nxos]
-sbx-nxos-mgmt.cisco.com
 sandbox-nxos-1.cisco.com
 
 [nxos:vars]
@@ -27,13 +24,12 @@ ansible_network_os=cisco.nxos.nxos
 ansible_password=Admin_1234!
 ansible_ssh_pass=Admin_1234!
 ansible_port=22
-ansible_user=admin
 
 [routers]
-sbx-nxos-mgmt.cisco.com
+; sbx-nxos-mgmt.cisco.com
 sandbox-nxos-1.cisco.com
 sandbox-iosxr-1.cisco.com
-sandbox-iosxe-latest-1.cisco.com
+; sandbox-iosxe-latest-1.cisco.com
 
 [routers:vars]
 ansible_connection=ansible.netcommon.network_cli
