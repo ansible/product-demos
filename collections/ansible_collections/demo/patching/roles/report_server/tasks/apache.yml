@@ -3,7 +3,7 @@
   ansible.builtin.include_vars: "{{ ansible_system }}.yml"
 
 - name: Install httpd package
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: httpd
     state: installed
   check_mode: false
