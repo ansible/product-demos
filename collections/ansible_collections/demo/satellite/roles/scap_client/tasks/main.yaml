@@ -20,7 +20,7 @@
 
 - name: Build policy {{ policy_name }}
   ansible.builtin.set_fact:
-    policy: "{{ policy | default([]) }} + {{ [item] }}"
+    scap_client_policy: "{{ scap_client_policy | default([]) }} + {{ [item] }}"
   loop: "{{ scap_client_policies.json.results }}"
   when: item.name in policy_name or policy_name == 'all'
 

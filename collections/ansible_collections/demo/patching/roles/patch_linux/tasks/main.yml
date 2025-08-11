@@ -8,7 +8,7 @@
   check_mode: false
 
 - name: Upgrade packages (yum)
-  ansible.builtin.yum:
+  ansible.legacy.dnf:
     name: '*'
     state: latest  # noqa: package-latest - Intended to update packages to latest
     exclude: "{{ exclude_packages }}"
@@ -25,13 +25,13 @@
 
 - name: Check to see if we need a reboot
   ansible.builtin.command: needs-restarting -r
-  register: result
-  changed_when: result.rc == 1
-  failed_when: result.rc > 1
+  register: patch_linux_result
+  changed_when: patch_linux_result.rc == 1
+  failed_when: patch_linux_result.rc > 1
   check_mode: false
 
 - name: Reboot Server if Necessary
   ansible.builtin.reboot:
   when:
-    - result.rc == 1
+    - patch_linux_result.rc == 1
     - allow_reboot

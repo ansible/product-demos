@@ -23,7 +23,7 @@
       loop_control:
         loop_var: volume
         label: "{{ volume.id }}"
-      register: r_snapshots
+      register: aws_r_snapshots
       amazon.aws.ec2_snapshot:
         region: "{{ aws_region }}"
         volume_id: "{{ volume.id }}"
@@ -34,7 +34,7 @@
   ansible.builtin.set_fact:
     aws_snapshot_stat:
       - key: "{{ inventory_hostname }}"
-        value: "{{ r_snapshots.results | json_query(aws_ec2_snapshot_query) }}"
+        value: "{{ aws_r_snapshots.results | json_query(aws_ec2_snapshot_query) }}"
 
 - name: AWS | SNAPSHOT VM | record snapshot with host key
   ansible.builtin.set_stats:

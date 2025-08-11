@@ -29,7 +29,7 @@
     wait: true
     wait_condition:
       type: Ready
-  register: snapshot
+  register: snapshot_snapshot
 
 - name: Start VirtualMachine
   redhat.openshift_virtualization.kubevirt_vm:
@@ -42,8 +42,8 @@
 - name: Export snapshot name
   ansible.builtin.set_stats:
     data:
-      restore_snapshot_name: "{{ snapshot.result.metadata.name }}"
+      restore_snapshot_name: "{{ snapshot_snapshot.result.metadata.name }}"
 
 - name: Output snapshot name
   ansible.builtin.debug:
-    msg: "Successfully created snapshot {{ snapshot.result.metadata.name }}"
+    msg: "Successfully created snapshot {{ snapshot_snapshot.result.metadata.name }}"
