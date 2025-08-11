@@ -21,6 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - run: USE_PYTHON=python3.10 ./.github/workflows/run-pc.sh
+    - run: USE_PYTHON=python3.9 ./.github/workflows/run-pc.sh
       shell: bash
 
