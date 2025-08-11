@@ -16,7 +16,7 @@ repos:
 
   - repo: https://github.com/ansible/ansible-lint.git
     # get latest release tag from https://github.com/ansible/ansible-lint/releases/
-    rev: v6.20.3
+    rev: v25.7.0
     hooks:
       - id: ansible-lint
         additional_dependencies:
