@@ -40,7 +40,7 @@
 
     - name: AWS | RESTORE VM | get all snapshots
       when: inventory_hostname not in aws_snapshots
-      register: r_snapshots
+      register: aws_r_snapshots
       amazon.aws.ec2_snapshot_info:
         region: "{{ aws_region }}"
         filters:
@@ -51,7 +51,7 @@
       amazon.aws.ec2_vol:
         region: "{{ aws_region }}"
         instance: "{{ instance_id }}"
-        snapshot: "{{ r_snapshots.snapshots[0].snapshot_id }}"
+        snapshot: "{{ aws_r_snapshots.snapshots[0].snapshot_id }}"
         device_name: "/dev/sda1"
 
     - name: AWS | RESTORE VM | start vm
