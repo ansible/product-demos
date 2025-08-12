@@ -16,7 +16,7 @@
         key: "{{ sudo_user }}"
 
     - name: Check Cleanup package
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: at
         state: present
 

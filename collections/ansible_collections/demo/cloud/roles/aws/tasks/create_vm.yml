@@ -17,12 +17,12 @@
     filters:
       name: "{{ aws_image_filter }}"
       architecture: "{{ aws_image_architecture | default(omit) }}"
-  register: amis
+  register: aws_amis
 
 - name: AWS| CREATE VM | save ami
   ansible.builtin.set_fact:
     aws_instance_ami: >
-      {{ (amis.images | selectattr('name', 'defined') | sort(attribute='creation_date'))[-2] }}
+      {{ (aws_amis.images | selectattr('name', 'defined') | sort(attribute='creation_date'))[-2] }}
 
 - name: AWS| CREATE VM | create instance
   amazon.aws.ec2_instance:

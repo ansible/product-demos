@@ -1,6 +1,7 @@
 #!/bin/bash -x
 
-dnf install git-lfs -y
+# should no longer need this
+#dnf install git-lfs -y
 
 PYTHON_VARIANT="${USE_PYTHON:-python3.11}"
 PATH="$PATH:$HOME/.local/bin"

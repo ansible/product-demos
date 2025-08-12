@@ -1,6 +1,6 @@
 ---
 - name: Install openscap client packages
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name:
       - openscap-scanner
       - rubygem-foreman_scap_client
@@ -15,18 +15,18 @@
     force_basic_auth: true
     body_format: json
     validate_certs: false
-  register: policies
+  register: scap_client_policies
   no_log: "{{ foreman_operations_scap_client_secure_logging }}"
 
 - name: Build policy {{ policy_name }}
   ansible.builtin.set_fact:
-    policy: "{{ policy | default([]) }} + {{ [item] }}"
-  loop: "{{ policies.json.results }}"
+    scap_client_policy: "{{ scap_client_policy | default([]) }} + {{ [item] }}"
+  loop: "{{ scap_client_policies.json.results }}"
   when: item.name in policy_name or policy_name == 'all'
 
 - name: Fail if no policy found with required name
   ansible.builtin.fail:
-  when: policy is not defined
+  when: scap_client_policy is not defined
 
 - name: Get scap content information
   ansible.builtin.uri:
@@ -37,8 +37,8 @@
     force_basic_auth: false
     body_format: json
     validate_certs: false
-  register: scapcontents
-  loop: "{{ policy }}"
+  register: scap_client_scapcontents
+  loop: "{{ scap_client_policy }}"
   no_log: "{{ foreman_operations_scap_client_secure_logging }}"
 
 - name: Get tailoring content information
@@ -50,21 +50,21 @@
     force_basic_auth: false
     body_format: json
     validate_certs: false
-  register: tailoringfiles
+  register: scap_client_tailoringfiles
   when: item.tailoring_file_id | int > 0 | d(False)
-  loop: "{{ policy }}"
+  loop: "{{ scap_client_policy }}"
   no_log: "{{ foreman_operations_scap_client_secure_logging }}"
 
 - name: Build scap content parameters
   ansible.builtin.set_fact:
-    scap_content: "{{ scap_content | default({}) | combine({item.json.id: item.json}) }}"
-  loop: "{{ scapcontents.results }}"
+    scap_client_scap_content: "{{ scap_client_scap_content | default({}) | combine({item.json.id: item.json}) }}"
+  loop: "{{ scap_client_scapcontents.results }}"
 
 - name: Build tailoring content parameters
   ansible.builtin.set_fact:
-    tailoring_files: "{{ tailoring_files | default({}) | combine({item.json.id: item.json}) }}"
+    scap_client_tailoring_files: "{{ scap_client_tailoring_files | default({}) | combine({item.json.id: item.json}) }}"
   when: item.json is defined
-  loop: "{{ tailoringfiles.results }}"
+  loop: "{{ scap_client_tailoringfiles.results }}"
 
 - name: Apply openscap client configuration template
   ansible.builtin.template:
@@ -78,7 +78,7 @@
 #   cron:
 #     name: "Openscap Execution"
 #     cron_file: 'foreman_openscap_client'
-#     job: '/usr/bin/foreman_scap_client {{policy.id}} > /dev/null'
+#     job: '/usr/bin/foreman_scap_client {{scap_client_policy.id}} > /dev/null'
 #     weekday: "{{crontab_weekdays}}"
 #     hour: "{{crontab_hour}}"
 #     minute: "{{crontab_minute}}"
