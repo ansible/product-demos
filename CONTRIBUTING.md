@@ -53,20 +53,12 @@ This document aims to outline the requirements for the various forms of contribu
 
 ## Testing
 
-We utilize pre-commit to handle Git hooks, initiating a pre-commit check with each commit, both locally and on CI.
+We utilize pre-commit to handle Git hooks, initiating a pre-commit check with each commit, both locally and on CI. For consistency, we run pre-commit with within [execution environments](https://docs.ansible.com/ansible/latest/getting_started_ee/index.html) via [ansible-navigator](https://ansible.readthedocs.io/projects/navigator/).
 
-To install pre-commit, use the following commands:
+To install pre-commit and ansible-navigator use the following commands:
 ```bash
-pip install pre-commit
+pip install pre-commit ansible-navigator
 pre-commit install
 ```
 
 For further details, refer to the [pre-commit installation documentation](https://pre-commit.com/#installation).
-
-To execute ansible-lint (whether within pre-commit or independently), you must configure an environment variable for the token required to connect to Automation Hub. Obtain the token [here](https://console.redhat.com/ansible/automation-hub/token).
-
-Copy the token value and execute the following command:
-
-```bash
-export ANSIBLE_GALAXY_SERVER_AH_TOKEN=<token>
-```
