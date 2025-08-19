@@ -12,4 +12,4 @@
     category_names: "{{ win_update_categories | default(omit) }}"
     reboot: "{{ allow_reboot }}"
     state: installed
-  register: patchingresult
+  register: patch_windows_patchingresult
