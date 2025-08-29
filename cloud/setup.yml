@@ -85,8 +85,8 @@ controller_templates:
     organization: Default
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_reports.yml
+    project: Ansible Cloud AWS Demos
+    playbook: cloud_report_tags.yml
     inventory: Demo Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
