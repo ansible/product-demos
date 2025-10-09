@@ -1,4 +1,5 @@
 ansible-navigator.log
+ansible-builder.log
 sean_login_info.yml
 .DS_Store
 choose_demo.yml
