@@ -257,7 +257,7 @@ controller_templates:
     inventory: "Demo Inventory"
     project: "Ansible Product Demos"
     playbook: "windows/powershell.yml"
-    limit: kerberos
+    limit: domain_ansible_local
     ask_limit_on_launch: false
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -557,6 +557,11 @@ controller_workflows:
           domain_controller: dc01
         failure_nodes:
           - Cleanup Resources
+        success_nodes:
+          - Domain Inventory Sync
+      - identifier: Domain Inventory Sync
+        unified_job_template: AWS Inventory
+        all_parents_must_converge: true
         success_nodes:
           - PowerShell Validation
           - Kerberos Validation

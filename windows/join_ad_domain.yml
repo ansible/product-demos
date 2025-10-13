@@ -37,3 +37,11 @@
     - name: Reboot windows machine
       when: r_domain_membership.reboot_required
       ansible.windows.win_reboot:
+
+    - name: Add domain tag
+      amazon.aws.ec2_tag:
+        region: "{{ placement['region'] }}"
+        resource: "{{ instance_id }}"
+        state: present
+        tags:
+          domain: ansible_local

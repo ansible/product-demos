@@ -50,7 +50,6 @@ controller_inventory_sources:
         cloud_aws: true
         os_linux: "platform_details == 'Red Hat Enterprise Linux'"
         os_windows: "platform_details == 'Windows'"
-        kerberos: "platform_details == 'Windows'"
 
       keyed_groups:
         - key: tags.blueprint
@@ -59,6 +58,8 @@ controller_inventory_sources:
           prefix: owner
         - key: tags.purpose
           prefix: purpose
+        - key: tags.domain
+          prefix: domain
         - key: tags.deployment
           prefix: deployment
         - key: tags.Compliance
@@ -76,7 +77,7 @@ controller_groups:
       ansible_winrm_transport: credssp
       ansible_winrm_server_cert_validation: ignore
       ansible_port: 5986
-  - name: kerberos
+  - name: domain_ansible_local
     inventory: Demo Inventory
     variables:
       ansible_connection: winrm
