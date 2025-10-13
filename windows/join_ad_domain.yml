@@ -39,6 +39,7 @@
       ansible.windows.win_reboot:
 
     - name: Add domain tag
+      delegate_to: localhost
       amazon.aws.ec2_tag:
         region: "{{ placement['region'] }}"
         resource: "{{ instance_id }}"
