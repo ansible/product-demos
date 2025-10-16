@@ -32,4 +32,10 @@ There are additional groups created in the **Demo Inventory** for interacting wi
 
 In the validation step, you can expect to see the following output based on querying AD computers:
 
-![Expected Output](../.github/images/setup_domain_final_state.png)
+![Expected Output](../.github/images/setup_domain_pwsh_validation.png)
+
+## Kerberos Validation
+
+In the validation step, you can expect to see the following output based on checking for Kerberos events:
+
+![Expected Output](../.github/images/setup_domain_krb_validation.png)

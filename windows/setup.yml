@@ -582,4 +582,4 @@ controller_workflows:
         unified_job_template: WINDOWS / Run PowerShell / Kerberos
         job_type: run
         extra_data:
-          ps_script: "Get-ADComputer -Filter * | Select-Object -Property 'Name'"
+          ps_script: "Get-WinEvent -LogName Security | Where-Object {$_.Message -like '*Kerberos*'} | Select-Object TimeCreated, Message -First 1"
