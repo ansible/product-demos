@@ -4,7 +4,15 @@ A workflow to create a domain controller with two domain-joined Windows hosts.
 
 ## The Workflow
 
-![Workflow Visualization](../.github/images/setup_domain_workflow.png)
+### High-Level
+
+![Workflow Visualization Full](../.github/images/setup_domain_workflow_full.png)
+
+### Close-Up
+
+<img src="../.github/images/setup_domain_workflow_1.png" alt="Workflow Visualization Part 1" style="height: 250; width: auto"/>
+<img src="../.github/images/setup_domain_workflow_2.png" alt="Workflow Visualization Part 2" style="height: 250; width: auto"/>
+<img src="../.github/images/setup_domain_workflow_3.png" alt="Workflow Visualization Part 3" style="height: 250; width: auto"/>
 
 ## Ansible Inventory
 
