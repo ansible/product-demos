@@ -1,0 +1,83 @@
+---
+- name: Delete cloud stack VPC
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    aws_vpc_name: aws-test-vpc
+    aws_sg_name: aws-test-sg
+    aws_subnet_name: aws-test-subnet
+    aws_subnet_cidr: 10.0.1.0/24
+    aws_rt_name: aws-test-rt
+    aws_purpose_tag: ansible_demo
+
+  tasks:
+    - name: Verify the VPC name
+      ansible.builtin.assert:
+        that:
+          - aws_vpc_name == "aws-test-vpc"
+        fail_msg: 'Only the VPC "aws-test-vpc" can be deleted with this playbook'
+
+    - name: Retrieve VPC info
+      amazon.aws.ec2_vpc_net_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          "tag:Name": "{{ aws_vpc_name }}"
+          "tag:purpose": "{{ aws_purpose_tag }}"
+      register: _vpc
+
+    - name: Retrieve internet gateway info
+      amazon.aws.ec2_vpc_igw_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          "tag:Name": "{{ aws_vpc_name }}"
+          "tag:purpose": "{{ aws_purpose_tag }}"
+      register: _igw
+
+    - name: Retrieve route table info
+      amazon.aws.ec2_vpc_route_table_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          "tag:Name": "{{ aws_rt_name }}"
+          "tag:purpose": "{{ aws_purpose_tag }}"
+      register: _rt
+
+    - name: Delete demo security group
+      amazon.aws.ec2_security_group:
+        name: "{{ aws_sg_name }}"
+        region: "{{ create_vm_aws_region }}"
+        vpc_id: "{{ _vpc.vpcs.0.id }}"
+        state: absent
+      when: _vpc.vpcs
+
+    - name: Delete subnet in the VPC
+      amazon.aws.ec2_vpc_subnet:
+        vpc_id: "{{ _vpc.vpcs.0.id }}"
+        cidr: "{{ aws_subnet_cidr }}"
+        region: "{{ create_vm_aws_region }}"
+        state: absent
+      when: _vpc.vpcs
+
+    - name: Delete the subnet route table
+      amazon.aws.ec2_vpc_route_table:
+        route_table_id: "{{ _rt.route_tables.0.route_table_id }}"
+        region: "{{ create_vm_aws_region }}"
+        lookup: id
+        state: absent
+      when: _rt.route_tables
+
+    - name: Delete internet gateway
+      amazon.aws.ec2_vpc_igw:
+        internet_gateway_id: "{{ _igw.internet_gateways.0.internet_gateway_id }}"
+        region: "{{ create_vm_aws_region }}"
+        state: absent
+      when: _igw.internet_gateways
+
+    - name: Delete VPC
+      amazon.aws.ec2_vpc_net:
+        vpc_id: "{{ _vpc.vpcs.0.id }}"
+        region: "{{ create_vm_aws_region }}"
+        state: absent
+      when: _vpc.vpcs
+
+...
