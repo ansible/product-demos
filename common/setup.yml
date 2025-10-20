@@ -45,6 +45,7 @@ controller_inventory_sources:
       compose:
         ansible_host: public_ip_address
         ansible_user: ec2-user
+        ansible_winrm_kerberos_hostname_override: tags.Name + '.ansible.local' if platform_details == 'Windows' else omit
       groups:
         cloud_aws: true
         os_linux: "platform_details == 'Red Hat Enterprise Linux'"
@@ -57,6 +58,8 @@ controller_inventory_sources:
           prefix: owner
         - key: tags.purpose
           prefix: purpose
+        - key: tags.domain
+          prefix: domain
         - key: tags.deployment
           prefix: deployment
         - key: tags.Compliance
@@ -74,6 +77,15 @@ controller_groups:
       ansible_winrm_transport: credssp
       ansible_winrm_server_cert_validation: ignore
       ansible_port: 5986
+  - name: domain_ansible_local
+    inventory: Demo Inventory
+    variables:
+      ansible_connection: winrm
+      ansible_winrm_transport: kerberos
+      ansible_winrm_server_cert_validation: ignore
+      ansible_port: 5986
+      ansible_winrm_kinit_env_vars:
+        - KRB5_CONFIG
 
 controller_templates:
   - name: SUBMIT FEEDBACK
