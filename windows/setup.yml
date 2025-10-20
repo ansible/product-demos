@@ -8,6 +8,65 @@ controller_projects:
     scm_type: git
     scm_url: 'https://github.com/ansible/awx-facts-playbooks.git'
 
+controller_credential_types:
+  - name: Kerberos
+    description: Credential to inject krb5 conf and supply username/password for generating a ticket
+    kind: cloud
+    inputs:
+      fields:
+        - id: username
+          type: string
+          label: Username
+        - id: password
+          type: string
+          label: Password
+          secret: true
+        - id: default_realm
+          type: string
+          label: Default Realm
+        - id: kdc
+          type: string
+          label: KDC
+          help_text: Optional KDC, use only if KDC DNS lookup not working
+      required:
+        - username
+        - password
+        - default_realm
+    injectors:
+      env:
+        KRB5_CONFIG: !unsafe '{{ tower.filename }}'
+      file:
+        template: !unsafe |-
+          [libdefaults]
+          default_realm = {{ default_realm | upper }}
+          dns_canonicalize_hostname = fallback
+          dns_lookup_kdc = {% if kdc %}false{% else %}true{% endif %}
+          dns_lookup_realm = true
+          forwardable = true
+          rdns = false
+          #udp_preference_limit = 1
+          [realms]
+          {{ default_realm | upper }} = {
+            {% if kdc %}kdc = {{ kdc }}{% endif %}
+          }
+          [domain_realm]
+            {{ default_realm | lower }} = {{ default_realm | upper }}
+      extra_vars:
+        ansible_user: !unsafe '{{ username }}'
+        ansible_password: !unsafe '{{ password }}'
+
+controller_credentials:
+  - name: Kerberos Credential
+    credential_type: Kerberos
+    organization: Default
+    update_secrets: false
+    state: exists
+    inputs:
+      username: ec2-user@ANSIBLE.LOCAL
+      password: REPLACEME
+      default_realm: ANSIBLE.LOCAL
+      kdc: REPLACEME
+
 controller_templates:
   - name: "WINDOWS / Install IIS"
     job_type: run
@@ -193,6 +252,29 @@ controller_templates:
           default: "Get-Service | Where-Object -FilterScript {$_.Status -eq 'running'} | Select-Object -Property 'Name'"
           required: true
 
+  - name: "WINDOWS / Run PowerShell / Kerberos"
+    job_type: run
+    inventory: "Demo Inventory"
+    project: "Ansible Product Demos"
+    playbook: "windows/powershell.yml"
+    limit: domain_ansible_local
+    ask_limit_on_launch: false
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - "Kerberos Credential"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: PowerShell Script
+          type: textarea
+          variable: ps_script
+          default: "Get-Service | Where-Object -FilterScript {$_.Status -eq 'running'} | Select-Object -Property 'Name'"
+          required: true
+
   - name: "WINDOWS / Query Services"
     job_type: run
     inventory: "Demo Inventory"
@@ -251,6 +333,7 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - "Demo Credential"
+      - "Controller Credential"
     survey_enabled: true
     survey:
       name: ''
@@ -271,6 +354,7 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - "Demo Credential"
+      - "AWS"
     survey_enabled: true
     survey:
       name: ''
@@ -475,7 +559,13 @@ controller_workflows:
         failure_nodes:
           - Cleanup Resources
         success_nodes:
+          - Domain Inventory Sync
+      - identifier: Domain Inventory Sync
+        unified_job_template: AWS Inventory
+        all_parents_must_converge: true
+        success_nodes:
           - PowerShell Validation
+          - Kerberos Validation
       - identifier: Cleanup Resources
         unified_job_template: WINDOWS / Rollback
         job_type: run
@@ -488,3 +578,8 @@ controller_workflows:
         extra_data:
           _hosts: purpose_domain_controller
           ps_script: "Get-ADComputer -Filter * | Select-Object -Property 'Name'"
+      - identifier: Kerberos Validation
+        unified_job_template: WINDOWS / Run PowerShell / Kerberos
+        job_type: run
+        extra_data:
+          ps_script: "Get-WinEvent -LogName Security | Where-Object {$_.Message -like '*Kerberos*'} | Select-Object TimeCreated, Message -First 1"
