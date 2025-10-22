@@ -7,6 +7,10 @@ dependencies:
   galaxy: requirements.yml
   system:
     - python3.11-devel [platform:rpm]
+    # development requirements for ansible.eda collection, removed in append_final
+    - systemd-devel [platform:rpm]
+    - gcc [platform:rpm]
+    - pkg-config [platform:rpm]
   python:
     - pywinrm>=0.4.3
   python_interpreter:
@@ -22,7 +26,6 @@ options:
 additional_build_steps:
   prepend_base:
     - ARG OPENSHIFT_CLIENT_RPM
-    - RUN $PYCMD -m pip install --upgrade pip setuptools
     - RUN $PKGMGR -y update && $PKGMGR -y install bash-completion && $PKGMGR clean all
     # microdnf doesn't support URL or local file paths to RPMs, use rpm as a workaround
     - RUN curl -o /tmp/openshift-clients.rpm $OPENSHIFT_CLIENT_RPM && rpm -Uvh /tmp/openshift-clients.rpm && rm -f /tmp/openshift-clients.rpm
@@ -33,5 +36,7 @@ additional_build_steps:
   append_final:
     - RUN curl -o /etc/yum.repos.d/hasicorp.repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo &&
       microdnf install -y terraform
+    # remove development dependencies
+    - RUN microdnf remove -y systemd-devel gcc
 
 ...
