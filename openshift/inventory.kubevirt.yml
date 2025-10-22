@@ -3,7 +3,7 @@ plugin: redhat.openshift_virtualization.kubevirt
 strict: true
 connections:
   - namespaces:
-      - openshift-cnv
+      - apd-vms
 compose:
   ansible_user: "'cloud-user' if 'rhel' in vmi_annotations['vm.kubevirt.io/os']"
   vmi_annotations: "vmi_annotations | ansible.utils.replace_keys(target=[

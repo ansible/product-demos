@@ -20,3 +20,8 @@
     msg:
       - "Patching report availbable at:"
       - "{{ report_ocp_patching_resources_output.result.results[3].result.spec.port.targetPort }}://{{ report_ocp_patching_resources_output.result.results[3].result.spec.host }}"
+
+- name: Set stats for patching report
+  ansible.builtin.set_stats:
+    data:
+      patching_report: "{{ report_ocp_patching_resources_output.result.results[3].result.spec.port.targetPort }}://{{ report_ocp_patching_resources_output.result.results[3].result.spec.host }}"
