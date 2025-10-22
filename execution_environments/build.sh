@@ -1,4 +1,5 @@
 #!/bin/bash
+manifest=${1:-quay.io/ansible-product-demos/apd-ee-25}
 
 if [[ -z $ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN || -z $ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN ]]
 then
@@ -24,10 +25,10 @@ ansible-builder create \
 
 # remove existing manifest if present
 _tag=$(date +%Y%m%d)
-podman manifest rm quay.io/ansible-product-demos/apd-ee-25:${_tag}
+podman manifest rm ${manifest}:${_tag}
 
 # create manifest for EE image
-podman manifest create quay.io/ansible-product-demos/apd-ee-25:${_tag}
+podman manifest create ${manifest}:${_tag}
 
 # for the openshift-clients RPM, microdnf doesn't support URL-based installs
 # and HTTP doesn't support file globs for GETs, use multiple steps to determine
@@ -43,19 +44,19 @@ do
       --build-arg ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN \
       --build-arg ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN \
       --build-arg OPENSHIFT_CLIENT_RPM="${_baseurl}${_rpm}" \
-      --manifest quay.io/ansible-product-demos/apd-ee-25:${_tag} . \
+      --manifest ${manifest}:${_tag} . \
       | tee podman-build-${arch}.log
     popd > /dev/null
 done
 
 # inspect manifest content
-#podman manifest inspect quay.io/ansible-product-demos/apd-ee-25:${_tag}
+#podman manifest inspect ${manifest}:${_tag}
 
 # tag manifest as latest
-#podman tag quay.io/ansible-product-demos/apd-ee-25:${_tag} quay.io/ansible-product-demos/apd-ee-25:latest
+#podman tag ${manifest}:${_tag} ${manifest}:latest
 
 # push all manifest content to repository
 # using --all is important here, it pushes all content and not
 # just the native platform content
-#podman manifest push --all quay.io/ansible-product-demos/apd-ee-25:${_tag}
-#podman manifest push --all quay.io/ansible-product-demos/apd-ee-25:latest
+#podman manifest push --all ${manifest}:${_tag}
+#podman manifest push --all ${manifest}:latest
