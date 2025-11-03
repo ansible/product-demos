@@ -3,18 +3,18 @@ collections:
   # AAP config as code
   - name: ansible.controller
     version: ">=4.6.0"
-  # TODO this fails trying to install a different version of
-  # the python-systemd package
-  # - name: ansible.eda  # fails trying to install systemd-python package
-  #   version: ">=2.1.0"
+  - name: ansible.eda
+    version: ">=2.1.0"
   - name: ansible.hub
     version: ">=1.0.0"
   - name: ansible.platform
     version: ">=2.5.0"
   - name: infra.ah_configuration
-    version: ">=2.0.6"
+    version: "2.1.0"
   - name: infra.controller_configuration
-    version: ">=2.11.0"
+    version: "3.1.2"
+  - name: infra.aap_configuration
+    version: ">=3.4.1"
   # linux demos
   - name: ansible.posix
     version: ">=1.5.4"
