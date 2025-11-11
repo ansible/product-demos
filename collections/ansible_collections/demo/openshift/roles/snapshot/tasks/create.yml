@@ -27,6 +27,7 @@
           kind: VirtualMachine
           name: "{{ item }}"
     wait: true
+    wait_timeout: 240
     wait_condition:
       type: Ready
   register: snapshot_snapshot
