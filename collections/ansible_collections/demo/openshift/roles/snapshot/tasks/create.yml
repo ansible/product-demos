@@ -31,6 +31,7 @@
     wait_condition:
       type: Ready
   register: snapshot_snapshot
+  retries: 3
 
 - name: Start VirtualMachine
   redhat.openshift_virtualization.kubevirt_vm:
