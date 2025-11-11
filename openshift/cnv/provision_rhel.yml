@@ -103,4 +103,5 @@
         name: "{{ vm_name }}"
         namespace: "{{ vm_namespace }}"
         wait: true
-        wait_timeout: 240
+        # first-time image pulls (or maybe just the PVC provisioning?) can take a lont time
+        wait_timeout: 1200 
