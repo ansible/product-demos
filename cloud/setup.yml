@@ -6,12 +6,12 @@ user_message:
 controller_templates:
   - name: Cloud / AWS / Create Peer Infrastructure
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbooks/create_peer_network.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -22,12 +22,12 @@ controller_templates:
 
   - name: Cloud / AWS / Delete Peer Infrastructure
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbooks/delete_peer_network.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -36,12 +36,12 @@ controller_templates:
 
   - name: Cloud / AWS / Create Transit Infrastructure
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbooks/create_transit_network.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -52,12 +52,12 @@ controller_templates:
 
   - name: Cloud / AWS / Delete Transit Infrastructure
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbooks/delete_transit_network.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -66,12 +66,12 @@ controller_templates:
 
   - name: Cloud / AWS / VPC Report
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
     project: Ansible Cloud AWS Demos
     playbook: playbooks/cloud_report.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     execution_environment: Cloud Services Execution Environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -82,12 +82,12 @@ controller_templates:
 
   - name: Cloud / AWS / Tags Report
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
     project: Ansible Cloud Content Lab - AWS
     playbook: playbooks/create_reports.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -111,12 +111,12 @@ controller_templates:
 
   - name: Cloud / AWS / Snapshot EC2
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
     project: Ansible Product Demos
     playbook: cloud/snapshot_ec2.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -142,12 +142,12 @@ controller_templates:
 
   - name: Cloud / AWS / Restore EC2 from Snapshot
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
     project: Ansible Product Demos
     playbook: cloud/restore_ec2.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -173,29 +173,28 @@ controller_templates:
 
   - name: Cloud / AWS / Display EC2 Stats
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
     project: Ansible Product Demos
     playbook: cloud/display-ec2-stats.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
 
-  - name: "LINUX / Patching"
+  - name: LINUX / Patching
     job_type: check
-    inventory: "Demo Inventory"
-    project: "Ansible Product Demos"
-    playbook: "linux/patching.yml"
-    execution_environment: Default execution environment
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: linux/patching.yml
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
     ask_job_type_on_launch: true
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -209,7 +208,7 @@ controller_templates:
 controller_workflows:
   - name: Deploy Cloud Stack in AWS
     description: A workflow to deploy a cloud stack
-    organization: Default
+    organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -342,7 +341,7 @@ controller_workflows:
 
   - name: Cloud / AWS / Patch EC2 Workflow
     description: A workflow to patch ec2 instances with snapshot and restore on failure.
-    organization: Default
+    organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry

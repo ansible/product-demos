@@ -6,6 +6,7 @@ user_message:
 
 # "!unsafe" used to pass raw jinja2 through to the injector definition, see
 # https://github.com/redhat-cop/controller_configuration/tree/devel/roles/credential_types#formating-injectors
+# TODO there's a builtin "Insights" credential now so this should no longer be needed
 controller_credential_types:
   - name: Insights Collection
     kind: cloud
