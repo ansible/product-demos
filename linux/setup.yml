@@ -4,15 +4,35 @@ user_message:
   - Update Credential for Insights Inventory with Red Hat account.
   - Add variables for system_roles. https://console.redhat.com/ansible/automation-hub/repo/published/redhat/rhel_system_roles
 
+# "!unsafe" used to pass raw jinja2 through to the injector definition, see
+# https://github.com/redhat-cop/controller_configuration/tree/devel/roles/credential_types#formating-injectors
+controller_credential_types:
+  - name: Insights Collection
+    description: Insights credential that can be used with SCM-based inventory sources
+    kind: cloud
+    inputs:
+      fields:
+        - id: insights_user
+          type: string
+          label: Insights User
+        - id: insights_password
+          type: string
+          label: Insights Password
+          secret: true
+    injectors:
+      env:
+        INSIGHTS_USER: !unsafe '{{ insights_user }}'
+        INSIGHTS_PASSWORD: !unsafe '{{ insights_password }}'
+
 controller_credentials:
   - name: Insights Inventory
-    credential_type: Insights
+    credential_type: Insights Collection
     organization: Ansible Product Demos (APD)
     update_secrets: false
     state: exists
     inputs:
-      username: REPLACEME
-      password: REPLACEME
+      insights_user: REPLACEME
+      insights_password: REPLACEME
 
 controller_inventory_sources:
   - name: Insights Inventory
