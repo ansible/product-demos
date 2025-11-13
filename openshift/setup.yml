@@ -1,16 +1,9 @@
 ---
-controller_components:
-  - execution_environments
-  - credential_types
-  - credentials
-  - inventory_sources
-  - job_templates
-  - workflow_job_templates
-
 controller_credentials:
   - name: OpenShift Credential
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credential_type: OpenShift or Kubernetes API Bearer Token
+    update_secrets: false
     state: exists
     inputs:
       host: CHANGEME
@@ -19,7 +12,7 @@ controller_credentials:
 
 controller_inventory_sources:
   - name: OpenShift CNV Inventory
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     source: scm
     source_project: Ansible Product Demos
     source_path: openshift/inventory.kubevirt.yml
@@ -30,7 +23,7 @@ controller_inventory_sources:
 controller_templates:
   - name: OpenShift / EDA / Install Controller
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "openshift/eda/install.yml"
     notification_templates_started: Telemetry
@@ -38,12 +31,12 @@ controller_templates:
     notification_templates_error: Telemetry
     survey_enabled: true
     credentials:
-      - "OpenShift Credential"
-      - "Controller Credential"
+      - OpenShift Credential
+      - AAP Credential
 
   - name: OpenShift / CNV / Install Operator
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "openshift/cnv/install.yml"
     notification_templates_started: Telemetry
@@ -51,11 +44,11 @@ controller_templates:
     notification_templates_error: Telemetry
     survey_enabled: true
     credentials:
-      - "OpenShift Credential"
+      - OpenShift Credential
 
   - name: OpenShift / CNV / Create RHEL VM
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "openshift/cnv/provision_rhel.yml"
     notification_templates_started: Telemetry
@@ -95,11 +88,11 @@ controller_templates:
           variable: rh_subscription_org
           required: true
     credentials:
-      - "OpenShift Credential"
+      - OpenShift Credential
 
   - name: OpenShift / CNV / Create VM Snapshots
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "openshift/cnv/snapshot.yml"
     notification_templates_started: Telemetry
@@ -123,11 +116,11 @@ controller_templates:
           default: openshift-cnv
           required: true
     credentials:
-      - "OpenShift Credential"
+      - OpenShift Credential
 
   - name: OpenShift / CNV / Restore Latest VM Snapshots
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "openshift/cnv/snapshot.yml"
     notification_templates_started: Telemetry
@@ -151,11 +144,11 @@ controller_templates:
           default: openshift-cnv
           required: true
     credentials:
-      - "OpenShift Credential"
+      - OpenShift Credential
 
   - name: OpenShift / CNV / Delete VM
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "openshift/cnv/delete.yml"
     notification_templates_started: Telemetry
@@ -179,11 +172,11 @@ controller_templates:
           required: true
 
     credentials:
-      - "OpenShift Credential"
+      - OpenShift Credential
 
   - name: OpenShift / CNV / Patch
     job_type: check
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "openshift/cnv/patch.yml"
     notification_templates_started: Telemetry
@@ -191,8 +184,8 @@ controller_templates:
     notification_templates_error: Telemetry
     ask_job_type_on_launch: true
     credentials:
-      - "OpenShift Credential"
-      - "Demo Credential"
+      - OpenShift Credential
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -205,7 +198,7 @@ controller_templates:
           required: true
 
   - name: OpenShift / CNV / Wait Hosts
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "openshift/cnv/wait.yml"
     notification_templates_started: Telemetry
@@ -224,30 +217,30 @@ controller_templates:
 
   - name: OpenShift / Dev Spaces
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "openshift/devspaces.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "OpenShift Credential"
+      - OpenShift Credential
 
   - name: OpenShift / GitLab
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "openshift/gitlab.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "OpenShift Credential"
+      - OpenShift Credential
 
 controller_workflows:
   - name: OpenShift / CNV / Infra Stack
     description: A workflow to deploy Virtualized infra in OCP Virtalization
-    organization: Default
+    organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -300,7 +293,7 @@ controller_workflows:
 
   - name: OpenShift / CNV / Patch CNV Workflow
     description: A workflow to patch CNV instances with snapshot and restore on failure.
-    organization: Default
+    organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry

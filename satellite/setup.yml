@@ -30,24 +30,27 @@ controller_credential_types:
 controller_credentials:
   - name: Satellite Inventory
     credential_type: Red Hat Satellite 6
-    organization: Default
+    organization: Ansible Product Demos (APD)
+    update_secrets: false
     state: exists
     inputs:
       host: https://satellite.example.com
-      username: admin
-      password: ansible123!
+      username: REPLACEME
+      password: REPLACEME
+
   - name: Satellite Credential
     credential_type: Satellite Collection
-    organization: Default
+    organization: Ansible Product Demos (APD)
+    update_secrets: false
     state: exists
     inputs:
       host: https://satellite.example.com
-      username: admin
-      password: ansible123!
+      username: REPLACEME
+      password: REPLACEME
 
 controller_inventory_sources:
   - name: Satellite Inventory
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     credential: Satellite Inventory
     source: satellite6
     update_on_launch: false
@@ -76,12 +79,12 @@ controller_templates:
   - name: LINUX / Register with Satellite
     project: Ansible Product Demos
     playbook: satellite/server_register.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - Demo Credential
+      - APD Machine Credential
       - Satellite Credential
     extra_vars:
       org_id: "Default_Organization"
@@ -106,14 +109,14 @@ controller_templates:
   - name: LINUX / Compliance Scan with Satellite
     project: Ansible Product Demos
     playbook: satellite/server_openscap.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     # execution_environment: Ansible Engine 2.9 execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
       - Satellite Credential
-      - Demo Credential
+      - APD Machine Credential
     extra_vars:
       policy_scan: all
     survey_enabled: true
@@ -129,7 +132,7 @@ controller_templates:
   - name: SATELLITE / Publish Content View Version
     project: Ansible Product Demos
     playbook: satellite/satellite_publish.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -151,7 +154,7 @@ controller_templates:
   - name: SATELLITE / Promote Content View Version
     project: Ansible Product Demos
     playbook: satellite/satellite_promote.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -181,7 +184,7 @@ controller_templates:
   - name: SETUP / Satellite
     project: Ansible Product Demos
     playbook: satellite/setup_satellite.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -200,7 +203,7 @@ controller_launch_jobs:
 controller_workflows:
   - name: Patch Dev
     description: A workflow to patch the dev environment
-    organization: Default
+    organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry

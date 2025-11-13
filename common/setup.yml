@@ -7,6 +7,10 @@ controller_organizations:
   - name: Ansible Product Demos (APD)
     default_environment: Product Demos EE
 
+controller_inventories:
+  - name: Ansible Product Demos Inventory
+    organization: Ansible Product Demos (APD)
+
 controller_projects:
   - name: Ansible Cloud Content Lab - AWS
     organization: Ansible Product Demos (APD)
