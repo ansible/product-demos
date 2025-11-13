@@ -4,30 +4,10 @@ user_message:
   - Update Credential for Insights Inventory with Red Hat account.
   - Add variables for system_roles. https://console.redhat.com/ansible/automation-hub/repo/published/redhat/rhel_system_roles
 
-# "!unsafe" used to pass raw jinja2 through to the injector definition, see
-# https://github.com/redhat-cop/controller_configuration/tree/devel/roles/credential_types#formating-injectors
-# TODO there's a builtin "Insights" credential now so this should no longer be needed
-controller_credential_types:
-  - name: Insights Collection
-    kind: cloud
-    inputs:
-      fields:
-        - id: insights_user
-          type: string
-          label: Insights User
-        - id: insights_password
-          type: string
-          label: Insights Password
-          secret: true
-    injectors:
-      env:
-        INSIGHTS_USER: !unsafe '{{ insights_user }}'
-        INSIGHTS_PASSWORD: !unsafe '{{ insights_password }}'
-
 controller_credentials:
   - name: Insights Inventory
-    credential_type: Insights Collection
-    organization: Default
+    credential_type: Insights
+    organization: Ansible Product Demos (APD)
     state: exists
     inputs:
       insights_user: REPLACEME
@@ -35,7 +15,7 @@ controller_credentials:
 
 controller_inventory_sources:
   - name: Insights Inventory
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     source: scm
     source_project: Ansible Product Demos
     source_path: linux/inventory.insights.yml
@@ -44,14 +24,14 @@ controller_inventory_sources:
 controller_templates:
   - name: "LINUX / Register with Insights"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/ec2_register.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     extra_vars:
       activation_key: !unsafe "RHEL{{ ansible_distribution_major_version }}_{{ env }}"
@@ -83,7 +63,7 @@ controller_templates:
 
   - name: "LINUX / Troubleshoot"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/tshoot.yml"
     notification_templates_started: Telemetry
@@ -91,7 +71,7 @@ controller_templates:
     notification_templates_error: Telemetry
     use_fact_cache: true
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -104,14 +84,14 @@ controller_templates:
 
   - name: "LINUX / Temporary Sudo"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/temp_sudo.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -133,7 +113,7 @@ controller_templates:
 
   - name: "LINUX / Patching"
     job_type: check
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/patching.yml"
     execution_environment: Default execution environment
@@ -143,7 +123,7 @@ controller_templates:
     use_fact_cache: true
     ask_job_type_on_launch: true
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -156,7 +136,7 @@ controller_templates:
 
   - name: "LINUX / Start Service"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/service_start.yml"
     notification_templates_started: Telemetry
@@ -164,7 +144,7 @@ controller_templates:
     notification_templates_error: Telemetry
     use_fact_cache: true
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -181,7 +161,7 @@ controller_templates:
 
   - name: "LINUX / Stop Service"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/service_stop.yml"
     notification_templates_started: Telemetry
@@ -189,7 +169,7 @@ controller_templates:
     notification_templates_error: Telemetry
     use_fact_cache: true
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -206,14 +186,14 @@ controller_templates:
 
   - name: "LINUX / Run Shell Script"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/run_script.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -231,14 +211,14 @@ controller_templates:
   - name: "LINUX / Fact Scan"
     project: "Ansible Product Demos"
     playbook: linux/fact_scan.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     execution_environment: Default execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
     credentials:
-      - Demo Credential
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -251,14 +231,14 @@ controller_templates:
 
   - name: "LINUX / Podman Webserver"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/podman.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -276,7 +256,7 @@ controller_templates:
 
   - name: "LINUX / System Roles"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/system_roles.yml"
     notification_templates_started: Telemetry
@@ -290,7 +270,7 @@ controller_templates:
       selinux_policy: targeted
       selinux_state: enforcing
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -303,7 +283,7 @@ controller_templates:
 
   - name: "LINUX / Install Web Console (cockpit)"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/system_roles.yml"
     notification_templates_started: Telemetry
@@ -315,7 +295,7 @@ controller_templates:
       system_roles:
         - cockpit
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -337,14 +317,14 @@ controller_templates:
 
   - name: "LINUX / Compliance Enforce"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/remediate_out_of_compliance.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     extra_vars:
       sudo_remove_nopasswd: false
     survey_enabled: true
@@ -359,14 +339,14 @@ controller_templates:
 
   - name: "LINUX / DISA STIG"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/disa_stig.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     extra_vars:
       sudo_remove_nopasswd: false
     survey_enabled: true
@@ -381,14 +361,14 @@ controller_templates:
 
   - name: "LINUX / Multi-profile Compliance"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/multi_profile_compliance.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
       - "AWS"
     extra_vars:
       # used by CIS profile role
@@ -428,14 +408,14 @@ controller_templates:
 
   - name: "LINUX / Multi-profile Compliance Report"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/multi_profile_compliance_report.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
       - "AWS"
     survey_enabled: true
     survey:
@@ -469,11 +449,11 @@ controller_templates:
 
   - name: "LINUX / Insights Compliance Scan"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/insights_compliance_scan.yml"
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -494,7 +474,7 @@ controller_templates:
 
   - name: "LINUX / Deploy Application"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/deploy_application.yml"
     notification_templates_started: Telemetry
@@ -502,7 +482,7 @@ controller_templates:
     notification_templates_error: Telemetry
     use_fact_cache: true
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -520,7 +500,7 @@ controller_templates:
 controller_workflows:
   - name: "Linux / Compliance Workflow"
     description: A workflow to generate a SCAP report and run enforce on findings
-    organization: Default
+    organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
