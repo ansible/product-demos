@@ -125,7 +125,7 @@ controller_templates:
           variable: feedback
           required: true
 
-  - name: Cloud / AWS / Create VPC
+  - name: Cloud | AWS | Create VPC
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -155,7 +155,7 @@ controller_templates:
           variable: aws_owner_tag
           required: true
 
-  - name: Cloud / AWS / Create Keypair
+  - name: Cloud | AWS | Create Keypair
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -194,7 +194,7 @@ controller_templates:
           variable: aws_keypair_owner
           required: true
 
-  - name: Cloud / AWS / Create VM
+  - name: Cloud | AWS | Create VM
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -281,7 +281,7 @@ controller_templates:
           variable: create_vm_aws_image_filter
           required: false
 
-  - name: Cloud / AWS / Delete VM
+  - name: Cloud | AWS | Delete VM
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -303,12 +303,12 @@ controller_templates:
           variable: _hosts
           required: true
 
-  - name: Cloud / AWS / Resize EC2
+  - name: Cloud | AWS | Resize EC2
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-      - Controller Credential
+      - AAP Credential
     project: Ansible Product Demos
     playbook: cloud/resize_ec2.yml
     inventory: Ansible Product Demos Inventory

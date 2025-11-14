@@ -4,7 +4,7 @@ _deployment_id: "{{ lookup('file', playbook_dir + '/.deployment_id') }}"
 user_message:
 
 controller_templates:
-  - name: Cloud / AWS / Create Peer Infrastructure
+  - name: Cloud | AWS | Create Peer Infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -20,7 +20,7 @@ controller_templates:
       dmz_ssh_key_name: aws-test-key
       priv_network_ssh_key_name: aws-test-key
 
-  - name: Cloud / AWS / Delete Peer Infrastructure
+  - name: Cloud | AWS | Delete Peer Infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -34,7 +34,7 @@ controller_templates:
     extra_vars:
       aws_region: us-east-1
 
-  - name: Cloud / AWS / Create Transit Infrastructure
+  - name: Cloud | AWS | Create Transit Infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -50,7 +50,7 @@ controller_templates:
       dmz_ssh_key_name: aws-test-key
       priv_network_ssh_key_name: aws-test-key
 
-  - name: Cloud / AWS / Delete Transit Infrastructure
+  - name: Cloud | AWS | Delete Transit Infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -64,7 +64,7 @@ controller_templates:
     extra_vars:
       aws_region: us-east-1
 
-  - name: Cloud / AWS / VPC Report
+  - name: Cloud | AWS | VPC Report
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -80,7 +80,7 @@ controller_templates:
       reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
       reports_aws_region: "us-east-1"
 
-  - name: Cloud / AWS / Tags Report
+  - name: Cloud | AWS | Tags Report
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -109,7 +109,7 @@ controller_templates:
             - us-west-1
             - us-west-2
 
-  - name: Cloud / AWS / Snapshot EC2
+  - name: Cloud | AWS | Snapshot EC2
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -140,7 +140,7 @@ controller_templates:
           variable: _hosts
           required: false
 
-  - name: Cloud / AWS / Restore EC2 from Snapshot
+  - name: Cloud | AWS | Restore EC2 from Snapshot
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -171,7 +171,7 @@ controller_templates:
           variable: _hosts
           required: false
 
-  - name: Cloud / AWS / Display EC2 Stats
+  - name: Cloud | AWS | Display EC2 Stats
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -183,7 +183,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
 
-  - name: LINUX / Patching
+  - name: LINUX | Patching
     job_type: check
     inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
@@ -250,13 +250,13 @@ controller_workflows:
           required: true
     simplified_workflow_nodes:
       - identifier: Create Keypair
-        unified_job_template: Cloud / AWS / Create Keypair
+        unified_job_template: Cloud | AWS | Create Keypair
         success_nodes:
           - EC2 Stats
         failure_nodes:
           - Ticket - Keypair Failed
       - identifier: Create VPC
-        unified_job_template: Cloud / AWS / Create VPC
+        unified_job_template: Cloud | AWS | Create VPC
         success_nodes:
           - EC2 Stats
         failure_nodes:
@@ -266,12 +266,12 @@ controller_workflows:
         extra_data:
           feedback: Failed to create AWS keypair
       - identifier: EC2 Stats
-        unified_job_template: Cloud / AWS / Display EC2 Stats
+        unified_job_template: Cloud | AWS | Display EC2 Stats
         all_parents_must_converge: true
         always_nodes:
           - VPC Report
       - identifier: VPC Report
-        unified_job_template: Cloud / AWS / VPC Report
+        unified_job_template: Cloud | AWS | VPC Report
         all_parents_must_converge: true
         always_nodes:
           - Deploy Windows GUI Blueprint
@@ -280,7 +280,7 @@ controller_workflows:
           - Deploy Windows Core Blueprint
           - Deploy Report Server
       - identifier: Deploy Windows GUI Blueprint
-        unified_job_template: Cloud / AWS / Create VM
+        unified_job_template: Cloud | AWS | Create VM
         extra_data:
           create_vm_vm_name: aws-dc
           vm_blueprint: windows_full
@@ -289,7 +289,7 @@ controller_workflows:
         failure_nodes:
           - Ticket - Instance Failed
       - identifier: Deploy Windows Core Blueprint
-        unified_job_template: Cloud / AWS / Create VM
+        unified_job_template: Cloud | AWS | Create VM
         extra_data:
           create_vm_vm_name: aws_win1
           vm_blueprint: windows_core
@@ -298,7 +298,7 @@ controller_workflows:
         failure_nodes:
           - Ticket - Instance Failed
       - identifier: Deploy RHEL8 Blueprint
-        unified_job_template: Cloud / AWS / Create VM
+        unified_job_template: Cloud | AWS | Create VM
         extra_data:
           create_vm_vm_name: aws_rhel8
           vm_blueprint: rhel8
@@ -307,7 +307,7 @@ controller_workflows:
         failure_nodes:
           - Ticket - Instance Failed
       - identifier: Deploy RHEL9 Blueprint
-        unified_job_template: Cloud / AWS / Create VM
+        unified_job_template: Cloud | AWS | Create VM
         extra_data:
           create_vm_vm_name: aws_rhel9
           vm_blueprint: rhel9
@@ -316,7 +316,7 @@ controller_workflows:
         failure_nodes:
           - Ticket - Instance Failed
       - identifier: Deploy Report Server
-        unified_job_template: Cloud / AWS / Create VM
+        unified_job_template: Cloud | AWS | Create VM
         extra_data:
           create_vm_vm_name: reports
           vm_blueprint: rhel9
@@ -333,13 +333,13 @@ controller_workflows:
         extra_data:
           feedback: Failed to create AWS instance
       - identifier: Tag Report
-        unified_job_template: Cloud / AWS / Tags Report
+        unified_job_template: Cloud | AWS | Tags Report
       - identifier: Ticket - VPC Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to create AWS VPC
 
-  - name: Cloud / AWS / Patch EC2 Workflow
+  - name: Cloud | AWS | Patch EC2 Workflow
     description: A workflow to patch ec2 instances with snapshot and restore on failure.
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
@@ -375,19 +375,19 @@ controller_workflows:
         success_nodes:
           - Take Snapshot
       - identifier: Take Snapshot
-        unified_job_template: Cloud / AWS / Snapshot EC2
+        unified_job_template: Cloud | AWS | Snapshot EC2
         success_nodes:
           - Patch Instance
       - identifier: Patch Instance
-        unified_job_template: LINUX / Patching
+        unified_job_template: LINUX | Patching
         job_type: run
         failure_nodes:
           - Restore from Snapshot
       - identifier: Restore from Snapshot
-        unified_job_template: Cloud / AWS / Restore EC2 from Snapshot
+        unified_job_template: Cloud | AWS | Restore EC2 from Snapshot
         failure_nodes:
           - Ticket - Restore Failed
       - identifier: Ticket - Restore Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
-          feedback: Cloud / AWS / Patch EC2 Workflow | Failed to restore ec2 from snapshot
+          feedback: Cloud | AWS | Patch EC2 Workflow | Failed to restore ec2 from snapshot

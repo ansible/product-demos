@@ -21,7 +21,7 @@ controller_inventory_sources:
     overwrite: true
 
 controller_templates:
-  - name: OpenShift / EDA / Install Controller
+  - name: OpenShift | EDA | Install Controller
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -34,7 +34,7 @@ controller_templates:
       - OpenShift Credential
       - AAP Credential
 
-  - name: OpenShift / CNV / Install Operator
+  - name: OpenShift | CNV | Install Operator
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -46,7 +46,7 @@ controller_templates:
     credentials:
       - OpenShift Credential
 
-  - name: OpenShift / CNV / Create RHEL VM
+  - name: OpenShift | CNV | Create RHEL VM
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -90,7 +90,7 @@ controller_templates:
     credentials:
       - OpenShift Credential
 
-  - name: OpenShift / CNV / Create VM Snapshots
+  - name: OpenShift | CNV | Create VM Snapshots
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -118,7 +118,7 @@ controller_templates:
     credentials:
       - OpenShift Credential
 
-  - name: OpenShift / CNV / Restore Latest VM Snapshots
+  - name: OpenShift | CNV | Restore Latest VM Snapshots
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -146,7 +146,7 @@ controller_templates:
     credentials:
       - OpenShift Credential
 
-  - name: OpenShift / CNV / Delete VM
+  - name: OpenShift | CNV | Delete VM
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -174,7 +174,7 @@ controller_templates:
     credentials:
       - OpenShift Credential
 
-  - name: OpenShift / CNV / Patch
+  - name: OpenShift | CNV | Patch
     job_type: check
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -197,7 +197,7 @@ controller_templates:
           default: "openshift-cnv-rhel*"
           required: true
 
-  - name: OpenShift / CNV / Wait Hosts
+  - name: OpenShift | CNV | Wait Hosts
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "openshift/cnv/wait.yml"
@@ -215,7 +215,7 @@ controller_templates:
           default: "openshift-cnv-rhel*"
           required: true
 
-  - name: OpenShift / Dev Spaces
+  - name: OpenShift | Dev Spaces
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -226,7 +226,7 @@ controller_templates:
     credentials:
       - OpenShift Credential
 
-  - name: OpenShift / GitLab
+  - name: OpenShift | GitLab
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -238,7 +238,7 @@ controller_templates:
       - OpenShift Credential
 
 controller_workflows:
-  - name: OpenShift / CNV / Infra Stack
+  - name: OpenShift | CNV | Infra Stack
     description: A workflow to deploy Virtualized infra in OCP Virtalization
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
@@ -267,7 +267,7 @@ controller_workflows:
           required: true
     simplified_workflow_nodes:
       - identifier: Deploy RHEL8 VM
-        unified_job_template: OpenShift / CNV / Create RHEL VM
+        unified_job_template: OpenShift | CNV | Create RHEL VM
         extra_data:
           vm_name: rhel8
           os_version: rhel8
@@ -276,7 +276,7 @@ controller_workflows:
         failure_nodes:
           - Ticket - Instance Failed
       - identifier: Deploy RHEL9 VM
-        unified_job_template: OpenShift / CNV / Create RHEL VM
+        unified_job_template: OpenShift | CNV | Create RHEL VM
         extra_data:
           vm_name: rhel9
           os_version: rhel9
@@ -291,7 +291,7 @@ controller_workflows:
         extra_data:
           feedback: Failed to create CNV instance
 
-  - name: OpenShift / CNV / Patch CNV Workflow
+  - name: OpenShift | CNV | Patch CNV Workflow
     description: A workflow to patch CNV instances with snapshot and restore on failure.
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
@@ -318,20 +318,20 @@ controller_workflows:
         success_nodes:
           - Patch Instance
       - identifier: Take Snapshot
-        unified_job_template: OpenShift / CNV / Create VM Snapshots
+        unified_job_template: OpenShift | CNV | Create VM Snapshots
         success_nodes:
           - Project Sync
           - Inventory Sync
       - identifier: Patch Instance
-        unified_job_template: OpenShift / CNV / Patch
+        unified_job_template: OpenShift | CNV | Patch
         job_type: run
         failure_nodes:
           - Restore from Snapshot
       - identifier: Restore from Snapshot
-        unified_job_template: OpenShift / CNV / Restore Latest VM Snapshots
+        unified_job_template: OpenShift | CNV | Restore Latest VM Snapshots
         failure_nodes:
           - Ticket - Restore Failed
       - identifier: Ticket - Restore Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
-          feedback: OpenShift / CNV / Patch CNV Workflow | Failed to restore CNV VM from snapshot
+          feedback: OpenShift | CNV | Patch CNV Workflow | Failed to restore CNV VM from snapshot

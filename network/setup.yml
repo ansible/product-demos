@@ -26,7 +26,7 @@ controller_inventory_sources:
     source_path: network/hosts
 
 controller_templates:
-  - name: NETWORK / Configuration
+  - name: NETWORK | Configuration
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
     survey_enabled: true
@@ -61,7 +61,7 @@ controller_templates:
             - snmp
             - user
 
-  - name: "NETWORK / Report"
+  - name: "NETWORK | Report"
     job_type: check
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
@@ -90,7 +90,7 @@ controller_templates:
             - sandbox-nxos-1.cisco.com
             - routers
 
-  - name: "NETWORK / DISA STIG"
+  - name: "NETWORK | DISA STIG"
     job_type: check
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
@@ -105,7 +105,7 @@ controller_templates:
     ask_job_type_on_launch: true
     survey_enabled: true
 
-  - name: "NETWORK / Backup"
+  - name: "NETWORK | Backup"
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
