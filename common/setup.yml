@@ -1,4 +1,14 @@
 ---
+aap_user_accounts:
+  - username: apd-admin
+    email: apd-admin@example.com
+
+gateway_role_user_assignments:
+  - role_definition: Organization Admin
+    user: apd-admin
+    object_ids:
+      - Ansible Product Demos (APD)
+
 controller_execution_environments:
   - name: Cloud Services Execution Environment
     image: quay.io/scottharwell/cloud-ee:latest
