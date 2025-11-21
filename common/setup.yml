@@ -2,6 +2,7 @@
 aap_user_accounts:
   - username: apd-admin
     email: apd-admin@example.com
+    update_secrets: false
 
 gateway_role_user_assignments:
   - role_definition: Organization Admin
@@ -12,6 +13,7 @@ gateway_role_user_assignments:
 controller_execution_environments:
   - name: Cloud Services Execution Environment
     image: quay.io/scottharwell/cloud-ee:latest
+    organization: Ansible Product Demos (APD)
 
 controller_organizations:
   - name: Ansible Product Demos (APD)
@@ -104,6 +106,7 @@ controller_groups:
 controller_templates:
   - name: SUBMIT FEEDBACK
     job_type: run
+    organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
     playbook: feedback.yml
