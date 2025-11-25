@@ -1,0 +1,149 @@
+---
+# override these with extra vars if needed
+apd_ee_image_version: '25'
+apd_ee_image_tag: latest
+apd_ee_image: quay.io/ansible-product-demos/apd-ee-{{ apd_ee_image_version }}:{{ apd_ee_image_tag }}
+apd_git_repo: https://github.com/ansible/product-demos
+apd_git_repo_branch: jce/apd-org
+
+## gateway resources
+aap_organizations:
+  - name: Ansible Product Demos (APD)
+
+aap_user_accounts:
+  - username: apd-admin
+    email: apd-admin@example.invalid
+    password: '{{ lookup("env","AAP_PASSWORD") | default(omit) }}'
+    update_secrets: false
+
+gateway_role_user_assignments:
+  - user: apd-admin
+    role_definition: Organization Admin
+    object_ids:
+      - Ansible Product Demos (APD)
+
+controller_credentials:
+  - name: AAP Credential
+    credential_type: Red Hat Ansible Automation Platform
+    organization: Ansible Product Demos (APD)
+    update_secrets: false
+    state: exists
+    inputs:
+      host: '{{ lookup("env", "AAP_HOSTNAME") | default("https://example.invalid") }}'
+      username: '{{ lookup("env", "AAP_USERNAME") | default("admin") }}'
+      password: '{{ lookup("env", "AAP_PASSWORD") | default(omit) }}'
+      verify_ssl: '{{ lookup("env", "AAP_VALIDATE_CERTS") | default(omit) }}'
+
+  - name: Automation Hub Certified Content
+    organization: Ansible Product Demos (APD)
+    credential_type: Ansible Galaxy/Automation Hub API Token
+    update_secrets: false
+    inputs:
+      url: https://cloud.redhat.com/api/automation-hub/content/published/
+      auth_url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+      token: '{{ lookup("env","ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN") | default(omit) }}'
+
+  - name: Automation Hub Validated Content
+    organization: Ansible Product Demos (APD)
+    credential_type: Ansible Galaxy/Automation Hub API Token
+    update_secrets: false
+    inputs:
+      url: https://cloud.redhat.com/api/automation-hub/content/published/
+      auth_url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+      token: '{{ lookup("env","ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN") | default(omit) }}'
+
+  - name: APD Machine Credential
+    description: Machine credential for Windows (username/password) and Linux (SSH key) instances
+    credential_type: Machine
+    organization: Ansible Product Demos (APD)
+    update_secrets: false
+    inputs:
+      username: '{{ apd_machine_credential_user | default("REPLACEME") }}'
+      ssh_key_data: '{{ vault_apd_machine_credential_ssh_key | default(omit) }}'
+      password: '{{ vault_apd_machine_credential_password | default("REPLACEME") }}'
+
+  - name: OpenShift Credential
+    description: Credential for OpenShift cluster
+    organization: Ansible Product Demos (APD)
+    credential_type: "OpenShift or Kubernetes API Bearer Token"
+    update_secrets: false
+    inputs:
+      host: '{{ apd_openshift_api_url | default("example.invalid") }}'
+      bearer_token: '{{ vault_apd_openshift_api_token | default(omit) }}'
+
+  - name: AWS
+    credential_type: Amazon Web Services
+    organization: Ansible Product Demos (APD)
+    update_secrets: false
+    inputs:
+      username: '{{ lookup("env", "AWS_ACCESS_KEY_ID") | default(vault_apd_aws_access_key) | default("REPLACEME") }}'
+      password: '{{ lookup("env", "AWS_SECRET_ACCESS_KEY") | default(vault_apd_aws_secret_key) | default("REPLACEME") }}'
+
+controller_inventories:
+  - name: Ansible Product Demos Inventory
+    organization: Ansible Product Demos (APD)
+
+controller_execution_environments:
+  - name: Product Demos EE
+    image: '{{ apd_ee_image }}'
+
+controller_projects:
+  - name: Ansible Product Demos
+    organization: Ansible Product Demos (APD)
+    scm_type: git
+    scm_url: '{{ apd_git_repo }}'
+    scm_branch: '{{ apd_git_repo_branch }}'
+    default_environment: Product Demos EE
+    wait: true
+
+controller_templates:
+  - name: "APD | Single demo setup"
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: setup_demo.yml
+    credentials: AAP Credential
+    execution_environment: Product Demos EE
+    allow_simultaneous: true
+    survey_enabled: true
+    survey_spec:
+      name: ''
+      description: ''
+      spec:
+        - type: multiplechoice
+          question_name: Demo Category
+          variable: demo
+          required: true
+          choices:
+            - linux
+            - windows
+            - cloud
+            - network
+            - openshift
+            - satellite
+
+  - name: "APD | Multi-demo setup"
+    project: Ansible Product Demos
+    playbook: multi_select_setup.yml
+    inventory: Ansible Product Demos Inventory
+    credentials: AAP Credential
+    execution_environment: Product Demos EE
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: "Which demos do you want to configure?"
+          type: multiselect
+          variable: demos
+          required: true
+          default: "cloud\nlinux\nnetwork\nopenshift\nwindows"
+          choices:
+            - cloud
+            - linux
+            - network
+            - openshift
+            - satellite
+            - windows
+
+...

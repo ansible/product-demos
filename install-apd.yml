@@ -1,0 +1,28 @@
+---
+- name: Install Ansible Product Demos
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Make sure AAP credential environment variables are set
+      ansible.builtin.assert:
+        that:
+          - 'lookup("env", "AAP_HOSTNAME")'
+          - 'lookup("env", "AAP_USERNAME")'
+          - 'lookup("env", "AAP_PASSWORD")'
+        fail_msg:
+          - 'Please ensure the following environment variables are set:'
+          - '  export AAP_HOSTNAME=https://your-aap-server.example.com'
+          - '  export AAP_USERNAME=admin  # or another user with AAP superuser privileges'
+          - '  export AAP_PASSWORD=<admin-user-password>'
+
+    - name: Include product-demos-postinstall variables
+      ansible.builtin.include_vars:
+        file: common/bootstrap-vars.yml
+
+    - name: Execute automation controller resource configuration
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.dispatch
+
+...
+# vim ft=yaml.ansible

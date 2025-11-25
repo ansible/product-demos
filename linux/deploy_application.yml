@@ -10,7 +10,7 @@
         that:
           - "application != ''"
 
-    - name: Printing to terminal application information
+    - name: Print pre-installation message
       ansible.builtin.debug:
         msg: "This Ansible Playbook will install {{ application }}"
 
@@ -21,7 +21,8 @@
       register: result
       notify: Printing to terminal application information
 
-    - name: Printing to terminal application information  # noqa: no-handler
+    - name: Print message if the application was already installed
+      # noqa: no-handler
       ansible.builtin.debug:
         msg: "The application: {{ application }} was already installed"
       when: not result.changed | bool
