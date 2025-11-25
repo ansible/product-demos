@@ -20,7 +20,8 @@
         allow_downgrade: true
       register: result
 
-    - name: Printing to terminal application information  # noqa: no-handler
+    - name: Print message if the application was already installed
+      # noqa: no-handler
       ansible.builtin.debug:
         msg: "The application: {{ application }} was already installed"
       when: not result.changed | bool
