@@ -1,13 +1,16 @@
 ---
-schemaVersion: 2.2.0
+schemaVersion: 2.2.2
 metadata:
   name: product-demos
 components:
-  - name: product-demos-ee
+  - name: tooling-container
     container:
-      image: quay.io/mloriedo/ansible-creator-ee:latest  # workaround for https://github.com/eclipse/che/issues/21778
+      image: quay.io/ansible-product-demos/apd-ee-25  # ghcr.io/ansible/ansible-devspaces:latest
       memoryRequest: 256M
       memoryLimit: 5Gi
       cpuRequest: 250m
       cpuLimit: 2000m
-      args: ['tail', '-f', '/dev/null']
+      args:
+        - 'tail'
+        - '-f'
+        - '/dev/null'
