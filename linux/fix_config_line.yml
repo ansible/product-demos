@@ -1,6 +1,6 @@
 ---
 - name: 4. Fix Config Line - Idempotent Solution
-  hosts: all
+  hosts: "{{ _hosts | default(omit) }}"
   # Ensure Ansible runs with elevated privileges to edit files in /etc/
   become: true
   gather_facts: false
