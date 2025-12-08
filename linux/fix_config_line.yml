@@ -1,0 +1,16 @@
+---
+- name: 4. Fix Config Line - Idempotent Solution
+  hosts: all
+  # Ensure Ansible runs with elevated privileges to edit files in /etc/
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Use lineinfile to ensure the critical setting is present exactly once
+      # This module guarantees the line exists and fixes any duplicates or incorrect lines.
+      ansible.builtin.lineinfile:
+        path: /etc/my-app/config.conf
+        line: 'CRITICAL_SETTING=true'
+        state: present
+        create: true
+        insertafter: EOF
