@@ -1,16 +1,19 @@
 ---
 - name: 4. Fix Config Line - Idempotent Solution
-  hosts: "{{ _hosts | default(omit) }}"
-  # Ensure Ansible runs with elevated privileges to edit files in /etc/
+  hosts: "{{ _hosts | default('all') }}"
+  connection: smart
   become: true
   gather_facts: false
 
   tasks:
-    - name: Use lineinfile to ensure the critical setting is present exactly once
-      # This module guarantees the line exists and fixes any duplicates or incorrect lines.
-      ansible.builtin.lineinfile:
-        path: /etc/my-app/config.conf
-        line: 'CRITICAL_SETTING=true'
-        state: present
-        create: true
-        insertafter: EOF
+    - name: Enforce exact configuration state (Removes duplicates)
+      # The 'copy' module is more powerful here. instead of checking for a line,
+      # it enforces that the file content MUST match this string exactly.
+      # This will automatically delete the duplicate lines found in the file.
+      ansible.builtin.copy:
+        dest: /etc/my-app/config.conf
+        content: |
+          CRITICAL_SETTING=true
+        owner: root
+        group: root
+        mode: '0644'
