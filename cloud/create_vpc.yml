@@ -27,7 +27,7 @@
         - us-east-2b
         - us-east-2c
       us-west-1:
-        # us-west-1a not available when last checked 20250218
+        # us-west-1a not available when last checked 20250618
         - us-west-1b
         - us-west-1c
       us-west-2:

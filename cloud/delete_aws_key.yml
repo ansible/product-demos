@@ -1,0 +1,22 @@
+---
+- name: Delete AWS keypair
+  hosts: localhost
+
+  vars:
+    aws_key_name: aws-test-key
+
+  tasks:
+    - name: Fail if variables not defined
+      ansible.builtin.assert:
+        that:
+          - aws_key_name is defined
+          - create_vm_aws_region is defined
+        fail_msg: "Required variables not set"
+
+    - name: Delete AWS keypair
+      amazon.aws.ec2_key:
+        name: "{{ aws_key_name }}"
+        region: "{{ create_vm_aws_region }}"
+        state: absent
+
+...
