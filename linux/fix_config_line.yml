@@ -11,7 +11,7 @@
       # it enforces that the file content MUST match this string exactly.
       # This will automatically delete the duplicate lines found in the file.
       ansible.builtin.copy:
-        dest: /etc/test-2-fedora-critical-app/config.conf
+        dest: /etc/test-3-fedora-critical-app/config.conf
         content: |
           CRITICAL_SETTING=true
         owner: root
