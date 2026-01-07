@@ -202,7 +202,7 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-      - Demo Credential
+      - APD Machine Credential
     project: Ansible Cloud Content Lab - AWS
     playbook: playbooks/create_vm.yml
     inventory: Ansible Product Demos Inventory
