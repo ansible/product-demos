@@ -14,4 +14,3 @@ jobs:
     - uses: actions/checkout@v4
     - run: ./.github/workflows/run-pc.sh
       shell: bash
-
