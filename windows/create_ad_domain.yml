@@ -78,7 +78,7 @@
       ansible.controller.credential:
         name: Kerberos Credential
         credential_type: Kerberos
-        organization: Default
+        organization: Ansible Product Demos (APD)
         inputs:
           username: "{{ ansible_user }}@{{ domain_name | upper }}"
           password: "{{ ansible_password }}"
