@@ -48,7 +48,7 @@ We are currently investigating an intermittent connectivity issue related to the
 
 ## Connecting to Windows Hosts \[credssp\]
 
-The provided template for provisioning VMs in AWS supports a few blueprints, notably [windows_core](../cloud/blueprints/windows_core.yml) and [windows_full](../cloud/blueprints/windows_full.yml). The windows blueprints both rely on the [aws_windows_userdata](../collections/ansible_collections/demo/cloud/roles/aws/templates/aws_windows_userdata.j2) script which configures a user with Administrator privileges. By default, the Demo Credential is used to inject a password for `ec2-user`. 
+The provided template for provisioning VMs in AWS supports a few blueprints, notably [windows_core](../cloud/blueprints/windows_core.yml) and [windows_full](../cloud/blueprints/windows_full.yml). The windows blueprints both rely on the [aws_windows_userdata](../collections/ansible_collections/demo/cloud/roles/aws/templates/aws_windows_userdata.j2) script which configures a user with Administrator privileges. By default, the Demo Credential is used to inject a password for `ec2-user`.
 
 ⚠️ When using Ansible Product Demos on demo.redhat.com,<br>
 the image below demonstrates where you can locate the Demo Credential password:<br>

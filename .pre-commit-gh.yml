@@ -14,14 +14,6 @@ repos:
       - id: check-json
       - id: check-symlinks
 
-  - repo: https://github.com/ansible/ansible-lint.git
-    # get latest release tag from https://github.com/ansible/ansible-lint/releases/
-    rev: v25.7.0
-    hooks:
-      - id: ansible-lint
-        additional_dependencies:
-          - jmespath
-
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 23.11.0
     hooks:
