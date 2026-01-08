@@ -42,9 +42,9 @@ We are currently investigating an intermittent connectivity issue related to the
 
 **WINDOWS / Create Active Directory Domain** - This job can take some to complete. It is recommended to run ahead of time if you would like to demo creating a helpdesk user.
 
-**WINDOWS / Helpdesk new user portal** - This job is dependant on the Create Active Directory Domain completing before users can be created.
+**WINDOWS / Helpdesk new user portal** - This job is dependent on the Create Active Directory Domain completing before users can be created.
 
-**WINDOWS / Join Active Directory Domain** - This job is dependant on the Create Active Directory Domain completing before computers can be joined.
+**WINDOWS / Join Active Directory Domain** - This job is dependent on the Create Active Directory Domain completing before computers can be joined.
 
 ## Connecting to Windows Hosts \[credssp\]
 

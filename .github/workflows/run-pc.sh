@@ -6,13 +6,13 @@
 PYTHON_VARIANT="${USE_PYTHON:-python3.11}"
 PATH="$PATH:$HOME/.local/bin"
 
-# intsall pip
+# install pip
 eval "${PYTHON_VARIANT} -m pip install --user --upgrade pip"
 
 # try to fix 2.4 incompatibility
 eval "${PYTHON_VARIANT} -m pip install --user --upgrade setuptools wheel twine check-wheel-contents"
 
-# intsall pre-commit
+# install pre-commit
 eval "${PYTHON_VARIANT} -m pip install --user pre-commit"
 
 # view pip packages

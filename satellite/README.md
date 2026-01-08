@@ -19,7 +19,7 @@ This category of demos shows examples of linux operations and management with An
 
 ### Inventory
 
-A dymanic inventory is created to pull inventory hosts from Red Hat Satellite. Groups will automatically be created
+A dynamic inventory is created to pull inventory hosts from Red Hat Satellite. Groups will automatically be created
 
 ## Suggested Usage
 **Linux / Register with Satellite** - Register a server with Red Hat Satellite using an activation key in the format `RHEL<major version>_<environment>`.

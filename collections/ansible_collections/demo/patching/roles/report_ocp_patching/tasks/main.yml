@@ -18,5 +18,5 @@
 - name: Display link to patching report
   ansible.builtin.debug:
     msg:
-      - "Patching report availbable at:"
+      - "Patching report available at:"
       - "{{ report_ocp_patching_resources_output.result.results[3].result.spec.port.targetPort }}://{{ report_ocp_patching_resources_output.result.results[3].result.spec.host }}"

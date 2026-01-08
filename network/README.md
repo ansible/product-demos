@@ -20,7 +20,7 @@ These demos leverage playbooks from a [git repo](https://github.com/nleiva/ansib
 
 ### Inventory
 
-These demos leverage "always-on" instances for Cisco IOS, IOSXR, and NXOS from [Cisco DevNet Sandboxes](https://developer.cisco.com/docs/sandbox/#!getting-started/always-on-sandboxes). These instances are shared and do not provide admin access but they are instantly avaible all the time meaning no setup time is required.
+These demos leverage "always-on" instances for Cisco IOS, IOSXR, and NXOS from [Cisco DevNet Sandboxes](https://developer.cisco.com/docs/sandbox/#!getting-started/always-on-sandboxes). These instances are shared and do not provide admin access but they are instantly available all the time meaning no setup time is required.
 
 A **`Demo Inventory`** is created when setting up these demos and a dynamic source is added to populate the Always-On instances. Review the inventory file [here](https://github.com/nleiva/ansible-net-modules/blob/main/hosts).  Demo Inventory is the default inventory for **`Product Demos`**.
 
