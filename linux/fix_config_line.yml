@@ -1,0 +1,19 @@
+---
+- name: 4. Fix Config Line - Idempotent Solution
+  hosts: "{{ _hosts | default('all') }}"
+  connection: smart
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Enforce exact configuration state (Removes duplicates)
+      # The 'copy' module is more powerful here. instead of checking for a line,
+      # it enforces that the file content MUST match this string exactly.
+      # This will automatically delete the duplicate lines found in the file.
+      ansible.builtin.copy:
+        dest: /etc/test-8-fedora-critical-app/config.conf
+        content: |
+          CRITICAL_SETTING=true
+        owner: root
+        group: root
+        mode: '0644'
