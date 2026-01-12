@@ -4,7 +4,7 @@ user_message: |
 
 controller_projects:
   - name: Fact Scan
-    organization: Default
+    organization: Ansible Product Demos (APD)
     scm_type: git
     scm_url: 'https://github.com/ansible/awx-facts-playbooks.git'
 
@@ -58,7 +58,7 @@ controller_credential_types:
 controller_credentials:
   - name: Kerberos Credential
     credential_type: Kerberos
-    organization: Default
+    organization: Ansible Product Demos (APD)
     update_secrets: false
     state: exists
     inputs:
@@ -68,16 +68,16 @@ controller_credentials:
       kdc: REPLACEME
 
 controller_templates:
-  - name: "WINDOWS / Install IIS"
+  - name: "WINDOWS | Install IIS"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/install_iis.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -92,18 +92,18 @@ controller_templates:
           variable: iis_message
           required: true
 
-  - name: "WINDOWS / Patching"
+  - name: "WINDOWS | Patching"
     use_fact_cache: true
     job_type: check
     ask_job_type_on_launch: true
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/patching.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -139,16 +139,16 @@ controller_templates:
             - 'Yes'
             - 'No'
 
-  - name: "WINDOWS / Rollback"
+  - name: "WINDOWS | Rollback"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/rollback.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -163,16 +163,16 @@ controller_templates:
           variable: rollback_msg
           required: false
 
-  - name: "WINDOWS / Test Connectivity"
+  - name: "WINDOWS | Test Connectivity"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/connect.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -183,16 +183,16 @@ controller_templates:
           variable: _hosts
           required: false
 
-  - name: "WINDOWS / Chocolatey install multiple"
+  - name: "WINDOWS | Chocolatey install multiple"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/windows_choco_multiple.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -203,16 +203,16 @@ controller_templates:
           variable: _hosts
           required: false
 
-  - name: "WINDOWS / Chocolatey install specific"
+  - name: "WINDOWS | Chocolatey install specific"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/windows_choco_specific.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -227,16 +227,16 @@ controller_templates:
           variable: package_name
           required: true
 
-  - name: "WINDOWS / Run PowerShell"
+  - name: "WINDOWS | Run PowerShell"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/powershell.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -252,9 +252,9 @@ controller_templates:
           default: "Get-Service | Where-Object -FilterScript {$_.Status -eq 'running'} | Select-Object -Property 'Name'"
           required: true
 
-  - name: "WINDOWS / Run PowerShell / Kerberos"
+  - name: "WINDOWS | Run PowerShell | Kerberos"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/powershell.yml"
     limit: domain_ansible_local
@@ -263,7 +263,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Kerberos Credential"
+      - Kerberos Credential
     survey_enabled: true
     survey:
       name: ''
@@ -275,16 +275,16 @@ controller_templates:
           default: "Get-Service | Where-Object -FilterScript {$_.Status -eq 'running'} | Select-Object -Property 'Name'"
           required: true
 
-  - name: "WINDOWS / Query Services"
+  - name: "WINDOWS | Query Services"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/powershell_script.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -303,16 +303,16 @@ controller_templates:
             - 'Running'
             - 'Stopped'
 
-  - name: "WINDOWS / Configuring Password Requirements"
+  - name: "WINDOWS | Configuring Password Requirements"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/powershell_dsc.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -323,17 +323,17 @@ controller_templates:
           variable: _hosts
           required: false
 
-  - name: "WINDOWS / AD / Create Domain"
+  - name: "WINDOWS | AD | Create Domain"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/create_ad_domain.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
-      - "Controller Credential"
+      - APD Machine Credential
+      - AAP Credential
     survey_enabled: true
     survey:
       name: ''
@@ -344,17 +344,17 @@ controller_templates:
           variable: _hosts
           required: false
 
-  - name: "WINDOWS / AD / Join Domain"
+  - name: "WINDOWS | AD | Join Domain"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/join_ad_domain.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
-      - "AWS"
+      - APD Machine Credential
+      - AWS
     survey_enabled: true
     survey:
       name: ''
@@ -370,16 +370,16 @@ controller_templates:
           required: true
           description: Inventory hostname for domain controller previously established using the Create Domain template
 
-  - name: "WINDOWS / AD / New User"
+  - name: "WINDOWS | AD | New User"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/helpdesk_new_user_portal.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -414,16 +414,16 @@ controller_templates:
           default: 555-123456
           required: false
 
-  - name: "WINDOWS / DISA STIG"
+  - name: "WINDOWS | DISA STIG"
     job_type: run
-    inventory: "Demo Inventory"
+    inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "windows/compliance.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - "Demo Credential"
+      - APD Machine Credential
     survey_enabled: true
     survey:
       name: ''
@@ -437,7 +437,7 @@ controller_templates:
 controller_workflows:
   - name: Setup Active Directory Domain
     description: A workflow to create a domain controller with two domain-joined Windows hosts.
-    organization: Default
+    organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -488,17 +488,17 @@ controller_workflows:
           default: aws-test-sg
     simplified_workflow_nodes:
       - identifier: Create Keypair
-        unified_job_template: Cloud / AWS / Create Keypair
+        unified_job_template: Cloud | AWS | Create Keypair
         success_nodes:
           - Create VPC
       - identifier: Create VPC
-        unified_job_template: Cloud / AWS / Create VPC
+        unified_job_template: Cloud | AWS | Create VPC
         success_nodes:
           - Create Domain Controller
           - Create Computer (1)
           - Create Computer (2)
       - identifier: Create Domain Controller
-        unified_job_template: Cloud / AWS / Create VM
+        unified_job_template: Cloud | AWS | Create VM
         job_type: run
         extra_data:
           create_vm_vm_name: dc01
@@ -508,7 +508,7 @@ controller_workflows:
         success_nodes:
           - Inventory Sync
       - identifier: Create Computer (1)
-        unified_job_template: Cloud / AWS / Create VM
+        unified_job_template: Cloud | AWS | Create VM
         job_type: run
         extra_data:
           create_vm_vm_name: winston
@@ -518,7 +518,7 @@ controller_workflows:
         success_nodes:
           - Inventory Sync
       - identifier: Create Computer (2)
-        unified_job_template: Cloud / AWS / Create VM
+        unified_job_template: Cloud | AWS | Create VM
         job_type: run
         extra_data:
           create_vm_vm_name: winthrop
@@ -533,7 +533,7 @@ controller_workflows:
         success_nodes:
           - Test Connectivity
       - identifier: Test Connectivity
-        unified_job_template: WINDOWS / Test Connectivity
+        unified_job_template: WINDOWS | Test Connectivity
         job_type: run
         extra_data:
           _hosts: deployment_domain_ansible_local
@@ -542,7 +542,7 @@ controller_workflows:
         success_nodes:
           - Create Domain
       - identifier: Create Domain
-        unified_job_template: WINDOWS / AD / Create Domain
+        unified_job_template: WINDOWS | AD | Create Domain
         job_type: run
         extra_data:
           _hosts: purpose_domain_controller
@@ -551,7 +551,7 @@ controller_workflows:
         success_nodes:
           - Join Domain
       - identifier: Join Domain
-        unified_job_template: WINDOWS / AD / Join Domain
+        unified_job_template: WINDOWS | AD | Join Domain
         job_type: run
         extra_data:
           _hosts: purpose_domain_computer
@@ -567,19 +567,19 @@ controller_workflows:
           - PowerShell Validation
           - Kerberos Validation
       - identifier: Cleanup Resources
-        unified_job_template: WINDOWS / Rollback
+        unified_job_template: WINDOWS | Rollback
         job_type: run
         extra_data:
           _hosts: localhost
           rollback_msg: "Domain setup failed. Cleaning up resources..."
       - identifier: PowerShell Validation
-        unified_job_template: WINDOWS / Run PowerShell
+        unified_job_template: WINDOWS | Run PowerShell
         job_type: run
         extra_data:
           _hosts: purpose_domain_controller
           ps_script: "Get-ADComputer -Filter * | Select-Object -Property 'Name'"
       - identifier: Kerberos Validation
-        unified_job_template: WINDOWS / Run PowerShell / Kerberos
+        unified_job_template: WINDOWS | Run PowerShell | Kerberos
         job_type: run
         extra_data:
           ps_script: "Get-WinEvent -LogName Security | Where-Object {$_.Message -like '*Kerberos*'} | Select-Object TimeCreated, Message -First 1"

@@ -1,0 +1,28 @@
+# https://ansible.readthedocs.io/projects/navigator/
+---
+ansible-navigator:
+  ansible-runner:
+    artifact-dir: navigator-output/runner/
+    rotate-artifacts-count: 10
+  execution-environment:
+    container-engine: podman
+    image: quay.io/ansible-product-demos/apd-ee-25:latest
+    environment-variables:
+      pass:
+        - AAP_HOSTNAME
+        - AAP_USERNAME
+        - AAP_PASSWORD
+        - AAP_TOKEN
+        - ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN
+        - ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN
+        - AWS_ACCESS_KEY_ID
+        - AWS_SECRET_ACCESS_KEY
+  logging:
+    level: info
+    append: false
+    file: navigator-output/ansible-navigator.log
+  playbook-artifact:
+    enable: true
+    save-as: navigator-output/{playbook_name}-artifact-{time_stamp}.json
+
+...

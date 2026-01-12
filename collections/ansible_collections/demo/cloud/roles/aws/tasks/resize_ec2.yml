@@ -7,8 +7,8 @@
     controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
     controller_inventory_sources:
       - name: AWS Inventory
-        inventory: Demo Inventory
-        organization: Default
+        inventory: Ansible Product Demos Inventory
+        organization: Ansible Product Demos (APD)
         wait: true
   block:
     - name: AWS | RESIZE EC2 | assert required vars

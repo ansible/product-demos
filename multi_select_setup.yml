@@ -4,7 +4,7 @@
   gather_facts: false
   vars:
     launch_jobs:
-      name: "Product Demos | Single demo setup"
+      name: "APD | Single demo setup"
       wait: true
   tasks:
     - name: Build controller launch jobs
