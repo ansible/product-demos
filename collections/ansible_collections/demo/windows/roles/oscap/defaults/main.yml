@@ -1,0 +1,19 @@
+---
+# OpenSCAP Windows installer URL
+openscap_installer_url: "https://github.com/OpenSCAP/openscap/releases/download/1.3.4/OpenSCAP-1.3.4-win32.msi"
+openscap_installer_path: "C:\\Windows\\Temp\\OpenSCAP.msi"
+
+# OpenSCAP executable path (single source of truth)
+oscap_exe_path: "C:\\Program Files (x86)\\OpenSCAP 1.3.4\\oscap.exe"
+
+# SCAP content file from repository
+scap_content_file: "winserv2019-stig-scap-benchmark.xml"
+
+# Directory on target system where SCAP content will be copied
+scap_content_dir: "C:\\oscap-content"
+
+# Source directory for SCAP content (relative to role or playbook)
+scap_content_source_dir: "{{ role_path }}/files"
+
+# Directory for OpenSCAP reports (used by setup_web_server.yml task file)
+oscap_report_dir: "C:\\oscap-reports"
