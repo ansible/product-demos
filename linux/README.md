@@ -33,7 +33,7 @@ This category of demos shows examples of linux operations and management with An
 
 ### Inventory
 
-A dymanic inventory is created to pull inventory hosts from Red Hat Insights. The Systems will be added by their host name therefore adding duplicate systems will cause conflicts in the inventory. Only systems with the tag `purpose=demo` in Red Hat Insights will be added to this inventory. Groups will be created for other tags given to the system.
+A dynamic inventory is created to pull inventory hosts from Red Hat Insights. The Systems will be added by their host name therefore adding duplicate systems will cause conflicts in the inventory. Only systems with the tag `purpose=demo` in Red Hat Insights will be added to this inventory. Groups will be created for other tags given to the system.
 
 Groups will also be created for systems with missing security, enhancement and bug updates. The inventory configuration is governed by the [inventory.insights.yml](inventory.insights.yml) file.
 

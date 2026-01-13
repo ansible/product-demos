@@ -42,13 +42,13 @@ We are currently investigating an intermittent connectivity issue related to the
 
 **WINDOWS / Create Active Directory Domain** - This job can take some to complete. It is recommended to run ahead of time if you would like to demo creating a helpdesk user.
 
-**WINDOWS / Helpdesk new user portal** - This job is dependant on the Create Active Directory Domain completing before users can be created.
+**WINDOWS / Helpdesk new user portal** - This job is dependent on the Create Active Directory Domain completing before users can be created.
 
-**WINDOWS / Join Active Directory Domain** - This job is dependant on the Create Active Directory Domain completing before computers can be joined.
+**WINDOWS / Join Active Directory Domain** - This job is dependent on the Create Active Directory Domain completing before computers can be joined.
 
 ## Connecting to Windows Hosts \[credssp\]
 
-The provided template for provisioning VMs in AWS supports a few blueprints, notably [windows_core](../cloud/blueprints/windows_core.yml) and [windows_full](../cloud/blueprints/windows_full.yml). The windows blueprints both rely on the [aws_windows_userdata](../collections/ansible_collections/demo/cloud/roles/aws/templates/aws_windows_userdata.j2) script which configures a user with Administrator privileges. By default, the Demo Credential is used to inject a password for `ec2-user`. 
+The provided template for provisioning VMs in AWS supports a few blueprints, notably [windows_core](../cloud/blueprints/windows_core.yml) and [windows_full](../cloud/blueprints/windows_full.yml). The windows blueprints both rely on the [aws_windows_userdata](../collections/ansible_collections/demo/cloud/roles/aws/templates/aws_windows_userdata.j2) script which configures a user with Administrator privileges. By default, the Demo Credential is used to inject a password for `ec2-user`.
 
 ⚠️ When using Ansible Product Demos on demo.redhat.com,<br>
 the image below demonstrates where you can locate the Demo Credential password:<br>
