@@ -1,29 +1,71 @@
 ---
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+  - repo: https://github.com/pre-commit/pre-commit-hooks.git
+    rev: v6.0.0
     hooks:
-      - id: trailing-whitespace
-        exclude: rhel[89]STIG/.*$
-
-      - id: check-yaml
-        exclude: \.j2.(yaml|yml)$|\.(yaml|yml).j2$
-        args: [--unsafe]   # see https://github.com/pre-commit/pre-commit-hooks/issues/273
-
-      - id: check-toml
-      - id: check-json
+      - id: check-added-large-files
+      - id: check-merge-conflict
       - id: check-symlinks
-
-  - repo: local
+      - id: debug-statements
+      - id: detect-private-key
+      - id: end-of-file-fixer
+        # ignore formatting-prettier to have an accurate prettier comparison
+        exclude: >
+          (?x)^(
+            collections/ansible_collections/demo/compliance/roles/.*|
+            test/eco/.*.result|
+            examples/yamllint/.*|
+            test/fixtures/formatting-before/.*|
+            test/fixtures/formatting-prettier/.*
+          )$
+      - id: trailing-whitespace
+        exclude: >
+          (?x)^(
+            collections/ansible_collections/demo/compliance/roles/.*|
+            examples/playbooks/(with-skip-tag-id|unicode).yml|
+            examples/playbooks/example.yml|
+            examples/yamllint/.*|
+            test/eco/.*.result|
+            test/fixtures/formatting-before/.*
+          )$
+      - id: mixed-line-ending
+        exclude: >
+          (?x)^(
+            collections/ansible_collections/demo/compliance/roles/.*
+          )$
+      - id: fix-byte-order-marker
+        exclude: >
+          (?x)^(
+            collections/ansible_collections/demo/compliance/roles/.*
+          )$
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: debug-statements
+        language_version: python3
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
     hooks:
-      - id: ansible-lint
-        name: ansible-navigator lint --eei quay.io/ansible-product-demos/apd-ee-25:latest --mode stdout
-        language: python
-        entry: bash -c "ansible-navigator lint --eei quay.io/ansible-product-demos/apd-ee-25 -v --force-color --mode stdout"
-
-  - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 23.11.0
+      - id: codespell
+        args: ["-L", "sumbit,UserA"]
+        exclude: >
+          (?x)^(
+            collections/ansible_collections/demo/compliance/roles/.*|
+            .config/dictionary.txt|
+            examples/broken/encoding.j2|
+            test/schemas/negative_test/.*|
+            test/schemas/test/.*|
+            src/ansiblelint/schemas/.*\.json
+          )$
+        additional_dependencies:
+          - tomli
+  - repo: https://github.com/pappasam/toml-sort
+    rev: v0.24.2
     hooks:
-      - id: black
-        exclude: rhel[89]STIG/.*$
+      - id: toml-sort-fix
+        alias: toml
+
+  - repo: https://github.com/tox-dev/tox-ini-fmt
+    rev: 1.6.0
+    hooks:
+      - id: tox-ini-fmt
 ...
