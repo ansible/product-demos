@@ -1,0 +1,19 @@
+---
+network_connections:
+  - name: System eth0
+    type: ethernet
+    interface_name: eth0
+    ip:
+      address:
+        - 10.0.2.40/24
+      gateway4: 10.0.2.20
+      dns:
+        - 10.0.0.2
+      route:
+        - network: 169.254.169.254 # Instance metadata service (IMDS)
+network_state:
+  interfaces:
+    - name: System eth0
+      type: ethernet
+      state: up
+...

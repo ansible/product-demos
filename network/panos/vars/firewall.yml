@@ -1,0 +1,70 @@
+---
+panos_zones:
+  - trust
+  - untrust
+
+panos_mgmt_profile: 
+  name: apd-panos-ping-mgmt-profile
+  ping: true
+
+panos_interfaces:
+  - if_name: ethernet1/1
+    mode: layer3
+    zone_name: untrust
+    management_profile: "{{ panos_mgmt_profile.name }}"
+    create_default_route: true
+    comment: public interface
+  - if_name: ethernet1/2
+    mode: layer3
+    zone_name: trust
+    management_profile: "{{ panos_mgmt_profile.name }}"
+    create_default_route: false
+    comment: private interface
+
+panos_nat_rules:
+  - name: NATtoWebServer
+    description: Destination NAT for the webserver
+    nat_type: ipv4
+    from_zones: ['untrust']
+    to_zones: ['untrust']
+    source_addresses: ['any']
+    destination_addresses: ['10.0.1.20']
+    destination_translated_address: '10.0.2.40'
+  - name: NATtoInternet
+    description: Source NAT for the internet
+    nat_type: ipv4
+    from_zones: ['trust']
+    to_zones: ['untrust']
+    source_addresses: ['any']
+    source_translation_type: dynamic-ip-and-port
+    source_translation_address_type: translated-address
+    source_translation_translated_addresses: ['10.0.1.20']
+    destination_addresses: ['any']
+
+panos_security_rules:
+  - rule_name: Ingress to Web Site
+    description: Traffic from the internet to the web server
+    source_ip: ['any']
+    source_zone: ['any']
+    destination_ip: ['any']
+    destination_zone: ['trust']
+    application: ['web-browsing']
+    service: ['application-default']
+    antivirus: default
+    vulnerability: default
+    spyware: default
+    log_start: false
+    log_end: true
+  - rule_name: Egress from Web Site to Internet
+    description: Website to Internet
+    source_ip: ['10.0.2.40']
+    source_zone: ['trust']
+    destination_ip: ['any']
+    destination_zone: ['untrust']
+    application: ['any']
+    service: ['any']
+    antivirus: default
+    vulnerability: default
+    spyware: default
+    log_start: false
+    log_end: true

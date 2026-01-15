@@ -17,6 +17,100 @@ controller_projects:
     controller_configuration_async_retries: 40
     default_environment: Networking Execution Environment
 
+controller_credential_types:
+- name: SSH Proxy
+  description: Designed for connecting to a managed node through a bastion host
+  kind: cloud
+  injectors:
+    env:
+      SSH_PROXY_KEY: !unsafe '{{ tower.filename }}'
+    extra_vars:
+      ssh_proxy_host: !unsafe '{{ ssh_proxy_host }}'
+      ssh_proxy_password: !unsafe '{{ ssh_proxy_password }}'
+      ssh_proxy_username: !unsafe '{{ ssh_proxy_username }}'
+    file:
+      template: !unsafe '{{ ssh_proxy_key }}'
+  inputs:
+    fields:
+    - id: ssh_proxy_username
+      label: SSH Proxy Username
+      type: string
+    - id: ssh_proxy_password
+      label: SSH Proxy Password
+      secret: true
+      type: string
+    - id: ssh_proxy_host
+      label: SSH Proxy Host
+      type: string
+    - format: ssh_private_key
+      id: ssh_proxy_key
+      label: SSH Proxy Private Key
+      multiline: true
+      secret: true
+      type: string
+    required:
+    - ssh_proxy_username
+    - ssh_proxy_host
+- name: Palo Alto Networks Provider
+  description: Designed for use with the paloaltonetworks.panos collection
+  kind: cloud
+  inputs:
+    fields:
+    - help_text: The IP address or hostname of the PAN-OS device being configured.
+      id: panos_ip_address
+      label: IP Address
+      type: string
+    - help_text: The port number to connect to the PAN-OS device on.
+      id: panos_port
+      label: Port
+      type: string
+    - help_text: The serial number of a firewall to use for targeted commands. If
+        ip_address is not a Panorama PAN-OS device, then this param is ignored.
+      id: panos_serial_number
+      label: Serial Number
+      type: string
+    - help_text: The username to use for authentication. This is ignored if api_key
+        is specified.
+      id: panos_username
+      label: Username
+      type: string
+    - help_text: The password to use for authentication. This is ignored if api_key
+        is specified.
+      id: panos_password
+      label: Password
+      secret: true
+      type: string
+    - help_text: The API key to use instead of generating it using username / password.
+      id: panos_api_key
+      label: API Key
+      secret: true
+      type: string
+    required:
+    - panos_ip_address
+  injectors:
+    extra_vars:
+      panos_provider:
+        ip_address: !unsafe '{{ panos_ip_address }}'
+        password: !unsafe '{{ panos_password | default(omit) }}'
+        username: !unsafe '{{ panos_username | default(omit) }}'
+
+controller_credentials:
+  - name: Palo Alto Firewall Admin
+    description: Palo Alto administrator credentials used by the paloaltonetworks.panos collection
+    organization: Ansible Product Demos (APD)
+    credential_type: Palo Alto Networks Provider
+    inputs:
+      panos_ip_address: REPLACEME
+      panos_username: admin
+      panos_password: REPLACEME
+  - name: Palo Alto Bastion
+    description: Palo Alto Bastion credential for supporting SSH proxy implementation
+    organization: Ansible Product Demos (APD)
+    credential_type: SSH Proxy
+    inputs:
+      ssh_proxy_host: REPLACEME
+      ssh_proxy_username: ec2-user
+
 controller_inventory_sources:
   - name: DevNet always-on sandboxes
     source: scm
@@ -24,6 +118,23 @@ controller_inventory_sources:
     overwrite: true
     source_project: Ansible Product Demos
     source_path: network/hosts
+  - name: Panos Demo Instances
+    organization: Ansible Product Demos (APD)
+    source: ec2
+    inventory: Ansible Product Demos Inventory
+    credential: AWS
+    overwrite: true
+    source_vars:
+      regions: 
+        - us-east-2
+      compose:
+        ansible_host: public_ip_address | default(private_ip_address)
+        ansible_user: "'ec2-user'"
+      hostnames:
+      - tag:Name
+      keyed_groups:
+      - key: tags['role']
+        prefix: panos_role
 
 controller_templates:
   - name: NETWORK | Configuration
@@ -116,3 +227,154 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+
+  - name: "NETWORK | Panos | Deploy"
+    playbook: network/panos/deploy.yml
+    project: Ansible Product Demos
+    credentials:
+    - AWS
+    - AAP Credential
+    - APD Machine Credential
+    - Palo Alto Bastion
+    execution_environment: Product Demos EE
+    inventory: Ansible Product Demos Inventory
+    job_slice_count: 1
+    job_type: run
+    extra_vars:
+      aws_region: us-east-2
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: EC2 Public Key
+          required: false
+          type: text
+          variable: panos_demo_public_key
+
+  - name: "NETWORK | Panos | Configure Firewall"
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: network/panos/configure_firewall.yml
+    execution_environment: Product Demos EE
+    credentials:
+      - Palo Alto Firewall Admin
+
+  - name: "NETWORK | Panos | Configure Security Rule"
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: network/panos/configure_security_rule.yml
+    execution_environment: Product Demos EE
+    credentials:
+      - Palo Alto Firewall Admin
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Rule Name
+          required: true
+          type: text
+          variable: panos_rule_name
+          default: Ingress to Web Site
+        - question_name: Action
+          required: true
+          type: multiplechoice
+          variable: panos_action
+          default: "deny"
+          choices:
+            - "deny"
+            - "allow"
+        - question_name: Commit changes?
+          required: true
+          type: multiplechoice
+          variable: panos_commit
+          default: "true"
+          choices:
+            - "true"
+            - "false"
+
+  - name: "NETWORK | Panos | Configure Webserver"
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: network/panos/configure_webserver.yml
+    execution_environment: Product Demos EE
+    credentials:
+      - Palo Alto Firewall Admin
+      - Palo Alto Bastion
+
+  - name: "NETWORK | Panos | Cleanup"
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: network/panos/cleanup.yml
+    execution_environment: Product Demos EE
+    credentials:
+      - AWS
+    extra_vars:
+      aws_region: us-east-2
+
+controller_workflows:
+  - name: "NETWORK | Panos | Demo Firewall Workflow"
+    description: A workflow to provision a firewall, web server, and security rule
+    inventory: Ansible Product Demos Inventory
+    organization: Ansible Product Demos (APD)
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: EC2 Public Key
+          required: false
+          type: text
+          variable: panos_demo_public_key
+    workflow_nodes:
+    - identifier: Deploy
+      related:
+        success_nodes:
+        - identifier: Sync Inventory
+        - identifier: Configure Firewall
+      unified_job_template:
+        name: NETWORK | Panos | Deploy
+        organization:
+          name: Ansible Product Demos (APD)
+          type: organization
+        type: job_template
+    - identifier: Sync Inventory
+      related:
+        success_nodes:
+        - identifier: Configure Webserver
+      unified_job_template:
+        inventory:
+          name: Ansible Product Demos Inventory
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: inventory
+        name: Panos Demo Instances
+        type: inventory_source
+    - identifier: Configure Firewall
+      related:
+        success_nodes:
+        - identifier: Configure Webserver
+      unified_job_template:
+        name: NETWORK | Panos | Configure Firewall
+        organization:
+          name: Ansible Product Demos (APD)
+          type: organization
+        type: job_template
+    - all_parents_must_converge: true
+      identifier: Configure Webserver
+      unified_job_template:
+        name: NETWORK | Panos | Configure Webserver
+        organization:
+          name: Ansible Product Demos (APD)
+          type: organization
+        type: job_template

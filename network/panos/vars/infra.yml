@@ -1,0 +1,183 @@
+---
+panos_demo_prefix: apd-panos
+panos_demo_owner: zleblanc
+# panos_demo_password: <secret>
+panos_demo_ami_pan: ami-0f16456ef765ba0ba
+panos_demo_ami_rhel: ami-0aa8fc2422063977a
+
+panos_demo_keypair: 
+  name: "{{ panos_demo_prefix }}-key"
+  tags:
+    demo: panos
+    prefix: "{{ panos_demo_prefix }}"
+    owner: "{{ panos_demo_owner }}"
+    created_by: apd
+
+panos_demo_vpc:
+  name: "{{ panos_demo_prefix }}-vpc"
+  cidr_block: 10.0.0.0/16
+  tags:
+    demo: panos
+    prefix: "{{ panos_demo_prefix }}"
+    owner: "{{ panos_demo_owner }}"
+    created_by: apd
+
+panos_demo_igw:
+  tags:
+    Name: "{{ panos_demo_prefix }}-igw"
+    demo: panos
+    prefix: "{{ panos_demo_prefix }}"
+    owner: "{{ panos_demo_owner }}"
+    created_by: apd
+
+panos_demo_subnet_public:
+  cidr: 10.0.1.0/24
+  tags:
+    Name: "{{ panos_demo_prefix }}-subnet-public"
+    demo: panos
+    prefix: "{{ panos_demo_prefix }}"
+    owner: "{{ panos_demo_owner }}"
+    created_by: apd
+
+panos_demo_subnet_private:
+  cidr: 10.0.2.0/24
+  tags:
+    Name: "{{ panos_demo_prefix }}-subnet-private"
+    demo: panos
+    prefix: "{{ panos_demo_prefix }}"
+    owner: "{{ panos_demo_owner }}"
+    created_by: apd
+
+panos_demo_security_groups: # order matters (mgmt, public, private)
+  - name: "{{ panos_demo_prefix }}-mgmt-sg"
+    tags:
+      Name: "{{ panos_demo_prefix }}-mgmt-sg"
+      demo: panos
+      prefix: "{{ panos_demo_prefix }}"
+      owner: "{{ panos_demo_owner }}"
+      created_by: apd
+    description: Specifies the protocols and source IP addresses that can connect to the mgmt interface of the firewall
+    rules:
+      - proto: tcp
+        ports:
+          - 22
+          - 80
+          - 443
+        cidr_ip: 0.0.0.0/0
+      - proto: icmp
+        icmp_code: -1
+        icmp_type: -1
+        cidr_ip: 0.0.0.0/0
+  - name: "{{ panos_demo_prefix }}-public-sg"
+    tags:
+      Name: "{{ panos_demo_prefix }}-public-sg"
+      demo: panos
+      prefix: "{{ panos_demo_prefix }}"
+      owner: "{{ panos_demo_owner }}"
+      created_by: apd
+    description: Specifies the source IP addresses that can connect over HTTP, FTP, SSH within the VPC
+    rules:
+      - proto: tcp
+        ports:
+          - 80
+        cidr_ip: 0.0.0.0/0
+      - proto: icmp
+        icmp_code: -1
+        icmp_type: -1
+        cidr_ip: 0.0.0.0/0
+  - name: "{{ panos_demo_prefix }}-private-sg"
+    tags:
+      Name: "{{ panos_demo_prefix }}-private-sg"
+      demo: panos
+      prefix: "{{ panos_demo_prefix }}"
+      owner: "{{ panos_demo_owner }}"
+      created_by: apd
+    description: Specifies the source IP addresses that can connect within the VPC
+    rules:
+      - proto: all
+        group_name: "{{ panos_demo_prefix }}-private-sg"
+        rule_desc: allow all traffic within subnet
+      - proto: tcp
+        ports:
+          - 22
+        group_name: "{{ panos_demo_prefix }}-mgmt-sg"
+        rule_desc: allow ssh from mgmt
+
+panos_demo_network_interfaces:
+  - name: "{{ panos_demo_prefix }}-eni-mgmt"
+    device_index: 0
+    subnet_id: "{{ r_subnet_public.subnet.id }}"
+    security_groups:
+      - "{{ panos_demo_security_groups[0].name }}"
+    tags:
+      name: "{{ panos_demo_prefix }}-eni-mgmt"
+      demo: panos
+      prefix: "{{ panos_demo_prefix }}"
+      owner: "{{ panos_demo_owner }}"
+      created_by: apd
+  - name: "{{ panos_demo_prefix }}-eni-untrusted"
+    device_index: 1
+    private_ip_address: 10.0.1.20
+    subnet_id: "{{ r_subnet_public.subnet.id }}"
+    source_dest_check: false
+    security_groups:
+      - "{{ panos_demo_security_groups[1].name }}"
+    tags:
+      name: "{{ panos_demo_prefix }}-eni-untrusted"
+      demo: panos
+      prefix: "{{ panos_demo_prefix }}"
+      owner: "{{ panos_demo_owner }}"
+      created_by: apd
+  - name: "{{ panos_demo_prefix }}-eni-trusted"
+    device_index: 2
+    private_ip_address: 10.0.2.20
+    subnet_id: "{{ r_subnet_private.subnet.id }}"
+    source_dest_check: false
+    security_groups:
+      - "{{ panos_demo_security_groups[2].name }}"
+    tags:
+      name: "{{ panos_demo_prefix }}-eni-trusted"
+      demo: panos
+      prefix: "{{ panos_demo_prefix }}"
+      owner: "{{ panos_demo_owner }}"
+      created_by: apd
+
+panos_demo_bastion_network_interfaces:
+  - name: "{{ panos_demo_prefix }}-bastion-eni-public"
+    device_index: 0
+    subnet_id: "{{ r_subnet_public.subnet.id }}"
+    private_ip_address: 10.0.1.30
+    security_groups:
+      - "{{ panos_demo_security_groups[0].name }}"
+    tags:
+      name: "{{ panos_demo_prefix }}-bastion-eni-public"
+      demo: panos
+      prefix: "{{ panos_demo_prefix }}"
+      owner: "{{ panos_demo_owner }}"
+      created_by: apd
+  - name: "{{ panos_demo_prefix }}-bastion-eni-private"
+    device_index: 1
+    private_ip_address: 10.0.2.30
+    subnet_id: "{{ r_subnet_private.subnet.id }}"
+    security_groups:
+      - "{{ panos_demo_security_groups[2].name }}"
+    tags:
+      name: "{{ panos_demo_prefix }}-bastion-eni-private"
+      demo: panos
+      prefix: "{{ panos_demo_prefix }}"
+      owner: "{{ panos_demo_owner }}"
+      created_by: apd
+
+panos_demo_webserver_network_interfaces:
+  - name: "{{ panos_demo_prefix }}-webserver-eni-private"
+    device_index: 0
+    private_ip_address: 10.0.2.40
+    subnet_id: "{{ r_subnet_private.subnet.id }}"
+    security_groups:
+      - "{{ panos_demo_security_groups[2].name }}"
+    tags:
+      name: "{{ panos_demo_prefix }}-webserver-eni-private"
+      demo: panos
+      prefix: "{{ panos_demo_prefix }}"
+      owner: "{{ panos_demo_owner }}"
+      created_by: apd
