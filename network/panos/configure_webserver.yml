@@ -1,0 +1,30 @@
+---
+- name: Start a webserver
+  hosts: panos_role_webserver
+  gather_facts: false
+  become: true
+
+  vars_files:
+    - vars/webserver.yml
+
+  tasks:
+    - name: Install required packages
+      ansible.builtin.dnf:
+        name: 
+          - httpd
+          - nmstate
+          - NetworkManager
+        state: present
+
+    - name: Apply network configuration
+      ansible.builtin.include_role:
+        name: redhat.rhel_system_roles.network
+
+    - name: Start httpd
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: Test network config
+      ansible.builtin.command: ping -c 1 google.com
