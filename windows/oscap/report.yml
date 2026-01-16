@@ -1,0 +1,81 @@
+---
+- name: Generate OpenSCAP compliance report for Windows
+  hosts: '{{ _hosts | default(omit) }}'
+  gather_facts: true
+  vars:
+    _compliance_profile: "{{ compliance_profile }}"
+    # OpenSCAP executable path (single source of truth)
+    oscap_exe_path: "C:\\Program Files (x86)\\OpenSCAP 1.3.4\\oscap.exe"
+    # SCAP content file from repository
+    scap_content_file: "winserv2019-stig-scap-benchmark.xml"
+    # Directory on target system where SCAP content will be copied
+    scap_content_dir: "C:\\oscap-content"
+
+  tasks:
+    - name: Install and configure OpenSCAP
+      ansible.builtin.include_role:
+        name: demo.windows.oscap
+
+    - name: Set report directory and SCAP content destination
+      ansible.builtin.set_fact:
+        _report_dir: "C:\\oscap-reports"
+        _scap_content_dest: "{{ scap_content_dir }}\\{{ scap_content_file }}"
+
+    - name: Ensure report directory exists
+      ansible.windows.win_file:
+        path: "{{ _report_dir }}\\{{ _compliance_profile }}"
+        state: directory
+
+    - name: Calculate rounded timestamp (600 second intervals)
+      ansible.builtin.set_fact:
+        _rounded_epoch: "{{ (ansible_date_time.epoch | int / 600) | int * 600 }}"
+
+    - name: Set report name with rounded timestamp
+      ansible.builtin.set_fact:
+        _report_timestamp: "{{ '%Y%m%dT%H%M%SZ' | strftime(_rounded_epoch | int) }}"
+
+    - name: Set report name
+      ansible.builtin.set_fact:
+        _report: "{{ _report_dir }}\\{{ _compliance_profile }}\\report-{{ _report_timestamp }}.html"
+
+    - name: Check if report already exists
+      ansible.windows.win_stat:
+        path: "{{ _report }}"
+      register: _report_exists
+
+    - name: Generate compliance report with profile name
+      ansible.windows.win_command: >
+        "{{ oscap_exe_path }}" xccdf eval
+        --profile "{{ _compliance_profile }}"
+        --report "{{ _report }}"
+        "{{ _scap_content_dest }}"
+      register: _oscap_result
+      failed_when: false
+      changed_when: false
+      when: not _report_exists.stat.exists
+
+    - name: Fail if profile not found
+      ansible.builtin.fail:
+        msg: "Profile '{{ _compliance_profile }}' not found in SCAP content. Use 'oscap info {{ _scap_content_dest }}' to list available profiles."
+      when:
+        - _oscap_result.rc not in [0, 2]
+        - not _report_exists.stat.exists
+
+    - name: Display report location
+      ansible.builtin.debug:
+        msg: "Compliance report generated at: {{ _report }}"
+
+    - name: Setup IIS web server for report viewing
+      ansible.builtin.include_role:
+        name: demo.windows.oscap
+        tasks_from: setup_web_server
+      vars:
+        oscap_report_dir: "{{ _report_dir }}"
+
+    - name: Display report web access information
+      ansible.builtin.debug:
+        msg:
+          - "Latest report available at:"
+          - "  http://{{ oscap_server_ip }}/compliance-reports/{{ _compliance_profile }}/report-{{ _report_timestamp }}.html"
+
+

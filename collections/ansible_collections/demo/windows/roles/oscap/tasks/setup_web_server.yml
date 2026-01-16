@@ -1,0 +1,84 @@
+---
+# This task file sets up IIS to serve OpenSCAP reports via web browser
+# Include this from your playbook after running the main role tasks
+
+- name: Ensure report directory exists
+  ansible.windows.win_file:
+    path: "{{ oscap_report_dir | default('C:\\oscap-reports') }}"
+    state: directory
+
+- name: Install IIS Web Server
+  ansible.windows.win_feature:
+    name:
+      - Web-Server
+      - Web-Mgmt-Tools
+    state: present
+  register: _iis_install
+
+- name: Reboot if IIS installation requires it
+  ansible.windows.win_reboot:
+    msg: "Rebooting to complete IIS installation"
+    post_reboot_delay: 30
+  when: _iis_install.reboot_required
+
+- name: Ensure report directory has proper permissions for IIS
+  ansible.windows.win_acl:
+    path: "{{ oscap_report_dir | default('C:\\oscap-reports') }}"
+    user: "IIS_IUSRS"
+    rights: Read
+    type: allow
+    state: present
+    inherit: ContainerInherit, ObjectInherit
+    propagation: None
+
+- name: Create IIS virtual directory for compliance reports
+  community.windows.win_iis_virtualdirectory:
+    name: compliance-reports
+    site: "Default Web Site"
+    physical_path: "{{ oscap_report_dir | default('C:\\oscap-reports') }}"
+    state: present
+
+- name: Enable directory browsing for virtual directory
+  community.windows.win_iis_webapplication:
+    name: compliance-reports
+    site: "Default Web Site"
+    physical_path: "{{ oscap_report_dir | default('C:\\oscap-reports') }}"
+    state: present
+
+- name: Configure directory browsing
+  ansible.windows.win_shell: |
+    Import-Module WebAdministration
+    Set-WebConfigurationProperty -Filter /system.webServer/directoryBrowse -Name enabled -Value $true -PSPath "IIS:\Sites\Default Web Site\compliance-reports"
+  changed_when: false
+
+- name: Ensure Windows Firewall allows HTTP
+  community.windows.win_firewall_rule:
+    name: "HTTP (TCP-In)"
+    localport: 80
+    action: allow
+    direction: in
+    protocol: tcp
+    state: present
+    enabled: true
+
+- name: Get AWS public IP address from metadata service
+  ansible.windows.win_uri:
+    url: http://169.254.169.254/latest/meta-data/public-ipv4
+    return_content: true
+  register: _aws_public_ip
+  failed_when: false
+
+- name: Set server IP address
+  ansible.builtin.set_fact:
+    oscap_server_ip: "{{ _aws_public_ip.content | default(ansible_ip_addresses | ansible.utils.ipv4 | first) }}"
+
+- name: Display web server access information
+  ansible.builtin.debug:
+    msg:
+      - "=========================================="
+      - "IIS Web Server configured successfully!"
+      - "=========================================="
+      - "Access compliance reports at:"
+      - "  http://{{ oscap_server_ip }}/compliance-reports/"
+      - "  http://{{ ansible_hostname }}/compliance-reports/"
+      - "=========================================="

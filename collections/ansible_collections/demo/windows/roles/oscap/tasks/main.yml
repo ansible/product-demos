@@ -1,0 +1,100 @@
+---
+- name: Get disk space information
+  ansible.windows.win_stat:
+    path: "C:\\"
+  register: _c_drive_info
+
+- name: Assert disk space meets minimum requirements
+  ansible.builtin.assert:
+    that:
+      - _c_drive_info.stat.exists
+    fail_msg: "Cannot access C: drive."
+
+- name: Set SCAP content destination
+  ansible.builtin.set_fact:
+    _scap_content_dest: "{{ scap_content_dir }}\\{{ scap_content_file }}"
+
+- name: Check if OpenSCAP is installed
+  ansible.windows.win_stat:
+    path: "{{ oscap_exe_path }}"
+  register: _oscap_installed
+
+- name: Check if Visual C++ redistributable installer exists
+  ansible.windows.win_stat:
+    path: "{{ openscap_installer_path | win_dirname }}\\vc_redist.x86.exe"
+  register: _vc_redist_exists
+
+- name: Download Visual C++ 2015-2022 Redistributable (x86)
+  ansible.windows.win_get_url:
+    url: https://aka.ms/vs/17/release/vc_redist.x86.exe
+    dest: "{{ openscap_installer_path | win_dirname }}\\vc_redist.x86.exe"
+  when: not _vc_redist_exists.stat.exists
+
+- name: Install Visual C++ x86 Redistributable
+  ansible.windows.win_package:
+    path: "{{ openscap_installer_path | win_dirname }}\\vc_redist.x86.exe"
+    arguments: /install /quiet /norestart
+    state: present
+    expected_return_code: [0, 1638, 3010]
+
+- name: Download OpenSCAP installer
+  when:
+    - not _oscap_installed.stat.exists
+  block:
+    - name: Create temp directory
+      ansible.windows.win_file:
+        path: "{{ openscap_installer_path | win_dirname }}"
+        state: directory
+
+    - name: Download OpenSCAP installer
+      ansible.windows.win_get_url:
+        url: "{{ openscap_installer_url }}"
+        dest: "{{ openscap_installer_path }}"
+        force: false
+
+    - name: Install OpenSCAP from MSI
+      ansible.windows.win_package:
+        path: "{{ openscap_installer_path }}"
+        state: present
+        arguments: /quiet /norestart
+
+- name: Re-check OpenSCAP installation after potential install
+  ansible.windows.win_stat:
+    path: "{{ oscap_exe_path }}"
+  register: _oscap_verify
+
+- name: Verify OpenSCAP installation
+  ansible.builtin.assert:
+    that:
+      - _oscap_verify.stat.exists | bool
+    fail_msg: "OpenSCAP installation failed. Please install manually."
+    success_msg: "OpenSCAP found at {{ oscap_exe_path }}"
+
+- name: Ensure SCAP content directory exists
+  ansible.windows.win_file:
+    path: "{{ scap_content_dir }}"
+    state: directory
+
+- name: Determine SCAP content source path
+  ansible.builtin.set_fact:
+    _scap_source_path: "{{ scap_content_source_dir }}/{{ scap_content_file }}"
+  when: scap_content_source_dir is defined
+
+- name: Copy SCAP content file to target system
+  ansible.windows.win_copy:
+    src: "{{ _scap_source_path | default(scap_content_file) }}"
+    dest: "{{ _scap_content_dest }}"
+    remote_src: false
+
+- name: Verify SCAP content file was copied
+  ansible.windows.win_stat:
+    path: "{{ _scap_content_dest }}"
+  register: _scap_content_verify
+  failed_when: not _scap_content_verify.stat.exists
+
+- name: Display OpenSCAP setup results
+  ansible.builtin.debug:
+    msg:
+      - "OpenSCAP setup completed successfully"
+      - "OpenSCAP executable: {{ oscap_exe_path }}"
+      - "SCAP content: {{ _scap_content_dest }}"
