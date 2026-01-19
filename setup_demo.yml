@@ -1,48 +1,62 @@
 ---
-- name: Setup common prerequisites
+- name: Setup Demo(s)
   hosts: localhost
   gather_facts: false
-
-  # vars_files should be scoped to a play so variables defined in the
-  # files should not be available in subsequent plays, so certain
-  # resources won't be retried
-  vars_files:
-    - common/setup.yml
+  vars:
+    demos_list: "{{ demos | default([demo]) }}"
+    final_setup_config: {}
 
   tasks:
-    - name: Create reusable deployment ID
+    - name: Create or read reusable deployment ID
       ansible.builtin.set_fact:
         _deployment_id: '{{ lookup("ansible.builtin.password", "{{ playbook_dir }}/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
 
-    - name: Create common demo resources
+    - name: Load common setup variables
+      ansible.builtin.include_vars:
+        file: common/setup.yml
+        name: common_vars
+
+    - name: Initialize config with common variables
+      ansible.builtin.set_fact:
+        final_setup_config: "{{ common_vars }}"
+
+    - name: Load demo-specific variables
+      ansible.builtin.include_vars:
+        file: "{{ item }}/setup.yml"
+        name: "demo_vars_{{ index }}"
+      loop: "{{ demos_list }}"
+      loop_control:
+        index_var: index
+
+    - name: Merge demo variables into final configuration
+      ansible.builtin.set_fact:
+        final_setup_config: "{{ final_setup_config | combine(lookup('vars', 'demo_vars_' + index|string), recursive=True, list_merge='append') }}"
+      loop: "{{ demos_list }}"
+      loop_control:
+        index_var: index
+
+    - name: Promote aggregated config to top-level facts
+      ansible.builtin.set_fact:
+        "{{ item.key }}": "{{ item.value }}"
+      loop: "{{ final_setup_config | dict2items }}"
+      # Hiding output as this can be very verbose
+      no_log: true
+
+    - name: Apply configuration (Dispatch Role)
       ansible.builtin.include_role:
         name: infra.aap_configuration.dispatch
       vars:
-        controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
+        controller_dependency_check: false
 
-- name: Setup demo
-  hosts: localhost
-  gather_facts: false
-  tasks:
-    - name: Include configuration for {{ demo }}
-      ansible.builtin.include_vars: "{{ demo }}/setup.yml"
-
-    - name: Demo Components
-      ansible.builtin.include_role:
-        name: infra.aap_configuration.dispatch
-      vars:
-        controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
-
-    - name: Log Demo
+    - name: Log Demo Usage
       ansible.builtin.uri:
         url: https://docs.google.com/forms/d/e/1FAIpQLSdIZ77YpETjEfGOoYlXtMnQiU-6M7QFlb2hJA4ujo25QYb2jw/formResponse
         method: POST
-        body: "ifq&entry.1569353616={{ demo }} &entry.498055740={{ lookup('ansible.builtin.env', 'AWX_HOST') }}&sumbit=Submit"
-      ignore_errors: true  # noqa: ignore-errors - connectivity should not fail play
+        body: "ifq&entry.1569353616={{ item }} &entry.498055740={{ lookup('ansible.builtin.env', 'AWX_HOST') }}&sumbit=Submit"
+      ignore_errors: true
+      loop: "{{ demos_list }}"
 
-    - name: Print Message
+    - name: Print User Message
       ansible.builtin.debug:
         msg: "{{ user_message }}"
       when: user_message is defined
-
-...
