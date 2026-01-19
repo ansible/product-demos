@@ -13,20 +13,11 @@ repos:
         exclude: >
           (?x)^(
             collections/ansible_collections/demo/compliance/roles/.*|
-            test/eco/.*.result|
-            examples/yamllint/.*|
-            test/fixtures/formatting-before/.*|
-            test/fixtures/formatting-prettier/.*
           )$
       - id: trailing-whitespace
         exclude: >
           (?x)^(
             collections/ansible_collections/demo/compliance/roles/.*|
-            examples/playbooks/(with-skip-tag-id|unicode).yml|
-            examples/playbooks/example.yml|
-            examples/yamllint/.*|
-            test/eco/.*.result|
-            test/fixtures/formatting-before/.*
           )$
       - id: mixed-line-ending
         exclude: >
@@ -50,11 +41,6 @@ repos:
         exclude: >
           (?x)^(
             collections/ansible_collections/demo/compliance/roles/.*|
-            .config/dictionary.txt|
-            examples/broken/encoding.j2|
-            test/schemas/negative_test/.*|
-            test/schemas/test/.*|
-            src/ansiblelint/schemas/.*\.json
           )$
         additional_dependencies:
           - tomli
@@ -63,9 +49,4 @@ repos:
     hooks:
       - id: toml-sort-fix
         alias: toml
-
-  - repo: https://github.com/tox-dev/tox-ini-fmt
-    rev: 1.6.0
-    hooks:
-      - id: tox-ini-fmt
 ...
