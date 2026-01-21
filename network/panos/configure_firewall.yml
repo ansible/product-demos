@@ -1,0 +1,82 @@
+---
+- name: Configure the Palo Alto firewall
+  hosts: localhost # API driven
+  gather_facts: false
+  become: false
+
+  vars_files:
+    - vars/firewall.yml
+
+  tasks:
+    - name: Create firewall zones
+      loop: "{{ panos_zones }}" 
+      paloaltonetworks.panos.panos_zone:
+        provider: "{{ panos_provider }}"
+        zone: "{{ item }}"
+
+    - name: Create mgmt profile
+      paloaltonetworks.panos.panos_management_profile:
+        provider: "{{ panos_provider }}"
+        name: "{{ panos_mgmt_profile.name }}"
+        ping: "{{ panos_mgmt_profile.ping }}"
+
+    - name: Configure public interface(s)
+      loop: "{{ panos_interfaces }}"
+      loop_control:
+        loop_var: __interface
+        label: "{{ __interface.if_name }}"
+      paloaltonetworks.panos.panos_interface:
+        provider: "{{ panos_provider }}"
+        if_name: "{{ __interface.if_name }}"
+        mode: "{{ __interface.mode }}"
+        zone_name: "{{ __interface.zone_name }}"
+        management_profile: "{{ __interface.management_profile }}"
+        create_default_route: "{{ __interface.create_default_route }}"
+        comment: "{{ __interface.comment | default('created by ansible') }}"
+
+    - name: Add NAT rule(s)
+      loop: "{{ panos_nat_rules }}"
+      loop_control:
+        loop_var: __nat_rule
+        label: "{{ __nat_rule.name }}"
+      paloaltonetworks.panos.panos_nat_rule2:
+        provider: "{{ panos_provider }}"
+        name: "{{ __nat_rule.name }}"
+        description: "{{ __nat_rule.description }}"
+        nat_type: "{{ __nat_rule.nat_type }}"
+        from_zones: "{{ __nat_rule.from_zones | default(omit) }}"
+        to_zones: "{{ __nat_rule.to_zones | default(omit) }}" 
+        to_interface: "{{ __nat_rule.to_interface | default(omit) }}"
+        service: "{{ __nat_rule.service | default(omit) }}"
+        source_addresses: "{{ __nat_rule.source_addresses | default(omit) }}"
+        source_translation_type: "{{ __nat_rule.source_translation_type | default(omit) }}"
+        source_translation_address_type: "{{ __nat_rule.source_translation_address_type | default(omit) }}"
+        source_translation_translated_addresses: "{{ __nat_rule.source_translation_translated_addresses | default(omit) }}"
+        destination_addresses: "{{ __nat_rule.destination_addresses | default(omit) }}"
+        destination_translated_address: "{{ __nat_rule.destination_translated_address | default(omit) }}" 
+
+    - name: Add security rules
+      loop: "{{ panos_security_rules }}"
+      loop_control:
+        loop_var: __security_rule
+        label: "{{ __security_rule.rule_name }}"
+      paloaltonetworks.panos.panos_security_rule:
+        provider: "{{ panos_provider }}"
+        rule_name: "{{  __security_rule.rule_name }}"
+        description: "{{  __security_rule.description }}"
+        source_ip: "{{  __security_rule.source_ip }}"
+        source_zone: "{{  __security_rule.source_zone }}"
+        destination_ip: "{{  __security_rule.destination_ip }}"
+        destination_zone: "{{  __security_rule.destination_zone }}"
+        application: "{{  __security_rule.application }}"
+        service: "{{  __security_rule.service }}"
+        antivirus: "{{  __security_rule.antivirus }}"
+        vulnerability: "{{  __security_rule.vulnerability }}"
+        spyware: "{{  __security_rule.spyware }}"
+        log_start: "{{  __security_rule.log_start }}"
+        log_end: "{{  __security_rule.log_end }}"
+
+    - name: Commit firewall changes
+      paloaltonetworks.panos.panos_commit_firewall:
+        provider: "{{ panos_provider }}"
+        description: "Triggered by ansible on {{ lookup('pipe', 'date') }}"

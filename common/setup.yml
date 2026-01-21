@@ -102,6 +102,17 @@ controller_groups:
       ansible_port: 5986
       ansible_winrm_kinit_env_vars:
         - KRB5_CONFIG
+  - name: panos_role_webserver
+    inventory: Ansible Product Demos Inventory
+    description: webserver host(s) in Palo Alto demo
+    preserve_existing_hosts: true
+    preserve_existing_children: true
+    variables:
+      ansible_ssh_private_key_file: !unsafe "{{ lookup('env', 'SSH_PROXY_KEY') }}"
+      ansible_ssh_common_args: !unsafe >-
+        -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null 
+        -o ProxyCommand="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null 
+        -i {{ lookup('env', 'SSH_PROXY_KEY') }} -W %h:%p -q {{ ssh_proxy_username }}@{{ ssh_proxy_host }}"
 
 controller_templates:
   - name: SUBMIT FEEDBACK
