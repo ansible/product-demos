@@ -192,7 +192,7 @@ controller_templates:
       - Satellite Credential
 
 controller_launch_jobs:
-  - name: SETUP
+  - name: "APD | Single demo setup"
     wait: false
     extra_vars:
       demo: linux
