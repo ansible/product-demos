@@ -1,6 +1,6 @@
 ---
 # parameters
-# snapshot_opeation: <ceate/restore>
+# snapshot_opeation: <create/restore>
 - name: Show hostnames we care about
   ansible.builtin.debug:
     msg: "About to {{ snapshot_operation }} snapshot(s) for the following hosts:
