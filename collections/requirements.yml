@@ -1,6 +1,5 @@
 ---
 # required collections are installed in the Product Demos EE.
 # additional collections needed during testing can be added here.
-collections: []
-
+collections: [] 
 ...
