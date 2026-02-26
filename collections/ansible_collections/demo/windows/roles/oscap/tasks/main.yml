@@ -12,7 +12,7 @@
 
 - name: Set SCAP content destination
   ansible.builtin.set_fact:
-    _scap_content_dest: "{{ oscap_content_dir }}\\{{ oscap_content_file }}"
+    _scap_content_dest: "{{ oscap_content_dir }}\\{{ oscap_content_file }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Check if OpenSCAP is installed
   ansible.windows.win_stat:
@@ -77,7 +77,7 @@
 
 - name: Determine SCAP content source path
   ansible.builtin.set_fact:
-    _scap_source_path: "{{ oscap_content_source_dir }}/{{ oscap_content_file }}"
+    _scap_source_path: "{{ oscap_content_source_dir }}/{{ oscap_content_file }}"  # noqa: var-naming[no-role-prefix]
   when: oscap_content_source_dir is defined
 
 - name: Copy SCAP content file to target system
