@@ -42,21 +42,47 @@
       # Hiding output as this can be very verbose
       no_log: true
 
-    - name: Apply configuration (Dispatch Role)
-      ansible.builtin.include_role:
-        name: infra.aap_configuration.dispatch
-      vars:
-        controller_dependency_check: false
+    - name: Authenticate with AAP and obtain token
+      ansible.platform.token:
+        description: "Ansible Product Demos setup authentication token"
+      register: __aap_token
 
-    - name: Log Demo Usage
-      ansible.builtin.uri:
-        url: https://docs.google.com/forms/d/e/1FAIpQLSdIZ77YpETjEfGOoYlXtMnQiU-6M7QFlb2hJA4ujo25QYb2jw/formResponse
-        method: POST
-        body: "ifq&entry.1569353616={{ item }} &entry.498055740={{ lookup('ansible.builtin.env', 'AWX_HOST') }}&sumbit=Submit"
-      ignore_errors: true
-      loop: "{{ demos_list }}"
+    - name: Unset password-based authentication variables
+      ansible.builtin.set_fact:
+        controller_password: ''
+        aap_password: ''
 
-    - name: Print User Message
-      ansible.builtin.debug:
-        msg: "{{ user_message }}"
-      when: user_message is defined
+    - name: Apply configuration and cleanup token
+      environment:
+        AAP_PASSWORD: ''
+        CONTROLLER_PASSWORD: ''
+      block:
+        - name: Apply configuration (Dispatch Role)
+          ansible.builtin.include_role:
+            name: infra.aap_configuration.dispatch
+          vars:
+            controller_dependency_check: false
+            controller_oauthtoken: "{{ aap_token.token }}"
+
+        - name: Log Demo Usage
+          ansible.builtin.uri:
+            url: https://docs.google.com/forms/d/e/1FAIpQLSdIZ77YpETjEfGOoYlXtMnQiU-6M7QFlb2hJA4ujo25QYb2jw/formResponse
+            method: POST
+            body: "ifq&entry.1569353616={{ item }} &entry.498055740={{ lookup('ansible.builtin.env', 'AWX_HOST') }}&sumbit=Submit"
+          ignore_errors: true
+          loop: "{{ demos_list }}"
+
+        - name: Print User Message
+          ansible.builtin.debug:
+            msg: "{{ user_message }}"
+          when: user_message is defined
+
+      always:
+        - name: Revoke authentication token
+          ansible.platform.token:
+            existing_token: "{{ __aap_token }}"
+            aap_token: "{{ aap_token.token }}"
+            state: absent
+          when: __aap_token is defined
+
+
