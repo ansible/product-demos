@@ -52,6 +52,8 @@ collections:
     version: ">=7.0.0"
   - name: network.backup
     version: ">=3.0.0"
+  - name: paloaltonetworks.panos
+    version: ">=3.2.0"
   # TODO on 2.5 ee-minimal-rhel9 this tries to build and install
   # a different version of python netifaces, which fails
   - name: infoblox.nios_modules
@@ -65,5 +67,18 @@ collections:
     version: ">=3.0.1"
   - name: redhat.openshift_virtualization
     version: ">=1.4.0"
+  # other demos
+  - name: cloud.terraform
+    version: ">=4.0.0"
+  - name: hashicorp.terraform
+    version: ">=1.1.0"
+  - name: hashicorp.vault
+    version: ">=1.0.0"
+  - name: servicenow.itsm
+    version: ">=2.13.0"
+  - name: redhat.rhbk
+    version: ">=3.0.0"
+  - name: redhat.rhel_idm
+    version: ">=1.15.0"
 
 ...
