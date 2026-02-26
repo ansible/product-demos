@@ -7,28 +7,22 @@
   vars_files:
     - vars/infra.yml
 
-  vars:
-    _ec2_key_provided: "{{ panos_demo_public_key | default('') | length > 0 }}"
-
   tasks:
-    - name: Create EC2 Key Pair | Existing
-      when: _ec2_key_provided
-      register: r_ec2_key_exists
-      amazon.aws.ec2_key:
-        name: "{{ panos_demo_keypair.name }}"
-        region: "{{ aws_region | default(omit) }}"
-        key_material: "{{ panos_demo_public_key }}"
-        state: present
-        tags: "{{ panos_demo_keypair.tags }}"
-
-    - name: Create EC2 Key Pair | New
-      when: not _ec2_key_provided
+    - name: Create EC2 Key Pair
       register: r_ec2_key_new
       amazon.aws.ec2_key:
         name: "{{ panos_demo_keypair.name }}"
         region: "{{ aws_region | default(omit) }}"
         state: present
         tags: "{{ panos_demo_keypair.tags }}"
+
+    - name: Assert that the key pair did not exist
+      ansible.builtin.assert:
+        that:
+          - r_ec2_key_new is changed
+        fail_msg: >
+          Key pair already existed and the private key is required to configure other resources.
+          Please run "NETWORK | Panos | Cleanup" to delete existing resources and try again.
 
     - name: Create VPC for fw
       register: r_vpc
@@ -193,6 +187,14 @@
         wait: true
         wait_timeout: 600
 
+    - name: Assert the firewall was created
+      ansible.builtin.assert:
+        that:
+          - r_palo_fw is changed
+        fail_msg: >
+          The firewall already existed with a different key pair.
+          Please run "NETWORK | Panos | Cleanup" to delete existing resources and try again.
+
     - name: Ensure network interfaces source/dest check disabled
       loop: "{{ panos_demo_network_interface_ids[1:] }}"
       register: r_panos_demo_enis
@@ -239,9 +241,23 @@
           ansible.builtin.pause:
             minutes: 5
 
+        - name: Create tmp file for private key
+          register: r_tmp_private_key
+          ansible.builtin.tempfile:
+            state: file
+            suffix: panos
+
+        - name: Copy private key to tmp file
+          no_log: "{{ credential_secure_logging | default(true) }}"
+          ansible.builtin.copy:
+            content: "{{ r_ec2_key_new.key.private_key }}"
+            dest: "{{ r_tmp_private_key.path }}"
+            mode: "0600"
+
         - name: Set the initial admin password
+          no_log: "{{ credential_secure_logging | default(true) }}"
           ansible.builtin.expect:
-            command: "ssh -i {{ lookup('env', 'SSH_PROXY_KEY') }} -o StrictHostKeyChecking=accept-new admin@{{ r_eip_mgmt.public_ip }}"
+            command: "ssh -i {{ r_tmp_private_key.path }} -o StrictHostKeyChecking=accept-new admin@{{ r_eip_mgmt.public_ip }}"
             timeout: 60
             responses:
               "admin@PA-VM>":
@@ -327,10 +343,16 @@
             wait: true
             wait_timeout: 600
 
+        - name: Assert the bastion was created
+          ansible.builtin.assert:
+            that:
+              - r_bastion_ec2 is changed
+            fail_msg: >
+              The bastion already existed with a different key pair.
+              Please run "NETWORK | Panos | Cleanup" to delete existing resources and try again.
+
         - name: Update credential in AAP | Palo Alto Bastion
           no_log: "{{ credential_secure_logging | default(true) }}"
-          vars:
-            _new_private_key: "{{ r_ec2_key_new.key.private_key | default('') }}"
           ansible.controller.credential:
             name: Palo Alto Bastion
             organization: Ansible Product Demos (APD)
@@ -339,7 +361,7 @@
             inputs:
               ssh_proxy_username: ec2-user
               ssh_proxy_host: "{{ r_bastion_eip_public.public_ip }}"
-              ssh_proxy_key: "{{ (not _ec2_key_provided) | ternary(_new_private_key, '$encrypted$') }}"
+              ssh_proxy_key: "{{ r_ec2_key_new.key.private_key }}"
             state: present
 
     - name: Create webserver host
@@ -380,6 +402,14 @@
               role: webserver
             wait: true
             wait_timeout: 600
+
+        - name: Assert the webserver was created
+          ansible.builtin.assert:
+            that:
+              - r_webserver_ec2 is changed
+            fail_msg: >
+              The webserver already existed with a different key pair.
+              Please run "NETWORK | Panos | Cleanup" to delete the resources and try again.
 
     - name: Save stats for downstream workflow nodes
       ansible.builtin.set_stats:

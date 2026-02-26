@@ -10,7 +10,12 @@
 
 ## About These Demos
 This category of demos shows examples of network operations and management with Ansible Automation Platform. The list of demos can be found below. See the [Suggested Usage](#suggested-usage) section of this document for recommendations on how to best use these demos.
+
+- [**NETWORK / Report**](./report.yml) - Use this job to gather facts from Cisco Network devices and create a report
 - [**NETWORK / Configuration**](https://github.com/nleiva/ansible-net-modules/blob/main/main.yml) - Deploy golden configurations for different resources to Cisco IOS, IOSXR, and NXOS.
+- [**NETWORK / DISA STIG**](./compliance.yml) - Use this job to run the DISA STIG role and show how Ansible can be used for configuration compliance of network devices.
+- [**NETWORK / BACKUP**](./backup.yml) - Use this job to show how Ansible can be used to backup network devices using Red Hat validated content.
+- [**NETWORK / PANOS**](./panos/README.md) - Use this demo to deploy and manage a Palo Alto Firewall instance with the certified panos collection.
 
 To run the demos, deploy them using Infrastructure as Code, run either the "Product Demos | Multi-demo setup" or the "Product Demos | Single demo setup" and select 'Network' in the "Product Demos" deployment, or utilize the steps in the repo level README.
 
@@ -87,3 +92,5 @@ To run this demo, you will need to complete a couple of prerequisites:
   - If using a demo.redhat.com Product Demos instance you should use the public key provided in the demo page in the 'Bastion Host Credentials' section. If you are using a different environment, you may need to update the "Demo Credential".
   - This works with Product Demos for AAP v2.5; which includes the "Product Demos EE" includes the \
   network.backup collection.
+
+**NETWORK / PANOS** - see [README](./panos/README.md) for usage instructions.

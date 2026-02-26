@@ -129,9 +129,9 @@
           "tag:prefix": "{{ panos_demo_prefix }}"
 
     - name: Delete EC2 Key
-      when: r_ec2_key_info.keys | length
-      loop: "{{ r_ec2_key_info.keys }}"
+      when: r_ec2_key_info.keypairs | length
+      loop: "{{ r_ec2_key_info.keypairs }}"
       amazon.aws.ec2_key:
-        name: "{{ item.name }}"
+        name: "{{ item.key_name }}"
         region: "{{ aws_region | default(omit) }}"
         state: absent

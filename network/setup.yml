@@ -242,15 +242,6 @@ controller_templates:
     job_type: run
     extra_vars:
       aws_region: us-east-2
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: EC2 Public Key
-          required: false
-          type: text
-          variable: panos_demo_public_key
 
   - name: "NETWORK | Panos | Configure Firewall"
     job_type: run
@@ -326,15 +317,6 @@ controller_workflows:
     description: A workflow to provision a firewall, web server, and security rule
     inventory: Ansible Product Demos Inventory
     organization: Ansible Product Demos (APD)
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: EC2 Public Key
-          required: false
-          type: text
-          variable: panos_demo_public_key
     workflow_nodes:
     - identifier: Deploy
       related:
