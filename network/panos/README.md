@@ -9,7 +9,9 @@ This demo creates a (virtual) Palo Alto Firewall instance, a bastion host, and a
 Access to a current Palo Alto AMI from the AWS marketplace is required before the instance can be created.
 
 * Log in to the AWS console (RHDP users: link and credentials provided in catalog item output)
-* Go to the AMI page for the [VM-Series Next-Gen Virtual Firewall w/Advanced Threat Prevention (PAYG)](https://aws.amazon.com/marketplace/pp?sku=e9yfvyj3uag5uo5j2hjikv74n) in the AWS Marketplace
+* Go to the Amazon Marketplace > Discover Products (tab)
+* Search for "VM-Series Next-Gen Virtual Firewall w/Advanced Threat Prevention (PAYG)"
+* Click on the product name to view details
 * Select "Try for free"
 * Review the terms (should be a $0.00 cost) and click "Subscribe".  The request needs to be processed and approved before the AMI will be available for use with this APD demo.
 * The approval process takes around five minutes.  Once the request has been approved the page will refresh with a banner stating the AMI was successfully purchased.
