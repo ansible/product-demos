@@ -13,7 +13,7 @@
       - Web-Server
       - Web-Mgmt-Tools
     state: present
-  register: _iis_install
+  register: _iis_install  # noqa: var-naming[no-role-prefix]
 
 - name: Reboot if IIS installation requires it
   ansible.windows.win_reboot:
@@ -65,7 +65,7 @@
   ansible.windows.win_uri:
     url: http://169.254.169.254/latest/meta-data/public-ipv4
     return_content: true
-  register: _aws_public_ip
+  register: _aws_public_ip  # noqa: var-naming[no-role-prefix]
   failed_when: false
 
 - name: Set server IP address

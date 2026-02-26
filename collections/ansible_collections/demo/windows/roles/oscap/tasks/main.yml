@@ -2,7 +2,7 @@
 - name: Get disk space information
   ansible.windows.win_stat:
     path: "C:\\"
-  register: _c_drive_info
+  register: _c_drive_info  # noqa: var-naming[no-role-prefix]
 
 - name: Assert disk space meets minimum requirements
   ansible.builtin.assert:
@@ -17,12 +17,12 @@
 - name: Check if OpenSCAP is installed
   ansible.windows.win_stat:
     path: "{{ oscap_exe_path }}"
-  register: _oscap_installed
+  register: _oscap_installed  # noqa: var-naming[no-role-prefix]
 
 - name: Check if Visual C++ redistributable installer exists
   ansible.windows.win_stat:
     path: "{{ oscap_installer_path | win_dirname }}\\vc_redist.x86.exe"
-  register: _vc_redist_exists
+  register: _vc_redist_exists  # noqa: var-naming[no-role-prefix]
 
 - name: Download Visual C++ 2015-2022 Redistributable (x86)
   ansible.windows.win_get_url:
@@ -61,7 +61,7 @@
 - name: Re-check OpenSCAP installation after potential install
   ansible.windows.win_stat:
     path: "{{ oscap_exe_path }}"
-  register: _oscap_verify
+  register: _oscap_verify  # noqa: var-naming[no-role-prefix]
 
 - name: Verify OpenSCAP installation
   ansible.builtin.assert:
@@ -89,7 +89,7 @@
 - name: Verify SCAP content file was copied
   ansible.windows.win_stat:
     path: "{{ _scap_content_dest }}"
-  register: _scap_content_verify
+  register: _scap_content_verify  # noqa: var-naming[no-role-prefix]
   failed_when: not _scap_content_verify.stat.exists
 
 - name: Display OpenSCAP setup results
