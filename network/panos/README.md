@@ -6,7 +6,7 @@ This demo creates a (virtual) Palo Alto Firewall instance, a bastion host, and a
 
 ### AWS account prerequisites
 
-Access to a current Palo Alto AMI from the AWS marketplace is required before the Infoblox instance can be created.
+Access to a current Palo Alto AMI from the AWS marketplace is required before the instance can be created.
 
 * Log in to the AWS console (RHDP users: link and credentials provided in catalog item output)
 * Go to the AMI page for the [VM-Series Next-Gen Virtual Firewall w/Advanced Threat Prevention (PAYG)](https://aws.amazon.com/marketplace/pp?sku=e9yfvyj3uag5uo5j2hjikv74n) in the AWS Marketplace
@@ -47,7 +47,7 @@ _If you want to bring-your-own keypair, the update the Palo Alto Bastion credent
 * Syncs the dynamic inventory source
 * Configures the firewall using the paloaltonetworks.panos collection
 * Configures a basic webserver to demonstrate security rule modifications
-* Creates an EC2 instance named "apd-infoblox" and refreshes the AAP inventory.
+* Syncs the relevant AAP inventory.
 
 ## Giving the demo
 
