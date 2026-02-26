@@ -76,6 +76,4 @@
       ansible.builtin.debug:
         msg:
           - "Latest report available at:"
-          - "  http://{{ oscap_server_ip }}/compliance-reports/{{ _compliance_profile }}/report-{{ _report_timestamp }}.html"
-
-
+          - "http://{{ oscap_server_ip }}/compliance-reports/{{ _compliance_profile }}/report-{{ _report_timestamp }}.html"
