@@ -68,6 +68,46 @@ controller_credentials:
       kdc: REPLACEME
 
 controller_templates:
+  - name: "WINDOWS | Run OSCAP Compliance Report"
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "windows/oscap/report.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: false
+        - question_name: Compliance Profile
+          type: multiplechoice
+          variable: compliance_profile
+          required: true
+          choices:
+            - xccdf_mil.disa.stig_profile_MAC-1_Public
+            - xccdf_mil.disa.stig_profile_MAC-1_Sensitive
+            - xccdf_mil.disa.stig_profile_MAC-2_Public
+            - xccdf_mil.disa.stig_profile_MAC-2_Sensitive
+            - xccdf_mil.disa.stig_profile_MAC-3_Public
+            - xccdf_mil.disa.stig_profile_MAC-3_Sensitive
+            - xccdf_mil.disa.stig_profile_CAT_I_Only
+        - question_name: Use IIS on the target host(s) to access reports locally?
+          type: multiplechoice
+          variable: use_iss
+          required: true
+          choices:
+            - "true"
+            - "false"
+          default: "true"
+
   - name: "WINDOWS | Install IIS"
     job_type: run
     inventory: Ansible Product Demos Inventory
@@ -435,6 +475,80 @@ controller_templates:
           required: false
 
 controller_workflows:
+  - name: "Windows OpenSCAP Compliance Workflow"
+    description: A workflow to generate a SCAP report and run enforce on findings
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          default: aws_win*
+          variable: _hosts
+          required: true
+        - question_name: Compliance Profile
+          type: multiplechoice
+          variable: compliance_profile
+          required: true
+          choices:
+            - xccdf_mil.disa.stig_profile_MAC-1_Public
+            - xccdf_mil.disa.stig_profile_MAC-1_Sensitive
+            - xccdf_mil.disa.stig_profile_MAC-2_Public
+            - xccdf_mil.disa.stig_profile_MAC-2_Sensitive
+            - xccdf_mil.disa.stig_profile_MAC-3_Public
+            - xccdf_mil.disa.stig_profile_MAC-3_Sensitive
+            - xccdf_mil.disa.stig_profile_CAT_I_Only
+        - question_name: Use IIS on the target host(s) to access reports locally?
+          type: multiplechoice
+          variable: use_iss
+          required: true
+          choices:
+            - "true"
+            - "false"
+          default: "true"
+        - question_name: Email
+          type: text
+          variable: email
+          required: true
+
+    simplified_workflow_nodes:
+      - identifier: Pre-Remediation Compliance Report
+        unified_job_template: "WINDOWS | Run OSCAP Compliance Report"
+        success_nodes:
+          - Compliance Remediation
+        failure_nodes:
+          - Ticket - Pre-Remediation Compliance Report Failure
+      - identifier: Compliance Remediation
+        unified_job_template: "WINDOWS | DISA STIG"
+        success_nodes:
+          - Post-Remedidation Compliance Report
+        failure_nodes:
+          - Ticket - Compliance Failure
+      - identifier: Post-Remedidation Compliance Report
+        unified_job_template: "WINDOWS | Run OSCAP Compliance Report"
+        failure_nodes:
+          - Ticket - Post-Remediation Compliance Report Failure
+
+      - identifier: Ticket - Pre-Remediation Compliance Report Failure
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to run pre-remediation compliance report
+
+      - identifier: Ticket - Compliance Failure
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to run compliance job
+
+      - identifier: Ticket - Post-Remediation Compliance Report Failure
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to run post-remediation compliance report
+
   - name: Setup Active Directory Domain
     description: A workflow to create a domain controller with two domain-joined Windows hosts.
     organization: Ansible Product Demos (APD)
