@@ -2729,7 +2729,7 @@ Satisfies: SRG-OS-000057-GPOS-00027, SRG-OS-000058-GPOS-00028, SRG-OS-000059-GPO
         <xccdf:Rule id="xccdf_mil.disa.stig_rule_SV-205644r958442_rule" severity="medium" weight="10.0">
           <xccdf:version>WN19-SO-000050</xccdf:version>
           <xccdf:title>Windows Server 2019 must force audit policy subcategory settings to override audit policy category settings.</xccdf:title>
-          <xccdf:description>&lt;VulnDiscussion&gt;Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary to provide a trail of evidence in case the system or network is compromised. Collecting this data is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected behavior. 
+          <xccdf:description>&lt;VulnDiscussion&gt;Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary to provide a trail of evidence in case the system or network is compromised. Collecting this data is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected behavior.
 This setting allows administrators to enable more precise auditing capabilities.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</xccdf:description>
           <xccdf:reference>
             <dc:title>DPMS Target Microsoft Windows Server 2019</dc:title>
@@ -2840,8 +2840,8 @@ Satisfies: SRG-OS-000066-GPOS-00034, SRG-OS-000403-GPOS-00182&lt;/VulnDiscussion
 
 Issued To - Issued By - Thumbprint
 
-DoD Root CA 3 - US DoD CCEB Interoperability Root CA 2 - 9B74964506C7ED9138070D08D5F8B969866560C8                 
-DoD Root CA 6 - US DOD CCEB Interoperability Root CA 2 -D471CA32F7A692CE6CBB6196BD3377FE4DBCD106              
+DoD Root CA 3 - US DoD CCEB Interoperability Root CA 2 - 9B74964506C7ED9138070D08D5F8B969866560C8
+DoD Root CA 6 - US DOD CCEB Interoperability Root CA 2 -D471CA32F7A692CE6CBB6196BD3377FE4DBCD106
 
 Administrators should run the Federal Bridge Certification Authority (FBCA) Cross-Certificate Removal Tool once as an administrator and once as the current user.
 
@@ -3114,7 +3114,7 @@ Satisfies: SRG-OS-000069-GPOS-00037, SRG-OS-000070-GPOS-00038, SRG-OS-000071-GPO
         <xccdf:description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</xccdf:description>
         <xccdf:Rule id="xccdf_mil.disa.stig_rule_SV-205665r1137691_rule" severity="medium" weight="10.0">
           <xccdf:version>WN19-DC-000340</xccdf:version>
-          <xccdf:title>Windows Server 2019 Access this computer from the network user right must only be assigned to the Administrators, Authenticated Users, and 
+          <xccdf:title>Windows Server 2019 Access this computer from the network user right must only be assigned to the Administrators, Authenticated Users, and
 Enterprise Domain Controllers groups on domain controllers.</xccdf:title>
           <xccdf:description>&lt;VulnDiscussion&gt;Inappropriate granting of user rights can provide system, administrative, and other high-level capabilities.
 
@@ -3855,7 +3855,7 @@ This policy setting requires the installation of the SecGuide custom templates i
         <xccdf:Rule id="xccdf_mil.disa.stig_rule_SV-205688r958478_rule" severity="medium" weight="10.0">
           <xccdf:version>WN19-CC-000150</xccdf:version>
           <xccdf:title>Windows Server 2019 downloading print driver packages over HTTP must be turned off.</xccdf:title>
-          <xccdf:description>&lt;VulnDiscussion&gt;Some features may communicate with the vendor, sending system information or downloading data or components for the feature. Turning off this capability will prevent potentially sensitive information from being sent outside the enterprise and will prevent uncontrolled updates to the system. 
+          <xccdf:description>&lt;VulnDiscussion&gt;Some features may communicate with the vendor, sending system information or downloading data or components for the feature. Turning off this capability will prevent potentially sensitive information from being sent outside the enterprise and will prevent uncontrolled updates to the system.
 
 This setting prevents the computer from downloading print driver packages over HTTP.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;FalseNegatives&gt;&lt;/FalseNegatives&gt;&lt;Documentable&gt;false&lt;/Documentable&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;&lt;SeverityOverrideGuidance&gt;&lt;/SeverityOverrideGuidance&gt;&lt;PotentialImpacts&gt;&lt;/PotentialImpacts&gt;&lt;ThirdPartyTools&gt;&lt;/ThirdPartyTools&gt;&lt;MitigationControl&gt;&lt;/MitigationControl&gt;&lt;Responsibility&gt;&lt;/Responsibility&gt;&lt;IAControls&gt;&lt;/IAControls&gt;</xccdf:description>
           <xccdf:reference>
@@ -4891,7 +4891,7 @@ The "Enable computer and user accounts to be trusted for delegation" user right 
           <xccdf:ident system="http://cyber.mil/legacy">SV-103133</xccdf:ident>
           <xccdf:ident system="http://cyber.mil/legacy">V-93045</xccdf:ident>
           <xccdf:ident system="http://cyber.mil/cci">CCI-002235</xccdf:ident>
-          <xccdf:fixtext fixref="F-6012r1106517_fix">Navigate to the policy Computer Configuration &gt;&gt; Windows Settings &gt;&gt; Security Settings &gt;&gt; Local Policies &gt;&gt; Security Options &gt;&gt; "Network access: Restrict clients allowed to make remote calls to SAM". 
+          <xccdf:fixtext fixref="F-6012r1106517_fix">Navigate to the policy Computer Configuration &gt;&gt; Windows Settings &gt;&gt; Security Settings &gt;&gt; Local Policies &gt;&gt; Security Options &gt;&gt; "Network access: Restrict clients allowed to make remote calls to SAM".
 
 Select "Edit Security" to configure the "Security descriptor:".
 
@@ -9751,7 +9751,7 @@ Specify the Transcript output directory to point to a Central Log Server or anot
         </definition>
         <definition id="oval:mil.disa.stig.defs:def:254418" version="3" class="compliance">
           <metadata>
-            <title>Windows Access this computer from the network user right must only be assigned to the Administrators, Authenticated Users, and 
+            <title>Windows Access this computer from the network user right must only be assigned to the Administrators, Authenticated Users, and
 Enterprise Domain Controllers groups on domain controllers.</title>
             <description />
           </metadata>
@@ -10362,7 +10362,7 @@ Satisfies: SRG-OS-000057-GPOS-00027, SRG-OS-000058-GPOS-00028, SRG-OS-000059-GPO
             <affected family="windows">
               <platform>Microsoft Windows Server 2019</platform>
             </affected>
-            <description>Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary to provide a trail of evidence in case the system or network is compromised. Collecting this data is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected behavior. 
+            <description>Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary to provide a trail of evidence in case the system or network is compromised. Collecting this data is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected behavior.
 This setting allows administrators to enable more precise auditing capabilities.</description>
           </metadata>
           <criteria>
@@ -10541,7 +10541,7 @@ Satisfies: SRG-OS-000069-GPOS-00037, SRG-OS-000070-GPOS-00038, SRG-OS-000071-GPO
         </definition>
         <definition id="oval:mil.disa.stig.windows2019:def:205665" version="1" class="compliance">
           <metadata>
-            <title>WN19-DC-000340 - Windows Server 2019 Access this computer from the network user right must only be assigned to the Administrators, Authenticated Users, and 
+            <title>WN19-DC-000340 - Windows Server 2019 Access this computer from the network user right must only be assigned to the Administrators, Authenticated Users, and
 Enterprise Domain Controllers groups on domain controllers.</title>
             <affected family="windows">
               <platform>Microsoft Windows Server 2019</platform>
@@ -10860,7 +10860,7 @@ Accounts with the "Allow log on locally" user right can log on interactively to 
             <affected family="windows">
               <platform>Microsoft Windows Server 2019</platform>
             </affected>
-            <description>Some features may communicate with the vendor, sending system information or downloading data or components for the feature. Turning off this capability will prevent potentially sensitive information from being sent outside the enterprise and will prevent uncontrolled updates to the system. 
+            <description>Some features may communicate with the vendor, sending system information or downloading data or components for the feature. Turning off this capability will prevent potentially sensitive information from being sent outside the enterprise and will prevent uncontrolled updates to the system.
 
 This setting prevents the computer from downloading print driver packages over HTTP.</description>
           </metadata>

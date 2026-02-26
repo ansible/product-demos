@@ -7,9 +7,9 @@
     # OpenSCAP executable path (single source of truth)
     oscap_exe_path: "C:\\Program Files (x86)\\OpenSCAP 1.3.4\\oscap.exe"
     # SCAP content file from repository
-    scap_content_file: "winserv2019-stig-scap-benchmark.xml"
+    oscap_content_file: "winserv2019-stig-scap-benchmark.xml"
     # Directory on target system where SCAP content will be copied
-    scap_content_dir: "C:\\oscap-content"
+    oscap_content_dir: "C:\\oscap-content"
 
   tasks:
     - name: Install and configure OpenSCAP
@@ -19,7 +19,7 @@
     - name: Set report directory and SCAP content destination
       ansible.builtin.set_fact:
         _report_dir: "C:\\oscap-reports"
-        _scap_content_dest: "{{ scap_content_dir }}\\{{ scap_content_file }}"
+        _scap_content_dest: "{{ oscap_content_dir }}\\{{ oscap_content_file }}"
 
     - name: Ensure report directory exists
       ansible.windows.win_file:

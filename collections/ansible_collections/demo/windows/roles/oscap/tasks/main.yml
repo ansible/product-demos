@@ -12,7 +12,7 @@
 
 - name: Set SCAP content destination
   ansible.builtin.set_fact:
-    _scap_content_dest: "{{ scap_content_dir }}\\{{ scap_content_file }}"
+    _scap_content_dest: "{{ oscap_content_dir }}\\{{ oscap_content_file }}"
 
 - name: Check if OpenSCAP is installed
   ansible.windows.win_stat:
@@ -21,18 +21,18 @@
 
 - name: Check if Visual C++ redistributable installer exists
   ansible.windows.win_stat:
-    path: "{{ openscap_installer_path | win_dirname }}\\vc_redist.x86.exe"
+    path: "{{ oscap_installer_path | win_dirname }}\\vc_redist.x86.exe"
   register: _vc_redist_exists
 
 - name: Download Visual C++ 2015-2022 Redistributable (x86)
   ansible.windows.win_get_url:
     url: https://aka.ms/vs/17/release/vc_redist.x86.exe
-    dest: "{{ openscap_installer_path | win_dirname }}\\vc_redist.x86.exe"
+    dest: "{{ oscap_installer_path | win_dirname }}\\vc_redist.x86.exe"
   when: not _vc_redist_exists.stat.exists
 
 - name: Install Visual C++ x86 Redistributable
   ansible.windows.win_package:
-    path: "{{ openscap_installer_path | win_dirname }}\\vc_redist.x86.exe"
+    path: "{{ oscap_installer_path | win_dirname }}\\vc_redist.x86.exe"
     arguments: /install /quiet /norestart
     state: present
     expected_return_code: [0, 1638, 3010]
@@ -43,18 +43,18 @@
   block:
     - name: Create temp directory
       ansible.windows.win_file:
-        path: "{{ openscap_installer_path | win_dirname }}"
+        path: "{{ oscap_installer_path | win_dirname }}"
         state: directory
 
     - name: Download OpenSCAP installer
       ansible.windows.win_get_url:
-        url: "{{ openscap_installer_url }}"
-        dest: "{{ openscap_installer_path }}"
+        url: "{{ oscap_installer_url }}"
+        dest: "{{ oscap_installer_path }}"
         force: false
 
     - name: Install OpenSCAP from MSI
       ansible.windows.win_package:
-        path: "{{ openscap_installer_path }}"
+        path: "{{ oscap_installer_path }}"
         state: present
         arguments: /quiet /norestart
 
@@ -72,17 +72,17 @@
 
 - name: Ensure SCAP content directory exists
   ansible.windows.win_file:
-    path: "{{ scap_content_dir }}"
+    path: "{{ oscap_content_dir }}"
     state: directory
 
 - name: Determine SCAP content source path
   ansible.builtin.set_fact:
-    _scap_source_path: "{{ scap_content_source_dir }}/{{ scap_content_file }}"
-  when: scap_content_source_dir is defined
+    _scap_source_path: "{{ oscap_content_source_dir }}/{{ oscap_content_file }}"
+  when: oscap_content_source_dir is defined
 
 - name: Copy SCAP content file to target system
   ansible.windows.win_copy:
-    src: "{{ _scap_source_path | default(scap_content_file) }}"
+    src: "{{ _scap_source_path | default(oscap_content_file) }}"
     dest: "{{ _scap_content_dest }}"
     remote_src: false
 
