@@ -4,7 +4,7 @@ apd_ee_image_version: '25'
 apd_ee_image_tag: latest
 apd_ee_image: quay.io/ansible-product-demos/apd-ee-{{ apd_ee_image_version }}:{{ apd_ee_image_tag }}
 apd_git_repo: https://github.com/ansible/product-demos
-apd_git_repo_branch: jce/apd-org
+apd_git_repo_branch: main
 
 ## gateway resources
 aap_organizations:
