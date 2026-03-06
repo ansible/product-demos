@@ -1,4 +1,12 @@
 ---
+controller_projects:
+  - name: Ansible Forge
+    organization: Ansible Product Demos (APD)
+    scm_type: git
+    scm_url: https://github.com/hfenner/ansibleforge.git
+    scm_branch: main
+    wait: true
+
 controller_credentials:
   - name: OpenShift Credential
     organization: Ansible Product Demos (APD)
@@ -9,6 +17,7 @@ controller_credentials:
       host: CHANGEME
       bearer_token: CHANGEME
       verify_ssl: false
+
 
 controller_inventory_sources:
   - name: OpenShift CNV Inventory
@@ -236,6 +245,18 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - OpenShift Credential
+
+  - name: OpenShift | GitOps | Deploy
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Forge"
+    playbook: "ocp/ansible/gitops_deploy.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - OpenShift Credential
+
 
 controller_workflows:
   - name: OpenShift | CNV | Infra Stack
