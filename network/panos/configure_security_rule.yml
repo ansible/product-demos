@@ -1,0 +1,87 @@
+---
+- name: Create / Update PanOS Security Rule
+  hosts: localhost
+  gather_facts: false
+  become: false
+
+  vars:
+    _commit: "{{ panos_commit | default(false) | bool }}"
+
+  tasks:
+    - name: Service now pre change steps
+      when: snow_sys_id is defined
+      block:
+        - name: Get ServiceNow requested item
+          register: r_snow_ticket
+          servicenow.itsm.api_info:
+            resource: sc_req_item
+            sys_id: "{{ snow_sys_id }}"
+
+        - name: Get ServiceNow configuration item
+          register: r_snow_ci
+          servicenow.itsm.configuration_item_info:
+            name: "{{ snow_ci_name }}"
+
+        - name: Create a catalog task
+          register: r_snow_sctask
+          vars:
+            _controller_host: "{{ lookup('ansible.builtin.env', 'AWX_HOST') | default(lookup('ansible.builtin.env', 'CONTROLLER_HOST'), true) }}"
+            _job_id: "{{ tower_job_id | default(awx_job_id) | default('unk') }}"
+            _job_url: "{{ _controller_host }}/execution/jobs/playbook/{{ _job_id }}/details"
+          servicenow.itsm.api:
+            resource: sc_task
+            action: post
+            data:
+              short_description: Ansible Job Template running to modify security rule
+              description: "{{ _job_url }}"
+              request_item: "{{ snow_sys_id }}"
+              cmdb_ci: "{{ r_snow_ci.records[0].sys_id }}"
+
+    - name: Define PanOS security rule
+      register: r_panos_security_rule
+      check_mode: "{{ not _commit }}"
+      paloaltonetworks.panos.panos_security_rule:
+        provider: "{{ panos_provider }}"
+        rule_name: "{{ panos_rule_name }}"
+        rule_type: "{{ panos_rule_type | default(omit) }}"
+        action: "{{ panos_action | default('') | ternary(panos_action, 'allow') }}"
+        location: "{{ panos_location | default('') | ternary(panos_location, omit) }}"
+        source_zone: "{{ panos_source_zone | default('') | ternary ([panos_source_zone], ['any']) }}"
+        source_ip: "{{ panos_source_ip | default('') | ternary ([panos_source_ip], ['any']) }}"
+        destination_zone: "{{ panos_destination_zone | default('') | ternary ([panos_destination_zone], ['any']) }}"
+        destination_ip: "{{ panos_destination_ip | default('') | ternary ([panos_destination_ip], ['any']) }}"
+        state: "{{ panos_state | default('') | ternary (panos_state, 'present') }}"
+
+    - name: Commit firewall changes
+      when: _commit
+      paloaltonetworks.panos.panos_commit_firewall:
+        provider: "{{ panos_provider }}"
+        description: "Changes committed by ansible on {{ lookup('pipe', 'date') }} based on request: {{ snow_ritm | default('N/A') }}"
+
+    - name: Service now post change steps
+      when: snow_sys_id is defined
+      block:
+        - name: Get a diff of the firewall change
+          register: r_security_rule_diff
+          ansible.utils.fact_diff:
+            before: "{{ r_panos_security_rule.before }}"
+            after: "{{ r_panos_security_rule.after }}"
+
+        - name: Complete catalog task
+          servicenow.itsm.api:
+            resource: sc_task
+            action: patch
+            sys_id: "{{ r_snow_sctask.record.sys_id }}"
+            data:
+              work_notes: "{{ r_security_rule_diff.diff_text | codify }}"
+              state: 3 # Closed Complete
+
+        - name: Complete ServiceNow requested item
+          register: r_snow_ticket
+          servicenow.itsm.api:
+            resource: sc_req_item
+            sys_id: "{{ snow_sys_id }}"
+            action: patch
+            data:
+              state: 3 # Closed Complete
+
