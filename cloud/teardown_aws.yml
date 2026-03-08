@@ -1,0 +1,69 @@
+---
+- name: Teardown Cloud Infra in AWS
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    aws_vpc_name: aws-test-vpc
+    aws_sg_name: aws-test-sg
+    aws_subnet_name: aws-test-subnet
+    aws_rt_name: aws-test-rt
+
+  tasks:
+    - name: Get EC2 instances in the VPC
+      amazon.aws.ec2_instance_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          "tag:purpose": "ansible_demo"
+          "vpc-id": "{{ stat_aws_vpc_id | default(omit) }}"
+      register: ec2_instances
+
+    - name: Terminate EC2 instances
+      amazon.aws.ec2_instance:
+        state: absent
+        instance_ids: "{{ ec2_instances.instances | map(attribute='instance_id') | list }}"
+        region: "{{ create_vm_aws_region }}"
+        wait: true
+      when: ec2_instances.instances | length > 0
+
+    - name: Remove Subnet Route Table
+      amazon.aws.ec2_vpc_route_table:
+        state: absent
+        region: "{{ create_vm_aws_region }}"
+        vpc_id: "{{ stat_aws_vpc_id | default(omit) }}"
+        tags:
+          Name: "{{ aws_rt_name }}"
+      ignore_errors: true
+
+    - name: Remove Subnet
+      amazon.aws.ec2_vpc_subnet:
+        state: absent
+        region: "{{ create_vm_aws_region }}"
+        vpc_id: "{{ stat_aws_vpc_id | default(omit) }}"
+        tags:
+          Name: "{{ aws_subnet_name }}"
+      ignore_errors: true
+
+    - name: Remove Security Group
+      amazon.aws.ec2_security_group:
+        state: absent
+        region: "{{ create_vm_aws_region }}"
+        vpc_id: "{{ stat_aws_vpc_id | default(omit) }}"
+        name: "{{ aws_sg_name }}"
+      ignore_errors: true
+
+    - name: Remove Internet Gateway
+      amazon.aws.ec2_vpc_igw:
+        state: absent
+        region: "{{ create_vm_aws_region }}"
+        vpc_id: "{{ stat_aws_vpc_id | default(omit) }}"
+        tags:
+          Name: "{{ aws_vpc_name }}"
+      ignore_errors: true
+
+    - name: Remove VPC
+      amazon.aws.ec2_vpc_net:
+        state: absent
+        region: "{{ create_vm_aws_region }}"
+        name: "{{ aws_vpc_name }}"
+      ignore_errors: true
