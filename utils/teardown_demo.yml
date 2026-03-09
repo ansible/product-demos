@@ -1,0 +1,114 @@
+---
+- name: Teardown Demo(s)
+  hosts: localhost
+  gather_facts: false
+  vars:
+    demos_list: "{{ demos | default([demo]) }}"
+    final_setup_config: {}
+
+    # Resource variable names to inject state: absent into
+    _resource_keys:
+      - controller_workflows
+      - controller_templates
+      - controller_notifications
+      - controller_groups
+      - controller_inventory_sources
+      - controller_inventories
+      - controller_projects
+      - controller_credentials
+      - controller_credential_types
+      - controller_execution_environments
+      - controller_organizations
+      - gateway_role_user_assignments
+      - aap_user_accounts
+
+    # Override the full dispatch list with reversed order for clean deletion
+    aap_configuration_dispatcher_roles:
+      - {role: controller_workflow_job_templates, var: controller_workflows, tags: workflow_job_templates}
+      - {role: controller_job_templates, var: controller_templates, tags: job_templates}
+      - {role: controller_notification_templates, var: controller_notifications, tags: notification_templates}
+      - {role: controller_host_groups, var: controller_groups, tags: host_groups}
+      - {role: controller_inventory_sources, var: controller_inventory_sources, tags: inventory_sources}
+      - {role: controller_inventories, var: controller_inventories, tags: inventories}
+      - {role: controller_projects, var: controller_projects, tags: projects}
+      - {role: controller_credentials, var: controller_credentials, tags: credentials}
+      - {role: controller_credential_types, var: controller_credential_types, tags: credential_types}
+      - {role: controller_execution_environments, var: controller_execution_environments, tags: execution_environments}
+      - {role: controller_organizations, var: controller_organizations, tags: organizations}
+      - {role: gateway_role_user_assignments, var: gateway_role_user_assignments, tags: role_user_assignments}
+      - {role: gateway_users, var: aap_user_accounts, tags: users}
+
+  tasks:
+    - name: Create or read reusable deployment ID
+      ansible.builtin.set_fact:
+        _deployment_id: '{{ lookup("ansible.builtin.password", "{{ playbook_dir }}/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
+
+    - name: Load common setup variables
+      ansible.builtin.include_vars:
+        file: ../common/setup.yml
+        name: common_vars
+
+    - name: Initialize config with common variables
+      ansible.builtin.set_fact:
+        final_setup_config: "{{ common_vars }}"
+
+    - name: Load demo-specific variables
+      ansible.builtin.include_vars:
+        file: "../{{ item }}/setup.yml"
+        name: "demo_vars_{{ index }}"
+      loop: "{{ demos_list }}"
+      loop_control:
+        index_var: index
+
+    - name: Merge demo variables into final configuration
+      ansible.builtin.set_fact:
+        final_setup_config: "{{ final_setup_config | combine(lookup('vars', 'demo_vars_' + index|string), recursive=True, list_merge='append') }}"
+      loop: "{{ demos_list }}"
+      loop_control:
+        index_var: index
+
+    - name: Promote aggregated config to top-level facts
+      ansible.builtin.set_fact:
+        "{{ item.key }}": "{{ item.value }}"
+      loop: "{{ final_setup_config | dict2items }}"
+      no_log: true
+
+    - name: Clear action-based variables to prevent unintended execution
+      ansible.builtin.set_fact:
+        controller_launch_jobs: []
+
+    - name: Set all resources to state absent
+      ansible.builtin.set_fact:
+        "{{ item }}": "{{ lookup('vars', item) | map('combine', {'state': 'absent'}) | list }}"
+      loop: "{{ _resource_keys }}"
+      when: lookup('vars', item, default=[]) | length > 0
+
+    - name: Authenticate with AAP and obtain token
+      ansible.platform.token:
+        description: "Ansible Product Demos teardown authentication token"
+      register: __aap_token
+
+    - name: Unset password-based authentication variables
+      ansible.builtin.set_fact:
+        controller_password: ''
+        aap_password: ''
+
+    - name: Remove configuration and cleanup token
+      environment:
+        AAP_PASSWORD: ''
+        CONTROLLER_PASSWORD: ''
+      block:
+        - name: Remove configuration (Dispatch Role)
+          ansible.builtin.include_role:
+            name: infra.aap_configuration.dispatch
+          vars:
+            controller_dependency_check: false
+            controller_oauthtoken: "{{ aap_token.token }}"
+
+      always:
+        - name: Revoke authentication token
+          ansible.platform.token:
+            existing_token: "{{ __aap_token }}"
+            aap_token: "{{ aap_token.token }}"
+            state: absent
+          when: __aap_token is defined
