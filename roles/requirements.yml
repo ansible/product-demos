@@ -63,4 +63,20 @@ roles:
   - name: redhatofficial.rhel9-stig
     src: https://github.com/RedHatOfficial/ansible-role-rhel9-stig
     version: 0.1.72
+  # RHEL 10 compliance roles from ComplianceAsCode
+  - name: redhatofficial.rhel10-cis
+    src: https://github.com/RedHatOfficial/ansible-role-rhel10-cis
+    version: 0.1.80
+  - name: redhatofficial.rhel10-hipaa
+    src: https://github.com/RedHatOfficial/ansible-role-rhel10-hipaa
+    version: 0.1.80
+  - name: redhatofficial.rhel10-ospp
+    src: https://github.com/RedHatOfficial/ansible-role-rhel10-ospp
+    version: 0.1.80
+  - name: redhatofficial.rhel10-pci-dss
+    src: https://github.com/RedHatOfficial/ansible-role-rhel10-pci-dss
+    version: 0.1.80
+  - name: redhatofficial.rhel10-stig
+    src: https://github.com/RedHatOfficial/ansible-role-rhel10-stig
+    version: 0.1.80
 ...
