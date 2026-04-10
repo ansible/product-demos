@@ -399,9 +399,6 @@ controller_templates:
       sudo_remove_no_authenticate: false
       # used by CIS and STIG profile role
       accounts_password_set_max_life_existing: false
-      # used by the CJIS profile role
-      service_firewalld_enabled: false
-      firewalld_sshd_port_enabled: false
       # used by the PCI-DSS profile role
       firewalld_loopback_traffic_restricted: false
       firewalld_loopback_traffic_trusted: false
@@ -420,8 +417,6 @@ controller_templates:
           required: true
           choices:
             - cis
-            - cjis
-            - cui
             - hipaa
             - ospp
             - pci-dss
@@ -453,8 +448,6 @@ controller_templates:
           required: true
           choices:
             - cis
-            - cjis
-            - cui
             - hipaa
             - ospp
             - pci_dss
@@ -541,8 +534,6 @@ controller_workflows:
           required: true
           choices:
             - cis
-            - cjis
-            - cui
             - hipaa
             - ospp
             - pci_dss
