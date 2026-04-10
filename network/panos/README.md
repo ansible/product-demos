@@ -51,7 +51,7 @@ The "NETWORK | Panos | Demo Firewall Workflow" workflow automates the following 
 
 1. In AAP, display the "NETWORK | Panos | Demo Firewall Workflow" workflow job template and walk through the individual steps.  Click on the "Infrastructure -> Credentials" tab and display the "Palo Alto Bastion" and "Palo Alto Network Admin" credentials, noting that they have a placeholder values for the host details.  Click on the "Infrastructure -> Hosts" tab to show that the Demo instances do not yet exist.
 
-1. Run the "NETWORK | Panos | Demo Firewall Workflow" workflow job template.  Explain that the survey answers will be used by the AWS-related steps in the workflow. If a private key was configured, then provide the associated public key. Otherwise, leave the survey blank and explain how the automation will generate a key-pair for the demo.
+1. Run the "NETWORK | Panos | Demo Firewall Workflow" workflow job template. 
 
 1. The workflow takes roughly 25 minutes to complete, the majority of that time is waiting for the virtual firewall instance to stand up and be in a ready state. During this time frame, I recommend reviewing the architecture diagram and explaining the mechanisms used to complete the deployment:
    - Provisioning AWS resources with the [amazon.aws](https://console.redhat.com/ansible/automation-hub/collections/published/amazon/aws/details) collection (API-driven)
