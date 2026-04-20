@@ -1,0 +1,34 @@
+eda_projects:
+  - name: Dynatrace
+    description: Dynatrace Rulebook project
+    url: https://github.com/taruch/aap-eda-testing.git
+    organization_id: 0
+    # credential: test_token
+
+
+eda_decision_environments:
+  - name: Dynatrace DE
+    description: Dynatrace Decision Environment
+    image_url: "quay.io/truch/dynatrace-de:3.3"
+    # credential: my_credential
+
+
+eda_user_tokens:
+  - name: dynatrace_token
+    description: Dynatrace user token
+    token: DYNATRACE_TOKEN_VALUE
+
+
+eda_rulebook_activations:
+  - name: Dynatrace Problems
+    description: Hook to listen for problems from Dynatrace
+    project: Dynatrace
+    rulebook: dynatrace_webhook.yml
+    decision_environment: Dynatrace DE
+    # extra_vars:
+    #   provider: github-local
+    #   repo_url: https://github.com/ansible/ansible-rulebook.git
+    enabled: True
+    state: present
+
+...
