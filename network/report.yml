@@ -36,6 +36,7 @@
     web_path: /var/www/html/reports/
 
   tasks:
+
     - name: Build report server
       ansible.builtin.include_role:
         name: "{{ item }}"
