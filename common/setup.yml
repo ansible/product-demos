@@ -23,21 +23,6 @@ controller_inventories:
   - name: Ansible Product Demos Inventory
     organization: Ansible Product Demos (APD)
 
-controller_projects:
-  - name: Ansible Cloud Content Lab - AWS
-    organization: Ansible Product Demos (APD)
-    scm_type: git
-    wait: true
-    scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
-    default_environment: Cloud Services Execution Environment
-
-  - name: Ansible Cloud AWS Demos
-    organization: Ansible Product Demos (APD)
-    scm_type: git
-    wait: true
-    scm_url: https://github.com/ansible-cloud/aws_demos.git
-    default_environment: Cloud Services Execution Environment
-
 controller_credentials:
   - name: AWS
     credential_type: Amazon Web Services
@@ -203,8 +188,8 @@ controller_templates:
     credentials:
       - AWS
       - APD Machine Credential
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_vm.yml
+    project: Ansible Product Demos
+    playbook: cloud/create_vm.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -256,6 +241,7 @@ controller_templates:
           choices:
             - windows_core
             - windows_full
+            - rhel10
             - rhel9
             - rhel8
             - rhel7
@@ -290,8 +276,8 @@ controller_templates:
     credentials:
       - AWS
       - APD Machine Credential
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/delete_inventory_vm.yml
+    project: Ansible Product Demos
+    playbook: cloud/delete_inventory_vm.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry

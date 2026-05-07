@@ -1,0 +1,19 @@
+---
+- name: Cloud tags report
+  hosts: localhost
+  gather_facts: false
+  vars:
+    create_vm_aws_region: "{{ create_vm_aws_region | default('us-east-1') }}"
+
+  tasks:
+    - name: Collect EC2 instances for report
+      amazon.aws.ec2_instance_info:
+        region: "{{ create_vm_aws_region }}"
+      register: aws_instances
+
+    - name: Print tag report summary
+      ansible.builtin.debug:
+        msg:
+          report_type: "{{ aws_report | default('tags') }}"
+          region: "{{ create_vm_aws_region }}"
+          instance_count: "{{ aws_instances.instances | length }}"

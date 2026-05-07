@@ -9,14 +9,14 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_peer_network.yml
+    project: Ansible Product Demos
+    playbook: cloud/create_peer_network.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      aws_region: us-east-1
+      create_vm_aws_region: us-east-1
       dmz_ssh_key_name: aws-test-key
       priv_network_ssh_key_name: aws-test-key
 
@@ -25,28 +25,28 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/delete_peer_network.yml
+    project: Ansible Product Demos
+    playbook: cloud/delete_peer_network.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      aws_region: us-east-1
+      create_vm_aws_region: us-east-1
 
   - name: Cloud | AWS | Create Transit Infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_transit_network.yml
+    project: Ansible Product Demos
+    playbook: cloud/create_transit_network.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      aws_region: us-east-1
+      create_vm_aws_region: us-east-1
       dmz_ssh_key_name: aws-test-key
       priv_network_ssh_key_name: aws-test-key
 
@@ -55,22 +55,22 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/delete_transit_network.yml
+    project: Ansible Product Demos
+    playbook: cloud/delete_transit_network.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      aws_region: us-east-1
+      create_vm_aws_region: us-east-1
 
   - name: Cloud | AWS | VPC Report
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-    project: Ansible Cloud AWS Demos
-    playbook: playbooks/cloud_report.yml
+    project: Ansible Product Demos
+    playbook: cloud/cloud_report.yml
     inventory: Ansible Product Demos Inventory
     execution_environment: Cloud Services Execution Environment
     notification_templates_started: Telemetry
@@ -85,8 +85,8 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_reports.yml
+    project: Ansible Product Demos
+    playbook: cloud/create_reports.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -277,6 +277,7 @@ controller_workflows:
           - Deploy Windows GUI Blueprint
           - Deploy RHEL8 Blueprint
           - Deploy RHEL9 Blueprint
+          - Deploy RHEL10 Blueprint
           - Deploy Windows Core Blueprint
           - Deploy Report Server
       - identifier: Deploy Windows GUI Blueprint
@@ -311,6 +312,15 @@ controller_workflows:
         extra_data:
           create_vm_vm_name: aws_rhel9
           vm_blueprint: rhel9
+        success_nodes:
+          - Update Inventory
+        failure_nodes:
+          - Ticket - Instance Failed
+      - identifier: Deploy RHEL10 Blueprint
+        unified_job_template: Cloud | AWS | Create VM
+        extra_data:
+          create_vm_vm_name: aws_rhel10
+          vm_blueprint: rhel10
         success_nodes:
           - Update Inventory
         failure_nodes:

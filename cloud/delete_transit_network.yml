@@ -1,0 +1,8 @@
+---
+- name: Delete transit infrastructure placeholder
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Report local replacement status
+      ansible.builtin.debug:
+        msg: "Local delete transit network playbook placeholder is configured in Ansible Product Demos."

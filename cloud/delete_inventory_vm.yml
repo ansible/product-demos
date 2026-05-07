@@ -1,0 +1,10 @@
+---
+- name: Delete VM by inventory target
+  hosts: "{{ _hosts | default(omit) }}"
+  gather_facts: false
+
+  tasks:
+    - name: Destroy EC2 instance
+      ansible.builtin.include_role:
+        name: demo.cloud.aws
+        tasks_from: destroy_vm
