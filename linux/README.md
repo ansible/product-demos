@@ -26,9 +26,9 @@ This category of demos shows examples of linux operations and management with An
 - [**Linux / Fact Scan**](https://github.com/ansible/awx-facts-playbooks/blob/master/scan_facts.yml) - Run a fact, package, and service scan against a system and store in fact cache
 - [**Linux / Podman Webserver**](podman.yml) - Install and run a Podman webserver with given text on the home page
 - [**Linux / System Roles**](system_roles.yml) - Apply Linux system roles to servers. Must provide variables and role names.
-- [**Linux / DISA STIG**](compliance.yml) - Apply the RHEL STIG supplemental content from DISA
-- [**Linux / Multi-profile compliance**](compliance-enforce.yml) - Apply remediation from [Compliance as Code](https://github.com/ComplianceAsCode/content) to enforce the requirements of a specified compliance profile
-- [**Linux / Report Compliance**](compliance-report.yml) - Run an OpenSCAP report against a specified compliance profile
+- [**Linux / DISA STIG**](disa_stig.yml) - Apply the RHEL STIG supplemental content from DISA
+- [**Linux / Multi-profile compliance**](multi_profile_compliance.yml) - Apply remediation from [Compliance as Code](https://github.com/ComplianceAsCode/content) to enforce the requirements of a specified compliance profile
+- [**Linux / Report Compliance**](multi_profile_compliance_report.yml) - Run an OpenSCAP report against a specified compliance profile
 - [**Linux / Insights Compliance Scan**](insights_compliance_scan.yml) - Run a Compliance scan based on the configuration in [Red Hat Insights](https://console.redhat.com)
 
 ### Inventory
