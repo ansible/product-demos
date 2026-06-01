@@ -81,4 +81,24 @@ collections:
   - name: redhat.rhel_idm
     version: ">=1.15.0"
 
+roles:
+  # RHEL 8 compliance roles from ComplianceAsCode
+  - name: RedHatOfficial.rhel8_cis
+  - name: RedHatOfficial.rhel8_hipaa
+  - name: RedHatOfficial.rhel8_ospp
+  - name: RedHatOfficial.rhel8_pci_dss
+  - name: RedHatOfficial.rhel8_stig
+  # RHEL 9 compliance roles from ComplianceAsCode
+  - name: RedHatOfficial.rhel9_cis
+  - name: RedHatOfficial.rhel9_hipaa
+  - name: RedHatOfficial.rhel9_ospp
+  - name: RedHatOfficial.rhel9_pci_dss
+  - name: RedHatOfficial.rhel9_stig
+  # RHEL 10 compliance roles from ComplianceAsCode
+  - name: RedHatOfficial.rhel10_cis
+  - name: RedHatOfficial.rhel10_hipaa
+  - name: RedHatOfficial.rhel10_ospp
+  - name: RedHatOfficial.rhel10_pci_dss
+  - name: RedHatOfficial.rhel10_stig
+
 ...
