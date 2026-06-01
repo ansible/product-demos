@@ -1,0 +1,58 @@
+apiVersion: hypershift.openshift.io/v1beta1
+kind: HostedCluster
+metadata:
+  name: "{{ hcp_cluster_name }}"
+  namespace: "{{ hcp_namespace }}"
+{% if hcp_capi_provider_kubevirt_image | default('') | trim | length > 0 %}
+  annotations:
+    hypershift.openshift.io/capi-provider-kubevirt-image: "{{ hcp_capi_provider_kubevirt_image | trim }}"
+{% endif %}
+spec:
+  controllerAvailabilityPolicy: "{{ hcp_controller_availability }}"
+  infrastructureAvailabilityPolicy: SingleReplica
+  etcd:
+    managementType: Managed
+    managed:
+      storage:
+        type: PersistentVolume
+        persistentVolume:
+          size: "{{ hcp_etcd_volume_size | default('8Gi') }}"
+{% if hcp_etcd_storage_class | default('') | trim | length > 0 %}
+          storageClassName: "{{ hcp_etcd_storage_class | trim }}"
+{% endif %}
+  networking:
+    networkType: OVNKubernetes
+  platform:
+    type: KubeVirt
+    kubevirt:
+      baseDomainPassthrough: true
+      storageDriver:
+        type: Default
+  pullSecret:
+    name: "{{ hcp_pull_secret_name }}"
+  sshKey:
+    name: "{{ hcp_ssh_secret_name }}"
+  release:
+    image: "{{ ocp_release_image }}"
+  services:
+{# APIServer+Route needs route.hostname; OAuth/Konnectivity/Ignition Route can omit. Empty hostname => LoadBalancer for API. #}
+{% if hcp_apiserver_route_hostname | default('') | trim | length > 0 %}
+    - service: APIServer
+      servicePublishingStrategy:
+        type: Route
+        route:
+          hostname: "{{ hcp_apiserver_route_hostname | trim }}"
+{% else %}
+    - service: APIServer
+      servicePublishingStrategy:
+        type: LoadBalancer
+{% endif %}
+    - service: OAuthServer
+      servicePublishingStrategy:
+        type: Route
+    - service: Konnectivity
+      servicePublishingStrategy:
+        type: Route
+    - service: Ignition
+      servicePublishingStrategy:
+        type: Route

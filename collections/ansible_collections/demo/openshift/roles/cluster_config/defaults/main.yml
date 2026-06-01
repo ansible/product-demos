@@ -21,3 +21,28 @@ cluster_config_cnv:
         namespace: *cluster_config_cnv_namespace
       spec:
         BareMetalPlatform: true
+
+cluster_config_mce:
+  checkplan: true
+  namespace:
+    name: &cluster_config_mce_namespace multicluster-engine
+  operator_group:
+    name: multicluster-engine
+    target_namespaces:
+      - *cluster_config_mce_namespace
+  subscription:
+    name: multicluster-engine
+    channel: stable-2.11
+  extra_resources:
+    - apiVersion: multicluster.openshift.io/v1
+      kind: MultiClusterEngine
+      metadata:
+        name: multiclusterengine
+      spec:
+        availabilityConfig: Basic
+        overrides:
+          components:
+            - name: hypershift
+              enabled: true
+            - name: hypershift-local-hosting
+              enabled: true
