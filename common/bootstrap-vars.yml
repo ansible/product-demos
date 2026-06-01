@@ -32,6 +32,7 @@ controller_credentials:
       host: '{{ lookup("env", "AAP_HOSTNAME") | default("https://example.invalid") }}'
       username: '{{ lookup("env", "AAP_USERNAME") | default("admin") }}'
       password: '{{ lookup("env", "AAP_PASSWORD") | default(omit) }}'
+      oauth_token: '{{ lookup("env", "AAP_TOKEN") | default(omit) }}'
       verify_ssl: '{{ lookup("env", "AAP_VALIDATE_CERTS") | default(omit) }}'
 
   - name: Automation Hub Certified Content
