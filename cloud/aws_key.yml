@@ -9,19 +9,62 @@
     - name: Derive public key from machine credential when not supplied
       when: aws_public_key | default('') | trim | length == 0
       block:
+        - name: Resolve machine credential private key path
+          ansible.builtin.set_fact:
+            _apd_ssh_private_key_file: >-
+              {{
+                ansible_ssh_private_key_file
+                | default(lookup('env', 'ANSIBLE_PRIVATE_KEY_FILE'), true)
+                | default('', true)
+              }}
+
+        - name: Resolve private key path from runner artifacts
+          ansible.builtin.set_fact:
+            _apd_ssh_private_key_file: "/runner/artifacts/{{ _apd_job_id }}/ssh_key_data"
+          vars:
+            _apd_job_id: >-
+              {{
+                lookup('env', 'JOB_ID')
+                | default(lookup('env', 'AWX_JOB_ID'), true)
+                | default(lookup('env', 'TOWER_JOB_ID'), true)
+                | default('', true)
+              }}
+          when:
+            - _apd_ssh_private_key_file | default('') | length == 0
+            - _apd_job_id | length > 0
+
+        - name: Check private key file exists
+          ansible.builtin.stat:
+            path: "{{ _apd_ssh_private_key_file }}"
+          register: _apd_ssh_key_stat
+          when: _apd_ssh_private_key_file | default('') | length > 0
+
+        - name: Clear private key path when file is missing
+          ansible.builtin.set_fact:
+            _apd_ssh_private_key_file: ""
+          when:
+            - _apd_ssh_private_key_file | default('') | length > 0
+            - not (_apd_ssh_key_stat.stat.exists | default(false))
+
+        - name: Set public key from private key file
+          ansible.builtin.set_fact:
+            aws_public_key: "{{ lookup('pipe', 'ssh-keygen -y -f ' ~ _apd_ssh_private_key_file) | trim }}"
+          when: _apd_ssh_private_key_file | default('') | length > 0
+
+        - name: Set public key from ssh-agent
+          ansible.builtin.set_fact:
+            aws_public_key: "{{ lookup('pipe', 'ssh-add -L 2>/dev/null | head -1') | trim }}"
+          when: aws_public_key | default('') | trim | length == 0
+
         - name: Fail if no private key available
           ansible.builtin.assert:
             that:
-              - ansible_ssh_private_key_file is defined
+              - aws_public_key | default('') | trim | length > 0
             fail_msg: >-
               No SSH public key was provided and no private key was found on
               APD Machine Credential. Add the bastion/RHDP private key to
               APD Machine Credential (Credentials → APD Machine Credential →
               SSH Private Key), or paste aws_public_key in the survey.
-
-        - name: Set public key from private key
-          ansible.builtin.set_fact:
-            aws_public_key: "{{ lookup('pipe', 'ssh-keygen -y -f ' ~ ansible_ssh_private_key_file) }}"
 
     - name: Fail if variables not defined
       ansible.builtin.assert:
