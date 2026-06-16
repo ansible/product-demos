@@ -34,6 +34,60 @@
       vars:
         cloud_stack_vpc_id: "{{ cloud_stack_vpc.vpcs[0].vpc_id }}"
       block:
+        - name: Find remaining EC2 instances in VPC
+          amazon.aws.ec2_instance_info:
+            region: "{{ create_vm_aws_region }}"
+            filters:
+              vpc-id: "{{ cloud_stack_vpc_id }}"
+              instance-state-name:
+                - pending
+                - running
+                - shutting-down
+                - stopping
+                - stopped
+          register: cloud_stack_instances
+
+        - name: Terminate remaining EC2 instances
+          amazon.aws.ec2_instance:
+            region: "{{ create_vm_aws_region }}"
+            instance_ids: "{{ cloud_stack_instances.instances | map(attribute='instance_id') | list }}"
+            state: absent
+            wait: true
+          when: cloud_stack_instances.instances | length > 0
+
+        - name: Find network interfaces in VPC
+          amazon.aws.ec2_eni_info:
+            region: "{{ create_vm_aws_region }}"
+            filters:
+              vpc-id: "{{ cloud_stack_vpc_id }}"
+          register: cloud_stack_enis
+
+        - name: Delete network interfaces
+          amazon.aws.ec2_eni:
+            region: "{{ create_vm_aws_region }}"
+            eni_id: "{{ item.id }}"
+            state: absent
+          loop: "{{ cloud_stack_enis.network_interfaces }}"
+          loop_control:
+            label: "{{ item.id }}"
+          when: cloud_stack_enis.network_interfaces | length > 0
+
+        - name: Find internet gateways
+          amazon.aws.ec2_vpc_igw_info:
+            region: "{{ create_vm_aws_region }}"
+            filters:
+              attachment.vpc-id: "{{ cloud_stack_vpc_id }}"
+          register: cloud_stack_igws
+
+        - name: Delete internet gateways
+          amazon.aws.ec2_vpc_igw:
+            region: "{{ create_vm_aws_region }}"
+            internet_gateway_id: "{{ item.internet_gateway_id }}"
+            state: absent
+          loop: "{{ cloud_stack_igws.internet_gateways }}"
+          loop_control:
+            label: "{{ item.internet_gateway_id }}"
+
         - name: Find subnets
           amazon.aws.ec2_vpc_subnet_info:
             region: "{{ create_vm_aws_region }}"
@@ -51,30 +105,24 @@
           loop_control:
             label: "{{ item.tags.Name | default(item.id) }}"
 
-        - name: Delete demo route table
-          amazon.aws.ec2_vpc_route_table:
-            region: "{{ create_vm_aws_region }}"
-            lookup: tag
-            tags:
-              Name: "{{ aws_rt_name }}"
-            state: absent
-          ignore_errors: true
-
-        - name: Find internet gateways
-          amazon.aws.ec2_vpc_igw_info:
+        - name: Find route tables
+          amazon.aws.ec2_vpc_route_table_info:
             region: "{{ create_vm_aws_region }}"
             filters:
-              attachment.vpc-id: "{{ cloud_stack_vpc_id }}"
-          register: cloud_stack_igws
+              vpc-id: "{{ cloud_stack_vpc_id }}"
+          register: cloud_stack_route_tables
 
-        - name: Delete internet gateways
-          amazon.aws.ec2_vpc_igw:
+        - name: Delete custom route tables
+          amazon.aws.ec2_vpc_route_table:
             region: "{{ create_vm_aws_region }}"
-            internet_gateway_id: "{{ item.internet_gateway_id }}"
+            lookup: id
+            route_table_id: "{{ item.id }}"
+            vpc_id: "{{ cloud_stack_vpc_id }}"
             state: absent
-          loop: "{{ cloud_stack_igws.internet_gateways }}"
+          loop: "{{ cloud_stack_route_tables.route_tables }}"
           loop_control:
-            label: "{{ item.internet_gateway_id }}"
+            label: "{{ item.tags.Name | default(item.id) }}"
+          when: item.associations | default([]) | selectattr('main', 'equalto', true) | list | length == 0
 
         - name: Find security groups
           amazon.aws.ec2_security_group_info:
