@@ -5,6 +5,7 @@
   - [Table of Contents](#table-of-contents)
   - [About These Demos](#about-these-demos)
     - [Jobs](#jobs)
+    - [Workflows](#workflows)
     - [Inventory](#inventory)
   - [Post Setup Setup](#post-setup-setup)
     - [Configure Credentials](#configure-credentials)
@@ -22,6 +23,12 @@ This category of demos shows examples of multi-cloud provisioning and management
 - [**Cloud / AWS / Snapshot EC2**](snapshot_ec2.yml) - Snapshot a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be snapshot.
 - [**Cloud / AWS / Restore EC2 from Snapshot**](snapshot_ec2.yml) - Restore a VM that has been created in a cloud provider.  By default, volumes will be restored from their latest snapshot. VM must be imported into dynamic inventory to be patched.
 - [**Cloud / Resize EC2**](resize_ec2.yml) - Re-size an EC2 instance.
+
+### Workflows
+
+- **Deploy Cloud Stack in AWS** - Provisions the full demo stack (VPC, keypair, five VMs, reports). See [Suggested Usage](#suggested-usage).
+- **Destroy Cloud Stack in AWS** - Tears down everything created by Deploy Cloud Stack in AWS. See [Suggested Usage](#suggested-usage).
+- **Cloud / AWS / Patch EC2 Workflow** - Snapshot, patch, and optionally restore Linux instances.
 
 ### Inventory
 
@@ -51,34 +58,61 @@ Override the defaults at install time with extra vars if needed:
 - `apd_machine_credential_user`
 - `apd_machine_credential_password` or `vault_apd_machine_credential_password`
 
-### Getting your Public Key for Create Keypair Job
+### Getting your SSH key for Create Keypair
 
-When launching **Deploy Cloud Stack in AWS** or **Cloud / AWS / Create Keypair**, paste the full public key line into the survey (including any trailing `=` padding and the comment at the end, if present).
+When launching **Deploy Cloud Stack in AWS**, the workflow registers an AWS keypair automatically using the **private SSH key** on **APD Machine Credential** — no public key is required in the survey.
+
+For standalone runs of **Cloud / AWS | Create Keypair**, you can either attach **APD Machine Credential** (recommended) or paste a public key in the survey.
 
 **Important:** Do not use **ED25519** keys (`ssh-ed25519`). AWS does not support ED25519 key pairs with Windows AMIs, and the Deploy Cloud Stack workflow provisions Windows instances. Use **RSA** or **ECDSA** instead.
 
-To generate a compatible RSA key:
+To generate a compatible RSA key pair:
 
 ```bash
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_aws_demo -C "your@email.com"
-cat ~/.ssh/id_rsa_aws_demo.pub
 ```
 
-Paste the entire output of `cat` into the **Keypair Public Key** survey field.
-
-If you already have a Linux node in AWS from a prior demo run, you can also retrieve a key from that host:
-
-1) Connect to the command line of your Controller server. This is easiest to do by opening the VS Code Web Editor from the landing page where you found the Controller login details.
-2) Open a Terminal Window in the VS Code Web Editor.
-3) SSH to one of your linux nodes (eg. `ssh aws_rhel9`). This should log you into the node as `ec2-user`
-4) `cat .ssh/authorized_keys` and copy the key listed including the `ssh-rsa` prefix
+Save the **private** key (`~/.ssh/id_rsa_aws_demo`) on **APD Machine Credential**. For manual Create Keypair runs, paste the **public** key (`~/.ssh/id_rsa_aws_demo.pub`) in the survey.
 
 
 ## Suggested Usage
 
-**Deploy Cloud Stack in AWS** - This workflow builds out many helpful and convient resources in AWS. Select an AWS region and it builds a default VPC, keypair (using the SSH private key from **APD Machine Credential**), five VMs (three RHEL and two Windows), and a cloud stats report. VM names, owner tags, and environment values are preset for the demo stack. Use an RSA or ECDSA private key on **APD Machine Credential** — ED25519 keys will fail when Windows instances are provisioned.
+### Deploy Cloud Stack in AWS
 
-**Destroy Cloud Stack in AWS** - Select the same AWS region to tear down the demo stack: terminate all five stack VMs in parallel, delete the VPC, delete the keypair, and refresh inventory. Use this to nuke the stack and start over.
+This is the typical starting point for cloud demos in AWS. Launch the workflow and select an **AWS Region** — that is the only survey prompt.
+
+The workflow:
+
+1. Creates keypair `aws-test-key` (public key derived from **APD Machine Credential**)
+2. Creates VPC `aws-test-vpc` with subnet, security group, and route table
+3. Deploys five VMs **in parallel**:
+   | VM name | Blueprint |
+   |---------|-----------|
+   | `aws-dc` | windows_full |
+   | `aws_win1` | windows_core |
+   | `aws_rhel8` | rhel8 |
+   | `aws_rhel9` | rhel9 |
+   | `reports` | rhel9 |
+4. Syncs AWS inventory and publishes tag/VPC reports
+
+Preset tags: owner `apd-demo`, deployment `cloud_stack`, environment `Dev`.
+
+**Prerequisites:** AWS credential configured, RSA/ECDSA private key on **APD Machine Credential**, demo password `Admin_1234!` on that credential for Windows.
+
+### Destroy Cloud Stack in AWS
+
+Use this workflow to completely tear down a stack created by **Deploy Cloud Stack in AWS** and start fresh. Launch it and select the **same AWS Region** used for deploy — that is the only survey prompt.
+
+The workflow:
+
+1. Terminates all five stack VMs **in parallel** (`aws-dc`, `aws_win1`, `aws_rhel8`, `aws_rhel9`, `reports`)
+2. Deletes VPC `aws-test-vpc` and related resources (subnet, route table, internet gateway, security group)
+3. Deletes keypair `aws-test-key` (runs in parallel with VPC teardown)
+4. Syncs AWS inventory so hosts are removed from AAP
+
+**Note:** S3 report buckets created during deploy (`reports-pd-*`) are not deleted by this workflow.
+
+### Other jobs
 
 **Cloud / Create VM** - The Create VM job builds a VM in the given provider based on the included `demo.cloud` collection. VM [blueprints](blueprints/) define variables for each provider that override the defaults in the collection. When creating VMs it is recommended to follow naming conventions that can be used as host patterns. (eg. VM names: `win1`, `win2`, `win3`.  Host Pattern: `win*` )
 
