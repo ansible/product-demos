@@ -3,20 +3,21 @@
   hosts: localhost
   vars:
     aws_key_name: aws-test-key
-    aws_keypair_owner: apd-demo
+    aws_keypair_owner: "{{ create_vm_aws_owner_tag | default(create_vm_vm_owner | default('apd-demo')) }}"
 
   tasks:
     - name: Derive public key from machine credential when not supplied
-      when: aws_public_key is not defined
+      when: aws_public_key | default('') | trim | length == 0
       block:
         - name: Fail if no private key available
           ansible.builtin.assert:
             that:
               - ansible_ssh_private_key_file is defined
             fail_msg: >-
-              aws_public_key was not provided and no SSH private key was found on
-              the APD Machine Credential. Attach APD Machine Credential to this job
-              or supply aws_public_key in the survey.
+              No SSH public key was provided and no private key was found on
+              APD Machine Credential. Add the bastion/RHDP private key to
+              APD Machine Credential (Credentials → APD Machine Credential →
+              SSH Private Key), or paste aws_public_key in the survey.
 
         - name: Set public key from private key
           ansible.builtin.set_fact:

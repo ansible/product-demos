@@ -297,15 +297,10 @@ controller_workflows:
     notification_templates_error: Telemetry
     extra_vars:
       aws_key_name: aws-test-key
-      aws_keypair_owner: apd-demo
-      aws_owner_tag: apd-demo
       create_vm_aws_keypair_name: aws-test-key
-      create_vm_aws_owner_tag: apd-demo
       create_vm_aws_securitygroup_name: aws-test-sg
       create_vm_aws_vpc_subnet_name: aws-test-subnet
       create_vm_vm_deployment: cloud_stack
-      create_vm_vm_environment: Dev
-      create_vm_vm_owner: apd-demo
       create_vm_vm_purpose: demo
     survey_enabled: true
     survey:
@@ -321,6 +316,22 @@ controller_workflows:
             - us-east-2
             - us-west-1
             - us-west-2
+        - question_name: Owner
+          type: text
+          variable: create_vm_aws_owner_tag
+          required: true
+        - question_name: Environment
+          type: multiplechoice
+          variable: vm_environment
+          required: true
+          choices:
+            - Dev
+            - QA
+            - Prod
+        - question_name: Email
+          type: text
+          variable: email
+          required: true
     simplified_workflow_nodes:
       - identifier: Create Keypair
         unified_job_template: Cloud | AWS | Create Keypair

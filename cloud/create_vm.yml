@@ -26,6 +26,20 @@
         - vm_deployment is defined
         - create_vm_vm_deployment is not defined or create_vm_vm_deployment | length == 0
 
+    - name: Map vm_environment to create_vm_vm_environment
+      ansible.builtin.set_fact:
+        create_vm_vm_environment: "{{ vm_environment }}"
+      when:
+        - vm_environment is defined
+        - create_vm_vm_environment is not defined or create_vm_vm_environment | length == 0
+
+    - name: Map create_vm_aws_owner_tag to create_vm_vm_owner
+      ansible.builtin.set_fact:
+        create_vm_vm_owner: "{{ create_vm_aws_owner_tag }}"
+      when:
+        - create_vm_aws_owner_tag is defined
+        - create_vm_vm_owner is not defined or create_vm_vm_owner | length == 0
+
     - name: Include create vm role
       ansible.builtin.include_role:
         name: demo.cloud.aws
