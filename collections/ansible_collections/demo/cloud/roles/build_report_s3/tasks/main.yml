@@ -13,7 +13,7 @@
 
 - name: Configure bucket for static website hosting
   ansible.builtin.shell: |
-    python3 <<'PY'
+    {{ _apd_python }} <<'PY'
     import boto3
 
     boto3.client("s3", region_name="{{ reports_aws_region }}").put_bucket_website(
@@ -22,6 +22,8 @@
     )
     PY
   changed_when: true
+  vars:
+    _apd_python: "{{ ansible_playbook_python | default('/usr/bin/python3.12') }}"
   args:
     executable: /bin/bash
 
