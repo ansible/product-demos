@@ -19,6 +19,30 @@
     region: "{{ create_vm_aws_region }}"
   register: create_vm_existing_vm
 
+- name: Find instances with the same name tag
+  amazon.aws.ec2_instance_info:
+    filters:
+      "tag:Name": "{{ create_vm_vm_name }}"
+      instance-state-name:
+        - pending
+        - running
+        - shutting-down
+        - stopping
+        - stopped
+    region: "{{ create_vm_aws_region }}"
+  register: create_vm_name_conflicts
+  when: create_vm_existing_vm.instances | length == 0
+
+- name: Terminate stale instance blocking create
+  amazon.aws.ec2_instance:
+    region: "{{ create_vm_aws_region }}"
+    instance_ids: "{{ create_vm_name_conflicts.instances | map(attribute='instance_id') | list }}"
+    state: absent
+    wait: true
+  when:
+    - create_vm_existing_vm.instances | length == 0
+    - create_vm_name_conflicts.instances | default([]) | length > 0
+
 - name: Output the IP of existing VM
   ansible.builtin.debug:
     msg:
@@ -69,6 +93,18 @@
       amazon.aws.ec2_instance:
         filters:
           "tag:Name": "{{ create_vm_vm_name }}"
+          "tag:blueprint": "{{ create_vm_vm_blueprint }}"
+          "tag:environment": "{{ create_vm_vm_environment }}"
+          "tag:deployment": "{{ create_vm_vm_deployment }}"
+          "tag:owner": "{{ create_vm_vm_owner }}"
+          "tag:purpose": "{{ create_vm_vm_purpose }}"
+          "tag:ansible-role": create_vm
+          "tag:ansible-collection": demo.cloud
+          instance-state-name:
+            - pending
+            - running
+            - stopping
+            - stopped
         network:
           assign_public_ip: true
           delete_on_termination: true
