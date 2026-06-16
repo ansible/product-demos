@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title> Ansible Linux Automation Report </title>
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="css/main.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
+<script>
+$(function() {
+$( "#accordion > div" ).accordion({
+    header: "h3",
+    active: false,
+collapsible: true
+});
+});
+</script>
+</head>
+<body>
+  {% include 'header.j2' %}
+<section>
+<center>
+<h1>AWS Instance Report</h1>
+<h3><input type="search" placeholder="Search..." class="form-control search-input" data-table="main_net_table"/>
+</center>
+<table class="table table-striped mt32 main_net_table searchable sortable">
+<tbody>
+  <tr>
+    <th class="vpc_info">{{ '%-38s'|format('Name')}}</th>
+    <th class="vpc_info">{{ '%-28s'|format('Instance Id') }}</th>
+    <th class="vpc_info">{{ '%-14s'|format('Type') }}</th>
+    <th class="vpc_info">{{ '%-18s'|format('Launch Time') }}</th>
+    <th class="vpc_info">{{ '%-26s'|format('VPC ID') }}</th>
+    <th class="vpc_info">{{ '%-22s'|format('Subnet ID') }}</th>
+    <th class="vpc_info">{{ '%-20s'|format('Tags') }}</th>
+  </tr>
+{% for vm in ec2_instance_info.instances %}
+  <tr>
+    <td>{{ '%-38s'|format(vm.tags['Name'] | default('Unspecified, missing name tag')) }}</td>
+    <td>{{ '%-28s'|format(vm.instance_id) }}</td>
+    <td>{{ '%-14s'|format(vm.instance_type) }}</td>
+    <td>{{ '%-18s'|format(vm.launch_time) }}</td>
+    <td>{{ '%-26s'|format(vm.vpc_id) }}</td>
+    <td>{{ '%-26s'|format(vm.subnet_id) }}</td>
+    <td>
+    <table border=#353a40>
+    {% for tag in vm.tags | sort %}
+    <tr>
+    <td>{{ tag }}</td> 
+    <td>{{ vm.tags[tag] }}</td>
+    </tr>
+    {% endfor %}
+    </table>
+    </td>
+   </tr> 
+{% endfor %}
+</tbody>
+</table>
+  {% include 'footer.j2' %}
+</section>
+</body>
+</html>

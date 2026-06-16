@@ -1,0 +1,19 @@
+---
+- name: Delete VM from AWS dynamic inventory
+  hosts: "{{ _hosts | default(omit) }}"
+  gather_facts: false
+
+  tasks:
+    - name: List systems to be destroyed
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }}"
+
+    - name: Pause for review...
+      ansible.builtin.pause:
+        seconds: 30
+        prompt: "Systems listed above will be DESTROYED in 30 seconds. Cancel the job to Abort."
+
+    - name: Include destroy vm role
+      ansible.builtin.include_role:
+        name: demo.cloud.aws
+        tasks_from: destroy_vm

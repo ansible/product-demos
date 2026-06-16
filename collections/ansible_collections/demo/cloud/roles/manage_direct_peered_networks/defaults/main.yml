@@ -1,0 +1,18 @@
+---
+tenancy: default
+vpc_priv_net_cidr: 10.0.0.0/16
+vpc_priv_net_public_subnet_cidr: 10.0.0.0/24
+vpc_priv_net_priv_subnet_cidr: 10.0.1.0/24
+vpc_priv_net_hosts_pattern: 10.0.*
+vpc_dmz_cidr: 10.1.0.0/16
+vpc_dmz_subnet1_cidr: 10.1.0.0/24
+dmz_instance_type: t2.micro
+dmz_instance_ami_owner: "{{ omit }}"
+dmz_instance_ami_architecture: x86_64
+dmz_instance_ami_filter: RHEL-8*HVM-*Hourly*
+dmz_instance_name: dmz-ssh-tunnel-vm
+priv_network_instance_type: t2.micro
+priv_network_instance_ami_owner: "{{ omit }}"
+priv_network_instance_ami_architecture: x86_64
+priv_network_instance_ami_filter: RHEL-8*HVM-*Hourly*
+priv_network_instance_name: priv-network-vm

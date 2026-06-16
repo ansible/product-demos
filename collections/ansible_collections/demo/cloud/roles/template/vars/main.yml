@@ -1,0 +1,14 @@
+file_path: /var/www/html/
+web_host: ansible-1
+web_port: 8088
+# multi key, same value lookup for cisco
+vendor:
+  ios: &my_value 'Cisco'
+  nxos: *my_value
+  iosxr: *my_value
+  junos: "Juniper"
+  eos: "Arista"
+transport:
+  cliconf: "network_cli"
+  netconf: "netconf"
+  httpapi: "httpapi"

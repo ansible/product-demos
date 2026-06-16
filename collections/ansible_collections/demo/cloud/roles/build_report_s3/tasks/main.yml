@@ -1,0 +1,41 @@
+---
+- name: Create report bucket
+  amazon.aws.s3_bucket:
+    name: "{{ reports_aws_bucket_name }}"
+    region: "{{ reports_aws_region }}"
+    state: present
+    policy: "{{ lookup('ansible.builtin.template', 'policy.json') }}"
+    public_access:
+      block_public_acls: false
+      block_public_policy: false
+      ignore_public_acls: false
+      restrict_public_buckets: false
+
+- name: Configure bucket for website
+  community.aws.s3_website:
+    name: "{{ reports_aws_bucket_name }}"
+    state: present
+
+- name: Put website files
+  community.aws.s3_sync:
+    bucket: "{{ reports_aws_bucket_name }}"
+    file_root: "{{ playbook_dir }}/files"
+    region: "{{ reports_aws_region }}"
+
+- name: Get bucket objects
+  amazon.aws.s3_object_info:
+    bucket_name: "{{ reports_aws_bucket_name }}"
+  register: bucket_objects
+
+- name: Put index.html
+  amazon.aws.s3_object:
+    bucket: "{{ reports_aws_bucket_name }}"
+    object: index.html
+    src: "{{ playbook_dir }}/index.html"
+    mode: put
+    headers:
+      ContentType: text/html
+
+- name: Print bucket URL
+  ansible.builtin.debug:
+    msg: "Bucket URL: http://{{ reports_aws_bucket_name }}.s3-website-{{ reports_aws_region }}.amazonaws.com"

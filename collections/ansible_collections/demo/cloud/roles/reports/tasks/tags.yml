@@ -1,0 +1,16 @@
+---
+- name: Retrieve instance information
+  amazon.aws.ec2_instance_info:
+    filters: "{{ reports_aws_instance_filters }}"
+    region: "{{ reports_aws_region }}"
+  register: ec2_instance_info
+
+- name: Put tags-report
+  amazon.aws.s3_object:
+    bucket: "{{ reports_aws_bucket_name }}"
+    object: tag-report.html
+    content: "{{ lookup('template', 'tags_report.j2') }}"
+    mode: put
+    permission: "{{ reports_aws_bucket_permissions }}"
+    headers:
+      ContentType: text/html

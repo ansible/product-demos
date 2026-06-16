@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cloud Automation Report</title>
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="css/main.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+$(function() {
+$( "#accordion > div" ).accordion({
+    header: "h3",
+    active: false,
+collapsible: true
+});
+});
+</script>
+</head>
+<body>
+  {% include 'header.j2' %}
+<section>
+<center>
+<h1>Ansible Hybrid Cloud Automation Example Report</h1>
+</center>
+<table class="main_net_table">
+    <thead>
+        <tr>
+            <th>Public Cloud</th>
+            <th class="region_column">Region</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="summary_info">
+              <div id="hostname">
+              <img class="router_image" src="aws.png" alt="picture of cloud">
+              <br><p class="hostname">AWS</p>
+            </div>
+              <div id="net_info_div">
+              <table class="net_info">
+              <tbody>
+                <tr>
+                  <td>Boto3 Version</td>
+                  <td class="sub_net_info">{{ boto3_version | default ('unknown')}}</td>
+                </tr>
+                <tr>
+                  <td>AWS user</td>
+                  <td class="sub_net_info">{{ aws_user | default('unknown') }}</td>
+                </tr>
+                <tr>
+                  <td>Account ID</td>
+                  <td class="sub_net_info">{{ whoami.account | default('unknown') }}</td>
+                </tr>
+                <tr>
+                  <td>Account Alias</td>
+                  <td class="sub_net_info">{{ whoami.account_alias | default ('unknown')}}</td>
+                </tr>
+              </tbody>
+              </table>
+
+
+            {% include 'ansible.j2' %}
+          </div>
+
+
+
+            </td>
+
+            <td>
+            {% include 'vpc.j2' %}
+            </td>
+        </tr>
+
+    </tbody>
+</table>
+<center><p>Created with</p><br><img src="webpage_logo.png" width="300" alt="red hat ansible automation platform logo">
+<p>The source code to create this report can be found at <a href="https://github.com/ansible/product-demos">https://github.com/ansible/product-demos</a><br><br>
+If you are new to Ansible Automation check out the following links:<br>
+<a href="https://docs.ansible.com/ansible/latest/user_guide/intro_getting_started.html">Getting Started</a><br>
+<a target="_blank" href="https://ansible.com/workshops">Free hands-on workshops</a><br>
+<a href="https://youtube.com/ansibleautomation">Youtube Videos</a><br>
+</p>
+</center>
+</section>
+</div>
+</body>
+</html>

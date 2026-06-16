@@ -1,0 +1,23 @@
+---
+- name: loop over all ec2 regions
+  ansible.builtin.include_tasks:
+    file: retrieve_info.yml
+  loop: "{{ ec2_regions }}"
+
+- name: grab boto version
+  ansible.builtin.pip:
+    name: boto3
+  register: register_boto3_version
+  check_mode: true
+
+- name: grab information about AWS user
+  amazon.aws.aws_caller_info:
+  register: whoami
+  delegate_to: localhost
+
+- name: save username of AWS user and boto3 version
+  set_fact:
+    aws_user: '{{ whoami.arn.split("/")[-1] }}'
+    boto3_version: >-
+      {{ lookup('pipe', ansible_playbook_python ~ ' -c "import boto3; print(boto3.__version__)"') | default('unknown') }}    
+  delegate_to: localhost

@@ -1,0 +1,42 @@
+---
+- name: Create report bucket
+  amazon.aws.s3_bucket:
+    name: "{{ reports_aws_bucket_name }}"
+    region: "{{ reports_aws_region }}"
+    state: present
+    acl: "{{ reports_aws_bucket_permissions }}"
+    public_access: "{{ reports_aws_public_access }}"
+    object_ownership: BucketOwnerPreferred
+
+- name: Configure bucket for website
+  community.aws.s3_website:
+    name: "{{ reports_aws_bucket_name }}"
+    state: present
+
+- name: Put website files
+  community.aws.s3_sync:
+    bucket: "{{ reports_aws_bucket_name }}"
+    file_root: "{{ role_path }}/files"
+    permission: "{{ reports_aws_bucket_permissions }}"
+
+- name: Include tasks
+  ansible.builtin.include_tasks: "{{ reports_aws_report }}.yml"
+
+- name: Get bucket objects
+  amazon.aws.s3_object_info:
+    bucket_name: "{{ reports_aws_bucket_name }}"
+  register: bucket_objects
+
+- name: Put index.html
+  amazon.aws.s3_object:
+    bucket: "{{ reports_aws_bucket_name }}"
+    object: index.html
+    content: "{{ lookup('template', 'landing_page.j2') }}"
+    mode: put
+    permission: "{{ reports_aws_bucket_permissions }}"
+    headers:
+      ContentType: text/html
+
+- name: Print bucket url
+  ansible.builtin.debug:
+    msg: "Bucket URL: http://{{ reports_aws_bucket_name }}.s3-website.{{ reports_aws_region }}.amazonaws.com"

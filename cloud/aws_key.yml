@@ -3,9 +3,25 @@
   hosts: localhost
   vars:
     aws_key_name: aws-test-key
-    aws_keypair_owner: undef
+    aws_keypair_owner: apd-demo
 
   tasks:
+    - name: Derive public key from machine credential when not supplied
+      when: aws_public_key is not defined
+      block:
+        - name: Fail if no private key available
+          ansible.builtin.assert:
+            that:
+              - ansible_ssh_private_key_file is defined
+            fail_msg: >-
+              aws_public_key was not provided and no SSH private key was found on
+              the APD Machine Credential. Attach APD Machine Credential to this job
+              or supply aws_public_key in the survey.
+
+        - name: Set public key from private key
+          ansible.builtin.set_fact:
+            aws_public_key: "{{ lookup('pipe', 'ssh-keygen -y -f ' ~ ansible_ssh_private_key_file) }}"
+
     - name: Fail if variables not defined
       ansible.builtin.assert:
         that:

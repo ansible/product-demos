@@ -1,0 +1,69 @@
+<!-- INTERNAL TABLE FOR Ansible -->
+<div id="accordion">
+{% for ec2_region in all_ec2_regions %}
+{% for key, value in ec2_region.items() %}
+{% set running = value.ec2_instance_info.instances | selectattr('state.name', 'equalto', "running") | length %}
+{% set stopped = value.ec2_instance_info.instances | selectattr('state.name', 'equalto', "stopped") | length %}
+{% set total = value.ec2_instance_info.instances | length %}
+<div>
+<h3><div id="region_title">{{ key | default('unknown') }}</div><div class="instances_highlight">{% if total > 0 %}{% if running > 0 %}<div class="instances_running">{% endif %}<span class="ui-accordion-header-icon ui-icon ui-icon-power"></span>{{ running }} instances running{% if running > 0 %}</div>{% endif %}<div class="instances_stopped"><span class="ui-accordion-header-icon ui-icon ui-icon-stop"></span>{{ stopped }} stopped ({{ total }} total)</div>{% endif %}</div></h3>
+<div class="net_content">
+<p class="description">There are <strong>{{ value.vpc_info.vpcs | length }}</strong> AWS VPCs configured and <strong>{{ total }}</strong> instances on region {{ key | default('unknown') }}</p>
+{% set nsvpc = namespace(total_empty_vpc = 0) %}
+{% for vpc in value.vpc_info.vpcs %}
+{% set instances_with_vpc = value.ec2_instance_info.instances | selectattr('vpc_id', 'defined') %}
+{% if instances_with_vpc | selectattr('vpc_id', 'equalto', vpc.id ) | length <= 0 %}
+{% set nsvpc.total_empty_vpc = nsvpc.total_empty_vpc + 1 %} 
+{% endif %}
+{% endfor %}
+{% if nsvpc.total_empty_vpc > 0 %}
+<div class="opportunities_box">
+<p class="opportunities">Optimization Opportunities</p> 
+<div class="empty_vpc"><span class="ui-accordion-header-icon ui-icon ui-icon-info"></span>{{ nsvpc.total_empty_vpc }} empty VPCs</div>
+</div>
+{% endif %}
+
+<table class="net_info">
+<tbody>
+  <tr>
+    <th class="vpc_info">VPC name</th>
+    <th class="vpc_info">VPC id</th>
+    <th class="vpc_info">instances <br> running</th>
+    <th class="vpc_info">instances <br> stopped</th>
+    <th class="vpc_info">CIDR block</th>
+    <th class="vpc_info" id="cidr_assoc">CIDR block<br> associations</th>
+    <th class="vpc_info">IGW</th>
+  </tr>
+  {% for vpc in value.vpc_info.vpcs %}
+  <tr>
+  <td>{{ vpc.tags['Name'] | default('<span class="ui-accordion-header-icon ui-icon ui-icon-circle-close"></span>no name tag') }}</td>
+  <td>{{ vpc.id }}</td>
+  {% set instances_with_vpc = value.ec2_instance_info.instances | selectattr('vpc_id', 'defined') %}
+  <td style="text-align: center;">{{ instances_with_vpc | selectattr('vpc_id', 'equalto', vpc.id ) | selectattr('state.name', 'equalto', "running") | length }}</td>
+  <td style="text-align: center;">{{ instances_with_vpc | selectattr('vpc_id', 'equalto', vpc.id ) | selectattr('state.name', 'equalto', "stopped") | length }}</td>
+  <td>{{ vpc.cidr_block }}</td>
+  <td style="text-align:center;">{{ vpc.cidr_block_association_set | length | default('0') }}</td>
+  {% set ns = namespace(igwfound=False) %}
+  {% for igw in value.igw_info.internet_gateways %}
+  {% if igw['attachments'] | length > 0 %}
+  {% if igw['attachments'][0]['vpc_id'] is defined %}
+  {% if igw['attachments'][0]['vpc_id'] == vpc.id %}
+  <td>{{ igw['internet_gateway_id'] }}</td>
+  {% set ns.igwfound = True %}
+  {% endif %}
+  {% endif %}
+  {% endif %}
+  {%- endfor -%}
+  {% if not ns.igwfound %}
+  <td>No IGW found</td>
+  {% endif %}
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+{% endfor %}
+{% endfor %}
+</div>
+<!-- END INTERNAL TABLE FOR Ansible -->

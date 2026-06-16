@@ -1,0 +1,36 @@
+---
+- name: Retrieve vpc information
+  amazon.aws.ec2_vpc_net_info:
+    region: "{{ reports_aws_region }}"
+  register: vpc_info
+
+- name: Retrieve info for ec2 instances
+  amazon.aws.ec2_instance_info:
+    region: "{{ reports_aws_region }}"
+  register: ec2_instance_info
+
+- name: Gather information about Internet Gateways IGWs
+  amazon.aws.ec2_vpc_igw_info:
+    region: "{{ reports_aws_region }}"
+  register: igw_info
+
+- name: Grab information about AWS user
+  amazon.aws.aws_caller_info:
+    region: "{{ reports_aws_region }}"
+  register: whoami
+
+- name: Save username of AWS user
+  ansible.builtin.set_fact:
+    aws_user: '{{ whoami.arn.split("/")[-1] }}'
+    py_cmd: >-
+      {{ lookup('pipe', ansible_playbook_python ~ ' -c "import boto3; print(boto3.__version__)"') }}
+
+- name: Put vpc-report
+  amazon.aws.s3_object:
+    bucket: "{{ reports_aws_bucket_name }}"
+    object: vpc-report.html
+    content: "{{ lookup('template', 'vpc_report.j2') }}"
+    mode: put
+    permission: "{{ reports_aws_bucket_permissions }}"
+    headers:
+      ContentType: text/html

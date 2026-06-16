@@ -1,0 +1,4 @@
+---
+aws_profile: default
+aws_region: us-east-1
+vpc_priv_net_hosts_pattern: 10.0.*

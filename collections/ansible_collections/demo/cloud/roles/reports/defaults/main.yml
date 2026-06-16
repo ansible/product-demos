@@ -1,0 +1,12 @@
+---
+reports_aws_region: us-east-1
+reports_aws_bucket_prefix: "{{ lookup('ansible.builtin.env', 'AWS_ACCESS_KEY_ID')[1:5] | lower }}"
+reports_aws_bucket_name: "{{ reports_aws_bucket_prefix }}-reports"
+reports_aws_bucket_permissions: public-read
+reports_aws_public_access:
+  block_public_acls: false
+  block_public_policy: false
+  ignore_public_acls: false
+  restrict_public_buckets: false
+reports_aws_report: vpc
+reports_aws_instance_filters: "{{ omit }}"

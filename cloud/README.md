@@ -8,9 +8,7 @@
     - [Inventory](#inventory)
   - [Post Setup Setup](#post-setup-setup)
     - [Configure Credentials](#configure-credentials)
-    - [Add Workshop Credential Password](#add-workshop-credential-password)
-    - [Remove Inventory Variables](#remove-inventory-variables)
-    - [Getting your Public Key for Create Keypair Job](#getting-your-public-key-for-create-keypair-job)
+    - [Configure APD Machine Credential SSH Key](#configure-apd-machine-credential-ssh-key)
   - [Suggested Usage](#suggested-usage)
   - [Known Issues](#known-issues)
 
@@ -40,25 +38,47 @@ After running the setup job template, there are a few steps required to make the
 
 - Add AWS Access and Secret key to the `AWS` Credential created by the setup job.
 
-### Add Workshop Credential Password
+### Configure APD Machine Credential SSH Key
 
-1) Add a password that meets the [default complexity requirements](https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-must-meet-complexity-requirements#reference). This allows you to connect to Windows Servers provisioned with Create VM job. Required until [RFE](https://github.com/ansible/workshops/issues/1597]) is complete
+The **APD Machine Credential** is created at install with username `ec2-user` and demo password `Admin_1234!` (Windows complexity compliant). That password is used when Windows instances are provisioned and for WinRM jobs against `ec2-user`.
 
-### Remove Inventory Variables
+For **Deploy Cloud Stack in AWS**, also add the **private SSH key** (RSA or ECDSA, not ED25519) that pairs with the key registered in AWS. The Create Keypair job derives the public key from this credential automatically — you no longer paste a public key in the workflow survey.
 
-1) Remove Workshop Inventory variables on the Details page of the inventory. Required until [RFE](https://github.com/ansible/workshops/issues/1597]) is complete
+Linux jobs such as **Linux | Fact Scan** will fail with `Permission denied (publickey)` until the matching private key is saved on this credential.
+
+Override the defaults at install time with extra vars if needed:
+
+- `apd_machine_credential_user`
+- `apd_machine_credential_password` or `vault_apd_machine_credential_password`
 
 ### Getting your Public Key for Create Keypair Job
+
+When launching **Deploy Cloud Stack in AWS** or **Cloud / AWS / Create Keypair**, paste the full public key line into the survey (including any trailing `=` padding and the comment at the end, if present).
+
+**Important:** Do not use **ED25519** keys (`ssh-ed25519`). AWS does not support ED25519 key pairs with Windows AMIs, and the Deploy Cloud Stack workflow provisions Windows instances. Use **RSA** or **ECDSA** instead.
+
+To generate a compatible RSA key:
+
+```bash
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_aws_demo -C "your@email.com"
+cat ~/.ssh/id_rsa_aws_demo.pub
+```
+
+Paste the entire output of `cat` into the **Keypair Public Key** survey field.
+
+If you already have a Linux node in AWS from a prior demo run, you can also retrieve a key from that host:
 
 1) Connect to the command line of your Controller server. This is easiest to do by opening the VS Code Web Editor from the landing page where you found the Controller login details.
 2) Open a Terminal Window in the VS Code Web Editor.
 3) SSH to one of your linux nodes (eg. `ssh aws_rhel9`). This should log you into the node as `ec2-user`
-4) `cat .ssh/authorized_keys` and copy the key listed including the  `ssh-rsa` prefix
+4) `cat .ssh/authorized_keys` and copy the key listed including the `ssh-rsa` prefix
 
 
 ## Suggested Usage
 
-**Deploy Cloud Stack in AWS** - This workflow builds out many helpful and convient resources in AWS. Given an AWS region, key, and some organizational paremetres for tagging it builds a default VPC, keypair, five VMs (three RHEL and two Windows), and even provides a report for cloud stats. It is the typical starting point for using Ansible Product-Demos in AWS.
+**Deploy Cloud Stack in AWS** - This workflow builds out many helpful and convient resources in AWS. Select an AWS region and it builds a default VPC, keypair (using the SSH private key from **APD Machine Credential**), five VMs (three RHEL and two Windows), and a cloud stats report. VM names, owner tags, and environment values are preset for the demo stack. Use an RSA or ECDSA private key on **APD Machine Credential** — ED25519 keys will fail when Windows instances are provisioned.
+
+**Destroy Cloud Stack in AWS** - Select the same AWS region to tear down the demo stack: terminate all five stack VMs in parallel, delete the VPC, delete the keypair, and refresh inventory. Use this to nuke the stack and start over.
 
 **Cloud / Create VM** - The Create VM job builds a VM in the given provider based on the included `demo.cloud` collection. VM [blueprints](blueprints/) define variables for each provider that override the defaults in the collection. When creating VMs it is recommended to follow naming conventions that can be used as host patterns. (eg. VM names: `win1`, `win2`, `win3`.  Host Pattern: `win*` )
 
@@ -67,4 +87,6 @@ After running the setup job template, there are a few steps required to make the
 **Cloud / AWS / Resize EC2** - Given an EC2 instance, change its size. This takes an AWS region, target host pattern, and a target instance size as parameters. As a final step, this job refreshes the AWS inventory so the re-created instance is accessible from AAP.
 
 ## Known Issues
-Azure does not work without a custom execution environment that includes the Azure dependencies.
+
+- **ED25519 key pairs are not supported with Windows AMIs on AWS.** The Deploy Cloud Stack workflow and any job that provisions Windows instances will fail if you register an `ssh-ed25519` public key. Use RSA (`ssh-rsa`) or ECDSA instead.
+- Azure does not work without a custom execution environment that includes the Azure dependencies.

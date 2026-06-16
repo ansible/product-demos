@@ -1,0 +1,19 @@
+---
+- name: Delete transit network VPCs and related assets
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Fail if variables not defined
+      ansible.builtin.assert:
+        that:
+          - aws_region is defined
+        fail_msg: "Required variables not set"
+
+    - name: Delete Transit Networking Model
+      ansible.builtin.include_role:
+        name: demo.cloud.manage_transit_peered_networks
+      vars:
+        manage_transit_peered_networks_operation: delete

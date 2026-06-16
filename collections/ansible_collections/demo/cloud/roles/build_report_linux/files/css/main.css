@@ -1,0 +1,277 @@
+p.hostname {
+  color: #000000;
+  font-weight: bolder;
+  font-size: large;
+  margin: auto;
+  width: 50%;
+}
+
+#subtable {
+  background: #ebebeb;
+  margin: 0px;
+  width: 100%;
+}
+
+#subtable tbody tr td {
+  padding: 5px 5px 5px 5px;
+}
+
+#subtable thead th {
+  padding: 5px;
+}
+
+* {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  font-family: "Open Sans", "Helvetica";
+
+}
+
+a {
+  color: #ffffff;
+}
+
+p {
+  color: #ffffff;
+}
+h1 {
+  text-align: center;
+  color: #ffffff;
+}
+
+body {
+  background:#353a40;
+  padding: 0px;
+  margin: 0px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+table {
+  border-collapse: separate;
+  background:#fff;
+  @include border-radius(5px);
+  @include box-shadow(0px 0px 5px rgba(0,0,0,0.3));
+}
+
+.main_net_table {
+  margin:50px auto;
+}
+
+.main_net_table {
+  margin:50px auto;
+}
+
+thead {
+  @include border-radius(5px);
+}
+
+thead th {
+  font-size:16px;
+  font-weight:400;
+  color:#fff;
+  @include text-shadow(1px 1px 0px rgba(0,0,0,0.5));
+  text-align:left;
+  padding:20px;
+  border-top:1px solid #858d99;
+  background: #353a40;
+
+  &:first-child {
+   @include border-top-left-radius(5px);
+  }
+
+  &:last-child {
+    @include border-top-right-radius(5px);
+  }
+}
+
+tbody tr td {
+  font-weight:400;
+  color:#5f6062;
+  font-size:13px;
+  padding:20px 20px 20px 20px;
+  border-bottom:1px solid #e0e0e0;
+
+}
+
+tbody tr:nth-child(2n) {
+  background:#f0f3f5;
+}
+
+tbody tr:last-child td {
+  border-bottom:none;
+  &:first-child {
+    @include border-bottom-left-radius(5px);
+  }
+  &:last-child {
+    @include border-bottom-right-radius(5px);
+  }
+}
+
+td {
+  vertical-align: top;
+}
+
+span.highlight {
+    background-color: yellow;
+}
+
+.expandclass {
+  color: #5f6062;
+}
+
+.content{
+         display:none;
+         margin: 10px;
+}
+
+header {
+  width: 100%;
+  position: initial;
+  float: initial;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  height: 88px;
+  background-color: #171717;
+}
+
+.header-container {
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  max-width: 1170px;
+  padding: 0;
+  float: initial;
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  width: 137px;
+  border: 0;
+  margin: 0;
+  margin-left: 15px;
+}
+
+.header-link {
+  margin-left: 40px;
+  text-decoration: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 15px;
+  font-family: 'Red Hat Text';
+  font-weight: 500;
+}
+
+.header-link:hover {
+  text-shadow: 0 0 0.02px white;
+  text-decoration: none;
+}
+
+table.net_info td {
+    padding: 5px;
+}
+
+p.expandclass:hover {
+    text-decoration: underline;
+    color: #EE0000;
+    cursor: pointer;
+}
+
+.summary_info {
+}
+
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
+    border: 1px solid #5F0000;
+    background: #EE0000;
+}
+
+div#net_content {
+    padding: 0px;
+    height: auto !important;
+}
+
+img.router_image {
+    vertical-align: middle;
+    padding: 0px 10px 10px 10px;
+}
+
+table.net_info {
+    width: 100%;
+}
+
+p.internal_label {
+    color: #000000;
+}
+
+p.description {
+    color: #5f6062;
+}
+
+th.region_column {
+    min-width: 990px;
+}
+
+th.vpc_info {
+    color: #ffffff;
+    background-color: #000000;
+    height: 30px;
+    min-width: 80px;
+}
+
+#cidr_assoc {
+    min-width: 155px;
+}
+
+.instances_highlight {
+    display: inline-block;
+}
+
+.instances_running {
+    display: inline-block;
+    color: #ee0000;
+}
+
+.instances_stopped {
+  display: inline-block;
+  color: #000000;
+}
+
+#region_title {
+    display: inline-block;
+    padding-right:10px;
+}
+
+.ui-state-active .instances_running {
+  color: #ffffff;
+}
+
+.ui-state-active .instances_stopped {
+  color: #ffffff;
+}
+
+.ui-state-default .instances_running {
+  background-image: ui-icons_ee0000_256x240.png;
+}
+
+.instances_running .ui-icon {
+  background-image: url("https://s3.amazonaws.com/ansible.demoredhat.com.private/ui-icons_ee0000_256x240.png");
+}
+
+.ui-state-active .ui-icon, .ui-button:active .ui-icon {
+  background-image: url("http://code.jquery.com/ui/1.12.1/themes/base/images/ui-icons_ffffff_256x240.png") !important;
+}
+
+p.opportunities {
+  color: #5f0000;
+  padding: 0px 10px 0px 00px;
+  margin-top: 5px;
+}
+
+.opportunities_box {
+  background-color: #e6e6e6;
+  padding: 1px 5px 5px 5px;
+  width: fit-content;
+  margin-bottom: 10px;
+}

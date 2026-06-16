@@ -1,0 +1,480 @@
+---
+- name: Create VPCs
+  block:
+    - name: Create private network VPC
+      amazon.aws.ec2_vpc_net:
+        name: private-network-vpc
+        cidr_block: "{{ vpc_priv_net_cidr }}"
+        purge_tags: false
+        region: "{{ aws_region }}"
+        tenancy: "{{ tenancy }}" # noqa args[module]
+        state: present
+        tags:
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: priv_network_vpc
+
+    - name: Create private subnet for private network
+      amazon.aws.ec2_vpc_subnet:
+        state: present
+        vpc_id: "{{ priv_network_vpc.vpc.id }}"
+        cidr: "{{ vpc_priv_net_priv_subnet_cidr }}"
+        region: "{{ aws_region }}"
+        tags:
+          Name: priv-net-private-subnet
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: priv_network_priv_subnet
+
+    - name: Create public subnet for private network natgw
+      amazon.aws.ec2_vpc_subnet:
+        state: present
+        vpc_id: "{{ priv_network_vpc.vpc.id }}"
+        cidr: "{{ vpc_priv_net_public_subnet_cidr }}"
+        region: "{{ aws_region }}"
+        tags:
+          Name: priv-net-public-subnet
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: priv_network_public_subnet
+
+    - name: Create Internet Gateway for private network (to connect NAT gateway)
+      amazon.aws.ec2_vpc_igw:
+        vpc_id: "{{ priv_network_vpc.vpc.id }}"
+        region: "{{ aws_region }}"
+        state: present
+        tags:
+          Name: priv-network-ig
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: priv_network_igw
+
+    - name: Create NAT gateway and allocate EIP if a nat gateway does not yet exist in the subnet
+      amazon.aws.ec2_vpc_nat_gateway:
+        state: present
+        subnet_id: "{{ priv_network_public_subnet.subnet.id }}"
+        wait: true
+        region: "{{ aws_region }}"
+        if_exist_do_not_create: true
+        tags:
+          Name: priv-network-nat-gw
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: priv_network_nat_gateway
+
+    - name: Create DMZ VPC
+      amazon.aws.ec2_vpc_net:
+        name: dmz-vpc
+        cidr_block: "{{ vpc_dmz_cidr }}"
+        purge_tags: false
+        region: "{{ aws_region }}"
+        state: present
+        tenancy: "{{ tenancy }}" # noqa args[module]
+        tags:
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: dmz_vpc
+
+    - name: Create subnet for DMZ network
+      amazon.aws.ec2_vpc_subnet:
+        state: present
+        vpc_id: "{{ dmz_vpc.vpc.id }}"
+        cidr: "{{ vpc_dmz_subnet1_cidr }}"
+        region: "{{ aws_region }}"
+        tags:
+          Name: dmz-subnet
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: dmz_subnet
+
+    - name: Create Internet Gateway for the DMZ
+      amazon.aws.ec2_vpc_igw:
+        vpc_id: "{{ dmz_vpc.vpc.id }}"
+        region: "{{ aws_region }}"
+        state: present
+        tags:
+          Name: dmz-ig
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: dmz_igw
+
+    - name: Create DMZ allow SSH security group
+      amazon.aws.ec2_security_group:
+        name: dmz-sg
+        description: DMZ VPC security group
+        vpc_id: "{{ dmz_vpc.vpc.id }}"
+        region: "{{ aws_region }}"
+        rules:
+          - proto: tcp
+            ports:
+              - 22
+            cidr_ip: 0.0.0.0/0
+            rule_desc: allow all on port 22
+          - proto: tcp
+            cidr_ip: 10.0.0.0/8
+            from_port: 0
+            to_port: 65535
+            rule_desc: allow all local network tcp traffic
+          - proto: udp
+            cidr_ip: 10.0.0.0/8
+            from_port: 0
+            to_port: 65535
+            rule_desc: allow all local network udp traffic
+          - proto: icmp
+            cidr_ip: 10.0.0.0/8
+            from_port: -1
+            to_port: -1
+            rule_desc: allow all local network icmp traffic
+        rules_egress:
+          - proto: all
+            cidr_ip: 0.0.0.0/0
+            rule_desc: allow all outbound traffic
+        tags:
+          Name: dmz-sg
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: dmz_sg
+
+    - name: Create priv network security group
+      amazon.aws.ec2_security_group:
+        name: private-network-sg
+        description: Private network security group
+        vpc_id: "{{ priv_network_vpc.vpc.id }}"
+        region: "{{ aws_region }}"
+        rules:
+          - proto: tcp
+            from_port: 0
+            to_port: 65535
+            cidr_ip: 10.0.0.0/8
+            rule_desc: allow all tcp traffic in private networks
+          - proto: udp
+            from_port: 0
+            to_port: 65535
+            cidr_ip: 10.0.0.0/8
+            rule_desc: allow all udp traffic in private networks
+          - proto: icmp
+            from_port: -1
+            to_port: -1
+            cidr_ip: 10.0.0.0/8
+            rule_desc: allow all icmp traffic in private networks
+        rules_egress:
+          - proto: all
+            cidr_ip: 0.0.0.0/0
+            rule_desc: allow all outbound traffic
+        tags:
+          Name: private-network-sg
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: priv_network_sg
+
+- name: Transit Network Setup
+  block:
+    - name: Create a new transit gateway with options
+      community.aws.ec2_transit_gateway:
+        asn: "{{ transit_gateway_asn }}"
+        auto_associate: "{{ transit_gateway_auto_associate }}"
+        auto_propagate: "{{ transit_gateway_auto_propagate }}"
+        dns_support: "{{ transit_gateway_dns_support }}"
+        description: Ansible deployed transit gateway
+        purge_tags: false
+        state: present
+        region: "{{ aws_region }}"
+        tags:
+          Name: transit-gw
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: transit_gw
+
+    - name: Output Transit GW ID
+      ansible.builtin.debug:
+        msg: "Transit GW ID: {{ transit_gw.transit_gateway.transit_gateway_id }}"
+
+    - name: Set stats for Controller for Transit GW
+      ansible.builtin.set_stats:
+        data:
+          transit_gw_id: "{{ transit_gw.transit_gateway.transit_gateway_id }}"
+
+    - name: Attach DMZ to transit gateway
+      community.aws.ec2_transit_gateway_vpc_attachment:
+        state: present
+        transit_gateway: "{{ transit_gw.transit_gateway.transit_gateway_id }}"
+        name: dmz-peer
+        subnets:
+          - "{{ dmz_subnet.subnet.id }}"
+        ipv6_support: false
+        purge_subnets: true
+        dns_support: true
+        appliance_mode_support: true
+        region: "{{ aws_region }}"
+        tags:
+          Name: dmz-peer
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: transit_gw_dmz_attachment
+
+    - name: Attach private network to transit gateway
+      community.aws.ec2_transit_gateway_vpc_attachment:
+        state: present
+        transit_gateway: "{{ transit_gw.transit_gateway.transit_gateway_id }}"
+        name: priv-network-peer
+        subnets:
+          - "{{ priv_network_priv_subnet.subnet.id }}"
+        ipv6_support: false
+        purge_subnets: true
+        dns_support: true
+        appliance_mode_support: true
+        region: "{{ aws_region }}"
+        tags:
+          Name: priv-network-peer
+          deployment: ansible
+          ansible-role: transit_peered_networks
+      register: transit_gw_priv_network_attachment
+
+- name: Route Tables
+  block:
+    - name: Setup private network public subnet route table
+      amazon.aws.ec2_vpc_route_table:
+        purge_tags: false
+        region: "{{ aws_region }}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ priv_network_igw.gateway_id }}"
+        subnets:
+          - "{{ priv_network_public_subnet.subnet.id }}"
+        state: present
+        tags:
+          Name: priv-net-pub-subnet-rt
+          deployment: ansible
+          ansible-role: transit_peered_networks
+        vpc_id: "{{ priv_network_vpc.vpc.id }}"
+      register: priv_net_pub_subnet_rt
+
+    - name: Setup private network private subnet route table
+      amazon.aws.ec2_vpc_route_table:
+        purge_tags: false
+        region: "{{ aws_region }}"
+        routes:
+          - dest: "{{ dmz_vpc.vpc.cidr_block }}"
+            gateway_id: "{{ transit_gw_priv_network_attachment.attachments[0].transit_gateway_id }}"
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ priv_network_nat_gateway.nat_gateway_id }}"
+        subnets:
+          - "{{ priv_network_priv_subnet.subnet.id }}"
+        state: present
+        tags:
+          Name: priv-net-priv-subnet-rt
+          deployment: ansible
+          ansible-role: transit_peered_networks
+        vpc_id: "{{ priv_network_vpc.vpc.id }}"
+      register: priv_net_priv_subnet_rt
+
+    - name: Set up DMZ route table
+      amazon.aws.ec2_vpc_route_table:
+        purge_tags: false
+        region: "{{ aws_region }}"
+        routes:
+          - dest: "{{ priv_network_vpc.vpc.cidr_block }}"
+            gateway_id: "{{ transit_gw_dmz_attachment.attachments[0].transit_gateway_id }}"
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ dmz_igw.gateway_id }}"
+        subnets:
+          - "{{ dmz_subnet.subnet.id }}"
+        state: present
+        tags:
+          Name: dmz-rt
+          deployment: ansible
+          ansible-role: transit_peered_networks
+        vpc_id: "{{ dmz_vpc.vpc.id }}"
+      register: dmz_rt
+
+- name: Create SSH Tunnel VM in DMZ
+  block:
+    - name: Check if a DMZ bastion VM is already provisioned
+      amazon.aws.ec2_instance_info:
+        filters:
+          "tag:deployment": ansible
+          "tag:purpose": ssh-tunnel
+          "tag:ansible-role": transit_peered_networks
+          instance-state-name:
+            - pending
+            - running
+            - shutting-down
+            - stopping
+            - stopped
+        region: "{{ aws_region }}"
+      register: existing_dmz_instance
+
+    - name: Output the IP of existing VM
+      ansible.builtin.debug:
+        msg: "Public IP for dmz host: {{ existing_dmz_instance.instances[0].public_ip_address }}"
+      when: existing_dmz_instance.instances is defined and existing_dmz_instance.instances | length > 0
+
+    - name: Set stats for Controller of existing VM
+      ansible.builtin.set_stats:
+        data:
+          dmz_public_ip: "{{ existing_dmz_instance.instances[0].public_ip_address }}"
+      when: existing_dmz_instance.instances is defined and existing_dmz_instance.instances | length > 0
+
+    - name: Add host to DMZ group
+      ansible.builtin.add_host:
+        hostname: "{{ existing_dmz_instance.instances[0].public_ip_address }}"
+        ansible_ssh_user: ec2-user
+        groups:
+          - DMZ
+      when: existing_dmz_instance.instances is defined and existing_dmz_instance.instances | length > 0
+
+    - name: Lookup DMZ instance ami
+      amazon.aws.ec2_ami_info:
+        region: "{{ aws_region }}"
+        owners: "{{ dmz_instance_ami_owner }}"
+        filters:
+          name: "{{ dmz_instance_ami_filter }}"
+          architecture: "{{ dmz_instance_ami_architecture }}"
+      register: dmz_amis
+      when: dmz_instance_ami is not defined
+
+    - name: Select DMZ instance ami
+      ansible.builtin.set_fact:
+        dmz_instance_ami: >
+          {{ (dmz_amis.images | selectattr('name', 'defined') | sort(attribute='creation_date'))[-1].image_id }}
+      when: dmz_instance_ami is not defined
+
+    - name: Provision an SSH tunnel VM in the DMZ
+      amazon.aws.ec2_instance:
+        count: 1
+        image:
+          id: "{{ dmz_instance_ami | trim }}"
+        instance_type: "{{ dmz_instance_type }}"
+        key_name: "{{ dmz_ssh_key_name }}"
+        name: "{{ dmz_instance_name }}"
+        network:
+          assign_public_ip: true
+          delete_on_termination: true
+        region: "{{ aws_region }}"
+        security_groups:
+          - "{{ dmz_sg.group_id }}"
+        state: running
+        tags:
+          deployment: ansible
+          purpose: ssh-tunnel
+          ansible-role: transit_peered_networks
+        tenancy: "{{ tenancy }}" # noqa args[module]
+        vpc_subnet_id: "{{ dmz_subnet.subnet.id }}"
+        wait: true
+      register: dmz_ec2
+      when: existing_dmz_instance.instances is defined and existing_dmz_instance.instances | length == 0
+
+    - name: Output the IP of new VM
+      ansible.builtin.debug:
+        msg: "Public IP for dmz host: {{ dmz_ec2.instances[0].public_ip_address }}"
+      when: dmz_ec2.instances is defined and dmz_ec2.instances | length > 0
+
+    - name: Set stats for Controller of new VM
+      ansible.builtin.set_stats:
+        data:
+          dmz_public_ip: "{{ dmz_ec2.instances[0].public_ip_address }}"
+      when: dmz_ec2.instances is defined and dmz_ec2.instances | length > 0
+
+    - name: Add host to DMZ group
+      ansible.builtin.add_host:
+        hostname: "{{ dmz_ec2.instances[0].public_ip_address }}"
+        ansible_ssh_user: ec2-user
+        groups:
+          - DMZ
+      when: dmz_ec2.instances is defined and dmz_ec2.instances | length > 0
+
+- name: Create Isolated VM in private network
+  block:
+    - name: Check if a private network VM is already provisioned
+      amazon.aws.ec2_instance_info:
+        filters:
+          "tag:deployment": ansible
+          "tag:purpose": priv-network-vm
+          "tag:ansible-role": transit_peered_networks
+          instance-state-name:
+            - pending
+            - running
+            - shutting-down
+            - stopping
+            - stopped
+        region: "{{ aws_region }}"
+      register: existing_priv_network_instance
+
+    - name: Output the IP of existing VM
+      ansible.builtin.debug:
+        msg: "Private IP for priv network host: {{ existing_priv_network_instance.instances[0].private_ip_address }}"
+      when: existing_priv_network_instance.instances is defined and existing_priv_network_instance.instances | length > 0
+
+    - name: Set stats for Controller of existing VM
+      ansible.builtin.set_stats:
+        data:
+          priv_network_private_ip: "{{ existing_priv_network_instance.instances[0].private_ip_address }}"
+      when: existing_priv_network_instance.instances is defined and existing_priv_network_instance.instances | length > 0
+
+    - name: Add host to private group
+      ansible.builtin.add_host:
+        hostname: "{{ existing_priv_network_instance.instances[0].private_ip_address }}"
+        ansible_ssh_user: ec2-user
+        groups:
+          - private
+      when: existing_priv_network_instance.instances is defined and existing_priv_network_instance.instances | length > 0
+
+    - name: Lookup private network instance ami
+      amazon.aws.ec2_ami_info:
+        region: "{{ aws_region }}"
+        owners: "{{ priv_network_instance_ami_owner }}"
+        filters:
+          name: "{{ priv_network_instance_ami_filter }}"
+          architecture: "{{ priv_network_instance_ami_architecture }}"
+      register: private_network_amis
+      when: priv_network_instance_ami is not defined
+
+    - name: Select private network instance ami
+      ansible.builtin.set_fact:
+        priv_network_instance_ami: >
+          {{ (private_network_amis.images | selectattr('name', 'defined') | sort(attribute='creation_date'))[-1].image_id }}
+      when: priv_network_instance_ami is not defined
+
+    - name: Provision a test VM in the private network
+      amazon.aws.ec2_instance:
+        count: 1
+        image:
+          id: "{{ priv_network_instance_ami | trim }}"
+        instance_type: "{{ priv_network_instance_type }}"
+        key_name: "{{ priv_network_ssh_key_name }}"
+        name: "{{ priv_network_instance_name }}"
+        network:
+          assign_public_ip: false
+          delete_on_termination: true
+        region: "{{ aws_region }}"
+        security_groups:
+          - "{{ priv_network_sg.group_id }}"
+        state: running
+        tags:
+          deployment: ansible
+          purpose: priv-network-vm
+          ansible-role: transit_peered_networks
+        tenancy: "{{ tenancy }}" # noqa args[module]
+        vpc_subnet_id: "{{ priv_network_priv_subnet.subnet.id }}"
+        wait: true
+      register: priv_network_ec2
+      when: existing_priv_network_instance.instances is defined and existing_priv_network_instance.instances | length == 0
+
+    - name: Output the IP of new VM
+      ansible.builtin.debug:
+        msg: "Private IP for private network host: {{ priv_network_ec2.instances[0].private_ip_address }}"
+      when: priv_network_ec2.instances is defined and priv_network_ec2.instances | length > 0
+
+    - name: Set stats for Controller of new VM
+      ansible.builtin.set_stats:
+        data:
+          priv_network_private_ip: "{{ priv_network_ec2.instances[0].private_ip_address }}"
+      when: priv_network_ec2.instances is defined and priv_network_ec2.instances | length > 0
+
+    - name: Add host to private group
+      ansible.builtin.add_host:
+        hostname: "{{ priv_network_ec2.instances[0].private_ip_address }}"
+        ansible_ssh_user: ec2-user
+        groups:
+          - private
+      when: priv_network_ec2.instances is defined and priv_network_ec2.instances | length > 0

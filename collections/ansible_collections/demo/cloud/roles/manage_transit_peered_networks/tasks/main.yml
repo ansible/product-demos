@@ -1,0 +1,8 @@
+---
+- name: Check operation validation
+  ansible.builtin.fail:
+    msg: "Please provide operation as 'create' or 'delete'"
+  when: manage_transit_peered_networks_operation not in ['create', 'delete']
+
+- name: Include tasks
+  ansible.builtin.include_tasks: "{{ manage_transit_peered_networks_operation }}.yml"

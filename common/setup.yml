@@ -23,21 +23,6 @@ controller_inventories:
   - name: Ansible Product Demos Inventory
     organization: Ansible Product Demos (APD)
 
-controller_projects:
-  - name: Ansible Cloud Content Lab - AWS
-    organization: Ansible Product Demos (APD)
-    scm_type: git
-    wait: true
-    scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
-    default_environment: Cloud Services Execution Environment
-
-  - name: Ansible Cloud AWS Demos
-    organization: Ansible Product Demos (APD)
-    scm_type: git
-    wait: true
-    scm_url: https://github.com/ansible-cloud/aws_demos.git
-    default_environment: Cloud Services Execution Environment
-
 controller_credentials:
   - name: AWS
     credential_type: Amazon Web Services
@@ -174,6 +159,7 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
+      - APD Machine Credential
     project: Ansible Product Demos
     playbook: cloud/aws_key.yml
     inventory: Ansible Product Demos Inventory
@@ -202,11 +188,12 @@ controller_templates:
         - question_name: Keypair Public Key
           type: textarea
           variable: aws_public_key
-          required: true
-        - question_name: Owner
-          type: text
-          variable: aws_keypair_owner
-          required: true
+          required: false
+          question_description: >-
+            Optional when APD Machine Credential includes an SSH private key — the
+            public key is derived automatically. Otherwise paste the full public key
+            line (for example, from ~/.ssh/id_rsa.pub). Do not use ED25519 keys
+            (ssh-ed25519) with Windows AMIs. Use RSA (ssh-rsa) or ECDSA instead.
 
   - name: Cloud | AWS | Create VM
     job_type: run
@@ -214,8 +201,8 @@ controller_templates:
     credentials:
       - AWS
       - APD Machine Credential
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_vm.yml
+    project: Ansible Product Demos
+    playbook: cloud/create_vm.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -301,8 +288,8 @@ controller_templates:
     credentials:
       - AWS
       - APD Machine Credential
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/delete_inventory_vm.yml
+    project: Ansible Product Demos
+    playbook: cloud/destroy_vm.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry

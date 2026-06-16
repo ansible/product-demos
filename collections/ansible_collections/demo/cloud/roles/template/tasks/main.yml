@@ -1,0 +1,16 @@
+---
+- name: Template HTML report
+  ansible.builtin.template:
+    src: report.j2
+    dest: "{{ playbook_dir }}/index.html"
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy CSS and pictures
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files"
+    dest: "{{ playbook_dir }}"
+    directory_mode: '0755'
+    remote_src: yes
+  delegate_to: localhost
+  run_once: true
