@@ -386,12 +386,12 @@ controller_workflows:
       - identifier: Update Inventory
         unified_job_template: AWS Inventory
         success_nodes:
-          - VPC Report
+          - Publish VPC Report
       - identifier: Ticket - Instance Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to create AWS instance
-      - identifier: VPC Report
+      - identifier: Publish VPC Report
         unified_job_template: Cloud | AWS | VPC Report
       - identifier: Ticket - VPC Failed
         unified_job_template: 'SUBMIT FEEDBACK'
