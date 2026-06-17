@@ -13,12 +13,12 @@
 {% for vpc in value.vpc_info.vpcs %}
 {% set instances_with_vpc = value.ec2_instance_info.instances | selectattr('vpc_id', 'defined') %}
 {% if instances_with_vpc | selectattr('vpc_id', 'equalto', vpc.id ) | length <= 0 %}
-{% set nsvpc.total_empty_vpc = nsvpc.total_empty_vpc + 1 %} 
+{% set nsvpc.total_empty_vpc = nsvpc.total_empty_vpc + 1 %}
 {% endif %}
 {% endfor %}
 {% if nsvpc.total_empty_vpc > 0 %}
 <div class="opportunities_box">
-<p class="opportunities">Optimization Opportunities</p> 
+<p class="opportunities">Optimization Opportunities</p>
 <div class="empty_vpc"><span class="ui-accordion-header-icon ui-icon ui-icon-info"></span>{{ nsvpc.total_empty_vpc }} empty VPCs</div>
 </div>
 {% endif %}

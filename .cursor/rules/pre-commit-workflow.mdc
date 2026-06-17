@@ -1,0 +1,14 @@
+---
+description: Run product-demos pre-commit before considering Ansible/YAML work complete
+alwaysApply: true
+---
+
+# Pre-commit gate for product-demos
+
+When changing playbooks, roles, AAP setup YAML, or collections in this repo, run pre-commit before handing work back:
+
+```bash
+python3 -m pre_commit run --config .pre-commit-gh.yml --files $(git diff --name-only -- '*.yml' '*.yaml' '*.j2' | tr '\n' ' ')
+```
+
+If that passes locally, upstream CI (`pre-commit-25` on PRs) should pass. See `.cursor/rules/pre-commit-ansible-lint.mdc` for lint conventions.

@@ -18,81 +18,81 @@ controller_projects:
     default_environment: Networking Execution Environment
 
 controller_credential_types:
-- name: SSH Proxy
-  description: Designed for connecting to a managed node through a bastion host
-  kind: cloud
-  injectors:
-    env:
-      SSH_PROXY_KEY: !unsafe '{{ tower.filename }}'
-    extra_vars:
-      ssh_proxy_host: !unsafe '{{ ssh_proxy_host }}'
-      ssh_proxy_password: !unsafe '{{ ssh_proxy_password }}'
-      ssh_proxy_username: !unsafe '{{ ssh_proxy_username }}'
-    file:
-      template: !unsafe '{{ ssh_proxy_key }}'
-  inputs:
-    fields:
-    - id: ssh_proxy_username
-      label: SSH Proxy Username
-      type: string
-    - id: ssh_proxy_password
-      label: SSH Proxy Password
-      secret: true
-      type: string
-    - id: ssh_proxy_host
-      label: SSH Proxy Host
-      type: string
-    - format: ssh_private_key
-      id: ssh_proxy_key
-      label: SSH Proxy Private Key
-      multiline: true
-      secret: true
-      type: string
-    required:
-    - ssh_proxy_username
-    - ssh_proxy_host
-- name: Palo Alto Networks Provider
-  description: Designed for use with the paloaltonetworks.panos collection
-  kind: cloud
-  inputs:
-    fields:
-    - help_text: The IP address or hostname of the PAN-OS device being configured.
-      id: panos_ip_address
-      label: IP Address
-      type: string
-    - help_text: The port number to connect to the PAN-OS device on.
-      id: panos_port
-      label: Port
-      type: string
-    - help_text: The serial number of a firewall to use for targeted commands. If
-        ip_address is not a Panorama PAN-OS device, then this param is ignored.
-      id: panos_serial_number
-      label: Serial Number
-      type: string
-    - help_text: The username to use for authentication. This is ignored if api_key
-        is specified.
-      id: panos_username
-      label: Username
-      type: string
-    - help_text: The password to use for authentication. This is ignored if api_key
-        is specified.
-      id: panos_password
-      label: Password
-      secret: true
-      type: string
-    - help_text: The API key to use instead of generating it using username / password.
-      id: panos_api_key
-      label: API Key
-      secret: true
-      type: string
-    required:
-    - panos_ip_address
-  injectors:
-    extra_vars:
-      panos_provider:
-        ip_address: !unsafe '{{ panos_ip_address }}'
-        password: !unsafe '{{ panos_password | default(omit) }}'
-        username: !unsafe '{{ panos_username | default(omit) }}'
+  - name: SSH Proxy
+    description: Designed for connecting to a managed node through a bastion host
+    kind: cloud
+    injectors:
+      env:
+        SSH_PROXY_KEY: !unsafe '{{ tower.filename }}'
+      extra_vars:
+        ssh_proxy_host: !unsafe '{{ ssh_proxy_host }}'
+        ssh_proxy_password: !unsafe '{{ ssh_proxy_password }}'
+        ssh_proxy_username: !unsafe '{{ ssh_proxy_username }}'
+      file:
+        template: !unsafe '{{ ssh_proxy_key }}'
+    inputs:
+      fields:
+        - id: ssh_proxy_username
+          label: SSH Proxy Username
+          type: string
+        - id: ssh_proxy_password
+          label: SSH Proxy Password
+          secret: true
+          type: string
+        - id: ssh_proxy_host
+          label: SSH Proxy Host
+          type: string
+        - format: ssh_private_key
+          id: ssh_proxy_key
+          label: SSH Proxy Private Key
+          multiline: true
+          secret: true
+          type: string
+      required:
+        - ssh_proxy_username
+        - ssh_proxy_host
+  - name: Palo Alto Networks Provider
+    description: Designed for use with the paloaltonetworks.panos collection
+    kind: cloud
+    inputs:
+      fields:
+        - help_text: The IP address or hostname of the PAN-OS device being configured.
+          id: panos_ip_address
+          label: IP Address
+          type: string
+        - help_text: The port number to connect to the PAN-OS device on.
+          id: panos_port
+          label: Port
+          type: string
+        - help_text: The serial number of a firewall to use for targeted commands. If
+            ip_address is not a Panorama PAN-OS device, then this param is ignored.
+          id: panos_serial_number
+          label: Serial Number
+          type: string
+        - help_text: The username to use for authentication. This is ignored if api_key
+            is specified.
+          id: panos_username
+          label: Username
+          type: string
+        - help_text: The password to use for authentication. This is ignored if api_key
+            is specified.
+          id: panos_password
+          label: Password
+          secret: true
+          type: string
+        - help_text: The API key to use instead of generating it using username / password.
+          id: panos_api_key
+          label: API Key
+          secret: true
+          type: string
+      required:
+        - panos_ip_address
+    injectors:
+      extra_vars:
+        panos_provider:
+          ip_address: !unsafe '{{ panos_ip_address }}'
+          password: !unsafe '{{ panos_password | default(omit) }}'
+          username: !unsafe '{{ panos_username | default(omit) }}'
 
 controller_credentials:
   - name: Palo Alto Firewall Admin
@@ -125,16 +125,16 @@ controller_inventory_sources:
     credential: AWS
     overwrite: true
     source_vars:
-      regions: 
+      regions:
         - us-east-2
       compose:
         ansible_host: public_ip_address | default(private_ip_address)
         ansible_user: "'ec2-user'"
       hostnames:
-      - tag:Name
+        - tag:Name
       keyed_groups:
-      - key: tags['role']
-        prefix: panos_role
+        - key: tags['role']
+          prefix: panos_role
 
 controller_templates:
   - name: NETWORK | Configuration
@@ -232,10 +232,10 @@ controller_templates:
     playbook: network/panos/deploy.yml
     project: Ansible Product Demos
     credentials:
-    - AWS
-    - AAP Credential
-    - APD Machine Credential
-    - Palo Alto Bastion
+      - AWS
+      - AAP Credential
+      - APD Machine Credential
+      - Palo Alto Bastion
     execution_environment: Product Demos EE
     inventory: Ansible Product Demos Inventory
     job_slice_count: 1
@@ -318,45 +318,45 @@ controller_workflows:
     inventory: Ansible Product Demos Inventory
     organization: Ansible Product Demos (APD)
     workflow_nodes:
-    - identifier: Deploy
-      related:
-        success_nodes:
-        - identifier: Sync Inventory
-        - identifier: Configure Firewall
-      unified_job_template:
-        name: NETWORK | Panos | Deploy
-        organization:
-          name: Ansible Product Demos (APD)
-          type: organization
-        type: job_template
-    - identifier: Sync Inventory
-      related:
-        success_nodes:
-        - identifier: Configure Webserver
-      unified_job_template:
-        inventory:
-          name: Ansible Product Demos Inventory
+      - identifier: Deploy
+        related:
+          success_nodes:
+            - identifier: Sync Inventory
+            - identifier: Configure Firewall
+        unified_job_template:
+          name: NETWORK | Panos | Deploy
           organization:
             name: Ansible Product Demos (APD)
             type: organization
-          type: inventory
-        name: Panos Demo Instances
-        type: inventory_source
-    - identifier: Configure Firewall
-      related:
-        success_nodes:
-        - identifier: Configure Webserver
-      unified_job_template:
-        name: NETWORK | Panos | Configure Firewall
-        organization:
-          name: Ansible Product Demos (APD)
-          type: organization
-        type: job_template
-    - all_parents_must_converge: true
-      identifier: Configure Webserver
-      unified_job_template:
-        name: NETWORK | Panos | Configure Webserver
-        organization:
-          name: Ansible Product Demos (APD)
-          type: organization
-        type: job_template
+          type: job_template
+      - identifier: Sync Inventory
+        related:
+          success_nodes:
+            - identifier: Configure Webserver
+        unified_job_template:
+          inventory:
+            name: Ansible Product Demos Inventory
+            organization:
+              name: Ansible Product Demos (APD)
+              type: organization
+            type: inventory
+          name: Panos Demo Instances
+          type: inventory_source
+      - identifier: Configure Firewall
+        related:
+          success_nodes:
+            - identifier: Configure Webserver
+        unified_job_template:
+          name: NETWORK | Panos | Configure Firewall
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+      - all_parents_must_converge: true
+        identifier: Configure Webserver
+        unified_job_template:
+          name: NETWORK | Panos | Configure Webserver
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template

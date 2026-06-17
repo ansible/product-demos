@@ -19,5 +19,5 @@
   set_fact:
     aws_user: '{{ whoami.arn.split("/")[-1] }}'
     boto3_version: >-
-      {{ lookup('pipe', ansible_playbook_python ~ ' -c "import boto3; print(boto3.__version__)"') | default('unknown') }}    
+      {{ lookup('pipe', ansible_playbook_python ~ ' -c "import boto3; print(boto3.__version__)"') | default('unknown') }}
   delegate_to: localhost
