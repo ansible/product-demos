@@ -1,5 +1,6 @@
 ---
 reports_aws_region: us-east-1
+reports_aws_staging_dir: "{{ playbook_dir | default('/tmp') }}"
 reports_aws_bucket_prefix: "{{ lookup('ansible.builtin.env', 'AWS_ACCESS_KEY_ID')[1:5] | lower }}"
 reports_aws_bucket_name: "{{ reports_aws_bucket_prefix }}-reports"
 reports_aws_bucket_permissions: public-read

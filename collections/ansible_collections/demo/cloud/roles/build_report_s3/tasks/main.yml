@@ -33,8 +33,10 @@
     object: index.html
     src: "{{ playbook_dir }}/index.html"
     mode: put
+    overwrite: always
     headers:
-      ContentType: text/html
+      ContentType: "text/html; charset=utf-8"
+      ContentDisposition: inline
 
 - name: Print bucket URL
   ansible.builtin.debug:

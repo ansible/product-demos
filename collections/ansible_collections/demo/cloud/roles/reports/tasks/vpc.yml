@@ -25,12 +25,20 @@
     py_cmd: >-
       {{ lookup('pipe', ansible_playbook_python ~ ' -c "import boto3; print(boto3.__version__)"') }}
 
+- name: Template vpc report to staging file
+  ansible.builtin.template:
+    src: vpc_report.j2
+    dest: "{{ reports_aws_staging_dir }}/vpc-report.html"
+    mode: "0644"
+
 - name: Put vpc-report
   amazon.aws.s3_object:
     bucket: "{{ reports_aws_bucket_name }}"
     object: vpc-report.html
-    content: "{{ lookup('template', 'vpc_report.j2') }}"
+    src: "{{ reports_aws_staging_dir }}/vpc-report.html"
     mode: put
     permission: "{{ reports_aws_bucket_permissions }}"
+    overwrite: always
     headers:
-      ContentType: text/html
+      ContentType: "text/html; charset=utf-8"
+      ContentDisposition: inline

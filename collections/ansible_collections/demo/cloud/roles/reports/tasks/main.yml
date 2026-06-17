@@ -27,15 +27,23 @@
     bucket_name: "{{ reports_aws_bucket_name }}"
   register: bucket_objects
 
+- name: Template landing page to staging file
+  ansible.builtin.template:
+    src: landing_page.j2
+    dest: "{{ reports_aws_staging_dir }}/index.html"
+    mode: "0644"
+
 - name: Put index.html
   amazon.aws.s3_object:
     bucket: "{{ reports_aws_bucket_name }}"
     object: index.html
-    content: "{{ lookup('template', 'landing_page.j2') }}"
+    src: "{{ reports_aws_staging_dir }}/index.html"
     mode: put
     permission: "{{ reports_aws_bucket_permissions }}"
+    overwrite: always
     headers:
-      ContentType: text/html
+      ContentType: "text/html; charset=utf-8"
+      ContentDisposition: inline
 
 - name: Print bucket url
   ansible.builtin.debug:
