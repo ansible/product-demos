@@ -11,7 +11,8 @@
 - name: Build report with facts - Dynamic Documentation
   hosts: "{{ _hosts | default('localhost') }}"
   gather_facts: true
-
+  vars:
+    reports_aws_region: "{{ create_vm_aws_region | default(reports_aws_region | default('us-east-1')) }}"
   tasks:
     - name: Load retrieve info role
       ansible.builtin.include_role:

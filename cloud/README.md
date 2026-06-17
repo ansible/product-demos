@@ -105,7 +105,7 @@ The workflow:
    | `aws_rhel8` | rhel8 |
    | `aws_rhel9` | rhel9 |
    | `reports` | rhel9 |
-4. Syncs AWS inventory and publishes tag/VPC reports
+4. Syncs AWS inventory and publishes the VPC report to S3
 
 Preset tags: deployment `cloud_stack`, purpose `demo`. Owner and environment come from the survey.
 

@@ -84,37 +84,10 @@ controller_templates:
     notification_templates_error: Telemetry
     extra_vars:
       reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
-      reports_aws_region: "us-east-1"
 
   - name: Cloud | AWS | Tags Report
-    job_type: run
     organization: Ansible Product Demos (APD)
-    execution_environment: TMM AWS EE
-    credentials:
-      - AWS
-    project: Ansible Product Demos
-    playbook: cloud/create_reports.yml
-    inventory: Ansible Product Demos Inventory
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-    extra_vars:
-      reports_aws_report: tags
-      reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: AWS Region
-          type: multiplechoice
-          variable: create_vm_aws_region
-          required: true
-          choices:
-            - us-east-1
-            - us-east-2
-            - us-west-1
-            - us-west-2
+    state: absent
 
   - name: Cloud | AWS | Snapshot EC2
     job_type: run
@@ -360,11 +333,6 @@ controller_workflows:
         unified_job_template: Cloud | AWS | Display EC2 Stats
         all_parents_must_converge: true
         always_nodes:
-          - VPC Report
-      - identifier: VPC Report
-        unified_job_template: Cloud | AWS | VPC Report
-        all_parents_must_converge: true
-        always_nodes:
           - Deploy Windows GUI Blueprint
           - Deploy RHEL8 Blueprint
           - Deploy RHEL9 Blueprint
@@ -418,13 +386,13 @@ controller_workflows:
       - identifier: Update Inventory
         unified_job_template: AWS Inventory
         success_nodes:
-          - Tag Report
+          - VPC Report
       - identifier: Ticket - Instance Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to create AWS instance
-      - identifier: Tag Report
-        unified_job_template: Cloud | AWS | Tags Report
+      - identifier: VPC Report
+        unified_job_template: Cloud | AWS | VPC Report
       - identifier: Ticket - VPC Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
