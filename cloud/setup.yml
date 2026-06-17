@@ -3,11 +3,6 @@ _deployment_id: "{{ lookup('file', playbook_dir + '/.deployment_id') }}"
 
 user_message:
 
-controller_execution_environments:
-  - name: TMM AWS EE
-    image: quay.io/acme_corp/aws_ee
-    organization: Ansible Product Demos (APD)
-
 controller_templates:
   - name: Cloud | AWS | Create Peer Infrastructure
     job_type: run
@@ -72,12 +67,12 @@ controller_templates:
   - name: Cloud | AWS | VPC Report
     job_type: run
     organization: Ansible Product Demos (APD)
+    execution_environment: TMM AWS EE
     credentials:
       - AWS
     project: Ansible Product Demos
     playbook: cloud/cloud_report.yml
     inventory: Ansible Product Demos Inventory
-    execution_environment: TMM AWS EE
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -88,12 +83,12 @@ controller_templates:
   - name: Cloud | AWS | Tags Report
     job_type: run
     organization: Ansible Product Demos (APD)
+    execution_environment: TMM AWS EE
     credentials:
       - AWS
     project: Ansible Product Demos
     playbook: cloud/create_reports.yml
     inventory: Ansible Product Demos Inventory
-    execution_environment: TMM AWS EE
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
