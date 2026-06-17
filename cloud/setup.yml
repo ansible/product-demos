@@ -3,6 +3,12 @@ _deployment_id: "{{ lookup('file', playbook_dir + '/.deployment_id') }}"
 
 user_message:
 
+controller_execution_environments:
+  - name: TMM AWS EE
+    image: quay.io/acme_corp/aws_ee
+    organization: Ansible Product Demos (APD)
+    pull: missing
+
 controller_templates:
   - name: Cloud | AWS | Create Peer Infrastructure
     job_type: run

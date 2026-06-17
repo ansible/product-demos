@@ -14,9 +14,6 @@ controller_execution_environments:
   - name: Cloud Services Execution Environment
     image: quay.io/scottharwell/cloud-ee:latest
     organization: Ansible Product Demos (APD)
-  - name: TMM AWS EE
-    image: quay.io/acme_corp/aws_ee
-    organization: Ansible Product Demos (APD)
 
 controller_organizations:
   - name: Ansible Product Demos (APD)
