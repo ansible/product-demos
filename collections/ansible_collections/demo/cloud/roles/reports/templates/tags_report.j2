@@ -43,8 +43,8 @@ collapsible: true
     <td>{{ '%-28s'|format(vm.instance_id) }}</td>
     <td>{{ '%-14s'|format(vm.instance_type) }}</td>
     <td>{{ '%-18s'|format(vm.launch_time) }}</td>
-    <td>{{ '%-26s'|format(vm.vpc_id) }}</td>
-    <td>{{ '%-26s'|format(vm.subnet_id) }}</td>
+    <td>{{ '%-26s'|format(vm.vpc_id | default('N/A')) }}</td>
+    <td>{{ '%-26s'|format(vm.subnet_id | default('N/A')) }}</td>
     <td>
     <table border=#353a40>
     {% for tag in vm.tags | sort %}
