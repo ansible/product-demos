@@ -5,7 +5,7 @@
   gather_facts: false
   vars:
     reports_aws_report: "{{ aws_report | default('tags') }}"
-    reports_aws_region: "{{ create_vm_aws_region | default(reports_aws_region | default('us-east-1')) }}"
+    reports_aws_region: "{{ create_vm_aws_region | default('us-east-1') }}"
   tasks:
     - name: Include reports role
       ansible.builtin.include_role:
