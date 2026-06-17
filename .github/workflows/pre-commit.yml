@@ -7,7 +7,7 @@ on:
 jobs:
   pre-commit-25:
     container:
-      image: quay.io/ansible-product-demos/apd-ee-25
+      image: quay.io/ansible-product-demos/apd-ee-26
       options: --user root
     runs-on: ubuntu-latest
     steps:

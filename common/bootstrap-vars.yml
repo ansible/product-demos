@@ -1,6 +1,6 @@
 ---
 # override these with extra vars if needed
-apd_ee_image_version: '25'
+apd_ee_image_version: '26'
 apd_ee_image_tag: latest
 apd_ee_image: quay.io/ansible-product-demos/apd-ee-{{ apd_ee_image_version }}:{{ apd_ee_image_tag }}
 apd_git_repo: https://github.com/ansible/product-demos
