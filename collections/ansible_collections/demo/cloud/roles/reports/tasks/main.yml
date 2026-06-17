@@ -8,38 +8,16 @@
     public_access: "{{ reports_aws_public_access }}"
     object_ownership: BucketOwnerPreferred
 
-- name: Configure bucket for static website hosting
-  ansible.builtin.shell: |
-    {{ _apd_python }} <<'PY'
-    import boto3
+- name: Configure bucket for website
+  community.aws.s3_website:
+    name: "{{ reports_aws_bucket_name }}"
+    state: present
 
-    boto3.client("s3", region_name="{{ reports_aws_region }}").put_bucket_website(
-        Bucket="{{ reports_aws_bucket_name }}",
-        WebsiteConfiguration={"IndexDocument": {"Suffix": "index.html"}},
-    )
-    PY
-  changed_when: true
-  vars:
-    _apd_python: "{{ ansible_playbook_python | default('/usr/bin/python3.12') }}"
-  args:
-    executable: /bin/bash
-
-- name: Find report static files
-  ansible.builtin.find:
-    paths: "{{ role_path }}/files"
-    file_type: file
-    recurse: true
-  register: _report_static_files
-
-- name: Upload report static files to S3
-  amazon.aws.s3_object:
+- name: Put website files
+  community.aws.s3_sync:
     bucket: "{{ reports_aws_bucket_name }}"
-    object: "{{ item.path | regex_replace('^' ~ role_path ~ '/files/?', '') }}"
-    src: "{{ item.path }}"
-    mode: put
+    file_root: "{{ role_path }}/files"
     permission: "{{ reports_aws_bucket_permissions }}"
-  loop: "{{ _report_static_files.files }}"
-  when: _report_static_files.matched > 0
 
 - name: Include tasks
   ansible.builtin.include_tasks: "{{ reports_aws_report }}.yml"

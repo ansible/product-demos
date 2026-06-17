@@ -11,37 +11,16 @@
       ignore_public_acls: false
       restrict_public_buckets: false
 
-- name: Configure bucket for static website hosting
-  ansible.builtin.shell: |
-    {{ _apd_python }} <<'PY'
-    import boto3
+- name: Configure bucket for website
+  community.aws.s3_website:
+    name: "{{ reports_aws_bucket_name }}"
+    state: present
 
-    boto3.client("s3", region_name="{{ reports_aws_region }}").put_bucket_website(
-        Bucket="{{ reports_aws_bucket_name }}",
-        WebsiteConfiguration={"IndexDocument": {"Suffix": "index.html"}},
-    )
-    PY
-  changed_when: true
-  vars:
-    _apd_python: "{{ ansible_playbook_python | default('/usr/bin/python3.12') }}"
-  args:
-    executable: /bin/bash
-
-- name: Find report static files
-  ansible.builtin.find:
-    paths: "{{ playbook_dir }}/files"
-    file_type: file
-    recurse: true
-  register: _report_static_files
-
-- name: Upload report static files to S3
-  amazon.aws.s3_object:
+- name: Put website files
+  community.aws.s3_sync:
     bucket: "{{ reports_aws_bucket_name }}"
-    object: "{{ item.path | regex_replace('^' ~ playbook_dir ~ '/files/?', '') }}"
-    src: "{{ item.path }}"
-    mode: put
-  loop: "{{ _report_static_files.files }}"
-  when: _report_static_files.matched > 0
+    file_root: "{{ playbook_dir }}/files"
+    region: "{{ reports_aws_region }}"
 
 - name: Get bucket objects
   amazon.aws.s3_object_info:
