@@ -5,8 +5,6 @@ apd_ee_image_tag: latest
 apd_ee_image: quay.io/ansible-product-demos/apd-ee-{{ apd_ee_image_version }}:{{ apd_ee_image_tag }}
 apd_git_repo: https://github.com/ansible/product-demos
 apd_git_repo_branch: main
-apd_machine_credential_user: ec2-user
-apd_machine_credential_password: Admin_1234!
 
 ## gateway resources
 aap_organizations:
@@ -60,9 +58,9 @@ controller_credentials:
     organization: Ansible Product Demos (APD)
     update_secrets: false
     inputs:
-      username: '{{ apd_machine_credential_user }}'
+      username: '{{ apd_machine_credential_user | default("admin") }}'
       ssh_key_data: '{{ vault_apd_machine_credential_ssh_key | default(omit) }}'
-      password: '{{ vault_apd_machine_credential_password | default(apd_machine_credential_password) }}'
+      password: '{{ vault_apd_machine_credential_password | default(omit) }}'
 
   - name: OpenShift Credential
     description: Credential for OpenShift cluster

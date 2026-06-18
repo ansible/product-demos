@@ -192,8 +192,7 @@ controller_templates:
           question_description: >-
             Optional when APD Machine Credential includes an SSH private key — the
             public key is derived automatically. Otherwise paste the full public key
-            line (for example, from ~/.ssh/id_rsa.pub). Do not use ED25519 keys
-            (ssh-ed25519) with Windows AMIs. Use RSA (ssh-rsa) or ECDSA instead.
+            line (for example, from ~/.ssh/id_rsa.pub).
 
   - name: Cloud | AWS | Create VM
     job_type: run
@@ -287,9 +286,8 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-      - APD Machine Credential
     project: Ansible Product Demos
-    playbook: cloud/destroy_vm.yml
+    playbook: cloud/delete_vm_by_name.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -299,9 +297,18 @@ controller_templates:
       name: ''
       description: ''
       spec:
-        - question_name: Name or Pattern
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: VM Name
           type: text
-          variable: _hosts
+          variable: create_vm_vm_name
           required: true
 
   - name: Cloud | AWS | Resize EC2

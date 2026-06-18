@@ -17,7 +17,7 @@ reg delete "HKLM\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service" /v DisableRu
 Set-MpPreference -DisableRealtimeMonitoring $true
 
 # Enable WinRM
-Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/stable-2.12/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible-documentation/refs/heads/stable-2.16/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1
 C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
 
 # add ec2-user

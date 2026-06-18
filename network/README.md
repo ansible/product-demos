@@ -32,7 +32,7 @@ A **`Demo Inventory`** is created when setting up these demos and a dynamic sour
 ## Suggested Usage
 
 **NETWORK / Report** - Use this job to gather facts from Cisco Network devices and create a report with information about the device such as code version, along with configuration information about layers 1, 2, and 3.  This shows how Ansible can be used to gather facts and build reports.  Generating html pages is just one potential output.  This information can be used in a number of ways, such as integration with different network management tools.
-  - to run this you will first need to run the **`Deploy Cloud Stack in AWS`** job template to deploy the report server. On demo.redhat.com, save the **private** key from **Bastion Host Credentials** on **APD Machine Credential** (see [cloud/README.md](../cloud/README.md)); the deploy workflow derives the public key automatically. If you are using a different environment, configure **APD Machine Credential** with your SSH private key.
+  - to run this you will first need to run the **`Deploy Cloud Stack in AWS`** job template to deploy the report server.  If using a demo.redhat.com Product Demos instance you should use the public key provided in the demo page in the Bastion Host Credentials section. If you are using a different environment, you may need to update the "Demo Credential".
 
 **NETWORK / Configuration** - Use this job to execute different [Ansible Network Resource Modules](https://docs.ansible.com/ansible/latest/network/user_guide/network_resource_modules.html) to deploy golden configs. Below is a list of the different resources the can be configured with a link to their golden config.
   - [acls](https://github.com/nleiva/ansible-net-modules/blob/main/acls.cfg)
@@ -89,7 +89,7 @@ A **`Demo Inventory`** is created when setting up these demos and a dynamic sour
 
 To run this demo, you will need to complete a couple of prerequisites:
   - to run this you will first need to run the **`Deploy Cloud Stack in AWS`** job template to deploy the report server.
-  - On demo.redhat.com, save the **private** key from **Bastion Host Credentials** on **APD Machine Credential** (see [cloud/README.md](../cloud/README.md)); the deploy workflow derives the public key automatically. If you are using a different environment, configure **APD Machine Credential** with your SSH private key.
+  - If using a demo.redhat.com Product Demos instance you should use the public key provided in the demo page in the 'Bastion Host Credentials' section. If you are using a different environment, you may need to update the "Demo Credential".
   - This works with Product Demos for AAP v2.5; which includes the "Product Demos EE" includes the \
   network.backup collection.
 

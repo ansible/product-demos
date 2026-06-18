@@ -85,10 +85,6 @@ controller_templates:
     extra_vars:
       reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
 
-  - name: Cloud | AWS | Tags Report
-    organization: Ansible Product Demos (APD)
-    state: absent
-
   - name: Cloud | AWS | Snapshot EC2
     job_type: run
     organization: Ansible Product Demos (APD)

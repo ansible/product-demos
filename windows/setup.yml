@@ -463,10 +463,6 @@ controller_workflows:
           type: textarea
           variable: aws_public_key
           required: true
-          question_description: >-
-            Paste the full public key line (for example, from ~/.ssh/id_rsa.pub).
-            Do not use ED25519 keys (ssh-ed25519) — AWS does not support them with
-            Windows AMIs. Use RSA (ssh-rsa) or ECDSA instead.
         # Create VM variables
         - question_name: Owner
           type: text

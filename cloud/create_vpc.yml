@@ -5,7 +5,7 @@
 
   vars:
     aws_vpc_name: aws-test-vpc
-    aws_owner_tag: "{{ create_vm_aws_owner_tag | default(create_vm_vm_owner | default('default')) }}"
+    aws_owner_tag: "{{ create_vm_aws_owner_tag | default(create_vm_vm_owner | default('apd-demo')) }}"
     aws_purpose_tag: ansible_demo
     aws_tenancy: default
     aws_vpc_cidr_block: 10.0.0.0/16

@@ -19,7 +19,7 @@ This category of demos shows examples of multi-cloud provisioning and management
 ### Jobs
 
 - [**Cloud / AWS / Create VM**](create_vm.yml) - Create a VM based on a [blueprint](blueprints/) in the selected cloud provider
-- [**Cloud / AWS / Destroy VM**](destroy_vm.yml) - Destroy a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be deleted.
+- [**Cloud / AWS / Delete VM**](delete_vm_by_name.yml) - Terminate an EC2 instance by Name tag and region (no dynamic inventory required)
 - [**Cloud / AWS / Snapshot EC2**](snapshot_ec2.yml) - Snapshot a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be snapshot.
 - [**Cloud / AWS / Restore EC2 from Snapshot**](snapshot_ec2.yml) - Restore a VM that has been created in a cloud provider.  By default, volumes will be restored from their latest snapshot. VM must be imported into dynamic inventory to be patched.
 - [**Cloud / Resize EC2**](resize_ec2.yml) - Re-size an EC2 instance.
@@ -47,38 +47,15 @@ After running the setup job template, there are a few steps required to make the
 
 ### Configure APD Machine Credential SSH Key
 
-The **APD Machine Credential** is created at install with username `ec2-user` and demo password `Admin_1234!` (Windows complexity compliant). That password is used when Windows instances are provisioned and for WinRM jobs against `ec2-user`.
+The **APD Machine Credential** is used for both Windows and Linux instances: the username and password are used for Windows connections (WinRM), and the SSH private key is used for Linux connections.
 
-For **Deploy Cloud Stack in AWS**, add the **private SSH key** (RSA or ECDSA, not ED25519) to **APD Machine Credential** — the same private key you use to SSH to the RHDP bastion. The **Create Keypair** job derives the matching public key automatically (`ssh-keygen -y`); you do **not** need to copy the public key from the demo portal into the workflow survey.
+For **Deploy Cloud Stack in AWS**, add an **SSH private key** to **APD Machine Credential**. The **Create Keypair** job derives the matching public key automatically (`ssh-keygen -y`); no public key survey field is required.
 
-On **demo.redhat.com**, the catalog page shows a public key under **Bastion Host Credentials** for reference and for SSH to the bastion itself. That public key pairs with the private key you save on **APD Machine Credential**. One-time setup: paste the private key on the credential, then every deploy reuses it.
+Linux jobs such as **Linux | Fact Scan** will fail with `Permission denied (publickey)` until a private key is saved on this credential.
 
-Linux jobs such as **Linux | Fact Scan** will fail with `Permission denied (publickey)` until the matching private key is saved on this credential.
-
-Install-time pre-configuration (optional, for RHDP operators): set `vault_apd_machine_credential_ssh_key` in bootstrap extra vars so the bastion private key is loaded when AAP is provisioned and users never touch credentials manually.
-
-Override the defaults at install time with extra vars if needed:
-
-- `apd_machine_credential_user`
-- `apd_machine_credential_password` or `vault_apd_machine_credential_password`
-- `vault_apd_machine_credential_ssh_key`
-
-### Getting your SSH key for Create Keypair
-
-When launching **Deploy Cloud Stack in AWS**, no public key survey field is required — **Create Keypair** reads the private key from **APD Machine Credential** and registers the derived public key in AWS.
+When bootstrapping AAP manually, you can pre-load the SSH key with the `vault_apd_machine_credential_ssh_key` extra var (see `common/bootstrap-vars.yml`).
 
 For standalone runs of **Cloud / AWS | Create Keypair**, paste a public key in the optional survey field only if **APD Machine Credential** does not include a private key.
-
-**Important:** Do not use **ED25519** keys (`ssh-ed25519`). AWS does not support ED25519 key pairs with Windows AMIs, and the Deploy Cloud Stack workflow provisions Windows instances. Use **RSA** or **ECDSA** instead.
-
-To generate a compatible RSA key pair:
-
-```bash
-ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_aws_demo -C "your@email.com"
-```
-
-Save the **private** key on **APD Machine Credential**. You only need the public key file if running **Create Keypair** standalone without a private key on that credential.
-
 
 ## Suggested Usage
 
@@ -109,7 +86,7 @@ The workflow:
 
 Preset tags: deployment `cloud_stack`, purpose `demo`. Owner and environment come from the survey.
 
-**Prerequisites:** AWS credential configured, RSA/ECDSA **private** key on **APD Machine Credential** (same key as RHDP bastion), demo password `Admin_1234!` on that credential for Windows.
+**Prerequisites:** AWS credential configured and an SSH private key on **APD Machine Credential**.
 
 ### Destroy Cloud Stack in AWS
 
@@ -134,5 +111,4 @@ The workflow:
 
 ## Known Issues
 
-- **ED25519 key pairs are not supported with Windows AMIs on AWS.** The Deploy Cloud Stack workflow and any job that provisions Windows instances will fail if you register an `ssh-ed25519` public key. Use RSA (`ssh-rsa`) or ECDSA instead.
 - Azure does not work without a custom execution environment that includes the Azure dependencies.

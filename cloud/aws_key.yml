@@ -62,9 +62,8 @@
               - aws_public_key | default('') | trim | length > 0
             fail_msg: >-
               No SSH public key was provided and no private key was found on
-              APD Machine Credential. Add the bastion/RHDP private key to
-              APD Machine Credential (Credentials → APD Machine Credential →
-              SSH Private Key), or paste aws_public_key in the survey.
+              APD Machine Credential. Add an SSH private key to APD Machine
+              Credential, or paste aws_public_key in the survey.
 
     - name: Fail if variables not defined
       ansible.builtin.assert:
