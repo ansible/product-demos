@@ -22,3 +22,20 @@ aws_purpose_tag: ansible_demo
 aws_ansiblegroup_tag: cloud
 aws_ec2_wait: true
 aws_snapshots: {}
+
+#######
+# CREATE VM VARS
+#######
+create_vm_vm_blueprint: ""
+create_vm_aws_region: us-east-1
+create_vm_aws_instance_size: t2.micro
+create_vm_aws_tenancy: default
+create_vm_aws_ec2_wait: true
+create_vm_aws_userdata_template: default
+create_vm_vm_name: demo_vm
+create_vm_vm_deployment: default
+create_vm_vm_environment: default
+create_vm_vm_owner: ansible
+create_vm_vm_purpose: demo
+create_vm_aws_image_filter: 'RHEL-9*HVM-*Hourly*'
+create_vm_aws_image_architecture: x86_64

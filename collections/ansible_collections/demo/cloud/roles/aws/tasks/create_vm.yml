@@ -1,47 +1,143 @@
 ---
-- name: AWS | CREATE VM | get subnet info
-  amazon.aws.ec2_vpc_subnet_info:
-    region: "{{ aws_region }}"
+- name: Check if the VM is already provisioned
+  amazon.aws.ec2_instance_info:
     filters:
-      "tag:Name": "{{ aws_vpc_name }}-{{ aws_vpc_prefix }}-subnet"
-  register: aws_subnet
+      "tag:Name": "{{ create_vm_vm_name }}"
+      "tag:blueprint": "{{ create_vm_vm_blueprint }}"
+      "tag:environment": "{{ create_vm_vm_environment }}"
+      "tag:deployment": "{{ create_vm_vm_deployment }}"
+      "tag:owner": "{{ create_vm_vm_owner }}"
+      "tag:purpose": "{{ create_vm_vm_purpose }}"
+      "tag:ansible-role": create_vm
+      "tag:ansible-collection": demo.cloud
+      instance-state-name:
+        - pending
+        - running
+        - shutting-down
+        - stopping
+        - stopped
+    region: "{{ create_vm_aws_region }}"
+  register: create_vm_existing_vm
 
-- name: AWS | CREATE VM | save subnet id
-  ansible.builtin.set_fact:
-    aws_subnet_id: "{{ aws_subnet.subnets | map(attribute='id') | list | last }}"
-
-- name: AWS| CREATE VM | find ami
-  amazon.aws.ec2_ami_info:
-    region: "{{ aws_region }}"
-    owners: "{{ aws_image_owners | default(omit) }}"
+- name: Find instances with the same name tag
+  amazon.aws.ec2_instance_info:
     filters:
-      name: "{{ aws_image_filter }}"
-      architecture: "{{ aws_image_architecture | default(omit) }}"
-  register: aws_amis
+      "tag:Name": "{{ create_vm_vm_name }}"
+      instance-state-name:
+        - pending
+        - running
+        - shutting-down
+        - stopping
+        - stopped
+    region: "{{ create_vm_aws_region }}"
+  register: create_vm_name_conflicts
+  when: create_vm_existing_vm.instances | length == 0
 
-- name: AWS| CREATE VM | save ami
-  ansible.builtin.set_fact:
-    aws_instance_ami: >
-      {{ (aws_amis.images | selectattr('name', 'defined') | sort(attribute='creation_date'))[-2] }}
-
-- name: AWS| CREATE VM | create instance
+- name: Terminate stale instance blocking create
   amazon.aws.ec2_instance:
-    network:
-      assign_public_ip: true
-    key_name: "{{ aws_keypair_name }}"
-    instance_type: "{{ aws_instance_size }}"
-    image_id: "{{ aws_instance_ami.image_id }}"
-    region: "{{ aws_region }}"
-    security_group: "{{ aws_securitygroup_name }}"
-    tags:
-      blueprint: "{{ aws_blueprint }}"
-      purpose: "{{ aws_purpose_tag }}"
-      env: "{{ aws_env_tag }}"
-      ansible_group: "{{ aws_ansiblegroup_tag }}"
-      owner: "{{ aws_vm_owner }}"
-      info: "This instance was built by Red Hat Product Demos"
-      Name: "{{ aws_vm_name }}"
-    wait: "{{ aws_ec2_wait }}"
-    vpc_subnet_id: "{{ aws_subnet_id }}"
-    user_data: "{{ lookup('template', aws_userdata_template + '.j2', template_vars=dict(aws_vm_name=vm_name)) }}"
-  register: aws_vm_output
+    region: "{{ create_vm_aws_region }}"
+    instance_ids: "{{ create_vm_name_conflicts.instances | map(attribute='instance_id') | list }}"
+    state: absent
+    wait: true
+  when:
+    - create_vm_existing_vm.instances | length == 0
+    - create_vm_name_conflicts.instances | default([]) | length > 0
+
+- name: Output the IP of existing VM
+  ansible.builtin.debug:
+    msg:
+      - "Public IP for new instance: {{ create_vm_existing_vm.instances[0].public_ip_address }}"
+      - "Private IP for new instance: {{ create_vm_existing_vm.instances[0].private_ip_address }}"
+  when: create_vm_existing_vm.instances is defined and create_vm_existing_vm.instances | length > 0
+
+- name: Set stats for Controller of existing VM
+  ansible.builtin.set_stats:
+    data:
+      priv_network_private_ip: "{{ create_vm_existing_vm.instances[0].private_ip_address }}"
+      public_ip: "{{ create_vm_existing_vm.instances[0].public_ip_address }}"
+  when: create_vm_existing_vm.instances is defined and create_vm_existing_vm.instances | length > 0
+
+- name: Create Instance
+  when: create_vm_existing_vm.instances | length == 0
+  block:
+    - name: Get subnet info
+      amazon.aws.ec2_vpc_subnet_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          "tag:Name": "{{ create_vm_aws_vpc_subnet_name }}"
+      register: create_vm_aws_subnet
+      when: create_vm_aws_subnet_id is not defined
+
+    - name: Save subnet id
+      ansible.builtin.set_fact:
+        create_vm_aws_subnet_id: "{{ create_vm_aws_subnet.subnets | map(attribute='id') | list | last }}"
+      when: create_vm_aws_subnet_id is not defined
+
+    - name: Find ami
+      amazon.aws.ec2_ami_info:
+        region: "{{ create_vm_aws_region }}"
+        owners: "{{ create_vm_aws_image_owners | default(omit) }}"
+        filters:
+          name: "{{ create_vm_aws_image_filter }}"
+          architecture: "{{ create_vm_aws_image_architecture | default(omit) }}"
+      register: create_vm_vm_amis
+      when: create_vm_aws_instance_ami is not defined
+
+    - name: Save ami
+      ansible.builtin.set_fact:
+        create_vm_aws_instance_ami: >
+          {{ (create_vm_vm_amis.images | selectattr('name', 'defined') | sort(attribute='creation_date'))[-1].image_id }}
+      when: create_vm_aws_instance_ami is not defined
+
+    - name: Create instance
+      amazon.aws.ec2_instance:
+        filters:
+          "tag:Name": "{{ create_vm_vm_name }}"
+          "tag:blueprint": "{{ create_vm_vm_blueprint }}"
+          "tag:environment": "{{ create_vm_vm_environment }}"
+          "tag:deployment": "{{ create_vm_vm_deployment }}"
+          "tag:owner": "{{ create_vm_vm_owner }}"
+          "tag:purpose": "{{ create_vm_vm_purpose }}"
+          "tag:ansible-role": create_vm
+          "tag:ansible-collection": demo.cloud
+          instance-state-name:
+            - pending
+            - running
+            - stopping
+            - stopped
+        network:
+          assign_public_ip: true
+          delete_on_termination: true
+        tenancy: "{{ create_vm_aws_tenancy }}"
+        key_name: "{{ create_vm_aws_keypair_name }}"
+        instance_type: "{{ create_vm_aws_instance_size }}"
+        image_id: "{{ create_vm_aws_instance_ami | trim }}"
+        region: "{{ create_vm_aws_region }}"
+        security_group: "{{ create_vm_aws_securitygroup_name }}"
+        tags:
+          Name: "{{ create_vm_vm_name }}"
+          blueprint: "{{ create_vm_vm_blueprint }}"
+          environment: "{{ create_vm_vm_environment }}"
+          deployment: "{{ create_vm_vm_deployment }}"
+          owner: "{{ create_vm_vm_owner }}"
+          purpose: "{{ create_vm_vm_purpose }}"
+          ansible-role: create_vm
+          ansible-collection: demo.cloud
+        wait: "{{ create_vm_aws_ec2_wait }}"
+        vpc_subnet_id: "{{ create_vm_aws_subnet_id }}"
+        user_data: "{{ lookup('template', create_vm_aws_userdata_template + '.j2', template_vars=dict(vm_name=create_vm_vm_name)) }}"
+      register: create_vm_aws_ec2_instance
+
+    - name: Output the IP of new VM
+      ansible.builtin.debug:
+        msg:
+          - "Public IP for new instance: {{ create_vm_aws_ec2_instance.instances[0].public_ip_address | default('') }}"
+          - "Private IP for new instance: {{ create_vm_aws_ec2_instance.instances[0].private_ip_address | default('') }}"
+      when: create_vm_aws_ec2_instance.instances is defined and create_vm_aws_ec2_instance.instances | length > 0
+
+    - name: Set stats for Controller of new VM
+      ansible.builtin.set_stats:
+        data:
+          priv_network_private_ip: "{{ create_vm_aws_ec2_instance.instances[0].private_ip_address | default('') }}"
+          public_ip: "{{ create_vm_aws_ec2_instance.instances[0].public_ip_address | default('') }}"
+      when: create_vm_aws_ec2_instance.instances is defined and create_vm_aws_ec2_instance.instances | length > 0

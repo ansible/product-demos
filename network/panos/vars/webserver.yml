@@ -10,7 +10,7 @@ network_connections:
       dns:
         - 10.0.0.2
       route:
-        - network: 169.254.169.254 # Instance metadata service (IMDS)
+        - network: 169.254.169.254  # Instance metadata service (IMDS)
 network_state:
   interfaces:
     - name: System eth0

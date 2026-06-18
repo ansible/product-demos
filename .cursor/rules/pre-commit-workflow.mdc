@@ -1,0 +1,14 @@
+---
+description: Run product-demos pre-commit before considering Ansible/YAML work complete
+alwaysApply: true
+---
+
+# Pre-commit gate for product-demos
+
+When changing playbooks, roles, AAP setup YAML, or collections in this repo, run pre-commit before handing work back:
+
+```bash
+python3 -m pre_commit run --config .pre-commit-gh.yml --files $(git diff --name-only -- '*.yml' '*.yaml' '*.j2' | tr '\n' ' ')
+```
+
+For fork PRs, upstream CI uses `pull_request_target` and checks out **base** `main` until `.github/workflows/pre-commit.yml` on main is updated to checkout `github.event.pull_request.head.sha`. Lint fixes in the PR branch apply after merge.

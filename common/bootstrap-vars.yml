@@ -58,9 +58,9 @@ controller_credentials:
     organization: Ansible Product Demos (APD)
     update_secrets: false
     inputs:
-      username: '{{ apd_machine_credential_user | default("REPLACEME") }}'
+      username: '{{ apd_machine_credential_user | default("admin") }}'
       ssh_key_data: '{{ vault_apd_machine_credential_ssh_key | default(omit) }}'
-      password: '{{ vault_apd_machine_credential_password | default("REPLACEME") }}'
+      password: '{{ vault_apd_machine_credential_password | default(omit) }}'
 
   - name: OpenShift Credential
     description: Credential for OpenShift cluster

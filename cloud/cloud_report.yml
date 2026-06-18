@@ -1,0 +1,37 @@
+---
+- name: Build report with facts - Dynamic Documentation
+  hosts: "{{ _aws_instances | default('none') }}"
+  gather_facts: true
+
+  tasks:
+    - name: Load retrieve info role
+      ansible.builtin.include_role:
+        name: demo.cloud.retrieve_aws_instances_info
+
+- name: Build report with facts - Dynamic Documentation
+  hosts: "{{ _hosts | default('localhost') }}"
+  gather_facts: true
+  vars:
+    reports_aws_region: "{{ create_vm_aws_region | default('us-east-1') }}"
+  tasks:
+    - name: Load retrieve info role
+      ansible.builtin.include_role:
+        name: demo.cloud.retrieve_info
+
+    - name: Template report into HTML
+      ansible.builtin.include_role:
+        name: demo.cloud.template
+
+    - name: Load report to host on Linux
+      ansible.builtin.include_role:
+        name: demo.cloud.build_report_linux
+      when: inventory_hostname != 'localhost'
+
+    - name: Load report to host on AWS S3
+      ansible.builtin.include_role:
+        name: demo.cloud.build_report_s3
+      when: inventory_hostname == 'localhost'
+
+    - name: Print all host_vars
+      ansible.builtin.debug:
+        var: hostvars
