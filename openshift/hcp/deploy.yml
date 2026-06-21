@@ -1,0 +1,150 @@
+---
+# Deploys a HostedCluster on the KubeVirt platform with a configurable KubeVirt worker NodePool.
+# Prerequisites on the management cluster: OpenShift Virtualization (CNV) and MCE with HyperShift enabled.
+#
+# Troubleshooting provisioning (HostedControlPlane conditions):
+#
+# - InfrastructureReady=False (WaitingOnInfrastructureReady): control-plane operands (including the etcd
+#   StatefulSet) are not created yet — this is normal until Cluster API / KubeVirt infrastructure reconciles.
+#   Etcd "StatefulSetNotFound" in this phase usually means you are still blocked on infra, not on etcd PVCs.
+#   Inspect: cluster-api-provider-kubevirt pod (init/availability-prober), Cluster/Machine (CAPI) in the
+#   clusters namespace, and confirm MCE/HyperShift supports your OCP release image (support matrix).
+#
+# - Availability-prober "connection refused" to kube-apiserver:6443: the hosted apiserver is not ready yet.
+#   Often chained behind InfrastructureReady + etcd; if infra is still provisioning, fix CAPI/kubevirt first.
+#
+# - After InfrastructureReady=True: if etcd stays StatefulSetNotFound, then check etcd PVC (Pending storage
+#   class), worker capacity, and "Etcd StorageClass" / default StorageClass on the management cluster.
+#
+# - cluster-api "clustercache" / Connect failed / Secret "<cluster>-kubeconfig" not found: CAPI tries to cache
+#   the remote API using a kubeconfig Secret named like <CAPI-Cluster.metadata.name>-kubeconfig. It appears
+#   only after HyperShift publishes it (often once the hosted API is reachable). Missing during early
+#   provisioning is common and can repeat in logs until the control plane advances; if it never appears,
+#   the cluster never became healthy enough to emit kubeconfig — keep debugging infra/capi-provider first.
+#
+# - APIServer publishing: Route without route.hostname is invalid for APIServer (reconciler error "route hostname
+#   is required for service APIServer"). OAuth/Konnectivity/Ignition can stay Route with inferred hostnames.
+#   This playbook uses LoadBalancer for APIServer when hcp_apiserver_route_hostname is unset (needs LB provider),
+#   or Route when you set the survey / extra_var to a real FQDN (DNS must resolve to ingress).
+#
+# - LoadBalancer support on the *management* cluster: HyperShift KubeVirt docs require Services of type
+#   LoadBalancer to be provisioned (typically MetalLB on bare metal / workshops). If no LB controller exists,
+#   LoadBalancer Services stay Pending and provisioning can stall — check oc get svc -n clusters-<name> and
+#   MetalLB / cloud LB integration. This is independent of Ingress wildcard routes.
+#
+# - For manual inspection: oc get hostedcluster,hostedcontrolplane -n <namespace>; oc get pods,pvc,svc -n clusters-<name>.
+- name: Deploy Hosted Control Plane cluster (KubeVirt node pool)
+  hosts: localhost
+  gather_facts: false
+  vars:
+    hcp_namespace: clusters
+    hcp_cluster_name: demo-hcp
+    hcp_worker_replicas: 1
+    hcp_pull_secret_name: pull-secret
+    hcp_ssh_secret_name: hcp-ssh-key
+    hcp_copy_pull_secret: true
+    hcp_controller_availability: SingleReplica
+    hcp_kubevirt_root_volume_size: 64Gi
+    hcp_kubevirt_node_memory: 8Gi
+    hcp_kubevirt_node_cores: 4
+    ocp_release_image: quay.io/openshift-release-dev/ocp-release:4.16.20-x86_64
+    # Optional pullspec; some HyperShift builds require an explicit CAPK image (annotation on HostedCluster).
+    hcp_capi_provider_kubevirt_image: ""
+    # Hosted etcd PVC: set storage class if management cluster has no default StorageClass.
+    hcp_etcd_storage_class: ""
+    hcp_etcd_volume_size: 8Gi
+    # If set (FQDN), APIServer is published via Route with this hostname. If empty, APIServer uses LoadBalancer.
+    hcp_apiserver_route_hostname: ""
+  tasks:
+    - name: Normalize boolean from survey (extra vars may be string)
+      ansible.builtin.set_fact:
+        hcp_copy_pull_secret_effective: >-
+          {{
+            (hcp_copy_pull_secret | default(true) | bool)
+            if hcp_copy_pull_secret is not string
+            else (hcp_copy_pull_secret | lower in ['true', '1', 'yes'])
+          }}
+
+    - name: Normalize worker replica count (survey may pass string)
+      ansible.builtin.set_fact:
+        hcp_worker_replicas_effective: "{{ hcp_worker_replicas | default(1) | int }}"
+
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - hcp_cluster_name | length > 0
+          - ocp_release_image | length > 0
+          - hcp_ssh_public_key is defined
+          - hcp_ssh_public_key | length > 0
+          - hcp_worker_replicas_effective | int >= 1
+        fail_msg: >-
+          Set hcp_ssh_public_key (worker SSH public key), ensure hcp_cluster_name / ocp_release_image are set,
+          and set worker replicas to at least 1.
+
+    - name: Read cluster pull secret from openshift-config
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Secret
+        name: pull-secret
+        namespace: openshift-config
+      register: r_cluster_pull_secret
+      when: hcp_copy_pull_secret_effective | bool
+
+    - name: Ensure pull secret is present when copy is enabled
+      ansible.builtin.assert:
+        that:
+          - r_cluster_pull_secret.resources | default([]) | length > 0
+          - r_cluster_pull_secret.resources[0].data['.dockerconfigjson'] is defined
+        fail_msg: >-
+          Could not read openshift-config/pull-secret. Set hcp_copy_pull_secret to false and create {{ hcp_pull_secret_name }}
+          in {{ hcp_namespace }} manually.
+      when: hcp_copy_pull_secret_effective | bool
+
+    - name: Ensure namespace for HostedCluster resources
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ hcp_namespace }}"
+
+    - name: Seed pull secret into target namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: "{{ hcp_pull_secret_name }}"
+            namespace: "{{ hcp_namespace }}"
+          type: kubernetes.io/dockerconfigjson
+          data:
+            .dockerconfigjson: "{{ r_cluster_pull_secret.resources[0].data['.dockerconfigjson'] }}"
+      when: hcp_copy_pull_secret_effective | bool
+
+    - name: Create SSH public key secret for node ignition
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: "{{ hcp_ssh_secret_name }}"
+            namespace: "{{ hcp_namespace }}"
+          type: Opaque
+          stringData:
+            id_rsa.pub: "{{ hcp_ssh_public_key }}"
+
+    - name: Apply HostedCluster (KubeVirt platform)
+      kubernetes.core.k8s:
+        state: present
+        wait: false
+        definition: "{{ lookup('template', 'templates/hostedcluster.yml.j2') | from_yaml }}"
+
+    # NodePool spec.replicas and kubevirt.compute.cores must be JSON integers (uint32), not strings.
+    # Inline YAML definitions stringify Jinja output; render from a template so numbers stay numeric.
+    - name: Apply NodePool with KubeVirt workers
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', 'templates/nodepool.yml.j2') | from_yaml }}"

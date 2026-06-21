@@ -1,0 +1,11 @@
+---
+- name: Install multicluster engine operator for hosted control planes (HCP)
+  hosts: localhost
+  gather_facts: false
+  vars:
+    cluster_config_operators:
+      - mce
+  tasks:
+    - name: Install MCE via cluster_config
+      ansible.builtin.include_role:
+        name: demo.openshift.cluster_config
