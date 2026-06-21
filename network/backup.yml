@@ -21,33 +21,47 @@
 
 - name: Play to Backup Cisco Always-On Network Devices
   hosts: routers
-  gather_facts: false
+  gather_facts: true
   vars:
     report_server: reports
-    backup_dir: "/tmp/network_backups"
 
   tasks:
-    - name: Network Backup and Resource Manager
-      ansible.builtin.include_role:
-        name: network.backup.run
-      vars:  # noqa var-naming[no-role-prefix]
-        operation: backup
-        type: full
-        data_store:
-          local: "{{ backup_dir }}"
+    - name: Create Network Backup (IOS-XE)
+      when: ansible_network_os == 'cisco.ios.ios'
+      cisco.ios.ios_config:
+        backup: true
+        backup_options:
+          filename: "{{ inventory_hostname }}.txt"
+          dir_path: /tmp/
+
+    - name: Create Network Backup (IOS-XR)
+      when: ansible_network_os == 'cisco.iosxr.iosxr'
+      cisco.iosxr.iosxr_config:
+        backup: true
+        backup_options:
+          filename: "{{ inventory_hostname }}.txt"
+          dir_path: /tmp/
+
+    - name: Create Network Backup (NX-OS)
+      when: ansible_network_os == 'cisco.nxos.nxos'
+      cisco.nxos.nxos_config:
+        backup: true
+        backup_options:
+          filename: "{{ inventory_hostname }}.txt"
+          dir_path: /tmp/
 
     # This task removes the Current configuration... from the top of IOS routers show run
     - name: Remove non config lines - regexp
       delegate_to: localhost
       ansible.builtin.lineinfile:
-        path: "{{ backup_dir }}/{{ inventory_hostname }}.txt"
+        path: "/tmp/{{ inventory_hostname }}.txt"
         line: "Building configuration..."
         state: absent
 
     - name: Copy backup file
       delegate_to: "{{ report_server }}"
       ansible.builtin.copy:
-        src: "{{ backup_dir }}/{{ inventory_hostname }}.txt"
+        src: "/tmp/{{ inventory_hostname }}.txt"
         dest: "/var/www/html/backups/{{ inventory_hostname }}.cfg"
         backup: true
         owner: ec2-user
