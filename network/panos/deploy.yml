@@ -54,7 +54,7 @@
         region: "{{ aws_region | default(omit) }}"
         vpc_id: "{{ panos_demo_vpc_id }}"
         cidr: "{{ panos_demo_subnet_public.cidr }}"
-        tags: "{{ panos_demo_subnet_public.tags }}" 
+        tags: "{{ panos_demo_subnet_public.tags }}"
 
     - name: Create private subnet
       register: r_subnet_private
@@ -62,7 +62,7 @@
         region: "{{ aws_region | default(omit) }}"
         vpc_id: "{{ panos_demo_vpc_id }}"
         cidr: "{{ panos_demo_subnet_private.cidr }}"
-        tags: "{{ panos_demo_subnet_private.tags }}" 
+        tags: "{{ panos_demo_subnet_private.tags }}"
 
     - name: Create security groups (without rules)
       loop: "{{ panos_demo_security_groups }}"
@@ -170,17 +170,17 @@
         instance_type: c5n.xlarge
         ebs_optimized: true
         network_interfaces_ids:
-          - id: "{{ panos_demo_network_interface_ids[0] }}" # mgmt
-            device_index: 0 
-          - id: "{{ panos_demo_network_interface_ids[1] }}" # public
+          - id: "{{ panos_demo_network_interface_ids[0] }}"  # mgmt
+            device_index: 0
+          - id: "{{ panos_demo_network_interface_ids[1] }}"  # public
             device_index: 1
-          - id: "{{ panos_demo_network_interface_ids[2] }}" # private
+          - id: "{{ panos_demo_network_interface_ids[2] }}"  # private
             device_index: 2
-        image_id: "{{ panos_demo_ami_pan }}" # Palo Alto Firewall PayGo
+        image_id: "{{ panos_demo_ami_pan }}"  # Palo Alto Firewall PayGo
         tags:
           Name: "{{ panos_demo_prefix }}-fw"
           demo: panos
-          prefix: "{{ panos_demo_prefix }}" 
+          prefix: "{{ panos_demo_prefix }}"
           owner: "{{ panos_demo_owner }}"
           created_by: ansible
           role: firewall
@@ -236,7 +236,7 @@
             sleep: 30
             timeout: 900
 
-        - name: Pause for things to spin up
+        - name: Pause for things to spin up  # noqa: no-handler
           when: r_palo_fw is changed
           ansible.builtin.pause:
             minutes: 5
@@ -263,7 +263,7 @@
               "admin@PA-VM>":
                 - "configure"
                 - "exit"
-              "admin@PA-VM#":
+              "admin@PA-VM  #":
                 - "set mgt-config users admin password"
                 - "commit"
                 - "exit"
@@ -328,15 +328,15 @@
             vpc_subnet_id: "{{ r_subnet_public.subnet.id }}"
             instance_type: t2.micro
             network_interfaces_ids:
-              - id: "{{ panos_demo_bastion_network_interface_ids[0] }}" # public
-                device_index: 0 
-              - id: "{{ panos_demo_bastion_network_interface_ids[1] }}" # private
+              - id: "{{ panos_demo_bastion_network_interface_ids[0] }}"  # public
+                device_index: 0
+              - id: "{{ panos_demo_bastion_network_interface_ids[1] }}"  # private
                 device_index: 1
-            image_id: "{{ panos_demo_ami_rhel }}" # RHEL9
+            image_id: "{{ panos_demo_ami_rhel }}"  # RHEL9
             tags:
               Name: "{{ panos_demo_prefix }}-bastion"
               demo: panos
-              prefix: "{{ panos_demo_prefix }}" 
+              prefix: "{{ panos_demo_prefix }}"
               owner: "{{ panos_demo_owner }}"
               created_by: ansible
               role: bastion
@@ -390,13 +390,13 @@
             vpc_subnet_id: "{{ r_subnet_private.subnet.id }}"
             instance_type: t2.micro
             network_interfaces_ids:
-              - id: "{{ r_panos_demo_webserver_enis.results[0].interface.id }}" # private
-                device_index: 0 
-            image_id: "{{ panos_demo_ami_rhel }}" # RHEL9
+              - id: "{{ r_panos_demo_webserver_enis.results[0].interface.id }}"  # private
+                device_index: 0
+            image_id: "{{ panos_demo_ami_rhel }}"  # RHEL9
             tags:
               Name: "{{ panos_demo_prefix }}-webserver"
               demo: panos
-              prefix: "{{ panos_demo_prefix }}" 
+              prefix: "{{ panos_demo_prefix }}"
               owner: "{{ panos_demo_owner }}"
               created_by: ansible
               role: webserver

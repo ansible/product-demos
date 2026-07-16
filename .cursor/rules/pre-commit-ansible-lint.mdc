@@ -1,0 +1,38 @@
+---
+description: Pass ansible/product-demos pre-commit (ansible-lint production profile) on first try
+globs: "**/*.{yml,yaml,j2}"
+alwaysApply: false
+---
+
+# Pre-commit / ansible-lint (product-demos)
+
+Before finishing edits to playbooks, roles, or setup YAML, validate against the repo CI hooks.
+
+## Run locally before commit
+
+```bash
+python3 -m pip install pre-commit ansible-lint
+python3 -m pre_commit run --config .pre-commit-gh.yml --files <changed-files>
+```
+
+CI uses `.pre-commit-gh.yml` inside `quay.io/ansible-product-demos/apd-ee-25` (ansible-lint v25, `production` profile). Lint runs on the **whole repo**, not just PR files.
+
+## YAML style (ansible-lint yaml rules)
+
+- Start playbooks/vars with `---`
+- No trailing whitespace; file ends with a single newline
+- Inline comments: **two spaces** before `#` (`state: 3  # note`, not `state: 3 # note`)
+- Jinja filters: no space before `(` — `ternary([x], ['any'])`, not `ternary ([x], ['any'])`
+- Match existing indentation (2 spaces); list items under keys must align with sibling keys
+
+## Ansible idioms
+
+- `ansible.builtin.command` / `shell`: add `changed_when: false` when read-only
+- Tasks gated with `when: ... is changed` on mutating follow-ups: use a handler or `# noqa: no-handler`
+- Prefer FQCN modules (`ansible.builtin.debug`, `amazon.aws.ec2_instance`)
+- Role variables/registers should use the role prefix (e.g. `aws_` in `demo.cloud.aws`); playbook-level survey vars (`create_vm_*`) are fine outside roles
+
+## Scope discipline
+
+- Fix lint in files you touch; if CI fails on unrelated paths, fix those too — upstream CI is repo-wide
+- Do not rely on auto-fix: `.yamllint` blocks `ansible-lint --fix` in this repo

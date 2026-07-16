@@ -1,6 +1,6 @@
 ---
 - name: Configure the Palo Alto firewall
-  hosts: localhost # API driven
+  hosts: localhost  # API driven
   gather_facts: false
   become: false
 
@@ -9,7 +9,7 @@
 
   tasks:
     - name: Create firewall zones
-      loop: "{{ panos_zones }}" 
+      loop: "{{ panos_zones }}"
       paloaltonetworks.panos.panos_zone:
         provider: "{{ panos_provider }}"
         zone: "{{ item }}"
@@ -45,7 +45,7 @@
         description: "{{ __nat_rule.description }}"
         nat_type: "{{ __nat_rule.nat_type }}"
         from_zones: "{{ __nat_rule.from_zones | default(omit) }}"
-        to_zones: "{{ __nat_rule.to_zones | default(omit) }}" 
+        to_zones: "{{ __nat_rule.to_zones | default(omit) }}"
         to_interface: "{{ __nat_rule.to_interface | default(omit) }}"
         service: "{{ __nat_rule.service | default(omit) }}"
         source_addresses: "{{ __nat_rule.source_addresses | default(omit) }}"
@@ -53,7 +53,7 @@
         source_translation_address_type: "{{ __nat_rule.source_translation_address_type | default(omit) }}"
         source_translation_translated_addresses: "{{ __nat_rule.source_translation_translated_addresses | default(omit) }}"
         destination_addresses: "{{ __nat_rule.destination_addresses | default(omit) }}"
-        destination_translated_address: "{{ __nat_rule.destination_translated_address | default(omit) }}" 
+        destination_translated_address: "{{ __nat_rule.destination_translated_address | default(omit) }}"
 
     - name: Add security rules
       loop: "{{ panos_security_rules }}"

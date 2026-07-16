@@ -23,21 +23,6 @@ controller_inventories:
   - name: Ansible Product Demos Inventory
     organization: Ansible Product Demos (APD)
 
-controller_projects:
-  - name: Ansible Cloud Content Lab - AWS
-    organization: Ansible Product Demos (APD)
-    scm_type: git
-    wait: true
-    scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
-    default_environment: Cloud Services Execution Environment
-
-  - name: Ansible Cloud AWS Demos
-    organization: Ansible Product Demos (APD)
-    scm_type: git
-    wait: true
-    scm_url: https://github.com/ansible-cloud/aws_demos.git
-    default_environment: Cloud Services Execution Environment
-
 controller_credentials:
   - name: AWS
     credential_type: Amazon Web Services
@@ -110,8 +95,8 @@ controller_groups:
     variables:
       ansible_ssh_private_key_file: !unsafe "{{ lookup('env', 'SSH_PROXY_KEY') }}"
       ansible_ssh_common_args: !unsafe >-
-        -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null 
-        -o ProxyCommand="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null 
+        -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+        -o ProxyCommand="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
         -i {{ lookup('env', 'SSH_PROXY_KEY') }} -W %h:%p -q {{ ssh_proxy_username }}@{{ ssh_proxy_host }}"
 
 controller_templates:
@@ -174,6 +159,7 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
+      - APD Machine Credential
     project: Ansible Product Demos
     playbook: cloud/aws_key.yml
     inventory: Ansible Product Demos Inventory
@@ -202,11 +188,11 @@ controller_templates:
         - question_name: Keypair Public Key
           type: textarea
           variable: aws_public_key
-          required: true
-        - question_name: Owner
-          type: text
-          variable: aws_keypair_owner
-          required: true
+          required: false
+          question_description: >-
+            Optional when APD Machine Credential includes an SSH private key — the
+            public key is derived automatically. Otherwise paste the full public key
+            line (for example, from ~/.ssh/id_rsa.pub).
 
   - name: Cloud | AWS | Create VM
     job_type: run
@@ -214,8 +200,8 @@ controller_templates:
     credentials:
       - AWS
       - APD Machine Credential
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_vm.yml
+    project: Ansible Product Demos
+    playbook: cloud/create_vm.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -300,9 +286,8 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-      - APD Machine Credential
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/delete_inventory_vm.yml
+    project: Ansible Product Demos
+    playbook: cloud/delete_vm_by_name.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -312,9 +297,18 @@ controller_templates:
       name: ''
       description: ''
       spec:
-        - question_name: Name or Pattern
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: VM Name
           type: text
-          variable: _hosts
+          variable: create_vm_vm_name
           required: true
 
   - name: Cloud | AWS | Resize EC2

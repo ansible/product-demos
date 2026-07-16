@@ -3,14 +3,20 @@ _deployment_id: "{{ lookup('file', playbook_dir + '/.deployment_id') }}"
 
 user_message:
 
+controller_execution_environments:
+  - name: TMM AWS EE
+    image: quay.io/acme_corp/aws_ee
+    organization: Ansible Product Demos (APD)
+    pull: missing
+
 controller_templates:
   - name: Cloud | AWS | Create Peer Infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_peer_network.yml
+    project: Ansible Product Demos
+    playbook: cloud/create_peer_network.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -25,8 +31,8 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/delete_peer_network.yml
+    project: Ansible Product Demos
+    playbook: cloud/delete_peer_network.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -39,8 +45,8 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_transit_network.yml
+    project: Ansible Product Demos
+    playbook: cloud/create_transit_network.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -55,8 +61,8 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/delete_transit_network.yml
+    project: Ansible Product Demos
+    playbook: cloud/delete_transit_network.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -67,47 +73,17 @@ controller_templates:
   - name: Cloud | AWS | VPC Report
     job_type: run
     organization: Ansible Product Demos (APD)
+    execution_environment: TMM AWS EE
     credentials:
       - AWS
-    project: Ansible Cloud AWS Demos
-    playbook: playbooks/cloud_report.yml
-    inventory: Ansible Product Demos Inventory
-    execution_environment: Cloud Services Execution Environment
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-    extra_vars:
-      reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
-      reports_aws_region: "us-east-1"
-
-  - name: Cloud | AWS | Tags Report
-    job_type: run
-    organization: Ansible Product Demos (APD)
-    credentials:
-      - AWS
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_reports.yml
+    project: Ansible Product Demos
+    playbook: cloud/cloud_report.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      aws_report: tags
       reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: AWS Region
-          type: multiplechoice
-          variable: create_vm_aws_region
-          required: true
-          choices:
-            - us-east-1
-            - us-east-2
-            - us-west-1
-            - us-west-2
 
   - name: Cloud | AWS | Snapshot EC2
     job_type: run
@@ -183,6 +159,89 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
 
+  - name: Cloud | AWS | Delete Stack VM
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+    project: Ansible Product Demos
+    playbook: cloud/delete_vm_by_name.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    allow_simultaneous: true
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: VM Name
+          type: text
+          variable: create_vm_vm_name
+          required: true
+
+  - name: Cloud | AWS | Delete VPC
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+    project: Ansible Product Demos
+    playbook: cloud/delete_vpc.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+
+  - name: Cloud | AWS | Delete Keypair
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+    project: Ansible Product Demos
+    playbook: cloud/delete_keypair.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+
   - name: LINUX | Patching
     job_type: check
     inventory: Ansible Product Demos Inventory
@@ -213,7 +272,12 @@ controller_workflows:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      vm_deployment: cloud_stack
+      aws_key_name: aws-test-key
+      create_vm_aws_keypair_name: aws-test-key
+      create_vm_aws_securitygroup_name: aws-test-sg
+      create_vm_aws_vpc_subnet_name: aws-test-subnet
+      create_vm_vm_deployment: cloud_stack
+      create_vm_vm_purpose: demo
     survey_enabled: true
     survey:
       name: ''
@@ -240,10 +304,6 @@ controller_workflows:
             - Dev
             - QA
             - Prod
-        - question_name: Keypair Public Key
-          type: textarea
-          variable: aws_public_key
-          required: true
         - question_name: Email
           type: text
           variable: email
@@ -267,11 +327,6 @@ controller_workflows:
           feedback: Failed to create AWS keypair
       - identifier: EC2 Stats
         unified_job_template: Cloud | AWS | Display EC2 Stats
-        all_parents_must_converge: true
-        always_nodes:
-          - VPC Report
-      - identifier: VPC Report
-        unified_job_template: Cloud | AWS | VPC Report
         all_parents_must_converge: true
         always_nodes:
           - Deploy Windows GUI Blueprint
@@ -327,17 +382,82 @@ controller_workflows:
       - identifier: Update Inventory
         unified_job_template: AWS Inventory
         success_nodes:
-          - Tag Report
+          - Publish VPC Report
       - identifier: Ticket - Instance Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to create AWS instance
-      - identifier: Tag Report
-        unified_job_template: Cloud | AWS | Tags Report
+      - identifier: Publish VPC Report
+        unified_job_template: Cloud | AWS | VPC Report
       - identifier: Ticket - VPC Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to create AWS VPC
+
+  - name: Destroy Cloud Stack in AWS
+    description: Tear down the cloud stack VMs, VPC, and keypair created by Deploy Cloud Stack in AWS
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+    simplified_workflow_nodes:
+      - identifier: Delete Windows GUI VM
+        unified_job_template: Cloud | AWS | Delete Stack VM
+        extra_data:
+          create_vm_vm_name: aws-dc
+        success_nodes:
+          - Delete Infrastructure
+      - identifier: Delete Windows Core VM
+        unified_job_template: Cloud | AWS | Delete Stack VM
+        extra_data:
+          create_vm_vm_name: aws_win1
+        success_nodes:
+          - Delete Infrastructure
+      - identifier: Delete RHEL8 VM
+        unified_job_template: Cloud | AWS | Delete Stack VM
+        extra_data:
+          create_vm_vm_name: aws_rhel8
+        success_nodes:
+          - Delete Infrastructure
+      - identifier: Delete RHEL9 VM
+        unified_job_template: Cloud | AWS | Delete Stack VM
+        extra_data:
+          create_vm_vm_name: aws_rhel9
+        success_nodes:
+          - Delete Infrastructure
+      - identifier: Delete Report Server
+        unified_job_template: Cloud | AWS | Delete Stack VM
+        extra_data:
+          create_vm_vm_name: reports
+        success_nodes:
+          - Delete Infrastructure
+      - identifier: Delete Infrastructure
+        unified_job_template: Cloud | AWS | Delete VPC
+        all_parents_must_converge: true
+        success_nodes:
+          - Update Inventory
+      - identifier: Delete Keypair
+        unified_job_template: Cloud | AWS | Delete Keypair
+        all_parents_must_converge: true
+        success_nodes:
+          - Update Inventory
+      - identifier: Update Inventory
+        unified_job_template: AWS Inventory
+        all_parents_must_converge: true
 
   - name: Cloud | AWS | Patch EC2 Workflow
     description: A workflow to patch ec2 instances with snapshot and restore on failure.

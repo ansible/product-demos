@@ -1,0 +1,67 @@
+---
+- name: install apache
+  become: true
+  yum:
+    name: httpd
+    state: present
+
+- name: change apache to specified port
+  become: true
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^Listen '
+    insertafter: '^#Listen '
+    line: 'Listen {{web_port}}'
+
+- name: Set nis_enabled flag on and keep it persistent across reboots
+  become: true
+  seboolean:
+    name: nis_enabled
+    state: true
+    persistent: true
+
+- name: start httpd
+  become: true
+  service:
+    name: httpd
+    state: started
+
+- name: create HTML report
+  become: true
+  template:
+    src: report.j2
+    dest: "{{ file_path }}/index.html"
+
+- name: copy CSS over
+  become: true
+  copy:
+    src: "css"
+    dest: "{{ file_path }}"
+    directory_mode: true
+
+- name: copy CSS over
+  become: true
+  copy:
+    src: "{{ item }}"
+    dest: "{{ file_path }}"
+    directory_mode: true
+  loop:
+    - "webpage_logo.png"
+    - "redhat-ansible-logo.svg"
+    - "aws.png"
+
+- name: print variables
+  debug:
+    var: hostvars['ansible-1']
+
+- name: retrieve public IP address
+  ansible.builtin.command: curl https://ifconfig.me
+  register: public_ip_report
+  ignore_errors: true
+
+- name: display link to inventory report
+  debug:
+    msg:
+      - "Please go to http://{{ public_ip_report.stdout | default(ansible_fqdn) }}:{{ web_port }}"
+      - "or just refresh the Cloud Report tab"
+      - "at the top of your window if you using Instruqt labs!"

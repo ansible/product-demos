@@ -3,7 +3,7 @@ panos_zones:
   - trust
   - untrust
 
-panos_mgmt_profile: 
+panos_mgmt_profile:
   name: apd-panos-ping-mgmt-profile
   ping: true
 

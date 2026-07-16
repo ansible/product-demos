@@ -10,7 +10,7 @@
   tasks:
     - name: Install required packages
       ansible.builtin.dnf:
-        name: 
+        name:
           - httpd
           - nmstate
           - NetworkManager
@@ -28,3 +28,4 @@
 
     - name: Test network config
       ansible.builtin.command: ping -c 1 google.com
+      changed_when: false

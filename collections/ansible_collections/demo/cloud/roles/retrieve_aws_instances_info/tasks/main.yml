@@ -1,0 +1,51 @@
+---
+- name: Check Services
+  ansible.builtin.service_facts:
+  register: service_facts
+
+- name: Check if /etc/motd file exists
+  ansible.builtin.stat:
+    path: /etc/motd
+  register: motd_file
+
+- name: Check if selinux is enabled
+  ansible.builtin.command: getenforce
+  register: selinux_status
+
+- name: Check IP address
+  ansible.builtin.debug:
+    var: ansible_default_ipv4.address
+
+- name: Retrieve EC2 instance information based on private IP address
+  amazon.aws.ec2_instance_info:
+    region: "{{ reports_aws_region | default(aws_region | default('us-east-1')) }}"
+    filters:
+      "network-interface.private-ip-address": "{{ ansible_default_ipv4.address }}"
+  register: ec2_info
+  delegate_to: localhost
+
+- name: Print out instance EC2 facts
+  ansible.builtin.debug:
+    var: ec2_info
+
+- name: Check if the web URL is responding
+  ansible.builtin.uri:
+    url: "http://{{ ec2_info.instances[0].public_dns_name }}"
+    validate_certs: false
+  register: webserver
+  failed_when: webserver.status is undefined or webserver.status == ""
+
+- name: Check if oscap-reports web URL is responding
+  ansible.builtin.uri:
+    url: "http://{{ ec2_info.instances[0].public_dns_name }}/oscap-reports/"
+    validate_certs: false
+  register: openscap_webserver
+  failed_when: openscap_webserver.status is undefined or openscap_webserver.status == ""
+
+- name: Print out webserver info
+  ansible.builtin.debug:
+    var: webserver
+
+- name: Print out openscap_webserver info
+  ansible.builtin.debug:
+    var: openscap_webserver
