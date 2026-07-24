@@ -135,6 +135,11 @@
       closeBtn.addEventListener('click', dismiss);
 
       document.addEventListener('keydown', function(e) {
+        if (e.keyCode === 27 && wrap.classList.contains('drop')) {
+          dismiss();
+          return;
+        }
+
         var tag = (e.target.tagName || '').toLowerCase();
         if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
         if (e.target.closest && e.target.closest('button, [role="tablist"]')) return;
