@@ -1,14 +1,14 @@
 # Cloud Demo Guides
 
-> **Full experience:** Browse the [GitHub Pages demo catalog](https://ipvsean.github.io/product-demos/) for workflow diagrams, presenter walkthroughs, and search/filter.
+> **Full experience:** Browse the [GitHub Pages demo catalog](https://ansible.github.io/product-demos/) for workflow diagrams, presenter walkthroughs, and search/filter.
 
 ## Workflows
 
 | Demo | Description | Detail page |
 |------|-------------|-------------|
-| [Deploy Cloud Stack in AWS](../setup.yml) | Provision VPC, keypair, and 5 VMs in one click | [Guide](https://ipvsean.github.io/product-demos/demos/deploy-cloud-stack/) |
-| [Destroy Cloud Stack in AWS](../setup.yml) | Tear down the full stack | [Guide](https://ipvsean.github.io/product-demos/demos/cloud-destroy-stack/) |
-| [Patch Cloud Stack in AWS](../setup.yml) | Snapshot, patch, verify, restore for RHEL + Windows | [Guide](https://ipvsean.github.io/product-demos/demos/patch-cloud-stack/) |
+| [Deploy Cloud Stack in AWS](../setup.yml) | Provision VPC, keypair, and 5 VMs in one click | [Guide](https://ansible.github.io/product-demos/demos/deploy-cloud-stack/) |
+| [Destroy Cloud Stack in AWS](../setup.yml) | Tear down the full stack | [Guide](https://ansible.github.io/product-demos/demos/cloud-destroy-stack/) |
+| [Patch Cloud Stack in AWS](../setup.yml) | Snapshot, patch, verify, restore for RHEL + Windows | [Guide](https://ansible.github.io/product-demos/demos/patch-cloud-stack/) |
 
 ## Standalone jobs
 
