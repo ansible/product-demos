@@ -10,10 +10,14 @@
     target_kb_ids: "{{ (_raw_kb_input.split(',') | map('trim') | list) if _raw_kb_input is string else _raw_kb_input }}"
 
   tasks:
+    - name: Clear stale compliance facts from previous runs
+      ansible.builtin.set_fact:
+        compliance_status: null
+        cacheable: true
+
     - name: RHEL audit block
       when:
         - ansible_os_family == "RedHat"
-        - compliance_status is not defined
       become: true
       block:
         - name: Ensure RHSM registration
@@ -71,7 +75,6 @@
     - name: Windows audit block
       when:
         - ansible_os_family == "Windows"
-        - compliance_status is not defined
       block:
         - name: Force Windows Update scan
           ansible.windows.win_shell: |
