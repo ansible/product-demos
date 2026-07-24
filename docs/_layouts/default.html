@@ -124,6 +124,7 @@
       var wrap = document.getElementById('konami-wrap');
       var closeBtn = document.getElementById('konami-close');
       var timer = null;
+      var seqTimer = null;
 
       function dismiss() {
         clearTimeout(timer);
@@ -134,12 +135,19 @@
       closeBtn.addEventListener('click', dismiss);
 
       document.addEventListener('keydown', function(e) {
+        var tag = (e.target.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+        if (e.target.closest && e.target.closest('button, [role="tablist"]')) return;
+
+        clearTimeout(seqTimer);
         if (e.keyCode === seq[pos]) {
           pos++;
           if (pos === seq.length) {
             pos = 0;
             wrap.className = 'konami-wrap drop';
             timer = setTimeout(dismiss, 4200);
+          } else {
+            seqTimer = setTimeout(function() { pos = 0; }, 2000);
           }
         } else {
           pos = 0;
