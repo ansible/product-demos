@@ -7,7 +7,7 @@
 {% endif %}
 
 <article
-  class="demo-card{% if featured %} demo-card--featured{% endif %}"
+  class="demo-card{% if include.featured %} demo-card--featured{% endif %}"
   data-status="{{ demo.status }}"
   data-category="{{ demo.category }}"
   data-search="{{ demo.title | downcase }} {{ demo.subtitle | downcase }} {{ demo.blurb | downcase }} {{ demo.category | downcase }} {% for tag in demo.tags %}{{ tag | downcase }} {% endfor %}"
