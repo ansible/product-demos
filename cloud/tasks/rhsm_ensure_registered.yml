@@ -21,6 +21,9 @@
 - name: RHSM registration workflow
   when: rhsm_registered is not defined or not rhsm_registered
   block:
+    - name: Ensure swap before DNF operations
+      ansible.builtin.include_tasks: ensure_swap.yml
+
     - name: Check RHSM registration status
       ansible.builtin.command: subscription-manager identity
       register: _rhsm_id_check
