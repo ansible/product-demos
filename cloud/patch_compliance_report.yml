@@ -156,7 +156,7 @@
 
     - name: Copy AAP logo to web root
       ansible.builtin.copy:
-        src: "{{ playbook_dir }}/files/aap-logo-standard.png"
+        src: "{{ playbook_dir }}/patch_files/aap-logo-standard.png"
         dest: /var/www/html/aap-logo.png
         mode: "0644"
 
