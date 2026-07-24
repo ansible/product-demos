@@ -69,25 +69,42 @@
   {% endif %}
 
   <style>
-    .konami-egg {
+    .konami-wrap {
       position: fixed;
       z-index: 9999;
-      pointer-events: none;
-      width: 340px;
-      max-width: 90vw;
       left: 50%;
       transform: translateX(-50%);
-      top: -400px;
+      top: -500px;
       opacity: 0;
+      text-align: center;
     }
-    .konami-egg.drop {
+    .konami-wrap.drop {
       animation: konami-drop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      pointer-events: auto;
     }
-    .konami-egg.yeet {
+    .konami-wrap.yeet {
       animation: konami-yeet 0.5s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+      pointer-events: none;
     }
+    .konami-egg {
+      width: 340px;
+      max-width: 90vw;
+    }
+    .konami-close {
+      display: block;
+      margin: 8px auto 0;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      padding: 4px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .konami-close:hover { background: rgba(0,0,0,0.9); }
     @keyframes konami-drop {
-      0% { top: -400px; opacity: 0; }
+      0% { top: -500px; opacity: 0; }
       60% { opacity: 1; }
       100% { top: 50%; opacity: 1; transform: translateX(-50%) translateY(-50%); }
     }
@@ -96,24 +113,33 @@
       100% { top: 120vh; opacity: 0; transform: translateX(40vw) translateY(0) rotate(720deg); }
     }
   </style>
-  <img src="{{ '/assets/img/i-made-this.png' | relative_url }}" class="konami-egg" id="konami-egg" alt="">
+  <div class="konami-wrap" id="konami-wrap">
+    <img src="{{ '/assets/img/i-made-this.png' | relative_url }}" class="konami-egg" alt="">
+    <button class="konami-close" id="konami-close">✕ dismiss</button>
+  </div>
   <script>
     (function() {
       var seq = [38,38,40,40,37,39,37,39,66,65];
       var pos = 0;
-      var egg = document.getElementById('konami-egg');
+      var wrap = document.getElementById('konami-wrap');
+      var closeBtn = document.getElementById('konami-close');
+      var timer = null;
+
+      function dismiss() {
+        clearTimeout(timer);
+        wrap.className = 'konami-wrap yeet';
+        setTimeout(function() { wrap.className = 'konami-wrap'; }, 600);
+      }
+
+      closeBtn.addEventListener('click', dismiss);
+
       document.addEventListener('keydown', function(e) {
         if (e.keyCode === seq[pos]) {
           pos++;
           if (pos === seq.length) {
             pos = 0;
-            egg.className = 'konami-egg drop';
-            setTimeout(function() {
-              egg.className = 'konami-egg yeet';
-            }, 2200);
-            setTimeout(function() {
-              egg.className = 'konami-egg';
-            }, 2800);
+            wrap.className = 'konami-wrap drop';
+            timer = setTimeout(dismiss, 4200);
           }
         } else {
           pos = 0;
