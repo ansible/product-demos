@@ -3,6 +3,7 @@
   ansible.builtin.template:
     src: report.j2
     dest: "{{ playbook_dir }}/index.html"
+    mode: "0644"
   delegate_to: localhost
   run_once: true
 
@@ -11,6 +12,7 @@
     src: "{{ role_path }}/files"
     dest: "{{ playbook_dir }}"
     directory_mode: '0755'
-    remote_src: yes
+    mode: "0755"
+    remote_src: true
   delegate_to: localhost
   run_once: true

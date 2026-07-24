@@ -6,6 +6,11 @@ apd_ee_image: quay.io/ansible-product-demos/apd-ee-{{ apd_ee_image_version }}:{{
 apd_git_repo: https://github.com/ansible/product-demos
 apd_git_repo_branch: main
 
+## Disable async for gateway roles to work around ansible.platform 2.7 action plugin
+## incompatibility (redhat-cop/infra.aap_configuration#1368).
+## Remove once the EE ships ansible.platform >= 2.7.20260615.
+gateway_configuration_async_retries: 0
+
 ## gateway resources
 aap_organizations:
   - name: Ansible Product Demos (APD)

@@ -7,7 +7,7 @@
         cidr_block: "{{ vpc_priv_net_cidr }}"
         purge_tags: false
         region: "{{ aws_region }}"
-        tenancy: "{{ tenancy }}" # noqa args[module]
+        tenancy: "{{ tenancy }}"  # noqa args[module]
         state: present
         tags:
           deployment: ansible
@@ -69,7 +69,7 @@
         purge_tags: false
         region: "{{ aws_region }}"
         state: present
-        tenancy: "{{ tenancy }}" # noqa args[module]
+        tenancy: "{{ tenancy }}"  # noqa args[module]
         tags:
           deployment: ansible
           ansible-role: direct_peered_networks
@@ -313,7 +313,7 @@
           deployment: ansible
           purpose: ssh-tunnel
           ansible-role: direct_peered_networks
-        tenancy: "{{ tenancy }}" # noqa args[module]
+        tenancy: "{{ tenancy }}"  # noqa args[module]
         vpc_subnet_id: "{{ dmz_subnet.subnet.id }}"
         wait: true
       register: dmz_ec2
@@ -409,7 +409,7 @@
           deployment: ansible
           purpose: priv-network-vm
           ansible-role: direct_peered_networks
-        tenancy: "{{ tenancy }}" # noqa args[module]
+        tenancy: "{{ tenancy }}"  # noqa args[module]
         vpc_subnet_id: "{{ priv_network_priv_subnet.subnet.id }}"
         wait: true
       register: priv_network_ec2

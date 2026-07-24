@@ -21,12 +21,12 @@
 
 # Dashes are not allowed as Ansible var names so we use underscores _
 - name: Set facts all info for {{ item }}
-  set_fact:
-    '{{ item|replace("-", "_") }}':
-      vpc_info:  '{{ vpc_info }}'
+  ansible.builtin.set_fact:
+    '{{ item | replace("-", "_") }}':
+      vpc_info: '{{ vpc_info }}'
       ec2_instance_info: '{{ ec2_instance_info }}'
       igw_info: '{{ igw_info }}'
 
 - name: Set facts all info for {{ item }}
-  set_fact:
-    all_ec2_regions: "{{ all_ec2_regions | default ([]) + [{ item|replace('-','_'): hostvars[inventory_hostname][item|replace('-','_')]}] }}"
+  ansible.builtin.set_fact:
+    all_ec2_regions: "{{ all_ec2_regions | default([]) + [{item | replace('-', '_'): hostvars[inventory_hostname][item | replace('-', '_')]}] }}"

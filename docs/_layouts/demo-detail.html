@@ -1,0 +1,174 @@
+---
+layout: default
+mermaid: true
+---
+{% assign demo = site.data.demos | where: "slug", page.demo_slug | first %}
+{% assign detail = site.data.demo_pages[page.demo_slug] %}
+
+<div class="detail-hero">
+  <div class="detail-hero__row">
+    <div class="detail-hero__content">
+      <div class="detail-hero__main">
+        <p class="detail-status detail-status--active">{{ demo.category | capitalize }}</p>
+        <h1>{{ demo.title }}</h1>
+        <p class="subtitle">{{ demo.subtitle }}</p>
+        {% if detail.one_liner %}
+          <p class="detail-one-liner"><em>{{ detail.one_liner }}</em></p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="detail-hero__actions">
+      {% include demo-cta.html demo=demo %}
+    </div>
+  </div>
+  <hr class="detail-divider">
+</div>
+
+<div class="detail-meta-bar">
+  <span class="detail-meta-bar__author">Author: {{ demo.author | default: "Unknown" }}</span>
+</div>
+
+{% assign description = detail.description %}
+{% if description or detail.why_it_matters %}
+<section class="detail-overview">
+  {% if description %}
+  <div class="detail-overview__col detail-section" id="description">
+    <h2>Description</h2>
+    <p>{{ description }}</p>
+  </div>
+  {% endif %}
+  {% if detail.why_it_matters %}
+  <div class="detail-overview__col detail-section detail-overview__value" id="why-it-matters">
+    <h2>Why it matters</h2>
+    <ul class="detail-list">
+      {% for item in detail.why_it_matters %}
+        <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if detail.prerequisites %}
+<section class="detail-section" id="prerequisites">
+  <h2>Prerequisites</h2>
+  <ul class="detail-list">
+    {% for item in detail.prerequisites %}
+      <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if detail.credential_setup %}
+<section class="detail-section" id="credential-setup">
+  <h2>{{ detail.credential_setup.title }}</h2>
+  <ol class="detail-list">
+    {% for step in detail.credential_setup.steps %}
+      <li>{{ step }}</li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if detail.survey_prompts %}
+<section class="detail-section" id="survey-prompts">
+  <h2>Survey prompts</h2>
+  <div class="detail-table-wrap">
+    <table class="detail-table">
+      <thead>
+        <tr>
+          <th>Prompt</th>
+          <th>Variable</th>
+          <th>Type</th>
+          <th>Required</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for prompt in detail.survey_prompts %}
+          <tr>
+            <td>{{ prompt.question }}</td>
+            <td><code>{{ prompt.variable }}</code></td>
+            <td>{{ prompt.type }}</td>
+            <td>{{ prompt.required | default: "Yes" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+{% if demo.workflow_mermaid %}
+<section class="detail-section" id="workflow">
+  <h2>Workflow</h2>
+  {% include workflow-diagram.html mermaid=demo.workflow_mermaid %}
+</section>
+{% endif %}
+
+{% if detail.walkthrough %}
+<section class="detail-section" id="walkthrough">
+  <h2>Presenter walkthrough</h2>
+  <ol class="detail-list">
+    {% for step in detail.walkthrough %}
+      <li>{{ step }}</li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if detail.talking_points %}
+<section class="detail-section" id="talking-points">
+  <h2>Talking points</h2>
+  <ul class="detail-list">
+    {% for point in detail.talking_points %}
+      <li>{{ point }}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if detail.job_templates %}
+<section class="detail-section" id="job-templates">
+  <h2>Job templates</h2>
+  <div class="detail-table-wrap">
+    <table class="detail-table">
+      <thead>
+        <tr>
+          <th>Template name</th>
+          <th>Playbook</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for jt in detail.job_templates %}
+          <tr>
+            <td>{{ jt.name }}</td>
+            <td><code>{{ jt.playbook }}</code></td>
+            <td>{{ jt.description }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+{% if detail.related_demos %}
+<section class="detail-section" id="related-demos">
+  <h2>Related demos</h2>
+  <ul class="detail-list">
+    {% for item in detail.related_demos %}
+      <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if detail.special_thanks %}
+<section class="detail-section detail-special-thanks" id="special-thanks">
+  <h2>Special thanks</h2>
+  <p>{{ detail.special_thanks }}</p>
+</section>
+{% endif %}

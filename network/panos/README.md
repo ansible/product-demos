@@ -51,7 +51,7 @@ The "NETWORK | Panos | Demo Firewall Workflow" workflow automates the following 
 
 1. In AAP, display the "NETWORK | Panos | Demo Firewall Workflow" workflow job template and walk through the individual steps.  Click on the "Infrastructure -> Credentials" tab and display the "Palo Alto Bastion" and "Palo Alto Network Admin" credentials, noting that they have a placeholder values for the host details.  Click on the "Infrastructure -> Hosts" tab to show that the Demo instances do not yet exist.
 
-1. Run the "NETWORK | Panos | Demo Firewall Workflow" workflow job template. 
+1. Run the "NETWORK | Panos | Demo Firewall Workflow" workflow job template.
 
 1. The workflow takes roughly 25 minutes to complete, the majority of that time is waiting for the virtual firewall instance to stand up and be in a ready state. During this time frame, I recommend reviewing the architecture diagram and explaining the mechanisms used to complete the deployment:
    - Provisioning AWS resources with the [amazon.aws](https://console.redhat.com/ansible/automation-hub/collections/published/amazon/aws/details) collection (API-driven)
@@ -65,7 +65,7 @@ The "NETWORK | Panos | Demo Firewall Workflow" workflow automates the following 
 
 1. After logging into the management portal and confirming the webserver is up, launch the "NETWORK | Panos | Configure Security Rule" job template. The survey defaults are set to deny traffic to the webserver. Without making any changes, submit the survey and wait for execution to complete.
 
-1. After updating the security rule, return to the tab used to connect to the webserver and refresh. Observe that the web page does not load because traffic is denied ⛔ 
+1. After updating the security rule, return to the tab used to connect to the webserver and refresh. Observe that the web page does not load because traffic is denied ⛔
 
 1. In the management portal, you can navigate to the Monitor (tab) and select Traffic logs (side-menu). Observe the logs based on traffic you initiated before and after modifying the security rule.
 

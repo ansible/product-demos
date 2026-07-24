@@ -11,6 +11,7 @@
 - name: Check if selinux is enabled
   ansible.builtin.command: getenforce
   register: selinux_status
+  changed_when: false
 
 - name: Check IP address
   ansible.builtin.debug:

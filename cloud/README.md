@@ -28,7 +28,7 @@ This category of demos shows examples of multi-cloud provisioning and management
 
 - **Deploy Cloud Stack in AWS** - Provisions the full demo stack (VPC, keypair, five VMs, reports). See [Suggested Usage](#suggested-usage).
 - **Destroy Cloud Stack in AWS** - Tears down everything created by Deploy Cloud Stack in AWS. See [Suggested Usage](#suggested-usage).
-- **Cloud / AWS / Patch EC2 Workflow** - Snapshot, patch, and optionally restore Linux instances.
+- **Patch Cloud Stack in AWS** - Snapshot, pre-check, patch, post-check (or restore on failure), and compliance report for both RHEL and Windows instances. See [Suggested Usage](#suggested-usage).
 
 ### Inventory
 
@@ -101,11 +101,47 @@ The workflow:
 
 **Note:** S3 report buckets created during deploy (`reports-pd-*`) are not deleted by this workflow.
 
+### Patch Cloud Stack in AWS
+
+This workflow demonstrates enterprise-grade patching with snapshot safety, parallel RHEL/Windows paths, automatic rollback on failure, and a consolidated compliance report. It is designed to run against the VMs deployed by **Deploy Cloud Stack in AWS** and covers both operating systems in a single execution. Based on [jopaik/patch_demo](https://github.com/jopaik/patch_demo).
+
+Launch the workflow and complete the survey:
+
+| Prompt | Purpose |
+|--------|---------|
+| **AWS Region** | Region where the stack is deployed |
+| **RHEL Advisory IDs** | Comma-separated RHSA/CVE IDs to patch (e.g. `RHSA-2024:3138, CVE-2024-33599`) |
+| **Windows KB IDs** | Comma-separated KB IDs to patch (e.g. `KB5044284, KB5044030`) |
+
+The workflow:
+
+```
+Take Snapshot
+├─→ Pre-check RHEL ─→ Patch RHEL
+│       ├─ (success) Post-check RHEL ──→ (always) ──┐
+│       └─ (fail)    Restore RHEL from Snapshot      │
+├─→ Pre-check Windows ─→ Patch Windows              │
+│       ├─ (success) Post-check Windows ─→ (always) ─┤
+│       └─ (fail)    Restore Windows from Snapshot    │
+└──────────────────────────────────────────────────── ALL → Compliance Report
+```
+
+1. **Take Snapshot** — EBS snapshots of all target instances for recovery
+2. **Pre-check** (parallel) — Queries advisory/KB applicability on RHEL and Windows
+3. **Patch** (parallel) — Applies targeted advisories via `dnf` (RHEL) or `win_updates` (Windows)
+4. **Post-check / Restore** — Verifies compliance; on failure restores from the EBS snapshot taken in step 1
+5. **Compliance Report** — Generates an HTML dashboard at `http://<reports>/patch_report.html` (runs only when at least one post-check completes)
+
+**Prerequisites:**
+- Run **Deploy Cloud Stack in AWS** first to create the target VMs
+- AWS credential configured
+- SSH private key on **APD Machine Credential**
+
+> **Note:** This workflow replaces the older *Cloud / AWS / Patch EC2 Workflow* and adds Windows support, pre/post verification, and snapshot-based restore on failure. The rollback job templates (`Cloud | AWS | Patch Rollback RHEL` / `Windows`) are also available as standalone jobs for undoing patches without a full snapshot restore. See also [Linux / Patching](../linux/README.md) and [Windows / Patching](../windows/README.md) for standalone OS-specific patching jobs.
+
 ### Other jobs
 
 **Cloud / Create VM** - The Create VM job builds a VM in the given provider based on the included `demo.cloud` collection. VM [blueprints](blueprints/) define variables for each provider that override the defaults in the collection. When creating VMs it is recommended to follow naming conventions that can be used as host patterns. (eg. VM names: `win1`, `win2`, `win3`.  Host Pattern: `win*` )
-
-**Cloud / AWS / Patch EC2 Workflow** - Create a VPC and one or more linux VM(s) in AWS using the `Cloud / Create VPC` and `Cloud / Create VM` templates. Run the workflow and observe the instance snapshots followed by patching operation. Optionally, use the survey to force a patch failure in order to demonstrate the restore path. At this time, the workflow does not support patching Windows instances.
 
 **Cloud / AWS / Resize EC2** - Given an EC2 instance, change its size. This takes an AWS region, target host pattern, and a target instance size as parameters. As a final step, this job refreshes the AWS inventory so the re-created instance is accessible from AAP.
 

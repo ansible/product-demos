@@ -14,6 +14,10 @@ The Ansible Product Demos (APD) project is a set of Ansible demos that run on th
 | [OpenShift](openshift/README.md) | OpenShift automation demos |
 | [Satellite](satellite/README.md) | Demos of automation with Red Hat Satellite Server |
 
+## Demo catalog
+
+Browse all demos, presenter guides, and walkthroughs on the **[Ansible Product Demos — GitHub Pages site](https://ipvsean.github.io/product-demos/)**.
+
 ## Installation
 
 APD can be added to an existing AAP deployment by running the installation playbook.  It relies on the [APD execution environment image](https://quay.io/repository/ansible-product-demos/apd-ee-25) for access to the modules and roles used to apply configuration-as-code to AAP.

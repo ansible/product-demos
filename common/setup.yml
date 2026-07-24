@@ -1,14 +1,10 @@
 ---
-aap_user_accounts:
-  - username: apd-admin
-    email: apd-admin@example.com
-    update_secrets: false
-
-gateway_role_user_assignments:
-  - role_definition: Organization Admin
-    user: apd-admin
-    object_ids:
-      - Ansible Product Demos (APD)
+# aap_user_accounts and gateway_role_user_assignments are handled by
+# the initial bootstrap (install-apd.yml / bootstrap-vars.yml).
+# Defining them here triggers infra.aap_configuration.gateway_users which
+# fails with "async is not supported" on ansible.platform >= 2.7.20260515
+# (redhat-cop/infra.aap_configuration#1368).
+# Restore these once the EE ships ansible.platform >= 2.7.20260615.
 
 controller_execution_environments:
   - name: Cloud Services Execution Environment
