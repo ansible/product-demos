@@ -83,9 +83,12 @@ patch-cloud-stack:
       playbook: cloud/patch_compliance_report.yml
       description: Generates HTML compliance dashboard on the reports server
   related_demos:
-    - "<strong>Deploy Cloud Stack in AWS</strong> — Required prerequisite; creates the five target VMs"
-    - "<strong>Linux | Patching</strong> — Standalone Linux patching job (simpler, no workflow)"
-    - "<strong>Linux | Register with Insights</strong> — Register RHEL hosts with RHSM for full advisory access"
+    - slug: deploy-cloud-stack
+      description: "Required prerequisite; creates the five target VMs"
+    - slug: linux-patching
+      description: "Standalone Linux patching job (simpler, no workflow)"
+    - slug: linux-register-insights
+      description: "Register RHEL hosts with RHSM for full advisory access"
   special_thanks: "Joon Paik <jopaik@redhat.com> — original patch demo author"
 
 cloud-destroy-stack:
@@ -107,7 +110,8 @@ cloud-destroy-stack:
     - "<strong>Launch:</strong> Select the same AWS region used for Deploy. The workflow handles everything else."
     - "<strong>Watch the parallel teardown:</strong> All five VMs are terminated simultaneously, then VPC and keypair cleanup happens."
   related_demos:
-    - "<strong>Deploy Cloud Stack in AWS</strong> — The matching provisioning workflow"
+    - slug: deploy-cloud-stack
+      description: "The matching provisioning workflow"
 
 deploy-cloud-stack:
   description: >-
@@ -148,9 +152,12 @@ deploy-cloud-stack:
     - "<strong>VPC report:</strong> Show the S3 report — a visual summary of what was built."
     - "<strong>Transition:</strong> 'Now that we have infrastructure, let's do something with it' — pivot to patching, compliance, or other demos."
   related_demos:
-    - "<strong>Patch Cloud Stack in AWS</strong> — Run this after deploying to demonstrate day-2 patching"
-    - "<strong>Destroy Cloud Stack in AWS</strong> — Tear down everything when done"
-    - "<strong>Linux | Fact Scan</strong> — Gather facts from the newly deployed RHEL hosts"
+    - slug: patch-cloud-stack
+      description: "Run this after deploying to demonstrate day-2 patching"
+    - slug: cloud-destroy-stack
+      description: "Tear down everything when done"
+    - slug: linux-fact-scan
+      description: "Gather facts from the newly deployed RHEL hosts"
 
 linux-patching:
   description: >-
@@ -188,9 +195,12 @@ linux-patching:
     - "Insights Client scanning after patching closes the loop — your compliance dashboard updates in near real-time."
     - "This is a single job template. For heterogeneous environments with Windows, snapshots, and rollback, we have a full workflow demo."
   related_demos:
-    - "<strong>Patch Cloud Stack in AWS</strong> — Full enterprise patching workflow with snapshots, parallel RHEL/Windows paths, and automatic rollback"
-    - "<strong>LINUX | Register with Insights</strong> — Register hosts with Red Hat Insights for advisory visibility and dynamic inventory"
-    - "<strong>LINUX | Multi-profile Compliance Report</strong> — Run an OpenSCAP report to assess security posture before and after patching"
+    - slug: patch-cloud-stack
+      description: "Full enterprise patching workflow with snapshots, parallel RHEL/Windows paths, and automatic rollback"
+    - slug: linux-register-insights
+      description: "Register hosts with Red Hat Insights for advisory visibility and dynamic inventory"
+    - slug: linux-multi-profile-compliance
+      description: "Run an OpenSCAP report to assess security posture before and after patching"
 
 linux-compliance-workflow:
   description: >-
@@ -246,9 +256,12 @@ linux-compliance-workflow:
     - "The scan-sync-enforce pattern is how enterprises actually implement compliance. This demo mirrors that real-world workflow."
     - "Running the report before and after enforcement gives you a measurable delta — perfect for auditors and compliance officers."
   related_demos:
-    - "<strong>LINUX | Multi-profile Compliance Report</strong> — Run the compliance report standalone to assess posture without enforcing"
-    - "<strong>LINUX | DISA STIG</strong> — Apply DISA STIG hardening directly without the workflow wrapper"
-    - "<strong>LINUX | Patching</strong> — Patch first, then run compliance to show a complete day-2 operations story"
+    - slug: linux-multi-profile-compliance
+      description: "Run the compliance report standalone to assess posture without enforcing"
+    - slug: linux-disa-stig
+      description: "Apply DISA STIG hardening directly without the workflow wrapper"
+    - slug: linux-patching
+      description: "Patch first, then run compliance to show a complete day-2 operations story"
 
 windows-patching:
   description: >-
@@ -294,9 +307,12 @@ windows-patching:
     - "The reboot survey option is a small detail that matters in production — operators control when reboots happen, not the automation."
     - "This same patching pattern works on-prem, in AWS, or in Azure. The playbook does not care where the Windows host lives."
   related_demos:
-    - "<strong>Patch Cloud Stack in AWS</strong> — Full workflow with EBS snapshots, parallel RHEL and Windows patching, and automatic rollback"
-    - "<strong>WINDOWS | Install IIS</strong> — Quick Windows demo to show application deployment alongside patching"
-    - "<strong>Setup Active Directory Domain</strong> — Provision a full AD environment to demonstrate domain-joined Windows patching"
+    - slug: patch-cloud-stack
+      description: "Full workflow with EBS snapshots, parallel RHEL and Windows patching, and automatic rollback"
+    - slug: windows-install-iis
+      description: "Quick Windows demo to show application deployment alongside patching"
+    - slug: windows-setup-ad-domain
+      description: "Provision a full AD environment to demonstrate domain-joined Windows patching"
 
 windows-setup-ad-domain:
   description: >-
@@ -393,9 +409,12 @@ windows-setup-ad-domain:
     - "Kerberos validation is the real proof — it shows the domain is functional, not just provisioned."
     - "After this workflow completes, you can pivot to the Helpdesk New User demo to show AD user management."
   related_demos:
-    - "<strong>WINDOWS | AD | New User</strong> — Create users in the domain built by this workflow for a helpdesk self-service demo"
-    - "<strong>WINDOWS | Patching</strong> — Patch the domain-joined Windows hosts to show day-2 operations"
-    - "<strong>Deploy Cloud Stack in AWS</strong> — The general-purpose infrastructure provisioning workflow for mixed OS environments"
+    - slug: windows-ad-new-user
+      description: "Create users in the domain built by this workflow for a helpdesk self-service demo"
+    - slug: windows-patching
+      description: "Patch the domain-joined Windows hosts to show day-2 operations"
+    - slug: deploy-cloud-stack
+      description: "The general-purpose infrastructure provisioning workflow for mixed OS environments"
 
 network-panos-workflow:
   description: >-
@@ -444,6 +463,9 @@ network-panos-workflow:
     - "Three different automation mechanisms in one workflow — cloud provisioning, firewall API, and SSH-based Linux config — all orchestrated by AAP."
     - "After the demo, the Cleanup job template tears down all AWS resources. No orphaned instances, no surprise bills."
   related_demos:
-    - "<strong>NETWORK | Configuration</strong> — Deploy golden configurations to Cisco IOS, IOSXR, and NXOS devices using resource modules"
-    - "<strong>NETWORK | DISA STIG</strong> — Run network DISA STIG compliance checks to show security hardening for network devices"
-    - "<strong>Deploy Cloud Stack in AWS</strong> — Provision the full demo infrastructure including the reports server used by other network demos"
+    - slug: network-configuration
+      description: "Deploy golden configurations to Cisco IOS, IOSXR, and NXOS devices using resource modules"
+    - slug: network-disa-stig
+      description: "Run network DISA STIG compliance checks to show security hardening for network devices"
+    - slug: deploy-cloud-stack
+      description: "Provision the full demo infrastructure including the reports server used by other network demos"
