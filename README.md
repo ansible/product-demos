@@ -60,3 +60,4 @@ See the [contributing guide](CONTRIBUTING.md) for more details on how to customi
 ---
 
 [Privacy statement](https://www.redhat.com/en/about/privacy-policy) | [Terms of use](https://www.redhat.com/en/about/terms-use) | [Security disclosure](https://www.ansible.com/security?hsLang=en-us) | [All policies and guidelines](https://www.redhat.com/en/about/all-policies-guidelines)
+.
