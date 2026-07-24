@@ -402,7 +402,7 @@ a {
 }
 
 .demo-card--featured .demo-card__thumb {
-  aspect-ratio: 16 / 7;
+  aspect-ratio: 16 / 4;
 }
 
 .demo-card__icon {
