@@ -1,12 +1,12 @@
 # Windows Demo Guides
 
-> **Full experience:** Browse the [GitHub Pages demo catalog](https://ipvsean.github.io/product-demos/) for presenter walkthroughs and search/filter.
+> **Full experience:** Browse the [GitHub Pages demo catalog](https://ansible.github.io/product-demos/) for presenter walkthroughs and search/filter.
 
 ## Workflows
 
 | Demo | Description | Detail page |
 |------|-------------|-------------|
-| Setup Active Directory Domain | Full AD setup with DC + domain-joined hosts | [Guide](https://ipvsean.github.io/product-demos/demos/windows-setup-ad-domain/) |
+| Setup Active Directory Domain | Full AD setup with DC + domain-joined hosts | [Guide](https://ansible.github.io/product-demos/demos/windows-setup-ad-domain/) |
 
 ## Standalone jobs
 

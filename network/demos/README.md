@@ -1,12 +1,12 @@
 # Network Demo Guides
 
-> **Full experience:** Browse the [GitHub Pages demo catalog](https://ipvsean.github.io/product-demos/) for workflow diagrams and search/filter.
+> **Full experience:** Browse the [GitHub Pages demo catalog](https://ansible.github.io/product-demos/) for workflow diagrams and search/filter.
 
 ## Workflows
 
 | Demo | Description | Detail page |
 |------|-------------|-------------|
-| Palo Alto Firewall Demo | Deploy + configure PAN-OS | [Guide](https://ipvsean.github.io/product-demos/demos/network-panos-workflow/) |
+| Palo Alto Firewall Demo | Deploy + configure PAN-OS | [Guide](https://ansible.github.io/product-demos/demos/network-panos-workflow/) |
 
 ## Standalone jobs
 

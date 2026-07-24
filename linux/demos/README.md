@@ -1,12 +1,12 @@
 # Linux Demo Guides
 
-> **Full experience:** Browse the [GitHub Pages demo catalog](https://ipvsean.github.io/product-demos/) for presenter walkthroughs and search/filter.
+> **Full experience:** Browse the [GitHub Pages demo catalog](https://ansible.github.io/product-demos/) for presenter walkthroughs and search/filter.
 
 ## Workflows
 
 | Demo | Description | Detail page |
 |------|-------------|-------------|
-| Compliance Workflow | Scan → inventory → remediate | [Guide](https://ipvsean.github.io/product-demos/demos/linux-compliance-workflow/) |
+| Compliance Workflow | Scan → inventory → remediate | [Guide](https://ansible.github.io/product-demos/demos/linux-compliance-workflow/) |
 
 ## Standalone jobs
 

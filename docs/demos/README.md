@@ -1,6 +1,6 @@
 # Ansible Product Demos — Demo Catalog
 
-> **Tip:** For the best experience, browse the [GitHub Pages site](https://ipvsean.github.io/product-demos/) which has search, filtering, workflow diagrams, and presenter walkthroughs.
+> **Tip:** For the best experience, browse the [GitHub Pages site](https://ansible.github.io/product-demos/) which has search, filtering, workflow diagrams, and presenter walkthroughs.
 
 ## Featured demos
 
