@@ -214,6 +214,15 @@ a {
   flex-shrink: 0;
 }
 
+.sidebar-footer__link--issue {
+  color: #f0ab00;
+}
+
+.sidebar-footer__link--issue:hover {
+  color: #f5c451;
+  background: var(--bg-surface);
+}
+
 /* Main */
 .main {
   flex: 1;
