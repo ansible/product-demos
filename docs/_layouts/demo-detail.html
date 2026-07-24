@@ -145,7 +145,7 @@ mermaid: true
         {% for jt in detail.job_templates %}
           <tr>
             <td>{{ jt.name }}</td>
-            <td><code>{{ jt.playbook }}</code></td>
+            <td><a href="https://github.com/ansible/product-demos/blob/main/{{ jt.playbook }}" target="_blank" rel="noopener"><code>{{ jt.playbook }}</code></a></td>
             <td>{{ jt.description }}</td>
           </tr>
         {% endfor %}
