@@ -143,6 +143,9 @@
     audit_hosts: "{{ groups[_hosts | default('os_linux')] | default([]) + groups[_hosts_windows | default('os_windows')] | default([]) }}"
 
   tasks:
+    - name: Ensure swap for DNF operations
+      ansible.builtin.include_tasks: tasks/ensure_swap.yml
+
     - name: Install httpd
       ansible.builtin.dnf:
         name: httpd
