@@ -140,9 +140,8 @@
           return;
         }
 
-        var tag = (e.target.tagName || '').toLowerCase();
-        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
-        if (e.target.closest && e.target.closest('button, [role="tablist"]')) return;
+        var active = document.activeElement;
+        if (active && active !== document.body && active !== document.documentElement) return;
 
         clearTimeout(seqTimer);
         if (e.keyCode === seq[pos]) {
