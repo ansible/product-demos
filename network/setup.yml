@@ -111,17 +111,6 @@ controller_credentials:
       ssh_proxy_host: REPLACEME
       ssh_proxy_username: ec2-user
 
-controller_credentials:
-  - name: Containerlab SSH
-    description: Auto-created by the Containerlab provision playbook
-    organization: Ansible Product Demos (APD)
-    credential_type: Machine
-    state: exists
-    update_secrets: false
-    inputs:
-      username: ec2-user
-      ssh_key_data: REPLACEME
-
 controller_inventory_sources:
   - name: DevNet always-on sandboxes
     source: scm
