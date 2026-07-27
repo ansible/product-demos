@@ -42,6 +42,15 @@
       section.style.display = visible > 0 ? '' : 'none';
     });
 
+    var divider = document.querySelector('.section-divider');
+    if (divider) {
+      var featured = document.getElementById('featured');
+      var allDemos = document.getElementById('all-demos');
+      var showDivider = featured && featured.style.display !== 'none' &&
+                        allDemos && allDemos.style.display !== 'none';
+      divider.style.display = showDivider ? '' : 'none';
+    }
+
     if (emptyState) {
       emptyState.classList.toggle('hidden', visibleCount > 0);
     }
@@ -58,6 +67,17 @@
   if (searchInput) {
     searchInput.addEventListener('input', applyFilters);
   }
+
+  /* Make entire demo-row clickable */
+  document.querySelectorAll('.demo-row[data-href]').forEach(function (row) {
+    row.addEventListener('click', function (e) {
+      if (e.target.closest('a')) return;
+      var href = row.dataset.href;
+      if (href && href !== '#') {
+        window.location.href = href;
+      }
+    });
+  });
 
   applyFilters();
 })();
