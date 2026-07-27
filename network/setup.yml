@@ -110,6 +110,14 @@ controller_credentials:
     inputs:
       ssh_proxy_host: REPLACEME
       ssh_proxy_username: ec2-user
+  - name: Containerlab SSH
+    description: SSH key for the containerlab hypervisor, updated by the provision playbook
+    organization: Ansible Product Demos (APD)
+    credential_type: Machine
+    update_secrets: false
+    state: exists
+    inputs:
+      username: ec2-user
 
 controller_inventory_sources:
   - name: DevNet always-on sandboxes
