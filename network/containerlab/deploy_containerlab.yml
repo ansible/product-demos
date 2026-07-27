@@ -35,10 +35,31 @@
     - vars/main.yml
 
   tasks:
+    - name: Find EBS data volume
+      ansible.builtin.shell:
+        cmd: >-
+          lsblk -dno NAME,SIZE --bytes |
+          awk '$2 > 50000000000 {print "/dev/" $1}' |
+          while read dev; do
+            if ! lsblk -no MOUNTPOINT "$dev" | grep -q '/'; then echo "$dev"; break; fi
+          done
+      register: ebs_detect
+      changed_when: false
+
+    - name: Set EBS device fact
+      ansible.builtin.set_fact:
+        clab_ebs_device: "{{ ebs_detect.stdout | trim }}"
+
+    - name: Fail if no EBS data volume found
+      ansible.builtin.assert:
+        that:
+          - clab_ebs_device | length > 0
+        fail_msg: "No unmounted EBS volume >50GB found"
+
     - name: Format EBS volume
       community.general.filesystem:
         fstype: xfs
-        dev: "{{ clab_aws_ebs_nvme_device }}"
+        dev: "{{ clab_ebs_device }}"
 
     - name: Create mount point
       ansible.builtin.file:
@@ -49,7 +70,7 @@
     - name: Mount EBS volume
       ansible.posix.mount:
         path: "{{ clab_aws_ebs_mount }}"
-        src: "{{ clab_aws_ebs_nvme_device }}"
+        src: "{{ clab_ebs_device }}"
         fstype: xfs
         state: mounted
 
