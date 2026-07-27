@@ -105,12 +105,25 @@
         state: present
       register: clab_keypair
 
-    - name: Save private key  # noqa: no-handler
+    - name: Save private key to AAP credential  # noqa: no-handler
+      ansible.controller.credential:
+        name: Containerlab SSH
+        organization: Ansible Product Demos (APD)
+        credential_type: Machine
+        inputs:
+          username: "{{ clab_aws_admin_user }}"
+          ssh_key_data: "{{ clab_keypair.key.private_key }}"
+        state: present
+      when: clab_keypair.changed
+
+    - name: Save private key locally  # noqa: no-handler
       ansible.builtin.copy:
         content: "{{ clab_keypair.key.private_key }}"
         dest: "{{ playbook_dir }}/{{ clab_aws_keypair_name }}.pem"
         mode: '0600'
-      when: clab_keypair.changed
+      when:
+        - clab_keypair.changed
+        - lookup('ansible.builtin.env', 'AWX_HOST') | length == 0
 
     - name: Find RHEL 9 AMI
       amazon.aws.ec2_ami_info:
