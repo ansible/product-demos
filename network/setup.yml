@@ -202,6 +202,31 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
 
+  - name: "NETWORK | Containerlab | Configure Devices"
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+    project: Ansible Product Demos
+    playbook: network/containerlab/configure_devices.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: clab_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-2
+            - us-west-2
+
   - name: "NETWORK | Containerlab | Teardown Hypervisor"
     job_type: run
     organization: Ansible Product Demos (APD)

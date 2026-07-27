@@ -38,11 +38,13 @@
     - name: Find EBS data volume
       ansible.builtin.shell:
         cmd: >-
+          set -o pipefail &&
           lsblk -dno NAME,SIZE --bytes |
           awk '$2 > 50000000000 {print "/dev/" $1}' |
           while read dev; do
             if ! lsblk -no MOUNTPOINT "$dev" | grep -q '/'; then echo "$dev"; break; fi
           done
+        executable: /bin/bash
       register: ebs_detect
       changed_when: false
 

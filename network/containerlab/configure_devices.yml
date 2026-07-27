@@ -1,0 +1,150 @@
+---
+- name: Discover Containerlab Hypervisor
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - vars/main.yml
+
+  tasks:
+    - name: Discover hypervisor IP from EC2 tags
+      amazon.aws.ec2_instance_info:
+        region: "{{ clab_aws_region | default('us-east-2') }}"
+        filters:
+          "tag:deployment": containerlab
+          "tag:purpose": "{{ clab_aws_purpose_tag }}"
+          instance-state-name: running
+      register: clab_discovered
+
+    - name: Fail if no hypervisor found
+      ansible.builtin.assert:
+        that:
+          - clab_discovered.instances | length > 0
+        fail_msg: "No running containerlab hypervisor found. Deploy the stack first."
+
+    - name: Set hypervisor IP
+      ansible.builtin.set_fact:
+        clab_host_ip: "{{ clab_discovered.instances[0].public_ip_address }}"
+
+    - name: Add n9kv to inventory
+      ansible.builtin.add_host:
+        name: n9kv
+        ansible_host: "{{ clab_host_ip }}"
+        ansible_port: 2122
+        ansible_user: admin
+        ansible_password: "admin@123"
+        ansible_network_os: cisco.nxos.nxos
+        ansible_connection: ansible.netcommon.network_cli
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        groups:
+          - clab_switches
+          - clab_nxos
+
+    - name: Add cat8kv to inventory
+      ansible.builtin.add_host:
+        name: cat8kv
+        ansible_host: "{{ clab_host_ip }}"
+        ansible_port: 2123
+        ansible_user: admin
+        ansible_password: "admin@123"
+        ansible_network_os: cisco.ios.ios
+        ansible_connection: ansible.netcommon.network_cli
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        groups:
+          - clab_routers
+          - clab_ios
+
+    - name: Display target devices
+      ansible.builtin.debug:
+        msg: "Configuring devices via {{ clab_host_ip }}: n9kv (:2122), cat8kv (:2123)"
+
+- name: Configure NX-OS Device
+  hosts: clab_nxos
+  gather_facts: false
+
+  tasks:
+    - name: Configure banner
+      cisco.nxos.nxos_banner:
+        banner: motd
+        text: |
+          *** MANAGED BY ANSIBLE AUTOMATION PLATFORM ***
+          Unauthorized access is prohibited.
+        state: present
+
+    - name: Configure NTP servers
+      cisco.nxos.nxos_ntp_global:
+        config:
+          servers:
+            - server: 216.239.35.0
+            - server: 216.239.35.4
+        state: merged
+
+    - name: Configure SNMP
+      cisco.nxos.nxos_snmp_server:
+        config:
+          communities:
+            - name: public
+              ro: true
+          contact: "Ansible Product Demos"
+          location: "Containerlab on AWS"
+        state: merged
+
+    - name: Gather NX-OS facts
+      cisco.nxos.nxos_facts:
+        gather_subset:
+          - min
+      register: nxos_facts
+
+    - name: Display NX-OS device info
+      ansible.builtin.debug:
+        msg:
+          - "Hostname: {{ nxos_facts.ansible_facts.ansible_net_hostname }}"
+          - "OS Version: {{ nxos_facts.ansible_facts.ansible_net_version }}"
+          - "Model: {{ nxos_facts.ansible_facts.ansible_net_model }}"
+          - "NTP, SNMP, and banner configured successfully"
+
+- name: Configure IOS-XE Device
+  hosts: clab_ios
+  gather_facts: false
+
+  tasks:
+    - name: Configure banner
+      cisco.ios.ios_banner:
+        banner: motd
+        text: |
+          *** MANAGED BY ANSIBLE AUTOMATION PLATFORM ***
+          Unauthorized access is prohibited.
+        state: present
+
+    - name: Configure NTP servers
+      cisco.ios.ios_ntp_global:
+        config:
+          servers:
+            - server: 216.239.35.0
+            - server: 216.239.35.4
+        state: merged
+
+    - name: Configure SNMP
+      cisco.ios.ios_snmp_server:
+        config:
+          communities:
+            - name: public
+              ro: true
+          contact: "Ansible Product Demos"
+          location: "Containerlab on AWS"
+        state: merged
+
+    - name: Gather IOS facts
+      cisco.ios.ios_facts:
+        gather_subset:
+          - min
+      register: ios_facts
+
+    - name: Display IOS-XE device info
+      ansible.builtin.debug:
+        msg:
+          - "Hostname: {{ ios_facts.ansible_facts.ansible_net_hostname }}"
+          - "OS Version: {{ ios_facts.ansible_facts.ansible_net_version }}"
+          - "Model: {{ ios_facts.ansible_facts.ansible_net_model }}"
+          - "NTP, SNMP, and banner configured successfully"
