@@ -1,33 +1,26 @@
 {% assign demo = site.data.demos | where: "slug", page.demo_slug | first %}
-{% assign detail = site.data.demo_pages[page.demo_slug] %}
 
 <nav class="demo-toc" aria-label="On this page">
   <p class="nav-heading">On this page</p>
-  {% if detail.description %}
+  {% if content and content != "" %}
     <a href="#description" class="demo-toc__link">Description</a>
   {% endif %}
-  {% if detail.prerequisites %}
+  {% if page.prerequisites %}
     <a href="#prerequisites" class="demo-toc__link">Prerequisites</a>
   {% endif %}
-  {% if detail.credential_setup %}
+  {% if page.credential_setup %}
     <a href="#credential-setup" class="demo-toc__link">Credential setup</a>
   {% endif %}
-  {% if detail.survey_prompts %}
+  {% if page.survey_prompts %}
     <a href="#survey-prompts" class="demo-toc__link">Survey prompts</a>
   {% endif %}
   {% if demo.workflow_mermaid %}
     <a href="#workflow" class="demo-toc__link">Workflow</a>
   {% endif %}
-  {% if detail.walkthrough %}
-    <a href="#walkthrough" class="demo-toc__link">Presenter walkthrough</a>
-  {% endif %}
-  {% if detail.talking_points %}
-    <a href="#talking-points" class="demo-toc__link">Talking points</a>
-  {% endif %}
-  {% if detail.job_templates %}
+  {% if page.job_templates %}
     <a href="#job-templates" class="demo-toc__link">Job templates</a>
   {% endif %}
-  {% if detail.related_demos %}
+  {% if page.related_demos %}
     <a href="#related-demos" class="demo-toc__link">Related demos</a>
   {% endif %}
 </nav>
