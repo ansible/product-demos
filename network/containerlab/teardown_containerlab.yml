@@ -8,13 +8,28 @@
     - vars/main.yml
 
   tasks:
-    - name: Validate required variables
+    - name: Discover hypervisor IP from EC2 tags
+      amazon.aws.ec2_instance_info:
+        region: "{{ clab_aws_region | default('us-east-2') }}"
+        filters:
+          "tag:deployment": containerlab
+          "tag:purpose": "{{ clab_aws_purpose_tag }}"
+          instance-state-name: running
+      register: clab_discovered
+      when: clab_host_ip is not defined
+
+    - name: Set host IP from discovery
+      ansible.builtin.set_fact:
+        clab_host_ip: "{{ clab_discovered.instances[0].public_ip_address }}"
+      when:
+        - clab_host_ip is not defined
+        - clab_discovered.instances | length > 0
+
+    - name: Fail if no hypervisor found
       ansible.builtin.assert:
         that:
           - clab_host_ip is defined
-          - clab_aws_keypair_name is defined
-        fail_msg: >-
-          clab_host_ip and clab_aws_keypair_name must be set.
+        fail_msg: "No running containerlab hypervisor found"
 
     - name: Add hypervisor to inventory
       ansible.builtin.add_host:
