@@ -74,10 +74,6 @@
       activateCategory(pill.dataset.filterCategory);
     });
 
-    pill.addEventListener('mousedown', function (e) {
-      e.preventDefault();
-    });
-
     pill.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
