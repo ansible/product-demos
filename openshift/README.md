@@ -23,6 +23,13 @@ This category of demos shows examples of OpenShift operations and management wit
     - [**OpenShift / CNV / Restore Latest VM Snapshots**](cnv/snapshot.yml) - Restore VM in CNV to last snapshot.
 - [**OpenShift / CNV / Delete VM**](cnv/install.yml) - Deletes VMs in OpenShift CNV.
 
+**Hosted control planes (HyperShift on KubeVirt)** — deploy and tear down a hosted OpenShift cluster whose workers run as KubeVirt VMs on the management cluster. Requires OpenShift Virtualization (CNV), multicluster engine (MCE), and a management cluster that meets [HyperShift KubeVirt prerequisites](https://hypershift.pages.dev/how-to/kubevirt/create-kubevirt-cluster/) (for example wildcard Routes, default `StorageClass`, `LoadBalancer` support such as MetalLB, and enough worker capacity).
+
+- [**OpenShift / HCP / Install Operator**](hcp/install_operator.yml) — Install the multicluster engine operator and create the `MultiClusterEngine` custom resource (HyperShift components enabled). Uses the shared `demo.openshift.cluster_config` role; channel is defined in `cluster_config` defaults.
+- [**OpenShift / HCP / Management prerequisites**](hcp/management_prereqs.yml) — Patch the default `IngressController` so wildcard DNS routes are allowed (`routeAdmission.wildcardPolicy: WildcardsAllowed`). Run once per management cluster before deploy (or confirm the setting already exists).
+- [**OpenShift / HCP / Deploy**](hcp/deploy.yml) — Create a `HostedCluster` and `NodePool` on the KubeVirt platform (manifests rendered from [`hcp/templates/hostedcluster.yml.j2`](hcp/templates/hostedcluster.yml.j2) and [`hcp/templates/nodepool.yml.j2`](hcp/templates/nodepool.yml.j2)). Job survey sets cluster name, worker count, release image, SSH key, optional etcd `StorageClass`, optional APIServer Route hostname, and related options.
+- [**OpenShift / HCP / Delete**](hcp/delete.yml) — Remove the `NodePool`(s) and `HostedCluster`. Survey can enable finalizer stripping and optional deletion of the `clusters-<name>` control-plane namespace for stuck or partial installs.
+
 ## Pre Setup
 These demos require an OpenShift cluster to deploy to. Luckily the default Ansible Product Demos item from [demo.redhat.com](https://demo.redhat.com) includes an OpenShift cluster. Most of the jobs require an `OpenShift or Kubernetes API Bearer Token` credential in order to interact with OpenShift. When ordered from RHDP this credential is configured for the user.
 
@@ -47,3 +54,7 @@ These demos require an OpenShift cluster to deploy to. Luckily the default Ansib
 - **OpenShift / CNV / Restore Latest VM Snapshots** - restores VMs to their latest snapshot, for the workflow this is invoked upon failure of the patching job. The same host string is used by this job template as the others in the workflow.
 
 **OpenShift / CNV / Delete VM** - Delete VMs based on host string pattern, similar to the other CNV jobs.
+
+**OpenShift / HCP** — Run jobs in order: **CNV / Install Operator** (KubeVirt) → **HCP / Install Operator** (MCE) → **HCP / Management prerequisites** (wildcard routes) → **HCP / Deploy**. Use the **OpenShift** API token credential. Surveys drive cluster name, namespace (default `clusters`), OCP release image, worker replicas, SSH public key for nodes, and optional settings (etcd PVC size/class, CAPK image override, APIServer Route FQDN — if left blank, deploy publishes the API via `LoadBalancer`, which requires a working `LoadBalancer` provider on the management cluster). **HCP / Delete** removes the hosted cluster; enable finalizer stripping only for resources stuck in `Terminating`.
+
+For troubleshooting provisioning (infrastructure not ready, etcd not created yet, APIServer Route hostname errors, or `LoadBalancer` Services pending), see the comment header in [`hcp/deploy.yml`](hcp/deploy.yml) and your MCE/HyperShift support matrix for the chosen release image.

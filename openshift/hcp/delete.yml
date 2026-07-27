@@ -1,0 +1,121 @@
+---
+# Deletes a HostedCluster and its NodePools. Optional finalizer stripping for stuck / Terminating installs.
+- name: Delete Hosted Control Plane (KubeVirt)
+  hosts: localhost
+  gather_facts: false
+  vars:
+    hcp_namespace: clusters
+    hcp_delete_remove_finalizers: false
+    hcp_delete_infra_namespace: false
+  tasks:
+    - name: Validate cluster name
+      ansible.builtin.assert:
+        that:
+          - hcp_cluster_name is defined
+          - hcp_cluster_name | length > 0
+        fail_msg: Set hcp_cluster_name to the HostedCluster name to delete.
+
+    - name: Normalize booleans from survey
+      ansible.builtin.set_fact:
+        hcp_delete_remove_finalizers_effective: >-
+          {{
+            (hcp_delete_remove_finalizers | default(false) | bool)
+            if hcp_delete_remove_finalizers is not string
+            else (hcp_delete_remove_finalizers | lower in ['true', '1', 'yes'])
+          }}
+        hcp_delete_infra_namespace_effective: >-
+          {{
+            (hcp_delete_infra_namespace | default(false) | bool)
+            if hcp_delete_infra_namespace is not string
+            else (hcp_delete_infra_namespace | lower in ['true', '1', 'yes'])
+          }}
+
+    - name: List NodePools for this HostedCluster (label)
+      kubernetes.core.k8s_info:
+        api_version: hypershift.openshift.io/v1beta1
+        kind: NodePool
+        namespace: "{{ hcp_namespace }}"
+        label_selectors:
+          - "hypershift.openshift.io/cluster-name={{ hcp_cluster_name }}"
+      register: r_nodepools
+
+    - name: Build NodePool name list
+      ansible.builtin.set_fact:
+        hcp_nodepool_names: >-
+          {{
+            (r_nodepools.resources | default([]) | map(attribute='metadata.name') | list)
+            | union([hcp_cluster_name + '-workers'])
+            | unique | list
+          }}
+
+    - name: Strip NodePool finalizers (stale / Terminating installs)
+      kubernetes.core.k8s_json_patch:
+        api_version: hypershift.openshift.io/v1beta1
+        kind: NodePool
+        name: "{{ item }}"
+        namespace: "{{ hcp_namespace }}"
+        patch:
+          - op: replace
+            path: /metadata/finalizers
+            value: []
+      loop: "{{ hcp_nodepool_names }}"
+      when: hcp_delete_remove_finalizers_effective | bool
+      failed_when: false
+
+    - name: Delete NodePools
+      kubernetes.core.k8s:
+        state: absent
+        api_version: hypershift.openshift.io/v1beta1
+        kind: NodePool
+        name: "{{ item }}"
+        namespace: "{{ hcp_namespace }}"
+        wait: true
+        wait_timeout: 600
+      loop: "{{ hcp_nodepool_names }}"
+
+    - name: Strip HostedCluster finalizers (stale / Terminating installs)
+      kubernetes.core.k8s_json_patch:
+        api_version: hypershift.openshift.io/v1beta1
+        kind: HostedCluster
+        name: "{{ hcp_cluster_name }}"
+        namespace: "{{ hcp_namespace }}"
+        patch:
+          - op: replace
+            path: /metadata/finalizers
+            value: []
+      when: hcp_delete_remove_finalizers_effective | bool
+      failed_when: false
+
+    - name: Delete HostedCluster
+      kubernetes.core.k8s:
+        state: absent
+        api_version: hypershift.openshift.io/v1beta1
+        kind: HostedCluster
+        name: "{{ hcp_cluster_name }}"
+        namespace: "{{ hcp_namespace }}"
+        wait: true
+        wait_timeout: 900
+
+    - name: Delete HyperShift infra namespace clusters-NAME (leftover control-plane namespace)
+      when: hcp_delete_infra_namespace_effective | bool
+      block:
+        - name: Strip namespace finalizers if stuck
+          kubernetes.core.k8s_json_patch:
+            api_version: v1
+            kind: Namespace
+            name: "clusters-{{ hcp_cluster_name }}"
+            patch:
+              - op: replace
+                path: /metadata/finalizers
+                value: []
+          when: hcp_delete_remove_finalizers_effective | bool
+          failed_when: false
+
+        - name: Remove infra namespace
+          kubernetes.core.k8s:
+            state: absent
+            api_version: v1
+            kind: Namespace
+            name: "clusters-{{ hcp_cluster_name }}"
+            wait: true
+            wait_timeout: 600

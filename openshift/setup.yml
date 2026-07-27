@@ -46,6 +46,150 @@ controller_templates:
     credentials:
       - OpenShift Credential
 
+  - name: OpenShift | HCP | Install Operator
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "openshift/hcp/install_operator.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    credentials:
+      - OpenShift Credential
+
+  - name: OpenShift | HCP | Management prerequisites
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "openshift/hcp/management_prereqs.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - OpenShift Credential
+
+  - name: OpenShift | HCP | Deploy
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "openshift/hcp/deploy.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: HCP / HostedCluster name (DNS label)
+          type: text
+          variable: hcp_cluster_name
+          default: demo-hcp
+          required: true
+        - question_name: Number of KubeVirt worker nodes (NodePool replicas)
+          type: integer
+          variable: hcp_worker_replicas
+          default: 1
+          required: true
+        - question_name: Namespace for HostedCluster and NodePool
+          type: text
+          variable: hcp_namespace
+          default: clusters
+          required: true
+        - question_name: OCP release image (pullspec)
+          type: text
+          variable: ocp_release_image
+          default: quay.io/openshift-release-dev/ocp-release:4.16.20-x86_64
+          required: true
+        - question_name: APIServer Route hostname (FQDN, optional). Blank = use LoadBalancer for APIServer (needs MetalLB/LB). Set to use Route for API (required hostname for APIServer+Route).
+          type: text
+          variable: hcp_apiserver_route_hostname
+          required: false
+        - question_name: Worker SSH public key (id_rsa.pub content)
+          type: textarea
+          variable: hcp_ssh_public_key
+          required: true
+        - question_name: Copy pull-secret from openshift-config into the target namespace
+          type: multiplechoice
+          variable: hcp_copy_pull_secret
+          default: "true"
+          required: true
+          choices:
+            - "true"
+            - "false"
+        - question_name: KubeVirt root volume size (NodePool)
+          type: text
+          variable: hcp_kubevirt_root_volume_size
+          default: 64Gi
+          required: true
+        - question_name: KubeVirt worker memory
+          type: text
+          variable: hcp_kubevirt_node_memory
+          default: 8Gi
+          required: true
+        - question_name: KubeVirt worker vCPU cores
+          type: text
+          variable: hcp_kubevirt_node_cores
+          default: "4"
+          required: true
+        - question_name: Etcd PVC size (hosted control plane etcd)
+          type: text
+          variable: hcp_etcd_volume_size
+          default: "8Gi"
+          required: true
+        - question_name: Etcd StorageClass (set if management cluster has no default StorageClass; blank uses cluster default)
+          type: text
+          variable: hcp_etcd_storage_class
+          required: false
+        - question_name: Optional CAPI KubeVirt provider image pullspec (only if HyperShift requires an explicit CAPK image)
+          type: text
+          variable: hcp_capi_provider_kubevirt_image
+          required: false
+    credentials:
+      - OpenShift Credential
+
+  - name: OpenShift | HCP | Delete
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "openshift/hcp/delete.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: HCP / HostedCluster name to delete
+          type: text
+          variable: hcp_cluster_name
+          required: true
+        - question_name: Namespace where HostedCluster lives
+          type: text
+          variable: hcp_namespace
+          default: clusters
+          required: true
+        - question_name: Strip finalizers first (use for stuck Terminating / failed installs)
+          type: multiplechoice
+          variable: hcp_delete_remove_finalizers
+          default: "false"
+          required: true
+          choices:
+            - "false"
+            - "true"
+        - question_name: Also delete infra namespace clusters-NAME if it remains (advanced cleanup)
+          type: multiplechoice
+          variable: hcp_delete_infra_namespace
+          default: "false"
+          required: true
+          choices:
+            - "false"
+            - "true"
+    credentials:
+      - OpenShift Credential
+
   - name: OpenShift | CNV | Create RHEL VM
     job_type: run
     inventory: Ansible Product Demos Inventory
@@ -335,3 +479,4 @@ controller_workflows:
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: OpenShift | CNV | Patch CNV Workflow | Failed to restore CNV VM from snapshot
+
