@@ -10,9 +10,11 @@
     target_kb_ids: "{{ (_raw_kb_input.split(',') | map('trim') | list) if _raw_kb_input is string else _raw_kb_input }}"
 
   tasks:
-    - name: Clear stale compliance facts from previous runs
+    - name: Clear stale facts from previous runs
       ansible.builtin.set_fact:
         compliance_status: null
+        rhsm_registered: null
+        rhsm_unregistered: null
         cacheable: true
 
     - name: RHEL audit block
@@ -25,7 +27,7 @@
 
         - name: Ensure swap for DNF operations
           ansible.builtin.include_tasks: tasks/ensure_swap.yml
-          when: rhsm_registered
+          when: rhsm_registered | default(false)
 
         - name: Check RHEL for targeted advisories
           ansible.builtin.command: >-
@@ -33,20 +35,20 @@
             {{ cve_advisory_ids | map('regex_replace', '^', '--advisory=') | join(' ') }}
           register: rhel_target_check
           changed_when: false
-          when: rhsm_registered
+          when: rhsm_registered | default(false)
 
         - name: Get all missing security advisories
           ansible.builtin.command: "dnf updateinfo list security --quiet --setopt=metadata_expire=7200"
           register: rhel_all_vulns
           changed_when: false
-          when: rhsm_registered
+          when: rhsm_registered | default(false)
 
         - name: Check if RHEL needs a reboot
           ansible.builtin.command: "needs-restarting -r"
           register: rhel_reboot_check
           failed_when: false
           changed_when: false
-          when: rhsm_registered
+          when: rhsm_registered | default(false)
 
         - name: Set RHEL compliance facts (registered host)
           ansible.builtin.set_fact:
@@ -57,7 +59,7 @@
                  | select('string') | list | unique }}
             reboot_needed: "{{ 'YES' if rhel_reboot_check.rc != 0 else 'NO' }}"
             cacheable: true
-          when: rhsm_registered
+          when: rhsm_registered | default(false)
 
         - name: Set RHEL compliance facts (unregistered host)
           ansible.builtin.set_fact:

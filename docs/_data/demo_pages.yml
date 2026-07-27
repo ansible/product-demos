@@ -83,9 +83,12 @@ patch-cloud-stack:
       playbook: cloud/patch_compliance_report.yml
       description: Generates HTML compliance dashboard on the reports server
   related_demos:
-    - "<strong>Deploy Cloud Stack in AWS</strong> — Required prerequisite; creates the five target VMs"
-    - "<strong>Linux | Patching</strong> — Standalone Linux patching job (simpler, no workflow)"
-    - "<strong>Linux | Register with Insights</strong> — Register RHEL hosts with RHSM for full advisory access"
+    - slug: deploy-cloud-stack
+      description: "Required prerequisite; creates the five target VMs"
+    - slug: linux-patching
+      description: "Standalone Linux patching job (simpler, no workflow)"
+    - slug: linux-register-insights
+      description: "Register RHEL hosts with RHSM for full advisory access"
   special_thanks: "Joon Paik <jopaik@redhat.com> — original patch demo author"
 
 cloud-destroy-stack:
@@ -107,7 +110,8 @@ cloud-destroy-stack:
     - "<strong>Launch:</strong> Select the same AWS region used for Deploy. The workflow handles everything else."
     - "<strong>Watch the parallel teardown:</strong> All five VMs are terminated simultaneously, then VPC and keypair cleanup happens."
   related_demos:
-    - "<strong>Deploy Cloud Stack in AWS</strong> — The matching provisioning workflow"
+    - slug: deploy-cloud-stack
+      description: "The matching provisioning workflow"
 
 deploy-cloud-stack:
   description: >-
@@ -148,9 +152,12 @@ deploy-cloud-stack:
     - "<strong>VPC report:</strong> Show the S3 report — a visual summary of what was built."
     - "<strong>Transition:</strong> 'Now that we have infrastructure, let's do something with it' — pivot to patching, compliance, or other demos."
   related_demos:
-    - "<strong>Patch Cloud Stack in AWS</strong> — Run this after deploying to demonstrate day-2 patching"
-    - "<strong>Destroy Cloud Stack in AWS</strong> — Tear down everything when done"
-    - "<strong>Linux | Fact Scan</strong> — Gather facts from the newly deployed RHEL hosts"
+    - slug: patch-cloud-stack
+      description: "Run this after deploying to demonstrate day-2 patching"
+    - slug: cloud-destroy-stack
+      description: "Tear down everything when done"
+    - slug: linux-fact-scan
+      description: "Gather facts from the newly deployed RHEL hosts"
 
 linux-patching:
   description: >-
@@ -188,9 +195,12 @@ linux-patching:
     - "Insights Client scanning after patching closes the loop — your compliance dashboard updates in near real-time."
     - "This is a single job template. For heterogeneous environments with Windows, snapshots, and rollback, we have a full workflow demo."
   related_demos:
-    - "<strong>Patch Cloud Stack in AWS</strong> — Full enterprise patching workflow with snapshots, parallel RHEL/Windows paths, and automatic rollback"
-    - "<strong>LINUX | Register with Insights</strong> — Register hosts with Red Hat Insights for advisory visibility and dynamic inventory"
-    - "<strong>LINUX | Multi-profile Compliance Report</strong> — Run an OpenSCAP report to assess security posture before and after patching"
+    - slug: patch-cloud-stack
+      description: "Full enterprise patching workflow with snapshots, parallel RHEL/Windows paths, and automatic rollback"
+    - slug: linux-register-insights
+      description: "Register hosts with Red Hat Insights for advisory visibility and dynamic inventory"
+    - slug: linux-multi-profile-compliance
+      description: "Run an OpenSCAP report to assess security posture before and after patching"
 
 linux-compliance-workflow:
   description: >-
@@ -246,9 +256,12 @@ linux-compliance-workflow:
     - "The scan-sync-enforce pattern is how enterprises actually implement compliance. This demo mirrors that real-world workflow."
     - "Running the report before and after enforcement gives you a measurable delta — perfect for auditors and compliance officers."
   related_demos:
-    - "<strong>LINUX | Multi-profile Compliance Report</strong> — Run the compliance report standalone to assess posture without enforcing"
-    - "<strong>LINUX | DISA STIG</strong> — Apply DISA STIG hardening directly without the workflow wrapper"
-    - "<strong>LINUX | Patching</strong> — Patch first, then run compliance to show a complete day-2 operations story"
+    - slug: linux-multi-profile-compliance
+      description: "Run the compliance report standalone to assess posture without enforcing"
+    - slug: linux-disa-stig
+      description: "Apply DISA STIG hardening directly without the workflow wrapper"
+    - slug: linux-patching
+      description: "Patch first, then run compliance to show a complete day-2 operations story"
 
 windows-patching:
   description: >-
@@ -294,9 +307,12 @@ windows-patching:
     - "The reboot survey option is a small detail that matters in production — operators control when reboots happen, not the automation."
     - "This same patching pattern works on-prem, in AWS, or in Azure. The playbook does not care where the Windows host lives."
   related_demos:
-    - "<strong>Patch Cloud Stack in AWS</strong> — Full workflow with EBS snapshots, parallel RHEL and Windows patching, and automatic rollback"
-    - "<strong>WINDOWS | Install IIS</strong> — Quick Windows demo to show application deployment alongside patching"
-    - "<strong>Setup Active Directory Domain</strong> — Provision a full AD environment to demonstrate domain-joined Windows patching"
+    - slug: patch-cloud-stack
+      description: "Full workflow with EBS snapshots, parallel RHEL and Windows patching, and automatic rollback"
+    - slug: windows-install-iis
+      description: "Quick Windows demo to show application deployment alongside patching"
+    - slug: windows-setup-ad-domain
+      description: "Provision a full AD environment to demonstrate domain-joined Windows patching"
 
 windows-setup-ad-domain:
   description: >-
@@ -393,9 +409,12 @@ windows-setup-ad-domain:
     - "Kerberos validation is the real proof — it shows the domain is functional, not just provisioned."
     - "After this workflow completes, you can pivot to the Helpdesk New User demo to show AD user management."
   related_demos:
-    - "<strong>WINDOWS | AD | New User</strong> — Create users in the domain built by this workflow for a helpdesk self-service demo"
-    - "<strong>WINDOWS | Patching</strong> — Patch the domain-joined Windows hosts to show day-2 operations"
-    - "<strong>Deploy Cloud Stack in AWS</strong> — The general-purpose infrastructure provisioning workflow for mixed OS environments"
+    - slug: windows-ad-new-user
+      description: "Create users in the domain built by this workflow for a helpdesk self-service demo"
+    - slug: windows-patching
+      description: "Patch the domain-joined Windows hosts to show day-2 operations"
+    - slug: deploy-cloud-stack
+      description: "The general-purpose infrastructure provisioning workflow for mixed OS environments"
 
 network-panos-workflow:
   description: >-
@@ -444,6 +463,1333 @@ network-panos-workflow:
     - "Three different automation mechanisms in one workflow — cloud provisioning, firewall API, and SSH-based Linux config — all orchestrated by AAP."
     - "After the demo, the Cleanup job template tears down all AWS resources. No orphaned instances, no surprise bills."
   related_demos:
-    - "<strong>NETWORK | Configuration</strong> — Deploy golden configurations to Cisco IOS, IOSXR, and NXOS devices using resource modules"
-    - "<strong>NETWORK | DISA STIG</strong> — Run network DISA STIG compliance checks to show security hardening for network devices"
-    - "<strong>Deploy Cloud Stack in AWS</strong> — Provision the full demo infrastructure including the reports server used by other network demos"
+    - slug: network-configuration
+      description: "Deploy golden configurations to Cisco IOS, IOSXR, and NXOS devices using resource modules"
+    - slug: network-disa-stig
+      description: "Run network DISA STIG compliance checks to show security hardening for network devices"
+    - slug: deploy-cloud-stack
+      description: "Provision the full demo infrastructure including the reports server used by other network demos"
+
+cloud-create-vpc:
+  description: >-
+    Provisions an AWS VPC with subnet, internet gateway, route table, and security group. Supports
+    multiple regions with configurable availability zones. This is a building-block playbook used
+    by the Deploy Cloud Stack workflow and can also be run standalone.
+  one_liner: "Create a full VPC with networking in one playbook"
+  prerequisites:
+    - "AWS credential configured with Access and Secret key"
+    - "Run <strong>APD | Single demo setup</strong> with <code>cloud</code> to create the job template"
+  job_templates:
+    - name: "Cloud | AWS | Create VPC"
+      playbook: cloud/create_vpc.yml
+      description: Provisions VPC, subnet, security group, internet gateway, and route table in the selected region
+  related_demos:
+    - slug: deploy-cloud-stack
+      description: "Uses this playbook as part of the full stack deployment workflow"
+    - slug: cloud-create-keypair
+      description: "Create an SSH keypair to use with VMs in this VPC"
+
+cloud-create-keypair:
+  description: >-
+    Creates an AWS EC2 keypair from the SSH public key attached to the APD Machine Credential. If
+    no public key is supplied via survey, the playbook derives it automatically from the machine
+    credential private key.
+  one_liner: "Generate an SSH keypair in AWS from your machine credential"
+  prerequisites:
+    - "AWS credential configured"
+    - "<strong>APD Machine Credential</strong> with an SSH private key"
+  job_templates:
+    - name: "Cloud | AWS | Create Keypair"
+      playbook: cloud/aws_key.yml
+      description: Creates or updates an EC2 keypair, deriving the public key from the machine credential if not provided
+  related_demos:
+    - slug: deploy-cloud-stack
+      description: "Uses this playbook as part of the full stack deployment workflow"
+    - slug: cloud-create-vpc
+      description: "Create the VPC where you will launch VMs using this keypair"
+
+cloud-create-vm:
+  description: >-
+    Launches an EC2 instance from a blueprint definition. Blueprints are YAML files under
+    cloud/blueprints/ that define AMI, instance type, security group, tags, and user data. Supports
+    both Linux and Windows instances with automatic WinRM bootstrapping for Windows.
+  one_liner: "Launch an EC2 instance from a reusable blueprint"
+  prerequisites:
+    - "AWS credential configured"
+    - "A VPC, subnet, security group, and keypair already created"
+    - "A blueprint file under <code>cloud/blueprints/</code>"
+  survey_prompts:
+    - question: AWS Region
+      variable: create_vm_aws_region
+      type: multiplechoice
+      required: "Yes"
+  job_templates:
+    - name: "Cloud | AWS | Create VM"
+      playbook: cloud/create_vm.yml
+      description: Provisions an EC2 instance using a blueprint, sets tags, and waits for connectivity
+  related_demos:
+    - slug: deploy-cloud-stack
+      description: "Launches multiple VMs in parallel using this playbook"
+    - slug: cloud-delete-vm
+      description: "Terminate VMs created by this playbook"
+
+cloud-delete-vm:
+  description: >-
+    Terminates an EC2 instance by its Name tag. Looks up the instance in the specified region and
+    terminates it, waiting for the instance to fully shut down. Safe to run even if the instance
+    has already been terminated.
+  one_liner: "Terminate an EC2 instance by name"
+  prerequisites:
+    - "AWS credential configured"
+    - "An existing EC2 instance to terminate"
+  survey_prompts:
+    - question: VM Name
+      variable: create_vm_vm_name
+      type: text
+      required: "Yes"
+    - question: AWS Region
+      variable: create_vm_aws_region
+      type: multiplechoice
+      required: "Yes"
+  job_templates:
+    - name: "Cloud | AWS | Delete VM"
+      playbook: cloud/delete_vm_by_name.yml
+      description: Finds and terminates an EC2 instance by its Name tag
+  related_demos:
+    - slug: cloud-create-vm
+      description: "Create VMs that can be cleaned up with this playbook"
+    - slug: cloud-destroy-stack
+      description: "Tear down the entire demo stack at once"
+
+cloud-resize-ec2:
+  description: >-
+    Changes the instance type of one or more EC2 instances. Useful for demonstrating vertical
+    scaling -- resize a t2.micro to a t2.large and back without reprovisioning.
+  one_liner: "Change EC2 instance type for vertical scaling"
+  prerequisites:
+    - "AWS credential configured"
+    - "Running EC2 instances to resize"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "Cloud | AWS | Resize EC2"
+      playbook: cloud/resize_ec2.yml
+      description: Stops the instance, changes instance type, and restarts it
+  related_demos:
+    - slug: cloud-snapshot-ec2
+      description: "Take a snapshot before resizing as a safety measure"
+    - slug: deploy-cloud-stack
+      description: "Create instances to resize"
+
+cloud-snapshot-ec2:
+  description: >-
+    Creates EBS snapshots of all volumes attached to the target EC2 instances. Used as a safety net
+    before patching or other changes -- if something goes wrong, you can restore from these
+    snapshots.
+  one_liner: "EBS snapshot for backup before changes"
+  prerequisites:
+    - "AWS credential configured"
+    - "Running EC2 instances to snapshot"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "Cloud | AWS | Snapshot EC2"
+      playbook: cloud/snapshot_ec2.yml
+      description: Creates EBS snapshots of all volumes on the target instances
+  related_demos:
+    - slug: cloud-restore-ec2
+      description: "Restore instances from snapshots created by this playbook"
+    - slug: patch-cloud-stack
+      description: "The patching workflow uses snapshots as its safety net"
+
+cloud-restore-ec2:
+  description: >-
+    Restores EC2 instance volumes from the most recent EBS snapshot. This is the rollback mechanism
+    used by the patching workflow -- if patching fails, instances are restored to the pre-patch
+    state.
+  one_liner: "Restore EC2 volumes from the latest snapshot"
+  prerequisites:
+    - "AWS credential configured"
+    - "A previous snapshot taken with <strong>Cloud | AWS | Snapshot EC2</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "Cloud | AWS | Restore EC2 from Snapshot"
+      playbook: cloud/restore_ec2.yml
+      description: Restores volumes from the latest EBS snapshot for the target instances
+  related_demos:
+    - slug: cloud-snapshot-ec2
+      description: "Take snapshots before making changes"
+    - slug: patch-cloud-stack
+      description: "The patching workflow automates snapshot/restore on failure"
+
+cloud-peer-networking:
+  description: >-
+    Creates a multi-VPC peered network topology with a DMZ and private network. Provisions VPCs,
+    subnets, peering connections, route tables, and EC2 instances in each zone. Configures SSH
+    bastion access from DMZ hosts to private network hosts.
+  one_liner: "Build a multi-VPC peered network with DMZ and bastion access"
+  prerequisites:
+    - "AWS credential configured"
+    - "SSH keypair for DMZ and private network hosts"
+  job_templates:
+    - name: "Cloud | AWS | Create Peer Infrastructure"
+      playbook: cloud/create_peer_network.yml
+      description: Provisions peered VPCs, subnets, instances, and configures SSH bastion access
+  related_demos:
+    - slug: cloud-transit-networking
+      description: "Alternative hub-and-spoke topology using transit gateways"
+    - slug: cloud-create-vpc
+      description: "Standalone VPC creation for simpler setups"
+
+cloud-transit-networking:
+  description: >-
+    Creates a hub-and-spoke network topology using AWS Transit Gateway. Provisions multiple VPCs
+    connected through a central transit gateway, with DMZ and private network zones. Includes
+    bastion host configuration for cross-VPC SSH access.
+  one_liner: "Build a transit gateway hub-and-spoke network in AWS"
+  prerequisites:
+    - "AWS credential configured"
+    - "SSH keypair for DMZ and private network hosts"
+  job_templates:
+    - name: "Cloud | AWS | Create Transit Infrastructure"
+      playbook: cloud/create_transit_network.yml
+      description: Provisions VPCs, transit gateway, attachments, and configures bastion SSH access
+  related_demos:
+    - slug: cloud-peer-networking
+      description: "Alternative direct-peering topology for simpler two-VPC setups"
+    - slug: cloud-create-vpc
+      description: "Standalone VPC creation for simpler setups"
+
+cloud-vpc-report:
+  description: >-
+    Generates an HTML report of the current AWS VPC infrastructure -- instances, networks, security
+    groups, and tags. Publishes the report to either a Linux report server or an S3 bucket for web
+    access.
+  one_liner: "Visual HTML report of your AWS VPC infrastructure"
+  prerequisites:
+    - "AWS credential configured"
+    - "Existing infrastructure deployed (e.g., via <strong>Deploy Cloud Stack in AWS</strong>)"
+  job_templates:
+    - name: "Cloud | AWS | VPC Report"
+      playbook: cloud/cloud_report.yml
+      description: Gathers facts from EC2 instances and generates an HTML infrastructure report
+  related_demos:
+    - slug: deploy-cloud-stack
+      description: "Deploy infrastructure to report on"
+
+linux-register-insights:
+  description: >-
+    Registers RHEL EC2 instances with Red Hat Subscription Manager using an activation key and org
+    ID. Removes RHUI packages, installs subscription-manager, sets the hostname, and registers the
+    host. Required before RHEL advisory patching.
+  one_liner: "Register RHEL hosts with RHSM for advisory access"
+  prerequisites:
+    - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+    - "<strong>RHSM Registration</strong> credential with org ID and activation key"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Register with Insights"
+      playbook: linux/ec2_register.yml
+      description: Registers RHEL hosts with RHSM, removes RHUI packages, and configures subscription access
+  related_demos:
+    - slug: patch-cloud-stack
+      description: "RHSM registration is required for RHEL patching in this workflow"
+    - slug: linux-patching
+      description: "Patch hosts after registering them"
+
+linux-troubleshoot:
+  description: >-
+    Gathers quick diagnostic information from RHEL hosts -- vmstat for CPU/memory/swap, top
+    processes by CPU usage, and top processes by memory usage. A handy first-response playbook for
+    investigating performance issues.
+  one_liner: "Quick system diagnostics -- CPU, memory, and top processes"
+  prerequisites:
+    - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Troubleshoot"
+      playbook: linux/tshoot.yml
+      description: Runs vmstat, ps by CPU, and ps by memory on target hosts and displays results
+  related_demos:
+    - slug: linux-fact-scan
+      description: "Gather broader system facts including packages and services"
+    - slug: linux-run-shell-script
+      description: "Run ad-hoc commands for deeper investigation"
+
+linux-temporary-sudo:
+  description: >-
+    Grants temporary sudo access to a user for a configurable duration. Creates a sudoers rule,
+    schedules automatic cleanup via the at daemon, and removes the rule when time expires.
+    Demonstrates just-in-time privilege escalation.
+  one_liner: "Time-limited sudo access with automatic revocation"
+  prerequisites:
+    - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+    - "The target user must exist on the system"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: Sudo User
+      variable: sudo_user
+      type: text
+      required: "Yes"
+    - question: Time
+      variable: sudo_time
+      type: integer
+      required: "Yes"
+    - question: Time Units
+      variable: sudo_units
+      type: multiplechoice
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Temporary Sudo"
+      playbook: linux/temp_sudo.yml
+      description: Creates a time-limited sudoers rule and schedules automatic cleanup
+  related_demos:
+    - slug: linux-run-shell-script
+      description: "Run scripts that may need the temporary privileges"
+
+linux-start-service:
+  description: >-
+    Starts a named systemd service on target hosts. Checks that the service exists before
+    attempting to start it. A simple but common operational task that demonstrates self-service IT
+    operations.
+  one_liner: "Start a Linux service by name"
+  prerequisites:
+    - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: Service Name
+      variable: service_name
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Start Service"
+      playbook: linux/service_start.yml
+      description: Checks for the service and starts it if present
+  related_demos:
+    - slug: linux-stop-service
+      description: "Stop a running service"
+
+linux-stop-service:
+  description: >-
+    Stops a named systemd service on target hosts. Checks that the service exists before attempting
+    to stop it. Paired with Start Service for basic service lifecycle management.
+  one_liner: "Stop a Linux service by name"
+  prerequisites:
+    - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: Service Name
+      variable: service_name
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Stop Service"
+      playbook: linux/service_stop.yml
+      description: Checks for the service and stops it if present
+  related_demos:
+    - slug: linux-start-service
+      description: "Start a stopped service"
+
+linux-run-shell-script:
+  description: >-
+    Runs an arbitrary shell script on target hosts. The script content is provided via survey.
+    Outputs the result and reminds users they should consider converting scripts to proper
+    playbooks. Great for showing the migration path from scripts to automation.
+  one_liner: "Run an ad-hoc shell script on RHEL hosts"
+  prerequisites:
+    - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: Shell Script
+      variable: shell_script
+      type: textarea
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Run Shell Script"
+      playbook: linux/run_script.yml
+      description: Executes the provided shell script on target hosts and displays the output
+  related_demos:
+    - slug: linux-troubleshoot
+      description: "Pre-built troubleshooting commands instead of ad-hoc scripts"
+
+linux-fact-scan:
+  description: >-
+    Scans hosts and gathers package and service facts. This populates the AAP fact cache with
+    installed packages and running services, which can then be viewed in the host details page.
+    Useful for inventory auditing and compliance checks.
+  one_liner: "Gather package and service facts for inventory auditing"
+  prerequisites:
+    - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Fact Scan"
+      playbook: linux/fact_scan.yml
+      description: Gathers package_facts and service_facts, caching them in AAP
+  related_demos:
+    - slug: linux-troubleshoot
+      description: "Active troubleshooting beyond passive fact gathering"
+    - slug: deploy-cloud-stack
+      description: "Deploy hosts to scan"
+
+linux-podman-webserver:
+  description: >-
+    Deploys a containerized Apache httpd webserver using Podman. Installs Podman, creates a volume
+    directory with a custom index.html, and runs an httpd container serving the custom page.
+    Demonstrates rootless container management with Ansible.
+  one_liner: "Deploy a Podman container serving a custom webpage"
+  prerequisites:
+    - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: Web Page Message
+      variable: message
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Podman Webserver"
+      playbook: linux/podman.yml
+      description: Installs Podman, creates a custom index.html, and runs an httpd container
+  related_demos:
+    - slug: linux-deploy-application
+      description: "Traditional package-based application deployment"
+
+linux-system-roles:
+  description: >-
+    Applies one or more RHEL System Roles to target hosts. System Roles are a collection of Ansible
+    roles for configuring common RHEL subsystems (timesync, network, storage, etc.) in a
+    consistent, supported way.
+  one_liner: "Apply certified RHEL System Roles for consistent configuration"
+  prerequisites:
+    - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: System Roles
+      variable: system_roles
+      type: multiselect
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | System Roles"
+      playbook: linux/system_roles.yml
+      description: Applies selected RHEL System Roles (timesync, network, storage, etc.) to target hosts
+  related_demos:
+    - slug: linux-cockpit
+      description: "Install Cockpit web console using System Roles"
+
+linux-cockpit:
+  description: >-
+    Installs and configures the Cockpit web console on RHEL hosts using RHEL System Roles. Cockpit
+    provides a browser-based management interface for Linux servers. Demonstrates how System Roles
+    make complex configurations repeatable.
+  one_liner: "Deploy the Cockpit web console via System Roles"
+  prerequisites:
+    - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Cockpit"
+      playbook: linux/system_roles.yml
+      description: Applies the cockpit System Role to install and configure the web console
+  related_demos:
+    - slug: linux-system-roles
+      description: "Apply additional System Roles alongside Cockpit"
+
+linux-compliance-enforce:
+  description: >-
+    Applies remediation for a compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG) to hosts that
+    were found out of compliance. Targets hosts dynamically based on inventory groups populated by
+    a prior compliance scan.
+  one_liner: "Enforce compliance remediation on non-compliant hosts"
+  prerequisites:
+    - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "A prior compliance scan that populated the out-of-compliance inventory group"
+  job_templates:
+    - name: "LINUX | Compliance Enforce"
+      playbook: linux/remediate_out_of_compliance.yml
+      description: Applies compliance role remediation to hosts in the OUT_OF_COMPLIANCE group
+  related_demos:
+    - slug: linux-compliance-workflow
+      description: "Full workflow that combines scanning, inventory sync, and enforcement"
+    - slug: linux-compliance-report
+      description: "Generate a compliance report to measure the impact of enforcement"
+
+linux-disa-stig:
+  description: >-
+    Applies DISA STIG (Security Technical Implementation Guide) hardening to RHEL hosts. Uses the
+    demo.compliance collection STIG role to configure security controls required for U.S.
+    Department of Defense environments.
+  one_liner: "Apply DISA STIG hardening to RHEL servers"
+  prerequisites:
+    - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | DISA STIG"
+      playbook: linux/disa_stig.yml
+      description: Applies DISA STIG hardening controls from the demo.compliance collection
+  related_demos:
+    - slug: linux-compliance-workflow
+      description: "Full compliance workflow with scanning and enforcement"
+    - slug: linux-compliance-report
+      description: "Generate a compliance report to measure STIG compliance"
+
+linux-multi-profile-compliance:
+  description: >-
+    Applies a selected compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG) to RHEL hosts using
+    the official Red Hat compliance roles. This is the enforcement-only playbook -- for scanning
+    and reporting, see the Multi-profile Compliance Report.
+  one_liner: "Apply a compliance profile to RHEL hosts"
+  prerequisites:
+    - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: Compliance Profile
+      variable: compliance_profile
+      type: multiplechoice
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Multi-profile Compliance"
+      playbook: linux/multi_profile_compliance.yml
+      description: Applies the selected compliance profile to target hosts
+  related_demos:
+    - slug: linux-compliance-report
+      description: "Generate an OpenSCAP report to assess compliance posture"
+    - slug: linux-compliance-workflow
+      description: "Automated scan then enforce workflow"
+
+linux-compliance-report:
+  description: >-
+    Runs an OpenSCAP scan against a selected compliance profile and generates an HTML report.
+    Installs the scanner and security guide packages, evaluates the system against the profile, and
+    publishes results as a browsable HTML report.
+  one_liner: "Generate an OpenSCAP compliance report for any profile"
+  prerequisites:
+    - "RHEL hosts with at least 2 GB RAM"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: Compliance Profile
+      variable: compliance_profile
+      type: multiplechoice
+      required: "Yes"
+    - question: Use httpd to host reports locally?
+      variable: use_httpd
+      type: multiplechoice
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Multi-profile Compliance Report"
+      playbook: linux/multi_profile_compliance_report.yml
+      description: Runs OpenSCAP scan and generates an HTML compliance report on target hosts
+  related_demos:
+    - slug: linux-multi-profile-compliance
+      description: "Apply compliance enforcement after reviewing the report"
+    - slug: linux-compliance-workflow
+      description: "Automated scan then enforce workflow that uses this report"
+
+linux-insights-compliance-scan:
+  description: >-
+    Triggers a Red Hat Insights compliance scan on RHEL hosts. Uses the redhat.insights.compliance
+    role to run the scan and upload results to the Insights compliance dashboard on
+    console.redhat.com.
+  one_liner: "Run an Insights compliance scan and upload results"
+  prerequisites:
+    - "RHEL hosts registered with Red Hat Insights"
+    - "Compliance profile assigned in Insights"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: Compliance profile configured?
+      variable: compliance_profile_configured
+      type: multiplechoice
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Insights Compliance Scan"
+      playbook: linux/insights_compliance_scan.yml
+      description: Runs the Insights compliance scan and uploads results to console.redhat.com
+  related_demos:
+    - slug: linux-register-insights
+      description: "Register hosts with RHSM before running Insights scans"
+    - slug: linux-compliance-report
+      description: "Local OpenSCAP scanning as an alternative to Insights"
+
+linux-deploy-application:
+  description: >-
+    Installs a Linux application package via DNF. Supports version pinning with allow_downgrade for
+    rollback scenarios. A straightforward demo of application deployment that shows how AAP
+    replaces manual package management.
+  one_liner: "Install or roll back a Linux application package"
+  prerequisites:
+    - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "SSH connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: Application
+      variable: application
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Deploy Application"
+      playbook: linux/deploy_application.yml
+      description: Installs or updates an application package via DNF on target hosts
+  related_demos:
+    - slug: linux-podman-webserver
+      description: "Container-based deployment as an alternative to packages"
+
+windows-install-iis:
+  description: >-
+    Installs Internet Information Services (IIS) on Windows Server, starts the W3SVC service, and
+    deploys a custom index.html page. The page content is provided via survey. A quick, visual demo
+    of Windows application deployment with Ansible.
+  one_liner: "Install IIS and deploy a custom web page"
+  prerequisites:
+    - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "WinRM connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: IIS Message
+      variable: iis_message
+      type: textarea
+      required: "Yes"
+  job_templates:
+    - name: "WINDOWS | Install IIS"
+      playbook: windows/install_iis.yml
+      description: Installs the IIS Web-Server feature, starts it, and deploys a custom index page
+  related_demos:
+    - slug: windows-patching
+      description: "Patch Windows hosts after deploying applications"
+    - slug: windows-test-connectivity
+      description: "Verify WinRM is working before running demos"
+
+windows-rollback:
+  description: >-
+    A generic rollback playbook used as a cleanup step in Windows workflows. Outputs a configurable
+    rollback message. Used by the Setup Active Directory Domain workflow as the failure handler to
+    clean up resources on error.
+  one_liner: "Generic workflow rollback and cleanup step"
+  prerequisites:
+    - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong>"
+  job_templates:
+    - name: "WINDOWS | Rollback"
+      playbook: windows/rollback.yml
+      description: Outputs rollback message -- used as a failure handler in workflows
+  related_demos:
+    - slug: windows-setup-ad-domain
+      description: "Uses this playbook as its failure cleanup handler"
+
+windows-test-connectivity:
+  description: >-
+    Tests WinRM connectivity to Windows hosts using wait_for_connection and win_ping. Verifies that
+    AAP can reach the hosts before running any configuration. Useful as a smoke test after
+    provisioning.
+  one_liner: "Verify WinRM connectivity to Windows hosts"
+  prerequisites:
+    - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "WinRM connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "WINDOWS | Test Connectivity"
+      playbook: windows/connect.yml
+      description: Waits for WinRM to become available and runs win_ping to confirm connectivity
+  related_demos:
+    - slug: windows-install-iis
+      description: "Run a quick demo after confirming connectivity"
+    - slug: deploy-cloud-stack
+      description: "Deploy Windows VMs to test against"
+
+windows-chocolatey-multiple:
+  description: >-
+    Installs multiple packages (Node.js and Python by default) using the Chocolatey package
+    manager. Verifies the installations by checking version output. Demonstrates bulk software
+    provisioning on Windows with Ansible.
+  one_liner: "Install multiple packages via Chocolatey"
+  prerequisites:
+    - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "WinRM connectivity via <strong>APD Machine Credential</strong>"
+    - "Internet access from the Windows hosts"
+  job_templates:
+    - name: "WINDOWS | Chocolatey Install Multiple"
+      playbook: windows/windows_choco_multiple.yml
+      description: Installs Node.js and Python via Chocolatey and verifies the installed versions
+  related_demos:
+    - slug: windows-chocolatey-specific
+      description: "Install a single specific package via Chocolatey"
+    - slug: windows-install-iis
+      description: "Install IIS using native Windows features instead of Chocolatey"
+
+windows-chocolatey-specific:
+  description: >-
+    Installs a specific package by name using the Chocolatey package manager. The package name is
+    provided via survey. Demonstrates targeted software installation on Windows.
+  one_liner: "Install a single Chocolatey package by name"
+  prerequisites:
+    - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "WinRM connectivity via <strong>APD Machine Credential</strong>"
+    - "Internet access from the Windows hosts"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: Package Name
+      variable: package_name
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "WINDOWS | Chocolatey Install Specific"
+      playbook: windows/windows_choco_specific.yml
+      description: Installs a single named package via Chocolatey
+  related_demos:
+    - slug: windows-chocolatey-multiple
+      description: "Install multiple packages at once"
+
+windows-run-powershell:
+  description: >-
+    Runs an arbitrary PowerShell script on target Windows hosts. The script content is provided via
+    survey. Outputs the results in the job log. Demonstrates how Ansible can execute any PowerShell
+    command remotely.
+  one_liner: "Run an ad-hoc PowerShell script on Windows hosts"
+  prerequisites:
+    - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "WinRM connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: PowerShell Script
+      variable: ps_script
+      type: textarea
+      required: "Yes"
+  job_templates:
+    - name: "WINDOWS | Run PowerShell"
+      playbook: windows/powershell.yml
+      description: Executes the provided PowerShell script on target hosts and displays the output
+  related_demos:
+    - slug: windows-run-powershell-kerberos
+      description: "Same playbook but with Kerberos authentication"
+    - slug: windows-query-services
+      description: "Pre-built PowerShell script for querying services"
+
+windows-run-powershell-kerberos:
+  description: >-
+    Runs a PowerShell script on Windows hosts using Kerberos authentication instead of basic WinRM.
+    Demonstrates Ansible ability to authenticate via Active Directory credentials for domain-joined
+    environments.
+  one_liner: "Run PowerShell with Kerberos authentication"
+  prerequisites:
+    - "Windows hosts joined to an Active Directory domain"
+    - "Kerberos credential configured in AAP"
+    - "Domain controller reachable from AAP"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: PowerShell Script
+      variable: ps_script
+      type: textarea
+      required: "Yes"
+  job_templates:
+    - name: "WINDOWS | Run PowerShell | Kerberos"
+      playbook: windows/powershell.yml
+      description: Executes PowerShell on target hosts using Kerberos authentication
+  related_demos:
+    - slug: windows-run-powershell
+      description: "Same playbook with standard WinRM authentication"
+    - slug: windows-setup-ad-domain
+      description: "Set up an AD domain for Kerberos authentication"
+
+windows-query-services:
+  description: >-
+    Copies a PowerShell script to the target host and queries Windows services filtered by state
+    (Running, Stopped, etc.). Demonstrates file transfer and script execution patterns on Windows
+    with Ansible.
+  one_liner: "Query Windows services by state using PowerShell"
+  prerequisites:
+    - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "WinRM connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+    - question: Service State
+      variable: service_state
+      type: multiplechoice
+      required: "Yes"
+  job_templates:
+    - name: "WINDOWS | Query Services"
+      playbook: windows/powershell_script.yml
+      description: Copies and runs a PowerShell script that filters services by the selected state
+  related_demos:
+    - slug: windows-run-powershell
+      description: "Run arbitrary PowerShell for more complex queries"
+
+windows-password-requirements:
+  description: >-
+    Configures Windows password policies using PowerShell Desired State Configuration (DSC). Sets
+    password history, minimum length, and complexity requirements. Demonstrates the integration of
+    Ansible with Windows DSC.
+  one_liner: "Set password policies using PowerShell DSC"
+  prerequisites:
+    - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "WinRM connectivity via <strong>APD Machine Credential</strong>"
+  job_templates:
+    - name: "WINDOWS | Configure Password Requirements"
+      playbook: windows/powershell_dsc.yml
+      description: Installs SecurityPolicyDSC module and configures password history, length, and complexity via DSC
+  related_demos:
+    - slug: windows-disa-stig
+      description: "Full STIG hardening which includes password policies and more"
+
+windows-ad-create-domain:
+  description: >-
+    Promotes a Windows Server to a domain controller and creates a new Active Directory forest.
+    Sets the local admin password, updates the hostname, creates the domain, and reboots. The
+    default domain is ansible.local.
+  one_liner: "Promote a server to domain controller and create an AD forest"
+  prerequisites:
+    - "A Windows Server VM not yet joined to a domain"
+    - "WinRM connectivity via <strong>APD Machine Credential</strong>"
+  job_templates:
+    - name: "WINDOWS | AD | Create Domain"
+      playbook: windows/create_ad_domain.yml
+      description: Sets admin password, updates hostname, creates AD forest, and reboots
+  related_demos:
+    - slug: windows-ad-join-domain
+      description: "Join additional hosts to the domain after creation"
+    - slug: windows-setup-ad-domain
+      description: "Full workflow that automates the entire AD setup"
+
+windows-ad-join-domain:
+  description: >-
+    Joins Windows hosts to an existing Active Directory domain. Sets the DNS client to point at the
+    domain controller, creates an OU, updates the hostname, and performs the domain join.
+  one_liner: "Join Windows hosts to an Active Directory domain"
+  prerequisites:
+    - "An existing AD domain (created by <strong>WINDOWS | AD | Create Domain</strong>)"
+    - "Domain controller private IP accessible from target hosts"
+  job_templates:
+    - name: "WINDOWS | AD | Join Domain"
+      playbook: windows/join_ad_domain.yml
+      description: Configures DNS, creates OU, updates hostname, and joins the host to the domain
+  related_demos:
+    - slug: windows-ad-create-domain
+      description: "Create the domain before joining hosts"
+    - slug: windows-ad-new-user
+      description: "Create users in the domain after hosts are joined"
+
+windows-ad-new-user:
+  description: >-
+    Creates a new Active Directory user with full attributes -- name, department, company, address,
+    phone, and group memberships. Generates a random temporary password. Demonstrates a helpdesk
+    self-service portal for user provisioning.
+  one_liner: "Self-service AD user creation for helpdesk operators"
+  prerequisites:
+    - "An Active Directory domain (deployed by <strong>Setup Active Directory Domain</strong> workflow)"
+    - "Domain controller accessible via WinRM"
+  survey_prompts:
+    - question: First Name
+      variable: firstname
+      type: text
+      required: "Yes"
+    - question: Surname
+      variable: surname
+      type: text
+      required: "Yes"
+    - question: Street
+      variable: street
+      type: text
+      required: "Yes"
+    - question: City
+      variable: city
+      type: text
+      required: "Yes"
+    - question: Postal Code
+      variable: postal_code
+      type: text
+      required: "Yes"
+    - question: Telephone
+      variable: telephone_number
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "WINDOWS | AD | New User"
+      playbook: windows/helpdesk_new_user_portal.yml
+      description: Creates an AD user with full attributes, random password, and group memberships
+  related_demos:
+    - slug: windows-setup-ad-domain
+      description: "Set up the AD domain before creating users"
+    - slug: windows-run-powershell
+      description: "Query AD for the newly created user"
+
+windows-disa-stig:
+  description: >-
+    Applies DISA STIG hardening to Windows Server 2022. Uses the demo.compliance.win2022STIG role
+    to configure security controls required for U.S. Department of Defense Windows environments.
+  one_liner: "Apply DISA STIG hardening to Windows Server 2022"
+  prerequisites:
+    - "Windows Server 2022 hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "WinRM connectivity via <strong>APD Machine Credential</strong>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: HOSTS
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "WINDOWS | DISA STIG"
+      playbook: windows/compliance.yml
+      description: Applies Windows 2022 DISA STIG hardening controls from the demo.compliance collection
+  related_demos:
+    - slug: linux-disa-stig
+      description: "DISA STIG hardening for RHEL servers"
+    - slug: windows-password-requirements
+      description: "Lighter-weight password policy configuration via DSC"
+
+network-configuration:
+  description: >-
+    Deploys golden configurations to Cisco IOS, IOS-XR, and NX-OS network devices using Ansible
+    resource modules. Pulls configurations from a separate Git repository (Network Golden Configs)
+    and applies them to the network devices.
+  one_liner: "Push golden configs to Cisco IOS, IOS-XR, and NX-OS"
+  prerequisites:
+    - "Network devices in inventory (Cisco IOS, IOS-XR, and/or NX-OS)"
+    - "Network credentials configured"
+    - "Run <strong>APD | Single demo setup</strong> with <code>network</code>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "NETWORK | Configuration"
+      playbook: (Network Golden Configs project)
+      description: Applies golden configurations to network devices using Ansible resource modules
+  related_demos:
+    - slug: network-report
+      description: "Generate a network report after applying configurations"
+    - slug: network-backup
+      description: "Back up device configs before making changes"
+
+network-report:
+  description: >-
+    Generates an HTML network report by gathering facts from Cisco IOS, IOS-XR, and NX-OS devices.
+    Collects interface, routing, and system information using the platform-specific facts modules
+    and renders them into a browsable report.
+  one_liner: "Generate an HTML network device report"
+  prerequisites:
+    - "Network devices in inventory"
+    - "Network credentials configured"
+    - "A <code>reports</code> host for publishing the HTML report"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "NETWORK | Report"
+      playbook: network/report.yml
+      description: Gathers facts from Cisco IOS, IOS-XR, and NX-OS devices and generates an HTML report
+  related_demos:
+    - slug: network-configuration
+      description: "Apply configurations before generating a report"
+    - slug: network-backup
+      description: "Back up configurations alongside reporting"
+
+network-disa-stig:
+  description: >-
+    Applies DISA STIG compliance checks and hardening to Cisco IOS-XE network devices. Uses the
+    demo.compliance.iosxeSTIG role to evaluate and enforce security controls for network
+    infrastructure.
+  one_liner: "Apply DISA STIG compliance to Cisco IOS-XE devices"
+  prerequisites:
+    - "Cisco IOS-XE devices in inventory"
+    - "Network credentials configured"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "NETWORK | DISA STIG"
+      playbook: network/compliance.yml
+      description: Runs DISA STIG compliance checks and hardening on IOS-XE devices
+  related_demos:
+    - slug: linux-disa-stig
+      description: "DISA STIG hardening for RHEL servers"
+    - slug: windows-disa-stig
+      description: "DISA STIG hardening for Windows servers"
+
+network-backup:
+  description: >-
+    Backs up running configurations from network devices to a report server. Sets up a backup
+    directory on the report server, then saves device configs. Provides a browsable backup archive
+    via HTTP.
+  one_liner: "Back up network device configurations to a central server"
+  prerequisites:
+    - "Network devices (routers) in inventory"
+    - "A <code>reports</code> host for storing backups"
+    - "Network credentials configured"
+  job_templates:
+    - name: "NETWORK | Backup"
+      playbook: network/backup.yml
+      description: Sets up a backup directory on the report server and saves device running configs
+  related_demos:
+    - slug: network-configuration
+      description: "Apply configurations that you may want to back up first"
+    - slug: network-report
+      description: "Generate a report alongside backups"
+
+openshift-eda-install:
+  description: >-
+    Deploys an Event-Driven Ansible (EDA) Controller on OpenShift, connected to the same AAP
+    instance. Uses the demo.openshift.eda_controller role to install and configure the operator and
+    custom resource.
+  one_liner: "Install EDA Controller on OpenShift"
+  prerequisites:
+    - "<strong>OpenShift Credential</strong> configured with API token"
+    - "Cluster admin access to the target OpenShift cluster"
+  job_templates:
+    - name: "OpenShift | EDA | Install Controller"
+      playbook: openshift/eda/install.yml
+      description: Deploys the EDA Controller operator and creates the EDA instance on OpenShift
+  related_demos:
+    - slug: openshift-cnv-install
+      description: "Install OpenShift Virtualization alongside EDA"
+
+openshift-cnv-install:
+  description: >-
+    Deploys the OpenShift Virtualization (CNV) operator on an OpenShift cluster, creates the
+    HyperConverged custom resource, and provisions a test VM to verify functionality.
+  one_liner: "Install OpenShift Virtualization and verify with a test VM"
+  prerequisites:
+    - "<strong>OpenShift Credential</strong> configured with API token"
+    - "Cluster admin access with bare-metal or nested-virt capable nodes"
+  job_templates:
+    - name: "OpenShift | CNV | Install"
+      playbook: openshift/cnv/install.yml
+      description: Installs the CNV operator, creates HyperConverged CR, and provisions a test VM
+  related_demos:
+    - slug: openshift-cnv-create-vm
+      description: "Create additional VMs after installing CNV"
+    - slug: openshift-cnv-delete-vm
+      description: "Clean up VMs when done"
+
+openshift-cnv-create-vm:
+  description: >-
+    Provisions a RHEL virtual machine on OpenShift Virtualization (CNV) using the KubeVirt API.
+    Creates the VM definition with a DataVolume for the OS disk from a cluster image source.
+  one_liner: "Provision a RHEL VM on OpenShift Virtualization"
+  prerequisites:
+    - "OpenShift Virtualization installed"
+    - "<strong>OpenShift Credential</strong> configured"
+    - "RHEL OS images available in openshift-virtualization-os-images namespace"
+  survey_prompts:
+    - question: VM Name
+      variable: vm_name
+      type: text
+      required: "Yes"
+    - question: Namespace
+      variable: vm_namespace
+      type: text
+      required: "Yes"
+    - question: OS Version
+      variable: os_version
+      type: multiplechoice
+      required: "Yes"
+  job_templates:
+    - name: "OpenShift | CNV | Create VM"
+      playbook: openshift/cnv/provision_rhel.yml
+      description: Creates a KubeVirt VirtualMachine with a DataVolume from a cluster image source
+  related_demos:
+    - slug: openshift-cnv-delete-vm
+      description: "Delete VMs created by this playbook"
+    - slug: openshift-cnv-install
+      description: "Install CNV if not already present"
+
+openshift-cnv-delete-vm:
+  description: >-
+    Deletes one or more virtual machines from OpenShift Virtualization. Removes the VirtualMachine
+    and associated DataVolume resources. Supports pattern-based host selection for bulk cleanup.
+  one_liner: "Delete VMs from OpenShift Virtualization"
+  prerequisites:
+    - "Existing CNV VMs to delete"
+    - "<strong>OpenShift Credential</strong> configured"
+  job_templates:
+    - name: "OpenShift | CNV | Delete VM"
+      playbook: openshift/cnv/delete.yml
+      description: Removes VirtualMachine and DataVolume resources from the specified namespace
+  related_demos:
+    - slug: openshift-cnv-create-vm
+      description: "Create VMs to manage with this playbook"
+
+openshift-dev-spaces:
+  description: >-
+    Deploys Red Hat OpenShift Dev Spaces on an OpenShift cluster. Creates the namespace, installs
+    the operator via OLM subscription, and creates the CheCluster custom resource.
+  one_liner: "Install OpenShift Dev Spaces for cloud-based development"
+  prerequisites:
+    - "<strong>OpenShift Credential</strong> configured with API token"
+    - "Cluster admin access to the target OpenShift cluster"
+  job_templates:
+    - name: "OpenShift | Dev Spaces | Install"
+      playbook: openshift/devspaces.yml
+      description: Creates the namespace, installs the Dev Spaces operator, and provisions the CheCluster instance
+  related_demos:
+    - slug: openshift-gitlab
+      description: "Install GitLab alongside Dev Spaces for a full developer platform"
+
+openshift-gitlab:
+  description: >-
+    Deploys GitLab on an OpenShift cluster using the GitLab Operator. Installs cert-manager as a
+    prerequisite, then deploys the GitLab operator and creates a GitLab instance.
+  one_liner: "Deploy GitLab on OpenShift via the GitLab Operator"
+  prerequisites:
+    - "<strong>OpenShift Credential</strong> configured with API token"
+    - "Cluster admin access"
+    - "Sufficient cluster resources for GitLab"
+  job_templates:
+    - name: "OpenShift | GitLab | Install"
+      playbook: openshift/gitlab.yml
+      description: Installs cert-manager, deploys the GitLab operator, and creates a GitLab instance on OpenShift
+  related_demos:
+    - slug: openshift-dev-spaces
+      description: "Install Dev Spaces alongside GitLab for a complete developer platform"
+
+openshift-cnv-infra-stack:
+  description: >-
+    Deploys the full OpenShift CNV infrastructure stack -- installs the OpenShift Virtualization
+    operator, configures cluster settings, provisions RHEL VMs, and syncs the CNV inventory. The
+    OpenShift equivalent of Deploy Cloud Stack in AWS.
+  one_liner: "Full CNV infrastructure setup in one workflow"
+  prerequisites:
+    - "<strong>OpenShift Credential</strong> configured with API token"
+    - "Cluster admin access with bare-metal or nested-virt nodes"
+    - "Run <strong>APD | Single demo setup</strong> with <code>openshift</code>"
+  job_templates:
+    - name: "OpenShift | CNV | Infra Stack (workflow)"
+      playbook: openshift/setup.yml
+      description: Installs CNV, provisions VMs, and syncs inventory in a single workflow
+  related_demos:
+    - slug: openshift-cnv-create-vm
+      description: "Create additional VMs after the stack is deployed"
+    - slug: deploy-cloud-stack
+      description: "The AWS equivalent of this infrastructure workflow"
+
+openshift-cnv-patch-workflow:
+  description: >-
+    Patching workflow for RHEL VMs running on OpenShift Virtualization. Similar to the cloud
+    patching workflow but targeting CNV-managed virtual machines instead of EC2 instances.
+  one_liner: "Patch RHEL VMs on OpenShift Virtualization"
+  prerequisites:
+    - "RHEL VMs provisioned on OpenShift CNV"
+    - "<strong>OpenShift Credential</strong> configured"
+    - "SSH connectivity to the CNV VMs"
+  job_templates:
+    - name: "OpenShift | CNV | Patch Workflow"
+      playbook: openshift/setup.yml
+      description: Runs the patching workflow against CNV-managed RHEL virtual machines
+  related_demos:
+    - slug: patch-cloud-stack
+      description: "The AWS version of this patching workflow"
+    - slug: openshift-cnv-infra-stack
+      description: "Deploy the CNV infrastructure to patch"
+
+satellite-register:
+  description: >-
+    Registers RHEL hosts with a Red Hat Satellite server. Uses the demo.satellite.register_host
+    role to configure the Satellite URL, install the katello-ca-consumer package, and register the
+    host.
+  one_liner: "Register hosts with Red Hat Satellite"
+  prerequisites:
+    - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
+    - "<strong>Satellite Collection</strong> credential configured"
+    - "Run <strong>APD | Single demo setup</strong> with <code>satellite</code>"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | Register with Satellite"
+      playbook: satellite/server_register.yml
+      description: Registers target RHEL hosts with the configured Satellite server
+  related_demos:
+    - slug: satellite-compliance-scan
+      description: "Run compliance scans on Satellite-managed hosts"
+    - slug: linux-register-insights
+      description: "Register directly with RHSM instead of through Satellite"
+
+satellite-compliance-scan:
+  description: >-
+    Runs OpenSCAP compliance scans on Satellite-managed hosts and uploads results to Satellite.
+    Uses the demo.satellite.scap_client role to install and configure the foreman_scap_client.
+  one_liner: "Run OpenSCAP scans and upload results to Satellite"
+  prerequisites:
+    - "Hosts registered with Satellite"
+    - "Compliance policies configured in Satellite"
+    - "<strong>Satellite Collection</strong> credential configured"
+  survey_prompts:
+    - question: Server Name or Pattern
+      variable: _hosts
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "LINUX | OpenSCAP Scan (Satellite)"
+      playbook: satellite/server_openscap.yml
+      description: Installs foreman_scap_client, runs compliance scans, and uploads results to Satellite
+  related_demos:
+    - slug: satellite-register
+      description: "Register hosts with Satellite before scanning"
+    - slug: linux-compliance-report
+      description: "Local OpenSCAP scanning without Satellite"
+
+satellite-publish-content-view:
+  description: >-
+    Publishes a new version of a Satellite content view to a specified lifecycle environment.
+    Content views control which packages and errata are available to hosts -- publishing creates a
+    point-in-time snapshot of the content.
+  one_liner: "Publish a Satellite content view version"
+  prerequisites:
+    - "<strong>Satellite Collection</strong> credential configured"
+    - "Content views already defined in Satellite"
+  survey_prompts:
+    - question: Content View
+      variable: content_view
+      type: text
+      required: "Yes"
+    - question: Environment
+      variable: env
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "SATELLITE | Publish Content View"
+      playbook: satellite/satellite_publish.yml
+      description: Publishes a new version of the content view to the specified lifecycle environment
+  related_demos:
+    - slug: satellite-promote-content-view
+      description: "Promote the published version to the next lifecycle stage"
+
+satellite-promote-content-view:
+  description: >-
+    Promotes a Satellite content view version from one lifecycle environment to another. This is
+    the mechanism for moving tested content from Dev to QA to Production in a controlled manner.
+  one_liner: "Promote a content view to the next lifecycle stage"
+  prerequisites:
+    - "<strong>Satellite Collection</strong> credential configured"
+    - "A published content view version to promote"
+  survey_prompts:
+    - question: Content View
+      variable: content_view
+      type: text
+      required: "Yes"
+    - question: Current Lifecycle Environment
+      variable: current_lifecycle_environment
+      type: text
+      required: "Yes"
+    - question: Target Lifecycle Environment
+      variable: lifecycle_environment
+      type: text
+      required: "Yes"
+  job_templates:
+    - name: "SATELLITE | Promote Content View"
+      playbook: satellite/satellite_promote.yml
+      description: Promotes a content view version from one lifecycle environment to another
+  related_demos:
+    - slug: satellite-publish-content-view
+      description: "Publish a new version before promoting"
+
+satellite-patch-dev:
+  description: >-
+    End-to-end Satellite patching workflow for development environments. Combines content view
+    publishing with host patching to demonstrate the full content management lifecycle.
+  one_liner: "Publish content and patch dev hosts through Satellite"
+  prerequisites:
+    - "<strong>Satellite Collection</strong> credential configured"
+    - "Content views and lifecycle environments configured in Satellite"
+    - "Dev hosts registered with Satellite"
+    - "Run <strong>APD | Single demo setup</strong> with <code>satellite</code>"
+  job_templates:
+    - name: "SATELLITE | Patch Dev (workflow)"
+      playbook: satellite/setup.yml
+      description: Publishes content view, syncs hosts, and applies patches to development environment
+  related_demos:
+    - slug: satellite-publish-content-view
+      description: "Standalone content view publishing"
+    - slug: satellite-promote-content-view
+      description: "Promote content from dev to production after testing"
