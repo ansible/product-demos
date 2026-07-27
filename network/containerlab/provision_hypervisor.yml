@@ -172,7 +172,7 @@
     - name: Enable nested virtualization via boto3
       ansible.builtin.command:
         argv:
-          - python3
+          - "{{ ansible_playbook_python }}"
           - -c
           - |
             import boto3
