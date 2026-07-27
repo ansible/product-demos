@@ -64,6 +64,15 @@
   gather_facts: false
 
   tasks:
+    - name: Wait for NX-OS device to be ready
+      cisco.nxos.nxos_facts:
+        gather_subset:
+          - min
+      retries: 30
+      delay: 10
+      register: nxos_wait
+      until: nxos_wait is not failed
+
     - name: Configure banner
       cisco.nxos.nxos_banner:
         banner: motd
@@ -109,6 +118,15 @@
   gather_facts: false
 
   tasks:
+    - name: Wait for IOS-XE device to be ready
+      cisco.ios.ios_facts:
+        gather_subset:
+          - min
+      retries: 30
+      delay: 10
+      register: ios_wait
+      until: ios_wait is not failed
+
     - name: Configure banner
       cisco.ios.ios_banner:
         banner: motd
