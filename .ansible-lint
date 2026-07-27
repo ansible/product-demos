@@ -19,6 +19,7 @@ exclude_paths:
 
 mock_modules:
   - amazon.aws.aws_caller_info
+  - amazon.aws.ec2_ami_info
   - amazon.aws.ec2_eip
   - amazon.aws.ec2_eip_info
   - amazon.aws.ec2_eni
@@ -43,6 +44,7 @@ mock_modules:
   - amazon.aws.s3_object_info
   - ansible.controller.credential
   - ansible.posix.at
+  - ansible.posix.mount
   - ansible.posix.authorized_key
   - ansible.posix.firewalld
   - ansible.posix.seboolean
@@ -67,10 +69,13 @@ mock_modules:
   - cisco.nxos.nxos_facts
   - community.aws.s3_sync
   - community.aws.s3_website
+  - community.general.filesystem
+  - community.general.modprobe
   - community.general.redhat_subscription
   - community.general.rhsm_repository
   - community.windows.win_psmodule
   - containers.podman.podman_container
+  - containers.podman.podman_image
   - kubernetes.core.k8s
   - kubernetes.core.k8s_info
   - microsoft.ad.domain

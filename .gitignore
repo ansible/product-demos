@@ -17,3 +17,5 @@ roles/*
 .ansible/
 **/tmp/
 execution_environments/context/
+network/containerlab/clab-key.pem
+*.pem

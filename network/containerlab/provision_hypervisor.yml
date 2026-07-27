@@ -1,0 +1,232 @@
+---
+- name: Provision Containerlab Hypervisor on AWS
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - vars/main.yml
+
+  vars:
+    clab_aws_region: "{{ clab_aws_region | default('us-east-2') }}"
+    clab_aws_instance_type: "{{ clab_aws_instance_type | default('c8i.2xlarge') }}"
+    aws_owner_tag: "{{ clab_aws_owner_tag | default('apd-demo') }}"
+
+  tasks:
+    - name: Validate region selection
+      ansible.builtin.assert:
+        that:
+          - clab_aws_region in ['us-east-2', 'us-west-2']
+        fail_msg: >-
+          Region '{{ clab_aws_region }}' is not supported.
+          Use 'us-east-2' or 'us-west-2'.
+
+    - name: Create VPC
+      amazon.aws.ec2_vpc_net:
+        state: present
+        name: "{{ clab_aws_vpc_name }}"
+        cidr_block: "{{ clab_aws_vpc_cidr }}"
+        region: "{{ clab_aws_region }}"
+        tags:
+          owner: "{{ aws_owner_tag }}"
+          purpose: "{{ clab_aws_purpose_tag }}"
+      register: clab_vpc
+
+    - name: Create internet gateway
+      amazon.aws.ec2_vpc_igw:
+        state: present
+        vpc_id: "{{ clab_vpc.vpc.id }}"
+        region: "{{ clab_aws_region }}"
+        tags:
+          Name: "{{ clab_aws_vpc_name }}"
+          owner: "{{ aws_owner_tag }}"
+          purpose: "{{ clab_aws_purpose_tag }}"
+      register: clab_igw
+
+    - name: Create security group
+      amazon.aws.ec2_security_group:
+        state: present
+        name: "{{ clab_aws_sg_name }}"
+        description: Containerlab hypervisor - SSH and port-mapped device access
+        region: "{{ clab_aws_region }}"
+        vpc_id: "{{ clab_vpc.vpc.id }}"
+        rules:
+          - proto: tcp
+            ports:
+              - 22
+              - 2122-2123
+            cidr_ip: 0.0.0.0/0
+          - proto: icmp
+            from_port: -1
+            to_port: -1
+            cidr_ip: 0.0.0.0/0
+        rules_egress:
+          - proto: -1
+            cidr_ip: 0.0.0.0/0
+        tags:
+          Name: "{{ clab_aws_sg_name }}"
+          owner: "{{ aws_owner_tag }}"
+          purpose: "{{ clab_aws_purpose_tag }}"
+      register: clab_sg
+
+    - name: Create subnet
+      amazon.aws.ec2_vpc_subnet:
+        state: present
+        vpc_id: "{{ clab_vpc.vpc.id }}"
+        cidr: "{{ clab_aws_subnet_cidr }}"
+        region: "{{ clab_aws_region }}"
+        az: "{{ _azs[clab_aws_region] | shuffle | first }}"
+        map_public: true
+        tags:
+          Name: "{{ clab_aws_subnet_name }}"
+          owner: "{{ aws_owner_tag }}"
+          purpose: "{{ clab_aws_purpose_tag }}"
+      register: clab_subnet
+
+    - name: Create route table
+      amazon.aws.ec2_vpc_route_table:
+        state: present
+        vpc_id: "{{ clab_vpc.vpc.id }}"
+        region: "{{ clab_aws_region }}"
+        subnets:
+          - "{{ clab_subnet.subnet.id }}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ clab_igw.gateway_id }}"
+        tags:
+          Name: "{{ clab_aws_rt_name }}"
+          owner: "{{ aws_owner_tag }}"
+          purpose: "{{ clab_aws_purpose_tag }}"
+
+    - name: Create keypair
+      amazon.aws.ec2_key:
+        name: "{{ clab_aws_keypair_name }}"
+        region: "{{ clab_aws_region }}"
+        state: present
+      register: clab_keypair
+
+    - name: Save private key  # noqa: no-handler
+      ansible.builtin.copy:
+        content: "{{ clab_keypair.key.private_key }}"
+        dest: "{{ playbook_dir }}/{{ clab_aws_keypair_name }}.pem"
+        mode: '0600'
+      when: clab_keypair.changed
+
+    - name: Find RHEL 9 AMI
+      amazon.aws.ec2_ami_info:
+        region: "{{ clab_aws_region }}"
+        owners:
+          - "{{ clab_aws_image_owners }}"
+        filters:
+          name: "{{ clab_aws_image_filter }}"
+          architecture: "{{ clab_aws_image_architecture }}"
+      register: clab_ami_results
+
+    - name: Select latest AMI
+      ansible.builtin.set_fact:
+        clab_ami_id: >-
+          {{ (clab_ami_results.images | sort(attribute='creation_date') | last).image_id }}
+
+    - name: Launch EC2 instance
+      amazon.aws.ec2_instance:
+        state: running
+        name: clab-hypervisor
+        instance_type: "{{ clab_aws_instance_type }}"
+        image_id: "{{ clab_ami_id }}"
+        key_name: "{{ clab_aws_keypair_name }}"
+        region: "{{ clab_aws_region }}"
+        vpc_subnet_id: "{{ clab_subnet.subnet.id }}"
+        security_group: "{{ clab_sg.group_id }}"
+        network:
+          assign_public_ip: true
+        volumes:
+          - device_name: /dev/sda1
+            ebs:
+              volume_size: 30
+              volume_type: gp3
+              delete_on_termination: true
+          - device_name: "{{ clab_aws_ebs_device }}"
+            ebs:
+              volume_size: "{{ clab_aws_ebs_size_gb }}"
+              volume_type: gp3
+              delete_on_termination: true
+        tags:
+          owner: "{{ aws_owner_tag }}"
+          purpose: "{{ clab_aws_purpose_tag }}"
+          deployment: containerlab
+        wait: true
+      register: clab_ec2
+
+    - name: Get instance ID
+      ansible.builtin.set_fact:
+        clab_instance_id: "{{ clab_ec2.instances[0].instance_id }}"
+
+    - name: Stop instance to enable nested virtualization
+      amazon.aws.ec2_instance:
+        state: stopped
+        instance_ids:
+          - "{{ clab_instance_id }}"
+        region: "{{ clab_aws_region }}"
+        wait: true
+
+    - name: Enable nested virtualization via boto3
+      ansible.builtin.command:
+        argv:
+          - python3
+          - -c
+          - |
+            import boto3
+            ec2 = boto3.client('ec2', region_name='{{ clab_aws_region }}')
+            ec2.modify_instance_cpu_options(
+                InstanceId='{{ clab_instance_id }}',
+                NestedVirtualization='enabled'
+            )
+            print('Nested virtualization enabled')
+      changed_when: true
+
+    - name: Start instance with nested virtualization
+      amazon.aws.ec2_instance:
+        state: running
+        instance_ids:
+          - "{{ clab_instance_id }}"
+        region: "{{ clab_aws_region }}"
+        wait: true
+      register: clab_ec2_started
+
+    - name: Get instance info after restart
+      amazon.aws.ec2_instance_info:
+        instance_ids:
+          - "{{ clab_instance_id }}"
+        region: "{{ clab_aws_region }}"
+      register: clab_ec2_info
+
+    - name: Set host IP fact
+      ansible.builtin.set_fact:
+        clab_host_ip: "{{ clab_ec2_info.instances[0].public_ip_address }}"
+
+    - name: Wait for SSH to become available
+      ansible.builtin.wait_for:
+        port: 22
+        host: "{{ clab_host_ip }}"
+        search_regex: OpenSSH
+        delay: 10
+        timeout: 300
+
+    - name: Export connection info via set_stats
+      ansible.builtin.set_stats:
+        data:
+          clab_host_ip: "{{ clab_host_ip }}"
+          clab_aws_region: "{{ clab_aws_region }}"
+          clab_aws_keypair_name: "{{ clab_aws_keypair_name }}"
+          clab_instance_id: "{{ clab_instance_id }}"
+          clab_vpc_id: "{{ clab_vpc.vpc.id }}"
+        per_host: false
+
+    - name: Display connection information
+      ansible.builtin.debug:
+        msg:
+          - "Hypervisor public IP: {{ clab_host_ip }}"
+          - "Instance ID: {{ clab_instance_id }}"
+          - "Instance type: {{ clab_aws_instance_type }}"
+          - "Region: {{ clab_aws_region }}"
+          - "SSH: ssh -i {{ clab_aws_keypair_name }}.pem {{ clab_aws_admin_user }}@{{ clab_host_ip }}"

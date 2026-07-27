@@ -1,0 +1,159 @@
+---
+- name: Deploy Containerlab on Hypervisor
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - vars/main.yml
+
+  tasks:
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - clab_host_ip is defined
+          - clab_aws_keypair_name is defined
+        fail_msg: >-
+          clab_host_ip and clab_aws_keypair_name must be set.
+          Run provision_hypervisor.yml first or pass them as extra vars.
+
+    - name: Add hypervisor to inventory
+      ansible.builtin.add_host:
+        name: clab-hypervisor
+        ansible_host: "{{ clab_host_ip }}"
+        ansible_user: "{{ clab_aws_admin_user }}"
+        ansible_ssh_private_key_file: "{{ playbook_dir }}/{{ clab_aws_keypair_name }}.pem"
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        groups: clab_hosts
+
+- name: Configure Hypervisor and Deploy Topology
+  hosts: clab-hypervisor
+  become: true
+  gather_facts: true
+
+  vars_files:
+    - vars/main.yml
+
+  tasks:
+    - name: Format EBS volume
+      community.general.filesystem:
+        fstype: xfs
+        dev: "{{ clab_aws_ebs_nvme_device }}"
+
+    - name: Create mount point
+      ansible.builtin.file:
+        path: "{{ clab_aws_ebs_mount }}"
+        state: directory
+        mode: '0777'
+
+    - name: Mount EBS volume
+      ansible.posix.mount:
+        path: "{{ clab_aws_ebs_mount }}"
+        src: "{{ clab_aws_ebs_nvme_device }}"
+        fstype: xfs
+        state: mounted
+
+    - name: Ensure KVM kernel module is loaded
+      community.general.modprobe:
+        name: kvm_intel
+        params: nested=1
+        state: present
+
+    - name: Install podman
+      ansible.builtin.package:
+        name: podman
+        state: present
+
+    - name: Configure podman system storage
+      ansible.builtin.lineinfile:
+        path: /etc/containers/storage.conf
+        regexp: '^#?graphroot ?='
+        line: 'graphroot = "{{ clab_podman_image_path }}"'
+        mode: '0644'
+        create: true
+
+    - name: Restart podman service
+      ansible.builtin.systemd:
+        name: podman
+        state: restarted
+
+    - name: Create user containers config directory
+      ansible.builtin.file:
+        path: "/home/{{ clab_aws_admin_user }}/.config/containers"
+        state: directory
+        owner: "{{ clab_aws_admin_user }}"
+        group: "{{ clab_aws_admin_user }}"
+        mode: '0755'
+
+    - name: Configure podman storage for non-root user
+      ansible.builtin.copy:
+        dest: "/home/{{ clab_aws_admin_user }}/.config/containers/storage.conf"
+        content: "{{ clab_podman_user_storage_content }}"
+        owner: "{{ clab_aws_admin_user }}"
+        group: "{{ clab_aws_admin_user }}"
+        mode: '0644'
+
+    - name: Enable lingering for the user
+      ansible.builtin.command: "loginctl enable-linger {{ clab_aws_admin_user }}"
+      changed_when: true
+
+    - name: Enable podman socket
+      ansible.builtin.systemd:
+        name: podman.socket
+        scope: user
+        enabled: true
+        state: started
+      become: false
+
+    - name: Sync container images
+      containers.podman.podman_image:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ clab_images }}"
+
+    - name: Install containerlab
+      ansible.builtin.shell:
+        cmd: bash -c "$(curl -sL https://get.containerlab.dev)"
+      args:
+        creates: /usr/bin/containerlab
+
+    - name: Copy topology files
+      ansible.builtin.copy:
+        src: files/clab/
+        dest: ~/clab/
+        mode: '0644'
+
+    - name: Deploy containerlab topology
+      ansible.builtin.command:
+        cmd: containerlab deploy --reconfigure --runtime podman
+        chdir: "/root/clab/{{ clab_topology }}/"
+      environment:
+        DOCKER_HOST: "unix:///run/user/1000/podman/podman.sock"
+      retries: 2
+      changed_when: true
+      register: clab_deploy
+
+    - name: Wait for n9kv SSH to become available
+      ansible.builtin.wait_for:
+        port: 2122
+        host: 0.0.0.0
+        delay: 30
+        timeout: 600
+
+    - name: Wait for cat8kv SSH to become available
+      ansible.builtin.wait_for:
+        port: 2123
+        host: 0.0.0.0
+        delay: 30
+        timeout: 600
+
+    - name: Display device connection information
+      ansible.builtin.debug:
+        msg:
+          - "Containerlab topology '{{ clab_topology }}' deployed successfully"
+          - ""
+          - "Device connections (from outside AWS):"
+          - "  n9kv:   ssh -p 2122 admin@{{ clab_host_ip }}  (password: admin@123)"
+          - "  cat8kv: ssh -p 2123 admin@{{ clab_host_ip }}  (password: admin@123)"
+      vars:
+        clab_host_ip: "{{ ansible_host }}"

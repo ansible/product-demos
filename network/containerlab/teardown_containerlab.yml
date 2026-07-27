@@ -1,0 +1,49 @@
+---
+- name: Teardown Containerlab Topology
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - vars/main.yml
+
+  tasks:
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - clab_host_ip is defined
+          - clab_aws_keypair_name is defined
+        fail_msg: >-
+          clab_host_ip and clab_aws_keypair_name must be set.
+
+    - name: Add hypervisor to inventory
+      ansible.builtin.add_host:
+        name: clab-hypervisor
+        ansible_host: "{{ clab_host_ip }}"
+        ansible_user: "{{ clab_aws_admin_user }}"
+        ansible_ssh_private_key_file: "{{ playbook_dir }}/{{ clab_aws_keypair_name }}.pem"
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        groups: clab_hosts
+
+- name: Destroy Containerlab Topology on Hypervisor
+  hosts: clab-hypervisor
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - vars/main.yml
+
+  tasks:
+    - name: Destroy containerlab topology
+      ansible.builtin.command:
+        cmd: containerlab destroy --cleanup
+        chdir: "/root/clab/{{ clab_topology }}/"
+      environment:
+        DOCKER_HOST: "unix:///run/user/1000/podman/podman.sock"
+      register: clab_destroy
+      changed_when: clab_destroy.rc == 0
+      failed_when: false
+
+    - name: Display result
+      ansible.builtin.debug:
+        msg: "Containerlab topology '{{ clab_topology }}' destroyed"
