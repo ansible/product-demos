@@ -1,18 +1,14 @@
 ---
 collections:
-  # AAP config as code
+  # AAP config as code, see https://access.redhat.com/articles/7143507 for version pinning
   - name: ansible.controller
-    version: ">=4.6.0"
+    version: ">=4.8"
   - name: ansible.eda
-    version: ">=2.1.0"
+    version: ">=2.12.0"
   - name: ansible.hub
-    version: ">=1.0.0"
+    version: ">=1.0.6"
   - name: ansible.platform
-    version: ">=2.5.0"
-  - name: infra.ah_configuration
-    version: "2.1.0"
-  - name: infra.controller_configuration
-    version: "3.1.2"
+    version: ">=2.7"
   - name: infra.aap_configuration
     version: ">=3.4.1"
   # linux demos
@@ -28,7 +24,7 @@ collections:
     version: ">=1.23.0"
   # windows demos
   - name: microsoft.ad
-    version: "1.9"
+    version: ">=1.10"
   - name: ansible.windows
     version: ">=2.3.0"
   - name: chocolatey.chocolatey
@@ -56,8 +52,6 @@ collections:
     version: ">=3.0.0"
   - name: paloaltonetworks.panos
     version: ">=3.2.0"
-  # TODO on 2.5 ee-minimal-rhel9 this tries to build and install
-  # a different version of python netifaces, which fails
   - name: infoblox.nios_modules
     version: ">=1.6.1"
   # openshift demos
