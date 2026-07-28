@@ -21,7 +21,7 @@ Triggers a Red Hat Insights compliance scan on RHEL hosts. Uses the redhat.insig
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | Insights Compliance Scan | [`linux/insights_compliance_scan.yml`](https://github.com/ansible/product-demos/blob/main/linux/insights_compliance_scan.yml) | Runs the Insights compliance scan and uploads results to console.redhat.com |
+| LINUX ǀ Insights Compliance Scan | [`linux/insights_compliance_scan.yml`](https://github.com/ansible/product-demos/blob/main/linux/insights_compliance_scan.yml) | Runs the Insights compliance scan and uploads results to console.redhat.com |
 
 ## Related demos
 

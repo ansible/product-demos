@@ -20,7 +20,7 @@ Tests WinRM connectivity to Windows hosts using wait_for_connection and win_ping
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS | Test Connectivity | [`windows/connect.yml`](https://github.com/ansible/product-demos/blob/main/windows/connect.yml) | Waits for WinRM to become available and runs win_ping to confirm connectivity |
+| WINDOWS ǀ Test Connectivity | [`windows/connect.yml`](https://github.com/ansible/product-demos/blob/main/windows/connect.yml) | Waits for WinRM to become available and runs win_ping to confirm connectivity |
 
 ## Related demos
 

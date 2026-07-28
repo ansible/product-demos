@@ -14,7 +14,7 @@ Provisions an AWS VPC with subnet, internet gateway, route table, and security g
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud | AWS | Create VPC | [`cloud/create_vpc.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vpc.yml) | Provisions VPC, subnet, security group, internet gateway, and route table in the selected region |
+| Cloud ǀ AWS ǀ Create VPC | [`cloud/create_vpc.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vpc.yml) | Provisions VPC, subnet, security group, internet gateway, and route table in the selected region |
 
 ## Related demos
 

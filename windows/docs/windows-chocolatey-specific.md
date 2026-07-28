@@ -22,7 +22,7 @@ Installs a specific package by name using the Chocolatey package manager. The pa
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS | Chocolatey Install Specific | [`windows/windows_choco_specific.yml`](https://github.com/ansible/product-demos/blob/main/windows/windows_choco_specific.yml) | Installs a single named package via Chocolatey |
+| WINDOWS ǀ Chocolatey Install Specific | [`windows/windows_choco_specific.yml`](https://github.com/ansible/product-demos/blob/main/windows/windows_choco_specific.yml) | Installs a single named package via Chocolatey |
 
 ## Related demos
 

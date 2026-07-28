@@ -14,7 +14,7 @@ Configures Windows password policies using PowerShell Desired State Configuratio
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS | Configure Password Requirements | [`windows/powershell_dsc.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell_dsc.yml) | Installs SecurityPolicyDSC module and configures password history, length, and complexity via DSC |
+| WINDOWS ǀ Configure Password Requirements | [`windows/powershell_dsc.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell_dsc.yml) | Installs SecurityPolicyDSC module and configures password history, length, and complexity via DSC |
 
 ## Related demos
 

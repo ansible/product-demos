@@ -21,7 +21,7 @@ Starts a named systemd service on target hosts. Checks that the service exists b
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | Start Service | [`linux/service_start.yml`](https://github.com/ansible/product-demos/blob/main/linux/service_start.yml) | Checks for the service and starts it if present |
+| LINUX ǀ Start Service | [`linux/service_start.yml`](https://github.com/ansible/product-demos/blob/main/linux/service_start.yml) | Checks for the service and starts it if present |
 
 ## Related demos
 

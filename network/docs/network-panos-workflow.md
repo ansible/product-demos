@@ -17,10 +17,10 @@ A workflow that provisions a Palo Alto Networks virtual firewall in AWS, configu
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| NETWORK | Panos | Deploy | [`network/panos/deploy.yml`](https://github.com/ansible/product-demos/blob/main/network/panos/deploy.yml) | Provisions the virtual firewall, bastion host, and webserver instances in AWS |
+| NETWORK ǀ Panos ǀ Deploy | [`network/panos/deploy.yml`](https://github.com/ansible/product-demos/blob/main/network/panos/deploy.yml) | Provisions the virtual firewall, bastion host, and webserver instances in AWS |
 | Panos Demo Instances (Inventory Sync) | [`(inventory sync)`](https://github.com/ansible/product-demos/blob/main/(inventory sync)) | Syncs the dynamic inventory source to discover the newly created EC2 instances |
-| NETWORK | Panos | Configure Firewall | [`network/panos/configure_firewall.yml`](https://github.com/ansible/product-demos/blob/main/network/panos/configure_firewall.yml) | Applies initial firewall configuration using the paloaltonetworks.panos collection |
-| NETWORK | Panos | Configure Webserver | [`network/panos/configure_webserver.yml`](https://github.com/ansible/product-demos/blob/main/network/panos/configure_webserver.yml) | Configures a basic Apache webserver behind the firewall to demonstrate security rules |
+| NETWORK ǀ Panos ǀ Configure Firewall | [`network/panos/configure_firewall.yml`](https://github.com/ansible/product-demos/blob/main/network/panos/configure_firewall.yml) | Applies initial firewall configuration using the paloaltonetworks.panos collection |
+| NETWORK ǀ Panos ǀ Configure Webserver | [`network/panos/configure_webserver.yml`](https://github.com/ansible/product-demos/blob/main/network/panos/configure_webserver.yml) | Configures a basic Apache webserver behind the firewall to demonstrate security rules |
 
 ## Why it matters
 

@@ -21,7 +21,7 @@ Applies a selected compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG) to RH
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | Multi-profile Compliance | [`linux/multi_profile_compliance.yml`](https://github.com/ansible/product-demos/blob/main/linux/multi_profile_compliance.yml) | Applies the selected compliance profile to target hosts |
+| LINUX ǀ Multi-profile Compliance | [`linux/multi_profile_compliance.yml`](https://github.com/ansible/product-demos/blob/main/linux/multi_profile_compliance.yml) | Applies the selected compliance profile to target hosts |
 
 ## Related demos
 

@@ -20,7 +20,7 @@ Gathers quick diagnostic information from RHEL hosts -- vmstat for CPU/memory/sw
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | Troubleshoot | [`linux/tshoot.yml`](https://github.com/ansible/product-demos/blob/main/linux/tshoot.yml) | Runs vmstat, ps by CPU, and ps by memory on target hosts and displays results |
+| LINUX ǀ Troubleshoot | [`linux/tshoot.yml`](https://github.com/ansible/product-demos/blob/main/linux/tshoot.yml) | Runs vmstat, ps by CPU, and ps by memory on target hosts and displays results |
 
 ## Related demos
 

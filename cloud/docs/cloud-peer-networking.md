@@ -14,7 +14,7 @@ Creates a multi-VPC peered network topology with a DMZ and private network. Prov
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud | AWS | Create Peer Infrastructure | [`cloud/create_peer_network.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_peer_network.yml) | Provisions peered VPCs, subnets, instances, and configures SSH bastion access |
+| Cloud ǀ AWS ǀ Create Peer Infrastructure | [`cloud/create_peer_network.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_peer_network.yml) | Provisions peered VPCs, subnets, instances, and configures SSH bastion access |
 
 ## Related demos
 

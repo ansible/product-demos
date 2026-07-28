@@ -21,7 +21,7 @@ Publishes a new version of a Satellite content view to a specified lifecycle env
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| SATELLITE | Publish Content View | [`satellite/satellite_publish.yml`](https://github.com/ansible/product-demos/blob/main/satellite/satellite_publish.yml) | Publishes a new version of the content view to the specified lifecycle environment |
+| SATELLITE ǀ Publish Content View | [`satellite/satellite_publish.yml`](https://github.com/ansible/product-demos/blob/main/satellite/satellite_publish.yml) | Publishes a new version of the content view to the specified lifecycle environment |
 
 ## Related demos
 

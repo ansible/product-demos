@@ -24,9 +24,9 @@ A workflow that ties together compliance reporting, inventory refresh, and enfor
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | Multi-profile Compliance Report | [`linux/multi_profile_compliance_report.yml`](https://github.com/ansible/product-demos/blob/main/linux/multi_profile_compliance_report.yml) | Runs an OpenSCAP scan against the selected compliance profile and generates an HTML report |
+| LINUX ǀ Multi-profile Compliance Report | [`linux/multi_profile_compliance_report.yml`](https://github.com/ansible/product-demos/blob/main/linux/multi_profile_compliance_report.yml) | Runs an OpenSCAP scan against the selected compliance profile and generates an HTML report |
 | AWS Inventory | [`(inventory sync)`](https://github.com/ansible/product-demos/blob/main/(inventory sync)) | Refreshes the AWS dynamic inventory to ensure host data is current before enforcement |
-| LINUX | Compliance Enforce | [`linux/remediate_out_of_compliance.yml`](https://github.com/ansible/product-demos/blob/main/linux/remediate_out_of_compliance.yml) | Applies remediation for findings from the compliance scan |
+| LINUX ǀ Compliance Enforce | [`linux/remediate_out_of_compliance.yml`](https://github.com/ansible/product-demos/blob/main/linux/remediate_out_of_compliance.yml) | Applies remediation for findings from the compliance scan |
 
 ## Why it matters
 

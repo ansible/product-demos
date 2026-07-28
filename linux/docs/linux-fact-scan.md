@@ -20,7 +20,7 @@ Scans hosts and gathers package and service facts. This populates the AAP fact c
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | Fact Scan | [`linux/fact_scan.yml`](https://github.com/ansible/product-demos/blob/main/linux/fact_scan.yml) | Gathers package_facts and service_facts, caching them in AAP |
+| LINUX ǀ Fact Scan | [`linux/fact_scan.yml`](https://github.com/ansible/product-demos/blob/main/linux/fact_scan.yml) | Gathers package_facts and service_facts, caching them in AAP |
 
 ## Related demos
 

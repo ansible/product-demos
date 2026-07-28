@@ -21,7 +21,7 @@ Runs OpenSCAP compliance scans on Satellite-managed hosts and uploads results to
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | OpenSCAP Scan (Satellite) | [`satellite/server_openscap.yml`](https://github.com/ansible/product-demos/blob/main/satellite/server_openscap.yml) | Installs foreman_scap_client, runs compliance scans, and uploads results to Satellite |
+| LINUX ǀ OpenSCAP Scan (Satellite) | [`satellite/server_openscap.yml`](https://github.com/ansible/product-demos/blob/main/satellite/server_openscap.yml) | Installs foreman_scap_client, runs compliance scans, and uploads results to Satellite |
 
 ## Related demos
 

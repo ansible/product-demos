@@ -22,7 +22,7 @@ Runs a PowerShell script on Windows hosts using Kerberos authentication instead 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS | Run PowerShell | Kerberos | [`windows/powershell.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell.yml) | Executes PowerShell on target hosts using Kerberos authentication |
+| WINDOWS ǀ Run PowerShell ǀ Kerberos | [`windows/powershell.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell.yml) | Executes PowerShell on target hosts using Kerberos authentication |
 
 ## Related demos
 

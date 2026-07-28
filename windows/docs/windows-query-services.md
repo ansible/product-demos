@@ -21,7 +21,7 @@ Copies a PowerShell script to the target host and queries Windows services filte
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS | Query Services | [`windows/powershell_script.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell_script.yml) | Copies and runs a PowerShell script that filters services by the selected state |
+| WINDOWS ǀ Query Services | [`windows/powershell_script.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell_script.yml) | Copies and runs a PowerShell script that filters services by the selected state |
 
 ## Related demos
 

@@ -21,7 +21,7 @@ Installs a Linux application package via DNF. Supports version pinning with allo
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | Deploy Application | [`linux/deploy_application.yml`](https://github.com/ansible/product-demos/blob/main/linux/deploy_application.yml) | Installs or updates an application package via DNF on target hosts |
+| LINUX ǀ Deploy Application | [`linux/deploy_application.yml`](https://github.com/ansible/product-demos/blob/main/linux/deploy_application.yml) | Installs or updates an application package via DNF on target hosts |
 
 ## Related demos
 

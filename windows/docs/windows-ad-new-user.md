@@ -25,7 +25,7 @@ Creates a new Active Directory user with full attributes -- name, department, co
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS | AD | New User | [`windows/helpdesk_new_user_portal.yml`](https://github.com/ansible/product-demos/blob/main/windows/helpdesk_new_user_portal.yml) | Creates an AD user with full attributes, random password, and group memberships |
+| WINDOWS ǀ AD ǀ New User | [`windows/helpdesk_new_user_portal.yml`](https://github.com/ansible/product-demos/blob/main/windows/helpdesk_new_user_portal.yml) | Creates an AD user with full attributes, random password, and group memberships |
 
 ## Related demos
 

@@ -15,7 +15,7 @@ Deploys the full OpenShift CNV infrastructure stack -- installs the OpenShift Vi
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| OpenShift | CNV | Infra Stack (workflow) | [`openshift/setup.yml`](https://github.com/ansible/product-demos/blob/main/openshift/setup.yml) | Installs CNV, provisions VMs, and syncs inventory in a single workflow |
+| OpenShift ǀ CNV ǀ Infra Stack (workflow) | [`openshift/setup.yml`](https://github.com/ansible/product-demos/blob/main/openshift/setup.yml) | Installs CNV, provisions VMs, and syncs inventory in a single workflow |
 
 ## Related demos
 

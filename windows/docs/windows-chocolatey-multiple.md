@@ -15,7 +15,7 @@ Installs multiple packages (Node.js and Python by default) using the Chocolatey 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS | Chocolatey Install Multiple | [`windows/windows_choco_multiple.yml`](https://github.com/ansible/product-demos/blob/main/windows/windows_choco_multiple.yml) | Installs Node.js and Python via Chocolatey and verifies the installed versions |
+| WINDOWS ǀ Chocolatey Install Multiple | [`windows/windows_choco_multiple.yml`](https://github.com/ansible/product-demos/blob/main/windows/windows_choco_multiple.yml) | Installs Node.js and Python via Chocolatey and verifies the installed versions |
 
 ## Related demos
 

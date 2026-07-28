@@ -14,7 +14,7 @@ Promotes a Windows Server to a domain controller and creates a new Active Direct
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS | AD | Create Domain | [`windows/create_ad_domain.yml`](https://github.com/ansible/product-demos/blob/main/windows/create_ad_domain.yml) | Sets admin password, updates hostname, creates AD forest, and reboots |
+| WINDOWS ǀ AD ǀ Create Domain | [`windows/create_ad_domain.yml`](https://github.com/ansible/product-demos/blob/main/windows/create_ad_domain.yml) | Sets admin password, updates hostname, creates AD forest, and reboots |
 
 ## Related demos
 

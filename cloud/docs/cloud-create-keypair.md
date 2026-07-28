@@ -14,7 +14,7 @@ Creates an AWS EC2 keypair from the SSH public key attached to the APD Machine C
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud | AWS | Create Keypair | [`cloud/aws_key.yml`](https://github.com/ansible/product-demos/blob/main/cloud/aws_key.yml) | Creates or updates an EC2 keypair, deriving the public key from the machine credential if not provided |
+| Cloud ǀ AWS ǀ Create Keypair | [`cloud/aws_key.yml`](https://github.com/ansible/product-demos/blob/main/cloud/aws_key.yml) | Creates or updates an EC2 keypair, deriving the public key from the machine credential if not provided |
 
 ## Related demos
 

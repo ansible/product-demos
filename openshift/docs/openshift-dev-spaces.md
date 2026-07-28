@@ -14,7 +14,7 @@ Deploys Red Hat OpenShift Dev Spaces on an OpenShift cluster. Creates the namesp
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| OpenShift | Dev Spaces | Install | [`openshift/devspaces.yml`](https://github.com/ansible/product-demos/blob/main/openshift/devspaces.yml) | Creates the namespace, installs the Dev Spaces operator, and provisions the CheCluster instance |
+| OpenShift ǀ Dev Spaces ǀ Install | [`openshift/devspaces.yml`](https://github.com/ansible/product-demos/blob/main/openshift/devspaces.yml) | Creates the namespace, installs the Dev Spaces operator, and provisions the CheCluster instance |
 
 ## Related demos
 

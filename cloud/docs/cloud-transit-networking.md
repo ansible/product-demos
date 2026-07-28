@@ -14,7 +14,7 @@ Creates a hub-and-spoke network topology using AWS Transit Gateway. Provisions m
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud | AWS | Create Transit Infrastructure | [`cloud/create_transit_network.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_transit_network.yml) | Provisions VPCs, transit gateway, attachments, and configures bastion SSH access |
+| Cloud ǀ AWS ǀ Create Transit Infrastructure | [`cloud/create_transit_network.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_transit_network.yml) | Provisions VPCs, transit gateway, attachments, and configures bastion SSH access |
 
 ## Related demos
 

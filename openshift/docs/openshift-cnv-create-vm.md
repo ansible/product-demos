@@ -23,7 +23,7 @@ Provisions a RHEL virtual machine on OpenShift Virtualization (CNV) using the Ku
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| OpenShift | CNV | Create VM | [`openshift/cnv/provision_rhel.yml`](https://github.com/ansible/product-demos/blob/main/openshift/cnv/provision_rhel.yml) | Creates a KubeVirt VirtualMachine with a DataVolume from a cluster image source |
+| OpenShift ǀ CNV ǀ Create VM | [`openshift/cnv/provision_rhel.yml`](https://github.com/ansible/product-demos/blob/main/openshift/cnv/provision_rhel.yml) | Creates a KubeVirt VirtualMachine with a DataVolume from a cluster image source |
 
 ## Related demos
 

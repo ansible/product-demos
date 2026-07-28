@@ -21,7 +21,7 @@ Runs an arbitrary PowerShell script on target Windows hosts. The script content 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS | Run PowerShell | [`windows/powershell.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell.yml) | Executes the provided PowerShell script on target hosts and displays the output |
+| WINDOWS ǀ Run PowerShell | [`windows/powershell.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell.yml) | Executes the provided PowerShell script on target hosts and displays the output |
 
 ## Related demos
 

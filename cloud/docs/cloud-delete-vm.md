@@ -21,7 +21,7 @@ Terminates an EC2 instance by its Name tag. Looks up the instance in the specifi
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud | AWS | Delete VM | [`cloud/delete_vm_by_name.yml`](https://github.com/ansible/product-demos/blob/main/cloud/delete_vm_by_name.yml) | Finds and terminates an EC2 instance by its Name tag |
+| Cloud ǀ AWS ǀ Delete VM | [`cloud/delete_vm_by_name.yml`](https://github.com/ansible/product-demos/blob/main/cloud/delete_vm_by_name.yml) | Finds and terminates an EC2 instance by its Name tag |
 
 ## Related demos
 

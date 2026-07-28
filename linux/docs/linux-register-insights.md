@@ -21,7 +21,7 @@ Registers RHEL EC2 instances with Red Hat Subscription Manager using an activati
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | Register with Insights | [`linux/ec2_register.yml`](https://github.com/ansible/product-demos/blob/main/linux/ec2_register.yml) | Registers RHEL hosts with RHSM, removes RHUI packages, and configures subscription access |
+| LINUX ǀ Register with Insights | [`linux/ec2_register.yml`](https://github.com/ansible/product-demos/blob/main/linux/ec2_register.yml) | Registers RHEL hosts with RHSM, removes RHUI packages, and configures subscription access |
 
 ## Related demos
 

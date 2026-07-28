@@ -14,7 +14,7 @@ Deletes one or more virtual machines from OpenShift Virtualization. Removes the 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| OpenShift | CNV | Delete VM | [`openshift/cnv/delete.yml`](https://github.com/ansible/product-demos/blob/main/openshift/cnv/delete.yml) | Removes VirtualMachine and DataVolume resources from the specified namespace |
+| OpenShift ǀ CNV ǀ Delete VM | [`openshift/cnv/delete.yml`](https://github.com/ansible/product-demos/blob/main/openshift/cnv/delete.yml) | Removes VirtualMachine and DataVolume resources from the specified namespace |
 
 ## Related demos
 

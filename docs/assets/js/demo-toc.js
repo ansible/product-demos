@@ -2,13 +2,46 @@
   var toc = document.querySelector('.demo-toc');
   if (!toc) return;
 
+  var body = document.querySelector('.detail-body');
+  if (!body) return;
+
+  /* Auto-build TOC from h2 headings in the markdown body */
+  var headings = body.querySelectorAll('h2');
+  headings.forEach(function (h2) {
+    if (!h2.id) {
+      h2.id = h2.textContent
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+    }
+    var link = document.createElement('a');
+    link.href = '#' + h2.id;
+    link.className = 'demo-toc__link';
+    link.textContent = h2.textContent.trim();
+    toc.appendChild(link);
+  });
+
+  /* Wrap prerequisites list in a callout box */
+  headings.forEach(function (h2) {
+    if (h2.textContent.trim().toLowerCase() === 'prerequisites') {
+      var ul = h2.nextElementSibling;
+      if (ul && (ul.tagName === 'UL' || ul.tagName === 'OL')) {
+        var box = document.createElement('div');
+        box.className = 'prereq-box';
+        ul.parentNode.insertBefore(box, ul);
+        box.appendChild(ul);
+      }
+    }
+  });
+
+  /* Highlight active TOC link on scroll */
   var links = toc.querySelectorAll('.demo-toc__link');
   var sections = [];
-
   links.forEach(function (link) {
     var id = link.getAttribute('href').slice(1);
-    var section = document.getElementById(id);
-    if (section) sections.push({ id: id, el: section, link: link });
+    var el = document.getElementById(id);
+    if (el) sections.push({ id: id, el: el, link: link });
   });
 
   function setActive(id) {

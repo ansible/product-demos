@@ -13,7 +13,7 @@ A generic rollback playbook used as a cleanup step in Windows workflows. Outputs
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS | Rollback | [`windows/rollback.yml`](https://github.com/ansible/product-demos/blob/main/windows/rollback.yml) | Outputs rollback message -- used as a failure handler in workflows |
+| WINDOWS ǀ Rollback | [`windows/rollback.yml`](https://github.com/ansible/product-demos/blob/main/windows/rollback.yml) | Outputs rollback message -- used as a failure handler in workflows |
 
 ## Related demos
 

@@ -20,7 +20,7 @@ Applies DISA STIG (Security Technical Implementation Guide) hardening to RHEL ho
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | DISA STIG | [`linux/disa_stig.yml`](https://github.com/ansible/product-demos/blob/main/linux/disa_stig.yml) | Applies DISA STIG hardening controls from the demo.compliance collection |
+| LINUX ǀ DISA STIG | [`linux/disa_stig.yml`](https://github.com/ansible/product-demos/blob/main/linux/disa_stig.yml) | Applies DISA STIG hardening controls from the demo.compliance collection |
 
 ## Related demos
 

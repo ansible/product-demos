@@ -21,7 +21,7 @@ Registers RHEL hosts with a Red Hat Satellite server. Uses the demo.satellite.re
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | Register with Satellite | [`satellite/server_register.yml`](https://github.com/ansible/product-demos/blob/main/satellite/server_register.yml) | Registers target RHEL hosts with the configured Satellite server |
+| LINUX ǀ Register with Satellite | [`satellite/server_register.yml`](https://github.com/ansible/product-demos/blob/main/satellite/server_register.yml) | Registers target RHEL hosts with the configured Satellite server |
 
 ## Related demos
 

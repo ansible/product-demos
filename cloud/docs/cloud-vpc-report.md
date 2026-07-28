@@ -14,7 +14,7 @@ Generates an HTML report of the current AWS VPC infrastructure -- instances, net
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud | AWS | VPC Report | [`cloud/cloud_report.yml`](https://github.com/ansible/product-demos/blob/main/cloud/cloud_report.yml) | Gathers facts from EC2 instances and generates an HTML infrastructure report |
+| Cloud ǀ AWS ǀ VPC Report | [`cloud/cloud_report.yml`](https://github.com/ansible/product-demos/blob/main/cloud/cloud_report.yml) | Gathers facts from EC2 instances and generates an HTML infrastructure report |
 
 ## Related demos
 

@@ -21,7 +21,7 @@ Launches an EC2 instance from a blueprint definition. Blueprints are YAML files 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud | AWS | Create VM | [`cloud/create_vm.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vm.yml) | Provisions an EC2 instance using a blueprint, sets tags, and waits for connectivity |
+| Cloud ǀ AWS ǀ Create VM | [`cloud/create_vm.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vm.yml) | Provisions an EC2 instance using a blueprint, sets tags, and waits for connectivity |
 
 ## Related demos
 

@@ -21,7 +21,7 @@ Installs Internet Information Services (IIS) on Windows Server, starts the W3SVC
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS | Install IIS | [`windows/install_iis.yml`](https://github.com/ansible/product-demos/blob/main/windows/install_iis.yml) | Installs the IIS Web-Server feature, starts it, and deploys a custom index page |
+| WINDOWS ǀ Install IIS | [`windows/install_iis.yml`](https://github.com/ansible/product-demos/blob/main/windows/install_iis.yml) | Installs the IIS Web-Server feature, starts it, and deploys a custom index page |
 
 ## Related demos
 

@@ -14,7 +14,7 @@ Applies remediation for a compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | Compliance Enforce | [`linux/remediate_out_of_compliance.yml`](https://github.com/ansible/product-demos/blob/main/linux/remediate_out_of_compliance.yml) | Applies compliance role remediation to hosts in the OUT_OF_COMPLIANCE group |
+| LINUX ǀ Compliance Enforce | [`linux/remediate_out_of_compliance.yml`](https://github.com/ansible/product-demos/blob/main/linux/remediate_out_of_compliance.yml) | Applies compliance role remediation to hosts in the OUT_OF_COMPLIANCE group |
 
 ## Related demos
 

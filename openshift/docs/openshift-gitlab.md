@@ -15,7 +15,7 @@ Deploys GitLab on an OpenShift cluster using the GitLab Operator. Installs cert-
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| OpenShift | GitLab | Install | [`openshift/gitlab.yml`](https://github.com/ansible/product-demos/blob/main/openshift/gitlab.yml) | Installs cert-manager, deploys the GitLab operator, and creates a GitLab instance on OpenShift |
+| OpenShift ǀ GitLab ǀ Install | [`openshift/gitlab.yml`](https://github.com/ansible/product-demos/blob/main/openshift/gitlab.yml) | Installs cert-manager, deploys the GitLab operator, and creates a GitLab instance on OpenShift |
 
 ## Related demos
 

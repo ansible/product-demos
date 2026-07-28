@@ -24,7 +24,7 @@ Grants temporary sudo access to a user for a configurable duration. Creates a su
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | Temporary Sudo | [`linux/temp_sudo.yml`](https://github.com/ansible/product-demos/blob/main/linux/temp_sudo.yml) | Creates a time-limited sudoers rule and schedules automatic cleanup |
+| LINUX ǀ Temporary Sudo | [`linux/temp_sudo.yml`](https://github.com/ansible/product-demos/blob/main/linux/temp_sudo.yml) | Creates a time-limited sudoers rule and schedules automatic cleanup |
 
 ## Related demos
 

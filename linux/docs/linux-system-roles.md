@@ -21,7 +21,7 @@ Applies one or more RHEL System Roles to target hosts. System Roles are a collec
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | System Roles | [`linux/system_roles.yml`](https://github.com/ansible/product-demos/blob/main/linux/system_roles.yml) | Applies selected RHEL System Roles (timesync, network, storage, etc.) to target hosts |
+| LINUX ǀ System Roles | [`linux/system_roles.yml`](https://github.com/ansible/product-demos/blob/main/linux/system_roles.yml) | Applies selected RHEL System Roles (timesync, network, storage, etc.) to target hosts |
 
 ## Related demos
 

@@ -20,7 +20,7 @@ Restores EC2 instance volumes from the most recent EBS snapshot. This is the rol
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud | AWS | Restore EC2 from Snapshot | [`cloud/restore_ec2.yml`](https://github.com/ansible/product-demos/blob/main/cloud/restore_ec2.yml) | Restores volumes from the latest EBS snapshot for the target instances |
+| Cloud ǀ AWS ǀ Restore EC2 from Snapshot | [`cloud/restore_ec2.yml`](https://github.com/ansible/product-demos/blob/main/cloud/restore_ec2.yml) | Restores volumes from the latest EBS snapshot for the target instances |
 
 ## Related demos
 

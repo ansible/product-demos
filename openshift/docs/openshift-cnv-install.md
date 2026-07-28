@@ -14,7 +14,7 @@ Deploys the OpenShift Virtualization (CNV) operator on an OpenShift cluster, cre
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| OpenShift | CNV | Install | [`openshift/cnv/install.yml`](https://github.com/ansible/product-demos/blob/main/openshift/cnv/install.yml) | Installs the CNV operator, creates HyperConverged CR, and provisions a test VM |
+| OpenShift ǀ CNV ǀ Install | [`openshift/cnv/install.yml`](https://github.com/ansible/product-demos/blob/main/openshift/cnv/install.yml) | Installs the CNV operator, creates HyperConverged CR, and provisions a test VM |
 
 ## Related demos
 

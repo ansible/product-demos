@@ -15,7 +15,7 @@ Patching workflow for RHEL VMs running on OpenShift Virtualization. Similar to t
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| OpenShift | CNV | Patch Workflow | [`openshift/setup.yml`](https://github.com/ansible/product-demos/blob/main/openshift/setup.yml) | Runs the patching workflow against CNV-managed RHEL virtual machines |
+| OpenShift ǀ CNV ǀ Patch Workflow | [`openshift/setup.yml`](https://github.com/ansible/product-demos/blob/main/openshift/setup.yml) | Runs the patching workflow against CNV-managed RHEL virtual machines |
 
 ## Related demos
 

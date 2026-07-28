@@ -20,7 +20,7 @@ Applies DISA STIG hardening to Windows Server 2022. Uses the demo.compliance.win
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS | DISA STIG | [`windows/compliance.yml`](https://github.com/ansible/product-demos/blob/main/windows/compliance.yml) | Applies Windows 2022 DISA STIG hardening controls from the demo.compliance collection |
+| WINDOWS ǀ DISA STIG | [`windows/compliance.yml`](https://github.com/ansible/product-demos/blob/main/windows/compliance.yml) | Applies Windows 2022 DISA STIG hardening controls from the demo.compliance collection |
 
 ## Related demos
 

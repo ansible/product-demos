@@ -22,7 +22,7 @@ Promotes a Satellite content view version from one lifecycle environment to anot
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| SATELLITE | Promote Content View | [`satellite/satellite_promote.yml`](https://github.com/ansible/product-demos/blob/main/satellite/satellite_promote.yml) | Promotes a content view version from one lifecycle environment to another |
+| SATELLITE ǀ Promote Content View | [`satellite/satellite_promote.yml`](https://github.com/ansible/product-demos/blob/main/satellite/satellite_promote.yml) | Promotes a content view version from one lifecycle environment to another |
 
 ## Related demos
 

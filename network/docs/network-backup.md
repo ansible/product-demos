@@ -15,7 +15,7 @@ Backs up running configurations from network devices to a report server. Sets up
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| NETWORK | Backup | [`network/backup.yml`](https://github.com/ansible/product-demos/blob/main/network/backup.yml) | Sets up a backup directory on the report server and saves device running configs |
+| NETWORK ǀ Backup | [`network/backup.yml`](https://github.com/ansible/product-demos/blob/main/network/backup.yml) | Sets up a backup directory on the report server and saves device running configs |
 
 ## Related demos
 

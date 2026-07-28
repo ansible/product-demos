@@ -22,7 +22,7 @@ Runs an OpenSCAP scan against a selected compliance profile and generates an HTM
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX | Multi-profile Compliance Report | [`linux/multi_profile_compliance_report.yml`](https://github.com/ansible/product-demos/blob/main/linux/multi_profile_compliance_report.yml) | Runs OpenSCAP scan and generates an HTML compliance report on target hosts |
+| LINUX ǀ Multi-profile Compliance Report | [`linux/multi_profile_compliance_report.yml`](https://github.com/ansible/product-demos/blob/main/linux/multi_profile_compliance_report.yml) | Runs OpenSCAP scan and generates an HTML compliance report on target hosts |
 
 ## Related demos
 

@@ -20,7 +20,7 @@ Changes the instance type of one or more EC2 instances. Useful for demonstrating
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud | AWS | Resize EC2 | [`cloud/resize_ec2.yml`](https://github.com/ansible/product-demos/blob/main/cloud/resize_ec2.yml) | Stops the instance, changes instance type, and restarts it |
+| Cloud ǀ AWS ǀ Resize EC2 | [`cloud/resize_ec2.yml`](https://github.com/ansible/product-demos/blob/main/cloud/resize_ec2.yml) | Stops the instance, changes instance type, and restarts it |
 
 ## Related demos
 

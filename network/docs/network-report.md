@@ -21,7 +21,7 @@ Generates an HTML network report by gathering facts from Cisco IOS, IOS-XR, and 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| NETWORK | Report | [`network/report.yml`](https://github.com/ansible/product-demos/blob/main/network/report.yml) | Gathers facts from Cisco IOS, IOS-XR, and NX-OS devices and generates an HTML report |
+| NETWORK ǀ Report | [`network/report.yml`](https://github.com/ansible/product-demos/blob/main/network/report.yml) | Gathers facts from Cisco IOS, IOS-XR, and NX-OS devices and generates an HTML report |
 
 ## Related demos
 

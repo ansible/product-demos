@@ -16,7 +16,7 @@ End-to-end Satellite patching workflow for development environments. Combines co
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| SATELLITE | Patch Dev (workflow) | [`satellite/setup.yml`](https://github.com/ansible/product-demos/blob/main/satellite/setup.yml) | Publishes content view, syncs hosts, and applies patches to development environment |
+| SATELLITE ǀ Patch Dev (workflow) | [`satellite/setup.yml`](https://github.com/ansible/product-demos/blob/main/satellite/setup.yml) | Publishes content view, syncs hosts, and applies patches to development environment |
 
 ## Related demos
 

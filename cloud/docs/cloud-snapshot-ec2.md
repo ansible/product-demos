@@ -20,7 +20,7 @@ Creates EBS snapshots of all volumes attached to the target EC2 instances. Used 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud | AWS | Snapshot EC2 | [`cloud/snapshot_ec2.yml`](https://github.com/ansible/product-demos/blob/main/cloud/snapshot_ec2.yml) | Creates EBS snapshots of all volumes on the target instances |
+| Cloud ǀ AWS ǀ Snapshot EC2 | [`cloud/snapshot_ec2.yml`](https://github.com/ansible/product-demos/blob/main/cloud/snapshot_ec2.yml) | Creates EBS snapshots of all volumes on the target instances |
 
 ## Related demos
 
