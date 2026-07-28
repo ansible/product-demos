@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: cloud-delete-vm
+description: >-
+  Terminates an EC2 instance by its Name tag. Looks up the instance in the
+  specified region and terminates it, waiting for the instance to fully shut
+  down. Safe to run even if the instance has already been terminated.
 prerequisites:
   - "AWS credential configured"
   - "An existing EC2 instance to terminate"
@@ -23,7 +27,3 @@ related_demos:
   - slug: cloud-destroy-stack
     description: "Tear down the entire demo stack at once"
 ---
-
-Terminates an EC2 instance by its Name tag. Looks up the instance in the specified region and terminates it, waiting for the instance to fully shut down. Safe to run even if the instance has already been terminated.
-
-_Terminate an EC2 instance by name_

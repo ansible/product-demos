@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: windows-ad-join-domain
+description: >-
+  Joins Windows hosts to an existing Active Directory domain. Sets the DNS
+  client to point at the domain controller, creates an OU, updates the
+  hostname, and performs the domain join.
 prerequisites:
   - "An existing AD domain (created by <strong>WINDOWS | AD | Create Domain</strong>)"
   - "Domain controller private IP accessible from target hosts"
@@ -14,7 +18,3 @@ related_demos:
   - slug: windows-ad-new-user
     description: "Create users in the domain after hosts are joined"
 ---
-
-Joins Windows hosts to an existing Active Directory domain. Sets the DNS client to point at the domain controller, creates an OU, updates the hostname, and performs the domain join.
-
-_Join Windows hosts to an Active Directory domain_

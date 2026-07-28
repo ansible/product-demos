@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: satellite-publish-content-view
+description: >-
+  Publishes a new version of a Satellite content view to a specified lifecycle
+  environment. Content views control which packages and errata are available
+  to hosts -- publishing creates a point-in-time snapshot of the content.
 prerequisites:
   - "<strong>Satellite Collection</strong> credential configured"
   - "Content views already defined in Satellite"
@@ -21,7 +25,3 @@ related_demos:
   - slug: satellite-promote-content-view
     description: "Promote the published version to the next lifecycle stage"
 ---
-
-Publishes a new version of a Satellite content view to a specified lifecycle environment. Content views control which packages and errata are available to hosts -- publishing creates a point-in-time snapshot of the content.
-
-_Publish a Satellite content view version_

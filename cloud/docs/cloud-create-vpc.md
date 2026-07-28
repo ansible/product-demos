@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: cloud-create-vpc
+description: >-
+  Provisions an AWS VPC with subnet, internet gateway, route table, and
+  security group. Supports multiple regions with configurable availability
+  zones. This is a building-block playbook used by the Deploy Cloud Stack
+  workflow and can also be run standalone.
 prerequisites:
   - "AWS credential configured with Access and Secret key"
   - "Run <strong>APD | Single demo setup</strong> with <code>cloud</code> to create the job template"
@@ -14,7 +19,3 @@ related_demos:
   - slug: cloud-create-keypair
     description: "Create an SSH keypair to use with VMs in this VPC"
 ---
-
-Provisions an AWS VPC with subnet, internet gateway, route table, and security group. Supports multiple regions with configurable availability zones. This is a building-block playbook used by the Deploy Cloud Stack workflow and can also be run standalone.
-
-_Create a full VPC with networking in one playbook_

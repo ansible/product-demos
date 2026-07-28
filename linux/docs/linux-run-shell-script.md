@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: linux-run-shell-script
+description: >-
+  Runs an arbitrary shell script on target hosts. The script content is
+  provided via survey. Outputs the result and reminds users they should
+  consider converting scripts to proper playbooks. Great for showing the
+  migration path from scripts to automation.
 prerequisites:
   - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "SSH connectivity via <strong>APD Machine Credential</strong>"
@@ -21,7 +26,3 @@ related_demos:
   - slug: linux-troubleshoot
     description: "Pre-built troubleshooting commands instead of ad-hoc scripts"
 ---
-
-Runs an arbitrary shell script on target hosts. The script content is provided via survey. Outputs the result and reminds users they should consider converting scripts to proper playbooks. Great for showing the migration path from scripts to automation.
-
-_Run an ad-hoc shell script on RHEL hosts_

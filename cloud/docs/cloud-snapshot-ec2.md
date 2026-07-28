@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: cloud-snapshot-ec2
+description: >-
+  Creates EBS snapshots of all volumes attached to the target EC2 instances.
+  Used as a safety net before patching or other changes -- if something goes
+  wrong, you can restore from these snapshots.
 prerequisites:
   - "AWS credential configured"
   - "Running EC2 instances to snapshot"
@@ -19,7 +23,3 @@ related_demos:
   - slug: patch-cloud-stack
     description: "The patching workflow uses snapshots as its safety net"
 ---
-
-Creates EBS snapshots of all volumes attached to the target EC2 instances. Used as a safety net before patching or other changes -- if something goes wrong, you can restore from these snapshots.
-
-_EBS snapshot for backup before changes_

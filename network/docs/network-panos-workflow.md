@@ -1,6 +1,12 @@
 ---
 layout: demo-detail
 demo_slug: network-panos-workflow
+description: >-
+  A workflow that provisions a Palo Alto Networks virtual firewall in AWS,
+  configures it using the paloaltonetworks.panos collection, deploys a
+  webserver behind it, and sets up security rules to demonstrate firewall
+  policy management. Covers the full lifecycle from infrastructure
+  provisioning through configuration and validation.
 prerequisites:
   - "AWS credential configured with Access and Secret key"
   - "Subscribe to the <strong>VM-Series Next-Gen Virtual Firewall</strong> AMI in the AWS Marketplace (five-minute approval process)"
@@ -28,10 +34,6 @@ related_demos:
   - slug: deploy-cloud-stack
     description: "Provision the full demo infrastructure including the reports server used by other network demos"
 ---
-
-A workflow that provisions a Palo Alto Networks virtual firewall in AWS, configures it using the paloaltonetworks.panos collection, deploys a webserver behind it, and sets up security rules to demonstrate firewall policy management. Covers the full lifecycle from infrastructure provisioning through configuration and validation.
-
-_Deploy and manage a Palo Alto firewall with security rule demos_
 
 ## Why it matters
 

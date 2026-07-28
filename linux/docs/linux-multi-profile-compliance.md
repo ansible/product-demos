@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: linux-multi-profile-compliance
+description: >-
+  Applies a selected compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG)
+  to RHEL hosts using the official Red Hat compliance roles. This is the
+  enforcement-only playbook -- for scanning and reporting, see the
+  Multi-profile Compliance Report.
 prerequisites:
   - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "SSH connectivity via <strong>APD Machine Credential</strong>"
@@ -23,7 +28,3 @@ related_demos:
   - slug: linux-compliance-workflow
     description: "Automated scan then enforce workflow"
 ---
-
-Applies a selected compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG) to RHEL hosts using the official Red Hat compliance roles. This is the enforcement-only playbook -- for scanning and reporting, see the Multi-profile Compliance Report.
-
-_Apply a compliance profile to RHEL hosts_

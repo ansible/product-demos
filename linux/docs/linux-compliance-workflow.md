@@ -1,6 +1,12 @@
 ---
 layout: demo-detail
 demo_slug: linux-compliance-workflow
+description: >-
+  A workflow that ties together compliance reporting, inventory refresh, and
+  enforcement in a single execution. It first generates an OpenSCAP report
+  against a chosen compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG),
+  syncs the AWS inventory, and then enforces remediation on findings — giving
+  you a before-and-after view of compliance posture.
 prerequisites:
   - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "SSH connectivity via <strong>APD Machine Credential</strong>"
@@ -37,10 +43,6 @@ related_demos:
   - slug: linux-patching
     description: "Patch first, then run compliance to show a complete day-2 operations story"
 ---
-
-A workflow that ties together compliance reporting, inventory refresh, and enforcement in a single execution. It first generates an OpenSCAP report against a chosen compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG), syncs the AWS inventory, and then enforces remediation on findings — giving you a before-and-after view of compliance posture.
-
-_Scan, sync, and enforce compliance in one automated workflow_
 
 ## Why it matters
 

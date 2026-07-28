@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: linux-system-roles
+description: >-
+  Applies one or more RHEL System Roles to target hosts. System Roles are a
+  collection of Ansible roles for configuring common RHEL subsystems
+  (timesync, network, storage, etc.) in a consistent, supported way.
 prerequisites:
   - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "SSH connectivity via <strong>APD Machine Credential</strong>"
@@ -21,7 +25,3 @@ related_demos:
   - slug: linux-cockpit
     description: "Install Cockpit web console using System Roles"
 ---
-
-Applies one or more RHEL System Roles to target hosts. System Roles are a collection of Ansible roles for configuring common RHEL subsystems (timesync, network, storage, etc.) in a consistent, supported way.
-
-_Apply certified RHEL System Roles for consistent configuration_

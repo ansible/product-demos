@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: linux-disa-stig
+description: >-
+  Applies DISA STIG (Security Technical Implementation Guide) hardening to
+  RHEL hosts. Uses the demo.compliance collection STIG role to configure
+  security controls required for U.S. Department of Defense environments.
 prerequisites:
   - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "SSH connectivity via <strong>APD Machine Credential</strong>"
@@ -19,7 +23,3 @@ related_demos:
   - slug: linux-compliance-report
     description: "Generate a compliance report to measure STIG compliance"
 ---
-
-Applies DISA STIG (Security Technical Implementation Guide) hardening to RHEL hosts. Uses the demo.compliance collection STIG role to configure security controls required for U.S. Department of Defense environments.
-
-_Apply DISA STIG hardening to RHEL servers_

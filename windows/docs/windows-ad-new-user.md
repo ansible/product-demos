@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: windows-ad-new-user
+description: >-
+  Creates a new Active Directory user with full attributes -- name,
+  department, company, address, phone, and group memberships. Generates a
+  random temporary password. Demonstrates a helpdesk self-service portal for
+  user provisioning.
 prerequisites:
   - "An Active Directory domain (deployed by <strong>Setup Active Directory Domain</strong> workflow)"
   - "Domain controller accessible via WinRM"
@@ -39,7 +44,3 @@ related_demos:
   - slug: windows-run-powershell
     description: "Query AD for the newly created user"
 ---
-
-Creates a new Active Directory user with full attributes -- name, department, company, address, phone, and group memberships. Generates a random temporary password. Demonstrates a helpdesk self-service portal for user provisioning.
-
-_Self-service AD user creation for helpdesk operators_

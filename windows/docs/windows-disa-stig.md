@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: windows-disa-stig
+description: >-
+  Applies DISA STIG hardening to Windows Server 2022. Uses the
+  demo.compliance.win2022STIG role to configure security controls required for
+  U.S. Department of Defense Windows environments.
 prerequisites:
   - "Windows Server 2022 hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "WinRM connectivity via <strong>APD Machine Credential</strong>"
@@ -19,7 +23,3 @@ related_demos:
   - slug: windows-password-requirements
     description: "Lighter-weight password policy configuration via DSC"
 ---
-
-Applies DISA STIG hardening to Windows Server 2022. Uses the demo.compliance.win2022STIG role to configure security controls required for U.S. Department of Defense Windows environments.
-
-_Apply DISA STIG hardening to Windows Server 2022_

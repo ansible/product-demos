@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: deploy-cloud-stack
+description: >-
+  Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two
+  Windows, two RHEL, one reports server), dynamic inventory sync, and a VPC
+  report published to S3. This is the starting point for most cloud, Linux,
+  and Windows demos.
 prerequisites:
   - "<strong>If using RHDP (demo.redhat.com):</strong> Run <strong>APD | Multi-demo setup</strong> to configure all templates and credentials. AWS and APD Machine credentials are pre-configured for you."
   - "<strong>If using your own installation:</strong> Run <strong>APD | Single demo setup</strong> and choose <code>cloud</code>. Configure the <strong>AWS</strong> credential with your Access Key and Secret Key, and add an SSH private key to <strong>APD Machine Credential</strong>."
@@ -29,10 +34,6 @@ related_demos:
   - slug: linux-fact-scan
     description: "Gather facts from the newly deployed RHEL hosts"
 ---
-
-Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Windows, two RHEL, one reports server), dynamic inventory sync, and a VPC report published to S3. This is the starting point for most cloud, Linux, and Windows demos.
-
-_One workflow deploys everything you need for hands-on demos_
 
 ## Why it matters
 

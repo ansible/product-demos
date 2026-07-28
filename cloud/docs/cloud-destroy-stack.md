@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: cloud-destroy-stack
+description: >-
+  Tears down everything created by Deploy Cloud Stack in AWS — terminates all
+  five stack VMs in parallel, deletes the VPC and related networking
+  resources, deletes the keypair, and re-syncs the AWS dynamic inventory so
+  hosts are removed from AAP.
 prerequisites:
   - "A stack previously deployed with <strong>Deploy Cloud Stack in AWS</strong>"
   - "AWS credential configured"
@@ -13,10 +18,6 @@ related_demos:
   - slug: deploy-cloud-stack
     description: "The matching provisioning workflow"
 ---
-
-Tears down everything created by Deploy Cloud Stack in AWS — terminates all five stack VMs in parallel, deletes the VPC and related networking resources, deletes the keypair, and re-syncs the AWS dynamic inventory so hosts are removed from AAP.
-
-_Clean teardown of the full demo environment in one workflow_
 
 ## Presenter walkthrough
 

@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: network-disa-stig
+description: >-
+  Applies DISA STIG compliance checks and hardening to Cisco IOS-XE network
+  devices. Uses the demo.compliance.iosxeSTIG role to evaluate and enforce
+  security controls for network infrastructure.
 prerequisites:
   - "Cisco IOS-XE devices in inventory"
   - "Network credentials configured"
@@ -19,7 +23,3 @@ related_demos:
   - slug: windows-disa-stig
     description: "DISA STIG hardening for Windows servers"
 ---
-
-Applies DISA STIG compliance checks and hardening to Cisco IOS-XE network devices. Uses the demo.compliance.iosxeSTIG role to evaluate and enforce security controls for network infrastructure.
-
-_Apply DISA STIG compliance to Cisco IOS-XE devices_

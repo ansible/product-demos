@@ -1,6 +1,12 @@
 ---
 layout: demo-detail
 demo_slug: linux-patching
+description: >-
+  Apply security updates to RHEL servers and generate an HTML patch report.
+  The playbook installs yum-utils, applies patches via the
+  demo.patching.patch_linux role, optionally triggers an Insights Client scan,
+  and publishes a patching compliance report to a dedicated report server.
+  Runs in check mode by default so you can audit before applying.
 prerequisites:
   - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "SSH connectivity via <strong>APD Machine Credential</strong>"
@@ -19,10 +25,6 @@ related_demos:
   - slug: linux-multi-profile-compliance
     description: "Run an OpenSCAP report to assess security posture before and after patching"
 ---
-
-Apply security updates to RHEL servers and generate an HTML patch report. The playbook installs yum-utils, applies patches via the demo.patching.patch_linux role, optionally triggers an Insights Client scan, and publishes a patching compliance report to a dedicated report server. Runs in check mode by default so you can audit before applying.
-
-_Audit or apply Linux patches with a one-click compliance report_
 
 ## Why it matters
 

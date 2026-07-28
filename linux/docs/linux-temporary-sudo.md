@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: linux-temporary-sudo
+description: >-
+  Grants temporary sudo access to a user for a configurable duration. Creates
+  a sudoers rule, schedules automatic cleanup via the at daemon, and removes
+  the rule when time expires. Demonstrates just-in-time privilege escalation.
 prerequisites:
   - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "SSH connectivity via <strong>APD Machine Credential</strong>"
@@ -30,7 +34,3 @@ related_demos:
   - slug: linux-run-shell-script
     description: "Run scripts that may need the temporary privileges"
 ---
-
-Grants temporary sudo access to a user for a configurable duration. Creates a sudoers rule, schedules automatic cleanup via the at daemon, and removes the rule when time expires. Demonstrates just-in-time privilege escalation.
-
-_Time-limited sudo access with automatic revocation_

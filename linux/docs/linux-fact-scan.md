@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: linux-fact-scan
+description: >-
+  Scans hosts and gathers package and service facts. This populates the AAP
+  fact cache with installed packages and running services, which can then be
+  viewed in the host details page. Useful for inventory auditing and
+  compliance checks.
 prerequisites:
   - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "SSH connectivity via <strong>APD Machine Credential</strong>"
@@ -19,7 +24,3 @@ related_demos:
   - slug: deploy-cloud-stack
     description: "Deploy hosts to scan"
 ---
-
-Scans hosts and gathers package and service facts. This populates the AAP fact cache with installed packages and running services, which can then be viewed in the host details page. Useful for inventory auditing and compliance checks.
-
-_Gather package and service facts for inventory auditing_

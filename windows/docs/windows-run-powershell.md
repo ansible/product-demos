@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: windows-run-powershell
+description: >-
+  Runs an arbitrary PowerShell script on target Windows hosts. The script
+  content is provided via survey. Outputs the results in the job log.
+  Demonstrates how Ansible can execute any PowerShell command remotely.
 prerequisites:
   - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "WinRM connectivity via <strong>APD Machine Credential</strong>"
@@ -23,7 +27,3 @@ related_demos:
   - slug: windows-query-services
     description: "Pre-built PowerShell script for querying services"
 ---
-
-Runs an arbitrary PowerShell script on target Windows hosts. The script content is provided via survey. Outputs the results in the job log. Demonstrates how Ansible can execute any PowerShell command remotely.
-
-_Run an ad-hoc PowerShell script on Windows hosts_

@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: openshift-cnv-infra-stack
+description: >-
+  Deploys the full OpenShift CNV infrastructure stack -- installs the
+  OpenShift Virtualization operator, configures cluster settings, provisions
+  RHEL VMs, and syncs the CNV inventory. The OpenShift equivalent of Deploy
+  Cloud Stack in AWS.
 prerequisites:
   - "<strong>OpenShift Credential</strong> configured with API token"
   - "Cluster admin access with bare-metal or nested-virt nodes"
@@ -15,7 +20,3 @@ related_demos:
   - slug: deploy-cloud-stack
     description: "The AWS equivalent of this infrastructure workflow"
 ---
-
-Deploys the full OpenShift CNV infrastructure stack -- installs the OpenShift Virtualization operator, configures cluster settings, provisions RHEL VMs, and syncs the CNV inventory. The OpenShift equivalent of Deploy Cloud Stack in AWS.
-
-_Full CNV infrastructure setup in one workflow_

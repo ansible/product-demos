@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: linux-start-service
+description: >-
+  Starts a named systemd service on target hosts. Checks that the service
+  exists before attempting to start it. A simple but common operational task
+  that demonstrates self-service IT operations.
 prerequisites:
   - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "SSH connectivity via <strong>APD Machine Credential</strong>"
@@ -21,7 +25,3 @@ related_demos:
   - slug: linux-stop-service
     description: "Stop a running service"
 ---
-
-Starts a named systemd service on target hosts. Checks that the service exists before attempting to start it. A simple but common operational task that demonstrates self-service IT operations.
-
-_Start a Linux service by name_

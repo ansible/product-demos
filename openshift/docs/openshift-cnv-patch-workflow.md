@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: openshift-cnv-patch-workflow
+description: >-
+  Patching workflow for RHEL VMs running on OpenShift Virtualization. Similar
+  to the cloud patching workflow but targeting CNV-managed virtual machines
+  instead of EC2 instances.
 prerequisites:
   - "RHEL VMs provisioned on OpenShift CNV"
   - "<strong>OpenShift Credential</strong> configured"
@@ -15,7 +19,3 @@ related_demos:
   - slug: openshift-cnv-infra-stack
     description: "Deploy the CNV infrastructure to patch"
 ---
-
-Patching workflow for RHEL VMs running on OpenShift Virtualization. Similar to the cloud patching workflow but targeting CNV-managed virtual machines instead of EC2 instances.
-
-_Patch RHEL VMs on OpenShift Virtualization_

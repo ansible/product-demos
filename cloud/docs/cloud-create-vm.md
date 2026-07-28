@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: cloud-create-vm
+description: >-
+  Launches an EC2 instance from a blueprint definition. Blueprints are YAML
+  files under cloud/blueprints/ that define AMI, instance type, security
+  group, tags, and user data. Supports both Linux and Windows instances with
+  automatic WinRM bootstrapping for Windows.
 prerequisites:
   - "AWS credential configured"
   - "A VPC, subnet, security group, and keypair already created"
@@ -20,7 +25,3 @@ related_demos:
   - slug: cloud-delete-vm
     description: "Terminate VMs created by this playbook"
 ---
-
-Launches an EC2 instance from a blueprint definition. Blueprints are YAML files under cloud/blueprints/ that define AMI, instance type, security group, tags, and user data. Supports both Linux and Windows instances with automatic WinRM bootstrapping for Windows.
-
-_Launch an EC2 instance from a reusable blueprint_

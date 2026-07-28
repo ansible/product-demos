@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: cloud-resize-ec2
+description: >-
+  Changes the instance type of one or more EC2 instances. Useful for
+  demonstrating vertical scaling -- resize a t2.micro to a t2.large and back
+  without reprovisioning.
 prerequisites:
   - "AWS credential configured"
   - "Running EC2 instances to resize"
@@ -19,7 +23,3 @@ related_demos:
   - slug: deploy-cloud-stack
     description: "Create instances to resize"
 ---
-
-Changes the instance type of one or more EC2 instances. Useful for demonstrating vertical scaling -- resize a t2.micro to a t2.large and back without reprovisioning.
-
-_Change EC2 instance type for vertical scaling_

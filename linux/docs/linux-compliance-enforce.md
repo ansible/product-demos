@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: linux-compliance-enforce
+description: >-
+  Applies remediation for a compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or
+  STIG) to hosts that were found out of compliance. Targets hosts dynamically
+  based on inventory groups populated by a prior compliance scan.
 prerequisites:
   - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "A prior compliance scan that populated the out-of-compliance inventory group"
@@ -14,7 +18,3 @@ related_demos:
   - slug: linux-compliance-report
     description: "Generate a compliance report to measure the impact of enforcement"
 ---
-
-Applies remediation for a compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG) to hosts that were found out of compliance. Targets hosts dynamically based on inventory groups populated by a prior compliance scan.
-
-_Enforce compliance remediation on non-compliant hosts_

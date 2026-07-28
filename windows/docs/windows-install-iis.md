@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: windows-install-iis
+description: >-
+  Installs Internet Information Services (IIS) on Windows Server, starts the
+  W3SVC service, and deploys a custom index.html page. The page content is
+  provided via survey. A quick, visual demo of Windows application deployment
+  with Ansible.
 prerequisites:
   - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "WinRM connectivity via <strong>APD Machine Credential</strong>"
@@ -23,7 +28,3 @@ related_demos:
   - slug: windows-test-connectivity
     description: "Verify WinRM is working before running demos"
 ---
-
-Installs Internet Information Services (IIS) on Windows Server, starts the W3SVC service, and deploys a custom index.html page. The page content is provided via survey. A quick, visual demo of Windows application deployment with Ansible.
-
-_Install IIS and deploy a custom web page_

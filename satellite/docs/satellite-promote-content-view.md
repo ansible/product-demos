@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: satellite-promote-content-view
+description: >-
+  Promotes a Satellite content view version from one lifecycle environment to
+  another. This is the mechanism for moving tested content from Dev to QA to
+  Production in a controlled manner.
 prerequisites:
   - "<strong>Satellite Collection</strong> credential configured"
   - "A published content view version to promote"
@@ -25,7 +29,3 @@ related_demos:
   - slug: satellite-publish-content-view
     description: "Publish a new version before promoting"
 ---
-
-Promotes a Satellite content view version from one lifecycle environment to another. This is the mechanism for moving tested content from Dev to QA to Production in a controlled manner.
-
-_Promote a content view to the next lifecycle stage_

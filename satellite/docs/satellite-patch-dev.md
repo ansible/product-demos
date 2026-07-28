@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: satellite-patch-dev
+description: >-
+  End-to-end Satellite patching workflow for development environments.
+  Combines content view publishing with host patching to demonstrate the full
+  content management lifecycle.
 prerequisites:
   - "<strong>Satellite Collection</strong> credential configured"
   - "Content views and lifecycle environments configured in Satellite"
@@ -16,7 +20,3 @@ related_demos:
   - slug: satellite-promote-content-view
     description: "Promote content from dev to production after testing"
 ---
-
-End-to-end Satellite patching workflow for development environments. Combines content view publishing with host patching to demonstrate the full content management lifecycle.
-
-_Publish content and patch dev hosts through Satellite_

@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: windows-run-powershell-kerberos
+description: >-
+  Runs a PowerShell script on Windows hosts using Kerberos authentication
+  instead of basic WinRM. Demonstrates Ansible ability to authenticate via
+  Active Directory credentials for domain-joined environments.
 prerequisites:
   - "Windows hosts joined to an Active Directory domain"
   - "Kerberos credential configured in AAP"
@@ -24,7 +28,3 @@ related_demos:
   - slug: windows-setup-ad-domain
     description: "Set up an AD domain for Kerberos authentication"
 ---
-
-Runs a PowerShell script on Windows hosts using Kerberos authentication instead of basic WinRM. Demonstrates Ansible ability to authenticate via Active Directory credentials for domain-joined environments.
-
-_Run PowerShell with Kerberos authentication_

@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: linux-insights-compliance-scan
+description: >-
+  Triggers a Red Hat Insights compliance scan on RHEL hosts. Uses the
+  redhat.insights.compliance role to run the scan and upload results to the
+  Insights compliance dashboard on console.redhat.com.
 prerequisites:
   - "RHEL hosts registered with Red Hat Insights"
   - "Compliance profile assigned in Insights"
@@ -23,7 +27,3 @@ related_demos:
   - slug: linux-compliance-report
     description: "Local OpenSCAP scanning as an alternative to Insights"
 ---
-
-Triggers a Red Hat Insights compliance scan on RHEL hosts. Uses the redhat.insights.compliance role to run the scan and upload results to the Insights compliance dashboard on console.redhat.com.
-
-_Run an Insights compliance scan and upload results_

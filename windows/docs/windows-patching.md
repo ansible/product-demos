@@ -1,6 +1,12 @@
 ---
 layout: demo-detail
 demo_slug: windows-patching
+description: >-
+  Apply Windows updates by category to Windows Server hosts and generate an
+  HTML patch report. The playbook uses the demo.patching.patch_windows role to
+  install updates filtered by category (Security, Critical, Feature Packs,
+  etc.), with optional reboot control. A report server is deployed
+  automatically to publish patching results. Runs in check mode by default.
 prerequisites:
   - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong> (deployed by <strong>Deploy Cloud Stack in AWS</strong>)"
   - "WinRM connectivity via <strong>APD Machine Credential</strong>"
@@ -26,10 +32,6 @@ related_demos:
   - slug: windows-setup-ad-domain
     description: "Provision a full AD environment to demonstrate domain-joined Windows patching"
 ---
-
-Apply Windows updates by category to Windows Server hosts and generate an HTML patch report. The playbook uses the demo.patching.patch_windows role to install updates filtered by category (Security, Critical, Feature Packs, etc.), with optional reboot control. A report server is deployed automatically to publish patching results. Runs in check mode by default.
-
-_Audit or apply Windows updates by category with automatic reporting_
 
 ## Why it matters
 

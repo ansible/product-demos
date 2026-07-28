@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: linux-deploy-application
+description: >-
+  Installs a Linux application package via DNF. Supports version pinning with
+  allow_downgrade for rollback scenarios. A straightforward demo of
+  application deployment that shows how AAP replaces manual package
+  management.
 prerequisites:
   - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "SSH connectivity via <strong>APD Machine Credential</strong>"
@@ -21,7 +26,3 @@ related_demos:
   - slug: linux-podman-webserver
     description: "Container-based deployment as an alternative to packages"
 ---
-
-Installs a Linux application package via DNF. Supports version pinning with allow_downgrade for rollback scenarios. A straightforward demo of application deployment that shows how AAP replaces manual package management.
-
-_Install or roll back a Linux application package_

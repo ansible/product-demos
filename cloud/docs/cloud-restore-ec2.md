@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: cloud-restore-ec2
+description: >-
+  Restores EC2 instance volumes from the most recent EBS snapshot. This is the
+  rollback mechanism used by the patching workflow -- if patching fails,
+  instances are restored to the pre-patch state.
 prerequisites:
   - "AWS credential configured"
   - "A previous snapshot taken with <strong>Cloud | AWS | Snapshot EC2</strong>"
@@ -19,7 +23,3 @@ related_demos:
   - slug: patch-cloud-stack
     description: "The patching workflow automates snapshot/restore on failure"
 ---
-
-Restores EC2 instance volumes from the most recent EBS snapshot. This is the rollback mechanism used by the patching workflow -- if patching fails, instances are restored to the pre-patch state.
-
-_Restore EC2 volumes from the latest snapshot_

@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: network-report
+description: >-
+  Generates an HTML network report by gathering facts from Cisco IOS, IOS-XR,
+  and NX-OS devices. Collects interface, routing, and system information using
+  the platform-specific facts modules and renders them into a browsable
+  report.
 prerequisites:
   - "Network devices in inventory"
   - "Network credentials configured"
@@ -20,7 +25,3 @@ related_demos:
   - slug: network-backup
     description: "Back up configurations alongside reporting"
 ---
-
-Generates an HTML network report by gathering facts from Cisco IOS, IOS-XR, and NX-OS devices. Collects interface, routing, and system information using the platform-specific facts modules and renders them into a browsable report.
-
-_Generate an HTML network device report_

@@ -1,6 +1,13 @@
 ---
 layout: demo-detail
 demo_slug: windows-setup-ad-domain
+description: >-
+  A workflow that provisions a complete Active Directory environment from
+  scratch in AWS. It creates a keypair, VPC, and three Windows VMs (one domain
+  controller, two domain computers), syncs inventory, tests connectivity,
+  promotes the domain controller, joins the computers to the domain, and
+  validates both PowerShell and Kerberos connectivity. Includes automatic
+  cleanup on failure.
 prerequisites:
   - "AWS credential configured with Access and Secret key"
   - "SSH public key for AWS keypair creation"
@@ -76,10 +83,6 @@ related_demos:
   - slug: deploy-cloud-stack
     description: "The general-purpose infrastructure provisioning workflow for mixed OS environments"
 ---
-
-A workflow that provisions a complete Active Directory environment from scratch in AWS. It creates a keypair, VPC, and three Windows VMs (one domain controller, two domain computers), syncs inventory, tests connectivity, promotes the domain controller, joins the computers to the domain, and validates both PowerShell and Kerberos connectivity. Includes automatic cleanup on failure.
-
-_One-click Active Directory domain with infrastructure, domain join, and Kerberos validation_
 
 ## Why it matters
 

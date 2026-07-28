@@ -24,7 +24,14 @@ mermaid: true
   <span class="detail-meta-bar__author">Author: {{ demo.author | default: "Unknown" }}</span>
 </div>
 
-{% if content and content != "" %}
+{% if page.description %}
+<section class="detail-section" id="description">
+  <div class="detail-body">
+    <p>{{ page.description }}</p>
+    {{ content }}
+  </div>
+</section>
+{% elsif content and content != "" %}
 <section class="detail-section" id="description">
   <div class="detail-body">
     {{ content }}

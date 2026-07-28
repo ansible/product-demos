@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: windows-chocolatey-multiple
+description: >-
+  Installs multiple packages (Node.js and Python by default) using the
+  Chocolatey package manager. Verifies the installations by checking version
+  output. Demonstrates bulk software provisioning on Windows with Ansible.
 prerequisites:
   - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "WinRM connectivity via <strong>APD Machine Credential</strong>"
@@ -15,7 +19,3 @@ related_demos:
   - slug: windows-install-iis
     description: "Install IIS using native Windows features instead of Chocolatey"
 ---
-
-Installs multiple packages (Node.js and Python by default) using the Chocolatey package manager. Verifies the installations by checking version output. Demonstrates bulk software provisioning on Windows with Ansible.
-
-_Install multiple packages via Chocolatey_

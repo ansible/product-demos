@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: linux-stop-service
+description: >-
+  Stops a named systemd service on target hosts. Checks that the service
+  exists before attempting to stop it. Paired with Start Service for basic
+  service lifecycle management.
 prerequisites:
   - "Linux hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "SSH connectivity via <strong>APD Machine Credential</strong>"
@@ -21,7 +25,3 @@ related_demos:
   - slug: linux-start-service
     description: "Start a stopped service"
 ---
-
-Stops a named systemd service on target hosts. Checks that the service exists before attempting to stop it. Paired with Start Service for basic service lifecycle management.
-
-_Stop a Linux service by name_

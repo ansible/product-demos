@@ -1,6 +1,11 @@
 ---
 layout: demo-detail
 demo_slug: network-configuration
+description: >-
+  Deploys golden configurations to Cisco IOS, IOS-XR, and NX-OS network
+  devices using Ansible resource modules. Pulls configurations from a separate
+  Git repository (Network Golden Configs) and applies them to the network
+  devices.
 prerequisites:
   - "Network devices in inventory (Cisco IOS, IOS-XR, and/or NX-OS)"
   - "Network credentials configured"
@@ -20,7 +25,3 @@ related_demos:
   - slug: network-backup
     description: "Back up device configs before making changes"
 ---
-
-Deploys golden configurations to Cisco IOS, IOS-XR, and NX-OS network devices using Ansible resource modules. Pulls configurations from a separate Git repository (Network Golden Configs) and applies them to the network devices.
-
-_Push golden configs to Cisco IOS, IOS-XR, and NX-OS_

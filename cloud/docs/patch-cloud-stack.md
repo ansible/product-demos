@@ -1,6 +1,12 @@
 ---
 layout: demo-detail
 demo_slug: patch-cloud-stack
+description: >-
+  Enterprise-grade patching workflow with snapshot safety, parallel RHEL and
+  Windows paths, automatic restore on failure, and a consolidated HTML
+  compliance report. Based on jopaik/patch_demo, this workflow covers both
+  operating systems in a single execution against the VMs deployed by Deploy
+  Cloud Stack in AWS.
 prerequisites:
   - "<strong>If using RHDP (demo.redhat.com):</strong> Run <strong>APD | Multi-demo setup</strong> to configure all demo categories at once, or run <strong>APD | Single demo setup</strong> and choose <code>cloud</code> — either option configures the cloud patching templates and credentials. AWS and APD Machine credentials are pre-configured for you."
   - "<strong>If using your own installation:</strong> Run <strong>APD | Single demo setup</strong> and choose <code>cloud</code>. You will also need to configure the <strong>AWS</strong> credential (Access Key + Secret Key), add an SSH private key and Windows username/password to <strong>APD Machine Credential</strong>, and ensure you have the target VMs, VPC, and keypair provisioned."
@@ -62,10 +68,6 @@ related_demos:
     description: "Register RHEL hosts with RHSM for full advisory access"
 special_thanks: "Joon Paik <jopaik@redhat.com> — original patch demo author"
 ---
-
-Enterprise-grade patching workflow with snapshot safety, parallel RHEL and Windows paths, automatic restore on failure, and a consolidated HTML compliance report. Based on jopaik/patch_demo, this workflow covers both operating systems in a single execution against the VMs deployed by Deploy Cloud Stack in AWS.
-
-_Snapshot → Pre-check → Patch → Post-check → Compliance Report, with automatic restore on failure_
 
 ## Why it matters
 

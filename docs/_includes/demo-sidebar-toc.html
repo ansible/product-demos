@@ -2,7 +2,7 @@
 
 <nav class="demo-toc" aria-label="On this page">
   <p class="nav-heading">On this page</p>
-  {% if content and content != "" %}
+  {% if page.description or content != "" %}
     <a href="#description" class="demo-toc__link">Description</a>
   {% endif %}
   {% if page.prerequisites %}

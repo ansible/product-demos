@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: windows-chocolatey-specific
+description: >-
+  Installs a specific package by name using the Chocolatey package manager.
+  The package name is provided via survey. Demonstrates targeted software
+  installation on Windows.
 prerequisites:
   - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong>"
   - "WinRM connectivity via <strong>APD Machine Credential</strong>"
@@ -22,7 +26,3 @@ related_demos:
   - slug: windows-chocolatey-multiple
     description: "Install multiple packages at once"
 ---
-
-Installs a specific package by name using the Chocolatey package manager. The package name is provided via survey. Demonstrates targeted software installation on Windows.
-
-_Install a single Chocolatey package by name_

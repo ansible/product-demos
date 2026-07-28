@@ -1,6 +1,10 @@
 ---
 layout: demo-detail
 demo_slug: windows-ad-create-domain
+description: >-
+  Promotes a Windows Server to a domain controller and creates a new Active
+  Directory forest. Sets the local admin password, updates the hostname,
+  creates the domain, and reboots. The default domain is ansible.local.
 prerequisites:
   - "A Windows Server VM not yet joined to a domain"
   - "WinRM connectivity via <strong>APD Machine Credential</strong>"
@@ -14,7 +18,3 @@ related_demos:
   - slug: windows-setup-ad-domain
     description: "Full workflow that automates the entire AD setup"
 ---
-
-Promotes a Windows Server to a domain controller and creates a new Active Directory forest. Sets the local admin password, updates the hostname, creates the domain, and reboots. The default domain is ansible.local.
-
-_Promote a server to domain controller and create an AD forest_
