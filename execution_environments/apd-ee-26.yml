@@ -4,7 +4,7 @@ images:
   base_image:
     name: registry.redhat.io/ansible-automation-platform-26/ee-minimal-rhel9:latest
 dependencies:
-  galaxy: requirements.yml
+  galaxy: requirements-26.yml
   system:
     - python3.12-devel [platform:rpm]
     # development requirements for ansible.eda collection, removed in append_final
