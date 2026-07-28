@@ -1,9 +1,32 @@
 #!/bin/bash
 manifest=${1:-quay.io/ansible-product-demos/apd-ee-26}
+image="${manifest##*/}"  # everything up to and including last slash, e.g. "apd-ee-26"
+
+if [[ "$(uname -s)" == "Linux" ]]
+then
+    source /etc/os-release
+
+    if [[ "$ID" == "rhel" ]]
+    then
+        echo "RHEL does not include the necessary QEMU RPMs for creating multi-arch EE images,"
+        echo "please run this script on a Fedora system with the qemu-user-static RPM installed"
+        exit 1
+    fi
+
+    if [[ "$ID" == "fedora" ]]
+    then
+        if ! rpm -q --quiet qemu-user-static
+        then
+            echo "Please install the qemu-user-static RPM before continuing, it is required"
+            echo "for building multi-arch EE images"
+            exit 1
+        fi
+    fi
+fi
 
 if [[ -z $ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN || -z $ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN ]]
 then
-    echo "A valid Automation Hub token is required, Set the following environment variables before continuing"
+    echo "A valid Automation Hub token is required, set the following environment variables before continuing:"
     echo "export ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN=<token>"
     echo "export ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN=<token>"
     exit 1
@@ -19,7 +42,7 @@ fi
 # create EE definition
 rm -rf ./context/*
 ansible-builder create \
-    --file apd-ee-26.yml \
+    --file ${image}.yml \
     --context ./context \
     -v 3 | tee ansible-builder.log
 
