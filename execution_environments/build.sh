@@ -10,7 +10,7 @@ then
     then
         echo "RHEL does not include the necessary QEMU RPMs for creating multi-arch EE images,"
         echo "please run this script on a Fedora system with the qemu-user-static RPM installed"
-    exit 1
+        exit 1
     fi
 
     if [[ "$ID" == "fedora" ]]
