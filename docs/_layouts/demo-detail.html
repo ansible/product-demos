@@ -145,7 +145,7 @@ mermaid: true
         {% for jt in detail.job_templates %}
           <tr>
             <td>{{ jt.name }}</td>
-            <td><code>{{ jt.playbook }}</code></td>
+            <td><a href="https://github.com/ansible/product-demos/blob/main/{{ jt.playbook }}" target="_blank" rel="noopener"><code>{{ jt.playbook }}</code></a></td>
             <td>{{ jt.description }}</td>
           </tr>
         {% endfor %}
@@ -158,11 +158,47 @@ mermaid: true
 {% if detail.related_demos %}
 <section class="detail-section" id="related-demos">
   <h2>Related demos</h2>
-  <ul class="detail-list">
-    {% for item in detail.related_demos %}
-      <li>{{ item }}</li>
-    {% endfor %}
-  </ul>
+  <div class="detail-table-wrap">
+    <table class="detail-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Demo</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rel in detail.related_demos %}
+          {% assign rel_demo = nil %}
+          {% for d in site.data.demos %}
+            {% if d.slug == rel.slug %}
+              {% assign rel_demo = d %}
+            {% endif %}
+          {% endfor %}
+          {% if rel_demo %}
+            {% if site.data.demo_pages[rel.slug] %}
+              {% assign rel_href = "/demos/" | append: rel.slug | append: "/" | relative_url %}
+            {% elsif rel_demo.github_path %}
+              {% assign rel_href = "https://github.com/" | append: site.repository | append: "/blob/main/" | append: rel_demo.github_path %}
+            {% else %}
+              {% assign rel_href = "#" %}
+            {% endif %}
+            <tr>
+              <td><span class="demo-row__icon">{{ rel_demo.thumbnail.icon }}</span></td>
+              <td><a href="{{ rel_href }}">{{ rel_demo.title }}</a></td>
+              <td>{{ rel.description }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td></td>
+              <td>{{ rel.slug }}</td>
+              <td>{{ rel.description }}</td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </section>
 {% endif %}
 
@@ -172,3 +208,7 @@ mermaid: true
   <p>{{ detail.special_thanks }}</p>
 </section>
 {% endif %}
+
+<div class="detail-back-to-all">
+  <a href="{{ '/' | relative_url }}">← All demos</a>
+</div>

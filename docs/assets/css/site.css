@@ -813,6 +813,31 @@ a {
   color: var(--text-secondary);
 }
 
+.detail-table td a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.detail-table td a:hover {
+  text-decoration: underline;
+}
+
+.detail-back-to-all {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.detail-back-to-all a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+}
+.detail-back-to-all a:hover {
+  text-decoration: underline;
+}
+
 .detail-table code {
   font-size: 12px;
   background: var(--border);

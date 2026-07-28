@@ -16,7 +16,7 @@ The Ansible Product Demos (APD) project is a set of Ansible demos that run on th
 
 ## Demo catalog
 
-Browse all demos, presenter guides, and walkthroughs on the **[Ansible Product Demos — GitHub Pages site](https://ipvsean.github.io/product-demos/)**.
+Browse all demos, presenter guides, and walkthroughs on the **[Ansible Product Demos — GitHub Pages site](https://ansible.github.io/product-demos/)**.
 
 ## Installation
 

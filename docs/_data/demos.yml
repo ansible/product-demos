@@ -132,6 +132,7 @@
   github_path: cloud/setup.yml
 
 - slug: cloud-create-vpc
+  url: /demos/cloud-create-vpc/
   title: "AWS — Create VPC"
   category: cloud
   status: active
@@ -148,6 +149,7 @@
   github_path: cloud/create_vpc.yml
 
 - slug: cloud-create-keypair
+  url: /demos/cloud-create-keypair/
   title: "AWS — Create Keypair"
   category: cloud
   status: active
@@ -164,6 +166,7 @@
   github_path: cloud/aws_key.yml
 
 - slug: cloud-create-vm
+  url: /demos/cloud-create-vm/
   title: "AWS — Create VM"
   category: cloud
   status: active
@@ -180,6 +183,7 @@
   github_path: cloud/create_vm.yml
 
 - slug: cloud-delete-vm
+  url: /demos/cloud-delete-vm/
   title: "AWS — Delete VM"
   category: cloud
   status: active
@@ -196,6 +200,7 @@
   github_path: cloud/delete_vm_by_name.yml
 
 - slug: cloud-resize-ec2
+  url: /demos/cloud-resize-ec2/
   title: "AWS — Resize EC2"
   category: cloud
   status: active
@@ -212,6 +217,7 @@
   github_path: cloud/resize_ec2.yml
 
 - slug: cloud-snapshot-ec2
+  url: /demos/cloud-snapshot-ec2/
   title: "AWS — Snapshot EC2"
   category: cloud
   status: active
@@ -228,6 +234,7 @@
   github_path: cloud/snapshot_ec2.yml
 
 - slug: cloud-restore-ec2
+  url: /demos/cloud-restore-ec2/
   title: "AWS — Restore EC2 from Snapshot"
   category: cloud
   status: active
@@ -244,6 +251,7 @@
   github_path: cloud/restore_ec2.yml
 
 - slug: cloud-peer-networking
+  url: /demos/cloud-peer-networking/
   title: "AWS — Peer Networking"
   category: cloud
   status: active
@@ -260,6 +268,7 @@
   github_path: cloud/create_peer_network.yml
 
 - slug: cloud-transit-networking
+  url: /demos/cloud-transit-networking/
   title: "AWS — Transit Networking"
   category: cloud
   status: active
@@ -276,6 +285,7 @@
   github_path: cloud/create_transit_network.yml
 
 - slug: cloud-vpc-report
+  url: /demos/cloud-vpc-report/
   title: "AWS — VPC Report"
   category: cloud
   status: active
@@ -294,6 +304,7 @@
 # ─── Linux ──────────────────────────────────────────────────────────
 
 - slug: linux-register-insights
+  url: /demos/linux-register-insights/
   title: "Register with Insights"
   category: linux
   status: active
@@ -310,6 +321,7 @@
   github_path: linux/ec2_register.yml
 
 - slug: linux-troubleshoot
+  url: /demos/linux-troubleshoot/
   title: "Troubleshoot"
   category: linux
   status: active
@@ -325,6 +337,7 @@
   github_path: linux/tshoot.yml
 
 - slug: linux-temporary-sudo
+  url: /demos/linux-temporary-sudo/
   title: "Temporary Sudo"
   category: linux
   status: active
@@ -358,6 +371,7 @@
   github_path: linux/patching.yml
 
 - slug: linux-start-service
+  url: /demos/linux-start-service/
   title: "Start Service"
   category: linux
   status: active
@@ -373,6 +387,7 @@
   github_path: linux/service_start.yml
 
 - slug: linux-stop-service
+  url: /demos/linux-stop-service/
   title: "Stop Service"
   category: linux
   status: active
@@ -388,6 +403,7 @@
   github_path: linux/service_stop.yml
 
 - slug: linux-run-shell-script
+  url: /demos/linux-run-shell-script/
   title: "Run Shell Script"
   category: linux
   status: active
@@ -403,6 +419,7 @@
   github_path: linux/run_script.yml
 
 - slug: linux-fact-scan
+  url: /demos/linux-fact-scan/
   title: "Fact Scan"
   category: linux
   status: active
@@ -418,6 +435,7 @@
   github_path: linux/fact_scan.yml
 
 - slug: linux-podman-webserver
+  url: /demos/linux-podman-webserver/
   title: "Podman Webserver"
   category: linux
   status: active
@@ -434,6 +452,7 @@
   github_path: linux/podman.yml
 
 - slug: linux-system-roles
+  url: /demos/linux-system-roles/
   title: "System Roles"
   category: linux
   status: active
@@ -450,6 +469,7 @@
   github_path: linux/system_roles.yml
 
 - slug: linux-cockpit
+  url: /demos/linux-cockpit/
   title: "Install Web Console (Cockpit)"
   category: linux
   status: active
@@ -466,6 +486,7 @@
   github_path: linux/system_roles.yml
 
 - slug: linux-compliance-enforce
+  url: /demos/linux-compliance-enforce/
   title: "Compliance Enforce"
   category: linux
   status: active
@@ -482,6 +503,7 @@
   github_path: linux/remediate_out_of_compliance.yml
 
 - slug: linux-disa-stig
+  url: /demos/linux-disa-stig/
   title: "DISA STIG"
   category: linux
   status: active
@@ -499,6 +521,7 @@
   github_path: linux/disa_stig.yml
 
 - slug: linux-multi-profile-compliance
+  url: /demos/linux-multi-profile-compliance/
   title: "Multi-profile Compliance"
   category: linux
   status: active
@@ -516,6 +539,7 @@
   github_path: linux/multi_profile_compliance.yml
 
 - slug: linux-compliance-report
+  url: /demos/linux-compliance-report/
   title: "Multi-profile Compliance Report"
   category: linux
   status: active
@@ -533,6 +557,7 @@
   github_path: linux/multi_profile_compliance_report.yml
 
 - slug: linux-insights-compliance-scan
+  url: /demos/linux-insights-compliance-scan/
   title: "Insights Compliance Scan"
   category: linux
   status: active
@@ -550,6 +575,7 @@
   github_path: linux/insights_compliance_scan.yml
 
 - slug: linux-deploy-application
+  url: /demos/linux-deploy-application/
   title: "Deploy Application"
   category: linux
   status: active
@@ -587,6 +613,7 @@
 # ─── Windows ────────────────────────────────────────────────────────
 
 - slug: windows-install-iis
+  url: /demos/windows-install-iis/
   title: "Install IIS"
   category: windows
   status: active
@@ -619,6 +646,7 @@
   github_path: windows/patching.yml
 
 - slug: windows-rollback
+  url: /demos/windows-rollback/
   title: "Rollback"
   category: windows
   status: active
@@ -634,6 +662,7 @@
   github_path: windows/rollback.yml
 
 - slug: windows-test-connectivity
+  url: /demos/windows-test-connectivity/
   title: "Test Connectivity"
   category: windows
   status: active
@@ -649,6 +678,7 @@
   github_path: windows/connect.yml
 
 - slug: windows-chocolatey-multiple
+  url: /demos/windows-chocolatey-multiple/
   title: "Chocolatey Install Multiple"
   category: windows
   status: active
@@ -664,6 +694,7 @@
   github_path: windows/windows_choco_multiple.yml
 
 - slug: windows-chocolatey-specific
+  url: /demos/windows-chocolatey-specific/
   title: "Chocolatey Install Specific"
   category: windows
   status: active
@@ -679,6 +710,7 @@
   github_path: windows/windows_choco_specific.yml
 
 - slug: windows-run-powershell
+  url: /demos/windows-run-powershell/
   title: "Run PowerShell"
   category: windows
   status: active
@@ -694,6 +726,7 @@
   github_path: windows/powershell.yml
 
 - slug: windows-run-powershell-kerberos
+  url: /demos/windows-run-powershell-kerberos/
   title: "Run PowerShell (Kerberos)"
   category: windows
   status: active
@@ -711,6 +744,7 @@
   github_path: windows/powershell.yml
 
 - slug: windows-query-services
+  url: /demos/windows-query-services/
   title: "Query Services"
   category: windows
   status: active
@@ -726,6 +760,7 @@
   github_path: windows/powershell_script.yml
 
 - slug: windows-password-requirements
+  url: /demos/windows-password-requirements/
   title: "Configure Password Requirements"
   category: windows
   status: active
@@ -742,6 +777,7 @@
   github_path: windows/powershell_dsc.yml
 
 - slug: windows-ad-create-domain
+  url: /demos/windows-ad-create-domain/
   title: "AD — Create Domain"
   category: windows
   status: active
@@ -758,6 +794,7 @@
   github_path: windows/create_ad_domain.yml
 
 - slug: windows-ad-join-domain
+  url: /demos/windows-ad-join-domain/
   title: "AD — Join Domain"
   category: windows
   status: active
@@ -774,6 +811,7 @@
   github_path: windows/join_ad_domain.yml
 
 - slug: windows-ad-new-user
+  url: /demos/windows-ad-new-user/
   title: "AD — New User"
   category: windows
   status: active
@@ -790,6 +828,7 @@
   github_path: windows/helpdesk_new_user_portal.yml
 
 - slug: windows-disa-stig
+  url: /demos/windows-disa-stig/
   title: "DISA STIG"
   category: windows
   status: active
@@ -829,6 +868,7 @@
 # ─── Network ────────────────────────────────────────────────────────
 
 - slug: network-configuration
+  url: /demos/network-configuration/
   title: "Golden Configuration"
   category: network
   status: active
@@ -844,6 +884,7 @@
   github_path: network/setup.yml
 
 - slug: network-report
+  url: /demos/network-report/
   title: "Report"
   category: network
   status: active
@@ -860,6 +901,7 @@
   github_path: network/report.yml
 
 - slug: network-disa-stig
+  url: /demos/network-disa-stig/
   title: "DISA STIG"
   category: network
   status: active
@@ -876,6 +918,7 @@
   github_path: network/compliance.yml
 
 - slug: network-backup
+  url: /demos/network-backup/
   title: "Backup"
   category: network
   status: active
@@ -912,6 +955,7 @@
 # ─── OpenShift ──────────────────────────────────────────────────────
 
 - slug: openshift-eda-install
+  url: /demos/openshift-eda-install/
   title: "EDA — Install Controller"
   category: openshift
   status: active
@@ -928,6 +972,7 @@
   github_path: openshift/eda/install.yml
 
 - slug: openshift-cnv-install
+  url: /demos/openshift-cnv-install/
   title: "CNV — Install Operator"
   category: openshift
   status: active
@@ -944,6 +989,7 @@
   github_path: openshift/cnv/install.yml
 
 - slug: openshift-cnv-create-vm
+  url: /demos/openshift-cnv-create-vm/
   title: "CNV — Create RHEL VM"
   category: openshift
   status: active
@@ -960,6 +1006,7 @@
   github_path: openshift/cnv/provision_rhel.yml
 
 - slug: openshift-cnv-delete-vm
+  url: /demos/openshift-cnv-delete-vm/
   title: "CNV — Delete VM"
   category: openshift
   status: active
@@ -976,6 +1023,7 @@
   github_path: openshift/cnv/delete.yml
 
 - slug: openshift-dev-spaces
+  url: /demos/openshift-dev-spaces/
   title: "Dev Spaces"
   category: openshift
   status: active
@@ -990,6 +1038,7 @@
   github_path: openshift/devspaces.yml
 
 - slug: openshift-gitlab
+  url: /demos/openshift-gitlab/
   title: "GitLab"
   category: openshift
   status: active
@@ -1004,6 +1053,7 @@
   github_path: openshift/gitlab.yml
 
 - slug: openshift-cnv-infra-stack
+  url: /demos/openshift-cnv-infra-stack/
   title: "CNV — Infra Stack"
   category: openshift
   status: active
@@ -1022,6 +1072,7 @@
   github_path: openshift/setup.yml
 
 - slug: openshift-cnv-patch-workflow
+  url: /demos/openshift-cnv-patch-workflow/
   title: "CNV — Patch Workflow"
   category: openshift
   status: active
@@ -1043,6 +1094,7 @@
 # ─── Satellite ──────────────────────────────────────────────────────
 
 - slug: satellite-register
+  url: /demos/satellite-register/
   title: "Register with Satellite"
   category: satellite
   status: active
@@ -1058,6 +1110,7 @@
   github_path: satellite/server_register.yml
 
 - slug: satellite-compliance-scan
+  url: /demos/satellite-compliance-scan/
   title: "Compliance Scan with Satellite"
   category: satellite
   status: active
@@ -1074,6 +1127,7 @@
   github_path: satellite/server_openscap.yml
 
 - slug: satellite-publish-content-view
+  url: /demos/satellite-publish-content-view/
   title: "Publish Content View Version"
   category: satellite
   status: active
@@ -1090,6 +1144,7 @@
   github_path: satellite/satellite_publish.yml
 
 - slug: satellite-promote-content-view
+  url: /demos/satellite-promote-content-view/
   title: "Promote Content View Version"
   category: satellite
   status: active
@@ -1106,6 +1161,7 @@
   github_path: satellite/satellite_promote.yml
 
 - slug: satellite-patch-dev
+  url: /demos/satellite-patch-dev/
   title: "Patch Dev Workflow"
   category: satellite
   status: active

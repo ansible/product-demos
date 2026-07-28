@@ -10,7 +10,9 @@
   class="demo-row"
   data-status="{{ demo.status }}"
   data-category="{{ demo.category }}"
+  data-href="{{ row_href }}"
   data-search="{{ demo.title | downcase }} {{ demo.subtitle | downcase }} {{ demo.blurb | downcase }} {{ demo.category | downcase }} {% for tag in demo.tags %}{{ tag | downcase }} {% endfor %}"
+  style="cursor:pointer;"
 >
   <td><span class="demo-row__icon">{{ demo.thumbnail.icon }}</span></td>
   <td>
