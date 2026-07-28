@@ -2,25 +2,8 @@
 
 <nav class="demo-toc" aria-label="On this page">
   <p class="nav-heading">On this page</p>
-  {% if page.description or content != "" %}
-    <a href="#description" class="demo-toc__link">Description</a>
-  {% endif %}
-  {% if page.prerequisites %}
-    <a href="#prerequisites" class="demo-toc__link">Prerequisites</a>
-  {% endif %}
-  {% if page.credential_setup %}
-    <a href="#credential-setup" class="demo-toc__link">Credential setup</a>
-  {% endif %}
-  {% if page.survey_prompts %}
-    <a href="#survey-prompts" class="demo-toc__link">Survey prompts</a>
-  {% endif %}
   {% if demo.workflow_mermaid %}
     <a href="#workflow" class="demo-toc__link">Workflow</a>
   {% endif %}
-  {% if page.job_templates %}
-    <a href="#job-templates" class="demo-toc__link">Job templates</a>
-  {% endif %}
-  {% if page.related_demos %}
-    <a href="#related-demos" class="demo-toc__link">Related demos</a>
-  {% endif %}
+  <a href="#description" class="demo-toc__link">Description</a>
 </nav>

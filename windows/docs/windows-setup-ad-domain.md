@@ -1,88 +1,44 @@
 ---
 layout: demo-detail
 demo_slug: windows-setup-ad-domain
-description: >-
-  A workflow that provisions a complete Active Directory environment from
-  scratch in AWS. It creates a keypair, VPC, and three Windows VMs (one domain
-  controller, two domain computers), syncs inventory, tests connectivity,
-  promotes the domain controller, joins the computers to the domain, and
-  validates both PowerShell and Kerberos connectivity. Includes automatic
-  cleanup on failure.
-prerequisites:
-  - "AWS credential configured with Access and Secret key"
-  - "SSH public key for AWS keypair creation"
-  - "<strong>APD Machine Credential</strong> with Windows administrator credentials"
-  - "<strong>AAP Credential</strong> for Controller API callbacks during domain creation"
-survey_prompts:
-  - question: "AWS Region"
-    variable: create_vm_aws_region
-    type: multiplechoice
-    required: "Yes"
-  - question: "Keypair Public Key"
-    variable: aws_public_key
-    type: textarea
-    required: "Yes"
-  - question: "Owner"
-    variable: create_vm_vm_owner
-    type: text
-    required: "Yes"
-  - question: "Environment"
-    variable: create_vm_vm_environment
-    type: multiplechoice
-    required: "Yes"
-  - question: "Subnet"
-    variable: create_vm_aws_vpc_subnet_name
-    type: text
-    required: "Yes"
-  - question: "Security Group"
-    variable: create_vm_aws_securitygroup_name
-    type: text
-    required: "Yes"
-job_templates:
-  - name: "Cloud | AWS | Create Keypair"
-    playbook: cloud/create_keypair.yml
-    description: "Creates an SSH keypair in the target AWS region"
-  - name: "Cloud | AWS | Create VPC"
-    playbook: cloud/create_vpc.yml
-    description: "Provisions VPC, subnet, security group, and internet gateway"
-  - name: "Cloud | AWS | Create VM (Domain Controller)"
-    playbook: cloud/create_vm.yml
-    description: "Deploys the dc01 Windows Server instance as domain controller"
-  - name: "Cloud | AWS | Create VM (Computer 1 - winston)"
-    playbook: cloud/create_vm.yml
-    description: "Deploys the winston Windows Server instance as domain computer"
-  - name: "Cloud | AWS | Create VM (Computer 2 - winthrop)"
-    playbook: cloud/create_vm.yml
-    description: "Deploys the winthrop Windows Server instance as domain computer"
-  - name: "AWS Inventory"
-    playbook: (inventory sync)
-    description: "Syncs the AWS dynamic inventory to import the new VMs"
-  - name: "WINDOWS | Test Connectivity"
-    playbook: windows/connect.yml
-    description: "Validates WinRM connectivity to all three Windows hosts"
-  - name: "WINDOWS | AD | Create Domain"
-    playbook: windows/create_ad_domain.yml
-    description: "Promotes dc01 to domain controller and creates the ANSIBLE.LOCAL domain"
-  - name: "WINDOWS | AD | Join Domain"
-    playbook: windows/join_ad_domain.yml
-    description: "Joins winston and winthrop to the Active Directory domain"
-  - name: "WINDOWS | Run PowerShell (Validation)"
-    playbook: windows/powershell.yml
-    description: "Runs Get-ADComputer on the domain controller to list joined computers"
-  - name: "WINDOWS | Run PowerShell | Kerberos (Validation)"
-    playbook: windows/powershell.yml
-    description: "Validates Kerberos authentication by querying Security event logs"
-  - name: "WINDOWS | Rollback (Cleanup)"
-    playbook: windows/rollback.yml
-    description: "Cleans up resources if any workflow step fails"
-related_demos:
-  - slug: windows-ad-new-user
-    description: "Create users in the domain built by this workflow for a helpdesk self-service demo"
-  - slug: windows-patching
-    description: "Patch the domain-joined Windows hosts to show day-2 operations"
-  - slug: deploy-cloud-stack
-    description: "The general-purpose infrastructure provisioning workflow for mixed OS environments"
 ---
+
+A workflow that provisions a complete Active Directory environment from scratch in AWS. It creates a keypair, VPC, and three Windows VMs (one domain controller, two domain computers), syncs inventory, tests connectivity, promotes the domain controller, joins the computers to the domain, and validates both PowerShell and Kerberos connectivity. Includes automatic cleanup on failure.
+
+## Prerequisites
+
+- AWS credential configured with Access and Secret key
+- SSH public key for AWS keypair creation
+- <strong>APD Machine Credential</strong> with Windows administrator credentials
+- <strong>AAP Credential</strong> for Controller API callbacks during domain creation
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| AWS Region | `create_vm_aws_region` | multiplechoice | Yes |
+| Keypair Public Key | `aws_public_key` | textarea | Yes |
+| Owner | `create_vm_vm_owner` | text | Yes |
+| Environment | `create_vm_vm_environment` | multiplechoice | Yes |
+| Subnet | `create_vm_aws_vpc_subnet_name` | text | Yes |
+| Security Group | `create_vm_aws_securitygroup_name` | text | Yes |
+
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| Cloud | AWS | Create Keypair | [`cloud/create_keypair.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_keypair.yml) | Creates an SSH keypair in the target AWS region |
+| Cloud | AWS | Create VPC | [`cloud/create_vpc.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vpc.yml) | Provisions VPC, subnet, security group, and internet gateway |
+| Cloud | AWS | Create VM (Domain Controller) | [`cloud/create_vm.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vm.yml) | Deploys the dc01 Windows Server instance as domain controller |
+| Cloud | AWS | Create VM (Computer 1 - winston) | [`cloud/create_vm.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vm.yml) | Deploys the winston Windows Server instance as domain computer |
+| Cloud | AWS | Create VM (Computer 2 - winthrop) | [`cloud/create_vm.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vm.yml) | Deploys the winthrop Windows Server instance as domain computer |
+| AWS Inventory | [`(inventory sync)`](https://github.com/ansible/product-demos/blob/main/(inventory sync)) | Syncs the AWS dynamic inventory to import the new VMs |
+| WINDOWS | Test Connectivity | [`windows/connect.yml`](https://github.com/ansible/product-demos/blob/main/windows/connect.yml) | Validates WinRM connectivity to all three Windows hosts |
+| WINDOWS | AD | Create Domain | [`windows/create_ad_domain.yml`](https://github.com/ansible/product-demos/blob/main/windows/create_ad_domain.yml) | Promotes dc01 to domain controller and creates the ANSIBLE.LOCAL domain |
+| WINDOWS | AD | Join Domain | [`windows/join_ad_domain.yml`](https://github.com/ansible/product-demos/blob/main/windows/join_ad_domain.yml) | Joins winston and winthrop to the Active Directory domain |
+| WINDOWS | Run PowerShell (Validation) | [`windows/powershell.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell.yml) | Runs Get-ADComputer on the domain controller to list joined computers |
+| WINDOWS | Run PowerShell | Kerberos (Validation) | [`windows/powershell.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell.yml) | Validates Kerberos authentication by querying Security event logs |
+| WINDOWS | Rollback (Cleanup) | [`windows/rollback.yml`](https://github.com/ansible/product-demos/blob/main/windows/rollback.yml) | Cleans up resources if any workflow step fails |
 
 ## Why it matters
 
@@ -108,3 +64,11 @@ related_demos:
 - The automatic cleanup on failure means you never leave orphaned resources in AWS. If domain creation fails, everything rolls back.
 - Kerberos validation is the real proof — it shows the domain is functional, not just provisioned.
 - After this workflow completes, you can pivot to the Helpdesk New User demo to show AD user management.
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| 🪟 [AD — New User](/product-demos/demos/windows-ad-new-user/) | Create users in the domain built by this workflow for a helpdesk self-service demo |
+| 🪟 [Patching](/product-demos/demos/windows-patching/) | Patch the domain-joined Windows hosts to show day-2 operations |
+| 🚀 [Deploy Cloud Stack in AWS](/product-demos/demos/deploy-cloud-stack/) | The general-purpose infrastructure provisioning workflow for mixed OS environments |

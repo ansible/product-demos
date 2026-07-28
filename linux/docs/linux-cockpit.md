@@ -1,24 +1,29 @@
 ---
 layout: demo-detail
 demo_slug: linux-cockpit
-description: >-
-  Installs and configures the Cockpit web console on RHEL hosts using RHEL
-  System Roles. Cockpit provides a browser-based management interface for
-  Linux servers. Demonstrates how System Roles make complex configurations
-  repeatable.
-prerequisites:
-  - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
-  - "SSH connectivity via <strong>APD Machine Credential</strong>"
-survey_prompts:
-  - question: "Server Name or Pattern"
-    variable: _hosts
-    type: text
-    required: "Yes"
-job_templates:
-  - name: "LINUX | Cockpit"
-    playbook: linux/system_roles.yml
-    description: "Applies the cockpit System Role to install and configure the web console"
-related_demos:
-  - slug: linux-system-roles
-    description: "Apply additional System Roles alongside Cockpit"
 ---
+
+Installs and configures the Cockpit web console on RHEL hosts using RHEL System Roles. Cockpit provides a browser-based management interface for Linux servers. Demonstrates how System Roles make complex configurations repeatable.
+
+## Prerequisites
+
+- RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>
+- SSH connectivity via <strong>APD Machine Credential</strong>
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Server Name or Pattern | `_hosts` | text | Yes |
+
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| LINUX | Cockpit | [`linux/system_roles.yml`](https://github.com/ansible/product-demos/blob/main/linux/system_roles.yml) | Applies the cockpit System Role to install and configure the web console |
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| 🐧 [System Roles](/product-demos/demos/linux-system-roles/) | Apply additional System Roles alongside Cockpit |

@@ -1,48 +1,32 @@
 ---
 layout: demo-detail
 demo_slug: linux-compliance-workflow
-description: >-
-  A workflow that ties together compliance reporting, inventory refresh, and
-  enforcement in a single execution. It first generates an OpenSCAP report
-  against a chosen compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG),
-  syncs the AWS inventory, and then enforces remediation on findings — giving
-  you a before-and-after view of compliance posture.
-prerequisites:
-  - "RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>"
-  - "SSH connectivity via <strong>APD Machine Credential</strong>"
-  - "AWS credential configured (for inventory sync step)"
-  - "(Recommended) Run <strong>Deploy Cloud Stack in AWS</strong> first to create target VMs"
-survey_prompts:
-  - question: "Server Name or Pattern"
-    variable: _hosts
-    type: text
-    required: "Yes"
-  - question: "Compliance Profile"
-    variable: compliance_profile
-    type: multiplechoice
-    required: "Yes"
-  - question: "Use httpd on the target host(s) to access reports locally?"
-    variable: use_httpd
-    type: multiplechoice
-    required: "Yes"
-job_templates:
-  - name: "LINUX | Multi-profile Compliance Report"
-    playbook: linux/multi_profile_compliance_report.yml
-    description: "Runs an OpenSCAP scan against the selected compliance profile and generates an HTML report"
-  - name: "AWS Inventory"
-    playbook: (inventory sync)
-    description: "Refreshes the AWS dynamic inventory to ensure host data is current before enforcement"
-  - name: "LINUX | Compliance Enforce"
-    playbook: linux/remediate_out_of_compliance.yml
-    description: "Applies remediation for findings from the compliance scan"
-related_demos:
-  - slug: linux-multi-profile-compliance
-    description: "Run the compliance report standalone to assess posture without enforcing"
-  - slug: linux-disa-stig
-    description: "Apply DISA STIG hardening directly without the workflow wrapper"
-  - slug: linux-patching
-    description: "Patch first, then run compliance to show a complete day-2 operations story"
 ---
+
+A workflow that ties together compliance reporting, inventory refresh, and enforcement in a single execution. It first generates an OpenSCAP report against a chosen compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG), syncs the AWS inventory, and then enforces remediation on findings — giving you a before-and-after view of compliance posture.
+
+## Prerequisites
+
+- RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>
+- SSH connectivity via <strong>APD Machine Credential</strong>
+- AWS credential configured (for inventory sync step)
+- (Recommended) Run <strong>Deploy Cloud Stack in AWS</strong> first to create target VMs
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Server Name or Pattern | `_hosts` | text | Yes |
+| Compliance Profile | `compliance_profile` | multiplechoice | Yes |
+| Use httpd on the target host(s) to access reports locally? | `use_httpd` | multiplechoice | Yes |
+
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| LINUX | Multi-profile Compliance Report | [`linux/multi_profile_compliance_report.yml`](https://github.com/ansible/product-demos/blob/main/linux/multi_profile_compliance_report.yml) | Runs an OpenSCAP scan against the selected compliance profile and generates an HTML report |
+| AWS Inventory | [`(inventory sync)`](https://github.com/ansible/product-demos/blob/main/(inventory sync)) | Refreshes the AWS dynamic inventory to ensure host data is current before enforcement |
+| LINUX | Compliance Enforce | [`linux/remediate_out_of_compliance.yml`](https://github.com/ansible/product-demos/blob/main/linux/remediate_out_of_compliance.yml) | Applies remediation for findings from the compliance scan |
 
 ## Why it matters
 
@@ -67,3 +51,11 @@ related_demos:
 - Five compliance profiles cover most regulated industries: finance (PCI-DSS), healthcare (HIPAA), government (STIG, OSPP), and general best practices (CIS).
 - The scan-sync-enforce pattern is how enterprises actually implement compliance. This demo mirrors that real-world workflow.
 - Running the report before and after enforcement gives you a measurable delta — perfect for auditors and compliance officers.
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| 🐧 [Multi-profile Compliance](/product-demos/demos/linux-multi-profile-compliance/) | Run the compliance report standalone to assess posture without enforcing |
+| 🐧 [DISA STIG](/product-demos/demos/linux-disa-stig/) | Apply DISA STIG hardening directly without the workflow wrapper |
+| 🐧 [Patching](/product-demos/demos/linux-patching/) | Patch first, then run compliance to show a complete day-2 operations story |

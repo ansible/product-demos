@@ -1,37 +1,23 @@
 ---
 layout: demo-detail
 demo_slug: windows-patching
-description: >-
-  Apply Windows updates by category to Windows Server hosts and generate an
-  HTML patch report. The playbook uses the demo.patching.patch_windows role to
-  install updates filtered by category (Security, Critical, Feature Packs,
-  etc.), with optional reboot control. A report server is deployed
-  automatically to publish patching results. Runs in check mode by default.
-prerequisites:
-  - "Windows hosts in the <strong>Ansible Product Demos Inventory</strong> (deployed by <strong>Deploy Cloud Stack in AWS</strong>)"
-  - "WinRM connectivity via <strong>APD Machine Credential</strong>"
-  - "A Windows report server (<code>aws_win1</code>) in the <code>os_windows</code> inventory group"
-survey_prompts:
-  - question: "Server Name or Pattern"
-    variable: _hosts
-    type: text
-    required: "No"
-  - question: "Update categories"
-    variable: win_update_categories
-    type: multiselect
-    required: "No"
-  - question: "Reboot after install?"
-    variable: allow_reboot
-    type: multiplechoice
-    required: "No"
-related_demos:
-  - slug: patch-cloud-stack
-    description: "Full workflow with EBS snapshots, parallel RHEL and Windows patching, and automatic rollback"
-  - slug: windows-install-iis
-    description: "Quick Windows demo to show application deployment alongside patching"
-  - slug: windows-setup-ad-domain
-    description: "Provision a full AD environment to demonstrate domain-joined Windows patching"
 ---
+
+Apply Windows updates by category to Windows Server hosts and generate an HTML patch report. The playbook uses the demo.patching.patch_windows role to install updates filtered by category (Security, Critical, Feature Packs, etc.), with optional reboot control. A report server is deployed automatically to publish patching results. Runs in check mode by default.
+
+## Prerequisites
+
+- Windows hosts in the <strong>Ansible Product Demos Inventory</strong> (deployed by <strong>Deploy Cloud Stack in AWS</strong>)
+- WinRM connectivity via <strong>APD Machine Credential</strong>
+- A Windows report server (<code>aws_win1</code>) in the <code>os_windows</code> inventory group
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Server Name or Pattern | `_hosts` | text | No |
+| Update categories | `win_update_categories` | multiselect | No |
+| Reboot after install? | `allow_reboot` | multiplechoice | No |
 
 ## Why it matters
 
@@ -57,3 +43,11 @@ related_demos:
 - Check mode is your dry run. Show the change board exactly what will happen before you touch production.
 - The reboot survey option is a small detail that matters in production — operators control when reboots happen, not the automation.
 - This same patching pattern works on-prem, in AWS, or in Azure. The playbook does not care where the Windows host lives.
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| 🩹 [Patch Cloud Stack in AWS](/product-demos/demos/patch-cloud-stack/) | Full workflow with EBS snapshots, parallel RHEL and Windows patching, and automatic rollback |
+| 🪟 [Install IIS](/product-demos/demos/windows-install-iis/) | Quick Windows demo to show application deployment alongside patching |
+| 🪟 [Setup Active Directory Domain](/product-demos/demos/windows-setup-ad-domain/) | Provision a full AD environment to demonstrate domain-joined Windows patching |

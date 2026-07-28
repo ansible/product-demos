@@ -1,30 +1,32 @@
 ---
 layout: demo-detail
 demo_slug: windows-run-powershell-kerberos
-description: >-
-  Runs a PowerShell script on Windows hosts using Kerberos authentication
-  instead of basic WinRM. Demonstrates Ansible ability to authenticate via
-  Active Directory credentials for domain-joined environments.
-prerequisites:
-  - "Windows hosts joined to an Active Directory domain"
-  - "Kerberos credential configured in AAP"
-  - "Domain controller reachable from AAP"
-survey_prompts:
-  - question: "Server Name or Pattern"
-    variable: _hosts
-    type: text
-    required: "Yes"
-  - question: "PowerShell Script"
-    variable: ps_script
-    type: textarea
-    required: "Yes"
-job_templates:
-  - name: "WINDOWS | Run PowerShell | Kerberos"
-    playbook: windows/powershell.yml
-    description: "Executes PowerShell on target hosts using Kerberos authentication"
-related_demos:
-  - slug: windows-run-powershell
-    description: "Same playbook with standard WinRM authentication"
-  - slug: windows-setup-ad-domain
-    description: "Set up an AD domain for Kerberos authentication"
 ---
+
+Runs a PowerShell script on Windows hosts using Kerberos authentication instead of basic WinRM. Demonstrates Ansible ability to authenticate via Active Directory credentials for domain-joined environments.
+
+## Prerequisites
+
+- Windows hosts joined to an Active Directory domain
+- Kerberos credential configured in AAP
+- Domain controller reachable from AAP
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Server Name or Pattern | `_hosts` | text | Yes |
+| PowerShell Script | `ps_script` | textarea | Yes |
+
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| WINDOWS | Run PowerShell | Kerberos | [`windows/powershell.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell.yml) | Executes PowerShell on target hosts using Kerberos authentication |
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| 🪟 [Run PowerShell](/product-demos/demos/windows-run-powershell/) | Same playbook with standard WinRM authentication |
+| 🪟 [Setup Active Directory Domain](/product-demos/demos/windows-setup-ad-domain/) | Set up an AD domain for Kerberos authentication |

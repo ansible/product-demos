@@ -1,39 +1,26 @@
 ---
 layout: demo-detail
 demo_slug: network-panos-workflow
-description: >-
-  A workflow that provisions a Palo Alto Networks virtual firewall in AWS,
-  configures it using the paloaltonetworks.panos collection, deploys a
-  webserver behind it, and sets up security rules to demonstrate firewall
-  policy management. Covers the full lifecycle from infrastructure
-  provisioning through configuration and validation.
-prerequisites:
-  - "AWS credential configured with Access and Secret key"
-  - "Subscribe to the <strong>VM-Series Next-Gen Virtual Firewall</strong> AMI in the AWS Marketplace (five-minute approval process)"
-  - "Run APD setup with the network category to create the required credentials and templates"
-  - "<strong>Palo Alto Firewall Admin</strong> credential (created by setup with placeholder values)"
-  - "<strong>Palo Alto Bastion</strong> credential (created by setup with placeholder values)"
-job_templates:
-  - name: "NETWORK | Panos | Deploy"
-    playbook: network/panos/deploy.yml
-    description: "Provisions the virtual firewall, bastion host, and webserver instances in AWS"
-  - name: "Panos Demo Instances (Inventory Sync)"
-    playbook: (inventory sync)
-    description: "Syncs the dynamic inventory source to discover the newly created EC2 instances"
-  - name: "NETWORK | Panos | Configure Firewall"
-    playbook: network/panos/configure_firewall.yml
-    description: "Applies initial firewall configuration using the paloaltonetworks.panos collection"
-  - name: "NETWORK | Panos | Configure Webserver"
-    playbook: network/panos/configure_webserver.yml
-    description: "Configures a basic Apache webserver behind the firewall to demonstrate security rules"
-related_demos:
-  - slug: network-configuration
-    description: "Deploy golden configurations to Cisco IOS, IOSXR, and NXOS devices using resource modules"
-  - slug: network-disa-stig
-    description: "Run network DISA STIG compliance checks to show security hardening for network devices"
-  - slug: deploy-cloud-stack
-    description: "Provision the full demo infrastructure including the reports server used by other network demos"
 ---
+
+A workflow that provisions a Palo Alto Networks virtual firewall in AWS, configures it using the paloaltonetworks.panos collection, deploys a webserver behind it, and sets up security rules to demonstrate firewall policy management. Covers the full lifecycle from infrastructure provisioning through configuration and validation.
+
+## Prerequisites
+
+- AWS credential configured with Access and Secret key
+- Subscribe to the <strong>VM-Series Next-Gen Virtual Firewall</strong> AMI in the AWS Marketplace (five-minute approval process)
+- Run APD setup with the network category to create the required credentials and templates
+- <strong>Palo Alto Firewall Admin</strong> credential (created by setup with placeholder values)
+- <strong>Palo Alto Bastion</strong> credential (created by setup with placeholder values)
+
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| NETWORK | Panos | Deploy | [`network/panos/deploy.yml`](https://github.com/ansible/product-demos/blob/main/network/panos/deploy.yml) | Provisions the virtual firewall, bastion host, and webserver instances in AWS |
+| Panos Demo Instances (Inventory Sync) | [`(inventory sync)`](https://github.com/ansible/product-demos/blob/main/(inventory sync)) | Syncs the dynamic inventory source to discover the newly created EC2 instances |
+| NETWORK | Panos | Configure Firewall | [`network/panos/configure_firewall.yml`](https://github.com/ansible/product-demos/blob/main/network/panos/configure_firewall.yml) | Applies initial firewall configuration using the paloaltonetworks.panos collection |
+| NETWORK | Panos | Configure Webserver | [`network/panos/configure_webserver.yml`](https://github.com/ansible/product-demos/blob/main/network/panos/configure_webserver.yml) | Configures a basic Apache webserver behind the firewall to demonstrate security rules |
 
 ## Why it matters
 
@@ -59,3 +46,11 @@ related_demos:
 - The live deny-then-allow demo is a crowd pleaser. People can see the webserver go down and come back up in real time.
 - Three different automation mechanisms in one workflow — cloud provisioning, firewall API, and SSH-based Linux config — all orchestrated by AAP.
 - After the demo, the Cleanup job template tears down all AWS resources. No orphaned instances, no surprise bills.
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| 🌐 [Golden Configuration](/product-demos/demos/network-configuration/) | Deploy golden configurations to Cisco IOS, IOSXR, and NXOS devices using resource modules |
+| 🌐 [DISA STIG](/product-demos/demos/network-disa-stig/) | Run network DISA STIG compliance checks to show security hardening for network devices |
+| 🚀 [Deploy Cloud Stack in AWS](/product-demos/demos/deploy-cloud-stack/) | Provision the full demo infrastructure including the reports server used by other network demos |

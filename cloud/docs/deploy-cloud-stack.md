@@ -1,39 +1,23 @@
 ---
 layout: demo-detail
 demo_slug: deploy-cloud-stack
-description: >-
-  Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two
-  Windows, two RHEL, one reports server), dynamic inventory sync, and a VPC
-  report published to S3. This is the starting point for most cloud, Linux,
-  and Windows demos.
-prerequisites:
-  - "<strong>If using RHDP (demo.redhat.com):</strong> Run <strong>APD | Multi-demo setup</strong> to configure all templates and credentials. AWS and APD Machine credentials are pre-configured for you."
-  - "<strong>If using your own installation:</strong> Run <strong>APD | Single demo setup</strong> and choose <code>cloud</code>. Configure the <strong>AWS</strong> credential with your Access Key and Secret Key, and add an SSH private key to <strong>APD Machine Credential</strong>."
-survey_prompts:
-  - question: "AWS Region"
-    variable: aws_region
-    type: multiplechoice
-    required: "Yes"
-  - question: "Owner"
-    variable: owner_tag
-    type: text
-    required: "Yes"
-  - question: "Environment"
-    variable: env
-    type: multiplechoice
-    required: "Yes"
-  - question: "Email"
-    variable: email
-    type: text
-    required: "Yes"
-related_demos:
-  - slug: patch-cloud-stack
-    description: "Run this after deploying to demonstrate day-2 patching"
-  - slug: cloud-destroy-stack
-    description: "Tear down everything when done"
-  - slug: linux-fact-scan
-    description: "Gather facts from the newly deployed RHEL hosts"
 ---
+
+Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Windows, two RHEL, one reports server), dynamic inventory sync, and a VPC report published to S3. This is the starting point for most cloud, Linux, and Windows demos.
+
+## Prerequisites
+
+- <strong>If using RHDP (demo.redhat.com):</strong> Run <strong>APD | Multi-demo setup</strong> to configure all templates and credentials. AWS and APD Machine credentials are pre-configured for you.
+- <strong>If using your own installation:</strong> Run <strong>APD | Single demo setup</strong> and choose <code>cloud</code>. Configure the <strong>AWS</strong> credential with your Access Key and Secret Key, and add an SSH private key to <strong>APD Machine Credential</strong>.
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| AWS Region | `aws_region` | multiplechoice | Yes |
+| Owner | `owner_tag` | text | Yes |
+| Environment | `env` | multiplechoice | Yes |
+| Email | `email` | text | Yes |
 
 ## Why it matters
 
@@ -50,3 +34,11 @@ related_demos:
 4. <strong>Inventory sync:</strong> After VMs are created, the dynamic inventory syncs automatically. Show the new hosts appearing in AAP.
 5. <strong>VPC report:</strong> Show the S3 report — a visual summary of what was built.
 6. <strong>Transition:</strong> 'Now that we have infrastructure, let's do something with it' — pivot to patching, compliance, or other demos.
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| 🩹 [Patch Cloud Stack in AWS](/product-demos/demos/patch-cloud-stack/) | Run this after deploying to demonstrate day-2 patching |
+| 💥 [Destroy Cloud Stack in AWS](/product-demos/demos/cloud-destroy-stack/) | Tear down everything when done |
+| 🐧 [Fact Scan](/product-demos/demos/linux-fact-scan/) | Gather facts from the newly deployed RHEL hosts |

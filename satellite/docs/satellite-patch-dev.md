@@ -1,22 +1,26 @@
 ---
 layout: demo-detail
 demo_slug: satellite-patch-dev
-description: >-
-  End-to-end Satellite patching workflow for development environments.
-  Combines content view publishing with host patching to demonstrate the full
-  content management lifecycle.
-prerequisites:
-  - "<strong>Satellite Collection</strong> credential configured"
-  - "Content views and lifecycle environments configured in Satellite"
-  - "Dev hosts registered with Satellite"
-  - "Run <strong>APD | Single demo setup</strong> with <code>satellite</code>"
-job_templates:
-  - name: "SATELLITE | Patch Dev (workflow)"
-    playbook: satellite/setup.yml
-    description: "Publishes content view, syncs hosts, and applies patches to development environment"
-related_demos:
-  - slug: satellite-publish-content-view
-    description: "Standalone content view publishing"
-  - slug: satellite-promote-content-view
-    description: "Promote content from dev to production after testing"
 ---
+
+End-to-end Satellite patching workflow for development environments. Combines content view publishing with host patching to demonstrate the full content management lifecycle.
+
+## Prerequisites
+
+- <strong>Satellite Collection</strong> credential configured
+- Content views and lifecycle environments configured in Satellite
+- Dev hosts registered with Satellite
+- Run <strong>APD | Single demo setup</strong> with <code>satellite</code>
+
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| SATELLITE | Patch Dev (workflow) | [`satellite/setup.yml`](https://github.com/ansible/product-demos/blob/main/satellite/setup.yml) | Publishes content view, syncs hosts, and applies patches to development environment |
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| 🛰️ [Publish Content View Version](/product-demos/demos/satellite-publish-content-view/) | Standalone content view publishing |
+| 🛰️ [Promote Content View Version](/product-demos/demos/satellite-promote-content-view/) | Promote content from dev to production after testing |

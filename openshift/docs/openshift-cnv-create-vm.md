@@ -1,34 +1,33 @@
 ---
 layout: demo-detail
 demo_slug: openshift-cnv-create-vm
-description: >-
-  Provisions a RHEL virtual machine on OpenShift Virtualization (CNV) using
-  the KubeVirt API. Creates the VM definition with a DataVolume for the OS
-  disk from a cluster image source.
-prerequisites:
-  - "OpenShift Virtualization installed"
-  - "<strong>OpenShift Credential</strong> configured"
-  - "RHEL OS images available in openshift-virtualization-os-images namespace"
-survey_prompts:
-  - question: "VM Name"
-    variable: vm_name
-    type: text
-    required: "Yes"
-  - question: "Namespace"
-    variable: vm_namespace
-    type: text
-    required: "Yes"
-  - question: "OS Version"
-    variable: os_version
-    type: multiplechoice
-    required: "Yes"
-job_templates:
-  - name: "OpenShift | CNV | Create VM"
-    playbook: openshift/cnv/provision_rhel.yml
-    description: "Creates a KubeVirt VirtualMachine with a DataVolume from a cluster image source"
-related_demos:
-  - slug: openshift-cnv-delete-vm
-    description: "Delete VMs created by this playbook"
-  - slug: openshift-cnv-install
-    description: "Install CNV if not already present"
 ---
+
+Provisions a RHEL virtual machine on OpenShift Virtualization (CNV) using the KubeVirt API. Creates the VM definition with a DataVolume for the OS disk from a cluster image source.
+
+## Prerequisites
+
+- OpenShift Virtualization installed
+- <strong>OpenShift Credential</strong> configured
+- RHEL OS images available in openshift-virtualization-os-images namespace
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| VM Name | `vm_name` | text | Yes |
+| Namespace | `vm_namespace` | text | Yes |
+| OS Version | `os_version` | multiplechoice | Yes |
+
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| OpenShift | CNV | Create VM | [`openshift/cnv/provision_rhel.yml`](https://github.com/ansible/product-demos/blob/main/openshift/cnv/provision_rhel.yml) | Creates a KubeVirt VirtualMachine with a DataVolume from a cluster image source |
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| ⎈ [CNV — Delete VM](/product-demos/demos/openshift-cnv-delete-vm/) | Delete VMs created by this playbook |
+| ⎈ [CNV — Install Operator](/product-demos/demos/openshift-cnv-install/) | Install CNV if not already present |

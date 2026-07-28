@@ -1,18 +1,23 @@
 ---
 layout: demo-detail
 demo_slug: openshift-cnv-delete-vm
-description: >-
-  Deletes one or more virtual machines from OpenShift Virtualization. Removes
-  the VirtualMachine and associated DataVolume resources. Supports
-  pattern-based host selection for bulk cleanup.
-prerequisites:
-  - "Existing CNV VMs to delete"
-  - "<strong>OpenShift Credential</strong> configured"
-job_templates:
-  - name: "OpenShift | CNV | Delete VM"
-    playbook: openshift/cnv/delete.yml
-    description: "Removes VirtualMachine and DataVolume resources from the specified namespace"
-related_demos:
-  - slug: openshift-cnv-create-vm
-    description: "Create VMs to manage with this playbook"
 ---
+
+Deletes one or more virtual machines from OpenShift Virtualization. Removes the VirtualMachine and associated DataVolume resources. Supports pattern-based host selection for bulk cleanup.
+
+## Prerequisites
+
+- Existing CNV VMs to delete
+- <strong>OpenShift Credential</strong> configured
+
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| OpenShift | CNV | Delete VM | [`openshift/cnv/delete.yml`](https://github.com/ansible/product-demos/blob/main/openshift/cnv/delete.yml) | Removes VirtualMachine and DataVolume resources from the specified namespace |
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| ⎈ [CNV — Create RHEL VM](/product-demos/demos/openshift-cnv-create-vm/) | Create VMs to manage with this playbook |
