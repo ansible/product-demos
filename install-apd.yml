@@ -7,12 +7,16 @@
     - name: Make sure AAP credential environment variables are set
       ansible.builtin.assert:
         that:
-          - 'lookup("env", "AAP_HOSTNAME")'
-          - 'lookup("env", "AAP_USERNAME")'
-          - 'lookup("env", "AAP_PASSWORD")'
+          - lookup('env', 'AAP_HOSTNAME') != ''
+          - >
+            lookup('env', 'AAP_TOKEN') != '' or
+            (lookup('env', 'AAP_USERNAME') != '' and lookup('env', 'AAP_PASSWORD') != '')
         fail_msg:
           - 'Please ensure the following environment variables are set:'
           - '  export AAP_HOSTNAME=https://your-aap-server.example.com'
+          - '    # either a token for authentication'
+          - '  export AAP_TOKEN=<admin-token>'
+          - '    # or a username and password for basic auth'
           - '  export AAP_USERNAME=admin  # or another user with AAP superuser privileges'
           - '  export AAP_PASSWORD=<admin-user-password>'
 

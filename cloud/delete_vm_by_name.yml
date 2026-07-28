@@ -1,0 +1,39 @@
+---
+- name: Delete EC2 instance by Name tag
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Fail if variables not defined
+      ansible.builtin.assert:
+        that:
+          - create_vm_vm_name is defined
+          - create_vm_aws_region is defined
+        fail_msg: "create_vm_vm_name and create_vm_aws_region are required"
+
+    - name: Find instance
+      amazon.aws.ec2_instance_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          "tag:Name": "{{ create_vm_vm_name }}"
+          instance-state-name:
+            - pending
+            - running
+            - shutting-down
+            - stopping
+            - stopped
+      register: cloud_stack_instance
+
+    - name: Terminate instance
+      amazon.aws.ec2_instance:
+        region: "{{ create_vm_aws_region }}"
+        instance_ids: "{{ cloud_stack_instance.instances | map(attribute='instance_id') | list }}"
+        state: absent
+        wait: true
+      when: cloud_stack_instance.instances | length > 0
+
+    - name: Report instance not found
+      ansible.builtin.debug:
+        msg: "No running instance found with Name={{ create_vm_vm_name }} in {{ create_vm_aws_region }}"
+      when: cloud_stack_instance.instances | length == 0

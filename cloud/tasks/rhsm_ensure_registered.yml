@@ -1,0 +1,100 @@
+---
+# Ensures the host is registered with RHSM.
+# If the RHSM Registration credential is configured in AAP, unregistered
+# hosts are automatically registered. Otherwise the host is flagged as
+# unregistered and downstream tasks can handle it gracefully.
+#
+# Three outcomes (all set rhsm_registered / rhsm_unregistered facts):
+#   1. Already registered          → continues normally
+#   2. Credential works            → registers, then continues normally
+#   3. No credential or bad creds  → skips gracefully, no failure
+#
+# Sets facts:
+#   rhsm_registered: bool  – true when the host has valid RHSM identity
+#   rhsm_unregistered: bool – inverse, for convenience in Jinja conditionals
+
+- name: Skip RHSM check if status already cached
+  when: rhsm_registered is defined and rhsm_registered
+  ansible.builtin.debug:
+    msg: "RHSM status cached — {{ inventory_hostname }} is registered"
+
+- name: RHSM registration workflow
+  when: rhsm_registered is not defined or not rhsm_registered
+  block:
+    - name: Ensure swap before DNF operations
+      ansible.builtin.include_tasks: ensure_swap.yml
+
+    - name: Check RHSM registration status
+      ansible.builtin.command: subscription-manager identity
+      register: _rhsm_id_check
+      failed_when: false
+      changed_when: false
+
+    - name: Attempt RHSM registration via activation key
+      when:
+        - _rhsm_id_check.rc != 0
+        - rhsm_org_id is defined
+        - rhsm_activation_key is defined
+        - rhsm_org_id != 'REPLACEME'
+        - rhsm_activation_key != 'REPLACEME'
+        - rhsm_org_id | length > 0
+        - rhsm_activation_key | length > 0
+      block:
+        - name: Remove RHUI client packages
+          ansible.builtin.dnf:
+            name: rh-amazon-rhui-client*
+            state: removed
+
+        - name: Ensure manage_repos is enabled
+          ansible.builtin.lineinfile:
+            path: /etc/rhsm/rhsm.conf
+            regexp: '^manage_repos'
+            line: 'manage_repos = 1'
+
+        - name: Register with RHSM
+          ansible.builtin.command: >-
+            subscription-manager register
+            --activationkey={{ rhsm_activation_key }}
+            --org={{ rhsm_org_id }}
+            --force
+          register: _rhsm_register
+          changed_when: "'system has been registered' in _rhsm_register.stdout"
+
+        - name: Verify registration succeeded
+          ansible.builtin.command: subscription-manager identity
+          register: _rhsm_id_check
+          changed_when: false
+
+      rescue:
+        - name: Log registration failure
+          ansible.builtin.debug:
+            msg: >-
+              RHSM registration failed for {{ inventory_hostname }}.
+              Check the RHSM Registration credential in AAP
+              (org_id and activation_key). Continuing without registration.
+
+        - name: Re-check identity after failed attempt
+          ansible.builtin.command: subscription-manager identity
+          register: _rhsm_id_check
+          failed_when: false
+          changed_when: false
+
+    - name: Final RHSM identity check
+      ansible.builtin.command: subscription-manager identity
+      register: _rhsm_final
+      failed_when: false
+      changed_when: false
+
+    - name: Set RHSM status — registered
+      ansible.builtin.set_fact:
+        rhsm_registered: true
+        rhsm_unregistered: false
+        cacheable: true
+      when: _rhsm_final.rc == 0
+
+    - name: Set RHSM status — unregistered
+      ansible.builtin.set_fact:
+        rhsm_registered: false
+        rhsm_unregistered: true
+        cacheable: true
+      when: _rhsm_final.rc != 0

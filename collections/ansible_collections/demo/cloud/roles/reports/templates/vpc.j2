@@ -1,0 +1,44 @@
+<!-- INTERNAL TABLE FOR Ansible -->
+<div id="accordion">
+<div>
+<h3>{{ aws_region | default('unknown') }}</h3>
+<div class="net_content">
+<p class="description">There are <strong>{{ vpc_info.vpcs | length }}</strong> AWS VPCs configured and <strong>{{ ec2_instance_info.instances | length }}</strong> instances on region {{ aws_region | default('unknown') }}
+
+<table class="net_info">
+<tbody>
+  <tr>
+    <th class="vpc_info">{{ '%-38s'|format('VPC name')}}</th>
+    <th class="vpc_info">{{ '%-28s'|format('VPC id') }}</th>
+    <th class="vpc_info">{{ '%-14s'|format('instances') }}</th>
+    <th class="vpc_info">{{ '%-18s'|format('CIDR block') }}</th>
+    <th class="vpc_info" id="cidr_assoc">{{ '%-26s'|format('CIDR block associations') }}</th>
+    <th class="vpc_info">{{ '%-22s'|format('IGW') }}</th>
+  </tr>
+  {% for vpc in vpc_info.vpcs %}
+  <tr>
+  <td>{{ '%-38s'|format(vpc.tags['Name'] | default('Unspecified, missing name tag')) }}</td>
+  <td>{{ '%-28s' | format(vpc.id) }}</td>
+  <td>{{ '%-14s'|format(ec2_instance_info.instances | selectattr('vpc_id', 'equalto', vpc.id ) | length) -}}</td>
+  <td>{{ '%-18s'|format(vpc.cidr_block) }}</td>
+  <td>{{ '%-26s' | format(vpc.cidr_block_association_set | length | default('0')) }}</td>
+  {% set ns = namespace(igwfound=False) %}
+  {%- for igw in igw_info.internet_gateways -%}
+  {% if igw['attachments'] | length > 0 %}
+  {% if igw['attachments'][0]['vpc_id'] == vpc.id %}
+  <td>{{ '%-22s'|format(igw['internet_gateway_id']) }}</td>
+  {% set ns.igwfound = True %}
+  {% endif %}
+  {% endif %}
+  {%- endfor -%}
+  {% if not ns.igwfound %}
+  <td>{{ '%-22s'|format('No IGW found') }}</td>
+  {% endif %}
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- END INTERNAL TABLE FOR Ansible -->

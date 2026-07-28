@@ -5,7 +5,7 @@ panos_demo_owner: zleblanc
 panos_demo_ami_pan: ami-0f16456ef765ba0ba
 panos_demo_ami_rhel: ami-0aa8fc2422063977a
 
-panos_demo_keypair: 
+panos_demo_keypair:
   name: "{{ panos_demo_prefix }}-key"
   tags:
     demo: panos
@@ -48,7 +48,7 @@ panos_demo_subnet_private:
     owner: "{{ panos_demo_owner }}"
     created_by: apd
 
-panos_demo_security_groups: # order matters (mgmt, public, private)
+panos_demo_security_groups:  # order matters (mgmt, public, private)
   - name: "{{ panos_demo_prefix }}-mgmt-sg"
     tags:
       Name: "{{ panos_demo_prefix }}-mgmt-sg"

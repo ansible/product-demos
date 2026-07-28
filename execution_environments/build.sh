@@ -1,5 +1,5 @@
 #!/bin/bash
-manifest=${1:-quay.io/ansible-product-demos/apd-ee-25}
+manifest=${1:-quay.io/ansible-product-demos/apd-ee-26}
 
 if [[ -z $ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN || -z $ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN ]]
 then
@@ -19,7 +19,7 @@ fi
 # create EE definition
 rm -rf ./context/*
 ansible-builder create \
-    --file apd-ee-25.yml \
+    --file apd-ee-26.yml \
     --context ./context \
     -v 3 | tee ansible-builder.log
 

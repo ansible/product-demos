@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if page.demo_slug %}{% assign page_demo = site.data.demos | where: "slug", page.demo_slug | first %}{{ page_demo.title }} · {% elsif page.title %}{{ page.title }} · {% endif %}{{ site.title }}</title>
+  <meta name="description" content="{% if page.demo_slug %}{{ page_demo.blurb }}{% else %}{{ page.description | default: site.description }}{% endif %}">
+  <link rel="icon" href="{{ '/favicon.ico' | relative_url }}" sizes="any">
+  <link rel="icon" type="image/png" href="{{ '/assets/icons/favicon-32x32.png' | relative_url }}" sizes="32x32">
+  <link rel="icon" type="image/png" href="{{ '/assets/icons/favicon-16x16.png' | relative_url }}" sizes="16x16">
+  <link rel="apple-touch-icon" href="{{ '/assets/icons/apple-touch-icon.png' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a href="{{ '/' | relative_url }}" class="sidebar-logo">
+        {% include logo-mark.html %}
+        <span class="logo-text">Ansible Product Demos</span>
+      </a>
+
+      {% if page.demo_slug %}
+        <a href="{{ '/' | relative_url }}" class="nav-link sidebar-back">← All demos</a>
+      {% else %}
+        <nav class="sidebar-nav">
+          <p class="nav-heading">Explore</p>
+          <a href="{{ '/' | relative_url }}" class="nav-link{% if page.url == '/' %} active{% endif %}">All demos</a>
+        </nav>
+      {% endif %}
+
+      {% if page.demo_slug %}
+        {% include demo-sidebar-toc.html %}
+      {% endif %}
+
+      {% include sidebar-footer.html %}
+    </aside>
+
+    <div class="content-column">
+      <main class="main">
+        {{ content }}
+      </main>
+    </div>
+  </div>
+
+  {% if page.mermaid or page.layout == 'demo-detail' %}
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#0d1f12',
+        primaryTextColor: '#e8f5e9',
+        primaryBorderColor: '#22c55e',
+        lineColor: '#3a6b40',
+        secondaryColor: '#132a18',
+        tertiaryColor: '#071209'
+      }
+    });
+  </script>
+  {% endif %}
+
+  {% if page.layout == 'default' and page.url == '/' %}
+  <script src="{{ '/assets/js/filters.js' | relative_url }}"></script>
+  {% endif %}
+
+  {% if page.demo_slug %}
+  <script src="{{ '/assets/js/demo-toc.js' | relative_url }}"></script>
+  {% endif %}
+
+  <style>
+    .konami-wrap {
+      position: fixed;
+      z-index: 9999;
+      left: 50%;
+      transform: translateX(-50%);
+      top: -500px;
+      opacity: 0;
+      text-align: center;
+    }
+    .konami-wrap.drop {
+      animation: konami-drop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      pointer-events: auto;
+    }
+    .konami-wrap.yeet {
+      animation: konami-yeet 0.5s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+      pointer-events: none;
+    }
+    .konami-egg {
+      width: 340px;
+      max-width: 90vw;
+    }
+    .konami-close {
+      display: block;
+      margin: 8px auto 0;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      padding: 4px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .konami-close:hover { background: rgba(0,0,0,0.9); }
+    @keyframes konami-drop {
+      0% { top: -500px; opacity: 0; }
+      60% { opacity: 1; }
+      100% { top: 50%; opacity: 1; transform: translateX(-50%) translateY(-50%); }
+    }
+    @keyframes konami-yeet {
+      0% { top: 50%; opacity: 1; transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+      100% { top: 120vh; opacity: 0; transform: translateX(40vw) translateY(0) rotate(720deg); }
+    }
+  </style>
+  <div class="konami-wrap" id="konami-wrap">
+    <img src="{{ '/assets/img/i-made-this.png' | relative_url }}" class="konami-egg" alt="">
+    <button class="konami-close" id="konami-close">✕ dismiss</button>
+  </div>
+  <script>
+    (function() {
+      var seq = [38,38,40,40,37,39,37,39,66,65];
+      var pos = 0;
+      var wrap = document.getElementById('konami-wrap');
+      var closeBtn = document.getElementById('konami-close');
+      var timer = null;
+      var seqTimer = null;
+
+      function dismiss() {
+        clearTimeout(timer);
+        wrap.className = 'konami-wrap yeet';
+        setTimeout(function() { wrap.className = 'konami-wrap'; }, 600);
+      }
+
+      closeBtn.addEventListener('click', dismiss);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.keyCode === 27 && wrap.classList.contains('drop')) {
+          dismiss();
+          return;
+        }
+
+        var tag = (e.target.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+        if (e.target.closest && e.target.closest('button, [role="tablist"]')) return;
+
+        clearTimeout(seqTimer);
+        if (e.keyCode === seq[pos]) {
+          pos++;
+          if (pos === seq.length) {
+            pos = 0;
+            wrap.className = 'konami-wrap drop';
+            timer = setTimeout(dismiss, 4200);
+          } else {
+            seqTimer = setTimeout(function() { pos = 0; }, 2000);
+          }
+        } else {
+          pos = 0;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

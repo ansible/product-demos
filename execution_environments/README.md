@@ -1,6 +1,6 @@
 # Execution Environment Images for Ansible Product Demos
 
-When the Ansible Product Demos setup job template is run, it creates a number of execution environment definitions on the automation controller.  The content of this directory is used to create and update the default APD execution environment images defined during the setup process, [quay.io/ansible-product-demos/apd-ee-25](quay.io/ansible-product-demos/apd-ee-25).
+When the Ansible Product Demos setup job template is run, it creates a number of execution environment definitions on the automation controller.  The content of this directory is used to create and update the default APD execution environment images defined during the setup process, [quay.io/ansible-product-demos/apd-ee-26](quay.io/ansible-product-demos/apd-ee-26).
 
 Currently the execution environment image is created manually using the `build.sh` script, with a future goal of building in a CI pipeline when the EE definition or requirements are updated.
 

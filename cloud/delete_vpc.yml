@@ -1,0 +1,147 @@
+---
+- name: Delete Cloud Stack VPC and related resources
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    aws_vpc_name: aws-test-vpc
+    aws_sg_name: aws-test-sg
+    aws_subnet_name: aws-test-subnet
+    aws_rt_name: aws-test-rt
+
+  tasks:
+    - name: Fail if variables not defined
+      ansible.builtin.assert:
+        that:
+          - create_vm_aws_region is defined
+        fail_msg: "create_vm_aws_region is required"
+
+    - name: Find VPC
+      amazon.aws.ec2_vpc_net_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          "tag:Name": "{{ aws_vpc_name }}"
+      register: cloud_stack_vpc
+
+    - name: Report VPC not found
+      ansible.builtin.debug:
+        msg: "VPC {{ aws_vpc_name }} not found in {{ create_vm_aws_region }}"
+      when: cloud_stack_vpc.vpcs | length == 0
+
+    - name: Delete VPC resources
+      when: cloud_stack_vpc.vpcs | length > 0
+      vars:
+        cloud_stack_vpc_id: "{{ cloud_stack_vpc.vpcs[0].vpc_id }}"
+      block:
+        - name: Find remaining EC2 instances in VPC
+          amazon.aws.ec2_instance_info:
+            region: "{{ create_vm_aws_region }}"
+            filters:
+              vpc-id: "{{ cloud_stack_vpc_id }}"
+              instance-state-name:
+                - pending
+                - running
+                - shutting-down
+                - stopping
+                - stopped
+          register: cloud_stack_instances
+
+        - name: Terminate remaining EC2 instances
+          amazon.aws.ec2_instance:
+            region: "{{ create_vm_aws_region }}"
+            instance_ids: "{{ cloud_stack_instances.instances | map(attribute='instance_id') | list }}"
+            state: absent
+            wait: true
+          when: cloud_stack_instances.instances | length > 0
+
+        - name: Find network interfaces in VPC
+          amazon.aws.ec2_eni_info:
+            region: "{{ create_vm_aws_region }}"
+            filters:
+              vpc-id: "{{ cloud_stack_vpc_id }}"
+          register: cloud_stack_enis
+
+        - name: Delete network interfaces
+          amazon.aws.ec2_eni:
+            region: "{{ create_vm_aws_region }}"
+            eni_id: "{{ item.id }}"
+            state: absent
+          loop: "{{ cloud_stack_enis.network_interfaces }}"
+          loop_control:
+            label: "{{ item.id }}"
+          when: cloud_stack_enis.network_interfaces | length > 0
+
+        - name: Find internet gateways
+          amazon.aws.ec2_vpc_igw_info:
+            region: "{{ create_vm_aws_region }}"
+            filters:
+              attachment.vpc-id: "{{ cloud_stack_vpc_id }}"
+          register: cloud_stack_igws
+
+        - name: Delete internet gateways
+          amazon.aws.ec2_vpc_igw:
+            region: "{{ create_vm_aws_region }}"
+            internet_gateway_id: "{{ item.internet_gateway_id }}"
+            state: absent
+          loop: "{{ cloud_stack_igws.internet_gateways }}"
+          loop_control:
+            label: "{{ item.internet_gateway_id }}"
+
+        - name: Find subnets
+          amazon.aws.ec2_vpc_subnet_info:
+            region: "{{ create_vm_aws_region }}"
+            filters:
+              vpc-id: "{{ cloud_stack_vpc_id }}"
+          register: cloud_stack_subnets
+
+        - name: Delete subnets
+          amazon.aws.ec2_vpc_subnet:
+            region: "{{ create_vm_aws_region }}"
+            vpc_id: "{{ cloud_stack_vpc_id }}"
+            cidr: "{{ item.cidr_block }}"
+            state: absent
+          loop: "{{ cloud_stack_subnets.subnets }}"
+          loop_control:
+            label: "{{ item.tags.Name | default(item.id) }}"
+
+        - name: Find route tables
+          amazon.aws.ec2_vpc_route_table_info:
+            region: "{{ create_vm_aws_region }}"
+            filters:
+              vpc-id: "{{ cloud_stack_vpc_id }}"
+          register: cloud_stack_route_tables
+
+        - name: Delete custom route tables
+          amazon.aws.ec2_vpc_route_table:
+            region: "{{ create_vm_aws_region }}"
+            lookup: id
+            route_table_id: "{{ item.id }}"
+            vpc_id: "{{ cloud_stack_vpc_id }}"
+            state: absent
+          loop: "{{ cloud_stack_route_tables.route_tables }}"
+          loop_control:
+            label: "{{ item.tags.Name | default(item.id) }}"
+          when: item.associations | default([]) | selectattr('main', 'equalto', true) | list | length == 0
+
+        - name: Find security groups
+          amazon.aws.ec2_security_group_info:
+            region: "{{ create_vm_aws_region }}"
+            filters:
+              vpc-id: "{{ cloud_stack_vpc_id }}"
+          register: cloud_stack_security_groups
+
+        - name: Delete security groups
+          amazon.aws.ec2_security_group:
+            region: "{{ create_vm_aws_region }}"
+            group_id: "{{ item.group_id }}"
+            state: absent
+          loop: "{{ cloud_stack_security_groups.security_groups | rejectattr('group_name', 'equalto', 'default') | list }}"
+          loop_control:
+            label: "{{ item.group_name }}"
+
+        - name: Delete VPC
+          amazon.aws.ec2_vpc_net:
+            region: "{{ create_vm_aws_region }}"
+            vpc_id: "{{ cloud_stack_vpc_id }}"
+            state: absent
