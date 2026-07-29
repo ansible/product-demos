@@ -1,7 +1,3 @@
----
-layout: demo-detail
-demo_slug: cloud-transit-networking
----
 # AWS — Transit Networking
 
 

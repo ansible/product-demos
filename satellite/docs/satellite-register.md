@@ -1,7 +1,3 @@
----
-layout: demo-detail
-demo_slug: satellite-register
----
 # Register with Satellite
 
 

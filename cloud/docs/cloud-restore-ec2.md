@@ -1,7 +1,3 @@
----
-layout: demo-detail
-demo_slug: cloud-restore-ec2
----
 # AWS — Restore EC2 from Snapshot
 
 

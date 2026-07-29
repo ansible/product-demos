@@ -1,7 +1,3 @@
----
-layout: demo-detail
-demo_slug: linux-compliance-workflow
----
 # Compliance Workflow
 
 

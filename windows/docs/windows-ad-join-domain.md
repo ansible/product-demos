@@ -1,7 +1,3 @@
----
-layout: demo-detail
-demo_slug: windows-ad-join-domain
----
 # AD — Join Domain
 
 

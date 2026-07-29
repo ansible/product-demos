@@ -1,7 +1,3 @@
----
-layout: demo-detail
-demo_slug: openshift-cnv-delete-vm
----
 # CNV — Delete VM
 
 

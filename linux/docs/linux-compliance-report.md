@@ -1,7 +1,3 @@
----
-layout: demo-detail
-demo_slug: linux-compliance-report
----
 # Multi-profile Compliance Report
 
 

@@ -1,7 +1,3 @@
----
-layout: demo-detail
-demo_slug: satellite-promote-content-view
----
 # Promote Content View Version
 
 

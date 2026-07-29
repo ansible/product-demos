@@ -1,7 +1,3 @@
----
-layout: demo-detail
-demo_slug: network-panos-workflow
----
 # Palo Alto Firewall Demo
 
 

@@ -1,8 +1,3 @@
----
-layout: demo-detail
-demo_slug: patch-cloud-stack
-special_thanks: "Joon Paik <jopaik@redhat.com> — original patch demo author"
----
 # Patch Cloud Stack in AWS
 
 

@@ -1,7 +1,3 @@
----
-layout: demo-detail
-demo_slug: cloud-destroy-stack
----
 # Destroy Cloud Stack in AWS
 
 

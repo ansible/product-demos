@@ -1,7 +1,3 @@
----
-layout: demo-detail
-demo_slug: cloud-resize-ec2
----
 # AWS — Resize EC2
 
 

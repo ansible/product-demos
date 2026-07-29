@@ -1,7 +1,3 @@
----
-layout: demo-detail
-demo_slug: linux-insights-compliance-scan
----
 # Insights Compliance Scan
 
 

@@ -11,6 +11,7 @@
   category: cloud
   status: active
   author: "Joon Paik <jopaik@redhat.com>"
+  special_thanks: "Joon Paik <jopaik@redhat.com> — original patch demo author"
   featured: true
   is_workflow: true
   tags:
