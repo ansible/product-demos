@@ -59,6 +59,7 @@
   subtitle: "VPC, keypair, five VMs, inventory sync — one click"
   category: cloud
   status: active
+  author: "Matthew Fernandez <matferna@redhat.com>"
   featured: true
   is_workflow: true
   tags:
@@ -121,6 +122,7 @@
   title: "Destroy Cloud Stack in AWS"
   category: cloud
   status: active
+  author: "Matthew Fernandez <matferna@redhat.com>"
   is_workflow: true
   tags:
     - Workflow
