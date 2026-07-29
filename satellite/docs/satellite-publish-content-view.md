@@ -19,10 +19,10 @@ Publishes a new version of a Satellite content view to a specified lifecycle env
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| SATELLITE ǀ Publish Content View | [`satellite/satellite_publish.yml`](https://github.com/ansible/product-demos/blob/main/satellite/satellite_publish.yml) | Publishes a new version of the content view to the specified lifecycle environment |
+| SATELLITE ǀ Publish Content View | [`satellite/satellite_publish.yml`](../satellite_publish.yml) | Publishes a new version of the content view to the specified lifecycle environment |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🛰️ [Promote Content View Version](/product-demos/demos/satellite-promote-content-view/) | Promote the published version to the next lifecycle stage |
+| 🛰️ [Promote Content View Version](./satellite-promote-content-view.md) | Promote the published version to the next lifecycle stage |

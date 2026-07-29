@@ -32,9 +32,9 @@ Compliance Report ──→ Update Inventory ──→ Compliance Enforce
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Multi-profile Compliance Report | [`linux/multi_profile_compliance_report.yml`](https://github.com/ansible/product-demos/blob/main/linux/multi_profile_compliance_report.yml) | Runs an OpenSCAP scan against the selected compliance profile and generates an HTML report |
-| AWS Inventory | [`(inventory sync)`](https://github.com/ansible/product-demos/blob/main/(inventory sync)) | Refreshes the AWS dynamic inventory to ensure host data is current before enforcement |
-| LINUX ǀ Compliance Enforce | [`linux/remediate_out_of_compliance.yml`](https://github.com/ansible/product-demos/blob/main/linux/remediate_out_of_compliance.yml) | Applies remediation for findings from the compliance scan |
+| LINUX ǀ Multi-profile Compliance Report | [`linux/multi_profile_compliance_report.yml`](../multi_profile_compliance_report.yml) | Runs an OpenSCAP scan against the selected compliance profile and generates an HTML report |
+| AWS Inventory | `(inventory sync)` | Refreshes the AWS dynamic inventory to ensure host data is current before enforcement |
+| LINUX ǀ Compliance Enforce | [`linux/remediate_out_of_compliance.yml`](../remediate_out_of_compliance.yml) | Applies remediation for findings from the compliance scan |
 
 ## Why it matters
 
@@ -64,6 +64,6 @@ Compliance Report ──→ Update Inventory ──→ Compliance Enforce
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [Multi-profile Compliance](/product-demos/demos/linux-multi-profile-compliance/) | Run the compliance report standalone to assess posture without enforcing |
-| 🐧 [DISA STIG](/product-demos/demos/linux-disa-stig/) | Apply DISA STIG hardening directly without the workflow wrapper |
-| 🐧 [Patching](/product-demos/demos/linux-patching/) | Patch first, then run compliance to show a complete day-2 operations story |
+| 🐧 [Multi-profile Compliance](./linux-multi-profile-compliance.md) | Run the compliance report standalone to assess posture without enforcing |
+| 🐧 [DISA STIG](./linux-disa-stig.md) | Apply DISA STIG hardening directly without the workflow wrapper |
+| 🐧 [Patching](./linux-patching.md) | Patch first, then run compliance to show a complete day-2 operations story |

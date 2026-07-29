@@ -54,6 +54,6 @@ Create VPC ──────┘            ├──→ aws_win1 (Windows Core)
 
 | Demo | Description |
 |------|-------------|
-| 🩹 [Patch Cloud Stack in AWS](/product-demos/demos/patch-cloud-stack/) | Run this after deploying to demonstrate day-2 patching |
-| 💥 [Destroy Cloud Stack in AWS](/product-demos/demos/cloud-destroy-stack/) | Tear down everything when done |
-| 🐧 [Fact Scan](/product-demos/demos/linux-fact-scan/) | Gather facts from the newly deployed RHEL hosts |
+| 🩹 [Patch Cloud Stack in AWS](./patch-cloud-stack.md) | Run this after deploying to demonstrate day-2 patching |
+| 💥 [Destroy Cloud Stack in AWS](./cloud-destroy-stack.md) | Tear down everything when done |
+| 🐧 [Fact Scan](../../linux/docs/linux-fact-scan.md) | Gather facts from the newly deployed RHEL hosts |

@@ -20,11 +20,11 @@ Joins Windows hosts to an existing Active Directory domain. Sets the DNS client 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS ǀ AD ǀ Join Domain | [`windows/join_ad_domain.yml`](https://github.com/ansible/product-demos/blob/main/windows/join_ad_domain.yml) | Configures DNS, creates OU, updates hostname, and joins the host to the domain |
+| WINDOWS ǀ AD ǀ Join Domain | [`windows/join_ad_domain.yml`](../join_ad_domain.yml) | Configures DNS, creates OU, updates hostname, and joins the host to the domain |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🪟 [AD — Create Domain](/product-demos/demos/windows-ad-create-domain/) | Create the domain before joining hosts |
-| 🪟 [AD — New User](/product-demos/demos/windows-ad-new-user/) | Create users in the domain after hosts are joined |
+| 🪟 [AD — Create Domain](./windows-ad-create-domain.md) | Create the domain before joining hosts |
+| 🪟 [AD — New User](./windows-ad-new-user.md) | Create users in the domain after hosts are joined |

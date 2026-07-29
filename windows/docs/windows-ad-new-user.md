@@ -23,11 +23,11 @@ Creates a new Active Directory user with full attributes -- name, department, co
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS ǀ AD ǀ New User | [`windows/helpdesk_new_user_portal.yml`](https://github.com/ansible/product-demos/blob/main/windows/helpdesk_new_user_portal.yml) | Creates an AD user with full attributes, random password, and group memberships |
+| WINDOWS ǀ AD ǀ New User | [`windows/helpdesk_new_user_portal.yml`](../helpdesk_new_user_portal.yml) | Creates an AD user with full attributes, random password, and group memberships |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🪟 [Setup Active Directory Domain](/product-demos/demos/windows-setup-ad-domain/) | Set up the AD domain before creating users |
-| 🪟 [Run PowerShell](/product-demos/demos/windows-run-powershell/) | Query AD for the newly created user |
+| 🪟 [Setup Active Directory Domain](./windows-setup-ad-domain.md) | Set up the AD domain before creating users |
+| 🪟 [Run PowerShell](./windows-run-powershell.md) | Query AD for the newly created user |

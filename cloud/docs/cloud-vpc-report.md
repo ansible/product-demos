@@ -12,10 +12,10 @@ Generates an HTML report of the current AWS VPC infrastructure -- instances, net
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud ǀ AWS ǀ VPC Report | [`cloud/cloud_report.yml`](https://github.com/ansible/product-demos/blob/main/cloud/cloud_report.yml) | Gathers facts from EC2 instances and generates an HTML infrastructure report |
+| Cloud ǀ AWS ǀ VPC Report | [`cloud/cloud_report.yml`](../cloud_report.yml) | Gathers facts from EC2 instances and generates an HTML infrastructure report |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🚀 [Deploy Cloud Stack in AWS](/product-demos/demos/deploy-cloud-stack/) | Deploy infrastructure to report on |
+| 🚀 [Deploy Cloud Stack in AWS](./deploy-cloud-stack.md) | Deploy infrastructure to report on |

@@ -19,10 +19,10 @@ Runs an arbitrary shell script on target hosts. The script content is provided v
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Run Shell Script | [`linux/run_script.yml`](https://github.com/ansible/product-demos/blob/main/linux/run_script.yml) | Executes the provided shell script on target hosts and displays the output |
+| LINUX ǀ Run Shell Script | [`linux/run_script.yml`](../run_script.yml) | Executes the provided shell script on target hosts and displays the output |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [Troubleshoot](/product-demos/demos/linux-troubleshoot/) | Pre-built troubleshooting commands instead of ad-hoc scripts |
+| 🐧 [Troubleshoot](./linux-troubleshoot.md) | Pre-built troubleshooting commands instead of ad-hoc scripts |

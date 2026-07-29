@@ -19,10 +19,10 @@ Applies one or more RHEL System Roles to target hosts. System Roles are a collec
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ System Roles | [`linux/system_roles.yml`](https://github.com/ansible/product-demos/blob/main/linux/system_roles.yml) | Applies selected RHEL System Roles (timesync, network, storage, etc.) to target hosts |
+| LINUX ǀ System Roles | [`linux/system_roles.yml`](../system_roles.yml) | Applies selected RHEL System Roles (timesync, network, storage, etc.) to target hosts |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [Install Web Console (Cockpit)](/product-demos/demos/linux-cockpit/) | Install Cockpit web console using System Roles |
+| 🐧 [Install Web Console (Cockpit)](./linux-cockpit.md) | Install Cockpit web console using System Roles |

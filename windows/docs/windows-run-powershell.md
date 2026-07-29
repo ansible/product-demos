@@ -19,11 +19,11 @@ Runs an arbitrary PowerShell script on target Windows hosts. The script content 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS ǀ Run PowerShell | [`windows/powershell.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell.yml) | Executes the provided PowerShell script on target hosts and displays the output |
+| WINDOWS ǀ Run PowerShell | [`windows/powershell.yml`](../powershell.yml) | Executes the provided PowerShell script on target hosts and displays the output |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🪟 [Run PowerShell (Kerberos)](/product-demos/demos/windows-run-powershell-kerberos/) | Same playbook but with Kerberos authentication |
-| 🪟 [Query Services](/product-demos/demos/windows-query-services/) | Pre-built PowerShell script for querying services |
+| 🪟 [Run PowerShell (Kerberos)](./windows-run-powershell-kerberos.md) | Same playbook but with Kerberos authentication |
+| 🪟 [Query Services](./windows-query-services.md) | Pre-built PowerShell script for querying services |

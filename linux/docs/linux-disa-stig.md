@@ -18,11 +18,11 @@ Applies DISA STIG (Security Technical Implementation Guide) hardening to RHEL ho
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ DISA STIG | [`linux/disa_stig.yml`](https://github.com/ansible/product-demos/blob/main/linux/disa_stig.yml) | Applies DISA STIG hardening controls from the demo.compliance collection |
+| LINUX ǀ DISA STIG | [`linux/disa_stig.yml`](../disa_stig.yml) | Applies DISA STIG hardening controls from the demo.compliance collection |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [Compliance Workflow](/product-demos/demos/linux-compliance-workflow/) | Full compliance workflow with scanning and enforcement |
-| 🐧 [Multi-profile Compliance Report](/product-demos/demos/linux-compliance-report/) | Generate a compliance report to measure STIG compliance |
+| 🐧 [Compliance Workflow](./linux-compliance-workflow.md) | Full compliance workflow with scanning and enforcement |
+| 🐧 [Multi-profile Compliance Report](./linux-compliance-report.md) | Generate a compliance report to measure STIG compliance |

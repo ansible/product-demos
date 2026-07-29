@@ -20,11 +20,11 @@ Registers RHEL hosts with a Red Hat Satellite server. Uses the demo.satellite.re
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Register with Satellite | [`satellite/server_register.yml`](https://github.com/ansible/product-demos/blob/main/satellite/server_register.yml) | Registers target RHEL hosts with the configured Satellite server |
+| LINUX ǀ Register with Satellite | [`satellite/server_register.yml`](../server_register.yml) | Registers target RHEL hosts with the configured Satellite server |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🛰️ [Compliance Scan with Satellite](/product-demos/demos/satellite-compliance-scan/) | Run compliance scans on Satellite-managed hosts |
-| 🐧 [Register with Insights](/product-demos/demos/linux-register-insights/) | Register directly with RHSM instead of through Satellite |
+| 🛰️ [Compliance Scan with Satellite](./satellite-compliance-scan.md) | Run compliance scans on Satellite-managed hosts |
+| 🐧 [Register with Insights](../../linux/docs/linux-register-insights.md) | Register directly with RHSM instead of through Satellite |

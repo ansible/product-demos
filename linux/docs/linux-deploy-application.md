@@ -19,10 +19,10 @@ Installs a Linux application package via DNF. Supports version pinning with allo
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Deploy Application | [`linux/deploy_application.yml`](https://github.com/ansible/product-demos/blob/main/linux/deploy_application.yml) | Installs or updates an application package via DNF on target hosts |
+| LINUX ǀ Deploy Application | [`linux/deploy_application.yml`](../deploy_application.yml) | Installs or updates an application package via DNF on target hosts |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [Podman Webserver](/product-demos/demos/linux-podman-webserver/) | Container-based deployment as an alternative to packages |
+| 🐧 [Podman Webserver](./linux-podman-webserver.md) | Container-based deployment as an alternative to packages |

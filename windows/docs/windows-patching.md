@@ -21,7 +21,7 @@ Apply Windows updates by category to Windows Server hosts and generate an HTML p
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS ǀ Patching | [`windows/patching.yml`](https://github.com/ansible/product-demos/blob/main/windows/patching.yml) | Apply Windows updates by category, optionally reboot, and publish an HTML patch report |
+| WINDOWS ǀ Patching | [`windows/patching.yml`](../patching.yml) | Apply Windows updates by category, optionally reboot, and publish an HTML patch report |
 
 ## Why it matters
 
@@ -52,6 +52,6 @@ Apply Windows updates by category to Windows Server hosts and generate an HTML p
 
 | Demo | Description |
 |------|-------------|
-| 🩹 [Patch Cloud Stack in AWS](/product-demos/demos/patch-cloud-stack/) | Full workflow with EBS snapshots, parallel RHEL and Windows patching, and automatic rollback |
-| 🪟 [Install IIS](/product-demos/demos/windows-install-iis/) | Quick Windows demo to show application deployment alongside patching |
-| 🪟 [Setup Active Directory Domain](/product-demos/demos/windows-setup-ad-domain/) | Provision a full AD environment to demonstrate domain-joined Windows patching |
+| 🩹 [Patch Cloud Stack in AWS](../../cloud/docs/patch-cloud-stack.md) | Full workflow with EBS snapshots, parallel RHEL and Windows patching, and automatic rollback |
+| 🪟 [Install IIS](./windows-install-iis.md) | Quick Windows demo to show application deployment alongside patching |
+| 🪟 [Setup Active Directory Domain](./windows-setup-ad-domain.md) | Provision a full AD environment to demonstrate domain-joined Windows patching |

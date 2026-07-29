@@ -19,11 +19,11 @@ Creates EBS snapshots of all volumes attached to the target EC2 instances. Used 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud ǀ AWS ǀ Snapshot EC2 | [`cloud/snapshot_ec2.yml`](https://github.com/ansible/product-demos/blob/main/cloud/snapshot_ec2.yml) | Creates EBS snapshots of all volumes on the target instances |
+| Cloud ǀ AWS ǀ Snapshot EC2 | [`cloud/snapshot_ec2.yml`](../snapshot_ec2.yml) | Creates EBS snapshots of all volumes on the target instances |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| ☁️ [AWS — Restore EC2 from Snapshot](/product-demos/demos/cloud-restore-ec2/) | Restore instances from snapshots created by this playbook |
-| 🩹 [Patch Cloud Stack in AWS](/product-demos/demos/patch-cloud-stack/) | The patching workflow uses snapshots as its safety net |
+| ☁️ [AWS — Restore EC2 from Snapshot](./cloud-restore-ec2.md) | Restore instances from snapshots created by this playbook |
+| 🩹 [Patch Cloud Stack in AWS](./patch-cloud-stack.md) | The patching workflow uses snapshots as its safety net |

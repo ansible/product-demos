@@ -18,11 +18,11 @@ Applies DISA STIG hardening to Windows Server 2022. Uses the demo.compliance.win
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS ǀ DISA STIG | [`windows/compliance.yml`](https://github.com/ansible/product-demos/blob/main/windows/compliance.yml) | Applies Windows 2022 DISA STIG hardening controls from the demo.compliance collection |
+| WINDOWS ǀ DISA STIG | [`windows/compliance.yml`](../compliance.yml) | Applies Windows 2022 DISA STIG hardening controls from the demo.compliance collection |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [DISA STIG](/product-demos/demos/linux-disa-stig/) | DISA STIG hardening for RHEL servers |
-| 🪟 [Configure Password Requirements](/product-demos/demos/windows-password-requirements/) | Lighter-weight password policy configuration via DSC |
+| 🐧 [DISA STIG](../../linux/docs/linux-disa-stig.md) | DISA STIG hardening for RHEL servers |
+| 🪟 [Configure Password Requirements](./windows-password-requirements.md) | Lighter-weight password policy configuration via DSC |

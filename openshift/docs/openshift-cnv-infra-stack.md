@@ -26,11 +26,11 @@ Deploy RHEL9 VM ──┘
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| OpenShift ǀ CNV ǀ Infra Stack (workflow) | [`openshift/setup.yml`](https://github.com/ansible/product-demos/blob/main/openshift/setup.yml) | Installs CNV, provisions VMs, and syncs inventory in a single workflow |
+| OpenShift ǀ CNV ǀ Infra Stack (workflow) | [`openshift/setup.yml`](../setup.yml) | Installs CNV, provisions VMs, and syncs inventory in a single workflow |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| ⎈ [CNV — Create RHEL VM](/product-demos/demos/openshift-cnv-create-vm/) | Create additional VMs after the stack is deployed |
-| 🚀 [Deploy Cloud Stack in AWS](/product-demos/demos/deploy-cloud-stack/) | The AWS equivalent of this infrastructure workflow |
+| ⎈ [CNV — Create RHEL VM](./openshift-cnv-create-vm.md) | Create additional VMs after the stack is deployed |
+| 🚀 [Deploy Cloud Stack in AWS](../../cloud/docs/deploy-cloud-stack.md) | The AWS equivalent of this infrastructure workflow |

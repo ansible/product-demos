@@ -19,11 +19,11 @@ Launches an EC2 instance from a blueprint definition. Blueprints are YAML files 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud ǀ AWS ǀ Create VM | [`cloud/create_vm.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vm.yml) | Provisions an EC2 instance using a blueprint, sets tags, and waits for connectivity |
+| Cloud ǀ AWS ǀ Create VM | [`cloud/create_vm.yml`](../create_vm.yml) | Provisions an EC2 instance using a blueprint, sets tags, and waits for connectivity |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🚀 [Deploy Cloud Stack in AWS](/product-demos/demos/deploy-cloud-stack/) | Launches multiple VMs in parallel using this playbook |
-| ☁️ [AWS — Delete VM](/product-demos/demos/cloud-delete-vm/) | Terminate VMs created by this playbook |
+| 🚀 [Deploy Cloud Stack in AWS](./deploy-cloud-stack.md) | Launches multiple VMs in parallel using this playbook |
+| ☁️ [AWS — Delete VM](./cloud-delete-vm.md) | Terminate VMs created by this playbook |

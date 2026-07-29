@@ -19,11 +19,11 @@ Installs Internet Information Services (IIS) on Windows Server, starts the W3SVC
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS ǀ Install IIS | [`windows/install_iis.yml`](https://github.com/ansible/product-demos/blob/main/windows/install_iis.yml) | Installs the IIS Web-Server feature, starts it, and deploys a custom index page |
+| WINDOWS ǀ Install IIS | [`windows/install_iis.yml`](../install_iis.yml) | Installs the IIS Web-Server feature, starts it, and deploys a custom index page |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🪟 [Patching](/product-demos/demos/windows-patching/) | Patch Windows hosts after deploying applications |
-| 🪟 [Test Connectivity](/product-demos/demos/windows-test-connectivity/) | Verify WinRM is working before running demos |
+| 🪟 [Patching](./windows-patching.md) | Patch Windows hosts after deploying applications |
+| 🪟 [Test Connectivity](./windows-test-connectivity.md) | Verify WinRM is working before running demos |

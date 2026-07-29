@@ -19,11 +19,11 @@ Terminates an EC2 instance by its Name tag. Looks up the instance in the specifi
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud ǀ AWS ǀ Delete VM | [`cloud/delete_vm_by_name.yml`](https://github.com/ansible/product-demos/blob/main/cloud/delete_vm_by_name.yml) | Finds and terminates an EC2 instance by its Name tag |
+| Cloud ǀ AWS ǀ Delete VM | [`cloud/delete_vm_by_name.yml`](../delete_vm_by_name.yml) | Finds and terminates an EC2 instance by its Name tag |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| ☁️ [AWS — Create VM](/product-demos/demos/cloud-create-vm/) | Create VMs that can be cleaned up with this playbook |
-| 💥 [Destroy Cloud Stack in AWS](/product-demos/demos/cloud-destroy-stack/) | Tear down the entire demo stack at once |
+| ☁️ [AWS — Create VM](./cloud-create-vm.md) | Create VMs that can be cleaned up with this playbook |
+| 💥 [Destroy Cloud Stack in AWS](./cloud-destroy-stack.md) | Tear down the entire demo stack at once |

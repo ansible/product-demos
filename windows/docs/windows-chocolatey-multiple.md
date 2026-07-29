@@ -20,11 +20,11 @@ Installs multiple packages (Node.js and Python by default) using the Chocolatey 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS ǀ Chocolatey Install Multiple | [`windows/windows_choco_multiple.yml`](https://github.com/ansible/product-demos/blob/main/windows/windows_choco_multiple.yml) | Installs Node.js and Python via Chocolatey and verifies the installed versions |
+| WINDOWS ǀ Chocolatey Install Multiple | [`windows/windows_choco_multiple.yml`](../windows_choco_multiple.yml) | Installs Node.js and Python via Chocolatey and verifies the installed versions |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🪟 [Chocolatey Install Specific](/product-demos/demos/windows-chocolatey-specific/) | Install a single specific package via Chocolatey |
-| 🪟 [Install IIS](/product-demos/demos/windows-install-iis/) | Install IIS using native Windows features instead of Chocolatey |
+| 🪟 [Chocolatey Install Specific](./windows-chocolatey-specific.md) | Install a single specific package via Chocolatey |
+| 🪟 [Install IIS](./windows-install-iis.md) | Install IIS using native Windows features instead of Chocolatey |

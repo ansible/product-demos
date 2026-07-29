@@ -52,18 +52,18 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud ǀ AWS ǀ Create Keypair | [`cloud/create_keypair.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_keypair.yml) | Creates an SSH keypair in the target AWS region |
-| Cloud ǀ AWS ǀ Create VPC | [`cloud/create_vpc.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vpc.yml) | Provisions VPC, subnet, security group, and internet gateway |
-| Cloud ǀ AWS ǀ Create VM (Domain Controller) | [`cloud/create_vm.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vm.yml) | Deploys the dc01 Windows Server instance as domain controller |
-| Cloud ǀ AWS ǀ Create VM (Computer 1 - winston) | [`cloud/create_vm.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vm.yml) | Deploys the winston Windows Server instance as domain computer |
-| Cloud ǀ AWS ǀ Create VM (Computer 2 - winthrop) | [`cloud/create_vm.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vm.yml) | Deploys the winthrop Windows Server instance as domain computer |
-| AWS Inventory | [`(inventory sync)`](https://github.com/ansible/product-demos/blob/main/(inventory sync)) | Syncs the AWS dynamic inventory to import the new VMs |
-| WINDOWS ǀ Test Connectivity | [`windows/connect.yml`](https://github.com/ansible/product-demos/blob/main/windows/connect.yml) | Validates WinRM connectivity to all three Windows hosts |
-| WINDOWS ǀ AD ǀ Create Domain | [`windows/create_ad_domain.yml`](https://github.com/ansible/product-demos/blob/main/windows/create_ad_domain.yml) | Promotes dc01 to domain controller and creates the ANSIBLE.LOCAL domain |
-| WINDOWS ǀ AD ǀ Join Domain | [`windows/join_ad_domain.yml`](https://github.com/ansible/product-demos/blob/main/windows/join_ad_domain.yml) | Joins winston and winthrop to the Active Directory domain |
-| WINDOWS ǀ Run PowerShell (Validation) | [`windows/powershell.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell.yml) | Runs Get-ADComputer on the domain controller to list joined computers |
-| WINDOWS ǀ Run PowerShell ǀ Kerberos (Validation) | [`windows/powershell.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell.yml) | Validates Kerberos authentication by querying Security event logs |
-| WINDOWS ǀ Rollback (Cleanup) | [`windows/rollback.yml`](https://github.com/ansible/product-demos/blob/main/windows/rollback.yml) | Cleans up resources if any workflow step fails |
+| Cloud ǀ AWS ǀ Create Keypair | [`cloud/create_keypair.yml`](../../cloud/create_keypair.yml) | Creates an SSH keypair in the target AWS region |
+| Cloud ǀ AWS ǀ Create VPC | [`cloud/create_vpc.yml`](../../cloud/create_vpc.yml) | Provisions VPC, subnet, security group, and internet gateway |
+| Cloud ǀ AWS ǀ Create VM (Domain Controller) | [`cloud/create_vm.yml`](../../cloud/create_vm.yml) | Deploys the dc01 Windows Server instance as domain controller |
+| Cloud ǀ AWS ǀ Create VM (Computer 1 - winston) | [`cloud/create_vm.yml`](../../cloud/create_vm.yml) | Deploys the winston Windows Server instance as domain computer |
+| Cloud ǀ AWS ǀ Create VM (Computer 2 - winthrop) | [`cloud/create_vm.yml`](../../cloud/create_vm.yml) | Deploys the winthrop Windows Server instance as domain computer |
+| AWS Inventory | `(inventory sync)` | Syncs the AWS dynamic inventory to import the new VMs |
+| WINDOWS ǀ Test Connectivity | [`windows/connect.yml`](../connect.yml) | Validates WinRM connectivity to all three Windows hosts |
+| WINDOWS ǀ AD ǀ Create Domain | [`windows/create_ad_domain.yml`](../create_ad_domain.yml) | Promotes dc01 to domain controller and creates the ANSIBLE.LOCAL domain |
+| WINDOWS ǀ AD ǀ Join Domain | [`windows/join_ad_domain.yml`](../join_ad_domain.yml) | Joins winston and winthrop to the Active Directory domain |
+| WINDOWS ǀ Run PowerShell (Validation) | [`windows/powershell.yml`](../powershell.yml) | Runs Get-ADComputer on the domain controller to list joined computers |
+| WINDOWS ǀ Run PowerShell ǀ Kerberos (Validation) | [`windows/powershell.yml`](../powershell.yml) | Validates Kerberos authentication by querying Security event logs |
+| WINDOWS ǀ Rollback (Cleanup) | [`windows/rollback.yml`](../rollback.yml) | Cleans up resources if any workflow step fails |
 
 ## Why it matters
 
@@ -94,6 +94,6 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 
 | Demo | Description |
 |------|-------------|
-| 🪟 [AD — New User](/product-demos/demos/windows-ad-new-user/) | Create users in the domain built by this workflow for a helpdesk self-service demo |
-| 🪟 [Patching](/product-demos/demos/windows-patching/) | Patch the domain-joined Windows hosts to show day-2 operations |
-| 🚀 [Deploy Cloud Stack in AWS](/product-demos/demos/deploy-cloud-stack/) | The general-purpose infrastructure provisioning workflow for mixed OS environments |
+| 🪟 [AD — New User](./windows-ad-new-user.md) | Create users in the domain built by this workflow for a helpdesk self-service demo |
+| 🪟 [Patching](./windows-patching.md) | Patch the domain-joined Windows hosts to show day-2 operations |
+| 🚀 [Deploy Cloud Stack in AWS](../../cloud/docs/deploy-cloud-stack.md) | The general-purpose infrastructure provisioning workflow for mixed OS environments |

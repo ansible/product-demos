@@ -20,7 +20,7 @@ Apply security updates to RHEL servers and generate an HTML patch report. The pl
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Patching | [`linux/patching.yml`](https://github.com/ansible/product-demos/blob/main/linux/patching.yml) | Apply security updates, optionally scan with Insights Client, and publish an HTML patch report |
+| LINUX ǀ Patching | [`linux/patching.yml`](../patching.yml) | Apply security updates, optionally scan with Insights Client, and publish an HTML patch report |
 
 ## Why it matters
 
@@ -50,6 +50,6 @@ Apply security updates to RHEL servers and generate an HTML patch report. The pl
 
 | Demo | Description |
 |------|-------------|
-| 🩹 [Patch Cloud Stack in AWS](/product-demos/demos/patch-cloud-stack/) | Full enterprise patching workflow with snapshots, parallel RHEL/Windows paths, and automatic rollback |
-| 🐧 [Register with Insights](/product-demos/demos/linux-register-insights/) | Register hosts with Red Hat Insights for advisory visibility and dynamic inventory |
-| 🐧 [Multi-profile Compliance](/product-demos/demos/linux-multi-profile-compliance/) | Run an OpenSCAP report to assess security posture before and after patching |
+| 🩹 [Patch Cloud Stack in AWS](../../cloud/docs/patch-cloud-stack.md) | Full enterprise patching workflow with snapshots, parallel RHEL/Windows paths, and automatic rollback |
+| 🐧 [Register with Insights](./linux-register-insights.md) | Register hosts with Red Hat Insights for advisory visibility and dynamic inventory |
+| 🐧 [Multi-profile Compliance](./linux-multi-profile-compliance.md) | Run an OpenSCAP report to assess security posture before and after patching |

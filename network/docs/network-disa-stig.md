@@ -18,11 +18,11 @@ Applies DISA STIG compliance checks and hardening to Cisco IOS-XE network device
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| NETWORK ǀ DISA STIG | [`network/compliance.yml`](https://github.com/ansible/product-demos/blob/main/network/compliance.yml) | Runs DISA STIG compliance checks and hardening on IOS-XE devices |
+| NETWORK ǀ DISA STIG | [`network/compliance.yml`](../compliance.yml) | Runs DISA STIG compliance checks and hardening on IOS-XE devices |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [DISA STIG](/product-demos/demos/linux-disa-stig/) | DISA STIG hardening for RHEL servers |
-| 🪟 [DISA STIG](/product-demos/demos/windows-disa-stig/) | DISA STIG hardening for Windows servers |
+| 🐧 [DISA STIG](../../linux/docs/linux-disa-stig.md) | DISA STIG hardening for RHEL servers |
+| 🪟 [DISA STIG](../../windows/docs/windows-disa-stig.md) | DISA STIG hardening for Windows servers |

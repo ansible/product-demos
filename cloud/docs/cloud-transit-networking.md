@@ -12,11 +12,11 @@ Creates a hub-and-spoke network topology using AWS Transit Gateway. Provisions m
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud ǀ AWS ǀ Create Transit Infrastructure | [`cloud/create_transit_network.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_transit_network.yml) | Provisions VPCs, transit gateway, attachments, and configures bastion SSH access |
+| Cloud ǀ AWS ǀ Create Transit Infrastructure | [`cloud/create_transit_network.yml`](../create_transit_network.yml) | Provisions VPCs, transit gateway, attachments, and configures bastion SSH access |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| ☁️ [AWS — Peer Networking](/product-demos/demos/cloud-peer-networking/) | Alternative direct-peering topology for simpler two-VPC setups |
-| ☁️ [AWS — Create VPC](/product-demos/demos/cloud-create-vpc/) | Standalone VPC creation for simpler setups |
+| ☁️ [AWS — Peer Networking](./cloud-peer-networking.md) | Alternative direct-peering topology for simpler two-VPC setups |
+| ☁️ [AWS — Create VPC](./cloud-create-vpc.md) | Standalone VPC creation for simpler setups |

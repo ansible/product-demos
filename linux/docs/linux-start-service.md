@@ -19,10 +19,10 @@ Starts a named systemd service on target hosts. Checks that the service exists b
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Start Service | [`linux/service_start.yml`](https://github.com/ansible/product-demos/blob/main/linux/service_start.yml) | Checks for the service and starts it if present |
+| LINUX ǀ Start Service | [`linux/service_start.yml`](../service_start.yml) | Checks for the service and starts it if present |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [Stop Service](/product-demos/demos/linux-stop-service/) | Stop a running service |
+| 🐧 [Stop Service](./linux-stop-service.md) | Stop a running service |

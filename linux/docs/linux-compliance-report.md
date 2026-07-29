@@ -20,11 +20,11 @@ Runs an OpenSCAP scan against a selected compliance profile and generates an HTM
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Multi-profile Compliance Report | [`linux/multi_profile_compliance_report.yml`](https://github.com/ansible/product-demos/blob/main/linux/multi_profile_compliance_report.yml) | Runs OpenSCAP scan and generates an HTML compliance report on target hosts |
+| LINUX ǀ Multi-profile Compliance Report | [`linux/multi_profile_compliance_report.yml`](../multi_profile_compliance_report.yml) | Runs OpenSCAP scan and generates an HTML compliance report on target hosts |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [Multi-profile Compliance](/product-demos/demos/linux-multi-profile-compliance/) | Apply compliance enforcement after reviewing the report |
-| 🐧 [Compliance Workflow](/product-demos/demos/linux-compliance-workflow/) | Automated scan then enforce workflow that uses this report |
+| 🐧 [Multi-profile Compliance](./linux-multi-profile-compliance.md) | Apply compliance enforcement after reviewing the report |
+| 🐧 [Compliance Workflow](./linux-compliance-workflow.md) | Automated scan then enforce workflow that uses this report |

@@ -19,10 +19,10 @@ Deploys a containerized Apache httpd webserver using Podman. Installs Podman, cr
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Podman Webserver | [`linux/podman.yml`](https://github.com/ansible/product-demos/blob/main/linux/podman.yml) | Installs Podman, creates a custom index.html, and runs an httpd container |
+| LINUX ǀ Podman Webserver | [`linux/podman.yml`](../podman.yml) | Installs Podman, creates a custom index.html, and runs an httpd container |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [Deploy Application](/product-demos/demos/linux-deploy-application/) | Traditional package-based application deployment |
+| 🐧 [Deploy Application](./linux-deploy-application.md) | Traditional package-based application deployment |

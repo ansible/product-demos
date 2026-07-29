@@ -41,4 +41,4 @@ Delete reports ──────────┘    Delete Key ──┘
 
 | Demo | Description |
 |------|-------------|
-| 🚀 [Deploy Cloud Stack in AWS](/product-demos/demos/deploy-cloud-stack/) | The matching provisioning workflow |
+| 🚀 [Deploy Cloud Stack in AWS](./deploy-cloud-stack.md) | The matching provisioning workflow |

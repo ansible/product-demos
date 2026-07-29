@@ -22,11 +22,11 @@ Registers RHEL EC2 instances with Red Hat Subscription Manager using an activati
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Register with Insights | [`linux/ec2_register.yml`](https://github.com/ansible/product-demos/blob/main/linux/ec2_register.yml) | Registers RHEL hosts with RHSM, removes RHUI packages, and configures subscription access |
+| LINUX ǀ Register with Insights | [`linux/ec2_register.yml`](../ec2_register.yml) | Registers RHEL hosts with RHSM, removes RHUI packages, and configures subscription access |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🩹 [Patch Cloud Stack in AWS](/product-demos/demos/patch-cloud-stack/) | RHSM registration is required for RHEL patching in this workflow |
-| 🐧 [Patching](/product-demos/demos/linux-patching/) | Patch hosts after registering them |
+| 🩹 [Patch Cloud Stack in AWS](../../cloud/docs/patch-cloud-stack.md) | RHSM registration is required for RHEL patching in this workflow |
+| 🐧 [Patching](./linux-patching.md) | Patch hosts after registering them |

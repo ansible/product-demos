@@ -20,11 +20,11 @@ Runs a PowerShell script on Windows hosts using Kerberos authentication instead 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS ǀ Run PowerShell ǀ Kerberos | [`windows/powershell.yml`](https://github.com/ansible/product-demos/blob/main/windows/powershell.yml) | Executes PowerShell on target hosts using Kerberos authentication |
+| WINDOWS ǀ Run PowerShell ǀ Kerberos | [`windows/powershell.yml`](../powershell.yml) | Executes PowerShell on target hosts using Kerberos authentication |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🪟 [Run PowerShell](/product-demos/demos/windows-run-powershell/) | Same playbook with standard WinRM authentication |
-| 🪟 [Setup Active Directory Domain](/product-demos/demos/windows-setup-ad-domain/) | Set up an AD domain for Kerberos authentication |
+| 🪟 [Run PowerShell](./windows-run-powershell.md) | Same playbook with standard WinRM authentication |
+| 🪟 [Setup Active Directory Domain](./windows-setup-ad-domain.md) | Set up an AD domain for Kerberos authentication |

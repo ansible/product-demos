@@ -29,5 +29,5 @@ End-to-end Satellite patching workflow for development environments. Syncs the S
 
 | Demo | Description |
 |------|-------------|
-| 🛰️ [Publish Content View Version](/product-demos/demos/satellite-publish-content-view/) | Standalone content view publishing |
-| 🛰️ [Promote Content View Version](/product-demos/demos/satellite-promote-content-view/) | Promote content from dev to production after testing |
+| 🛰️ [Publish Content View Version](./satellite-publish-content-view.md) | Standalone content view publishing |
+| 🛰️ [Promote Content View Version](./satellite-promote-content-view.md) | Promote content from dev to production after testing |

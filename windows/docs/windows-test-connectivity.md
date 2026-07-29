@@ -18,11 +18,11 @@ Tests WinRM connectivity to Windows hosts using wait_for_connection and win_ping
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS ǀ Test Connectivity | [`windows/connect.yml`](https://github.com/ansible/product-demos/blob/main/windows/connect.yml) | Waits for WinRM to become available and runs win_ping to confirm connectivity |
+| WINDOWS ǀ Test Connectivity | [`windows/connect.yml`](../connect.yml) | Waits for WinRM to become available and runs win_ping to confirm connectivity |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🪟 [Install IIS](/product-demos/demos/windows-install-iis/) | Run a quick demo after confirming connectivity |
-| 🚀 [Deploy Cloud Stack in AWS](/product-demos/demos/deploy-cloud-stack/) | Deploy Windows VMs to test against |
+| 🪟 [Install IIS](./windows-install-iis.md) | Run a quick demo after confirming connectivity |
+| 🚀 [Deploy Cloud Stack in AWS](../../cloud/docs/deploy-cloud-stack.md) | Deploy Windows VMs to test against |

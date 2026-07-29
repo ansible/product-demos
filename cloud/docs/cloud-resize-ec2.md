@@ -18,11 +18,11 @@ Changes the instance type of one or more EC2 instances. Useful for demonstrating
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud ǀ AWS ǀ Resize EC2 | [`cloud/resize_ec2.yml`](https://github.com/ansible/product-demos/blob/main/cloud/resize_ec2.yml) | Stops the instance, changes instance type, and restarts it |
+| Cloud ǀ AWS ǀ Resize EC2 | [`cloud/resize_ec2.yml`](../resize_ec2.yml) | Stops the instance, changes instance type, and restarts it |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| ☁️ [AWS — Snapshot EC2](/product-demos/demos/cloud-snapshot-ec2/) | Take a snapshot before resizing as a safety measure |
-| 🚀 [Deploy Cloud Stack in AWS](/product-demos/demos/deploy-cloud-stack/) | Create instances to resize |
+| ☁️ [AWS — Snapshot EC2](./cloud-snapshot-ec2.md) | Take a snapshot before resizing as a safety measure |
+| 🚀 [Deploy Cloud Stack in AWS](./deploy-cloud-stack.md) | Create instances to resize |

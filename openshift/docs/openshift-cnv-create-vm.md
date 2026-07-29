@@ -24,11 +24,11 @@ Provisions a RHEL virtual machine on OpenShift Virtualization (CNV) using the Ku
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| OpenShift ǀ CNV ǀ Create VM | [`openshift/cnv/provision_rhel.yml`](https://github.com/ansible/product-demos/blob/main/openshift/cnv/provision_rhel.yml) | Creates a KubeVirt VirtualMachine with a DataVolume from a cluster image source |
+| OpenShift ǀ CNV ǀ Create VM | [`openshift/cnv/provision_rhel.yml`](../cnv/provision_rhel.yml) | Creates a KubeVirt VirtualMachine with a DataVolume from a cluster image source |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| ⎈ [CNV — Delete VM](/product-demos/demos/openshift-cnv-delete-vm/) | Delete VMs created by this playbook |
-| ⎈ [CNV — Install Operator](/product-demos/demos/openshift-cnv-install/) | Install CNV if not already present |
+| ⎈ [CNV — Delete VM](./openshift-cnv-delete-vm.md) | Delete VMs created by this playbook |
+| ⎈ [CNV — Install Operator](./openshift-cnv-install.md) | Install CNV if not already present |

@@ -19,10 +19,10 @@ A generic rollback playbook used as a cleanup step in Windows workflows. Outputs
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS ǀ Rollback | [`windows/rollback.yml`](https://github.com/ansible/product-demos/blob/main/windows/rollback.yml) | Outputs rollback message -- used as a failure handler in workflows |
+| WINDOWS ǀ Rollback | [`windows/rollback.yml`](../rollback.yml) | Outputs rollback message -- used as a failure handler in workflows |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🪟 [Setup Active Directory Domain](/product-demos/demos/windows-setup-ad-domain/) | Uses this playbook as its failure cleanup handler |
+| 🪟 [Setup Active Directory Domain](./windows-setup-ad-domain.md) | Uses this playbook as its failure cleanup handler |

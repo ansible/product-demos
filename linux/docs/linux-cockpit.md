@@ -19,10 +19,10 @@ Installs and configures the Cockpit web console on RHEL hosts using RHEL System 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Cockpit | [`linux/system_roles.yml`](https://github.com/ansible/product-demos/blob/main/linux/system_roles.yml) | Applies the cockpit System Role to install and configure the web console |
+| LINUX ǀ Cockpit | [`linux/system_roles.yml`](../system_roles.yml) | Applies the cockpit System Role to install and configure the web console |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [System Roles](/product-demos/demos/linux-system-roles/) | Apply additional System Roles alongside Cockpit |
+| 🐧 [System Roles](./linux-system-roles.md) | Apply additional System Roles alongside Cockpit |

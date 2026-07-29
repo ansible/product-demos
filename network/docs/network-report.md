@@ -19,11 +19,11 @@ Generates an HTML network report by gathering facts from Cisco IOS, IOS-XR, and 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| NETWORK ǀ Report | [`network/report.yml`](https://github.com/ansible/product-demos/blob/main/network/report.yml) | Gathers facts from Cisco IOS, IOS-XR, and NX-OS devices and generates an HTML report |
+| NETWORK ǀ Report | [`network/report.yml`](../report.yml) | Gathers facts from Cisco IOS, IOS-XR, and NX-OS devices and generates an HTML report |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🌐 [Golden Configuration](/product-demos/demos/network-configuration/) | Apply configurations before generating a report |
-| 🌐 [Backup](/product-demos/demos/network-backup/) | Back up configurations alongside reporting |
+| 🌐 [Golden Configuration](./network-configuration.md) | Apply configurations before generating a report |
+| 🌐 [Backup](./network-backup.md) | Back up configurations alongside reporting |

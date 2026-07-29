@@ -20,10 +20,10 @@ Deletes one or more virtual machines from OpenShift Virtualization. Removes the 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| OpenShift ǀ CNV ǀ Delete VM | [`openshift/cnv/delete.yml`](https://github.com/ansible/product-demos/blob/main/openshift/cnv/delete.yml) | Removes VirtualMachine and DataVolume resources from the specified namespace |
+| OpenShift ǀ CNV ǀ Delete VM | [`openshift/cnv/delete.yml`](../cnv/delete.yml) | Removes VirtualMachine and DataVolume resources from the specified namespace |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| ⎈ [CNV — Create RHEL VM](/product-demos/demos/openshift-cnv-create-vm/) | Create VMs to manage with this playbook |
+| ⎈ [CNV — Create RHEL VM](./openshift-cnv-create-vm.md) | Create VMs to manage with this playbook |

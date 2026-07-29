@@ -19,11 +19,11 @@ Deploys golden configurations to Cisco IOS, IOS-XR, and NX-OS network devices us
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| NETWORK | Configuration | [`(Network Golden Configs project)`](https://github.com/ansible/product-demos/blob/main/(Network Golden Configs project)) | Applies golden configurations to network devices using Ansible resource modules |
+| NETWORK | Configuration | `(Network Golden Configs project)` | Applies golden configurations to network devices using Ansible resource modules |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🌐 [Report](/product-demos/demos/network-report/) | Generate a network report after applying configurations |
-| 🌐 [Backup](/product-demos/demos/network-backup/) | Back up device configs before making changes |
+| 🌐 [Report](./network-report.md) | Generate a network report after applying configurations |
+| 🌐 [Backup](./network-backup.md) | Back up device configs before making changes |

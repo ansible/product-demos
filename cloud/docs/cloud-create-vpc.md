@@ -12,11 +12,11 @@ Provisions an AWS VPC with subnet, internet gateway, route table, and security g
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud ǀ AWS ǀ Create VPC | [`cloud/create_vpc.yml`](https://github.com/ansible/product-demos/blob/main/cloud/create_vpc.yml) | Provisions VPC, subnet, security group, internet gateway, and route table in the selected region |
+| Cloud ǀ AWS ǀ Create VPC | [`cloud/create_vpc.yml`](../create_vpc.yml) | Provisions VPC, subnet, security group, internet gateway, and route table in the selected region |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🚀 [Deploy Cloud Stack in AWS](/product-demos/demos/deploy-cloud-stack/) | Uses this playbook as part of the full stack deployment workflow |
-| ☁️ [AWS — Create Keypair](/product-demos/demos/cloud-create-keypair/) | Create an SSH keypair to use with VMs in this VPC |
+| 🚀 [Deploy Cloud Stack in AWS](./deploy-cloud-stack.md) | Uses this playbook as part of the full stack deployment workflow |
+| ☁️ [AWS — Create Keypair](./cloud-create-keypair.md) | Create an SSH keypair to use with VMs in this VPC |

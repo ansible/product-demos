@@ -18,11 +18,11 @@ Scans hosts and gathers package and service facts. This populates the AAP fact c
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Fact Scan | [`linux/fact_scan.yml`](https://github.com/ansible/product-demos/blob/main/linux/fact_scan.yml) | Gathers package_facts and service_facts, caching them in AAP |
+| LINUX ǀ Fact Scan | [`linux/fact_scan.yml`](../fact_scan.yml) | Gathers package_facts and service_facts, caching them in AAP |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [Troubleshoot](/product-demos/demos/linux-troubleshoot/) | Active troubleshooting beyond passive fact gathering |
-| 🚀 [Deploy Cloud Stack in AWS](/product-demos/demos/deploy-cloud-stack/) | Deploy hosts to scan |
+| 🐧 [Troubleshoot](./linux-troubleshoot.md) | Active troubleshooting beyond passive fact gathering |
+| 🚀 [Deploy Cloud Stack in AWS](../../cloud/docs/deploy-cloud-stack.md) | Deploy hosts to scan |

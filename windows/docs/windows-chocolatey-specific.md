@@ -20,10 +20,10 @@ Installs a specific package by name using the Chocolatey package manager. The pa
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| WINDOWS ǀ Chocolatey Install Specific | [`windows/windows_choco_specific.yml`](https://github.com/ansible/product-demos/blob/main/windows/windows_choco_specific.yml) | Installs a single named package via Chocolatey |
+| WINDOWS ǀ Chocolatey Install Specific | [`windows/windows_choco_specific.yml`](../windows_choco_specific.yml) | Installs a single named package via Chocolatey |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🪟 [Chocolatey Install Multiple](/product-demos/demos/windows-chocolatey-multiple/) | Install multiple packages at once |
+| 🪟 [Chocolatey Install Multiple](./windows-chocolatey-multiple.md) | Install multiple packages at once |

@@ -30,10 +30,10 @@ Deploy ──→ Inventory Sync ──→ Configure Firewall ──→ Configure
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| NETWORK ǀ Panos ǀ Deploy | [`network/panos/deploy.yml`](https://github.com/ansible/product-demos/blob/main/network/panos/deploy.yml) | Provisions the virtual firewall, bastion host, and webserver instances in AWS |
-| Panos Demo Instances (Inventory Sync) | [`(inventory sync)`](https://github.com/ansible/product-demos/blob/main/(inventory sync)) | Syncs the dynamic inventory source to discover the newly created EC2 instances |
-| NETWORK ǀ Panos ǀ Configure Firewall | [`network/panos/configure_firewall.yml`](https://github.com/ansible/product-demos/blob/main/network/panos/configure_firewall.yml) | Applies initial firewall configuration using the paloaltonetworks.panos collection |
-| NETWORK ǀ Panos ǀ Configure Webserver | [`network/panos/configure_webserver.yml`](https://github.com/ansible/product-demos/blob/main/network/panos/configure_webserver.yml) | Configures a basic Apache webserver behind the firewall to demonstrate security rules |
+| NETWORK ǀ Panos ǀ Deploy | [`network/panos/deploy.yml`](../panos/deploy.yml) | Provisions the virtual firewall, bastion host, and webserver instances in AWS |
+| Panos Demo Instances (Inventory Sync) | `(inventory sync)` | Syncs the dynamic inventory source to discover the newly created EC2 instances |
+| NETWORK ǀ Panos ǀ Configure Firewall | [`network/panos/configure_firewall.yml`](../panos/configure_firewall.yml) | Applies initial firewall configuration using the paloaltonetworks.panos collection |
+| NETWORK ǀ Panos ǀ Configure Webserver | [`network/panos/configure_webserver.yml`](../panos/configure_webserver.yml) | Configures a basic Apache webserver behind the firewall to demonstrate security rules |
 
 ## Why it matters
 
@@ -64,6 +64,6 @@ Deploy ──→ Inventory Sync ──→ Configure Firewall ──→ Configure
 
 | Demo | Description |
 |------|-------------|
-| 🌐 [Golden Configuration](/product-demos/demos/network-configuration/) | Deploy golden configurations to Cisco IOS, IOSXR, and NXOS devices using resource modules |
-| 🌐 [DISA STIG](/product-demos/demos/network-disa-stig/) | Run network DISA STIG compliance checks to show security hardening for network devices |
-| 🚀 [Deploy Cloud Stack in AWS](/product-demos/demos/deploy-cloud-stack/) | Provision the full demo infrastructure including the reports server used by other network demos |
+| 🌐 [Golden Configuration](./network-configuration.md) | Deploy golden configurations to Cisco IOS, IOSXR, and NXOS devices using resource modules |
+| 🌐 [DISA STIG](./network-disa-stig.md) | Run network DISA STIG compliance checks to show security hardening for network devices |
+| 🚀 [Deploy Cloud Stack in AWS](../../cloud/docs/deploy-cloud-stack.md) | Provision the full demo infrastructure including the reports server used by other network demos |

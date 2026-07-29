@@ -18,11 +18,11 @@ Gathers quick diagnostic information from RHEL hosts -- vmstat for CPU/memory/sw
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Troubleshoot | [`linux/tshoot.yml`](https://github.com/ansible/product-demos/blob/main/linux/tshoot.yml) | Runs vmstat, ps by CPU, and ps by memory on target hosts and displays results |
+| LINUX ǀ Troubleshoot | [`linux/tshoot.yml`](../tshoot.yml) | Runs vmstat, ps by CPU, and ps by memory on target hosts and displays results |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [Fact Scan](/product-demos/demos/linux-fact-scan/) | Gather broader system facts including packages and services |
-| 🐧 [Run Shell Script](/product-demos/demos/linux-run-shell-script/) | Run ad-hoc commands for deeper investigation |
+| 🐧 [Fact Scan](./linux-fact-scan.md) | Gather broader system facts including packages and services |
+| 🐧 [Run Shell Script](./linux-run-shell-script.md) | Run ad-hoc commands for deeper investigation |

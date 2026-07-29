@@ -19,11 +19,11 @@ Triggers a Red Hat Insights compliance scan on RHEL hosts. Uses the redhat.insig
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Insights Compliance Scan | [`linux/insights_compliance_scan.yml`](https://github.com/ansible/product-demos/blob/main/linux/insights_compliance_scan.yml) | Runs the Insights compliance scan and uploads results to console.redhat.com |
+| LINUX ǀ Insights Compliance Scan | [`linux/insights_compliance_scan.yml`](../insights_compliance_scan.yml) | Runs the Insights compliance scan and uploads results to console.redhat.com |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [Register with Insights](/product-demos/demos/linux-register-insights/) | Register hosts with RHSM before running Insights scans |
-| 🐧 [Multi-profile Compliance Report](/product-demos/demos/linux-compliance-report/) | Local OpenSCAP scanning as an alternative to Insights |
+| 🐧 [Register with Insights](./linux-register-insights.md) | Register hosts with RHSM before running Insights scans |
+| 🐧 [Multi-profile Compliance Report](./linux-compliance-report.md) | Local OpenSCAP scanning as an alternative to Insights |

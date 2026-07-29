@@ -19,11 +19,11 @@ Applies a selected compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG) to RH
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| LINUX ǀ Multi-profile Compliance | [`linux/multi_profile_compliance.yml`](https://github.com/ansible/product-demos/blob/main/linux/multi_profile_compliance.yml) | Applies the selected compliance profile to target hosts |
+| LINUX ǀ Multi-profile Compliance | [`linux/multi_profile_compliance.yml`](../multi_profile_compliance.yml) | Applies the selected compliance profile to target hosts |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🐧 [Multi-profile Compliance Report](/product-demos/demos/linux-compliance-report/) | Generate an OpenSCAP report to assess compliance posture |
-| 🐧 [Compliance Workflow](/product-demos/demos/linux-compliance-workflow/) | Automated scan then enforce workflow |
+| 🐧 [Multi-profile Compliance Report](./linux-compliance-report.md) | Generate an OpenSCAP report to assess compliance posture |
+| 🐧 [Compliance Workflow](./linux-compliance-workflow.md) | Automated scan then enforce workflow |

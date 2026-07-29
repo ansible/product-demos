@@ -12,10 +12,10 @@ Deploys an Event-Driven Ansible (EDA) Controller on OpenShift, connected to the 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| OpenShift ǀ EDA ǀ Install Controller | [`openshift/eda/install.yml`](https://github.com/ansible/product-demos/blob/main/openshift/eda/install.yml) | Deploys the EDA Controller operator and creates the EDA instance on OpenShift |
+| OpenShift ǀ EDA ǀ Install Controller | [`openshift/eda/install.yml`](../eda/install.yml) | Deploys the EDA Controller operator and creates the EDA instance on OpenShift |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| ⎈ [CNV — Install Operator](/product-demos/demos/openshift-cnv-install/) | Install OpenShift Virtualization alongside EDA |
+| ⎈ [CNV — Install Operator](./openshift-cnv-install.md) | Install OpenShift Virtualization alongside EDA |
