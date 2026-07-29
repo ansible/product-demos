@@ -1,17 +1,52 @@
 (function () {
   var toc = document.querySelector('.demo-toc');
-  if (!toc) return;
-
   var body = document.querySelector('.detail-body');
-  if (!body) return;
 
-  /* Find the first static link (Workflow / Video) so we insert before it */
-  var firstStatic = toc.querySelector('.demo-toc__link');
+  /*
+   * Enforced section order on every demo detail page:
+   *
+   *  1. Description          (lead paragraph — already first in markdown)
+   *  2. Workflow              (Mermaid diagram, rendered by layout)
+   *  3. Video walkthrough     (YouTube embed, rendered by layout)
+   *  4. Prerequisites         ── from markdown ──
+   *  5. Configure credentials
+   *  6. Survey prompts
+   *  7. Job templates
+   *  8. Why it matters
+   *  9. Presenter walkthrough
+   * 10. Talking points
+   * 11. Related demos
+   */
 
-  /* Auto-build TOC from h2 headings in the markdown body.
-     Insert before Workflow/Video so description sections come first. */
-  var headings = body.querySelectorAll('h2');
-  headings.forEach(function (h2) {
+  /* Move Workflow and Video into the detail-body, right after the lead
+     paragraph(s) and before the first <h2>. */
+  if (body) {
+    var workflow = document.getElementById('workflow');
+    var video = document.getElementById('video');
+    var firstH2 = body.querySelector('h2');
+
+    if (firstH2) {
+      if (video) {
+        body.insertBefore(video, firstH2);
+      }
+      if (workflow) {
+        body.insertBefore(workflow, video || firstH2);
+      }
+    }
+  }
+
+  if (!toc || !body) return;
+
+  /* ── Build sidebar TOC ─────────────────────────────────────── */
+
+  /* Collect all h2s now present in the body (including moved sections) */
+  var allH2s = body.querySelectorAll('h2');
+
+  /* Remove any static TOC links — we rebuild from scratch */
+  var oldLinks = toc.querySelectorAll('.demo-toc__link');
+  oldLinks.forEach(function (l) { l.remove(); });
+
+  allH2s.forEach(function (h2) {
     if (!h2.id) {
       h2.id = h2.textContent
         .trim()
@@ -23,15 +58,11 @@
     link.href = '#' + h2.id;
     link.className = 'demo-toc__link';
     link.textContent = h2.textContent.trim();
-    if (firstStatic) {
-      toc.insertBefore(link, firstStatic);
-    } else {
-      toc.appendChild(link);
-    }
+    toc.appendChild(link);
   });
 
-  /* Wrap prerequisites list in a callout box */
-  headings.forEach(function (h2) {
+  /* ── Wrap prerequisites list in a callout box ──────────────── */
+  allH2s.forEach(function (h2) {
     if (h2.textContent.trim().toLowerCase() === 'prerequisites') {
       var ul = h2.nextElementSibling;
       if (ul && (ul.tagName === 'UL' || ul.tagName === 'OL')) {
@@ -43,7 +74,7 @@
     }
   });
 
-  /* Highlight active TOC link on scroll */
+  /* ── Highlight active TOC link on scroll ───────────────────── */
   var links = toc.querySelectorAll('.demo-toc__link');
   var sections = [];
   links.forEach(function (link) {

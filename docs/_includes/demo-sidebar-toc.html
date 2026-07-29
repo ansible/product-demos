@@ -2,11 +2,5 @@
 
 <nav class="demo-toc" aria-label="On this page">
   <p class="nav-heading">On this page</p>
-  <!-- h2 headings from markdown body are inserted here by demo-toc.js -->
-  {% if demo.workflow_mermaid %}
-    <a href="#workflow" class="demo-toc__link">Workflow</a>
-  {% endif %}
-  {% if demo.video_url %}
-    <a href="#video" class="demo-toc__link">Video walkthrough</a>
-  {% endif %}
+  <!-- TOC links are built dynamically by demo-toc.js -->
 </nav>

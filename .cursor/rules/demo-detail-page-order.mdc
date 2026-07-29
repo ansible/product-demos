@@ -1,18 +1,27 @@
 ---
 description: Enforce section ordering on GitHub Pages demo detail pages
-globs: docs/_layouts/demo-detail.html
+globs: docs/_layouts/demo-detail.html, docs/assets/js/demo-toc.js, **/docs/*.md
 alwaysApply: false
 ---
 
 # Demo Detail Page Section Order
 
-The demo detail page layout (`docs/_layouts/demo-detail.html`) MUST render sections in this fixed order:
+Every demo detail page MUST render sections in this exact order:
 
-1. **Hero** — title, subtitle, category badge, author
-2. **Description** — the markdown body (`{{ content }}`) which includes the lead paragraph, prerequisites, survey prompts, job templates, and any prose sections
-3. **Workflow diagram** — Mermaid chart (if `demo.workflow_mermaid` exists)
-4. **Video walkthrough** — embedded YouTube iframe (if `demo.video_url` exists)
-5. **Special thanks** — (if `page.special_thanks` exists)
-6. **Back link** — "← All demos"
+1. **Description** — lead paragraph (first text in the markdown body)
+2. **Workflow** — Mermaid diagram (if present, moved via JS into the body)
+3. **Video walkthrough** — YouTube embed (if present, moved via JS into the body)
+4. **Prerequisites** — `## Prerequisites` in the markdown
+5. **Configure credentials before first run** — `## Configure credentials` (if present)
+6. **Survey prompts** — `## Survey prompts` table
+7. **Job templates** — `## Job templates` table
+8. **Why it matters** — `## Why it matters` (if present)
+9. **Presenter walkthrough** — `## Presenter walkthrough` (if present)
+10. **Talking points** — `## Talking points` (if present)
+11. **Related demos** — `## Related demos` table
 
-Description ALWAYS comes before Workflow and Video. Never put the workflow diagram or video above the description body.
+Description ALWAYS comes first. Workflow and Video come between the description and Prerequisites. Never reorder these sections.
+
+The layout renders Workflow and Video as separate `<section>` elements after `{{ content }}`. JavaScript in `demo-toc.js` moves them into `.detail-body` between the lead paragraph and the first `<h2>` heading.
+
+When writing new demo markdown files in `<section>/docs/`, follow this heading order.
