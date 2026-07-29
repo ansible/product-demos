@@ -1,0 +1,18 @@
+---
+description: Enforce section ordering on GitHub Pages demo detail pages
+globs: docs/_layouts/demo-detail.html
+alwaysApply: false
+---
+
+# Demo Detail Page Section Order
+
+The demo detail page layout (`docs/_layouts/demo-detail.html`) MUST render sections in this fixed order:
+
+1. **Hero** — title, subtitle, category badge, author
+2. **Description** — the markdown body (`{{ content }}`) which includes the lead paragraph, prerequisites, survey prompts, job templates, and any prose sections
+3. **Workflow diagram** — Mermaid chart (if `demo.workflow_mermaid` exists)
+4. **Video walkthrough** — embedded YouTube iframe (if `demo.video_url` exists)
+5. **Special thanks** — (if `page.special_thanks` exists)
+6. **Back link** — "← All demos"
+
+Description ALWAYS comes before Workflow and Video. Never put the workflow diagram or video above the description body.
