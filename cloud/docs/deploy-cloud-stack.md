@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: deploy-cloud-stack
 ---
+# Deploy Cloud Stack in AWS
+
 
 Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Windows, two RHEL, one reports server), dynamic inventory sync, and a VPC report published to S3. This is the starting point for most cloud, Linux, and Windows demos.
 

@@ -3,6 +3,8 @@ layout: demo-detail
 demo_slug: patch-cloud-stack
 special_thanks: "Joon Paik <jopaik@redhat.com> — original patch demo author"
 ---
+# Patch Cloud Stack in AWS
+
 
 Enterprise-grade patching workflow with snapshot safety, parallel RHEL and Windows paths, automatic restore on failure, and a consolidated HTML compliance report. Based on jopaik/patch_demo, this workflow covers both operating systems in a single execution against the VMs deployed by Deploy Cloud Stack in AWS.
 

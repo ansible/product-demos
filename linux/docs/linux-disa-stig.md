@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-disa-stig
 ---
+# DISA STIG
+
 
 Applies DISA STIG (Security Technical Implementation Guide) hardening to RHEL hosts. Uses the demo.compliance collection STIG role to configure security controls required for U.S. Department of Defense environments.
 

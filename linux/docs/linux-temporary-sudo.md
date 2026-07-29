@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-temporary-sudo
 ---
+# Temporary Sudo
+
 
 Grants temporary sudo access to a user for a configurable duration. Creates a sudoers rule, schedules automatic cleanup via the at daemon, and removes the rule when time expires. Demonstrates just-in-time privilege escalation.
 

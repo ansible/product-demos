@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-compliance-enforce
 ---
+# Compliance Enforce
+
 
 Applies remediation for a compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG) to hosts that were found out of compliance. Targets hosts dynamically based on inventory groups populated by a prior compliance scan.
 

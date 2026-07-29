@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: cloud-resize-ec2
 ---
+# AWS — Resize EC2
+
 
 Changes the instance type of one or more EC2 instances. Useful for demonstrating vertical scaling -- resize a t2.micro to a t2.large and back without reprovisioning.
 

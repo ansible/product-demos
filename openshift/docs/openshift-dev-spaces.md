@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: openshift-dev-spaces
 ---
+# Dev Spaces
+
 
 Deploys Red Hat OpenShift Dev Spaces on an OpenShift cluster. Creates the namespace, installs the operator via OLM subscription, and creates the CheCluster custom resource.
 

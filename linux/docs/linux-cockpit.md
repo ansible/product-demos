@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-cockpit
 ---
+# Install Web Console (Cockpit)
+
 
 Installs and configures the Cockpit web console on RHEL hosts using RHEL System Roles. Cockpit provides a browser-based management interface for Linux servers. Demonstrates how System Roles make complex configurations repeatable.
 

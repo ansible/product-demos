@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: openshift-cnv-infra-stack
 ---
+# CNV — Infra Stack
+
 
 Deploys the full OpenShift CNV infrastructure stack -- installs the OpenShift Virtualization operator, configures cluster settings, provisions RHEL VMs, and syncs the CNV inventory. The OpenShift equivalent of Deploy Cloud Stack in AWS.
 

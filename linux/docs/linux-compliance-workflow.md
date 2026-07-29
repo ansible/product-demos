@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-compliance-workflow
 ---
+# Compliance Workflow
+
 
 A workflow that ties together compliance reporting, inventory refresh, and enforcement in a single execution. It first generates an OpenSCAP report against a chosen compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG), syncs the AWS inventory, and then enforces remediation on findings — giving you a before-and-after view of compliance posture.
 

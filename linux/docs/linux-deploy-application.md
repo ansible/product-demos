@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-deploy-application
 ---
+# Deploy Application
+
 
 Installs a Linux application package via DNF. Supports version pinning with allow_downgrade for rollback scenarios. A straightforward demo of application deployment that shows how AAP replaces manual package management.
 

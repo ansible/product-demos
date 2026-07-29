@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: satellite-promote-content-view
 ---
+# Promote Content View Version
+
 
 Promotes a Satellite content view version from one lifecycle environment to another. This is the mechanism for moving tested content from Dev to QA to Production in a controlled manner.
 

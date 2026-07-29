@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: openshift-eda-install
 ---
+# EDA — Install Controller
+
 
 Deploys an Event-Driven Ansible (EDA) Controller on OpenShift, connected to the same AAP instance. Uses the demo.openshift.eda_controller role to install and configure the operator and custom resource.
 

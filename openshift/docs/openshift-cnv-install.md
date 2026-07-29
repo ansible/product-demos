@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: openshift-cnv-install
 ---
+# CNV — Install Operator
+
 
 Deploys the OpenShift Virtualization (CNV) operator on an OpenShift cluster, creates the HyperConverged custom resource, and provisions a test VM to verify functionality.
 

@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: cloud-peer-networking
 ---
+# AWS — Peer Networking
+
 
 Creates a multi-VPC peered network topology with a DMZ and private network. Provisions VPCs, subnets, peering connections, route tables, and EC2 instances in each zone. Configures SSH bastion access from DMZ hosts to private network hosts.
 

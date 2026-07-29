@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-ad-join-domain
 ---
+# AD — Join Domain
+
 
 Joins Windows hosts to an existing Active Directory domain. Sets the DNS client to point at the domain controller, creates an OU, updates the hostname, and performs the domain join.
 

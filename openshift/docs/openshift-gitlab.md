@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: openshift-gitlab
 ---
+# GitLab
+
 
 Deploys GitLab on an OpenShift cluster using the GitLab Operator. Installs cert-manager as a prerequisite, then deploys the GitLab operator and creates a GitLab instance.
 

@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: openshift-cnv-create-vm
 ---
+# CNV — Create RHEL VM
+
 
 Provisions a RHEL virtual machine on OpenShift Virtualization (CNV) using the KubeVirt API. Creates the VM definition with a DataVolume for the OS disk from a cluster image source.
 

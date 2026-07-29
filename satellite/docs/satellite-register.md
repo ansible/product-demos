@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: satellite-register
 ---
+# Register with Satellite
+
 
 Registers RHEL hosts with a Red Hat Satellite server. Uses the demo.satellite.register_host role to configure the Satellite URL, install the katello-ca-consumer package, and register the host.
 

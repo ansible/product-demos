@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: satellite-publish-content-view
 ---
+# Publish Content View Version
+
 
 Publishes a new version of a Satellite content view to a specified lifecycle environment. Content views control which packages and errata are available to hosts -- publishing creates a point-in-time snapshot of the content.
 

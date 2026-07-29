@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: satellite-compliance-scan
 ---
+# Compliance Scan with Satellite
+
 
 Runs OpenSCAP compliance scans on Satellite-managed hosts and uploads results to Satellite. Uses the demo.satellite.scap_client role to install and configure the foreman_scap_client.
 

@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-query-services
 ---
+# Query Services
+
 
 Copies a PowerShell script to the target host and queries Windows services filtered by state (Running, Stopped, etc.). Demonstrates file transfer and script execution patterns on Windows with Ansible.
 

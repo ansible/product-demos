@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-run-powershell
 ---
+# Run PowerShell
+
 
 Runs an arbitrary PowerShell script on target Windows hosts. The script content is provided via survey. Outputs the results in the job log. Demonstrates how Ansible can execute any PowerShell command remotely.
 

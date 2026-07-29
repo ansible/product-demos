@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: openshift-cnv-delete-vm
 ---
+# CNV — Delete VM
+
 
 Deletes one or more virtual machines from OpenShift Virtualization. Removes the VirtualMachine and associated DataVolume resources. Supports pattern-based host selection for bulk cleanup.
 

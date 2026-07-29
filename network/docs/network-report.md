@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: network-report
 ---
+# Report
+
 
 Generates an HTML network report by gathering facts from Cisco IOS, IOS-XR, and NX-OS devices. Collects interface, routing, and system information using the platform-specific facts modules and renders them into a browsable report.
 

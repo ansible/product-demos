@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-run-shell-script
 ---
+# Run Shell Script
+
 
 Runs an arbitrary shell script on target hosts. The script content is provided via survey. Outputs the result and reminds users they should consider converting scripts to proper playbooks. Great for showing the migration path from scripts to automation.
 

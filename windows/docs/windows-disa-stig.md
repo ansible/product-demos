@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-disa-stig
 ---
+# DISA STIG
+
 
 Applies DISA STIG hardening to Windows Server 2022. Uses the demo.compliance.win2022STIG role to configure security controls required for U.S. Department of Defense Windows environments.
 

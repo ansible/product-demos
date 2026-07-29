@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-rollback
 ---
+# Rollback
+
 
 A generic rollback playbook used as a cleanup step in Windows workflows. Outputs a configurable rollback message. Used by the Setup Active Directory Domain workflow as the failure handler to clean up resources on error.
 

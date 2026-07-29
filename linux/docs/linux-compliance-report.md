@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-compliance-report
 ---
+# Multi-profile Compliance Report
+
 
 Runs an OpenSCAP scan against a selected compliance profile and generates an HTML report. Installs the scanner and security guide packages, evaluates the system against the profile, and publishes results as a browsable HTML report.
 

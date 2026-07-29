@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-password-requirements
 ---
+# Configure Password Requirements
+
 
 Configures Windows password policies using PowerShell Desired State Configuration (DSC). Sets password history, minimum length, and complexity requirements. Demonstrates the integration of Ansible with Windows DSC.
 

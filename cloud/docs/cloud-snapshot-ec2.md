@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: cloud-snapshot-ec2
 ---
+# AWS — Snapshot EC2
+
 
 Creates EBS snapshots of all volumes attached to the target EC2 instances. Used as a safety net before patching or other changes -- if something goes wrong, you can restore from these snapshots.
 

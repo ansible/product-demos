@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-register-insights
 ---
+# Register with Insights
+
 
 Registers RHEL EC2 instances with Red Hat Subscription Manager using an activation key and org ID. Removes RHUI packages, installs subscription-manager, sets the hostname, and registers the host. Required before RHEL advisory patching.
 

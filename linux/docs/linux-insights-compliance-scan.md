@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-insights-compliance-scan
 ---
+# Insights Compliance Scan
+
 
 Triggers a Red Hat Insights compliance scan on RHEL hosts. Uses the redhat.insights.compliance role to run the scan and upload results to the Insights compliance dashboard on console.redhat.com.
 

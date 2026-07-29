@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-stop-service
 ---
+# Stop Service
+
 
 Stops a named systemd service on target hosts. Checks that the service exists before attempting to stop it. Paired with Start Service for basic service lifecycle management.
 

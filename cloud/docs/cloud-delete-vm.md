@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: cloud-delete-vm
 ---
+# AWS — Delete VM
+
 
 Terminates an EC2 instance by its Name tag. Looks up the instance in the specified region and terminates it, waiting for the instance to fully shut down. Safe to run even if the instance has already been terminated.
 

@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-start-service
 ---
+# Start Service
+
 
 Starts a named systemd service on target hosts. Checks that the service exists before attempting to start it. A simple but common operational task that demonstrates self-service IT operations.
 

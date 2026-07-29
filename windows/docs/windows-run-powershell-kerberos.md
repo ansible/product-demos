@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-run-powershell-kerberos
 ---
+# Run PowerShell (Kerberos)
+
 
 Runs a PowerShell script on Windows hosts using Kerberos authentication instead of basic WinRM. Demonstrates Ansible ability to authenticate via Active Directory credentials for domain-joined environments.
 

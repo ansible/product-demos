@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-multi-profile-compliance
 ---
+# Multi-profile Compliance
+
 
 Applies a selected compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG) to RHEL hosts using the official Red Hat compliance roles. This is the enforcement-only playbook -- for scanning and reporting, see the Multi-profile Compliance Report.
 

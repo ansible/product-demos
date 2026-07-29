@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: cloud-transit-networking
 ---
+# AWS — Transit Networking
+
 
 Creates a hub-and-spoke network topology using AWS Transit Gateway. Provisions multiple VPCs connected through a central transit gateway, with DMZ and private network zones. Includes bastion host configuration for cross-VPC SSH access.
 

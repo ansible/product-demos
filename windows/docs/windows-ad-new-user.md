@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-ad-new-user
 ---
+# AD — New User
+
 
 Creates a new Active Directory user with full attributes -- name, department, company, address, phone, and group memberships. Generates a random temporary password. Demonstrates a helpdesk self-service portal for user provisioning.
 

@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-patching
 ---
+# Patching
+
 
 Apply Windows updates by category to Windows Server hosts and generate an HTML patch report. The playbook uses the demo.patching.patch_windows role to install updates filtered by category (Security, Critical, Feature Packs, etc.), with optional reboot control. A report server is deployed automatically to publish patching results. Runs in check mode by default.
 

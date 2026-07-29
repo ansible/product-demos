@@ -696,8 +696,13 @@ a {
   white-space: nowrap;
 }
 
-/* 4: Lead paragraph — first <p> in detail-body is larger */
-.detail-body > p:first-child {
+/* Hide the h1 from markdown — the layout already renders the title */
+.detail-body > h1:first-child {
+  display: none;
+}
+
+/* 4: Lead paragraph — first visible <p> in detail-body is larger */
+.detail-body > p:first-of-type {
   font-size: 17px;
   line-height: 1.65;
   color: var(--text-primary);

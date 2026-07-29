@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: openshift-cnv-patch-workflow
 ---
+# CNV — Patch Workflow
+
 
 Patching workflow for RHEL VMs running on OpenShift Virtualization. Similar to the cloud patching workflow but targeting CNV-managed virtual machines instead of EC2 instances.
 

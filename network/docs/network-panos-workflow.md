@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: network-panos-workflow
 ---
+# Palo Alto Firewall Demo
+
 
 A workflow that provisions a Palo Alto Networks virtual firewall in AWS, configures it using the paloaltonetworks.panos collection, deploys a webserver behind it, and sets up security rules to demonstrate firewall policy management. Covers the full lifecycle from infrastructure provisioning through configuration and validation.
 

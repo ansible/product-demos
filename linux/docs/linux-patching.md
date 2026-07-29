@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-patching
 ---
+# Patching
+
 
 Apply security updates to RHEL servers and generate an HTML patch report. The playbook installs yum-utils, applies patches via the demo.patching.patch_linux role, optionally triggers an Insights Client scan, and publishes a patching compliance report to a dedicated report server. Runs in check mode by default so you can audit before applying.
 

@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: satellite-patch-dev
 ---
+# Patch Dev Workflow
+
 
 End-to-end Satellite patching workflow for development environments. Combines content view publishing with host patching to demonstrate the full content management lifecycle.
 

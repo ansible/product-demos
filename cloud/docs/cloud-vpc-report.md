@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: cloud-vpc-report
 ---
+# AWS — VPC Report
+
 
 Generates an HTML report of the current AWS VPC infrastructure -- instances, networks, security groups, and tags. Publishes the report to either a Linux report server or an S3 bucket for web access.
 

@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-fact-scan
 ---
+# Fact Scan
+
 
 Scans hosts and gathers package and service facts. This populates the AAP fact cache with installed packages and running services, which can then be viewed in the host details page. Useful for inventory auditing and compliance checks.
 

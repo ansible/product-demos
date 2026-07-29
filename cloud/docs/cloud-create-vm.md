@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: cloud-create-vm
 ---
+# AWS — Create VM
+
 
 Launches an EC2 instance from a blueprint definition. Blueprints are YAML files under cloud/blueprints/ that define AMI, instance type, security group, tags, and user data. Supports both Linux and Windows instances with automatic WinRM bootstrapping for Windows.
 

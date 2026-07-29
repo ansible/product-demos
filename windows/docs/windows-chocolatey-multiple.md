@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-chocolatey-multiple
 ---
+# Chocolatey Install Multiple
+
 
 Installs multiple packages (Node.js and Python by default) using the Chocolatey package manager. Verifies the installations by checking version output. Demonstrates bulk software provisioning on Windows with Ansible.
 

@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-test-connectivity
 ---
+# Test Connectivity
+
 
 Tests WinRM connectivity to Windows hosts using wait_for_connection and win_ping. Verifies that AAP can reach the hosts before running any configuration. Useful as a smoke test after provisioning.
 

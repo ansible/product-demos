@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: linux-troubleshoot
 ---
+# Troubleshoot
+
 
 Gathers quick diagnostic information from RHEL hosts -- vmstat for CPU/memory/swap, top processes by CPU usage, and top processes by memory usage. A handy first-response playbook for investigating performance issues.
 

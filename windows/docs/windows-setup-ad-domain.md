@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-setup-ad-domain
 ---
+# Setup Active Directory Domain
+
 
 A workflow that provisions a complete Active Directory environment from scratch in AWS. It creates a keypair, VPC, and three Windows VMs (one domain controller, two domain computers), syncs inventory, tests connectivity, promotes the domain controller, joins the computers to the domain, and validates both PowerShell and Kerberos connectivity. Includes automatic cleanup on failure.
 

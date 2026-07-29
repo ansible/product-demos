@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: cloud-create-keypair
 ---
+# AWS — Create Keypair
+
 
 Creates an AWS EC2 keypair from the SSH public key attached to the APD Machine Credential. If no public key is supplied via survey, the playbook derives it automatically from the machine credential private key.
 

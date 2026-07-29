@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-chocolatey-specific
 ---
+# Chocolatey Install Specific
+
 
 Installs a specific package by name using the Chocolatey package manager. The package name is provided via survey. Demonstrates targeted software installation on Windows.
 

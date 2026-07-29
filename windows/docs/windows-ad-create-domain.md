@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: windows-ad-create-domain
 ---
+# AD — Create Domain
+
 
 Promotes a Windows Server to a domain controller and creates a new Active Directory forest. Sets the local admin password, updates the hostname, creates the domain, and reboots. The default domain is ansible.local.
 

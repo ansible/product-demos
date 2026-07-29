@@ -2,6 +2,8 @@
 layout: demo-detail
 demo_slug: network-disa-stig
 ---
+# DISA STIG
+
 
 Applies DISA STIG compliance checks and hardening to Cisco IOS-XE network devices. Uses the demo.compliance.iosxeSTIG role to evaluate and enforce security controls for network infrastructure.
 
