@@ -3,6 +3,21 @@
 
 A workflow that provisions a Palo Alto Networks virtual firewall in AWS, configures it using the paloaltonetworks.panos collection, deploys a webserver behind it, and sets up security rules to demonstrate firewall policy management. Covers the full lifecycle from infrastructure provisioning through configuration and validation.
 
+## Workflow
+
+```
+Deploy ──→ Inventory Sync ──→ Configure Firewall ──→ Configure Security Rule ──→ Configure Webserver
+                                                                                        │
+                                                                                  Cleanup (teardown)
+```
+
+1. **Deploy** — Provisions the PAN-OS virtual firewall, bastion host, and webserver in AWS
+2. **Inventory Sync** — Discovers the new EC2 instances via dynamic inventory
+3. **Configure Firewall** — Applies initial PAN-OS configuration using the certified panos collection
+4. **Configure Security Rule** — Creates firewall security rules to allow traffic
+5. **Configure Webserver** — Deploys a webserver behind the firewall for testing
+6. **Cleanup** — Tears down all resources when the demo is complete
+
 ## Prerequisites
 
 - AWS credential configured with Access and Secret key

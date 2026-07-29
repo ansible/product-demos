@@ -3,6 +3,33 @@
 
 A workflow that provisions a complete Active Directory environment from scratch in AWS. It creates a keypair, VPC, and three Windows VMs (one domain controller, two domain computers), syncs inventory, tests connectivity, promotes the domain controller, joins the computers to the domain, and validates both PowerShell and Kerberos connectivity. Includes automatic cleanup on failure.
 
+## Workflow
+
+```
+Create Keypair ──→ Create VPC ──→ Create DC          ──┐
+                              ├──→ Create Computer 1  ──┼──→ Inventory Sync ──→ Test Connectivity
+                              └──→ Create Computer 2  ──┘         │
+                                                                   ↓
+                                                            Create Domain
+                                                                   │
+                                                            Join Domain ──→ Domain Inventory Sync
+                                                                                    │
+                                                            ┌───────────────────────┘
+                                                            ├──→ PowerShell Validation
+                                                            └──→ Kerberos Validation
+
+                                        (any failure) ──→ Cleanup Resources
+```
+
+1. **Create Keypair + VPC** — Provisions AWS infrastructure
+2. **Create VMs** (parallel) — Deploys one domain controller and two domain computers
+3. **Inventory Sync + Test Connectivity** — Verifies all three VMs are reachable
+4. **Create Domain** — Promotes the DC to a domain controller
+5. **Join Domain** — Joins the two computers to the new domain
+6. **Validation** (parallel) — Tests PowerShell and Kerberos authentication
+
+On any failure, the **Cleanup Resources** rollback node runs automatically.
+
 ## Prerequisites
 
 - AWS credential configured with Access and Secret key

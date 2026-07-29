@@ -17,6 +17,23 @@ Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Wind
 | Environment | `vm_environment` | multiplechoice | Yes |
 | Email | `email` | text | Yes |
 
+## Workflow
+
+```
+Create Keypair ──┐
+                 ├──→ EC2 Stats ──→ aws-dc (Windows Full)     ──┐
+Create VPC ──────┘            ├──→ aws_win1 (Windows Core)   ──┤
+                              ├──→ aws_rhel8 (RHEL 8)        ──┼──→ Sync Inventory ──→ VPC Report
+                              ├──→ aws_rhel9 (RHEL 9)        ──┤
+                              └──→ reports (RHEL 9)           ──┘
+```
+
+1. Creates keypair `aws-test-key` (public key derived from APD Machine Credential private key)
+2. Creates VPC `aws-test-vpc` with subnet, security group, and route table
+3. Deploys five VMs **in parallel** from blueprints
+4. Syncs AWS dynamic inventory so new hosts appear in AAP
+5. Publishes VPC infrastructure report to S3
+
 ## Why it matters
 
 - Creates a complete demo environment in minutes — no manual AWS console clicking

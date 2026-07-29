@@ -3,6 +3,19 @@
 
 Deploys the full OpenShift CNV infrastructure stack -- installs the OpenShift Virtualization operator, configures cluster settings, provisions RHEL VMs, and syncs the CNV inventory. The OpenShift equivalent of Deploy Cloud Stack in AWS.
 
+## Workflow
+
+```
+Deploy RHEL8 VM ──┐
+                  ├──→ Update Inventory
+Deploy RHEL9 VM ──┘
+    (failure) ──→ Ticket - Instance Failed
+```
+
+1. **Deploy VMs** (parallel) — Provisions RHEL 8 and RHEL 9 VMs on CNV
+2. **Update Inventory** — Syncs the CNV dynamic inventory so new VMs appear in AAP
+3. **Ticket** (on failure) — Creates a notification if VM deployment fails
+
 ## Prerequisites
 
 - <strong>OpenShift Credential</strong> configured with API token

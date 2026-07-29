@@ -3,6 +3,16 @@
 
 A workflow that ties together compliance reporting, inventory refresh, and enforcement in a single execution. It first generates an OpenSCAP report against a chosen compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG), syncs the AWS inventory, and then enforces remediation on findings — giving you a before-and-after view of compliance posture.
 
+## Workflow
+
+```
+Compliance Report ──→ Update Inventory ──→ Compliance Enforce
+```
+
+1. **Compliance Report** — Runs an OpenSCAP scan against the chosen profile and generates an HTML report
+2. **Update Inventory** — Syncs the AWS dynamic inventory to refresh host groups
+3. **Compliance Enforce** — Remediates out-of-compliance findings from the scan
+
 ## Prerequisites
 
 - RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>

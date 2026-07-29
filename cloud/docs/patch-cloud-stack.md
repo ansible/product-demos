@@ -24,6 +24,25 @@ Enterprise-grade patching workflow with snapshot safety, parallel RHEL and Windo
 | RHEL Advisory IDs | `input_cve_ids` | text | Yes |
 | Windows KB IDs | `input_kb_ids` | text | Yes |
 
+## Workflow
+
+```
+Snapshot EC2
+├──→ Pre-check RHEL ──→ Patch RHEL
+│       ├─ (success) Post-check RHEL ──────────┐
+│       └─ (failure) Restore from Snapshot      │
+├──→ Pre-check Windows ──→ Patch Windows       │
+│       ├─ (success) Post-check Windows ───────┼──→ Compliance Report
+│       └─ (failure) Restore from Snapshot      │
+└───────────────────────────────────────────────┘
+```
+
+1. **Snapshot** — EBS snapshots of all target instances for recovery
+2. **Pre-check** (parallel) — Queries advisory/KB applicability on RHEL and Windows
+3. **Patch** (parallel) — Applies targeted advisories via `dnf` (RHEL) or `win_updates` (Windows)
+4. **Post-check / Restore** — Verifies compliance; on failure, restores from EBS snapshot
+5. **Compliance Report** — Generates an HTML dashboard at `http://<reports>/patch_report.html`
+
 ## Job templates
 
 | Template | Playbook | Description |

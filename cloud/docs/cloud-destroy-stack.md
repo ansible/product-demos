@@ -14,6 +14,23 @@ Tears down everything created by Deploy Cloud Stack in AWS — terminates all fi
 |--------|----------|------|----------|
 | AWS Region | `create_vm_aws_region` | multiplechoice | Yes |
 
+## Workflow
+
+```
+Delete aws-dc ───────────┐
+Delete aws_win1 ─────────┤
+Delete aws_rhel8 ────────┼──→ Delete VPC ──┐
+Delete aws_rhel9 ────────┤                 ├──→ Sync Inventory
+Delete reports ──────────┘    Delete Key ──┘
+```
+
+1. Terminates all five stack VMs **in parallel**
+2. Deletes VPC `aws-test-vpc` and related resources (subnet, route table, internet gateway, security group)
+3. Deletes keypair `aws-test-key`
+4. Syncs AWS inventory so hosts are removed from AAP
+
+> **Note:** S3 report buckets created during deploy are not deleted by this workflow.
+
 ## Presenter walkthrough
 
 1. <strong>When to use:</strong> Run this at the end of a demo session or when you need to start fresh. It's safe to run even if some VMs are already terminated.
