@@ -16,6 +16,12 @@ Apply security updates to RHEL servers and generate an HTML patch report. The pl
 |--------|----------|------|----------|
 | Server Name or Pattern | `_hosts` | text | Yes |
 
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| LINUX ǀ Patching | [`linux/patching.yml`](https://github.com/ansible/product-demos/blob/main/linux/patching.yml) | Apply security updates, optionally scan with Insights Client, and publish an HTML patch report |
+
 ## Why it matters
 
 - Patching is the number one use case customers ask about — this demo addresses it directly

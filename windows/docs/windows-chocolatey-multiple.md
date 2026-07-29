@@ -9,6 +9,13 @@ Installs multiple packages (Node.js and Python by default) using the Chocolatey 
 - WinRM connectivity via <strong>APD Machine Credential</strong>
 - Internet access from the Windows hosts
 
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Server Name or Pattern | `_hosts` | text | No |
+
 ## Job templates
 
 | Template | Playbook | Description |

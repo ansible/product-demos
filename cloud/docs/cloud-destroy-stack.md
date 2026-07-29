@@ -12,7 +12,7 @@ Tears down everything created by Deploy Cloud Stack in AWS — terminates all fi
 
 | Prompt | Variable | Type | Required |
 |--------|----------|------|----------|
-| AWS Region | `aws_region` | multiplechoice | Yes |
+| AWS Region | `create_vm_aws_region` | multiplechoice | Yes |
 
 ## Presenter walkthrough
 

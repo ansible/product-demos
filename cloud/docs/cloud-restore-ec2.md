@@ -13,6 +13,7 @@ Restores EC2 instance volumes from the most recent EBS snapshot. This is the rol
 | Prompt | Variable | Type | Required |
 |--------|----------|------|----------|
 | Server Name or Pattern | `_hosts` | text | Yes |
+| AWS Region | `aws_region` | multiplechoice | Yes |
 
 ## Job templates
 

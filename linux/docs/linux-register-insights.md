@@ -14,6 +14,9 @@ Registers RHEL EC2 instances with Red Hat Subscription Manager using an activati
 | Prompt | Variable | Type | Required |
 |--------|----------|------|----------|
 | Server Name or Pattern | `_hosts` | text | Yes |
+| Choose Environment | `env` | multiplechoice | Yes |
+| Ansible Inventory Group (and Insights tag) to be created | `insights_tag` | text | Yes |
+| Org ID | `org_id` | text | Yes |
 
 ## Job templates
 

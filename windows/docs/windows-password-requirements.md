@@ -8,6 +8,13 @@ Configures Windows password policies using PowerShell Desired State Configuratio
 - Windows hosts in the <strong>Ansible Product Demos Inventory</strong>
 - WinRM connectivity via <strong>APD Machine Credential</strong>
 
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Server Name or Pattern | `_hosts` | text | No |
+
 ## Job templates
 
 | Template | Playbook | Description |

@@ -13,6 +13,7 @@ Creates EBS snapshots of all volumes attached to the target EC2 instances. Used 
 | Prompt | Variable | Type | Required |
 |--------|----------|------|----------|
 | Server Name or Pattern | `_hosts` | text | Yes |
+| AWS Region | `aws_region` | multiplechoice | Yes |
 
 ## Job templates
 

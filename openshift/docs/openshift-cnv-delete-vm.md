@@ -8,6 +8,14 @@ Deletes one or more virtual machines from OpenShift Virtualization. Removes the 
 - Existing CNV VMs to delete
 - <strong>OpenShift Credential</strong> configured
 
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| VM host string | `vm_host_string` | text | Yes |
+| VM NameSpace | `vm_namespace` | text | Yes |
+
 ## Job templates
 
 | Template | Playbook | Description |

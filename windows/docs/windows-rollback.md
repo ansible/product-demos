@@ -7,6 +7,14 @@ A generic rollback playbook used as a cleanup step in Windows workflows. Outputs
 
 - Windows hosts in the <strong>Ansible Product Demos Inventory</strong>
 
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Server Name or Pattern | `_hosts` | text | No |
+| Rollback Message | `rollback_msg` | text | No |
+
 ## Job templates
 
 | Template | Playbook | Description |

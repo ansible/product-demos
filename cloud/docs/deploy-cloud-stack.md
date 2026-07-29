@@ -12,9 +12,9 @@ Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Wind
 
 | Prompt | Variable | Type | Required |
 |--------|----------|------|----------|
-| AWS Region | `aws_region` | multiplechoice | Yes |
-| Owner | `owner_tag` | text | Yes |
-| Environment | `env` | multiplechoice | Yes |
+| AWS Region | `create_vm_aws_region` | multiplechoice | Yes |
+| Owner | `create_vm_aws_owner_tag` | text | Yes |
+| Environment | `vm_environment` | multiplechoice | Yes |
 | Email | `email` | text | Yes |
 
 ## Why it matters

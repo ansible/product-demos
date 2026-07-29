@@ -17,6 +17,12 @@ Apply Windows updates by category to Windows Server hosts and generate an HTML p
 | Update categories | `win_update_categories` | multiselect | No |
 | Reboot after install? | `allow_reboot` | multiplechoice | No |
 
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| WINDOWS ǀ Patching | [`windows/patching.yml`](https://github.com/ansible/product-demos/blob/main/windows/patching.yml) | Apply Windows updates by category, optionally reboot, and publish an HTML patch report |
+
 ## Why it matters
 
 - Windows patching is a top customer pain point — this demo proves AAP handles it natively

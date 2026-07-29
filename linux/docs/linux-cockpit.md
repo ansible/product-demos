@@ -13,6 +13,7 @@ Installs and configures the Cockpit web console on RHEL hosts using RHEL System 
 | Prompt | Variable | Type | Required |
 |--------|----------|------|----------|
 | Server Name or Pattern | `_hosts` | text | Yes |
+| Cockpit package load | `cockpit_packages` | multiplechoice | No |
 
 ## Job templates
 

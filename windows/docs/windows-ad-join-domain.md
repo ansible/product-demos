@@ -8,6 +8,14 @@ Joins Windows hosts to an existing Active Directory domain. Sets the DNS client 
 - An existing AD domain (created by <strong>WINDOWS | AD | Create Domain</strong>)
 - Domain controller private IP accessible from target hosts
 
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Server Name or Pattern | `_hosts` | text | Yes |
+| Domain Controller Inventory Hostname | `domain_controller` | text | Yes |
+
 ## Job templates
 
 | Template | Playbook | Description |

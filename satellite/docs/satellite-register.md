@@ -14,6 +14,7 @@ Registers RHEL hosts with a Red Hat Satellite server. Uses the demo.satellite.re
 | Prompt | Variable | Type | Required |
 |--------|----------|------|----------|
 | Server Name or Pattern | `_hosts` | text | Yes |
+| Choose Environment | `env` | multiplechoice | Yes |
 
 ## Job templates
 

@@ -16,6 +16,9 @@ Provisions a RHEL virtual machine on OpenShift Virtualization (CNV) using the Ku
 | VM Name | `vm_name` | text | Yes |
 | Namespace | `vm_namespace` | text | Yes |
 | OS Version | `os_version` | multiplechoice | Yes |
+| SSH Authorized Key | `ssh_authorized_key` | textarea | Yes |
+| RHEL Activation Key | `rh_subscription_key` | text | Yes |
+| RHEL Organization ID | `rh_subscription_org` | text | Yes |
 
 ## Job templates
 
