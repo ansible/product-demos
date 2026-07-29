@@ -975,6 +975,27 @@ a {
   color: var(--text-primary);
 }
 
+/* Video embed — responsive 16:9 iframe */
+.detail-video {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #000;
+}
+
+.detail-video iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .workflow-diagram {
   background: var(--bg-surface);
   border: 1px solid var(--border);

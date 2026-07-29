@@ -12,6 +12,7 @@
   status: active
   author: "Joon Paik <jopaik@redhat.com>"
   special_thanks: "Joon Paik <jopaik@redhat.com> — original patch demo author"
+  video_url: "https://www.youtube.com/embed/20fK6S1CHL0"
   featured: true
   is_workflow: true
   tags:

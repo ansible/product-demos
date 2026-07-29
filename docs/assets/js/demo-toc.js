@@ -5,6 +5,9 @@
   var body = document.querySelector('.detail-body');
   if (!body) return;
 
+  /* Find the first static link (Workflow / Video) so we insert before it */
+  var firstStatic = toc.querySelector('.demo-toc__link');
+
   /* Auto-build TOC from h2 headings in the markdown body */
   var headings = body.querySelectorAll('h2');
   headings.forEach(function (h2) {
@@ -19,7 +22,11 @@
     link.href = '#' + h2.id;
     link.className = 'demo-toc__link';
     link.textContent = h2.textContent.trim();
-    toc.appendChild(link);
+    if (firstStatic) {
+      toc.insertBefore(link, firstStatic);
+    } else {
+      toc.appendChild(link);
+    }
   });
 
   /* Wrap prerequisites list in a callout box */
