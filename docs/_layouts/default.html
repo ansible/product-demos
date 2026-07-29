@@ -77,6 +77,7 @@
       top: -500px;
       opacity: 0;
       text-align: center;
+      pointer-events: none;
     }
     .konami-wrap.drop {
       animation: konami-drop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -140,9 +141,8 @@
           return;
         }
 
-        var tag = (e.target.tagName || '').toLowerCase();
-        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
-        if (e.target.closest && e.target.closest('button, [role="tablist"]')) return;
+        var active = document.activeElement;
+        if (active && active !== document.body && active !== document.documentElement) return;
 
         clearTimeout(seqTimer);
         if (e.keyCode === seq[pos]) {

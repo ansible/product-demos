@@ -1,0 +1,28 @@
+# Install Web Console (Cockpit)
+
+
+Installs and configures the Cockpit web console on RHEL hosts using RHEL System Roles. Cockpit provides a browser-based management interface for Linux servers. Demonstrates how System Roles make complex configurations repeatable.
+
+## Prerequisites
+
+- RHEL hosts in the **Ansible Product Demos Inventory**
+- SSH connectivity via **APD Machine Credential**
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Server Name or Pattern | `_hosts` | text | Yes |
+| Cockpit package load | `cockpit_packages` | multiplechoice | No |
+
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| LINUX ǀ Cockpit | [`linux/system_roles.yml`](../system_roles.yml) | Applies the cockpit System Role to install and configure the web console |
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| 🐧 [System Roles](./linux-system-roles.md) | Apply additional System Roles alongside Cockpit |
