@@ -5,8 +5,8 @@ Gathers quick diagnostic information from RHEL hosts -- vmstat for CPU/memory/sw
 
 ## Prerequisites
 
-- Linux hosts in the <strong>Ansible Product Demos Inventory</strong>
-- SSH connectivity via <strong>APD Machine Credential</strong>
+- Linux hosts in the **Ansible Product Demos Inventory**
+- SSH connectivity via **APD Machine Credential**
 
 ## Survey prompts
 

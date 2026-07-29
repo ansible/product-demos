@@ -5,9 +5,9 @@ Apply Windows updates by category to Windows Server hosts and generate an HTML p
 
 ## Prerequisites
 
-- Windows hosts in the <strong>Ansible Product Demos Inventory</strong> (deployed by <strong>Deploy Cloud Stack in AWS</strong>)
-- WinRM connectivity via <strong>APD Machine Credential</strong>
-- A Windows report server (<code>aws_win1</code>) in the <code>os_windows</code> inventory group
+- Windows hosts in the **Ansible Product Demos Inventory** (deployed by **Deploy Cloud Stack in AWS**)
+- WinRM connectivity via **APD Machine Credential**
+- A Windows report server (`aws_win1`) in the `os_windows` inventory group
 
 ## Survey prompts
 
@@ -33,12 +33,12 @@ Apply Windows updates by category to Windows Server hosts and generate an HTML p
 
 ## Presenter walkthrough
 
-1. <strong>Show the survey:</strong> Walk through the category selector. 'We can target just security updates, or cast a wider net. The operator chooses — not the tool.'
-2. <strong>Launch in check mode:</strong> Run against the Windows hosts. 'Check mode queries Windows Update Agent without installing anything. We see exactly what would change.'
-3. <strong>Review the output:</strong> Show which KBs are applicable per host. Point out the reboot-required indicators.
-4. <strong>Switch to run mode:</strong> Re-launch with job type set to Run. Highlight the reboot control option. 'In production, you might patch during a maintenance window and defer reboots.'
-5. <strong>Show the report:</strong> Navigate to the report server and walk through the HTML patching report.
-6. <strong>Connect to the bigger picture:</strong> 'For environments with both Windows and RHEL, our Patch Cloud Stack workflow handles both in parallel with EBS snapshot rollback.'
+1. **Show the survey:** Walk through the category selector. 'We can target just security updates, or cast a wider net. The operator chooses — not the tool.'
+2. **Launch in check mode:** Run against the Windows hosts. 'Check mode queries Windows Update Agent without installing anything. We see exactly what would change.'
+3. **Review the output:** Show which KBs are applicable per host. Point out the reboot-required indicators.
+4. **Switch to run mode:** Re-launch with job type set to Run. Highlight the reboot control option. 'In production, you might patch during a maintenance window and defer reboots.'
+5. **Show the report:** Navigate to the report server and walk through the HTML patching report.
+6. **Connect to the bigger picture:** 'For environments with both Windows and RHEL, our Patch Cloud Stack workflow handles both in parallel with EBS snapshot rollback.'
 
 ## Talking points
 

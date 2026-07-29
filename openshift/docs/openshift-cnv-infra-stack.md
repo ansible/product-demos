@@ -18,9 +18,9 @@ Deploy RHEL9 VM ──┘
 
 ## Prerequisites
 
-- <strong>OpenShift Credential</strong> configured with API token
+- **OpenShift Credential** configured with API token
 - Cluster admin access with bare-metal or nested-virt nodes
-- Run <strong>APD | Single demo setup</strong> with <code>openshift</code>
+- Run **APD | Single demo setup** with `openshift`
 
 ## Job templates
 

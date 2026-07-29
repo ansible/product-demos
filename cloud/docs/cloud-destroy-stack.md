@@ -5,7 +5,7 @@ Tears down everything created by Deploy Cloud Stack in AWS — terminates all fi
 
 ## Prerequisites
 
-- A stack previously deployed with <strong>Deploy Cloud Stack in AWS</strong>
+- A stack previously deployed with **Deploy Cloud Stack in AWS**
 - AWS credential configured
 
 ## Survey prompts
@@ -33,9 +33,9 @@ Delete reports ──────────┘    Delete Key ──┘
 
 ## Presenter walkthrough
 
-1. <strong>When to use:</strong> Run this at the end of a demo session or when you need to start fresh. It's safe to run even if some VMs are already terminated.
-2. <strong>Launch:</strong> Select the same AWS region used for Deploy. The workflow handles everything else.
-3. <strong>Watch the parallel teardown:</strong> All five VMs are terminated simultaneously, then VPC and keypair cleanup happens.
+1. **When to use:** Run this at the end of a demo session or when you need to start fresh. It's safe to run even if some VMs are already terminated.
+2. **Launch:** Select the same AWS region used for Deploy. The workflow handles everything else.
+3. **Watch the parallel teardown:** All five VMs are terminated simultaneously, then VPC and keypair cleanup happens.
 
 ## Related demos
 

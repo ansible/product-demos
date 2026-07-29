@@ -5,9 +5,9 @@ Apply security updates to RHEL servers and generate an HTML patch report. The pl
 
 ## Prerequisites
 
-- Linux hosts in the <strong>Ansible Product Demos Inventory</strong>
-- SSH connectivity via <strong>APD Machine Credential</strong>
-- A host named <code>reports</code> in inventory to receive the HTML report (deployed by <strong>Deploy Cloud Stack in AWS</strong>)
+- Linux hosts in the **Ansible Product Demos Inventory**
+- SSH connectivity via **APD Machine Credential**
+- A host named `reports` in inventory to receive the HTML report (deployed by **Deploy Cloud Stack in AWS**)
 - (Optional) Insights Client configured on target hosts for post-patch scanning
 
 ## Survey prompts
@@ -32,12 +32,12 @@ Apply security updates to RHEL servers and generate an HTML patch report. The pl
 
 ## Presenter walkthrough
 
-1. <strong>Explain check mode:</strong> Show the audience that this template defaults to check mode. 'We can audit what would change before we touch a single package.'
-2. <strong>Launch in check mode:</strong> Run against a group of RHEL hosts. Walk through the output — which packages would be updated, which hosts are already current.
-3. <strong>Switch to run mode:</strong> Re-launch the job and change the job type to Run. 'Now we apply the patches for real — same playbook, same survey, different intent.'
-4. <strong>Show the report:</strong> Navigate to the reports server and open the patching report. Walk through the per-host breakdown of applied updates.
-5. <strong>Insights integration:</strong> If Insights Client is configured, show how the post-patch scan updates the host profile in Red Hat Insights automatically.
-6. <strong>Connect to the bigger picture:</strong> 'For a full enterprise workflow with snapshots and rollback, check out Patch Cloud Stack in AWS.'
+1. **Explain check mode:** Show the audience that this template defaults to check mode. 'We can audit what would change before we touch a single package.'
+2. **Launch in check mode:** Run against a group of RHEL hosts. Walk through the output — which packages would be updated, which hosts are already current.
+3. **Switch to run mode:** Re-launch the job and change the job type to Run. 'Now we apply the patches for real — same playbook, same survey, different intent.'
+4. **Show the report:** Navigate to the reports server and open the patching report. Walk through the per-host breakdown of applied updates.
+5. **Insights integration:** If Insights Client is configured, show how the post-patch scan updates the host profile in Red Hat Insights automatically.
+6. **Connect to the bigger picture:** 'For a full enterprise workflow with snapshots and rollback, check out Patch Cloud Stack in AWS.'
 
 ## Talking points
 

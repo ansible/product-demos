@@ -6,7 +6,7 @@ Creates an AWS EC2 keypair from the SSH public key attached to the APD Machine C
 ## Prerequisites
 
 - AWS credential configured
-- <strong>APD Machine Credential</strong> with an SSH private key
+- **APD Machine Credential** with an SSH private key
 
 ## Job templates
 

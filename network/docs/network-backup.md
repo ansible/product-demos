@@ -6,7 +6,7 @@ Backs up running configurations from network devices to a report server. Sets up
 ## Prerequisites
 
 - Network devices (routers) in inventory
-- A <code>reports</code> host for storing backups
+- A `reports` host for storing backups
 - Network credentials configured
 
 ## Job templates

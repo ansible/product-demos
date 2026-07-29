@@ -5,7 +5,7 @@ Deploys an Event-Driven Ansible (EDA) Controller on OpenShift, connected to the 
 
 ## Prerequisites
 
-- <strong>OpenShift Credential</strong> configured with API token
+- **OpenShift Credential** configured with API token
 - Cluster admin access to the target OpenShift cluster
 
 ## Job templates

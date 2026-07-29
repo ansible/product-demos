@@ -15,10 +15,10 @@ Compliance Report ──→ Update Inventory ──→ Compliance Enforce
 
 ## Prerequisites
 
-- RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>
-- SSH connectivity via <strong>APD Machine Credential</strong>
+- RHEL hosts in the **Ansible Product Demos Inventory**
+- SSH connectivity via **APD Machine Credential**
 - AWS credential configured (for inventory sync step)
-- (Recommended) Run <strong>Deploy Cloud Stack in AWS</strong> first to create target VMs
+- (Recommended) Run **Deploy Cloud Stack in AWS** first to create target VMs
 
 ## Survey prompts
 
@@ -46,12 +46,12 @@ Compliance Report ──→ Update Inventory ──→ Compliance Enforce
 
 ## Presenter walkthrough
 
-1. <strong>Choose a profile:</strong> Show the survey and explain the compliance profile options. 'CIS and STIG are the most common — pick one that matches your audience.'
-2. <strong>Launch the workflow:</strong> Start the workflow and show the three-node chain: Report → Inventory Sync → Enforce.
-3. <strong>Review the initial report:</strong> While the workflow runs, explain that the first node scans and generates an HTML report. 'This is our baseline — here is where we stand before remediation.'
-4. <strong>Inventory sync:</strong> Point out the middle node. 'We refresh inventory between scan and enforce to make sure we are working with the latest host data.'
-5. <strong>Enforcement results:</strong> After completion, show the enforce job output. Highlight specific remediation tasks that changed. 'Each of these is a compliance control being applied automatically.'
-6. <strong>Re-run the report:</strong> For maximum impact, re-run just the compliance report template and compare before and after scores.
+1. **Choose a profile:** Show the survey and explain the compliance profile options. 'CIS and STIG are the most common — pick one that matches your audience.'
+2. **Launch the workflow:** Start the workflow and show the three-node chain: Report → Inventory Sync → Enforce.
+3. **Review the initial report:** While the workflow runs, explain that the first node scans and generates an HTML report. 'This is our baseline — here is where we stand before remediation.'
+4. **Inventory sync:** Point out the middle node. 'We refresh inventory between scan and enforce to make sure we are working with the latest host data.'
+5. **Enforcement results:** After completion, show the enforce job output. Highlight specific remediation tasks that changed. 'Each of these is a compliance control being applied automatically.'
+6. **Re-run the report:** For maximum impact, re-run just the compliance report template and compare before and after scores.
 
 ## Talking points
 

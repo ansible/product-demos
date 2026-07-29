@@ -5,9 +5,9 @@ Registers RHEL hosts with a Red Hat Satellite server. Uses the demo.satellite.re
 
 ## Prerequisites
 
-- RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>
-- <strong>Satellite Collection</strong> credential configured
-- Run <strong>APD | Single demo setup</strong> with <code>satellite</code>
+- RHEL hosts in the **Ansible Product Demos Inventory**
+- **Satellite Collection** credential configured
+- Run **APD | Single demo setup** with `satellite`
 
 ## Survey prompts
 

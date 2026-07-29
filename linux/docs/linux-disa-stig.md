@@ -5,8 +5,8 @@ Applies DISA STIG (Security Technical Implementation Guide) hardening to RHEL ho
 
 ## Prerequisites
 
-- RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>
-- SSH connectivity via <strong>APD Machine Credential</strong>
+- RHEL hosts in the **Ansible Product Demos Inventory**
+- SSH connectivity via **APD Machine Credential**
 
 ## Survey prompts
 

@@ -5,7 +5,7 @@ Creates a new Active Directory user with full attributes -- name, department, co
 
 ## Prerequisites
 
-- An Active Directory domain (deployed by <strong>Setup Active Directory Domain</strong> workflow)
+- An Active Directory domain (deployed by **Setup Active Directory Domain** workflow)
 - Domain controller accessible via WinRM
 
 ## Survey prompts

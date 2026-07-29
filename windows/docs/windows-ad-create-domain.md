@@ -6,7 +6,7 @@ Promotes a Windows Server to a domain controller and creates a new Active Direct
 ## Prerequisites
 
 - A Windows Server VM not yet joined to a domain
-- WinRM connectivity via <strong>APD Machine Credential</strong>
+- WinRM connectivity via **APD Machine Credential**
 
 
 ## Survey prompts

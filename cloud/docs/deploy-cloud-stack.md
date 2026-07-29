@@ -5,8 +5,8 @@ Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Wind
 
 ## Prerequisites
 
-- <strong>If using RHDP (demo.redhat.com):</strong> Run <strong>APD | Multi-demo setup</strong> to configure all templates and credentials. AWS and APD Machine credentials are pre-configured for you.
-- <strong>If using your own installation:</strong> Run <strong>APD | Single demo setup</strong> and choose <code>cloud</code>. Configure the <strong>AWS</strong> credential with your Access Key and Secret Key, and add an SSH private key to <strong>APD Machine Credential</strong>.
+- **If using RHDP (demo.redhat.com):** Run **APD | Multi-demo setup** to configure all templates and credentials. AWS and APD Machine credentials are pre-configured for you.
+- **If using your own installation:** Run **APD | Single demo setup** and choose `cloud`. Configure the **AWS** credential with your Access Key and Secret Key, and add an SSH private key to **APD Machine Credential**.
 
 ## Survey prompts
 
@@ -43,12 +43,12 @@ Create VPC ──────┘            ├──→ aws_win1 (Windows Core)
 
 ## Presenter walkthrough
 
-1. <strong>Show the survey:</strong> Walk through each field — region, owner, environment. Explain how surveys make self-service provisioning safe.
-2. <strong>Launch:</strong> Start the workflow. As nodes light up, explain the sequence: keypair → VPC → parallel VM creation → inventory sync.
-3. <strong>Parallel VM creation:</strong> Point out that all five VMs deploy simultaneously. 'This is the power of workflow nodes — parallel execution with dependency management.'
-4. <strong>Inventory sync:</strong> After VMs are created, the dynamic inventory syncs automatically. Show the new hosts appearing in AAP.
-5. <strong>VPC report:</strong> Show the S3 report — a visual summary of what was built.
-6. <strong>Transition:</strong> 'Now that we have infrastructure, let's do something with it' — pivot to patching, compliance, or other demos.
+1. **Show the survey:** Walk through each field — region, owner, environment. Explain how surveys make self-service provisioning safe.
+2. **Launch:** Start the workflow. As nodes light up, explain the sequence: keypair → VPC → parallel VM creation → inventory sync.
+3. **Parallel VM creation:** Point out that all five VMs deploy simultaneously. 'This is the power of workflow nodes — parallel execution with dependency management.'
+4. **Inventory sync:** After VMs are created, the dynamic inventory syncs automatically. Show the new hosts appearing in AAP.
+5. **VPC report:** Show the S3 report — a visual summary of what was built.
+6. **Transition:** 'Now that we have infrastructure, let's do something with it' — pivot to patching, compliance, or other demos.
 
 ## Related demos
 

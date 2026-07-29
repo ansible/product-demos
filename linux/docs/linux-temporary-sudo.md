@@ -5,8 +5,8 @@ Grants temporary sudo access to a user for a configurable duration. Creates a su
 
 ## Prerequisites
 
-- Linux hosts in the <strong>Ansible Product Demos Inventory</strong>
-- SSH connectivity via <strong>APD Machine Credential</strong>
+- Linux hosts in the **Ansible Product Demos Inventory**
+- SSH connectivity via **APD Machine Credential**
 - The target user must exist on the system
 
 ## Survey prompts

@@ -5,8 +5,8 @@ Scans hosts and gathers package and service facts. This populates the AAP fact c
 
 ## Prerequisites
 
-- Linux hosts in the <strong>Ansible Product Demos Inventory</strong>
-- SSH connectivity via <strong>APD Machine Credential</strong>
+- Linux hosts in the **Ansible Product Demos Inventory**
+- SSH connectivity via **APD Machine Credential**
 
 ## Survey prompts
 

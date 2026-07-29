@@ -5,7 +5,7 @@ A generic rollback playbook used as a cleanup step in Windows workflows. Outputs
 
 ## Prerequisites
 
-- Windows hosts in the <strong>Ansible Product Demos Inventory</strong>
+- Windows hosts in the **Ansible Product Demos Inventory**
 
 
 ## Survey prompts

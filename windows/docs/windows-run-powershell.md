@@ -5,8 +5,8 @@ Runs an arbitrary PowerShell script on target Windows hosts. The script content 
 
 ## Prerequisites
 
-- Windows hosts in the <strong>Ansible Product Demos Inventory</strong>
-- WinRM connectivity via <strong>APD Machine Credential</strong>
+- Windows hosts in the **Ansible Product Demos Inventory**
+- WinRM connectivity via **APD Machine Credential**
 
 ## Survey prompts
 

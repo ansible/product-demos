@@ -7,7 +7,7 @@ Launches an EC2 instance from a blueprint definition. Blueprints are YAML files 
 
 - AWS credential configured
 - A VPC, subnet, security group, and keypair already created
-- A blueprint file under <code>cloud/blueprints/</code>
+- A blueprint file under `cloud/blueprints/`
 
 ## Survey prompts
 

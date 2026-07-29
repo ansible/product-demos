@@ -5,7 +5,7 @@ Deploys GitLab on an OpenShift cluster using the GitLab Operator. Installs cert-
 
 ## Prerequisites
 
-- <strong>OpenShift Credential</strong> configured with API token
+- **OpenShift Credential** configured with API token
 - Cluster admin access
 - Sufficient cluster resources for GitLab
 

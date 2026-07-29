@@ -6,7 +6,7 @@ Provisions a RHEL virtual machine on OpenShift Virtualization (CNV) using the Ku
 ## Prerequisites
 
 - OpenShift Virtualization installed
-- <strong>OpenShift Credential</strong> configured
+- **OpenShift Credential** configured
 - RHEL OS images available in openshift-virtualization-os-images namespace
 
 ## Survey prompts

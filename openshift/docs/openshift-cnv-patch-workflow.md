@@ -22,7 +22,7 @@ Take Snapshot ──→ Project Sync  ──┐
 ## Prerequisites
 
 - RHEL VMs provisioned on OpenShift CNV
-- <strong>OpenShift Credential</strong> configured
+- **OpenShift Credential** configured
 - SSH connectivity to the CNV VMs
 
 ## Job templates

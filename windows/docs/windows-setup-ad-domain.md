@@ -34,8 +34,8 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 
 - AWS credential configured with Access and Secret key
 - SSH public key for AWS keypair creation
-- <strong>APD Machine Credential</strong> with Windows administrator credentials
-- <strong>AAP Credential</strong> for Controller API callbacks during domain creation
+- **APD Machine Credential** with Windows administrator credentials
+- **AAP Credential** for Controller API callbacks during domain creation
 
 ## Survey prompts
 
@@ -52,7 +52,7 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Cloud ǀ AWS ǀ Create Keypair | [`cloud/create_keypair.yml`](../../cloud/create_keypair.yml) | Creates an SSH keypair in the target AWS region |
+| Cloud ǀ AWS ǀ Create Keypair | [`cloud/aws_key.yml`](../../cloud/aws_key.yml) | Creates an SSH keypair in the target AWS region |
 | Cloud ǀ AWS ǀ Create VPC | [`cloud/create_vpc.yml`](../../cloud/create_vpc.yml) | Provisions VPC, subnet, security group, and internet gateway |
 | Cloud ǀ AWS ǀ Create VM (Domain Controller) | [`cloud/create_vm.yml`](../../cloud/create_vm.yml) | Deploys the dc01 Windows Server instance as domain controller |
 | Cloud ǀ AWS ǀ Create VM (Computer 1 - winston) | [`cloud/create_vm.yml`](../../cloud/create_vm.yml) | Deploys the winston Windows Server instance as domain computer |
@@ -75,12 +75,12 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 
 ## Presenter walkthrough
 
-1. <strong>Set the stage:</strong> Show the empty inventory — no domain hosts exist yet. Explain that the workflow will build everything from scratch.
-2. <strong>Walk through the survey:</strong> Fill in the region, owner, environment, subnet, and security group. 'Surveys make this self-service — a helpdesk operator does not need AWS console access.'
-3. <strong>Launch and watch parallel creation:</strong> Point out the three VM nodes running simultaneously after VPC creation. 'One domain controller and two member computers, all deploying in parallel.'
-4. <strong>Domain promotion:</strong> After connectivity tests pass, the workflow promotes dc01 to a domain controller. 'This is the equivalent of running dcpromo — fully automated.'
-5. <strong>Domain join:</strong> Show winston and winthrop joining the domain. 'These machines are now domain members, ready for Group Policy, user management, and Kerberos auth.'
-6. <strong>Validation:</strong> Highlight the dual validation — PowerShell queries AD for joined computers, Kerberos checks security event logs. 'We verify the domain actually works, not just that VMs exist.'
+1. **Set the stage:** Show the empty inventory — no domain hosts exist yet. Explain that the workflow will build everything from scratch.
+2. **Walk through the survey:** Fill in the region, owner, environment, subnet, and security group. 'Surveys make this self-service — a helpdesk operator does not need AWS console access.'
+3. **Launch and watch parallel creation:** Point out the three VM nodes running simultaneously after VPC creation. 'One domain controller and two member computers, all deploying in parallel.'
+4. **Domain promotion:** After connectivity tests pass, the workflow promotes dc01 to a domain controller. 'This is the equivalent of running dcpromo — fully automated.'
+5. **Domain join:** Show winston and winthrop joining the domain. 'These machines are now domain members, ready for Group Policy, user management, and Kerberos auth.'
+6. **Validation:** Highlight the dual validation — PowerShell queries AD for joined computers, Kerberos checks security event logs. 'We verify the domain actually works, not just that VMs exist.'
 
 ## Talking points
 

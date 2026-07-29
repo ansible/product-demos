@@ -5,7 +5,7 @@ Promotes a Satellite content view version from one lifecycle environment to anot
 
 ## Prerequisites
 
-- <strong>Satellite Collection</strong> credential configured
+- **Satellite Collection** credential configured
 - A published content view version to promote
 
 ## Survey prompts

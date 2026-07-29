@@ -5,7 +5,7 @@ Deploys the OpenShift Virtualization (CNV) operator on an OpenShift cluster, cre
 
 ## Prerequisites
 
-- <strong>OpenShift Credential</strong> configured with API token
+- **OpenShift Credential** configured with API token
 - Cluster admin access with bare-metal or nested-virt capable nodes
 
 ## Job templates

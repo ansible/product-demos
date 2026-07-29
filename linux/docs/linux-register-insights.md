@@ -5,9 +5,9 @@ Registers RHEL EC2 instances with Red Hat Subscription Manager using an activati
 
 ## Prerequisites
 
-- RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>
-- SSH connectivity via <strong>APD Machine Credential</strong>
-- <strong>RHSM Registration</strong> credential with org ID and activation key
+- RHEL hosts in the **Ansible Product Demos Inventory**
+- SSH connectivity via **APD Machine Credential**
+- **RHSM Registration** credential with org ID and activation key
 
 ## Survey prompts
 

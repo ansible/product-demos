@@ -5,7 +5,7 @@ Publishes a new version of a Satellite content view to a specified lifecycle env
 
 ## Prerequisites
 
-- <strong>Satellite Collection</strong> credential configured
+- **Satellite Collection** credential configured
 - Content views already defined in Satellite
 
 ## Survey prompts

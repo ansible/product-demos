@@ -5,8 +5,8 @@ Installs a Linux application package via DNF. Supports version pinning with allo
 
 ## Prerequisites
 
-- Linux hosts in the <strong>Ansible Product Demos Inventory</strong>
-- SSH connectivity via <strong>APD Machine Credential</strong>
+- Linux hosts in the **Ansible Product Demos Inventory**
+- SSH connectivity via **APD Machine Credential**
 
 ## Survey prompts
 

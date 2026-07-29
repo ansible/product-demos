@@ -5,7 +5,7 @@ Joins Windows hosts to an existing Active Directory domain. Sets the DNS client 
 
 ## Prerequisites
 
-- An existing AD domain (created by <strong>WINDOWS | AD | Create Domain</strong>)
+- An existing AD domain (created by **WINDOWS | AD | Create Domain**)
 - Domain controller private IP accessible from target hosts
 
 

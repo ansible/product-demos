@@ -5,7 +5,7 @@ Applies remediation for a compliance profile (CIS, HIPAA, OSPP, PCI-DSS, or STIG
 
 ## Prerequisites
 
-- RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>
+- RHEL hosts in the **Ansible Product Demos Inventory**
 - A prior compliance scan that populated the out-of-compliance inventory group
 
 

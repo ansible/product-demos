@@ -5,7 +5,7 @@ Deploys Red Hat OpenShift Dev Spaces on an OpenShift cluster. Creates the namesp
 
 ## Prerequisites
 
-- <strong>OpenShift Credential</strong> configured with API token
+- **OpenShift Credential** configured with API token
 - Cluster admin access to the target OpenShift cluster
 
 ## Job templates

@@ -7,7 +7,7 @@ Deploys golden configurations to Cisco IOS, IOS-XR, and NX-OS network devices us
 
 - Network devices in inventory (Cisco IOS, IOS-XR, and/or NX-OS)
 - Network credentials configured
-- Run <strong>APD | Single demo setup</strong> with <code>network</code>
+- Run **APD | Single demo setup** with `network`
 
 ## Survey prompts
 

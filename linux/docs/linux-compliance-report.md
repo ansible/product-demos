@@ -6,7 +6,7 @@ Runs an OpenSCAP scan against a selected compliance profile and generates an HTM
 ## Prerequisites
 
 - RHEL hosts with at least 2 GB RAM
-- SSH connectivity via <strong>APD Machine Credential</strong>
+- SSH connectivity via **APD Machine Credential**
 
 ## Survey prompts
 

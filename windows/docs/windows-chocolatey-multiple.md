@@ -5,8 +5,8 @@ Installs multiple packages (Node.js and Python by default) using the Chocolatey 
 
 ## Prerequisites
 
-- Windows hosts in the <strong>Ansible Product Demos Inventory</strong>
-- WinRM connectivity via <strong>APD Machine Credential</strong>
+- Windows hosts in the **Ansible Product Demos Inventory**
+- WinRM connectivity via **APD Machine Credential**
 - Internet access from the Windows hosts
 
 

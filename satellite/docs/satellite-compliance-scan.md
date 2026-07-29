@@ -7,7 +7,7 @@ Runs OpenSCAP compliance scans on Satellite-managed hosts and uploads results to
 
 - Hosts registered with Satellite
 - Compliance policies configured in Satellite
-- <strong>Satellite Collection</strong> credential configured
+- **Satellite Collection** credential configured
 
 ## Survey prompts
 

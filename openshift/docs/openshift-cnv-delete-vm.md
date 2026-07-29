@@ -6,7 +6,7 @@ Deletes one or more virtual machines from OpenShift Virtualization. Removes the 
 ## Prerequisites
 
 - Existing CNV VMs to delete
-- <strong>OpenShift Credential</strong> configured
+- **OpenShift Credential** configured
 
 
 ## Survey prompts

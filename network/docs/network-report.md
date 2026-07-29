@@ -7,7 +7,7 @@ Generates an HTML network report by gathering facts from Cisco IOS, IOS-XR, and 
 
 - Network devices in inventory
 - Network credentials configured
-- A <code>reports</code> host for publishing the HTML report
+- A `reports` host for publishing the HTML report
 
 ## Survey prompts
 

@@ -6,7 +6,7 @@ Generates an HTML report of the current AWS VPC infrastructure -- instances, net
 ## Prerequisites
 
 - AWS credential configured
-- Existing infrastructure deployed (e.g., via <strong>Deploy Cloud Stack in AWS</strong>)
+- Existing infrastructure deployed (e.g., via **Deploy Cloud Stack in AWS**)
 
 ## Job templates
 

@@ -5,8 +5,8 @@ Deploys a containerized Apache httpd webserver using Podman. Installs Podman, cr
 
 ## Prerequisites
 
-- RHEL hosts in the <strong>Ansible Product Demos Inventory</strong>
-- SSH connectivity via <strong>APD Machine Credential</strong>
+- RHEL hosts in the **Ansible Product Demos Inventory**
+- SSH connectivity via **APD Machine Credential**
 
 ## Survey prompts
 
