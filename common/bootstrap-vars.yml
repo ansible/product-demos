@@ -42,7 +42,7 @@ controller_credentials:
       password: '{{ aap_password | default(omit) }}'
       oauth_token: '{{ aap_token | default(omit) }}'
       verify_ssl: '{{ aap_validate_certs }}'
-      request_timeout: 10
+      request_timeout: '10'
 
   - name: Automation Hub Certified Content
     organization: Ansible Product Demos (APD)
