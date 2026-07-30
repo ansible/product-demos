@@ -43,11 +43,11 @@
       ansible.builtin.set_fact:
         apd_ee_image_version: '{{ _gateway_ping.json.version | replace(".", "") }}'
 
-    - name: Include product-demos-postinstall variables
+    - name: Include APD bootstrap variables
       ansible.builtin.include_vars:
         file: common/bootstrap-vars.yml
 
-    - name: Execute automation controller resource configuration
+    - name: Run dispatcher to create APD resources
       ansible.builtin.include_role:
         name: infra.aap_configuration.dispatch
 
