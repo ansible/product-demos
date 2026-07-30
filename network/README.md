@@ -11,11 +11,20 @@
 ## About These Demos
 This category of demos shows examples of network operations and management with Ansible Automation Platform. The list of demos can be found below. See the [Suggested Usage](#suggested-usage) section of this document for recommendations on how to best use these demos.
 
-- [**NETWORK / Report**](./report.yml) - Use this job to gather facts from Cisco Network devices and create a report
-- [**NETWORK / Configuration**](https://github.com/nleiva/ansible-net-modules/blob/main/main.yml) - Deploy golden configurations for different resources to Cisco IOS, IOSXR, and NXOS.
-- [**NETWORK / DISA STIG**](./compliance.yml) - Use this job to run the DISA STIG role and show how Ansible can be used for configuration compliance of network devices.
-- [**NETWORK / BACKUP**](./backup.yml) - Use this job to show how Ansible can be used to backup network devices using Red Hat validated content.
-- [**NETWORK / PANOS**](./panos/README.md) - Use this demo to deploy and manage a Palo Alto Firewall instance with the certified panos collection.
+### Workflows
+
+| Workflow | Description |
+|----------|-------------|
+| [**Palo Alto Firewall Demo**](docs/network-panos-workflow.md) | End-to-end Palo Alto firewall workflow: deploy, configure, validate, and clean up a PAN-OS instance using the certified panos collection. |
+
+### Jobs
+
+| Job Template | Description |
+|--------------|-------------|
+| [**Report**](docs/network-report.md) | Gather facts from Cisco network devices and generate an HTML report with interface, routing, and configuration details. |
+| [**Golden Configuration**](docs/network-configuration.md) | Deploy golden configurations for different resources (ACLs, BGP, OSPF, NTP, etc.) to Cisco IOS, IOSXR, and NXOS using Network Resource Modules. |
+| [**DISA STIG**](docs/network-disa-stig.md) | Run the DISA STIG role in check mode to assess configuration compliance of Cisco IOS network devices. |
+| [**Backup**](docs/network-backup.md) | Back up network device configurations using Red Hat validated content and publish them to a report server. |
 
 To run the demos, deploy them using Infrastructure as Code, run either the "Product Demos | Multi-demo setup" or the "Product Demos | Single demo setup" and select 'Network' in the "Product Demos" deployment, or utilize the steps in the repo level README.
 

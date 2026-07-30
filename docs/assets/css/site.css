@@ -629,6 +629,135 @@ a {
   white-space: nowrap;
 }
 
+/* ── Detail page body (markdown content) ─────────────────────── */
+.detail-body {
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+/* 1 + 6 + 7: Styled tables with sticky headers and zebra-striping */
+.detail-body table {
+  width: 100%;
+  max-width: 760px;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin: 0 0 8px;
+}
+
+.detail-body table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border-bottom: 2px solid var(--accent-dim);
+}
+
+.detail-body table td {
+  padding: 10px 14px;
+  text-align: left;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-body table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.detail-body table tbody tr:hover td {
+  background: var(--bg-surface-hover);
+}
+
+.detail-body table a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.detail-body table a:hover {
+  text-decoration: underline;
+  color: var(--green-300);
+}
+
+/* 10: Playbook links as green pill chips */
+.detail-body table code {
+  font-size: 12px;
+  background: var(--green-900);
+  border: 1px solid var(--accent-dim);
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: var(--green-300);
+  white-space: nowrap;
+}
+
+/* Hide the h1 from markdown — the layout already renders the title */
+.detail-body > h1:first-child {
+  display: none;
+}
+
+/* 4: Lead paragraph — first visible <p> in detail-body is larger */
+.detail-body > p:first-of-type {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text-primary);
+  max-width: 720px;
+  margin-bottom: 28px;
+}
+
+/* 8: Section spacing and dividers between h2 sections */
+.detail-body h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin: 40px 0 14px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.detail-body h2:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* 5: Prerequisites callout box */
+.detail-body h2 + ul,
+.detail-body h2 + ol {
+  max-width: 720px;
+  padding-left: 1.25rem;
+  line-height: 1.7;
+}
+
+.detail-body h2 + ul li,
+.detail-body h2 + ol li {
+  margin-bottom: 8px;
+}
+
+/* Special styling when heading is "Prerequisites" */
+.detail-body .prereq-box {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  background: var(--bg-surface);
+  padding: 16px 20px;
+  max-width: 720px;
+}
+
+/* 9: Related demos section gets card-like rows */
+.detail-body table:last-of-type tbody tr {
+  transition: background 0.15s;
+}
+
+.detail-body table:last-of-type tbody tr:hover td {
+  background: var(--bg-surface);
+}
+
 /* ── Detail page ─────────────────────────────────────────────── */
 .detail-hero {
   margin-bottom: 32px;
@@ -844,6 +973,27 @@ a {
   padding: 2px 6px;
   border-radius: 4px;
   color: var(--text-primary);
+}
+
+/* Video embed — responsive 16:9 iframe */
+.detail-video {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #000;
+}
+
+.detail-video iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .workflow-diagram {
