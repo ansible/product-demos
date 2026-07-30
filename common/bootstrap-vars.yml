@@ -1,7 +1,7 @@
 ---
 # override these with extra vars if needed
-#apd_ee_image_version: '26'  # now retrieved from the API programmatically
 apd_ee_image_tag: latest
+# apd_ee_image_version set in install-apd.yml playbook
 apd_ee_image: quay.io/ansible-product-demos/apd-ee-{{ apd_ee_image_version }}:{{ apd_ee_image_tag }}
 apd_git_repo: https://github.com/ansible/product-demos
 apd_git_repo_branch: main
@@ -40,7 +40,7 @@ controller_credentials:
       host: '{{ aap_hostname }}'
       username: '{{ aap_username | default(omit) }}'
       password: '{{ aap_password | default(omit) }}'
-      oauth_token: '{{ aap_token | default(omit) }}'
+      oauth_token: '{{ aap_token | default(omit, true) }}'
       verify_ssl: '{{ aap_validate_certs }}'
       request_timeout: '10'
 
