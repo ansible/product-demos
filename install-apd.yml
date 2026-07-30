@@ -3,14 +3,23 @@
   hosts: localhost
   gather_facts: false
 
+  vars:
+    # version 2.7 of the ansible.platform collection broke environment variable fallback
+    # so these variables are set as a workaround
+    aap_hostname: '{{ lookup("env", "AAP_HOSTNAME") | default(omit, true) }}'
+    aap_username: '{{ lookup("env", "AAP_USERNAME") | default(omit, true) }}'
+    aap_password: '{{ lookup("env", "AAP_PASSWORD") | default(omit, true) }}'
+    aap_token: '{{ lookup("env", "AAP_TOKEN") | default(omit, true) }}'
+    aap_validate_certs: '{{ lookup("env", "AAP_VALIDATE_CERTS") | default(false, true) }}'
+
   tasks:
     - name: Make sure AAP credential environment variables are set
       ansible.builtin.assert:
         that:
-          - lookup('env', 'AAP_HOSTNAME') != ''
+          - aap_hostname is defined
           - >
-            lookup('env', 'AAP_TOKEN') != '' or
-            (lookup('env', 'AAP_USERNAME') != '' and lookup('env', 'AAP_PASSWORD') != '')
+            aap_token is defined or
+            (aap_username is defined and aap_password is defined)
         fail_msg:
           - 'Please ensure the following environment variables are set:'
           - '  export AAP_HOSTNAME=https://your-aap-server.example.com'
@@ -19,6 +28,20 @@
           - '    # or a username and password for basic auth'
           - '  export AAP_USERNAME=admin  # or another user with AAP superuser privileges'
           - '  export AAP_PASSWORD=<admin-user-password>'
+
+    - name: Query AAP version from the API
+      ansible.builtin.uri:
+        url: "{{ aap_hostname | regex_replace('/$', '') }}/api/gateway/v1/ping/"
+        method: GET
+        validate_certs: '{{ aap_validate_certs }}'
+        url_username: "{{ aap_username | default(omit) }}"
+        url_password: "{{ aap_password | default(omit) }}"
+        headers: "{{ {'Authorization': 'Bearer ' + aap_token} if aap_token is defined else omit }}"
+      register: _gateway_ping
+
+    - name: Set APD EE image version fact based on AAP version
+      ansible.builtin.set_fact:
+        apd_ee_image_version: '{{ _gateway_ping.json.version | replace(".", "") }}'
 
     - name: Include product-demos-postinstall variables
       ansible.builtin.include_vars:
