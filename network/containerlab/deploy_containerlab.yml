@@ -22,7 +22,11 @@
         name: clab-hypervisor
         ansible_host: "{{ clab_host_ip }}"
         ansible_user: "{{ clab_aws_admin_user }}"
+<<<<<<< HEAD
         ansible_ssh_private_key_file: "{{ (lookup('ansible.builtin.env', 'AWX_HOST') | length > 0) | ternary(omit, playbook_dir + '/' + clab_aws_keypair_name + '.pem') }}"
+=======
+        ansible_ssh_private_key_file: "{{ playbook_dir }}/{{ clab_aws_keypair_name }}.pem"
+>>>>>>> 192009e (feat: add containerlab network demo with AWS nested virtualization)
         ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
         groups: clab_hosts
 
@@ -35,6 +39,7 @@
     - vars/main.yml
 
   tasks:
+<<<<<<< HEAD
     - name: Find EBS data volume
       ansible.builtin.shell:
         cmd: >-
@@ -62,6 +67,12 @@
       community.general.filesystem:
         fstype: xfs
         dev: "{{ clab_ebs_device }}"
+=======
+    - name: Format EBS volume
+      community.general.filesystem:
+        fstype: xfs
+        dev: "{{ clab_aws_ebs_nvme_device }}"
+>>>>>>> 192009e (feat: add containerlab network demo with AWS nested virtualization)
 
     - name: Create mount point
       ansible.builtin.file:
@@ -72,7 +83,11 @@
     - name: Mount EBS volume
       ansible.posix.mount:
         path: "{{ clab_aws_ebs_mount }}"
+<<<<<<< HEAD
         src: "{{ clab_ebs_device }}"
+=======
+        src: "{{ clab_aws_ebs_nvme_device }}"
+>>>>>>> 192009e (feat: add containerlab network demo with AWS nested virtualization)
         fstype: xfs
         state: mounted
 

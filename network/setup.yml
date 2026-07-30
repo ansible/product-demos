@@ -150,7 +150,10 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
+<<<<<<< HEAD
       - AAP Credential
+=======
+>>>>>>> 192009e (feat: add containerlab network demo with AWS nested virtualization)
     project: Ansible Product Demos
     playbook: network/containerlab/provision_hypervisor.yml
     inventory: Ansible Product Demos Inventory
@@ -189,7 +192,11 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
+<<<<<<< HEAD
       - Containerlab SSH
+=======
+      - APD Machine Credential
+>>>>>>> 192009e (feat: add containerlab network demo with AWS nested virtualization)
     project: Ansible Product Demos
     playbook: network/containerlab/deploy_containerlab.yml
     inventory: Ansible Product Demos Inventory
@@ -202,7 +209,11 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
+<<<<<<< HEAD
       - Containerlab SSH
+=======
+      - APD Machine Credential
+>>>>>>> 192009e (feat: add containerlab network demo with AWS nested virtualization)
     project: Ansible Product Demos
     playbook: network/containerlab/teardown_containerlab.yml
     inventory: Ansible Product Demos Inventory
@@ -210,6 +221,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
 
+<<<<<<< HEAD
   - name: "NETWORK | Containerlab | Configure Devices"
     job_type: run
     organization: Ansible Product Demos (APD)
@@ -235,6 +247,8 @@ controller_templates:
             - us-east-2
             - us-west-2
 
+=======
+>>>>>>> 192009e (feat: add containerlab network demo with AWS nested virtualization)
   - name: "NETWORK | Containerlab | Teardown Hypervisor"
     job_type: run
     organization: Ansible Product Demos (APD)

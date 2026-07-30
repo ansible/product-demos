@@ -35,7 +35,24 @@
         state: absent
         instance_ids: "{{ clab_instances.instances | map(attribute='instance_id') | list }}"
         region: "{{ clab_aws_region }}"
+<<<<<<< HEAD
         wait: true
+=======
+      when: clab_instances.instances | length > 0
+
+    - name: Wait for instances to terminate
+      amazon.aws.ec2_instance_info:
+        region: "{{ clab_aws_region }}"
+        instance_ids: "{{ clab_instances.instances | map(attribute='instance_id') | list }}"
+        filters:
+          instance-state-name: terminated
+      register: clab_terminated
+      until: >-
+        clab_terminated.instances | length ==
+        clab_instances.instances | length
+      retries: 30
+      delay: 10
+>>>>>>> 192009e (feat: add containerlab network demo with AWS nested virtualization)
       when: clab_instances.instances | length > 0
 
     - name: Look up VPC
