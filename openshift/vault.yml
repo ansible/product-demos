@@ -1,0 +1,17 @@
+---
+- name: Deploy HashiCorp Vault on OpenShift
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Run demo.openshift.vault
+      loop:
+        - install_k8s
+        # - configure_jwt_auth # enable when OIDC feature is GA
+        - configure_kv_engine
+        - configure_userpass_auth
+      loop_control:
+        loop_var: function
+        label: "{{ function }}"
+      ansible.builtin.include_role:
+        name: demo.openshift.vault
+        tasks_from: "{{ function }}"

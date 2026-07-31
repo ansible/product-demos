@@ -1,0 +1,18 @@
+---
+# Resolve vault_token for configure_* entry points. Prefer an explicit token or
+# one set by install_k8s in the same play; otherwise fall back to the Helm
+# chart dev-mode root token (no host-side init_data.json).
+- name: Set vault_token from Helm chart dev root token when unset
+  when: vault_token is not defined or (vault_token | default('') | length) == 0
+  no_log: "{{ vault_no_log | default(true) }}"
+  ansible.builtin.set_fact:
+    vault_token: "{{ vault_k8s_dev_root_token }}"
+
+- name: Require vault_token
+  ansible.builtin.assert:
+    fail_msg: >-
+      vault_token is required. Provide it explicitly, run install_k8s in the
+      same play first, or set vault_k8s_dev_root_token (Helm chart dev mode).
+    that:
+      - vault_token is defined
+      - vault_token | length > 0

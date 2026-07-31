@@ -1,0 +1,45 @@
+# Remove the Vault Helm release, OpenShift Route, and namespace.
+---
+- name: Check if Vault Helm release exists
+  register: vault_helm_info
+  changed_when: false
+  failed_when: false
+  kubernetes.core.helm_info:
+    name: "{{ vault_k8s_release_name }}"
+    release_namespace: "{{ vault_k8s_namespace }}"
+
+- name: Set installation type facts
+  ansible.builtin.set_fact:
+    _vault_k8s_installed: >-
+      {{ vault_helm_info.status is defined
+         and (vault_helm_info.status is mapping
+              or (vault_helm_info.status | length > 0)) }}
+
+- name: Remove Vault OpenShift Route
+  when:
+    - _vault_k8s_installed | bool
+    - vault_k8s_route_enabled | bool
+  failed_when: false
+  kubernetes.core.k8s:
+    api_version: route.openshift.io/v1
+    kind: Route
+    name: vault
+    namespace: "{{ vault_k8s_namespace }}"
+    state: absent
+
+- name: Uninstall Vault Helm release
+  when: _vault_k8s_installed | bool
+  kubernetes.core.helm:
+    name: "{{ vault_k8s_release_name }}"
+    release_namespace: "{{ vault_k8s_namespace }}"
+    state: absent
+    wait: true
+    wait_timeout: "{{ vault_k8s_helm_timeout }}"
+
+- name: Remove Vault namespace
+  when: _vault_k8s_installed | bool
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ vault_k8s_namespace }}"
+    state: absent

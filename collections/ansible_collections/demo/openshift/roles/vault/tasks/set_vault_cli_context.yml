@@ -1,0 +1,24 @@
+---
+# oc does not read K8S_AUTH_*. Auth flags are baked into vault_cli_base by
+# install_k8s (--server / --token / --insecure-skip-tls-verify). No kubeconfig.
+- name: Set vault CLI privilege context for Kubernetes
+  no_log: "{{ vault_no_log | default(true) }}"
+  vars:
+    _k8s_token_env: >-
+      {{ ('VAULT_TOKEN=' ~ vault_token ~ ' ')
+         if (vault_token is defined and (vault_token | length) > 0)
+         else '' }}
+    _k8s_cli_base: "{{ vault_cli_base | default(vault_cli) }}"
+  ansible.builtin.set_fact:
+    _vault_cli_become: false
+    _vault_cli_become_user: ""
+    _vault_cli_environment: {}
+    # Rebuild from vault_cli_base so repeated includes do not stack VAULT_TOKEN.
+    vault_cli: >-
+      {{ _k8s_cli_base | regex_replace(' -- env ', ' -- env ' ~ _k8s_token_env) }}
+
+- name: Resolve Vault CLI argv for stdin writes
+  no_log: "{{ vault_no_log | default(true) }}"
+  ansible.builtin.set_fact:
+    # Insert -i immediately after exec so stdin reaches vault in the pod.
+    _vault_cli_stdin_argv: "{{ vault_cli.split()[:vault_cli.split().index('exec') + 1] + ['-i'] + vault_cli.split()[vault_cli.split().index('exec') + 1:] }}"

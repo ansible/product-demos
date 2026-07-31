@@ -2,6 +2,7 @@
 **/navigator-output/
 **/ansible-builder.log
 **/vault*.yml
+!openshift/vault.yml
 sean_login_info.yml
 .DS_Store
 choose_demo.yml
