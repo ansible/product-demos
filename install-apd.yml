@@ -18,7 +18,7 @@
       ansible.builtin.assert:
         that:
           - aap_hostname is defined
-          - aap_token or (aap_username is defined and aap_password is defined)
+          - aap_token != "" or (aap_username is defined and aap_password is defined)
         fail_msg: |
           Please ensure the following environment variables are set:
             export AAP_HOSTNAME=https://your-aap-server.example.com
@@ -38,9 +38,9 @@
         headers: "{{ {'Authorization': 'Bearer ' + aap_token} if aap_token else {} }}"
       register: _gateway_ping
 
-    - name: Set APD EE image version fact based on AAP version
+    - name: Set AAP version fact
       ansible.builtin.set_fact:
-        apd_ee_image_version: '{{ _gateway_ping.json.version | replace(".", "") }}'
+        _aap_version: '{{ _gateway_ping.json.version }}'
 
     - name: Include APD bootstrap variables
       ansible.builtin.include_vars:
