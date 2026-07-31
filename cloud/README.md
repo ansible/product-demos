@@ -16,25 +16,28 @@
 ## About These Demos
 This category of demos shows examples of multi-cloud provisioning and management with Ansible Automation Platform. The list of demos can be found below. These demos are particularly helpful in building additional infrastructure for other demo categories such as Linux and Windows. See the [Suggested Usage](#suggested-usage) section of this document for recommendations on how to best use these demos.
 
-### Jobs
-
-- [**Cloud / AWS / Create VM**](create_vm.yml) - Create a VM based on a [blueprint](blueprints/) in the selected cloud provider
-- [**Cloud / AWS / Delete VM**](delete_vm_by_name.yml) - Terminate an EC2 instance by Name tag and region (no dynamic inventory required)
-- [**Cloud / AWS / Snapshot EC2**](snapshot_ec2.yml) - Snapshot a VM that has been created in a cloud provider. VM must be imported into dynamic inventory to be snapshot.
-- [**Cloud / AWS / Restore EC2 from Snapshot**](snapshot_ec2.yml) - Restore a VM that has been created in a cloud provider.  By default, volumes will be restored from their latest snapshot. VM must be imported into dynamic inventory to be patched.
-- [**Cloud / Resize EC2**](resize_ec2.yml) - Re-size an EC2 instance.
-
 ### Workflows
 
-- **Deploy Cloud Stack in AWS** - Provisions the full demo stack (VPC, keypair, five VMs, reports). See [Suggested Usage](#suggested-usage).
-- **Destroy Cloud Stack in AWS** - Tears down everything created by Deploy Cloud Stack in AWS. See [Suggested Usage](#suggested-usage).
-- **Patch Cloud Stack in AWS** - Snapshot, pre-check, patch, post-check (or restore on failure), and compliance report for both RHEL and Windows instances. See [Suggested Usage](#suggested-usage).
+| Workflow | Description |
+|----------|-------------|
+| [**Patch Cloud Stack in AWS**](docs/patch-cloud-stack.md) | Enterprise-grade patching workflow with EBS snapshots, parallel RHEL and Windows paths, automatic rollback on failure, and a consolidated compliance report. |
+| [**Deploy Cloud Stack in AWS**](docs/deploy-cloud-stack.md) | One-click workflow to provision a full demo stack — VPC, keypair, and five VMs (2 Windows, 2 RHEL, 1 report server) — with inventory sync and VPC report. |
+| [**Destroy Cloud Stack in AWS**](docs/cloud-destroy-stack.md) | Tear down all five stack VMs, VPC, and keypair created by Deploy Cloud Stack, then sync inventory. |
 
-### Inventory
+### Jobs
 
-A dynamic inventory is created to pull inventory hosts from cloud providers. The VM will be added by name therefore provisioning VMs with the same name will cause conflict in the inventory.
-
-Groups will be created based on the operating system (platform) of the VM provisioned as well as a group called `cloud_<cloud provider>`.
+| Job Template | Description |
+|--------------|-------------|
+| [**AWS — Create VPC**](docs/cloud-create-vpc.md) | Create an AWS VPC with subnet, security group, and route table in a selected region. |
+| [**AWS — Create Keypair**](docs/cloud-create-keypair.md) | Create an AWS EC2 keypair, deriving the public key from the APD Machine Credential's private key. |
+| [**AWS — Create VM**](docs/cloud-create-vm.md) | Create an EC2 instance from a blueprint (RHEL 7/8/9, Windows Core/Full, AL2023) with full tagging support. |
+| [**AWS — Delete VM**](docs/cloud-delete-vm.md) | Terminate an EC2 instance by Name tag and region. |
+| [**AWS — Resize EC2**](docs/cloud-resize-ec2.md) | Change the instance type of a running EC2 instance and refresh the AWS inventory. |
+| [**AWS — Snapshot EC2**](docs/cloud-snapshot-ec2.md) | Create EBS snapshots of EC2 instances for backup and recovery. |
+| [**AWS — Restore EC2 from Snapshot**](docs/cloud-restore-ec2.md) | Restore EC2 instance volumes from their latest EBS snapshot. |
+| [**AWS — Peer Networking**](docs/cloud-peer-networking.md) | Create or delete VPC peering infrastructure in AWS for direct network connectivity between VPCs. |
+| [**AWS — Transit Networking**](docs/cloud-transit-networking.md) | Create or delete transit gateway infrastructure in AWS for hub-and-spoke network connectivity. |
+| [**AWS — VPC Report**](docs/cloud-vpc-report.md) | Generate a VPC infrastructure report and publish it to an S3 bucket. |
 
 ## Post Setup Setup
 After running the setup job template, there are a few steps required to make the demos fully functional. See post setup actions below.

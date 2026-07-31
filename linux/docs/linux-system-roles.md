@@ -1,0 +1,28 @@
+# System Roles
+
+
+Applies one or more RHEL System Roles to target hosts. System Roles are a collection of Ansible roles for configuring common RHEL subsystems (timesync, network, storage, etc.) in a consistent, supported way.
+
+## Prerequisites
+
+- RHEL hosts in the **Ansible Product Demos Inventory**
+- SSH connectivity via **APD Machine Credential**
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Server Name or Pattern | `_hosts` | text | Yes |
+| System Roles | `system_roles` | multiselect | Yes |
+
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| LINUX ǀ System Roles | [`linux/system_roles.yml`](../system_roles.yml) | Applies selected RHEL System Roles (timesync, network, storage, etc.) to target hosts |
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| 🐧 [Install Web Console (Cockpit)](./linux-cockpit.md) | Install Cockpit web console using System Roles |
