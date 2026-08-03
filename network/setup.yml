@@ -119,7 +119,81 @@ controller_credentials:
     inputs:
       username: ec2-user
 
+controller_inventories:
+  - name: ContainerLab Inventory
+    organization: Ansible Product Demos (APD)
+    description: Containerlab network devices discovered via AWS EC2
+
+controller_hosts:
+  - name: n9kv
+    inventory: ContainerLab Inventory
+    enabled: true
+    variables:
+      ansible_port: 2122
+      ansible_user: admin
+      ansible_password: "admin@123"
+      ansible_network_os: cisco.nxos.nxos
+      ansible_connection: ansible.netcommon.network_cli
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+  - name: cat8kv
+    inventory: ContainerLab Inventory
+    enabled: true
+    variables:
+      ansible_port: 2123
+      ansible_user: admin
+      ansible_password: "admin@123"
+      ansible_network_os: cisco.ios.ios
+      ansible_connection: ansible.netcommon.network_cli
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+
+controller_groups:
+  - name: clab_nxos
+    inventory: ContainerLab Inventory
+    hosts:
+      - n9kv
+  - name: clab_ios
+    inventory: ContainerLab Inventory
+    hosts:
+      - cat8kv
+  - name: clab_switches
+    inventory: ContainerLab Inventory
+    hosts:
+      - n9kv
+  - name: clab_routers
+    inventory: ContainerLab Inventory
+    hosts:
+      - cat8kv
+  - name: containerlab
+    inventory: ContainerLab Inventory
+    children:
+      - clab_nxos
+      - clab_ios
+
 controller_inventory_sources:
+  - name: ContainerLab Hypervisor
+    organization: Ansible Product Demos (APD)
+    source: ec2
+    inventory: ContainerLab Inventory
+    credential: AWS
+    overwrite: false
+    overwrite_vars: true
+    update_on_launch: false
+    source_vars:
+      regions:
+        - us-east-2
+        - us-west-2
+      filters:
+        tag:deployment: containerlab
+        instance-state-name: running
+      compose:
+        ansible_host: public_ip_address
+        ansible_user: "'ec2-user'"
+      hostnames:
+        - tag:Name
+      keyed_groups:
+        - key: tags['deployment']
+          prefix: clab
+
   - name: DevNet always-on sandboxes
     source: scm
     inventory: Ansible Product Demos Inventory
@@ -190,6 +264,7 @@ controller_templates:
     credentials:
       - AWS
       - Containerlab SSH
+      - AAP Credential
     project: Ansible Product Demos
     playbook: network/containerlab/deploy_containerlab.yml
     inventory: Ansible Product Demos Inventory
@@ -213,27 +288,12 @@ controller_templates:
   - name: "NETWORK | Containerlab | Configure Devices"
     job_type: run
     organization: Ansible Product Demos (APD)
-    credentials:
-      - AWS
     project: Ansible Product Demos
     playbook: network/containerlab/configure_devices.yml
-    inventory: Ansible Product Demos Inventory
+    inventory: ContainerLab Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: AWS Region
-          type: multiplechoice
-          variable: clab_aws_region
-          required: true
-          default: us-east-2
-          choices:
-            - us-east-2
-            - us-west-2
 
   - name: "NETWORK | Containerlab | Teardown Hypervisor"
     job_type: run
@@ -526,6 +586,11 @@ controller_workflows:
           - Ticket - Provision Failed
       - identifier: Deploy Topology
         unified_job_template: NETWORK | Containerlab | Deploy Topology
+        success_nodes:
+          - Sync ContainerLab Inventory
+      - identifier: Sync ContainerLab Inventory
+        unified_job_template: ContainerLab Hypervisor
+        inventory: ContainerLab Inventory
       - identifier: Ticket - Provision Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:

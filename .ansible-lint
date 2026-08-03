@@ -43,6 +43,7 @@ mock_modules:
   - amazon.aws.s3_object
   - amazon.aws.s3_object_info
   - ansible.controller.credential
+  - ansible.controller.host
   - ansible.posix.at
   - ansible.posix.mount
   - ansible.posix.authorized_key

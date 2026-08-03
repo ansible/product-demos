@@ -180,3 +180,24 @@
           - "  cat8kv: ssh -p 2123 admin@{{ clab_host_ip }}  (password: admin@123)"
       vars:
         clab_host_ip: "{{ ansible_host }}"
+
+- name: Update ContainerLab Inventory in AAP
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - vars/main.yml
+
+  tasks:
+    - name: Update device hosts in AAP inventory
+      ansible.controller.host:
+        name: "{{ item }}"
+        inventory: ContainerLab Inventory
+        variables:
+          ansible_host: "{{ clab_host_ip }}"
+        state: present
+      loop:
+        - n9kv
+        - cat8kv
+      when: lookup('ansible.builtin.env', 'AWX_HOST') | length > 0
