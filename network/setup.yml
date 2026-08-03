@@ -229,10 +229,7 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-<<<<<<< HEAD
       - AAP Credential
-=======
->>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
     project: Ansible Product Demos
     playbook: network/containerlab/provision_hypervisor.yml
     inventory: Ansible Product Demos Inventory
@@ -271,12 +268,8 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-<<<<<<< HEAD
       - Containerlab SSH
       - AAP Credential
-=======
-      - APD Machine Credential
->>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
     project: Ansible Product Demos
     playbook: network/containerlab/deploy_containerlab.yml
     inventory: Ansible Product Demos Inventory
@@ -289,11 +282,7 @@ controller_templates:
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-<<<<<<< HEAD
       - Containerlab SSH
-=======
-      - APD Machine Credential
->>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
     project: Ansible Product Demos
     playbook: network/containerlab/teardown_containerlab.yml
     inventory: Ansible Product Demos Inventory
@@ -301,7 +290,6 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
 
-<<<<<<< HEAD
   - name: "NETWORK | Containerlab | Configure Devices"
     job_type: run
     organization: Ansible Product Demos (APD)
@@ -314,8 +302,6 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
 
-=======
->>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
   - name: "NETWORK | Containerlab | Teardown Hypervisor"
     job_type: run
     organization: Ansible Product Demos (APD)
@@ -598,7 +584,6 @@ controller_workflows:
           variable: clab_aws_owner_tag
           required: true
           default: apd-demo
-<<<<<<< HEAD
     workflow_nodes:
       - identifier: Provision Hypervisor
         related:
@@ -639,19 +624,6 @@ controller_workflows:
             name: Ansible Product Demos (APD)
             type: organization
           type: job_template
-=======
-    simplified_workflow_nodes:
-      - identifier: Provision Hypervisor
-        unified_job_template: NETWORK | Containerlab | Provision Hypervisor
-        success_nodes:
-          - Deploy Topology
-        failure_nodes:
-          - Ticket - Provision Failed
-      - identifier: Deploy Topology
-        unified_job_template: NETWORK | Containerlab | Deploy Topology
-      - identifier: Ticket - Provision Failed
-        unified_job_template: 'SUBMIT FEEDBACK'
->>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
         extra_data:
           feedback: Failed to provision containerlab hypervisor
 
@@ -675,7 +647,6 @@ controller_workflows:
           choices:
             - us-east-2
             - us-west-2
-<<<<<<< HEAD
     workflow_nodes:
       - identifier: Teardown Topology
         related:
@@ -694,12 +665,3 @@ controller_workflows:
             name: Ansible Product Demos (APD)
             type: organization
           type: job_template
-=======
-    simplified_workflow_nodes:
-      - identifier: Teardown Topology
-        unified_job_template: NETWORK | Containerlab | Teardown Topology
-        success_nodes:
-          - Teardown Hypervisor
-      - identifier: Teardown Hypervisor
-        unified_job_template: NETWORK | Containerlab | Teardown Hypervisor
->>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
