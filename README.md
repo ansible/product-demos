@@ -43,6 +43,13 @@ export AAP_PASSWORD=<admin_user_password>
 ansible-navigator run -m stdout install-apd.yml
 ```
 
+> [!NOTE]
+> The execution environment used with the install-apd.yml playbook must match the version of the AAP deployment where APD is being installed.  The ansible-navigator configuration defaults to the EE image aligned with AAP 2.6.  To install on an AAP 2.7 deployment, use the `--eei` option to use the related EE image:
+> ```
+> ansible-navigator run -m stdout install-apd.yml \
+>     --eei quay.io/ansible-product-demos/apd-ee-27:latest
+> ```
+
 ### Use a pre-installed APD environment on the Red Hat Demo Platform (account required)
 
 For Red Hat associates and partners, there is an Ansible Product Demos catalog item [available on demo.redhat.com](https://red.ht/apd-sandbox) that provides a pre-installed environment for demo purposes.  An existing account is required for access to the Red Hat Demo Platform system.
