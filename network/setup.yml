@@ -128,33 +128,35 @@ controller_hosts:
   - name: n9kv
     inventory: ContainerLab Inventory
     enabled: true
-    variables:
-      ansible_port: 2122
-      ansible_user: admin
-      ansible_password: "admin@123"
-      ansible_network_os: cisco.nxos.nxos
-      ansible_connection: ansible.netcommon.network_cli
-      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
   - name: cat8kv
     inventory: ContainerLab Inventory
     enabled: true
-    variables:
-      ansible_port: 2123
-      ansible_user: admin
-      ansible_password: "admin@123"
-      ansible_network_os: cisco.ios.ios
-      ansible_connection: ansible.netcommon.network_cli
-      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
 
 controller_groups:
+  - name: containerlab
+    inventory: ContainerLab Inventory
+    children:
+      - clab_nxos
+      - clab_ios
+    variables:
+      ansible_user: admin
+      ansible_password: "admin@123"
+      ansible_connection: ansible.netcommon.network_cli
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
   - name: clab_nxos
     inventory: ContainerLab Inventory
     hosts:
       - n9kv
+    variables:
+      ansible_port: 2122
+      ansible_network_os: cisco.nxos.nxos
   - name: clab_ios
     inventory: ContainerLab Inventory
     hosts:
       - cat8kv
+    variables:
+      ansible_port: 2123
+      ansible_network_os: cisco.ios.ios
   - name: clab_switches
     inventory: ContainerLab Inventory
     hosts:
@@ -163,11 +165,6 @@ controller_groups:
     inventory: ContainerLab Inventory
     hosts:
       - cat8kv
-  - name: containerlab
-    inventory: ContainerLab Inventory
-    children:
-      - clab_nxos
-      - clab_ios
 
 controller_inventory_sources:
   - name: ContainerLab Hypervisor
