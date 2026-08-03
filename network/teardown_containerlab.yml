@@ -4,8 +4,8 @@
   connection: local
   gather_facts: false
 
-  vars_files:
-    - vars/main.yml
+  roles:
+    - role: demo.network.containerlab
 
   tasks:
     - name: Discover hypervisor IP from EC2 tags
@@ -45,8 +45,8 @@
   become: true
   gather_facts: false
 
-  vars_files:
-    - vars/main.yml
+  roles:
+    - role: demo.network.containerlab
 
   tasks:
     - name: Destroy containerlab topology

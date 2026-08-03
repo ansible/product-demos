@@ -4,8 +4,8 @@
   connection: local
   gather_facts: false
 
-  vars_files:
-    - vars/main.yml
+  roles:
+    - role: demo.network.containerlab
 
   tasks:
     - name: Validate required variables
@@ -31,8 +31,8 @@
   become: true
   gather_facts: true
 
-  vars_files:
-    - vars/main.yml
+  roles:
+    - role: demo.network.containerlab
 
   tasks:
     - name: Check if EBS is already mounted
@@ -154,7 +154,7 @@
 
     - name: Copy topology files
       ansible.builtin.copy:
-        src: files/clab/
+        src: "{{ clab_files_path }}"
         dest: ~/clab/
         mode: '0644'
 
@@ -197,9 +197,6 @@
   hosts: localhost
   connection: local
   gather_facts: false
-
-  vars_files:
-    - vars/main.yml
 
   tasks:
     - name: Update device hosts in AAP inventory

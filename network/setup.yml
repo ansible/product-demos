@@ -1,22 +1,6 @@
 ---
 user_message:
 
-controller_execution_environments:
-  - name: Networking Execution Environment
-    image: quay.io/nleiva/ee-network-image
-    organization: Ansible Product Demos (APD)
-
-controller_projects:
-  - name: Network Golden Configs
-    organization: Ansible Product Demos (APD)
-    scm_type: git
-    scm_url: https://github.com/nleiva/ansible-net-modules
-    update_project: true
-    wait: false
-    controller_request_timeout: 20
-    controller_configuration_async_retries: 40
-    default_environment: Networking Execution Environment
-
 controller_credential_types:
   - name: SSH Proxy
     description: Designed for connecting to a managed node through a bastion host
@@ -197,12 +181,6 @@ controller_inventory_sources:
         - key: tags['deployment']
           prefix: clab
 
-  - name: DevNet always-on sandboxes
-    source: scm
-    inventory: Ansible Product Demos Inventory
-    overwrite: true
-    source_project: Ansible Product Demos
-    source_path: network/hosts
   - name: Panos Demo Instances
     organization: Ansible Product Demos (APD)
     source: ec2
@@ -229,7 +207,7 @@ controller_templates:
       - AWS
       - AAP Credential
     project: Ansible Product Demos
-    playbook: network/containerlab/provision_hypervisor.yml
+    playbook: network/provision_hypervisor.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -269,7 +247,7 @@ controller_templates:
       - Containerlab SSH
       - AAP Credential
     project: Ansible Product Demos
-    playbook: network/containerlab/deploy_containerlab.yml
+    playbook: network/deploy_containerlab.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -282,7 +260,7 @@ controller_templates:
       - AWS
       - Containerlab SSH
     project: Ansible Product Demos
-    playbook: network/containerlab/teardown_containerlab.yml
+    playbook: network/teardown_containerlab.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -294,7 +272,7 @@ controller_templates:
     credentials:
       - Containerlab Device Access
     project: Ansible Product Demos
-    playbook: network/containerlab/configure_devices.yml
+    playbook: network/configure_devices.yml
     inventory: ContainerLab Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -306,7 +284,7 @@ controller_templates:
     credentials:
       - AWS
     project: Ansible Product Demos
-    playbook: network/containerlab/teardown_hypervisor.yml
+    playbook: network/teardown_hypervisor.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -325,54 +303,17 @@ controller_templates:
             - us-east-2
             - us-west-2
 
-  - name: NETWORK | Configuration
-    organization: Ansible Product Demos (APD)
-    inventory: Ansible Product Demos Inventory
-    survey_enabled: true
-    project: Network Golden Configs
-    playbook: main.yml
-    credentials:
-      - APD Machine Credential
-    execution_environment: Networking Execution Environment
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-    ask_limit_on_launch: true
-    use_fact_cache: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: What resource would you like to configure?
-          type: multiplechoice
-          variable: rm
-          required: true
-          choices:
-            - acls
-            - banner
-            - bgp_global
-            - hostname
-            - l3_interface
-            - logging
-            - ntp
-            - ospfv2
-            - prefix_lists
-            - snmp
-            - user
-
   - name: "NETWORK | Report"
-    job_type: check
+    job_type: run
     organization: Ansible Product Demos (APD)
-    inventory: Ansible Product Demos Inventory
+    inventory: ContainerLab Inventory
     project: "Ansible Product Demos"
     playbook: "network/report.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    execution_environment: Networking Execution Environment
-    use_fact_cache: true
     credentials:
-      - APD Machine Credential
+      - Containerlab Device Access
     survey_enabled: true
     survey:
       name: ''
@@ -381,22 +322,21 @@ controller_templates:
         - question_name: What devices do you want to include in the report?
           type: multiplechoice
           variable: _hosts
-          default: routers
+          default: containerlab
           required: true
           choices:
-            - sandbox-iosxe-latest-1.cisco.com
-            - sandbox-iosxr-1.cisco.com
-            - sandbox-nxos-1.cisco.com
-            - routers
+            - containerlab
+            - clab_nxos
+            - clab_ios
 
   - name: "NETWORK | DISA STIG"
     job_type: check
     organization: Ansible Product Demos (APD)
-    inventory: Ansible Product Demos Inventory
+    inventory: ContainerLab Inventory
     project: "Ansible Product Demos"
     playbook: "network/compliance.yml"
     credentials:
-      - APD Machine Credential
+      - Containerlab Device Access
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -407,11 +347,11 @@ controller_templates:
   - name: "NETWORK | Backup"
     job_type: run
     organization: Ansible Product Demos (APD)
-    inventory: Ansible Product Demos Inventory
+    inventory: ContainerLab Inventory
     project: "Ansible Product Demos"
     playbook: "network/backup.yml"
     credentials:
-      - APD Machine Credential
+      - Containerlab Device Access
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
