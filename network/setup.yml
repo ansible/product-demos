@@ -147,8 +147,6 @@ controller_groups:
       - clab_nxos
       - clab_ios
     variables:
-      ansible_user: !unsafe '{{ ssh_proxy_username }}'
-      ansible_password: !unsafe '{{ ssh_proxy_password }}'
       ansible_connection: ansible.netcommon.network_cli
       ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
   - name: clab_nxos
