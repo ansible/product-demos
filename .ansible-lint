@@ -66,11 +66,13 @@ mock_modules:
   - ansible.windows.win_user
   - chocolatey.chocolatey.win_chocolatey
   - cisco.ios.ios_banner
+  - cisco.ios.ios_config
   - cisco.ios.ios_facts
   - cisco.ios.ios_ntp_global
   - cisco.ios.ios_snmp_server
   - cisco.iosxr.iosxr_facts
   - cisco.nxos.nxos_banner
+  - cisco.nxos.nxos_config
   - cisco.nxos.nxos_facts
   - cisco.nxos.nxos_ntp_global
   - cisco.nxos.nxos_snmp_server

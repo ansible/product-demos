@@ -7,22 +7,21 @@
     backup_dir: /tmp/network_backups
 
   tasks:
-    - name: Network Backup and Resource Manager
-      ansible.builtin.include_role:
-        name: network.backup.run
-      vars:  # noqa var-naming[no-role-prefix]
-        operation: backup
-        type: full
-        data_store:
-          local: "{{ backup_dir }}"
-
-    - name: Remove non config lines
-      delegate_to: localhost
-      ansible.builtin.lineinfile:
-        path: "{{ backup_dir }}/{{ inventory_hostname }}.txt"
-        line: "Building configuration..."
-        state: absent
+    - name: Backup IOS-XE configuration
+      cisco.ios.ios_config:
+        backup: true
+        backup_options:
+          dir_path: "{{ backup_dir }}"
+          filename: "{{ inventory_hostname }}.cfg"
       when: ansible_network_os == 'cisco.ios.ios'
+
+    - name: Backup NX-OS configuration
+      cisco.nxos.nxos_config:
+        backup: true
+        backup_options:
+          dir_path: "{{ backup_dir }}"
+          filename: "{{ inventory_hostname }}.cfg"
+      when: ansible_network_os == 'cisco.nxos.nxos'
 
     - name: Display backup location
       run_once: true
