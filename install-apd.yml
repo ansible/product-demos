@@ -3,28 +3,50 @@
   hosts: localhost
   gather_facts: false
 
+  vars:
+    # version 2.7 of the ansible.platform collection broke environment variable fallback
+    # so these variables are set as a workaround
+    aap_hostname: '{{ lookup("env", "AAP_HOSTNAME") | default(omit, true) }}'
+    aap_username: '{{ lookup("env", "AAP_USERNAME") | default(omit, true) }}'
+    aap_password: '{{ lookup("env", "AAP_PASSWORD") | default(omit, true) }}'
+    # set to empty string when not set to avoid issues with omit sentinal during subsequent use
+    aap_token: '{{ lookup("env", "AAP_TOKEN") | default("", true) }}'
+    aap_validate_certs: '{{ lookup("env", "AAP_VALIDATE_CERTS") | default(false, true) }}'
+
   tasks:
     - name: Make sure AAP credential environment variables are set
       ansible.builtin.assert:
         that:
-          - lookup('env', 'AAP_HOSTNAME') != ''
-          - >
-            lookup('env', 'AAP_TOKEN') != '' or
-            (lookup('env', 'AAP_USERNAME') != '' and lookup('env', 'AAP_PASSWORD') != '')
-        fail_msg:
-          - 'Please ensure the following environment variables are set:'
-          - '  export AAP_HOSTNAME=https://your-aap-server.example.com'
-          - '    # either a token for authentication'
-          - '  export AAP_TOKEN=<admin-token>'
-          - '    # or a username and password for basic auth'
-          - '  export AAP_USERNAME=admin  # or another user with AAP superuser privileges'
-          - '  export AAP_PASSWORD=<admin-user-password>'
+          - aap_hostname is defined
+          - aap_token != "" or (aap_username is defined and aap_password is defined)
+        fail_msg: |
+          Please ensure the following environment variables are set:
+            export AAP_HOSTNAME=https://your-aap-server.example.com
+            # either a token for authentication
+            export AAP_TOKEN=<admin-token>
+            # or a username and password for basic auth
+            export AAP_USERNAME=admin  # or another user with AAP superuser privileges
+            export AAP_PASSWORD=<admin-user-password>
 
-    - name: Include product-demos-postinstall variables
+    - name: Query AAP version from the API
+      ansible.builtin.uri:
+        url: "{{ aap_hostname | regex_replace('/$', '') }}/api/gateway/v1/ping/"
+        method: GET
+        validate_certs: '{{ aap_validate_certs }}'
+        url_username: "{{ aap_username | default(omit) }}"
+        url_password: "{{ aap_password | default(omit) }}"
+        headers: "{{ {'Authorization': 'Bearer ' + aap_token} if aap_token else {} }}"
+      register: _gateway_ping
+
+    - name: Set AAP version fact
+      ansible.builtin.set_fact:
+        _aap_version: '{{ _gateway_ping.json.version }}'
+
+    - name: Include APD bootstrap variables
       ansible.builtin.include_vars:
         file: common/bootstrap-vars.yml
 
-    - name: Execute automation controller resource configuration
+    - name: Run dispatcher to create APD resources
       ansible.builtin.include_role:
         name: infra.aap_configuration.dispatch
 
