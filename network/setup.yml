@@ -51,6 +51,26 @@ controller_credential_types:
       required:
         - ssh_proxy_username
         - ssh_proxy_host
+  - name: Containerlab Device Credentials
+    description: Username and password for containerlab network devices
+    kind: cloud
+    inputs:
+      fields:
+        - id: clab_device_user
+          label: Device Username
+          type: string
+        - id: clab_device_password
+          label: Device Password
+          type: string
+          secret: true
+      required:
+        - clab_device_user
+        - clab_device_password
+    injectors:
+      extra_vars:
+        ansible_user: !unsafe '{{ clab_device_user }}'
+        ansible_password: !unsafe '{{ clab_device_password }}'
+
   - name: Palo Alto Networks Provider
     description: Designed for use with the paloaltonetworks.panos collection
     kind: cloud
@@ -110,6 +130,13 @@ controller_credentials:
     inputs:
       ssh_proxy_host: REPLACEME
       ssh_proxy_username: ec2-user
+  - name: Containerlab Device Admin
+    description: Admin credentials for containerlab network devices (n9kv, cat8kv)
+    organization: Ansible Product Demos (APD)
+    credential_type: Containerlab Device Credentials
+    inputs:
+      clab_device_user: admin
+      clab_device_password: "admin@123"
   - name: Containerlab SSH
     description: SSH key for the containerlab hypervisor, updated by the provision playbook
     organization: Ansible Product Demos (APD)
@@ -139,8 +166,6 @@ controller_groups:
       - clab_nxos
       - clab_ios
     variables:
-      ansible_user: admin
-      ansible_password: "admin@123"
       ansible_connection: ansible.netcommon.network_cli
       ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
   - name: clab_nxos
@@ -285,6 +310,8 @@ controller_templates:
   - name: "NETWORK | Containerlab | Configure Devices"
     job_type: run
     organization: Ansible Product Demos (APD)
+    credentials:
+      - Containerlab Device Admin
     project: Ansible Product Demos
     playbook: network/containerlab/configure_devices.yml
     inventory: ContainerLab Inventory
