@@ -577,22 +577,46 @@ controller_workflows:
           variable: clab_aws_owner_tag
           required: true
           default: apd-demo
-    simplified_workflow_nodes:
+    workflow_nodes:
       - identifier: Provision Hypervisor
-        unified_job_template: NETWORK | Containerlab | Provision Hypervisor
-        success_nodes:
-          - Deploy Topology
-        failure_nodes:
-          - Ticket - Provision Failed
+        related:
+          success_nodes:
+            - identifier: Deploy Topology
+          failure_nodes:
+            - identifier: Ticket - Provision Failed
+        unified_job_template:
+          name: NETWORK | Containerlab | Provision Hypervisor
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
       - identifier: Deploy Topology
-        unified_job_template: NETWORK | Containerlab | Deploy Topology
-        success_nodes:
-          - Sync ContainerLab Inventory
+        related:
+          success_nodes:
+            - identifier: Sync ContainerLab Inventory
+        unified_job_template:
+          name: NETWORK | Containerlab | Deploy Topology
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
       - identifier: Sync ContainerLab Inventory
-        unified_job_template: ContainerLab Hypervisor
-        inventory: ContainerLab Inventory
+        unified_job_template:
+          inventory:
+            name: ContainerLab Inventory
+            organization:
+              name: Ansible Product Demos (APD)
+              type: organization
+            type: inventory
+          name: ContainerLab Hypervisor
+          type: inventory_source
       - identifier: Ticket - Provision Failed
-        unified_job_template: 'SUBMIT FEEDBACK'
+        unified_job_template:
+          name: SUBMIT FEEDBACK
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
         extra_data:
           feedback: Failed to provision containerlab hypervisor
 
@@ -616,10 +640,21 @@ controller_workflows:
           choices:
             - us-east-2
             - us-west-2
-    simplified_workflow_nodes:
+    workflow_nodes:
       - identifier: Teardown Topology
-        unified_job_template: NETWORK | Containerlab | Teardown Topology
-        success_nodes:
-          - Teardown Hypervisor
+        related:
+          success_nodes:
+            - identifier: Teardown Hypervisor
+        unified_job_template:
+          name: NETWORK | Containerlab | Teardown Topology
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
       - identifier: Teardown Hypervisor
-        unified_job_template: NETWORK | Containerlab | Teardown Hypervisor
+        unified_job_template:
+          name: NETWORK | Containerlab | Teardown Hypervisor
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
