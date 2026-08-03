@@ -125,16 +125,6 @@ controller_hosts:
     enabled: true
 
 controller_groups:
-  - name: containerlab
-    inventory: ContainerLab Inventory
-    children:
-      - clab_nxos
-      - clab_ios
-    variables:
-      ansible_user: !unsafe '{{ ssh_proxy_username }}'
-      ansible_password: !unsafe '{{ ssh_proxy_password }}'
-      ansible_connection: ansible.netcommon.network_cli
-      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
   - name: clab_nxos
     inventory: ContainerLab Inventory
     hosts:
@@ -157,6 +147,16 @@ controller_groups:
     inventory: ContainerLab Inventory
     hosts:
       - cat8kv
+  - name: containerlab
+    inventory: ContainerLab Inventory
+    children:
+      - clab_nxos
+      - clab_ios
+    variables:
+      ansible_user: !unsafe '{{ ssh_proxy_username }}'
+      ansible_password: !unsafe '{{ ssh_proxy_password }}'
+      ansible_connection: ansible.netcommon.network_cli
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
 
 controller_inventory_sources:
   - name: ContainerLab Hypervisor
