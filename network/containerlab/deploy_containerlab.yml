@@ -35,6 +35,12 @@
     - vars/main.yml
 
   tasks:
+    - name: Check if EBS is already mounted
+      ansible.builtin.shell:
+        cmd: "mountpoint -q {{ clab_aws_ebs_mount }} && echo mounted || echo not_mounted"
+      register: ebs_mount_check
+      changed_when: false
+
     - name: Find EBS data volume
       ansible.builtin.shell:
         cmd: >-
@@ -47,27 +53,32 @@
         executable: /bin/bash
       register: ebs_detect
       changed_when: false
+      when: ebs_mount_check.stdout == 'not_mounted'
 
     - name: Set EBS device fact
       ansible.builtin.set_fact:
         clab_ebs_device: "{{ ebs_detect.stdout | trim }}"
+      when: ebs_mount_check.stdout == 'not_mounted'
 
     - name: Fail if no EBS data volume found
       ansible.builtin.assert:
         that:
           - clab_ebs_device | length > 0
         fail_msg: "No unmounted EBS volume >50GB found"
+      when: ebs_mount_check.stdout == 'not_mounted'
 
     - name: Format EBS volume
       community.general.filesystem:
         fstype: xfs
         dev: "{{ clab_ebs_device }}"
+      when: ebs_mount_check.stdout == 'not_mounted'
 
     - name: Create mount point
       ansible.builtin.file:
         path: "{{ clab_aws_ebs_mount }}"
         state: directory
         mode: '0777'
+      when: ebs_mount_check.stdout == 'not_mounted'
 
     - name: Mount EBS volume
       ansible.posix.mount:
@@ -75,6 +86,7 @@
         src: "{{ clab_ebs_device }}"
         fstype: xfs
         state: mounted
+      when: ebs_mount_check.stdout == 'not_mounted'
 
     - name: Ensure KVM kernel module is loaded
       community.general.modprobe:
