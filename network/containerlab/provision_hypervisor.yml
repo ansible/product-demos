@@ -105,6 +105,7 @@
         state: present
       register: clab_keypair
 
+<<<<<<< HEAD
     - name: Save private key to AAP credential  # noqa: no-handler
       ansible.controller.credential:
         name: Containerlab SSH
@@ -117,13 +118,20 @@
       when: clab_keypair.changed
 
     - name: Save private key locally  # noqa: no-handler
+=======
+    - name: Save private key  # noqa: no-handler
+>>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
       ansible.builtin.copy:
         content: "{{ clab_keypair.key.private_key }}"
         dest: "{{ playbook_dir }}/{{ clab_aws_keypair_name }}.pem"
         mode: '0600'
+<<<<<<< HEAD
       when:
         - clab_keypair.changed
         - lookup('ansible.builtin.env', 'AWX_HOST') | length == 0
+=======
+      when: clab_keypair.changed
+>>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
 
     - name: Find RHEL 9 AMI
       amazon.aws.ec2_ami_info:
@@ -185,7 +193,11 @@
     - name: Enable nested virtualization via boto3
       ansible.builtin.command:
         argv:
+<<<<<<< HEAD
           - "{{ ansible_playbook_python }}"
+=======
+          - python3
+>>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
           - -c
           - |
             import boto3

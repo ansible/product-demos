@@ -8,6 +8,7 @@
     - vars/main.yml
 
   tasks:
+<<<<<<< HEAD
     - name: Discover hypervisor IP from EC2 tags
       amazon.aws.ec2_instance_info:
         region: "{{ clab_aws_region | default('us-east-2') }}"
@@ -30,13 +31,26 @@
         that:
           - clab_host_ip is defined
         fail_msg: "No running containerlab hypervisor found"
+=======
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - clab_host_ip is defined
+          - clab_aws_keypair_name is defined
+        fail_msg: >-
+          clab_host_ip and clab_aws_keypair_name must be set.
+>>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
 
     - name: Add hypervisor to inventory
       ansible.builtin.add_host:
         name: clab-hypervisor
         ansible_host: "{{ clab_host_ip }}"
         ansible_user: "{{ clab_aws_admin_user }}"
+<<<<<<< HEAD
         ansible_ssh_private_key_file: "{{ (lookup('ansible.builtin.env', 'AWX_HOST') | length > 0) | ternary(omit, playbook_dir + '/' + clab_aws_keypair_name + '.pem') }}"
+=======
+        ansible_ssh_private_key_file: "{{ playbook_dir }}/{{ clab_aws_keypair_name }}.pem"
+>>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
         ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
         groups: clab_hosts
 

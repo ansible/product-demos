@@ -22,7 +22,11 @@
         name: clab-hypervisor
         ansible_host: "{{ clab_host_ip }}"
         ansible_user: "{{ clab_aws_admin_user }}"
+<<<<<<< HEAD
         ansible_ssh_private_key_file: "{{ (lookup('ansible.builtin.env', 'AWX_HOST') | length > 0) | ternary(omit, playbook_dir + '/' + clab_aws_keypair_name + '.pem') }}"
+=======
+        ansible_ssh_private_key_file: "{{ playbook_dir }}/{{ clab_aws_keypair_name }}.pem"
+>>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
         ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
         groups: clab_hosts
 
@@ -35,6 +39,7 @@
     - vars/main.yml
 
   tasks:
+<<<<<<< HEAD
     - name: Check if EBS is already mounted
       ansible.builtin.shell:
         cmd: "mountpoint -q {{ clab_aws_ebs_mount }} && echo mounted || echo not_mounted"
@@ -72,21 +77,36 @@
         fstype: xfs
         dev: "{{ clab_ebs_device }}"
       when: ebs_mount_check.stdout == 'not_mounted'
+=======
+    - name: Format EBS volume
+      community.general.filesystem:
+        fstype: xfs
+        dev: "{{ clab_aws_ebs_nvme_device }}"
+>>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
 
     - name: Create mount point
       ansible.builtin.file:
         path: "{{ clab_aws_ebs_mount }}"
         state: directory
         mode: '0777'
+<<<<<<< HEAD
       when: ebs_mount_check.stdout == 'not_mounted'
+=======
+>>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
 
     - name: Mount EBS volume
       ansible.posix.mount:
         path: "{{ clab_aws_ebs_mount }}"
+<<<<<<< HEAD
         src: "{{ clab_ebs_device }}"
         fstype: xfs
         state: mounted
       when: ebs_mount_check.stdout == 'not_mounted'
+=======
+        src: "{{ clab_aws_ebs_nvme_device }}"
+        fstype: xfs
+        state: mounted
+>>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
 
     - name: Ensure KVM kernel module is loaded
       community.general.modprobe:
@@ -192,6 +212,7 @@
           - "  cat8kv: ssh -p 2123 admin@{{ clab_host_ip }}  (password: admin@123)"
       vars:
         clab_host_ip: "{{ ansible_host }}"
+<<<<<<< HEAD
 
 - name: Update ContainerLab Inventory in AAP
   hosts: localhost
@@ -213,3 +234,5 @@
         - n9kv
         - cat8kv
       when: lookup('ansible.builtin.env', 'AWX_HOST') | length > 0
+=======
+>>>>>>> 4a3258b (feat: add containerlab network demo with AWS nested virtualization)
