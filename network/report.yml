@@ -1,4 +1,26 @@
 ---
+- name: Wait for Containerlab Devices
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Wait for n9kv SSH to be ready
+      ansible.builtin.wait_for:
+        host: "{{ hostvars['n9kv']['ansible_host'] }}"
+        port: 2122
+        search_regex: SSH
+        delay: 10
+        timeout: 600
+
+    - name: Wait for cat8kv SSH to be ready
+      ansible.builtin.wait_for:
+        host: "{{ hostvars['cat8kv']['ansible_host'] }}"
+        port: 2123
+        search_regex: SSH
+        delay: 10
+        timeout: 600
+
 - name: Network Device Report
   hosts: "{{ _hosts | default('containerlab') }}"
   gather_facts: false
