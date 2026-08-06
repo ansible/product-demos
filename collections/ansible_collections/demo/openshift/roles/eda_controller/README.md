@@ -16,7 +16,7 @@ Repo playbook: [`openshift/eda/install.yml`](../../../../../../openshift/eda/ins
 
 ## Requirements
 
-- Ansible 2.9+
+- ansible-core >= 2.16.0
 - Target: OpenShift cluster access with the AAP EDA operator available (typically already installed in the AAP namespace)
 - `kubernetes.core` collection
 - An attached "OpenShift Credential" (type `OpenShift or Kubernetes API Bearer Token`) so `K8S_AUTH_HOST` / `K8S_AUTH_API_KEY` / `K8S_AUTH_VERIFY_SSL` are injected
