@@ -1,0 +1,149 @@
+# Configure Vault userpass auth from a JSON users config.
+---
+- name: Resolve vault_token
+  ansible.builtin.include_tasks: resolve_vault_token.yml
+
+- name: Load vault users config
+  ansible.builtin.set_fact:
+    _vault_users_config: "{{ lookup('ansible.builtin.file', role_path ~ '/files/' ~ vault_userpass_users_file) | from_json }}"
+
+- name: Require users list in config
+  ansible.builtin.assert:
+    fail_msg: >-
+      {{ vault_userpass_users_file }} must contain a non-empty "users" list.
+    that:
+      - _vault_users_config.users is defined
+      - _vault_users_config.users | length > 0
+
+- name: Validate user entries
+  loop: "{{ _vault_users_config.users }}"
+  loop_control:
+    label: "{{ item.username | default('unknown') }}"
+  ansible.builtin.assert:
+    fail_msg: >-
+      Each user requires username and role (admin|user). Invalid entry: {{ item }}
+    that:
+      - item.username is defined
+      - item.username | length > 0
+      - item.role is defined
+      - item.role in ['admin', 'user']
+
+- name: List Vault auth methods
+  register: vault_auth_list_result
+  changed_when: false
+  failed_when: vault_auth_list_result.rc != 0
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['auth', 'list', '-format', 'json'] }}"
+
+- name: Enable userpass auth method
+  when: "'userpass/' not in (vault_auth_list_result.stdout | from_json)"
+  register: vault_userpass_enable_result
+  changed_when: "'Success' in vault_userpass_enable_result.stdout"
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['auth', 'enable', 'userpass'] }}"
+
+- name: Write admin Vault policy
+  register: vault_admin_policy_result
+  changed_when: "'Success' in vault_admin_policy_result.stdout"
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['policy', 'write', vault_userpass_admin_policy_name, '-'] }}"
+    stdin: "{{ lookup('ansible.builtin.template', 'vault_admin_policy.hcl.j2') }}"
+
+- name: Write user Vault policy
+  register: vault_user_policy_result
+  changed_when: "'Success' in vault_user_policy_result.stdout"
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['policy', 'write', vault_userpass_user_policy_name, '-'] }}"
+    stdin: "{{ lookup('ansible.builtin.template', 'vault_user_policy.hcl.j2') }}"
+
+- name: Resolve userpass passwords
+  loop: "{{ _vault_users_config.users }}"
+  loop_control:
+    label: "{{ item.username }}"
+  no_log: "{{ vault_no_log | default(true) }}"
+  ansible.builtin.set_fact:
+    _vault_userpass_resolved_users: >-
+      {{
+        _vault_userpass_resolved_users | default([]) + [
+          {
+            'username': item.username,
+            'role': item.role,
+            'password': (
+              item.password
+              if (item.password is defined and (item.password | length) > 0)
+              else lookup(
+                'ansible.builtin.password',
+                '/dev/null',
+                length=vault_userpass_password_length,
+                chars=vault_userpass_password_chars
+              )
+            ),
+            'password_generated': (
+              item.password is not defined or (item.password | default('') | length) == 0
+            ),
+            'policies': (
+              [vault_userpass_admin_policy_name]
+              if item.role == 'admin'
+              else [vault_userpass_user_policy_name]
+            )
+          }
+        ]
+      }}
+
+- name: Create userpass users
+  loop: "{{ _vault_userpass_resolved_users }}"
+  loop_control:
+    label: "{{ item.username }}"
+  register: vault_userpass_user_result
+  changed_when: "'Success' in vault_userpass_user_result.stdout"
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['write', 'auth/userpass/users/' + item.username, '-'] }}"
+    stdin: "{{ {'password': item.password, 'policies': item.policies | join(',')} | to_json }}"
+
+- name: Collect auto-generated userpass credentials
+  when: item.password_generated | bool
+  loop: "{{ _vault_userpass_resolved_users }}"
+  loop_control:
+    label: "{{ item.username }}"
+  no_log: "{{ vault_no_log | default(true) }}"
+  ansible.builtin.set_fact:
+    _vault_userpass_generated_users: >-
+      {{
+        _vault_userpass_generated_users | default([]) + [
+          {
+            'username': item.username,
+            'role': item.role,
+            'password': item.password
+          }
+        ]
+      }}
+
+# DEMO ONLY: publishing generated passwords via set_stats is convenient for AAP
+# job artifact visualization on localhost (no persistent host). Do not do this
+# in production -- store credentials in a credential/secret manager instead.
+- name: Export generated userpass credentials for job artifacts
+  when: (_vault_userpass_generated_users | default([]) | length) > 0
+  ansible.builtin.set_stats:
+    data:
+      vault_userpass_credentials:
+        users: "{{ _vault_userpass_generated_users }}"

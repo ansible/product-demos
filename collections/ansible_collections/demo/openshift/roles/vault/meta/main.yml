@@ -1,0 +1,24 @@
+---
+galaxy_info:
+  role_name: vault
+  author: Zachary LeBlanc
+  description: |
+    Deploy, initialize, and configure HashiCorp Vault on OpenShift via the
+    HashiCorp Helm chart. Supports AAP OIDC JWT workload identity, KV
+    secrets, and userpass auth.
+
+    Adapted from demo.zero_trust.vault
+    (https://github.com/zjleblanc/ansible-zero-trust) by Zachary LeBlanc,
+    simplified here to target OpenShift only.
+
+    Attribution: the underlying Kubernetes/Helm deployment automation
+    (tasks/install_k8s.yml) was originally authored by Matt Fernandez
+    (https://github.com/l3acon/aap-vault).
+  license: GPL-3.0-or-later
+  min_ansible_version: "2.14"
+  platforms: []
+  galaxy_tags:
+    - vault
+    - openshift
+    - aap
+dependencies: []

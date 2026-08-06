@@ -1,0 +1,8 @@
+{#
+  vault_jwt_dynamic_secret_path_template uses:
+  - JWT_ACCESSOR as a placeholder for the jwt/ auth method accessor
+  - [[ ]] as placeholders for Vault identity template braces {{ }}
+#}
+path "{{ vault_jwt_dynamic_secret_path_template | replace('JWT_ACCESSOR', vault_jwt_accessor) | replace('[[', '{{') | replace(']]', '}}') }}" {
+  capabilities = ["read"]
+}
