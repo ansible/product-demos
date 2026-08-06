@@ -169,7 +169,7 @@
       --server={{ _k8s_auth_host }}
       --token={{ _k8s_auth_api_key }}
       {% if not (_k8s_auth_verify_ssl | bool) %}--insecure-skip-tls-verify{% endif %}
-      exec
+      exec -i
       -n {{ vault_k8s_namespace }}
       {{ vault_k8s_pod_name }}
       -- env

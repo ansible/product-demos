@@ -3,9 +3,6 @@
 - name: Resolve vault_token
   ansible.builtin.include_tasks: resolve_vault_token.yml
 
-- name: Resolve vault CLI privilege context
-  ansible.builtin.include_tasks: set_vault_cli_context.yml
-
 - name: Load vault users config
   ansible.builtin.set_fact:
     _vault_users_config: "{{ lookup('ansible.builtin.file', role_path ~ '/files/' ~ vault_userpass_users_file) | from_json }}"
@@ -36,35 +33,43 @@
   changed_when: false
   failed_when: vault_auth_list_result.rc != 0
   no_log: "{{ vault_no_log | default(true) }}"
-  environment: "{{ _vault_cli_environment | combine({'VAULT_ADDR': vault_cli_addr, 'VAULT_TOKEN': vault_token}) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
   ansible.builtin.command:
-    argv: "{{ vault_cli.split() + ['auth', 'list', '-format', 'json'] }}"
+    argv: "{{ vault_argv + ['auth', 'list', '-format', 'json'] }}"
 
 - name: Enable userpass auth method
   when: "'userpass/' not in (vault_auth_list_result.stdout | from_json)"
   register: vault_userpass_enable_result
-  changed_when: vault_userpass_enable_result.rc == 0
+  changed_when: "'Success' in vault_userpass_enable_result.stdout"
   no_log: "{{ vault_no_log | default(true) }}"
-  environment: "{{ _vault_cli_environment | combine({'VAULT_ADDR': vault_cli_addr, 'VAULT_TOKEN': vault_token}) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
   ansible.builtin.command:
-    argv: "{{ vault_cli.split() + ['auth', 'enable', 'userpass'] }}"
+    argv: "{{ vault_argv + ['auth', 'enable', 'userpass'] }}"
 
 - name: Write admin Vault policy
   register: vault_admin_policy_result
-  changed_when: vault_admin_policy_result.rc == 0
+  changed_when: "'Success' in vault_admin_policy_result.stdout"
   no_log: "{{ vault_no_log | default(true) }}"
-  environment: "{{ _vault_cli_environment | combine({'VAULT_ADDR': vault_cli_addr, 'VAULT_TOKEN': vault_token}) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
   ansible.builtin.command:
-    argv: "{{ _vault_cli_stdin_argv + ['policy', 'write', vault_userpass_admin_policy_name, '-'] }}"
+    argv: "{{ vault_argv + ['policy', 'write', vault_userpass_admin_policy_name, '-'] }}"
     stdin: "{{ lookup('ansible.builtin.template', 'vault_admin_policy.hcl.j2') }}"
 
 - name: Write user Vault policy
   register: vault_user_policy_result
-  changed_when: vault_user_policy_result.rc == 0
+  changed_when: "'Success' in vault_user_policy_result.stdout"
   no_log: "{{ vault_no_log | default(true) }}"
-  environment: "{{ _vault_cli_environment | combine({'VAULT_ADDR': vault_cli_addr, 'VAULT_TOKEN': vault_token}) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
   ansible.builtin.command:
-    argv: "{{ _vault_cli_stdin_argv + ['policy', 'write', vault_userpass_user_policy_name, '-'] }}"
+    argv: "{{ vault_argv + ['policy', 'write', vault_userpass_user_policy_name, '-'] }}"
     stdin: "{{ lookup('ansible.builtin.template', 'vault_user_policy.hcl.j2') }}"
 
 - name: Resolve userpass passwords
@@ -106,11 +111,13 @@
   loop_control:
     label: "{{ item.username }}"
   register: vault_userpass_user_result
-  changed_when: vault_userpass_user_result.rc == 0
+  changed_when: "'Success' in vault_userpass_user_result.stdout"
   no_log: "{{ vault_no_log | default(true) }}"
-  environment: "{{ _vault_cli_environment | combine({'VAULT_ADDR': vault_cli_addr, 'VAULT_TOKEN': vault_token}) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
   ansible.builtin.command:
-    argv: "{{ _vault_cli_stdin_argv + ['write', 'auth/userpass/users/' + item.username, '-'] }}"
+    argv: "{{ vault_argv + ['write', 'auth/userpass/users/' + item.username, '-'] }}"
     stdin: "{{ {'password': item.password, 'policies': item.policies | join(',')} | to_json }}"
 
 - name: Collect auto-generated userpass credentials

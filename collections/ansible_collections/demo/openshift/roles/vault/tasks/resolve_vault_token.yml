@@ -16,3 +16,11 @@
     that:
       - vault_token is defined
       - vault_token | length > 0
+
+- name: Build vault CLI argv with token
+  no_log: "{{ vault_no_log | default(true) }}"
+  vars:
+    _parts: "{{ vault_cli.split() }}"
+  ansible.builtin.set_fact:
+    # vault is always the last word, so insert VAULT_TOKEN right before it.
+    vault_argv: "{{ _parts[:-1] + ['VAULT_TOKEN=' ~ vault_token] + [_parts[-1]] }}"
