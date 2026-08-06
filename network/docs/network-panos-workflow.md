@@ -64,6 +64,6 @@ Deploy ──→ Inventory Sync ──→ Configure Firewall ──→ Configure
 
 | Demo | Description |
 |------|-------------|
-| 🌐 [Golden Configuration](./network-configuration.md) | Deploy golden configurations to Cisco IOS, IOSXR, and NXOS devices using resource modules |
-| 🌐 [DISA STIG](./network-disa-stig.md) | Run network DISA STIG compliance checks to show security hardening for network devices |
-| 🚀 [Deploy Cloud Stack in AWS](../../cloud/docs/deploy-cloud-stack.md) | Provision the full demo infrastructure including the reports server used by other network demos |
+| 🌐 [Configure Devices](./network-configuration.md) | Apply baseline configurations to containerlab NX-OS and IOS-XE devices |
+| 🌐 [DISA STIG](./network-disa-stig.md) | Run network DISA STIG compliance checks on IOS-XE devices |
+| 🌐 [Report](./network-report.md) | Gather facts and display device summaries from containerlab devices |

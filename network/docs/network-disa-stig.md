@@ -5,14 +5,9 @@ Applies DISA STIG compliance checks and hardening to Cisco IOS-XE network device
 
 ## Prerequisites
 
-- Cisco IOS-XE devices in inventory
-- Network credentials configured
-
-## Survey prompts
-
-| Prompt | Variable | Type | Required |
-|--------|----------|------|----------|
-| Server Name or Pattern | `_hosts` | text | Yes |
+- Containerlab stack deployed via the **NETWORK | Deploy Containerlab Stack** workflow
+- **Containerlab Device Access** credential configured
+- ContainerLab Inventory synced with hypervisor IP
 
 ## Job templates
 
