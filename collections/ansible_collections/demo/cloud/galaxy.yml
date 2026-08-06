@@ -1,0 +1,17 @@
+---
+namespace: demo
+name: cloud
+version: 1.0.0+08062601
+readme: README.md
+authors:
+  - Ansible Product Demos (https://github.com/ansible/product-demos)
+description: Roles supporting multi-cloud provisioning and management demos in ansible-product-demos.
+license:
+  - GPL-3.0-or-later
+tags:
+  - apd
+  - cloud
+  - aws
+repository: https://github.com/ansible/product-demos
+issues: https://github.com/ansible/product-demos/issues
+...
