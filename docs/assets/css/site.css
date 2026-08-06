@@ -173,6 +173,14 @@ html[data-theme="dark"] .logo-play { fill: #58a6ff; }
 
 .sidebar-back {
   margin-bottom: 8px;
+  border-left: 3px solid var(--accent);
+  color: var(--accent);
+  font-weight: 500;
+  background: var(--accent-glow);
+}
+
+.sidebar-back:hover {
+  background: var(--bg-surface);
 }
 
 .demo-toc {
@@ -204,7 +212,7 @@ html[data-theme="dark"] .logo-play { fill: #58a6ff; }
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  margin: 12px 0 0;
+  margin: 0 0 16px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--bg-surface);
@@ -376,8 +384,8 @@ html[data-theme="dark"] .sidebar-footer__link--issue:hover {
   width: 100%;
   padding: 11px 14px 11px 42px;
   border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  background: var(--bg-body);
   color: var(--text-primary);
   font-size: 14px;
   font-family: inherit;
@@ -497,9 +505,19 @@ html[data-theme="dark"] .sidebar-footer__link--issue:hover {
 }
 
 .demo-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   border-color: var(--accent);
-  box-shadow: 0 8px 32px var(--accent-glow);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10), 0 0 0 2px var(--accent-glow);
+}
+
+html:not([data-theme="dark"]) .demo-card:hover {
+  box-shadow: 0 12px 32px rgba(9, 105, 218, 0.18), 0 0 0 2px var(--accent-glow);
+}
+
+@media (prefers-color-scheme: light) {
+  html:not([data-theme="dark"]) .demo-card:hover {
+    box-shadow: 0 12px 32px rgba(9, 105, 218, 0.18), 0 0 0 2px var(--accent-glow);
+  }
 }
 
 .demo-card__link {
@@ -605,9 +623,11 @@ html[data-theme="dark"] .sidebar-footer__link--issue:hover {
 .tag {
   padding: 3px 8px;
   border-radius: 6px;
-  background: var(--border);
+  background: var(--accent-glow);
+  border: 1px solid var(--accent);
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--accent);
+  font-weight: 500;
 }
 
 .demo-card__stats {
@@ -726,6 +746,7 @@ html[data-theme="dark"] .sidebar-footer__link--issue:hover {
 .demo-row__tags .tag {
   font-size: 10px;
   padding: 2px 6px;
+  border-width: 1px;
 }
 
 .demo-row__author {
