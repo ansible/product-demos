@@ -1,49 +1,49 @@
 ---
-# Re-write of:
-# https://github.com/network-automation/toolkit/blob/master/playbooks/network_report.yml
-# https://github.com/network-automation/toolkit/blob/master/roles/build_report/tasks/main.yml
-
-- name: Collect facts
-  hosts: "{{ _hosts | default(omit) }}"
+- name: Wait for Containerlab Devices
+  hosts: localhost
+  connection: local
   gather_facts: false
 
   tasks:
-    - name: Gather all network resource and minimal legacy facts [Cisco IOS]
+    - name: Wait for n9kv SSH to be ready
+      ansible.builtin.wait_for:
+        host: "{{ hostvars['n9kv']['ansible_host'] }}"
+        port: 2122
+        search_regex: SSH
+        delay: 10
+        timeout: 600
+
+    - name: Wait for cat8kv SSH to be ready
+      ansible.builtin.wait_for:
+        host: "{{ hostvars['cat8kv']['ansible_host'] }}"
+        port: 2123
+        search_regex: SSH
+        delay: 10
+        timeout: 600
+
+- name: Network Device Report
+  hosts: "{{ _hosts | default('containerlab') }}"
+  gather_facts: false
+
+  tasks:
+    - name: Gather facts [Cisco IOS]
       cisco.ios.ios_facts:
         gather_subset: min
         gather_network_resources: all
       when: ansible_network_os == 'cisco.ios.ios'
 
-    - name: Gather all network resource and minimal legacy facts [Cisco NX-OS]
+    - name: Gather facts [Cisco NX-OS]
       cisco.nxos.nxos_facts:
         gather_subset: min
         gather_network_resources: all
       when: ansible_network_os == 'cisco.nxos.nxos'
 
-    # TODO figure out why this keeps failing
-    - name: Gather all network resource and minimal legacy facts [Cisco IOS XR]
-      ignore_errors: true  # noqa: ignore-errors
-      cisco.iosxr.iosxr_facts:
-        gather_subset: min
-        gather_network_resources: all
-      when: ansible_network_os == 'cisco.iosxr.iosxr'
-
-- name: Create network reports
-  hosts: "{{ report_server }}"
-  become: true
-  vars:
-    report_server: reports
-    web_path: /var/www/html/reports/
-
-  tasks:
-    - name: Build report server
-      ansible.builtin.include_role:
-        name: "{{ item }}"
-      loop:
-        - demo.patching.report_server
-        - demo.patching.build_report_network
-
-    - name: Update landing page
-      ansible.builtin.include_role:
-        name: demo.patching.report_server
-        tasks_from: linux_landing_page
+    - name: Display device report
+      ansible.builtin.debug:
+        msg:
+          - "Hostname: {{ ansible_net_hostname }}"
+          - "OS: {{ ansible_network_os }}"
+          - "Version: {{ ansible_net_version }}"
+          - "Model: {{ ansible_net_model }}"
+          - "Serial: {{ ansible_net_serialnum | default('N/A') }}"
+          - "Interfaces: {{ ansible_net_all_ipv4_addresses | default([]) | join(', ') }}"

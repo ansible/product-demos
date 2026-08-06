@@ -1,0 +1,64 @@
+---
+- name: Teardown Containerlab Topology
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  roles:
+    - role: demo.network.containerlab
+
+  tasks:
+    - name: Discover hypervisor IP from EC2 tags
+      amazon.aws.ec2_instance_info:
+        region: "{{ clab_aws_region | default('us-east-2') }}"
+        filters:
+          "tag:deployment": containerlab
+          "tag:purpose": "{{ clab_aws_purpose_tag }}"
+          instance-state-name: running
+      register: clab_discovered
+      when: clab_host_ip is not defined
+
+    - name: Set host IP from discovery
+      ansible.builtin.set_fact:
+        clab_host_ip: "{{ clab_discovered.instances[0].public_ip_address }}"
+      when:
+        - clab_host_ip is not defined
+        - clab_discovered.instances | length > 0
+
+    - name: Fail if no hypervisor found
+      ansible.builtin.assert:
+        that:
+          - clab_host_ip is defined
+        fail_msg: "No running containerlab hypervisor found"
+
+    - name: Add hypervisor to inventory
+      ansible.builtin.add_host:
+        name: clab-hypervisor
+        ansible_host: "{{ clab_host_ip }}"
+        ansible_user: "{{ clab_aws_admin_user }}"
+        ansible_ssh_private_key_file: "{{ (lookup('ansible.builtin.env', 'AWX_HOST') | length > 0) | ternary(omit, playbook_dir + '/' + clab_aws_keypair_name + '.pem') }}"
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        groups: clab_hosts
+
+- name: Destroy Containerlab Topology on Hypervisor
+  hosts: clab-hypervisor
+  become: true
+  gather_facts: false
+
+  roles:
+    - role: demo.network.containerlab
+
+  tasks:
+    - name: Destroy containerlab topology
+      ansible.builtin.command:
+        cmd: containerlab destroy --cleanup
+        chdir: "/root/clab/{{ clab_topology }}/"
+      environment:
+        DOCKER_HOST: "unix:///run/user/1000/podman/podman.sock"
+      register: clab_destroy
+      changed_when: clab_destroy.rc == 0
+      failed_when: false
+
+    - name: Display result
+      ansible.builtin.debug:
+        msg: "Containerlab topology '{{ clab_topology }}' destroyed"
