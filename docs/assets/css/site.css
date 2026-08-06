@@ -188,6 +188,13 @@ a {
   width: 100%;
   max-width: 188px;
   height: auto;
+  filter: brightness(0) saturate(100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-footer__aap-logo {
+    filter: none;
+  }
 }
 
 .sidebar-footer__credit {
