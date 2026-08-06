@@ -26,7 +26,7 @@ html {
 }
 
 @media (prefers-color-scheme: dark) {
-  html {
+  html:not([data-theme="light"]) {
     --accent: #58a6ff;
     --accent-dim: #388bfd;
     --accent-glow: rgba(88, 166, 255, 0.10);
@@ -43,6 +43,24 @@ html {
     --code-border: #388bfd;
     --code-text: #79c0ff;
   }
+}
+
+html[data-theme="dark"] {
+  --accent: #58a6ff;
+  --accent-dim: #388bfd;
+  --accent-glow: rgba(88, 166, 255, 0.10);
+  --bg-body: #161b22;
+  --bg-sidebar: #0d1117;
+  --bg-surface: #21262d;
+  --bg-surface-hover: #30363d;
+  --border: #30363d;
+  --border-hover: #58a6ff;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #656d76;
+  --code-bg: #162c46;
+  --code-border: #388bfd;
+  --code-text: #79c0ff;
 }
 
 body {
@@ -107,6 +125,16 @@ a {
   object-fit: contain;
 }
 
+.logo-bg { fill: #0550ae; }
+.logo-play { fill: #0969da; }
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .logo-bg { fill: #1f3a5f; }
+  html:not([data-theme="light"]) .logo-play { fill: #58a6ff; }
+}
+html[data-theme="dark"] .logo-bg { fill: #1f3a5f; }
+html[data-theme="dark"] .logo-play { fill: #58a6ff; }
+
 .logo-text {
   font-size: 13px;
   font-weight: 600;
@@ -170,6 +198,36 @@ a {
   border-left-color: var(--accent);
 }
 
+/* Theme toggle */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 12px 0 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  width: 100%;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.theme-toggle__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
 .sidebar-footer {
   margin-top: auto;
   padding-top: 20px;
@@ -192,9 +250,13 @@ a {
 }
 
 @media (prefers-color-scheme: dark) {
-  .sidebar-footer__aap-logo {
+  html:not([data-theme="light"]) .sidebar-footer__aap-logo {
     filter: none;
   }
+}
+
+html[data-theme="dark"] .sidebar-footer__aap-logo {
+  filter: none;
 }
 
 .sidebar-footer__credit {
@@ -247,12 +309,19 @@ a {
 }
 
 @media (prefers-color-scheme: dark) {
-  .sidebar-footer__link--issue {
+  html:not([data-theme="light"]) .sidebar-footer__link--issue {
     color: #f0ab00;
   }
-  .sidebar-footer__link--issue:hover {
+  html:not([data-theme="light"]) .sidebar-footer__link--issue:hover {
     color: #f5c451;
   }
+}
+
+html[data-theme="dark"] .sidebar-footer__link--issue {
+  color: #f0ab00;
+}
+html[data-theme="dark"] .sidebar-footer__link--issue:hover {
+  color: #f5c451;
 }
 
 /* Main */
