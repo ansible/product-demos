@@ -1,0 +1,3 @@
+---
+reports_aws_bucket_name: "aws-cloud-report"
+reports_aws_region: "us-west-1"

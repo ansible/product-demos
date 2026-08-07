@@ -1,31 +1,28 @@
 ---
+# aap_user_accounts and gateway_role_user_assignments are handled by
+# the initial bootstrap (install-apd.yml / bootstrap-vars.yml).
+# Defining them here triggers infra.aap_configuration.gateway_users which
+# fails with "async is not supported" on ansible.platform >= 2.7.20260515
+# (redhat-cop/infra.aap_configuration#1368).
+# Restore these once the EE ships ansible.platform >= 2.7.20260615.
+
 controller_execution_environments:
   - name: Cloud Services Execution Environment
     image: quay.io/scottharwell/cloud-ee:latest
+    organization: Ansible Product Demos (APD)
 
 controller_organizations:
-  - name: Default
+  - name: Ansible Product Demos (APD)
     default_environment: Product Demos EE
 
-controller_projects:
-  - name: Ansible Cloud Content Lab - AWS
-    organization: Default
-    scm_type: git
-    wait: true
-    scm_url: https://github.com/ansible-content-lab/aws.infrastructure_config_demos.git
-    default_environment: Cloud Services Execution Environment
-
-  - name: Ansible Cloud AWS Demos
-    organization: Default
-    scm_type: git
-    wait: true
-    scm_url: https://github.com/ansible-cloud/aws_demos.git
-    default_environment: Cloud Services Execution Environment
+controller_inventories:
+  - name: Ansible Product Demos Inventory
+    organization: Ansible Product Demos (APD)
 
 controller_credentials:
   - name: AWS
     credential_type: Amazon Web Services
-    organization: Default
+    organization: Ansible Product Demos (APD)
     update_secrets: false
     state: exists
     inputs:
@@ -34,9 +31,9 @@ controller_credentials:
 
 controller_inventory_sources:
   - name: AWS Inventory
-    organization: Default
+    organization: Ansible Product Demos (APD)
     source: ec2
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     credential: AWS
     overwrite: true
     source_vars:
@@ -44,40 +41,65 @@ controller_inventory_sources:
         - tag:Name
       compose:
         ansible_host: public_ip_address
-        ansible_user: 'ec2-user'
+        ansible_user: ec2-user
+        ansible_winrm_kerberos_hostname_override: tags.Name + '.ansible.local' if platform_details == 'Windows' else omit
       groups:
         cloud_aws: true
-        os_linux: tags.blueprint.startswith('rhel')
-        os_windows: tags.blueprint.startswith('win')
+        os_linux: "platform_details == 'Red Hat Enterprise Linux'"
+        os_windows: "platform_details == 'Windows'"
+
       keyed_groups:
-        - key: platform
-          prefix: os
         - key: tags.blueprint
           prefix: blueprint
         - key: tags.owner
           prefix: owner
         - key: tags.purpose
           prefix: purpose
+        - key: tags.domain
+          prefix: domain
         - key: tags.deployment
           prefix: deployment
+        - key: tags.Compliance
+          separator: ''
 
 controller_groups:
   - name: cloud_aws
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     variables:
       ansible_user: ec2-user
   - name: os_windows
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     variables:
       ansible_connection: winrm
       ansible_winrm_transport: credssp
       ansible_winrm_server_cert_validation: ignore
       ansible_port: 5986
+  - name: domain_ansible_local
+    inventory: Ansible Product Demos Inventory
+    variables:
+      ansible_connection: winrm
+      ansible_winrm_transport: kerberos
+      ansible_winrm_server_cert_validation: ignore
+      ansible_port: 5986
+      ansible_winrm_kinit_env_vars:
+        - KRB5_CONFIG
+  - name: panos_role_webserver
+    inventory: Ansible Product Demos Inventory
+    description: webserver host(s) in Palo Alto demo
+    preserve_existing_hosts: true
+    preserve_existing_children: true
+    variables:
+      ansible_ssh_private_key_file: !unsafe "{{ lookup('env', 'SSH_PROXY_KEY') }}"
+      ansible_ssh_common_args: !unsafe >-
+        -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+        -o ProxyCommand="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+        -i {{ lookup('env', 'SSH_PROXY_KEY') }} -W %h:%p -q {{ ssh_proxy_username }}@{{ ssh_proxy_host }}"
 
 controller_templates:
   - name: SUBMIT FEEDBACK
     job_type: run
-    inventory: Demo Inventory
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
     playbook: feedback.yml
     execution_environment: Default execution environment
@@ -98,14 +120,14 @@ controller_templates:
           variable: feedback
           required: true
 
-  - name: Cloud / AWS / Create VPC
+  - name: Cloud | AWS | Create VPC
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
     project: Ansible Product Demos
     playbook: cloud/create_vpc.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -128,14 +150,15 @@ controller_templates:
           variable: aws_owner_tag
           required: true
 
-  - name: Cloud / AWS / Create Keypair
+  - name: Cloud | AWS | Create Keypair
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
+      - APD Machine Credential
     project: Ansible Product Demos
     playbook: cloud/aws_key.yml
-    inventory: Demo Inventory
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -161,21 +184,21 @@ controller_templates:
         - question_name: Keypair Public Key
           type: textarea
           variable: aws_public_key
-          required: true
-        - question_name: Owner
-          type: text
-          variable: aws_keypair_owner
-          required: true
+          required: false
+          question_description: >-
+            Optional when APD Machine Credential includes an SSH private key — the
+            public key is derived automatically. Otherwise paste the full public key
+            line (for example, from ~/.ssh/id_rsa.pub).
 
-  - name: Cloud / AWS / Create VM
+  - name: Cloud | AWS | Create VM
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-      - Demo Credential
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/create_vm.yml
-    inventory: Demo Inventory
+      - APD Machine Credential
+    project: Ansible Product Demos
+    playbook: cloud/create_vm.yml
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -254,15 +277,14 @@ controller_templates:
           variable: create_vm_aws_image_filter
           required: false
 
-  - name: Cloud / AWS / Delete VM
+  - name: Cloud | AWS | Delete VM
     job_type: run
-    organization: Default
+    organization: Ansible Product Demos (APD)
     credentials:
       - AWS
-      - Demo Credential
-    project: Ansible Cloud Content Lab - AWS
-    playbook: playbooks/delete_inventory_vm.yml
-    inventory: Demo Inventory
+    project: Ansible Product Demos
+    playbook: cloud/delete_vm_by_name.yml
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -271,20 +293,63 @@ controller_templates:
       name: ''
       description: ''
       spec:
-        - question_name: Name or Pattern
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: VM Name
+          type: text
+          variable: create_vm_vm_name
+          required: true
+
+  - name: Cloud | AWS | Resize EC2
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - AAP Credential
+    project: Ansible Product Demos
+    playbook: cloud/resize_ec2.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: aws_region
+          required: true
+          default: us-east-1
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Specify target hosts
           type: text
           variable: _hosts
           required: true
 
+        - question_name: Specify target instance type
+          type: text
+          variable: instance_type
+          default: t3a.medium
+          required: true
+
 controller_notifications:
   - name: Telemetry
-    organization: Default
+    organization: Ansible Product Demos (APD)
     notification_type: webhook
     notification_configuration:
       url: https://script.google.com/macros/s/AKfycbzxUObvCJ6ZbzfJyicw4RvxlGE3AZdrK4AR5-TsedCYd7O-rtTOVjvsRvqyb3rx6B0g8g/exec
       http_method: POST
       headers: {}
-
-controller_settings:
-  - name: SESSION_COOKIE_AGE
-    value: 180000

@@ -1,0 +1,31 @@
+{% if demo.url %}
+  {% assign row_href = demo.url | relative_url %}
+{% elsif demo.github_path %}
+  {% assign row_href = "https://github.com/" | append: site.repository | append: "/blob/main/" | append: demo.github_path %}
+{% else %}
+  {% assign row_href = "#" %}
+{% endif %}
+
+<tr
+  class="demo-row"
+  data-status="{{ demo.status }}"
+  data-category="{{ demo.category }}"
+  data-href="{{ row_href }}"
+  data-search="{{ demo.title | downcase }} {{ demo.subtitle | downcase }} {{ demo.blurb | downcase }} {{ demo.category | downcase }} {% for tag in demo.tags %}{{ tag | downcase }} {% endfor %}"
+  style="cursor:pointer;"
+>
+  <td><span class="demo-row__icon">{{ demo.thumbnail.icon }}</span></td>
+  <td>
+    <div class="demo-row__title"><a href="{{ row_href }}">{{ demo.title }}</a></div>
+    <div class="demo-row__blurb">{{ demo.blurb }}</div>
+  </td>
+  <td class="demo-row__category">{{ demo.category | capitalize }}</td>
+  <td>
+    <div class="demo-row__tags">
+      {% for tag in demo.tags limit:3 %}
+        <span class="tag">{{ tag }}</span>
+      {% endfor %}
+    </div>
+  </td>
+  <td class="demo-row__author">{% if demo.author %}{{ demo.author }}{% endif %}</td>
+</tr>

@@ -20,7 +20,7 @@
 </center>
 <table class="table table-striped mt32 main_net_table">
 <tbody>
-{% for report in reports.files %}
+{% for report in report_server_reports.files %}
         {% set page = report.path.split('/')[-1] %}
         <tr>
             <td class="summary_info">

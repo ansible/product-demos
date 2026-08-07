@@ -8,7 +8,7 @@
   tasks:
     # Install yum-utils if it's not there
     - name: Install yum-utils
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: yum-utils
         state: installed
       check_mode: false

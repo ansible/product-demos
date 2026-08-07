@@ -1,0 +1,80 @@
+---
+# --------------------------------------------------------
+# Shared
+# --------------------------------------------------------
+vault_port: "8200"
+vault_no_log: true
+# Demo OpenShift Routes use edge TLS with cluster router certs (often
+# self-signed / hostname mismatch). Disable verification by default.
+vault_validate_certs: false
+
+# --------------------------------------------------------
+# install_k8s (also referenced by uninstall for detection/cleanup)
+# --------------------------------------------------------
+vault_k8s_namespace: vault
+vault_k8s_release_name: vault
+vault_k8s_helm_repo_name: hashicorp
+vault_k8s_helm_repo_url: https://helm.releases.hashicorp.com
+vault_k8s_helm_chart: hashicorp/vault
+vault_k8s_helm_timeout: 5m0s
+vault_k8s_image_repository: docker.io/hashicorp/vault
+# Leave unset to use the Helm chart's default tag.
+# vault_k8s_image_tag: "2.0.3"
+vault_k8s_dev_root_token: root
+vault_k8s_route_enabled: true
+vault_fqdn: "{{ vault_k8s_release_name }}.apps.{{ vault_k8s_cluster_base_url }}"
+vault_addr: "https://{{ vault_fqdn }}"
+vault_k8s_pod_name: vault-0
+vault_k8s_wait_retries: 30
+vault_k8s_wait_delay: 10
+vault_k8s_health_retries: 12
+vault_k8s_health_delay: 5
+
+# --------------------------------------------------------
+# configure_jwt_auth
+# --------------------------------------------------------
+vault_jwt_oidc_discovery_url: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') }}/o"
+vault_jwt_bound_audiences:
+  - "{{ vault_addr }}"
+vault_jwt_static_role_name: aap-role-static
+vault_jwt_static_policy_name: aap-policy-static
+vault_jwt_static_secret_path: secret/data/aap/*
+vault_jwt_static_bound_claims_organization:
+  - Ansible Product Demos (APD)
+vault_jwt_static_bound_claims:
+  aap_controller_organization_name: "{{ vault_jwt_static_bound_claims_organization }}"
+vault_jwt_dynamic_role_name: aap-role-dynamic
+vault_jwt_dynamic_policy_name: aap-policy-dynamic
+vault_jwt_dynamic_bound_claims:
+  aap_controller_organization_name: "{{ vault_jwt_static_bound_claims_organization }}"
+vault_jwt_dynamic_claim_mappings:
+  aap_controller_organization_name: org
+  aap_controller_job_template_name: job_template
+# The role converts [[ ]] to {{ }} when writing the policy.
+vault_jwt_dynamic_secret_path_template: "secret/data/aap/[[identity.entity.aliases.JWT_ACCESSOR.metadata.org]]/*"
+
+# --------------------------------------------------------
+# configure_kv_engine
+# --------------------------------------------------------
+vault_kv_engine_path: secret
+vault_kv_engine_version: "2"
+vault_kv_sample_secrets:
+  - path: secret/data/aap/Default/ansible-sa
+    data:
+      client_id: guid
+      client_secret: secret
+  - path: secret/data/aap/Ansible Product Demos (APD)/ansible-sa
+    data:
+      client_id: guid
+      client_secret: secret
+
+# --------------------------------------------------------
+# configure_userpass_auth
+# --------------------------------------------------------
+vault_userpass_users_file: vault_users.json
+vault_userpass_admin_policy_name: admin-policy
+vault_userpass_user_policy_name: user-policy
+vault_userpass_user_secret_path: secret/data/*
+vault_userpass_user_secret_metadata_path: secret/metadata/*
+vault_userpass_password_length: 24
+vault_userpass_password_chars: ascii_letters,digits

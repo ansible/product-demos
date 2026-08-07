@@ -1,0 +1,100 @@
+<hr class="sean_line">
+<div id="instance_breakdown">Instance Compliance Report</div>
+<table class="instance_info">
+<tbody>
+  <tr>
+    <th class="instance_info">Name</th>
+    <th class="instance_info">OpenSCAP</th>
+    <th class="instance_info">Webserver</th>
+    <th class="instance_info">ID</th>
+    <th class="instance_info">VPC ID</th>
+    <th class="instance_info">Tag(s)</th>
+    <th class="instance_info">Tag Policy Violations</th>
+    <th class="instance_info">Firewalld Status</th>
+    <th class="instance_info">MOTD Status</th>
+    <th class="instance_info">SELinux</th>
+  </tr>
+  {% for instance in value.ec2_instance_info.instances %}
+  <tr>
+    <td>{{ instance.tags['Name'] | default('<span class="ui-accordion-header-icon ui-icon ui-icon-circle-close"></span>no name tag') }}</td>
+    <td>
+      {% set host = instance.tags['Name'] %}
+      {% if 'openscap_webserver' not in hostvars[host] %}
+        <span class="service-running">Unable to connect and retrieve info.</span>
+      {% elif 'openscap_webserver' in hostvars[host] and hostvars[host]['openscap_webserver'].status != -1 and hostvars[host]['openscap_webserver'].status != 404 %}
+        <span class="service-running"><a target="_new" href="{{ hostvars[host]['openscap_webserver'].url }}">Report</a></span>
+      {% else %}
+        <span class="service-running">N/A</span>
+      {% endif %}
+    </td>
+    <td>
+      {% set host = instance.tags['Name'] %}
+      {% if 'webserver' not in hostvars[host] %}
+        <span class="service-running">Unable to connect and retrieve info.</span>
+      {% elif 'webserver' in hostvars[host] and hostvars[host]['webserver'].status != -1 and hostvars[host]['webserver'].status != 404 %}
+        <span class="service-running"><a target="_new" href="{{ hostvars[host]['webserver'].url }}">Link</a></span>
+      {% else %}
+        <span class="service-running">N/A</span>
+      {% endif %}
+    </td>
+    <td>{{ instance.instance_id | default('Unknown instance ID') }}</td>
+    <td>{{ instance.vpc_id | default('Unknown VPC ID') }}</td>
+    <td>
+      {% if instance.tags | length > 0 %}<ul>
+      {% for key, value in instance.tags.items() %}
+        <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+    </td>
+    <td>
+      {% if required_tag is defined %}
+      {% if required_tag not in instance.tags %}
+      <class id="severity_button">Severity: {{ required_tag_severity | default('LOW') }}</class>
+      <p class="violation">Required tag <code class="sean_box">{{ required_tag }}</code> is missing</p>
+      {% else %}
+         <class id="compliant_button">Compliant.</class>
+         <p class="compliant">Required tag is present.</p>
+      {% endif %}
+      {% endif %}
+    </td>
+    <td>
+      {% set host = instance.tags['Name'] %}
+      {% if hostvars[host]['ansible_facts']['services']['firewalld.service'] is not defined %}
+        <span class="service-running">Unable to connect and retrieve info.</span>
+      {% elif hostvars[host]['ansible_facts']['services']['firewalld.service'] is defined and hostvars[host]['ansible_facts']['services']['firewalld.service']['state'] == "running" %}
+      <class id="compliant_button">Compliant.</class>
+      <p class="compliant">Running</p>
+      {% else %}
+        <class id="firewalld_severity">Severity: {{ firewalld_severity | default('HIGH') }}</class>
+        <span class="service-not-running"><p class="violation">Not Running</p></span>
+      {% endif %}
+    </td>
+    <td>
+      {% set host = instance.tags['Name'] %}
+      {% if 'motd_file' not in hostvars[host] %}
+        <span class="service-running">Unable to connect and retrieve info.</span>
+      {% elif 'motd_file' in hostvars[host] and hostvars[host]['motd_file'].stat.exists and hostvars[host]['motd_file'].stat.size > 0 %}
+        <class id="compliant_button">Compliant.</class>
+        <p class="compliant">/etc/motd file exists and contains data.</p>
+      {% else %}
+        <class id="motd_severity">Severity: {{ motd_severity | default('LOW') }}</class>
+        <span class="motd-not-running"><p class="violation">MOTD is non-compliant</p></span>
+      {% endif %}
+    </td>
+    <td>
+      {% set host = instance.tags['Name'] %}
+      {% if 'selinux_status' not in hostvars[host] %}
+        <p class="connect">Unable to connect and retrieve info.</p>
+      {% elif 'selinux_status' in hostvars[host] and hostvars[host]['selinux_status'].stdout == "Enforcing" %}
+        <class id="compliant_button">Compliant.</class>
+       <p class="compliant">The server is in compliance with the SELinux policy.</p>
+      {% else %}
+        <class id="selinux_severity">Severity: {{ selinux_severity | default('HIGH') }}</class>
+        <span class="motd-not-running"><p class="violation">The server is out of compliance with the SELinux policy.</p></span>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>

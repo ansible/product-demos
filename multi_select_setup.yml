@@ -4,7 +4,7 @@
   gather_facts: false
   vars:
     launch_jobs:
-      name: "Product Demos | Single demo setup"
+      name: "APD | Single demo setup"
       wait: true
   tasks:
     - name: Build controller launch jobs
@@ -14,6 +14,6 @@
 
     - name: Default Components
       ansible.builtin.include_role:
-        name: "infra.controller_configuration.job_launch"
-      vars:
-        controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
+        name: "infra.aap_configuration.controller_job_launch"
+
+...

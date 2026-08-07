@@ -1,5 +1,6 @@
 ---
 - name: Retrieve Operator name
+  # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _operator: "{{ vars['cluster_config_' + _operator_name] }}"
 - name: Configure Operator {{ _operator_name }}
@@ -10,6 +11,7 @@
       - operators/operator_group.yml.j2
       - operators/subscription.yml.j2
 - name: Query for install plan
+  # noqa var-naming[no-role-prefix]
   kubernetes.core.k8s_info:
     api_version: operators.coreos.com/v1alpha1
     kind: InstallPlan
@@ -26,6 +28,7 @@
     - _operator.checkplan | bool
 
 - name: Configure extra resources for Operator {{ _operator_name }}
+  # noqa var-naming[no-role-prefix]
   redhat.openshift.k8s:
     state: present
     definition: "{{ item }}"

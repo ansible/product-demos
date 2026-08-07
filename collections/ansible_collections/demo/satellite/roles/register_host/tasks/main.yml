@@ -10,7 +10,7 @@
     name: "{{ instance_name }}"
 
 - name: Remove rhui client packages
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name:
       - google-rhui-client*
       - rh-amazon-rhui-client*
@@ -19,17 +19,17 @@
 - name: Get current repos
   ansible.builtin.command:
     cmd: ls /etc/yum.repos.d/
-  register: repos
+  register: register_host_repos
   changed_when: false
 
 - name: Remove existing rhui repos
   ansible.builtin.file:
     path: "/etc/yum.repos.d/{{ item }}"
     state: absent
-  loop: "{{ repos.stdout_lines }}"
+  loop: "{{ register_host_repos.stdout_lines }}"
 
 - name: Install satellite certificate
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: "{{ satellite_url }}/pub/katello-ca-consumer-latest.noarch.rpm"
     state: present
     validate_certs: false
@@ -53,7 +53,7 @@
     state: enabled
 
 - name: Install satellite client
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name:
       - katello-host-tools
       - katello-host-tools-tracer

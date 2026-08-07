@@ -35,17 +35,17 @@
             <td>{{hostvars[linux_host]['ansible_distribution_version']|default("none")}}</td>
             <td>
               <ul>
-{% if hostvars[linux_host].patchingresult_yum.changed|default("false",true) == true %}
-{% for packagename in hostvars[linux_host].patchingresult_yum.changes.updated|sort %}
+{% if hostvars[linux_host].patch_linux_patchingresult_yum.changed|default("false",true) == true %}
+{% for packagename in hostvars[linux_host].patch_linux_patchingresult_yum.changes.updated|sort %}
         <li> {{ packagename[0] }} - {{ packagename[1] }} </li>
 {% endfor %}
-{% elif hostvars[linux_host].patchingresult_dnf.changed|default("false",true) == true %}
-{% for packagename in hostvars[linux_host].patchingresult_dnf.results|sort %}
+{% elif hostvars[linux_host].patch_linux_patchingresult_dnf.changed|default("false",true) == true %}
+{% for packagename in hostvars[linux_host].patch_linux_patchingresult_dnf.results|sort %}
         <li> {{ packagename }} </li>
 {% endfor %}
-{% elif hostvars[linux_host].patchingresult_dnf.changed is undefined %}
+{% elif hostvars[linux_host].patch_linux_patchingresult_dnf.changed is undefined %}
         <li> Patching Failed </li>
-{% elif hostvars[linux_host].patchingresult_yum.changed is undefined %}
+{% elif hostvars[linux_host].patch_linux_patchingresult_yum.changed is undefined %}
         <li> Patching Failed </li>
 {% else %}
         <li> Compliant </li>

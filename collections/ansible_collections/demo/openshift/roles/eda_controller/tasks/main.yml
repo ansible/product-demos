@@ -17,14 +17,14 @@
         kind: Route
         name: "{{ eda_controller_project_app_name }}"
         namespace: "{{ eda_controller_project }}"
-      register: r_eda_route
-      until: r_eda_route.resources[0].spec.host is defined
+      register: eda_controller_r_eda_route
+      until: eda_controller_r_eda_route.resources[0].spec.host is defined
       retries: 30
       delay: 45
 
     - name: Get eda-controller route hostname
       ansible.builtin.set_fact:
-        eda_controller_hostname: "{{ r_eda_route.resources[0].spec.host }}"
+        eda_controller_hostname: "{{ eda_controller_r_eda_route.resources[0].spec.host }}"
 
     - name: Wait for eda_controller to be running
       ansible.builtin.uri:
@@ -36,8 +36,8 @@
         validate_certs: false
         body_format: json
         status_code: 200
-      register: r_result
-      until: not r_result.failed
+      register: eda_controller_r_result
+      until: not eda_controller_r_result.failed
       retries: 60
       delay: 45
 

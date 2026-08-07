@@ -16,7 +16,7 @@
 
     - name: Create common demo resources
       ansible.builtin.include_role:
-        name: infra.controller_configuration.dispatch
+        name: infra.aap_configuration.dispatch
       vars:
         controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
 
@@ -29,7 +29,7 @@
 
     - name: Demo Components
       ansible.builtin.include_role:
-        name: infra.controller_configuration.dispatch
+        name: infra.aap_configuration.dispatch
       vars:
         controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
 

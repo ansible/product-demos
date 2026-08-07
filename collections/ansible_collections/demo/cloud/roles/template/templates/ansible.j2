@@ -1,0 +1,33 @@
+<!-- INTERNAL TABLE FOR Ansible -->
+<div id="accordion">
+<div>
+<h3>Ansible Automation Info</h3>
+<div class="net_content">
+<table class="net_info">
+<tbody>
+  <tr>
+    <td>Ansible user</td>
+    <td class="sub_net_info">{{ ansible_user_id | default('unknown') }}</td>
+  </tr>
+  <tr>
+    <td>Ansible FQDN</td>
+    <td class="sub_net_info">{{ ansible_fqdn | default('unknown') }}</td>
+  </tr>
+  <tr>
+    <td>Ansible core version</td>
+    <td class="sub_net_info">{{ ansible_version.full }}</td>
+  </tr>
+  <tr>
+    <td>Ansible Python</td>
+    <td class="sub_net_info">{{ ansible_python_version | default('unknown')}}</td>
+  </tr>
+  <tr>
+    <td>Host OS</td>
+    <td class="sub_net_info">{{ ansible_distribution | default ("unknown distribution")}} {{ ansible_distribution_version | default ("unknown distro version") }}</td>
+  </tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- END INTERNAL TABLE FOR Ansible -->

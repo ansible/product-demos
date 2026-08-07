@@ -20,12 +20,12 @@
 
     # Install subscription-manager if it's not there
     - name: Install subscription-manager
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: subscription-manager
         state: present
 
     - name: Remove rhui client packages
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: rh-amazon-rhui-client*
         state: removed
 
@@ -43,7 +43,7 @@
       when: "'rhui' in item"
 
     - name: Install katello package
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: "https://{{ sat_url }}/pub/katello-ca-consumer-latest.noarch.rpm"
         state: present
         validate_certs: false

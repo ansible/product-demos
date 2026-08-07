@@ -10,7 +10,7 @@
         # Example result: ['&Qw2|E[-']
 
     - name: Create new user
-      community.windows.win_domain_user:
+      microsoft.ad.user:
         name: "{{ firstname }} {{ surname }}"
         firstname: "{{ firstname }}"
         surname: "{{ surname }}"

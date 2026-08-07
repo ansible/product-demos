@@ -1,0 +1,336 @@
+---
+argument_specs:
+  install_k8s:
+    short_description: Install Vault on OpenShift via Helm
+    options:
+      vault_port:
+        type: str
+        required: true
+        description: TCP port Vault listens on inside the pod
+      vault_no_log:
+        type: bool
+        required: false
+        default: true
+        description: Suppress sensitive task output
+      vault_validate_certs:
+        type: bool
+        required: false
+        default: false
+        description: >-
+          Validate TLS certificates when probing Vault over the OpenShift
+          Route (ansible.builtin.uri). Defaults to false for demo clusters
+          with self-signed or hostname-mismatched router certs.
+      vault_k8s_namespace:
+        type: str
+        required: false
+        default: vault
+        description: Kubernetes namespace for the Vault release
+      vault_k8s_release_name:
+        type: str
+        required: false
+        default: vault
+        description: Helm release name
+      vault_k8s_helm_repo_name:
+        type: str
+        required: false
+        default: hashicorp
+        description: Name of the Helm repository to add
+      vault_k8s_helm_repo_url:
+        type: str
+        required: false
+        default: https://helm.releases.hashicorp.com
+        description: URL of the Helm repository to add
+      vault_k8s_helm_chart:
+        type: str
+        required: false
+        default: hashicorp/vault
+        description: Helm chart reference for Vault
+      vault_k8s_helm_timeout:
+        type: str
+        required: false
+        default: 5m0s
+        description: Helm wait timeout (e.g. 5m0s)
+      vault_k8s_image_repository:
+        type: str
+        required: false
+        default: docker.io/hashicorp/vault
+        description: >-
+          Vault server image repository. Fully qualified (docker.io/...) so
+          OpenShift short-name search does not pull from
+          registry.connect.redhat.com.
+      vault_k8s_image_tag:
+        type: str
+        required: false
+        description: >-
+          Vault server image tag. When unset, the Helm chart default tag is used.
+      vault_k8s_dev_root_token:
+        type: str
+        required: false
+        default: root
+        description: >-
+          Root token for the Helm chart "dev" mode Vault (always deployed
+          already initialized and unsealed)
+      vault_k8s_route_enabled:
+        type: bool
+        required: false
+        default: true
+        description: Create an OpenShift Route for external access
+      vault_k8s_cluster_base_url:
+        type: str
+        required: false
+        description: >-
+          Cluster base domain (e.g. cluster.example.com) or the OpenShift
+          apps domain (apps.cluster.example.com). A leading apps. prefix and
+          any scheme are stripped before composing the Route host as
+          <vault_k8s_release_name>.apps.<base>. When unset, discovered from
+          config.openshift.io/v1 Ingress/cluster.
+      vault_k8s_pod_name:
+        type: str
+        required: false
+        default: vault-0
+        description: Vault server pod name used for the oc exec vault_cli
+      vault_k8s_wait_retries:
+        type: int
+        required: false
+        default: 30
+        description: Retries while waiting for the Vault pod to become ready
+      vault_k8s_wait_delay:
+        type: int
+        required: false
+        default: 10
+        description: Delay in seconds between pod readiness polls
+      vault_k8s_health_retries:
+        type: int
+        required: false
+        default: 12
+        description: Retries while verifying Vault HTTP health
+      vault_k8s_health_delay:
+        type: int
+        required: false
+        default: 5
+        description: Delay in seconds between Vault health checks
+
+  configure_jwt_auth:
+    short_description: Enable and configure Vault JWT auth for AAP OIDC workload identity
+    options:
+      vault_cli:
+        type: str
+        required: true
+        description: Vault CLI invocation (oc exec wrapper, set by install_k8s)
+      vault_cli_addr:
+        type: str
+        required: true
+        description: VAULT_ADDR value for CLI operations (set by install_k8s)
+      vault_token:
+        type: str
+        required: false
+        description: >-
+          Vault root or admin token. Optional when set by install_k8s in the
+          same play; otherwise falls back to vault_k8s_dev_root_token.
+      vault_k8s_dev_root_token:
+        type: str
+        required: false
+        default: root
+        description: Fallback root token when vault_token is unset (Helm chart dev mode)
+      vault_no_log:
+        type: bool
+        required: false
+        default: true
+        description: Suppress sensitive task output
+      vault_jwt_oidc_discovery_url:
+        type: str
+        required: false
+        default: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') }}/o"
+        description: >-
+          AAP OIDC discovery URL (AAP base URL with /o suffix). Defaults to
+          the CONTROLLER_HOST environment variable injected by the AAP
+          Credential attached to the job template.
+      vault_jwt_oidc_discovery_ca_pem:
+        type: path
+        required: false
+        description: Controller-side path to CA PEM for AAP TLS discovery (optional)
+      vault_jwt_bound_audiences:
+        type: list
+        elements: str
+        required: false
+        description: Audiences accepted by JWT roles (defaults to vault_addr)
+      vault_jwt_static_role_name:
+        type: str
+        required: false
+        default: aap-role-static
+        description: Name of the static JWT role
+      vault_jwt_static_policy_name:
+        type: str
+        required: false
+        default: aap-policy-static
+        description: Name of the static Vault policy
+      vault_jwt_static_secret_path:
+        type: str
+        required: false
+        default: secret/data/aap/*
+        description: KV path granted read by the static policy
+      vault_jwt_static_bound_claims:
+        type: dict
+        required: false
+        description: bound_claims mapping for the static JWT role
+      vault_jwt_dynamic_role_name:
+        type: str
+        required: false
+        default: aap-role-dynamic
+        description: Name of the dynamic JWT role
+      vault_jwt_dynamic_policy_name:
+        type: str
+        required: false
+        default: aap-policy-dynamic
+        description: Name of the templated Vault policy
+      vault_jwt_dynamic_bound_claims:
+        type: dict
+        required: false
+        description: bound_claims mapping for the dynamic JWT role
+      vault_jwt_dynamic_claim_mappings:
+        type: dict
+        required: false
+        description: JWT claim to metadata mappings for templated policies
+      vault_jwt_dynamic_secret_path_template:
+        type: str
+        required: false
+        description: >-
+          Templated KV path for the dynamic policy. Use JWT_ACCESSOR as a
+          placeholder for the jwt/ auth method accessor, and [[ ]] as
+          stand-ins for Vault identity template braces (so Ansible does not
+          interpolate them).
+
+  configure_kv_engine:
+    short_description: Enable KV v2 secrets engine and seed sample secrets for e2e testing
+    options:
+      vault_cli:
+        type: str
+        required: true
+        description: Vault CLI invocation (oc exec wrapper, set by install_k8s)
+      vault_cli_addr:
+        type: str
+        required: true
+        description: VAULT_ADDR value for CLI operations (set by install_k8s)
+      vault_token:
+        type: str
+        required: false
+        description: >-
+          Vault root or admin token. Optional when set by install_k8s in the
+          same play; otherwise falls back to vault_k8s_dev_root_token.
+      vault_k8s_dev_root_token:
+        type: str
+        required: false
+        default: root
+        description: Fallback root token when vault_token is unset (Helm chart dev mode)
+      vault_no_log:
+        type: bool
+        required: false
+        default: true
+        description: Suppress sensitive task output
+      vault_kv_engine_path:
+        type: str
+        required: false
+        default: secret
+        description: Mount path for the KV secrets engine
+      vault_kv_engine_version:
+        type: str
+        required: false
+        default: "2"
+        description: KV secrets engine version (1 or 2)
+      vault_kv_sample_secrets:
+        type: list
+        elements: dict
+        required: false
+        description: >-
+          List of sample secrets to seed. Each entry has a path (KV v2 data
+          path) and a data dict of key-value pairs. Default entries align
+          with the static and dynamic JWT policy paths for e2e testing.
+
+  configure_userpass_auth:
+    short_description: Enable userpass auth and create users from a JSON config file
+    options:
+      vault_cli:
+        type: str
+        required: true
+        description: Vault CLI invocation (oc exec wrapper, set by install_k8s)
+      vault_cli_addr:
+        type: str
+        required: true
+        description: VAULT_ADDR value for CLI operations (set by install_k8s)
+      vault_token:
+        type: str
+        required: false
+        description: >-
+          Vault root or admin token. Optional when set by install_k8s in the
+          same play; otherwise falls back to vault_k8s_dev_root_token.
+      vault_k8s_dev_root_token:
+        type: str
+        required: false
+        default: root
+        description: Fallback root token when vault_token is unset (Helm chart dev mode)
+      vault_no_log:
+        type: bool
+        required: false
+        default: true
+        description: Suppress sensitive task output
+      vault_userpass_users_file:
+        type: str
+        required: false
+        default: vault_users.json
+        description: >-
+          Filename under the role files/ directory containing the users list
+          (username, role admin|user, optional password)
+      vault_userpass_admin_policy_name:
+        type: str
+        required: false
+        default: admin-policy
+        description: Policy name attached to role=admin users (full access)
+      vault_userpass_user_policy_name:
+        type: str
+        required: false
+        default: user-policy
+        description: Policy name attached to role=user users (read policies and secrets)
+      vault_userpass_user_secret_path:
+        type: str
+        required: false
+        default: secret/data/*
+        description: KV data path granted read/list by the user policy
+      vault_userpass_user_secret_metadata_path:
+        type: str
+        required: false
+        default: secret/metadata/*
+        description: KV metadata path granted read/list by the user policy
+      vault_userpass_password_length:
+        type: int
+        required: false
+        default: 24
+        description: Length of auto-generated userpass passwords
+      vault_userpass_password_chars:
+        type: str
+        required: false
+        default: ascii_letters,digits
+        description: Character classes for auto-generated passwords (password lookup)
+
+  uninstall:
+    short_description: Remove the Vault Helm release, OpenShift Route, and namespace
+    options:
+      vault_k8s_namespace:
+        type: str
+        required: false
+        default: vault
+        description: Kubernetes namespace used for Helm release detection and cleanup
+      vault_k8s_release_name:
+        type: str
+        required: false
+        default: vault
+        description: Helm release name used for detection and cleanup
+      vault_k8s_route_enabled:
+        type: bool
+        required: false
+        default: true
+        description: Whether an OpenShift Route was created and should be removed
+      vault_k8s_helm_timeout:
+        type: str
+        required: false
+        default: 5m0s
+        description: Helm wait timeout when uninstalling the release

@@ -5,7 +5,7 @@
 
   vars:
     aws_vpc_name: aws-test-vpc
-    aws_owner_tag: default
+    aws_owner_tag: "{{ create_vm_aws_owner_tag | default(create_vm_vm_owner | default('apd-demo')) }}"
     aws_purpose_tag: ansible_demo
     aws_tenancy: default
     aws_vpc_cidr_block: 10.0.0.0/16
@@ -72,6 +72,7 @@
               - 443  # HTTPS
               - 22  # SSH
               - 5986  # WinRM
+              - 88  # Kerberos Authentication
               - 3389  # RDP
               - 9090  # Cockpit
             cidr_ip: 0.0.0.0/0
@@ -85,7 +86,6 @@
               - 5986  # WinRM
               - 3389  # RDP
               - 53  # DNS
-              - 88  # Kerberos Authentication
               - 135  # RPC
               - 139  # Netlogon
               - 389  # LDAP

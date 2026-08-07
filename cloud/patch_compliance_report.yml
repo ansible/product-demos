@@ -1,0 +1,366 @@
+---
+- name: Gather patch compliance data
+  hosts: "{{ _hosts | default('os_linux') }}:{{ _hosts_windows | default('os_windows') }}"
+  gather_facts: true
+
+  vars:
+    _raw_cve_input: "{{ input_cve_ids | default('RHSA-2024:3138, CVE-2024-33599') }}"
+    cve_advisory_ids: "{{ (_raw_cve_input.split(',') | map('trim') | list) if _raw_cve_input is string else _raw_cve_input }}"
+    _raw_kb_input: "{{ input_kb_ids | default('KB5044284, KB5044030') }}"
+    target_kb_ids: "{{ (_raw_kb_input.split(',') | map('trim') | list) if _raw_kb_input is string else _raw_kb_input }}"
+
+  tasks:
+    - name: Clear stale facts from previous runs
+      ansible.builtin.set_fact:
+        compliance_status: null
+        rhsm_registered: null
+        rhsm_unregistered: null
+        cacheable: true
+
+    - name: RHEL audit block
+      when:
+        - ansible_os_family == "RedHat"
+      become: true
+      block:
+        - name: Ensure RHSM registration
+          ansible.builtin.include_tasks: tasks/rhsm_ensure_registered.yml
+
+        - name: Ensure swap for DNF operations
+          ansible.builtin.include_tasks: tasks/ensure_swap.yml
+          when: rhsm_registered | default(false)
+
+        - name: Check RHEL for targeted advisories
+          ansible.builtin.command: >-
+            dnf updateinfo list --setopt=metadata_expire=7200
+            {{ cve_advisory_ids | map('regex_replace', '^', '--advisory=') | join(' ') }}
+          register: rhel_target_check
+          changed_when: false
+          when: rhsm_registered | default(false)
+
+        - name: Get all missing security advisories
+          ansible.builtin.command: "dnf updateinfo list security --quiet --setopt=metadata_expire=7200"
+          register: rhel_all_vulns
+          changed_when: false
+          when: rhsm_registered | default(false)
+
+        - name: Check if RHEL needs a reboot
+          ansible.builtin.command: "needs-restarting -r"
+          register: rhel_reboot_check
+          failed_when: false
+          changed_when: false
+          when: rhsm_registered | default(false)
+
+        - name: Set RHEL compliance facts (registered host)
+          ansible.builtin.set_fact:
+            missing_targets: "{{ cve_advisory_ids | select('in', rhel_target_check.stdout | default('')) | list }}"
+            full_vulns: >-
+              {{ rhel_all_vulns.stdout_lines | default([])
+                 | map('regex_search', '(RHSA-\d{4}:\d+|CVE-\d{4}-\d+)')
+                 | select('string') | list | unique }}
+            reboot_needed: "{{ 'YES' if rhel_reboot_check.rc != 0 else 'NO' }}"
+            cacheable: true
+          when: rhsm_registered | default(false)
+
+        - name: Set RHEL compliance facts (unregistered host)
+          ansible.builtin.set_fact:
+            missing_targets: []
+            full_vulns: []
+            reboot_needed: "N/A"
+            cacheable: true
+          when: rhsm_unregistered | default(false)
+
+        - name: Set RHEL compliance status
+          ansible.builtin.set_fact:
+            compliance_status: "{{ 'UNREGISTERED' if rhsm_unregistered | default(false) else ('VULNERABLE' if (missing_targets | length > 0) else 'COMPLIANT') }}"
+            cacheable: true
+
+    - name: Windows audit block
+      when:
+        - ansible_os_family == "Windows"
+      block:
+        - name: Force Windows Update scan
+          ansible.windows.win_shell: |
+            $updateSession = New-Object -ComObject Microsoft.Update.Session
+            $updateSearcher = $updateSession.CreateUpdateSearcher()
+            $searchResult = $updateSearcher.Search("IsInstalled=0")
+            Write-Output "Found $($searchResult.Updates.Count) missing updates"
+          register: win_force_scan
+          changed_when: false
+
+        - name: Discover all missing Windows KBs
+          ansible.windows.win_updates:
+            category_names:
+              - SecurityUpdates
+              - CriticalUpdates
+              - Updates
+              - DefinitionUpdates
+            state: searched
+          register: win_all_check
+
+        - name: Check for Windows pending reboot
+          ansible.windows.win_shell: |
+            $reboot = $false
+            if (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending" -ErrorAction SilentlyContinue) { $reboot = $true }
+            if (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired" -ErrorAction SilentlyContinue) { $reboot = $true }
+            $reboot
+          register: win_reboot_check
+          changed_when: false
+
+        - name: Set Windows vulnerability facts
+          ansible.builtin.set_fact:
+            missing_targets: "{{ win_all_check.updates | selectattr('kb', 'defined') | map(attribute='kb') | select('in', target_kb_ids) | list }}"
+            full_vulns: "{{ win_all_check.updates | selectattr('kb', 'defined') | map(attribute='kb') | list }}"
+            reboot_needed: "{{ 'YES' if 'True' in win_reboot_check.stdout else 'NO' }}"
+            win_total_scanned: "{{ win_force_scan.stdout_lines[0] | default('Scan results unavailable') }}"
+            cacheable: true
+
+        - name: Set Windows compliance status
+          ansible.builtin.set_fact:
+            compliance_status: "{{ 'VULNERABLE' if (missing_targets | length > 0) else 'COMPLIANT' }}"
+            cacheable: true
+
+    - name: Set OS label
+      ansible.builtin.set_fact:
+        os_label: >-
+          {{ ansible_distribution | default('Unknown') }}
+          {{ ansible_distribution_major_version | default('') }}
+        cacheable: true
+
+    - name: Display compliance summary
+      ansible.builtin.debug:
+        msg:
+          - "Host: {{ inventory_hostname }}"
+          - "OS: {{ os_label | default('Unknown') }}"
+          - "Status: {{ compliance_status | default('UNKNOWN') }}"
+          - "Missing Targets: {{ missing_targets | default([]) | join(', ') or 'None' }}"
+          - "Reboot Needed: {{ reboot_needed | default('UNKNOWN') }}"
+
+- name: Generate patch compliance report
+  hosts: "{{ _report_server | default('reports') }}"
+  become: true
+  gather_facts: true
+
+  vars:
+    _raw_cve_input: "{{ input_cve_ids | default('RHSA-2024:3138, CVE-2024-33599') }}"
+    cve_advisory_ids: "{{ (_raw_cve_input.split(',') | map('trim') | list) if _raw_cve_input is string else _raw_cve_input }}"
+    _raw_kb_input: "{{ input_kb_ids | default('KB5044284, KB5044030') }}"
+    target_kb_ids: "{{ (_raw_kb_input.split(',') | map('trim') | list) if _raw_kb_input is string else _raw_kb_input }}"
+    audit_hosts: "{{ groups[_hosts | default('os_linux')] | default([]) + groups[_hosts_windows | default('os_windows')] | default([]) }}"
+
+  tasks:
+    - name: Ensure swap for DNF operations
+      ansible.builtin.include_tasks: tasks/ensure_swap.yml
+
+    - name: Install httpd
+      ansible.builtin.dnf:
+        name: httpd
+        state: present
+
+    - name: Start and enable httpd
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: Copy AAP logo to web root
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/patch_files/aap-logo-standard.png"
+        dest: /var/www/html/aap-logo.png
+        mode: "0644"
+
+    - name: Generate HTML compliance report
+      ansible.builtin.copy:
+        dest: /var/www/html/patch_report.html
+        mode: "0644"
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Patch Compliance Report</title>
+              <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAB+ElEQVR4nO2bwXXDIAyGpf+xQqboAJ2gQ/SYGTpHZ/AxQ3SCDNApMkR69eNBLIGQceXv5gRL+mWMZQxEJycnkWFPZ5e3j6e07eP3xyU2nkXwXgnh2YWPTgQfRfioRLCX8Mf1U293uQ1PBGhS8dLzensdZhXvlQRuOUnqsFe89nZouSV4T/GX5XZftX8XtDdPAqQNrUf5tfjScZdtRZyg4GDGZ7wF0nhhaUxDfs9LxgAtkriThZFWRoguxf9qUEzkyPPrKm7L3wt5AK+rrxHf0r5VByg4+C+j/hY1PUlryLK8HeVbWjFWe0AtW3uK11CLs6QLvUZnRRovLI3NhiRu3uoqGvGWjy7LOmE9JuRFEaxGf0/xPf5yfanJiPI9fjQ98aDHWenYm954QMEBBQczvsd7xpMsnO5NTzyg4ICCAwoOKDiw+trqNYfX6y/Xx5J62eJtsKV2t0hqPjmy+TLUO8MyE5K4YWlsJqTxovRjbRw4ShJqcZZ0JSvjHrNIIy4A9l6n50VNDyg4ePWnZS/QPtIs64ppPo6yc7EkIUmyN+ozmcfc4lYvhoWRFjzmFiVxw9LYTEjjBQUHmsaWvWDk3KImTm5xEHqlqPda4dGrxtFyksZpb/0+esk8Wk/0SILHfgEmQ8LuGMkJu2coJ+yusSPtGzw5odj8AbouGEQ1H9H2AAAAAElFTkSuQmCC">
+              <style>
+                  body { font-family: 'Red Hat Display', 'Segoe UI', sans-serif; margin: 20px; background-color: #f0f0f0; }
+                  .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 98%; margin: auto; }
+                  .report-header { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+                  .report-header img { height: 42px; }
+                  .report-header h1 { margin: 0; font-size: 1.6em; }
+                  .report-header .host-count { font-size: 0.55em; color: #6a6e73; font-weight: 400; }
+                  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; vertical-align: top; word-wrap: break-word; }
+                  th { background-color: #1a1a2e; color: white; position: sticky; top: 0; z-index: 1; }
+                  tbody tr:nth-child(even) { background-color: #f8f9fa; }
+                  tr.row-compliant { border-left: 3px solid #3e8635; }
+                  tr.row-vulnerable { border-left: 3px solid #c9190b; background-color: #fef2f2 !important; }
+                  tr.row-unregistered { border-left: 3px solid #f0ab00; background-color: #fdf7e7 !important; }
+                  .VULNERABLE { color: #c9190b; font-weight: bold; }
+                  .COMPLIANT { color: #3e8635; font-weight: bold; }
+                  .UNREGISTERED { color: #6a6e73; font-weight: bold; font-style: italic; }
+                  .reboot-YES { color: #f0ab00; font-weight: bold; }
+                  .reboot-NO { color: #adb5bd; }
+                  .os-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+                  .os-rhel { background: #fce8e8; color: #a30000; border: 1px solid #f5c6c6; }
+                  .os-windows { background: #e1f0ff; color: #004080; border: 1px solid #b8d9f5; }
+                  .vuln-tag { display: inline-block; background: #e9ecef; color: #495057; padding: 2px 8px; border-radius: 4px; margin: 2px; font-size: 11px; font-family: 'Red Hat Mono', 'Courier New', monospace; border: 1px solid #dee2e6; }
+                  details summary { cursor: pointer; color: #06c; font-size: 13px; }
+                  details summary:hover { text-decoration: underline; }
+                  .review-box { background-color: #e7f1fa; border: 1px solid #bee1f4; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+                  .stats-bar { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+                  .stat-card { flex: 1; min-width: 120px; padding: 14px 18px; border-radius: 8px; border: 1px solid #dee2e6; background: #fff; }
+                  .stat-card .stat-value { font-size: 28px; font-weight: 700; line-height: 1; }
+                  .stat-card .stat-label { font-size: 12px; color: #6a6e73; margin-top: 4px; }
+                  .stat-total .stat-value { color: #1a1a2e; }
+                  .stat-compliant .stat-value { color: #3e8635; }
+                  .stat-vulnerable .stat-value { color: #c9190b; }
+                  .stat-unregistered .stat-value { color: #f0ab00; }
+                  .warning-box { background-color: #fdf7e7; border: 1px solid #f0ab00; padding: 15px; border-radius: 8px; margin-top: 20px; }
+                  .warning-box h3 { margin-top: 0; color: #795600; }
+                  .report-footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid #dee2e6; display: flex; align-items: center; gap: 8px; font-size: 13px; color: #6a6e73; }
+                  .report-footer a { color: #06c; text-decoration: none; }
+                  .report-footer a:hover { text-decoration: underline; }
+                  .report-footer svg { vertical-align: middle; }
+                  .timestamp { color: #6a6e73; font-size: 13px; margin-bottom: 6px; }
+                  @media print {
+                      body { background: white; margin: 0; }
+                      .container { box-shadow: none; width: 100%; }
+                      th { position: static; }
+                      details[open] summary { display: none; }
+                      details { display: block; }
+                      details > div { display: block !important; }
+                      tr.row-vulnerable { background-color: #fef2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                      tr.row-unregistered { background-color: #fdf7e7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="report-header">
+                      <img src="aap-logo.png" alt="Red Hat Ansible Automation Platform">
+                      <h1>Patch Compliance Dashboard <span class="host-count">({{ audit_hosts | length }} hosts)</span></h1>
+                  </div>
+                  {% if awx_job_id is defined and tower_host is defined %}
+                  <p style="margin: 4px 0 12px; font-size: 13px;">
+                      <a href="{{ tower_host }}/#/jobs/workflow/{{ awx_job_id }}" target="_blank" style="color: #06c;">View workflow run in AAP &rarr;</a>
+                  </p>
+                  {% endif %}
+                  <div class="review-box">
+                      <h3 style="margin-top: 0; color: #06c;">Audit Targets</h3>
+                      <div style="display: flex; gap: 40px;">
+                          <div>
+                              <strong>RHEL Advisories:</strong><br>
+                              {% for cve in cve_advisory_ids %}
+                                  <span class="vuln-tag" style="background: #cce3f5;">{{ cve }}</span>
+                              {% endfor %}
+                          </div>
+                          <div>
+                              <strong>Windows KBs:</strong><br>
+                              {% for kb in target_kb_ids %}
+                                  <span class="vuln-tag" style="background: #cce3f5;">{{ kb }}</span>
+                              {% endfor %}
+                          </div>
+                      </div>
+                  </div>
+                  {% set ns = namespace(total=0, compliant=0, vulnerable=0, unregistered=0) %}
+                  {% for host in audit_hosts %}
+                    {% if hostvars[host] is defined and hostvars[host].compliance_status is defined %}
+                      {% set ns.total = ns.total + 1 %}
+                      {% if hostvars[host].compliance_status == 'COMPLIANT' %}{% set ns.compliant = ns.compliant + 1 %}
+                      {% elif hostvars[host].compliance_status == 'VULNERABLE' %}{% set ns.vulnerable = ns.vulnerable + 1 %}
+                      {% elif hostvars[host].compliance_status == 'UNREGISTERED' %}{% set ns.unregistered = ns.unregistered + 1 %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                  <div class="stats-bar">
+                      <div class="stat-card stat-total"><div class="stat-value">{{ ns.total }}</div><div class="stat-label">Total Hosts</div></div>
+                      <div class="stat-card stat-compliant"><div class="stat-value">{{ ns.compliant }}</div><div class="stat-label">Compliant</div></div>
+                      <div class="stat-card stat-vulnerable"><div class="stat-value">{{ ns.vulnerable }}</div><div class="stat-label">Vulnerable</div></div>
+                      <div class="stat-card stat-unregistered"><div class="stat-value">{{ ns.unregistered }}</div><div class="stat-label">Unregistered</div></div>
+                  </div>
+                  <p class="timestamp"><strong>Report Generated:</strong> {{ ansible_date_time.date }} at {{ ansible_date_time.time }} UTC</p>
+                  <table>
+                      <thead>
+                      <tr>
+                          <th style="width: 12%;">Host</th>
+                          <th style="width: 8%;">OS</th>
+                          <th style="width: 9%;">Status</th>
+                          <th style="width: 13%;">Missing Targeted</th>
+                          <th style="width: 8%;">Reboot</th>
+                          <th style="width: 50%;">All Vulnerabilities</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {% for host in audit_hosts %}
+                        {% if hostvars[host] is defined and hostvars[host].compliance_status is defined %}
+                        {% set status = hostvars[host].compliance_status %}
+                        {% set os = hostvars[host].os_label | default('Unknown') %}
+                        {% set is_windows = 'Windows' in os or 'Microsoft' in os %}
+                        <tr class="row-{{ status | lower }}">
+                            <td>{{ host }}</td>
+                            <td><span class="os-badge {{ 'os-windows' if is_windows else 'os-rhel' }}">{{ os }}</span></td>
+                            <td><span class="{{ status }}">{{ status }}</span></td>
+                            {% if status == 'UNREGISTERED' %}
+                            <td><span style="color: #6a6e73; font-style: italic;">Unable to check</span></td>
+                            <td><span style="color: #6a6e73; font-style: italic;">Unknown</span></td>
+                            <td><span style="color: #c9190b; font-style: italic;">&#9888; Cannot scan &mdash; not registered with RHSM</span></td>
+                            {% else %}
+                            <td>{{ hostvars[host].missing_targets | join(', ') if hostvars[host].missing_targets else 'None' }}</td>
+                            <td><span class="reboot-{{ hostvars[host].reboot_needed }}">{{ hostvars[host].reboot_needed }}</span></td>
+                            <td>
+                                {% if hostvars[host].full_vulns %}
+                                    <details>
+                                        <summary>{{ hostvars[host].full_vulns | length }} advisories</summary>
+                                        <div style="margin-top: 6px;">
+                                        {% for vuln in hostvars[host].full_vulns %}
+                                            <span class="vuln-tag">{{ vuln }}</span>
+                                        {% endfor %}
+                                        </div>
+                                    </details>
+                                {% else %}
+                                    <span style="color: #3e8635; font-style: italic;">No additional vulnerabilities</span>
+                                    {% if hostvars[host].win_total_scanned is defined %}
+                                        <br><span style="color: #6a6e73; font-size: 11px;">(WUA: {{ hostvars[host].win_total_scanned }})</span>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% endif %}
+                      {% endfor %}
+                      </tbody>
+                  </table>
+                  {% if ns.unregistered > 0 %}
+                  <div class="warning-box">
+                      <h3>&#9888; {{ ns.unregistered }} host{{ 's' if ns.unregistered > 1 }} not registered with RHSM</h3>
+                      <p style="margin-bottom: 8px;">Unregistered RHEL hosts cannot be scanned for vulnerabilities or patched. To register them:</p>
+                      <ol style="margin: 0; padding-left: 20px;">
+                          <li>In AAP, go to <strong>Resources &rarr; Credentials &rarr; RHSM Registration</strong></li>
+                          <li>Enter your Red Hat <strong>Org ID</strong> and <strong>Activation Key</strong></li>
+                          <li>Re-run this workflow &mdash; hosts will be auto-registered and patched</li>
+                      </ol>
+                      <p style="margin-top: 8px; margin-bottom: 0; font-size: 12px; color: #6a6e73;">
+                          Find your org ID and activation keys at <a href="https://console.redhat.com/insights/connector/activation-key">console.redhat.com/insights/connector/activation-key</a>
+                      </p>
+                  </div>
+                  {% endif %}
+                  <div class="report-footer" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                      <span style="font-style: italic;">Special thanks to Joon Paik &lt;<a href="mailto:jopaik@redhat.com">jopaik@redhat.com</a>&gt; for the original patch demo</span>
+                      <span style="display: flex; align-items: center; gap: 8px;">
+                          <svg height="20" width="20" viewBox="0 0 16 16" fill="#24292f"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                          Source: <a href="https://github.com/ansible/product-demos" target="_blank">github.com/ansible/product-demos</a> &mdash; Ansible Product Demos
+                      </span>
+                  </div>
+              </div>
+          </body>
+          </html>
+      changed_when: true
+
+    - name: Retrieve public IP address
+      ansible.builtin.uri:
+        url: https://checkip.amazonaws.com
+        return_content: true
+      register: public_ip_report
+      ignore_errors: true
+      changed_when: false
+
+    - name: Display report URL
+      ansible.builtin.debug:
+        msg: "Compliance report available at http://{{ (public_ip_report.content | default(ansible_host)) | trim }}/patch_report.html"

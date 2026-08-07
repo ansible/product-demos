@@ -10,18 +10,23 @@
 ## About These Demos
 This category of demos shows examples of OpenShift operations and management with Ansible Automation Platform. The list of demos can be found below. See the [Suggested Usage](#suggested-usage) section of this document for recommendations on how to best use these demos.
 
+### Workflows
+
+| Workflow | Description |
+|----------|-------------|
+| [**CNV — Infra Stack**](docs/openshift-cnv-infra-stack.md) | Workflow to deploy virtualized infrastructure (RHEL 8 + RHEL 9 VMs) in OpenShift Virtualization with inventory sync. |
+| [**CNV — Patch Workflow**](docs/openshift-cnv-patch-workflow.md) | Snapshot CNV virtual machines, apply patches, and automatically restore from snapshot on failure. |
+
 ### Jobs
-- [**OpenShift / Dev Spaces**](devspaces.yml) - Install and deploy dev spaces on OCP cluster. After this job has run successfully, login to your OCP cluster, click the application icon (to the left of the bell icon in the top right) to access Dev Spaces
-- [**OpenShift / GitLab**](gitlab.yml) - Install and deploy GitLab on OCP.
-- [**OpenShift / EDA / Install Controller**](eda/install.yml) - Install and deploy EDA Controller instance using the AAP OpenShift operator.
-- [**OpenShift / CNV / Install Operator**](cnv/install.yml) - Install the Container Native Virtualization (CNV) operator and all its required dependencies.
-- **OpenShift / CNV / Infra Stack** - Workflow Job Template to build out infrastructure necessary to run jobs against VMs in OpenShift Virtualization.
-    - [**OpenShift / CNV / Create RHEL VM**](cnv/install.yml) - Install the Container Native Virtualization (CNV) operator and all its required dependencies.
-- **OpenShift / CNV / Patch CNV Workflow** - Workflow Job Template to snapshot and patch VMs deployed in OpenShift Virtualization.
-    - [**OpenShift / CNV / Create VM Snapshots**](cnv/snapshot.yml) - Create snapshot of VMs running in CNV.
-    - [**OpenShift / CNV / Patch**](cnv/patch.yml) - Patch VMs in OpenShift CNV, when run in `run` mode build out container native patching report and display link to the user.
-    - [**OpenShift / CNV / Restore Latest VM Snapshots**](cnv/snapshot.yml) - Restore VM in CNV to last snapshot.
-- [**OpenShift / CNV / Delete VM**](cnv/install.yml) - Deletes VMs in OpenShift CNV.
+
+| Job Template | Description |
+|--------------|-------------|
+| [**EDA — Install Controller**](docs/openshift-eda-install.md) | Install and deploy an Event-Driven Ansible (EDA) Controller instance using the AAP OpenShift operator. |
+| [**CNV — Install Operator**](docs/openshift-cnv-install.md) | Install the OpenShift Container Native Virtualization (CNV) operator and all required dependencies. |
+| [**CNV — Create RHEL VM**](docs/openshift-cnv-create-vm.md) | Provision a RHEL 8 or 9 virtual machine in OpenShift Virtualization with SSH keys and RHSM registration. |
+| [**CNV — Delete VM**](docs/openshift-cnv-delete-vm.md) | Delete virtual machines in OpenShift CNV by host string pattern. |
+| [**Dev Spaces**](docs/openshift-dev-spaces.md) | Install and deploy Red Hat OpenShift Dev Spaces for cloud-based development environments. |
+| [**GitLab**](docs/openshift-gitlab.md) | Install and deploy GitLab on an OpenShift cluster. |
 
 ## Pre Setup
 These demos require an OpenShift cluster to deploy to. Luckily the default Ansible Product Demos item from [demo.redhat.com](https://demo.redhat.com) includes an OpenShift cluster. Most of the jobs require an `OpenShift or Kubernetes API Bearer Token` credential in order to interact with OpenShift. When ordered from RHDP this credential is configured for the user.

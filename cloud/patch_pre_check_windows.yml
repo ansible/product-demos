@@ -1,0 +1,48 @@
+---
+- name: Pre-check patch applicability - Windows
+  hosts: "{{ _hosts_windows | default('os_windows') }}"
+  gather_facts: false
+
+  vars:
+    _raw_kb_input: "{{ input_kb_ids | default('KB5044284, KB5044030') }}"
+    target_kb_ids: "{{ (_raw_kb_input.split(',') | map('trim') | list) if _raw_kb_input is string else _raw_kb_input }}"
+
+  tasks:
+    - name: Discover available updates from Windows Update Agent
+      ansible.windows.win_updates:
+        category_names:
+          - SecurityUpdates
+          - CriticalUpdates
+        state: searched
+      register: win_all_check
+
+    - name: Check all targeted KBs in one pass
+      ansible.windows.win_shell: |
+        $targetKBs = @({{ target_kb_ids | map('regex_replace', '^', "'") | map('regex_replace', '$', "'") | join(',') }})
+        $allMissing = @({{ win_all_check.updates | map(attribute='kb') | flatten | map('regex_replace', '^', "'") | map('regex_replace', '$', "'") | join(',') }})
+        $hotfixes = Get-HotFix | Select-Object -ExpandProperty HotFixID
+        $missing = @()
+        foreach ($kb in $targetKBs) {
+            $id = $kb.ToUpper().Replace("KB", "")
+            $installed = $hotfixes -match $id
+            $needed = $allMissing -contains $id
+            if (-not $installed -and $needed) { $missing += $kb }
+        }
+        Write-Output ($missing -join ",")
+      register: kb_check_result
+      changed_when: false
+
+    - name: Identify which Windows KBs are missing
+      ansible.builtin.set_fact:
+        missing_patches: "{{ (kb_check_result.stdout | trim).split(',') | select if (kb_check_result.stdout | trim) else [] }}"
+
+    - name: Set Windows status fact
+      ansible.builtin.set_fact:
+        patch_needed: "{{ missing_patches | length > 0 }}"
+
+    - name: Summary of Windows pre-check
+      ansible.builtin.debug:
+        msg: >
+          System: {{ inventory_hostname }} |
+          Missing Items: {{ missing_patches | join(', ') if missing_patches else 'None' }} |
+          Execution Recommended: {{ 'YES' if patch_needed else 'NO (System Compliant)' }}

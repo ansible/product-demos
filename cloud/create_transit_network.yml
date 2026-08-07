@@ -1,0 +1,56 @@
+---
+- name: Bootstrap transit network configuration with DMZ and private network
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Fail if variables not defined
+      ansible.builtin.assert:
+        that:
+          - aws_region is defined
+          - dmz_ssh_key_name is defined
+          - priv_network_ssh_key_name is defined
+        fail_msg: "Required variables not set"
+
+    - name: Create Transit Networking Model
+      ansible.builtin.include_role:
+        name: demo.cloud.manage_transit_peered_networks
+      vars:
+        manage_transit_peered_networks_operation: create
+
+- name: Configure EC2 instances created in the DMZ for SSH access to private hosts
+  hosts: DMZ
+  gather_facts: false
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Configure DMZ bastion SSH
+      when:
+        - ansible_ssh_user is defined
+        - ssh_key_data is defined
+        - priv_network_ssh_user is defined
+        - vpc_priv_net_hosts_pattern is defined
+        - ansible_ssh_private_key_file_dest_path is defined
+      block:
+        - name: Create SSH config file
+          ansible.builtin.lineinfile:
+            path: ~/.ssh/config
+            line: |
+              host {{ vpc_priv_net_hosts_pattern }}
+                User {{ priv_network_ssh_user }}
+                IdentityFile {{ ansible_ssh_private_key_file_dest_path }}
+            create: true
+            mode: "0655"
+        - name: Secure SSH config file
+          ansible.builtin.file:
+            path: ~/.ssh/config
+            mode: "0600"
+        - name: Add SSH private key to DMZ service so that it can access private network servers
+          ansible.builtin.template:
+            src: templates/ssh_priv_key.j2
+            dest: "{{ ansible_ssh_private_key_file_dest_path }}"
+            owner: "{{ ansible_ssh_user }}"
+            group: "{{ ansible_ssh_user }}"
+            mode: "0600"

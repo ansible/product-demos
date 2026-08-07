@@ -1,0 +1,32 @@
+---
+- name: Targeted Windows security patching
+  hosts: "{{ _hosts_windows | default('os_windows') }}"
+  gather_facts: false
+
+  vars:
+    _raw_kb_input: "{{ input_kb_ids | default('KB5044284, KB5044030') }}"
+    target_kb_ids: "{{ (_raw_kb_input.split(',') | map('trim') | list) if _raw_kb_input is string else _raw_kb_input }}"
+
+  tasks:
+    - name: Search and install specific updates
+      ansible.windows.win_updates:
+        category_names:
+          - DefinitionUpdates
+          - SecurityUpdates
+          - CriticalUpdates
+        accept_list: "{{ target_kb_ids | map('regex_replace', '^(.*)$', '.*\\1.*') | list }}"
+        state: installed
+      register: kb_patch_result
+
+    - name: Set cacheable reboot flag
+      ansible.builtin.set_fact:
+        windows_reboot_needed: "{{ kb_patch_result.reboot_required | default(false) }}"
+        cacheable: true
+
+    - name: Audit output
+      ansible.builtin.debug:
+        msg:
+          - "Target KBs: {{ target_kb_ids | join(', ') }}"
+          - "Found matching updates: {{ kb_patch_result.found_update_count | default(0) }}"
+          - "Installed successfully: {{ kb_patch_result.installed_update_count | default(0) }}"
+          - "Reboot Required: {{ windows_reboot_needed }}"

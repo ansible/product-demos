@@ -6,7 +6,7 @@
   ansible.windows.win_find:
     paths: "{{ doc_root }}/{{ reports_dir }}"
     patterns: '*.html'
-  register: reports
+  register: report_server_reports
   check_mode: false
 
 - name: Publish landing page

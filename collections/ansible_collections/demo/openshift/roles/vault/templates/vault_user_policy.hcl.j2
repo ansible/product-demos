@@ -1,0 +1,24 @@
+# Read-only access to policies and KV secrets for standard userpass users.
+path "sys/policies/acl" {
+  capabilities = ["list"]
+}
+
+path "sys/policies/acl/*" {
+  capabilities = ["read", "list"]
+}
+
+path "sys/policy" {
+  capabilities = ["read", "list"]
+}
+
+path "sys/policy/*" {
+  capabilities = ["read"]
+}
+
+path "{{ vault_userpass_user_secret_path }}" {
+  capabilities = ["read", "list"]
+}
+
+path "{{ vault_userpass_user_secret_metadata_path }}" {
+  capabilities = ["read", "list"]
+}

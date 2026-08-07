@@ -3,18 +3,18 @@
   redhat.openshift_virtualization.kubevirt_vm_info:
     name: "{{ item }}"
     namespace: "{{ vm_namespace }}"
-  register: state
+  register: snapshot_state
 
 - name: List snapshots
   kubernetes.core.k8s_info:
     api_version: snapshot.kubevirt.io/v1alpha1
     kind: VirtualMachineSnapshot
     namespace: "{{ vm_namespace }}"
-  register: snapshot
+  register: snapshot_snapshot
 
 - name: Set snapshot name for {{ item }}
   ansible.builtin.set_fact:
-    latest_snapshot: "{{ snapshot.resources | selectattr('spec.source.name', 'equalto', item) | sort(attribute='metadata.creationTimestamp') | first }}"
+    snapshot_latest_snapshot: "{{ snapshot_snapshot.resources | selectattr('spec.source.name', 'equalto', item) | sort(attribute='metadata.creationTimestamp') | first }}"
 
 - name: Stop VirtualMachine
   redhat.openshift_virtualization.kubevirt_vm:
@@ -22,7 +22,7 @@
     namespace: "{{ vm_namespace }}"
     running: false
     wait: true
-  when: state.resources.0.spec.running
+  when: snapshot_state.resources.0.spec.running
 
 - name: Restore a VirtualMachineSnapshot
   kubernetes.core.k8s:
@@ -30,14 +30,14 @@
       apiVersion: snapshot.kubevirt.io/v1alpha1
       kind: VirtualMachineRestore
       metadata:
-        generateName: "{{ latest_snapshot.metadata.generateName }}"
+        generateName: "{{ snapshot_latest_snapshot.metadata.generateName }}"
         namespace: "{{ vm_namespace }}"
       spec:
         target:
           apiGroup: kubevirt.io
           kind: VirtualMachine
           name: "{{ item }}"
-        virtualMachineSnapshotName: "{{ latest_snapshot.metadata.name }}"
+        virtualMachineSnapshotName: "{{ snapshot_latest_snapshot.metadata.name }}"
     wait: true
     wait_condition:
       type: Ready
@@ -48,4 +48,4 @@
     namespace: "{{ vm_namespace }}"
     running: true
     wait: true
-  when: state.resources.0.spec.running
+  when: snapshot_state.resources.0.spec.running

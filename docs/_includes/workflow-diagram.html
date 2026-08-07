@@ -1,0 +1,6 @@
+{% assign processed = include.mermaid | replace: '__ASSET__', site.baseurl %}
+<div class="workflow-diagram">
+  <pre class="mermaid">
+{{ processed }}
+  </pre>
+</div>

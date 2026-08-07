@@ -1,0 +1,57 @@
+# Patching
+
+
+Apply Windows updates by category to Windows Server hosts and generate an HTML patch report. The playbook uses the demo.patching.patch_windows role to install updates filtered by category (Security, Critical, Feature Packs, etc.), with optional reboot control. A report server is deployed automatically to publish patching results. Runs in check mode by default.
+
+## Prerequisites
+
+- Windows hosts in the **Ansible Product Demos Inventory** (deployed by **Deploy Cloud Stack in AWS**)
+- WinRM connectivity via **APD Machine Credential**
+- A Windows report server (`aws_win1`) in the `os_windows` inventory group
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Server Name or Pattern | `_hosts` | text | No |
+| Update categories | `win_update_categories` | multiselect | No |
+| Reboot after install? | `allow_reboot` | multiplechoice | No |
+
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| WINDOWS ǀ Patching | [`windows/patching.yml`](../patching.yml) | Apply Windows updates by category, optionally reboot, and publish an HTML patch report |
+
+## Why it matters
+
+- Windows patching is a top customer pain point — this demo proves AAP handles it natively
+- Category-based filtering (SecurityUpdates, CriticalUpdates, etc.) shows precision control over what gets installed
+- Check mode lets you preview updates before applying — critical for change management approval
+- The HTML report provides audit evidence without relying on WSUS or SCCM reporting
+- Reboot control via survey shows operational safety for production Windows servers
+
+## Presenter walkthrough
+
+1. **Show the survey:** Walk through the category selector. 'We can target just security updates, or cast a wider net. The operator chooses — not the tool.'
+2. **Launch in check mode:** Run against the Windows hosts. 'Check mode queries Windows Update Agent without installing anything. We see exactly what would change.'
+3. **Review the output:** Show which KBs are applicable per host. Point out the reboot-required indicators.
+4. **Switch to run mode:** Re-launch with job type set to Run. Highlight the reboot control option. 'In production, you might patch during a maintenance window and defer reboots.'
+5. **Show the report:** Navigate to the report server and walk through the HTML patching report.
+6. **Connect to the bigger picture:** 'For environments with both Windows and RHEL, our Patch Cloud Stack workflow handles both in parallel with EBS snapshot rollback.'
+
+## Talking points
+
+- Ansible manages Windows natively through WinRM — no agent installation required on the target hosts.
+- Category filtering means you can apply just security updates during an emergency patch cycle without pulling in feature packs.
+- Check mode is your dry run. Show the change board exactly what will happen before you touch production.
+- The reboot survey option is a small detail that matters in production — operators control when reboots happen, not the automation.
+- This same patching pattern works on-prem, in AWS, or in Azure. The playbook does not care where the Windows host lives.
+
+## Related demos
+
+| Demo | Description |
+|------|-------------|
+| 🩹 [Patch Cloud Stack in AWS](../../cloud/docs/patch-cloud-stack.md) | Full workflow with EBS snapshots, parallel RHEL and Windows patching, and automatic rollback |
+| 🪟 [Install IIS](./windows-install-iis.md) | Quick Windows demo to show application deployment alongside patching |
+| 🪟 [Setup Active Directory Domain](./windows-setup-ad-domain.md) | Provision a full AD environment to demonstrate domain-joined Windows patching |

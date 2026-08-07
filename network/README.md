@@ -10,7 +10,21 @@
 
 ## About These Demos
 This category of demos shows examples of network operations and management with Ansible Automation Platform. The list of demos can be found below. See the [Suggested Usage](#suggested-usage) section of this document for recommendations on how to best use these demos.
-- [**NETWORK / Configuration**](https://github.com/nleiva/ansible-net-modules/blob/main/main.yml) - Deploy golden configurations for different resources to Cisco IOS, IOSXR, and NXOS.
+
+### Workflows
+
+| Workflow | Description |
+|----------|-------------|
+| [**Palo Alto Firewall Demo**](docs/network-panos-workflow.md) | End-to-end Palo Alto firewall workflow: deploy, configure, validate, and clean up a PAN-OS instance using the certified panos collection. |
+
+### Jobs
+
+| Job Template | Description |
+|--------------|-------------|
+| [**Report**](docs/network-report.md) | Gather facts from Cisco network devices and generate an HTML report with interface, routing, and configuration details. |
+| [**Golden Configuration**](docs/network-configuration.md) | Deploy golden configurations for different resources (ACLs, BGP, OSPF, NTP, etc.) to Cisco IOS, IOSXR, and NXOS using Network Resource Modules. |
+| [**DISA STIG**](docs/network-disa-stig.md) | Run the DISA STIG role in check mode to assess configuration compliance of Cisco IOS network devices. |
+| [**Backup**](docs/network-backup.md) | Back up network device configurations using Red Hat validated content and publish them to a report server. |
 
 To run the demos, deploy them using Infrastructure as Code, run either the "Product Demos | Multi-demo setup" or the "Product Demos | Single demo setup" and select 'Network' in the "Product Demos" deployment, or utilize the steps in the repo level README.
 
@@ -87,3 +101,5 @@ To run this demo, you will need to complete a couple of prerequisites:
   - If using a demo.redhat.com Product Demos instance you should use the public key provided in the demo page in the 'Bastion Host Credentials' section. If you are using a different environment, you may need to update the "Demo Credential".
   - This works with Product Demos for AAP v2.5; which includes the "Product Demos EE" includes the \
   network.backup collection.
+
+**NETWORK / PANOS** - see [README](./panos/README.md) for usage instructions.

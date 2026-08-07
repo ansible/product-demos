@@ -3,7 +3,7 @@
   redhat.openshift_virtualization.kubevirt_vm_info:
     name: "{{ item }}"
     namespace: "{{ vm_namespace }}"
-  register: state
+  register: snapshot_state
 
 - name: Stop VirtualMachine
   redhat.openshift_virtualization.kubevirt_vm:
@@ -11,7 +11,7 @@
     namespace: "{{ vm_namespace }}"
     running: false
     wait: true
-  when: state.resources.0.spec.running
+  when: snapshot_state.resources.0.spec.running
 
 - name: Create a VirtualMachineSnapshot
   kubernetes.core.k8s:
@@ -29,7 +29,7 @@
     wait: true
     wait_condition:
       type: Ready
-  register: snapshot
+  register: snapshot_snapshot
 
 - name: Start VirtualMachine
   redhat.openshift_virtualization.kubevirt_vm:
@@ -37,13 +37,13 @@
     namespace: "{{ vm_namespace }}"
     running: true
     wait: true
-  when: state.resources.0.spec.running
+  when: snapshot_state.resources.0.spec.running
 
 - name: Export snapshot name
   ansible.builtin.set_stats:
     data:
-      restore_snapshot_name: "{{ snapshot.result.metadata.name }}"
+      restore_snapshot_name: "{{ snapshot_snapshot.result.metadata.name }}"
 
 - name: Output snapshot name
   ansible.builtin.debug:
-    msg: "Successfully created snapshot {{ snapshot.result.metadata.name }}"
+    msg: "Successfully created snapshot {{ snapshot_snapshot.result.metadata.name }}"

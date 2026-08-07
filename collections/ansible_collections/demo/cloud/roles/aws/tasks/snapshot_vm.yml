@@ -12,18 +12,18 @@
         file: snapshot_vm.yml
 
     - name: AWS | SNAPSHOT VM | get volumes
-      register: r_vol_info
+      register: aws_r_vol_info
       amazon.aws.ec2_vol_info:
         region: "{{ aws_region }}"
         filters:
           attachment.instance-id: "{{ instance_id }}"
 
     - name: AWS | SNAPSHOT VM | take snapshots
-      loop: "{{ r_vol_info.volumes }}"
+      loop: "{{ aws_r_vol_info.volumes }}"
       loop_control:
         loop_var: volume
         label: "{{ volume.id }}"
-      register: r_snapshots
+      register: aws_r_snapshots
       amazon.aws.ec2_snapshot:
         region: "{{ aws_region }}"
         volume_id: "{{ volume.id }}"
@@ -32,11 +32,11 @@
 
 - name: AWS | SNAPSHOT VM | format snapshot stat
   ansible.builtin.set_fact:
-    snapshot_stat:
+    aws_snapshot_stat:
       - key: "{{ inventory_hostname }}"
-        value: "{{ r_snapshots.results | json_query(aws_ec2_snapshot_query) }}"
+        value: "{{ aws_r_snapshots.results | json_query(aws_ec2_snapshot_query) }}"
 
 - name: AWS | SNAPSHOT VM | record snapshot with host key
   ansible.builtin.set_stats:
     data:
-      aws_snapshots: "{{ snapshot_stat | items2dict }}"
+      aws_snapshots: "{{ aws_snapshot_stat | items2dict }}"
