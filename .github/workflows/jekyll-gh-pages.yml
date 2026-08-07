@@ -3,7 +3,7 @@ name: Deploy GitHub Pages
 
 on:
   push:
-    branches: [main, github-pages-improvements, theme-redesign]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
