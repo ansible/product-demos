@@ -1,0 +1,10 @@
+---
+- name: disable autoreboot during bsod
+  ansible.windows.win_regedit:
+    path: HKLM:\SYSTEM\CurrentControlSet\Control\CrashControl
+    name: AutoReboot
+    data: 0
+    type: dword
+
+- name: trigger BSOD
+  ansible.builtin.include_tasks: trigger_bsod.yml

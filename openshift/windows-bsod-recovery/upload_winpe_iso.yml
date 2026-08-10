@@ -1,0 +1,16 @@
+---
+- name: upload winpe iso
+  hosts: all
+  become_method: ansible.builtin.runas
+  become: false
+  vars:
+    provider: vmware
+    create_winpe_temp_directory: "{{ ansible_env.TEMP }}"
+    create_winpe_name: winpe_bsod_recovery_fix
+
+  tasks:
+    - name: upload winpe iso to {{ provider }}
+      ansible.builtin.include_role:
+        name: "{{ provider }}_upload"
+      vars:
+        iso_file_path: "{{ create_winpe_temp_directory }}\\{{ create_winpe_name }}_no_prompt.iso"

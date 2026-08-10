@@ -1,0 +1,30 @@
+---
+- name: install windows adk from iso
+  ansible.builtin.include_tasks: install_adk_from_iso.yml
+  when: (adk_iso_file.stat.exists | default(false)) or create_winpe_win_adk_iso_download_url is defined
+
+- name: install windows adk from url
+  ansible.windows.win_package:
+    path: "{{ create_winpe_win_adk_download_url }}"
+    product_id: "{{ create_winpe_win_adk_product_id }}"
+    arguments: /quiet /installpath c:\ADK /norestart /ceip off /features {{ create_winpe_win_adk_features }}
+  when:
+    - not (adk_iso_file.stat.exists | default(false))
+    - create_winpe_win_adk_iso_download_url is undefined
+    - create_winpe_win_adk_download_url is defined
+    - create_winpe_win_adk_download_url | length
+
+- name: install winpe addon from iso
+  ansible.builtin.include_tasks: install_winpe_addon_from_iso.yml
+  when: (winpe_addon_iso_file.stat.exists | default(false)) or create_winpe_win_adk_winpe_addon_iso_download_url is defined
+
+- name: install winpe addon from url
+  ansible.windows.win_package:
+    path: "{{ create_winpe_win_adk_winpe_addon_download_url }}"
+    product_id: "{{ create_winpe_win_adk_winpe_addon_product_id }}"
+    arguments: /quiet /installpath c:\ADK /norestart /ceip off /features {{ create_winpe_win_adk_winpe_addon_features }}
+  when:
+    - not (winpe_addon_iso_file.stat.exists | default(false))
+    - create_winpe_win_adk_winpe_addon_iso_download_url is undefined
+    - create_winpe_win_adk_winpe_addon_download_url is defined
+    - create_winpe_win_adk_winpe_addon_download_url | length

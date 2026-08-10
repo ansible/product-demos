@@ -1,0 +1,95 @@
+---
+- name: check existing pvc
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: PersistentVolumeClaim
+    name: iso-{{ iso_file_check.stat.path | win_basename | to_uuid }}
+    namespace: "{{ kubevirt_upload_target_namespace }}"
+    verify_ssl: false
+    api_key: "{{ api_key }}"
+  register: pvc_iso_auto_info
+  delegate_to: localhost
+  connection: local
+  become: false
+
+- name: set iso file name label
+  ansible.builtin.set_fact:
+    iso_file_label: "{{ (iso_file_check.stat.path | win_basename)[0:63] | regex_replace('\\.$', '') }}"
+
+- name: upload iso file
+  block:
+    - name: create data volume for the iso file
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', 'iso-dv.yml') | from_yaml }}"
+        verify_ssl: false
+        api_key: "{{ api_key }}"
+      delegate_to: localhost
+      connection: local
+      become: false
+
+    - name: wait for dv to be ready
+      kubernetes.core.k8s_info:
+        api_version: "{{ kubevirt_upload_dv_api_version }}"
+        kind: DataVolume
+        name: iso-{{ iso_file_check.stat.path | win_basename | to_uuid }}
+        namespace: "{{ kubevirt_upload_target_namespace }}"
+        verify_ssl: false
+        api_key: "{{ api_key }}"
+      register: dv_iso_auto_info
+      until: >-
+        (dv_iso_auto_info.resources[0].status.phase | default('')) == 'UploadReady' or
+        (dv_iso_auto_info.resources[0].status.phase | default('')) == 'Succeeded'
+      retries: 100
+      delay: 5
+      failed_when: false
+      delegate_to: localhost
+      connection: local
+      become: false
+
+    - name: upload token request
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', 'cdi-upload-token-request.yml') | from_yaml }}"
+        validate_certs: false
+        api_key: "{{ api_key }}"
+      register: cdi_upload_token_request
+      delegate_to: localhost
+      connection: local
+      become: false
+
+    - name: upload iso file to data volume
+      win_uri:
+        url: "{{ kubevirt_upload_proxy_url }}/{{ kubevirt_upload_kubevirt_api_version }}/upload"
+        method: POST
+        src: "{{ iso_file_check.stat.path }}"
+        remote_src: true
+        force_basic_auth: true
+        headers:
+          Authorization: Bearer {{ cdi_upload_token_request.result.status.token }}
+        validate_certs: false
+      register: disk_iso_file
+      until: disk_iso_file is success
+      delay: 3
+      retries: 5
+
+    - name: update label on pvc
+      kubernetes.core.k8s:
+        state: patched
+        merge_type: merge
+        validate_certs: false
+        api_key: "{{ api_key }}"
+        definition:
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: iso-{{ iso_file_check.stat.path | win_basename | to_uuid }}
+            namespace: "{{ kubevirt_upload_target_namespace }}"
+            labels:
+              iso.file.name: "{{ iso_file_label }}"
+      failed_when: false
+      delegate_to: localhost
+      connection: local
+      become: false
+
+  when: pvc_iso_auto_info.resources is undefined or not (pvc_iso_auto_info.resources | length)

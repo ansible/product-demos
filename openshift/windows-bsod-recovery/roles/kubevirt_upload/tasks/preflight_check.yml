@@ -1,0 +1,62 @@
+---
+- name: validate files
+  ansible.windows.win_stat:
+    path: "{{ kubevirt_upload_iso_file_path }}"
+    get_checksum: false
+  register: iso_file_check
+
+- name: fail with message
+  ansible.builtin.fail:
+    msg: iso file not found
+  when: not iso_file_check.stat.exists
+
+- name: check kubevirt upload proxy url provided
+  ansible.builtin.uri:
+    url: "{{ kubevirt_upload_proxy_url }}"
+    status_code:
+      - 200
+      - 201
+      - 404
+    validate_certs: false
+    return_content: true
+  register: kubevirt_cdi_return
+  failed_when: false
+  delegate_to: localhost
+  become: false
+  no_log: true
+  when: kubevirt_upload_proxy_url | length > 0
+
+- name: set kubevirt upload proxy URL if not provided or invalid
+  block:
+    - name: get cdi route
+      kubernetes.core.k8s_info:
+        api_version: route.openshift.io/v1
+        kind: Route
+        name: "{{ kubevirt_upload_proxy_name }}"
+        namespace: "{{ kubevirt_upload_kubevirt_operator_namespace }}"
+        verify_ssl: false
+        api_key: "{{ api_key }}"
+      delegate_to: localhost
+      become: false
+      register: cdi_upload_proxy_route
+
+    - name: fail if no route is found
+      ansible.builtin.fail:
+        msg: cdi upload proxy url could not be determined, please provide with kubevirt_upload_proxy_url
+      when: >
+        cdi_upload_proxy_route.resources | length == 0 or
+        cdi_upload_proxy_route.resources[0].status.ingress | length == 0 or
+        cdi_upload_proxy_route.resources[0].status.ingress[0].host is not defined
+
+    - name: set kubevirt upload proxy url
+      ansible.builtin.set_fact:
+        kubevirt_upload_proxy_url: https://{{ cdi_upload_proxy_route.resources[0].status.ingress[0].host }}
+
+  when: >
+    kubevirt_upload_proxy_url | length == 0 or
+    kubevirt_cdi_return.status not in [200, 201] or
+    ('page not found' in kubevirt_cdi_return.content | default(''))
+
+- name: show kubevirt upload proxy url
+  ansible.builtin.debug:
+    msg: "{{ kubevirt_upload_proxy_url }}"

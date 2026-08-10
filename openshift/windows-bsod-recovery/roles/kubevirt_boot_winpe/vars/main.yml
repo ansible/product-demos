@@ -1,0 +1,3 @@
+---
+
+kubevirt_boot_winpe_iso_pvc_name: iso-{{ iso_file | to_uuid }}

@@ -1,0 +1,56 @@
+---
+- name: setup demo on Ansible Automation Platform
+  hosts: localhost
+  gather_facts: false
+  vars:
+    base_dir: aap_config
+    platforms:
+      - vmware
+      - kubevirt
+    scenarios:
+      - scenario_1
+      - scenario_2
+
+  tasks:
+    - name: load common configuration
+      ansible.builtin.include_vars:
+        file: "{{ base_dir }}/common/setup.yml"
+        name: common_config
+
+    - name: load platform configurations
+      ansible.builtin.include_vars:
+        file: "{{ base_dir }}/platforms/{{ item }}/setup.yml"
+        name: platform_{{ item }}_config
+      loop: "{{ platforms }}"
+
+    - name: load scenario configurations
+      ansible.builtin.include_vars:
+        file: "{{ base_dir }}/scenarios/{{ item.0 }}/{{ item.1 }}.yml"
+        name: scenario_{{ item.0 }}_{{ item.1 }}_config
+      loop: "{{ scenarios | product(['common'] + platforms) | list }}"
+
+    - name: initialize combined configuration
+      ansible.builtin.set_fact:
+        combined_config: "{{ common_config | default({}) }}"
+
+    - name: combine platform configurations
+      ansible.builtin.set_fact:
+        combined_config: >-
+          {{ combined_config | combine(lookup('vars', 'platform_' + item + '_config', default={}), recursive=True, list_merge='append') }}
+      loop: "{{ platforms }}"
+
+    - name: combine scenario configurations
+      ansible.builtin.set_fact:
+        combined_config: >-
+          {{ combined_config | combine(lookup('vars', 'scenario_' + item.0 + '_' + item.1 + '_config', default={}), recursive=True, list_merge='append') }}
+      loop: "{{ scenarios | product(['common'] + platforms) | list }}"
+
+    - name: extract individual objects from combined configuration
+      ansible.builtin.set_fact:
+        "{{ item.key }}": "{{ item.value }}"
+      loop: "{{ combined_config | dict2items }}"
+      when: item.key.startswith('controller_')
+
+    - name: import demo configuration
+      ansible.builtin.include_role:
+        name: infra.controller_configuration.dispatch

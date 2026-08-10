@@ -1,0 +1,16 @@
+---
+
+kubevirt_upload_target_namespace: "{{ target_namespace | default('openshift-cnv') }}"
+kubevirt_upload_pvc_storage_class: "{{ pvc_storage_class | default('hostpath-provisioner') }}"
+kubevirt_upload_proxy_url: ""
+kubevirt_upload_proxy_name: cdi-uploadproxy
+kubevirt_upload_kubevirt_operator_namespace: "{{ kubevirt_operator_namespace | default('openshift-cnv') }}"
+kubevirt_upload_kubevirt_api_version: "{{ kubevirt_api_version | default('v1beta1') }}"
+kubevirt_upload_kubevirt_clear_auth_key: "{{ kubevirt_clear_auth_key | default(false) }}"
+
+kubevirt_upload_dv_api_version: "{{ dv_api_version | default('cdi.kubevirt.io/v1beta1') }}"
+
+kubevirt_upload_iso_file_path: "{{ iso_file_path | default('file.iso') }}"
+
+kubevirt_upload_pvc_access_mode: ReadWriteOnce
+kubevirt_upload_pvc_volume_mode: Filesystem

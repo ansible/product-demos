@@ -1,0 +1,15 @@
+---
+- name: ensure system is working properly after fix
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: check for connection
+      ansible.builtin.wait_for_connection:
+        delay: 30
+
+    - name: gather facts
+      ansible.builtin.setup:
+
+    - name: we have connection
+      ansible.builtin.debug:
+        msg: successfully connected to the target system..

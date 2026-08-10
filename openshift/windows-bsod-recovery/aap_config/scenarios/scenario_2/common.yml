@@ -1,0 +1,35 @@
+---
+
+controller_templates:
+  - name: Produce BSOD
+    description: Triggers a Blue Screen of Death on the provisioned Windows systems
+    project: ansible-windows-0-day-bsod-recovery-fix
+    playbook: produce_bsod.yml
+    execution_environment: ansible-base-ee-dev
+    ask_credential_on_launch: true
+    ask_inventory_on_launch: true
+    ask_limit_on_launch: true
+    ask_variables_on_launch: true
+
+  - name: Recover from BSOD
+    description: Attempts to fix the BSOD by booting WinPE image
+    project: ansible-windows-0-day-bsod-recovery-fix
+    playbook: execute_winpe_recovery.yml
+    execution_environment: ansible-base-ee-dev
+    extra_vars:
+      provider: vmware
+      scenario: bsod_fix
+    ask_credential_on_launch: true
+    ask_inventory_on_launch: true
+    ask_limit_on_launch: true
+    ask_variables_on_launch: true
+
+  - name: Check System
+    description: Verifies that the system is working properly after the fix
+    project: ansible-windows-0-day-bsod-recovery-fix
+    playbook: check_system.yml
+    execution_environment: ansible-base-ee-dev
+    ask_credential_on_launch: true
+    ask_inventory_on_launch: true
+    ask_limit_on_launch: true
+    ask_variables_on_launch: true

@@ -1,0 +1,17 @@
+---
+- name: remove node(s)
+  hosts: all
+  gather_facts: false
+  connection: local
+  become: false
+  vars:
+    provider: vmware
+    scenario: winpe
+  vars_files:
+    - node-config/{{ scenario }}/node-{{ provider }}.yml
+
+  roles:
+    - role: ansible-role-{{ provider }}
+      role_action: deprovision
+      delegate_to: localhost
+      run_once: true

@@ -1,0 +1,22 @@
+---
+- name: execute winpe recovery
+  hosts: all
+  gather_facts: false
+  connection: local
+  become: false
+  vars:
+    provider: vmware
+    scenario: winpe
+    create_winpe_name: winpe_bsod_recovery_fix
+  vars_files:
+    - node-config/{{ scenario }}/node-{{ provider }}.yml
+
+  tasks:
+    - name: boot vm to winpe
+      ansible.builtin.include_role:
+        name: "{{ provider }}_boot_winpe"
+        apply:
+          delegate_to: localhost
+          run_once: true
+      vars:
+        iso_file: "{{ create_winpe_name }}_no_prompt.iso"
