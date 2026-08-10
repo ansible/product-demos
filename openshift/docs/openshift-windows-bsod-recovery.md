@@ -110,4 +110,4 @@ This approach works because WinPE can access the Windows filesystem even when Wi
 
 ## Credits
 
-Demo created by [Orcun Atakan](https://github.com/oatakan). Source playbooks: [ansible-windows-0-day-bsod-recovery](https://github.com/oatakan/ansible-windows-0-day-bsod-recovery).
+Demo created by [Orcun Atakan](https://github.com/oatakan). The source playbooks and roles are included in `openshift/windows-bsod-recovery/`.

@@ -1,5 +1,6 @@
 ---
 plugin: redhat.openshift_virtualization.kubevirt
+strict: false
 connections:
   - namespaces:
       - openshift-cnv
