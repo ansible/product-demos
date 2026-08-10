@@ -8,7 +8,7 @@ End-to-end Satellite patching workflow for development environments. Syncs the S
 - **Satellite Collection** credential configured
 - Content views and lifecycle environments configured in Satellite
 - Dev hosts registered with Satellite
-- Run **APD | Single demo setup** with `satellite`
+- Run **APD ǀ Single demo setup** with `satellite`
 
 ## Survey prompts
 

@@ -5,8 +5,8 @@ Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Wind
 
 ## Prerequisites
 
-- **If using RHDP (demo.redhat.com):** Run **APD | Multi-demo setup** to configure all templates and credentials. AWS and APD Machine credentials are pre-configured for you.
-- **If using your own installation:** Run **APD | Single demo setup** and choose `cloud`. Configure the **AWS** credential with your Access Key and Secret Key, and add an SSH private key to **APD Machine Credential**.
+- **If using RHDP (demo.redhat.com):** Run **APD ǀ Multi-demo setup** to configure all templates and credentials. AWS and APD Machine credentials are pre-configured for you.
+- **If using your own installation:** Run **APD ǀ Single demo setup** and choose `cloud`. Configure the **AWS** credential with your Access Key and Secret Key, and add an SSH private key to **APD Machine Credential**.
 
 ## Survey prompts
 

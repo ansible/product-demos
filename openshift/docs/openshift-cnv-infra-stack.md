@@ -21,7 +21,7 @@ graph LR
 
 - **OpenShift Credential** configured with API token
 - Cluster admin access with bare-metal or nested-virt nodes
-- Run **APD | Single demo setup** with `openshift`
+- Run **APD ǀ Single demo setup** with `openshift`
 
 ## Job templates
 
