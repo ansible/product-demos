@@ -30,6 +30,13 @@ mermaid: true
   </div>
 </section>
 
+{% if demo.workflow_mermaid %}
+<section class="detail-section" id="workflow">
+  <h2>Workflow</h2>
+  {% include workflow-diagram.html mermaid=demo.workflow_mermaid %}
+</section>
+{% endif %}
+
 {% if demo.video_url %}
 <section class="detail-section" id="video">
   <h2>Video walkthrough</h2>

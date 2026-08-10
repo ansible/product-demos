@@ -19,7 +19,9 @@
    */
 
   /* Move Workflow and Video into the detail-body, right after the lead
-     paragraph(s) and before the first <h2>. */
+     paragraph(s) and before the first <h2>. Layout Workflow is a <section>;
+     markdown may also have ## Workflow (step list) — merge that in so the
+     TOC only has one Workflow entry and steps sit under the diagram. */
   if (body) {
     var workflow = document.getElementById('workflow');
     var video = document.getElementById('video');
@@ -31,6 +33,18 @@
       }
       if (workflow) {
         body.insertBefore(workflow, video || firstH2);
+
+        body.querySelectorAll('h2').forEach(function (h2) {
+          if (h2 === workflow.querySelector('h2')) return;
+          if (h2.textContent.trim().toLowerCase() !== 'workflow') return;
+          var node = h2.nextElementSibling;
+          while (node && node.tagName !== 'H2') {
+            var next = node.nextElementSibling;
+            workflow.appendChild(node);
+            node = next;
+          }
+          h2.remove();
+        });
       }
     }
   }

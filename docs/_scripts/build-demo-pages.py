@@ -24,6 +24,9 @@ os.chdir(REPO_ROOT)
 
 GITHUB_BLOB = "https://github.com/ansible/product-demos/blob/main"
 LINK_RE = re.compile(r"(\[[^\]]*\])\(([^)]+)\)")
+# Mermaid fences stay in source READMEs for GitHub.com; Pages renders
+# diagrams from demos.yml via the layout <pre class="mermaid"> include.
+MERMAID_FENCE_RE = re.compile(r"```mermaid\n.*?```\n*", re.DOTALL)
 
 
 def rewrite_links(body: str, readme_path: str) -> str:
@@ -69,6 +72,8 @@ for demo in demos:
         body = f.read()
 
     body = rewrite_links(body, readme)
+    if demo.get("workflow_mermaid"):
+        body = MERMAID_FENCE_RE.sub("", body)
 
     fm_lines = [
         "---",
