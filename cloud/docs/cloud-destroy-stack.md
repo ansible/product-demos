@@ -18,6 +18,13 @@ Tears down everything created by Deploy Cloud Stack in AWS — terminates all fi
 
 ```mermaid
 graph LR
+  S["🏠 Start"]
+  S --> A
+  S --> B
+  S --> C
+  S --> D
+  S --> E
+  S --> G
   A["💥 Delete aws-dc"] --> F["🌐 Delete VPC"]
   B["💥 Delete aws_win1"] --> F
   C["💥 Delete aws_rhel8"] --> F
@@ -25,6 +32,7 @@ graph LR
   E["💥 Delete reports"] --> F
   F --> H["🔄 Sync Inventory"]
   G["🔑 Delete Key"] --> H
+  style S fill:#212427,stroke:#8a8d90,color:#fff
 ```
 
 1. Terminates all five stack VMs **in parallel**

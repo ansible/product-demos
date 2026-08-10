@@ -32,6 +32,8 @@
   github_path: cloud/setup.yml
   workflow_mermaid: |
     graph LR
+      S["🏠 Start"]
+      S --> A
       A["📸 Take Snapshot"] --> B["🔍 Pre-check RHEL"]
       A --> C["🔍 Pre-check Windows"]
       B --> D["🩹 Patch RHEL"]
@@ -52,6 +54,7 @@
       style H fill:#162c46,stroke:#58a6ff,color:#fff
       style I fill:#4a1a1a,stroke:#ef4444,color:#fff
       style J fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
 
 - slug: deploy-cloud-stack
   readme_path: cloud/docs/deploy-cloud-stack.md
@@ -77,6 +80,9 @@
   github_path: cloud/setup.yml
   workflow_mermaid: |
     graph LR
+      S["🏠 Start"]
+      S --> A
+      S --> B
       A["🔑 Create Keypair"] --> C["📊 EC2 Stats"]
       B["🌐 Create VPC"] --> C
       C -->|always| D["🪟 aws-dc<br/>windows_full"]
@@ -100,6 +106,7 @@
       style H fill:#3d1a1a,stroke:#cc0000,color:#fff
       style I fill:#162c46,stroke:#58a6ff,color:#fff
       style J fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
 
 - slug: contribute
   readme_path: cloud/docs/contribute.md
@@ -143,6 +150,13 @@
   github_path: cloud/setup.yml
   workflow_mermaid: |
     graph LR
+      S["🏠 Start"]
+      S --> A
+      S --> B
+      S --> C
+      S --> D
+      S --> E
+      S --> G
       A["💥 Delete aws-dc"] --> F["🌐 Delete VPC"]
       B["💥 Delete aws_win1"] --> F
       C["💥 Delete aws_rhel8"] --> F
@@ -158,6 +172,7 @@
       style F fill:#1e3a5f,stroke:#4a90d9,color:#fff
       style G fill:#1e3a5f,stroke:#4a90d9,color:#fff
       style H fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
 
 - slug: cloud-create-vpc
   readme_path: cloud/docs/cloud-create-vpc.md
@@ -667,10 +682,13 @@
   github_path: linux/setup.yml
   workflow_mermaid: |
     graph LR
+      S["🏠 Start"]
+      S --> A
       A["📋 Compliance Report"] --> B["🔄 Update Inventory"] --> C["🔧 Compliance Enforce"]
       style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
       style B fill:#2d2d2d,stroke:#888,color:#fff
       style C fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
 
 # ─── Windows ────────────────────────────────────────────────────────
 
@@ -943,6 +961,8 @@
   github_path: windows/setup.yml
   workflow_mermaid: |
     graph LR
+      S["🏠 Start"]
+      S --> A
       A["🔑 Create Keypair"] --> B["🌐 Create VPC"]
       B --> C["🪟 Create DC"]
       B --> D["🪟 Create Computer 1"]
@@ -972,6 +992,7 @@
       style K fill:#162c46,stroke:#58a6ff,color:#fff
       style L fill:#162c46,stroke:#58a6ff,color:#fff
       style M fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
 
 # ─── Network ────────────────────────────────────────────────────────
 
@@ -1066,6 +1087,8 @@
   github_path: network/panos/deploy.yml
   workflow_mermaid: |
     graph LR
+      S["🏠 Start"]
+      S --> A
       A["🚀 Deploy"] --> B["🔄 Inventory Sync"]
       B --> C["🔥 Configure Firewall"]
       C --> D["🛡️ Configure Security Rule"]
@@ -1077,6 +1100,7 @@
       style D fill:#162c46,stroke:#58a6ff,color:#fff
       style E fill:#1e3a5f,stroke:#4a90d9,color:#fff
       style F fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
 
 # ─── OpenShift ──────────────────────────────────────────────────────
 
@@ -1205,6 +1229,9 @@
   github_path: openshift/setup.yml
   workflow_mermaid: |
     graph LR
+      S["🏠 Start"]
+      S --> A
+      S --> B
       A["🐧 Deploy RHEL8 VM"] --> C["🔄 Update Inventory"]
       B["🐧 Deploy RHEL9 VM"] --> C
       A -. "failure" .-> D["🎫 Ticket — Instance Failed"]
@@ -1213,6 +1240,7 @@
       style B fill:#3d1a1a,stroke:#cc0000,color:#fff
       style C fill:#2d2d2d,stroke:#888,color:#fff
       style D fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
 
 - slug: openshift-cnv-patch-workflow
   readme_path: openshift/docs/openshift-cnv-patch-workflow.md
@@ -1236,6 +1264,8 @@
   github_path: openshift/setup.yml
   workflow_mermaid: |
     graph LR
+      S["🏠 Start"]
+      S --> A
       A["📸 Take Snapshot"] --> B["📂 Project Sync"]
       A --> C["🔄 Inventory Sync"]
       B --> D["🩹 Patch Instance"]
@@ -1250,6 +1280,7 @@
       style E fill:#162c46,stroke:#58a6ff,color:#fff
       style F fill:#4a1a1a,stroke:#ef4444,color:#fff
       style G fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
 
 # ─── Satellite ──────────────────────────────────────────────────────
 
@@ -1346,6 +1377,8 @@
   github_path: satellite/setup.yml
   workflow_mermaid: |
     graph LR
+      S["🏠 Start"]
+      S --> A
       A["🔄 Satellite Inventory"] --> B["📦 Publish Content View"]
       B --> C["🩹 Patching"]
       C --> D["📧 Submit Feedback"]
@@ -1353,3 +1386,4 @@
       style B fill:#2d1f4e,stroke:#a78bfa,color:#fff
       style C fill:#3d1a1a,stroke:#cc0000,color:#fff
       style D fill:#162c46,stroke:#58a6ff,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff

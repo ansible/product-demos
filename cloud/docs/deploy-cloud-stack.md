@@ -21,6 +21,9 @@ Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Wind
 
 ```mermaid
 graph LR
+  S["🏠 Start"]
+  S --> A
+  S --> B
   A["🔑 Create Keypair"] --> C["📊 EC2 Stats"]
   B["🌐 Create VPC"] --> C
   C --> D["🪟 aws-dc\n(Windows Full)"]
@@ -34,6 +37,7 @@ graph LR
   G --> I
   H --> I
   I --> J["📄 VPC Report"]
+  style S fill:#212427,stroke:#8a8d90,color:#fff
 ```
 
 1. Creates keypair `aws-test-key` (public key derived from APD Machine Credential private key)

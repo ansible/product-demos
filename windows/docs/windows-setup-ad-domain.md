@@ -7,6 +7,8 @@ A workflow that provisions a complete Active Directory environment from scratch 
 
 ```mermaid
 graph LR
+  S["🏠 Start"]
+  S --> A
   A["🔑 Create Keypair"] --> B["🌐 Create VPC"]
   B --> C["🪟 Create DC"]
   B --> D["🪟 Create Computer 1"]
@@ -23,6 +25,7 @@ graph LR
   G -. "any failure" .-> M["🧹 Cleanup Resources"]
   H -. "any failure" .-> M
   I -. "any failure" .-> M
+  style S fill:#212427,stroke:#8a8d90,color:#fff
 ```
 
 1. **Create Keypair + VPC** — Provisions AWS infrastructure

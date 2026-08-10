@@ -20,9 +20,12 @@ End-to-end Satellite patching workflow for development environments. Syncs the S
 
 ```mermaid
 graph LR
+  S["🏠 Start"]
+  S --> A
   A["🔄 Satellite Inventory"] --> B["📦 Publish Content View"]
   B --> C["🩹 Patching"]
   C --> D["📧 Submit Feedback"]
+  style S fill:#212427,stroke:#8a8d90,color:#fff
 ```
 
 ## Workflow nodes

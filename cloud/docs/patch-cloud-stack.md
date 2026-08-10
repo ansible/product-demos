@@ -28,6 +28,8 @@ Enterprise-grade patching workflow with snapshot safety, parallel RHEL and Windo
 
 ```mermaid
 graph LR
+  S["🏠 Start"]
+  S --> A
   A["📸 Snapshot EC2"] --> B["🔍 Pre-check RHEL"]
   A --> C["🔍 Pre-check Windows"]
   B --> D["🩹 Patch RHEL"]
@@ -38,6 +40,7 @@ graph LR
   E -->|failure| I["⏪ Restore from Snapshot"]
   F --> J["📊 Compliance Report"]
   H --> J
+  style S fill:#212427,stroke:#8a8d90,color:#fff
 ```
 
 1. **Snapshot** — EBS snapshots of all target instances for recovery
