@@ -22,7 +22,7 @@
     - Patching
     - Compliance
   thumbnail:
-    gradient: "linear-gradient(135deg, #16a34a 0%, #052e16 100%)"
+    gradient: "linear-gradient(135deg, #0969da 0%, #033d8b 100%)"
     icon: "🩹"
   blurb: "Enterprise-grade patching workflow with EBS snapshots, parallel RHEL and Windows paths, automatic rollback on failure, and a consolidated compliance report."
   stats:
@@ -43,13 +43,13 @@
       F -->|always| J["📊 Compliance Report"]
       H -->|always| J
       style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
-      style B fill:#1a3d2e,stroke:#4ade80,color:#fff
-      style C fill:#1a3d2e,stroke:#4ade80,color:#fff
+      style B fill:#162c46,stroke:#58a6ff,color:#fff
+      style C fill:#162c46,stroke:#58a6ff,color:#fff
       style D fill:#3d1a1a,stroke:#f87171,color:#fff
       style E fill:#3d1a1a,stroke:#f87171,color:#fff
-      style F fill:#1a3d2e,stroke:#4ade80,color:#fff
+      style F fill:#162c46,stroke:#58a6ff,color:#fff
       style G fill:#4a1a1a,stroke:#ef4444,color:#fff
-      style H fill:#1a3d2e,stroke:#4ade80,color:#fff
+      style H fill:#162c46,stroke:#58a6ff,color:#fff
       style I fill:#4a1a1a,stroke:#ef4444,color:#fff
       style J fill:#2d1f4e,stroke:#a78bfa,color:#fff
 
@@ -67,7 +67,7 @@
     - Survey
     - AWS
   thumbnail:
-    gradient: "linear-gradient(135deg, #15803d 0%, #14532d 100%)"
+    gradient: "linear-gradient(135deg, #0d9488 0%, #065f54 100%)"
     icon: "🚀"
   blurb: "One-click workflow to provision a full demo stack — VPC, keypair, and five VMs (2 Windows, 2 RHEL, 1 report server) — with inventory sync and VPC report."
   stats:
@@ -98,21 +98,25 @@
       style F fill:#3d1a1a,stroke:#cc0000,color:#fff
       style G fill:#3d1a1a,stroke:#cc0000,color:#fff
       style H fill:#3d1a1a,stroke:#cc0000,color:#fff
-      style I fill:#1a3d2e,stroke:#4ade80,color:#fff
+      style I fill:#162c46,stroke:#58a6ff,color:#fff
       style J fill:#2d1f4e,stroke:#a78bfa,color:#fff
 
-- slug: coming-soon
-  title: "More demos coming soon"
-  subtitle: "Your demo here?"
+- slug: contribute
+  readme_path: cloud/docs/contribute.md
+  title: "Contribute a Demo"
+  subtitle: "Fork, build, submit — your demo here"
   category: cloud
   status: active
   featured: true
-  tags: []
+  tags:
+    - Contributing
+    - Open Source
   thumbnail:
-    gradient: "linear-gradient(135deg, #1a3322 0%, #0a1a0e 100%)"
-    icon: "🔮"
-  blurb: "Have a demo idea? Fork the repo, add your playbook, and submit a PR. See the contributing guide for details."
+    gradient: "linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%)"
+    icon: "🤝"
+  blurb: "Have a demo idea? Fork the repo, add your playbook, and open a PR. Follow the contributing guide to get started."
   stats: {}
+  url: /demos/contribute/
   github_path: CONTRIBUTING.md
 
 # ─── Cloud ──────────────────────────────────────────────────────────

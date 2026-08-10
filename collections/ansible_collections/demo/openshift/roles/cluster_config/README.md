@@ -1,96 +1,49 @@
-Role Name
-=========
+# demo.openshift.cluster_config
 
-This Ansible role helps configure Operators on the Openshift Cluster to support VM migrations. Tasks include
-- Configure Catalog Sources to use mirroring repository for Operators
-- Create and configure Operators
+Configure OpenShift Operators via OLM -- namespaces, OperatorGroups, Subscriptions, optional CatalogSources, and operator-specific extra resources (for example HyperConverged for CNV).
 
+By default the role installs OpenShift Virtualization (CNV). Additional operators can be declared in `cluster_config_operators` with matching `cluster_config_<name>` dictionaries.
 
-Requirements
-------------
+```yaml
+- name: Install the CNV operator
+  ansible.builtin.include_role:
+    name: demo.openshift.cluster_config
+```
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Optional entry points select narrower task files with `tasks_from` (see [Entry points](#entry-points)).
 
-Role Variables
---------------
+Repo playbook: [`openshift/cnv/install.yml`](../../../../../../openshift/cnv/install.yml).
 
-The task `operators/catalog_sources.yml` needs following variables:
+## Requirements
 
-- **Variable Name**: `cluster_config_catalog_sources`
-  - **Type**: List
-  - **Description**: A list of custom CatalogSources configurations used as loop variables to generate Kubernetes manifest files from the  template `catalog_source.j2` for CatalogSource. If the variable is not available, no manifest is created.
-  - **Example**:
-    ```yaml
-    cluster_config_catalog_sources:
-      - name: redhat-marketplace2
-        source_type: grpc
-        display_name: Mirror to Red Hat Marketplace
-        image_path: internal-registry.example.com/operator:v1
-        priority: '-300'
-        icon:
-          base64data: ''
-          mediatype: ''
-        publisher: redhat
-        address: ''
-        grpc_pod_config: |
-          nodeSelector:
-            kubernetes.io/os: linux
-            node-role.kubernetes.io/master: ''
-          priorityClassName: system-cluster-critical
-          securityContextConfig: restricted
-          tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/master
-              operator: Exists
-            - effect: NoExecute
-              key: node.kubernetes.io/unreachable
-              operator: Exists
-              tolerationSeconds: 120
-            - effect: NoExecute
-              key: node.kubernetes.io/not-ready
-              operator: Exists
-              tolerationSeconds: 120
-        registry_poll_interval: 10m
-    ```
+- Ansible 2.14+
+- Target: OpenShift cluster access
+- `redhat.openshift` and `kubernetes.core` collections
+- An attached "OpenShift Credential" (type `OpenShift or Kubernetes API Bearer Token`) so `K8S_AUTH_HOST` / `K8S_AUTH_API_KEY` / `K8S_AUTH_VERIFY_SSL` are injected
+- Cluster-admin (or equivalent) rights to create namespaces, OperatorGroups, Subscriptions, and CatalogSources
 
-The task `operators/operator_config.yaml` needs following variables:
+## Role Variables
 
-- **Variable Name**: `cluster_config_operators`
-  - **Type**: List
-  - **Description**: A list of operators to be installed on OCP cluster
-- **Variable Name**: `cluster_config_[OPERATOR_NAME]`
-  - **Type**: Dict
-  - **Description**: Configuration specific to each operator listed in `cluster_config_operators`. Includes settings for namespace, operator group, subscription, and any extra resources
-  - **Example**: Assume the `cluster_config_operators` specifies these operators:
-  ```yaml
-  cluster_config_operators:
-    - cnv
-    - oadp
-  ```
-  then the corresponding `cluster_config_mtv` and `cluster_config_cnv` can be configured as following:
-  ```yaml
-  cluster_config_cnv_namespace: openshift-cnv
-  cluster_config_cnv:
-  namespace:
-    name: "{{ cluster_config_cnv_namespace }}"
-  operator_group:
-    name: kubevirt-hyperconverged-group
-    target_namespaces:
-      - "{{ cluster_config_cnv_namespace }}"
-  subscription:
-    name: kubevirt-hyperconverged
-    starting_csv: kubevirt-hyperconverged-operator.v4.13.8
-  extra_resources:
-    - apiVersion: hco.kubevirt.io/v1beta1
-      kind: HyperConverged
-      metadata:
-        name: kubevirt-hyperconverged
-        namespace: "{{ cluster_config_cnv_namespace }}"
-      spec:
-        BareMetalPlatform: true
+Defaults live in `defaults/main.yml`. See that file for the full list of variables and their descriptions; the highlights are:
 
-  cluster_config_oadp_namespace: openshift-adp
-  cluster_config_oadp:
+| Variable | Default | Description |
+| --- | --- | --- |
+| `cluster_config_operators` | `[cnv]` | List of operator short names to configure; each name must have a matching `cluster_config_<name>` dict |
+| `cluster_config_cnv` | see defaults | CNV operator config: namespace, OperatorGroup, Subscription, and HyperConverged `extra_resources` |
+| `cluster_config_catalog_sources` | unset | Optional list of custom CatalogSource definitions (used by the `operators/catalog_sources` entry point) |
+| `cluster_config_<operator>` | — | Per-operator dict with `namespace`, `operator_group`, `subscription`, optional `checkplan`, and optional `extra_resources` |
+
+For each name in `cluster_config_operators`, the role looks up `vars['cluster_config_' + name]`, applies the namespace / OperatorGroup / Subscription templates, optionally waits for the InstallPlan (`checkplan: true`), then applies any `extra_resources`.
+
+Example of adding OADP alongside CNV:
+
+```yaml
+cluster_config_operators:
+  - cnv
+  - oadp
+
+cluster_config_oadp_namespace: openshift-adp
+cluster_config_oadp:
   namespace:
     name: "{{ cluster_config_oadp_namespace }}"
   operator_group:
@@ -100,32 +53,20 @@ The task `operators/operator_config.yaml` needs following variables:
   subscription:
     name: redhat-oadp-operator-subscription
     spec_name: redhat-oadp-operator
-  ```
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
-Example Playbook
-----------------
-
-An example of configuring a CatalogSource resource:
-```
-- name: Configure Catalog Sources for Operators
-  hosts: localhost
-  gather_facts: false
-  tasks:
-    - ansible.builtin.include_role:
-        name: cluster_config
-        tasks_from: operators/catalog_sources
 ```
 
-License
--------
+## Entry points
 
-BSD
+| Entry point | Description |
+| --- | --- |
+| `main` (default) | Configure every operator listed in `cluster_config_operators` (`operators/operator_config.yml`). |
+| `operators/catalog_sources` | Apply custom CatalogSource manifests from `cluster_config_catalog_sources` (for example mirrored registries). Skips when the variable is undefined. |
+| `operators/node-health-check` | Install the Node Health Check operator into `openshift-workload-availability`. |
 
-Author Information
-------------------
+## License
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+GPL-3.0-or-later
+
+## Authors and Acknowledgments
+
+- Ansible Product Demos -- maintained as part of [`demo.openshift`](../../README.md) for the OpenShift automation demos in this repository.

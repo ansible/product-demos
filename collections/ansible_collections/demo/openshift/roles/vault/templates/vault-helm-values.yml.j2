@@ -1,0 +1,30 @@
+---
+global:
+  openshift: {{ vault_k8s_route_enabled | bool | to_json }}
+
+server:
+  # Fully qualify the registry. On OpenShift, short names like hashicorp/vault
+  # resolve via unqualified-search-registries (registry.access.redhat.com first),
+  # which redirects to registry.connect.redhat.com where chart tags often 404.
+  image:
+    repository: "{{ vault_k8s_image_repository }}"
+{% if vault_k8s_image_tag is defined and vault_k8s_image_tag | length > 0 %}
+    tag: "{{ vault_k8s_image_tag }}"
+{% endif %}
+  dev:
+    enabled: true
+    devRootToken: "{{ vault_k8s_dev_root_token }}"
+  standalone:
+    enabled: true
+  ha:
+    enabled: false
+  service:
+    type: ClusterIP
+  route:
+    enabled: false
+
+injector:
+  enabled: false
+
+ui:
+  enabled: true

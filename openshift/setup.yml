@@ -237,6 +237,31 @@ controller_templates:
     credentials:
       - OpenShift Credential
 
+  - name: OpenShift | Vault
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "openshift/vault.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Operation
+          type: multiplechoice
+          variable: vault_operation
+          required: true
+          default: install
+          choices:
+            - install
+            - uninstall
+    credentials:
+      - OpenShift Credential
+      - AAP Credential
+
 controller_workflows:
   - name: OpenShift | CNV | Infra Stack
     description: A workflow to deploy Virtualized infra in OCP Virtalization

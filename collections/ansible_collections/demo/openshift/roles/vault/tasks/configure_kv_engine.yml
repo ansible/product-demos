@@ -1,0 +1,40 @@
+# Enable the KV v2 secrets engine and seed sample secrets for e2e testing.
+---
+- name: Resolve vault_token
+  ansible.builtin.include_tasks: resolve_vault_token.yml
+
+- name: List secrets engines
+  register: vault_secrets_list_result
+  changed_when: false
+  failed_when: vault_secrets_list_result.rc != 0
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['secrets', 'list', '-format', 'json'] }}"
+
+- name: Enable KV v2 secrets engine
+  when: "(vault_kv_engine_path ~ '/') not in (vault_secrets_list_result.stdout | from_json)"
+  register: vault_kv_enable_result
+  changed_when: "'Success' in vault_kv_enable_result.stdout"
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['secrets', 'enable', '-path', vault_kv_engine_path, '-version', vault_kv_engine_version, 'kv'] }}"
+
+- name: Seed sample secrets
+  loop: "{{ vault_kv_sample_secrets }}"
+  loop_control:
+    label: "{{ item.path }}"
+  register: vault_kv_put_result
+  changed_when: "'created_time' in vault_kv_put_result.stdout"
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['kv', 'put', item.path | regex_replace('^secret/data/', 'secret/'), '-'] }}"
+    stdin: "{{ item.data | to_json }}"

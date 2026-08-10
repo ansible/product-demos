@@ -34,8 +34,8 @@ additional_build_steps:
     - ARG ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN
     - ARG ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN
   append_final:
-    - RUN curl -o /etc/yum.repos.d/hasicorp.repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo &&
-      microdnf install -y terraform
+    - RUN curl -fsSL https://get.helm.sh/helm-v3.15.3-linux-amd64.tar.gz | tar xz -C /usr/local/bin --strip-components=1 linux-amd64/helm
+    - RUN curl -o /etc/yum.repos.d/hashicorp.repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo && microdnf install -y terraform
     # remove development dependencies
     - RUN microdnf remove -y systemd-devel gcc
 

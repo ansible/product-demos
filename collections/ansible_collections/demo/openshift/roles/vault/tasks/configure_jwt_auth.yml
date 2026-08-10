@@ -1,0 +1,130 @@
+# Configure Vault JWT auth for AAP OIDC workload identity.
+---
+- name: Resolve vault_token
+  ansible.builtin.include_tasks: resolve_vault_token.yml
+
+- name: List Vault auth methods
+  register: vault_auth_list_result
+  changed_when: false
+  failed_when: vault_auth_list_result.rc != 0
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['auth', 'list', '-format', 'json'] }}"
+
+- name: Enable JWT auth method
+  when: "'jwt/' not in (vault_auth_list_result.stdout | from_json)"
+  register: vault_jwt_enable_result
+  changed_when: "'Success' in vault_jwt_enable_result.stdout"
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['auth', 'enable', 'jwt'] }}"
+
+- name: Build JWT auth backend config payload
+  no_log: "{{ vault_no_log | default(true) }}"
+  vars:
+    _vault_jwt_auth_config_base:
+      oidc_discovery_url: "{{ vault_jwt_oidc_discovery_url }}"
+  ansible.builtin.set_fact:
+    _vault_jwt_auth_config: >-
+      {{ _vault_jwt_auth_config_base | combine(
+        {'oidc_discovery_ca_pem': lookup('ansible.builtin.file', vault_jwt_oidc_discovery_ca_pem)}
+        if (vault_jwt_oidc_discovery_ca_pem | default('') | length > 0)
+        else {}
+      ) }}
+
+- name: Configure JWT auth backend
+  register: vault_jwt_config_result
+  changed_when: "'Success' in vault_jwt_config_result.stdout"
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['write', 'auth/jwt/config', '-'] }}"
+    stdin: "{{ _vault_jwt_auth_config | to_json }}"
+
+- name: Write static Vault policy
+  register: vault_static_policy_result
+  changed_when: "'Success' in vault_static_policy_result.stdout"
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['policy', 'write', vault_jwt_static_policy_name, '-'] }}"
+    stdin: "{{ lookup('ansible.builtin.template', 'vault_static_policy.hcl.j2') }}"
+
+- name: Build static JWT role payload
+  ansible.builtin.set_fact:
+    _vault_jwt_static_role:
+      role_type: jwt
+      bound_audiences: "{{ vault_jwt_bound_audiences }}"
+      user_claim: sub
+      bound_claims: "{{ vault_jwt_static_bound_claims }}"
+      policies:
+        - "{{ vault_jwt_static_policy_name }}"
+
+- name: Create static JWT role
+  register: vault_static_role_result
+  changed_when: "'Success' in vault_static_role_result.stdout"
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['write', 'auth/jwt/role/' + vault_jwt_static_role_name, '-'] }}"
+    stdin: "{{ _vault_jwt_static_role | to_json }}"
+
+- name: Refresh Vault auth methods for JWT accessor
+  register: vault_auth_list_for_accessor
+  changed_when: false
+  failed_when: vault_auth_list_for_accessor.rc != 0
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['auth', 'list', '-format', 'json'] }}"
+
+- name: Set JWT auth method accessor
+  ansible.builtin.set_fact:
+    vault_jwt_accessor: "{{ (vault_auth_list_for_accessor.stdout | from_json)['jwt/'].accessor }}"
+
+- name: Write dynamic Vault policy
+  register: vault_dynamic_policy_result
+  changed_when: "'Success' in vault_dynamic_policy_result.stdout"
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['policy', 'write', vault_jwt_dynamic_policy_name, '-'] }}"
+    stdin: "{{ lookup('ansible.builtin.template', 'vault_templated_policy.hcl.j2') }}"
+
+- name: Build dynamic JWT role payload
+  ansible.builtin.set_fact:
+    _vault_jwt_dynamic_role:
+      role_type: jwt
+      bound_audiences: "{{ vault_jwt_bound_audiences }}"
+      user_claim: sub
+      bound_claims: "{{ vault_jwt_dynamic_bound_claims }}"
+      claim_mappings: "{{ vault_jwt_dynamic_claim_mappings }}"
+      policies:
+        - "{{ vault_jwt_dynamic_policy_name }}"
+
+- name: Create dynamic JWT role
+  register: vault_dynamic_role_result
+  changed_when: "'Success' in vault_dynamic_role_result.stdout"
+  no_log: "{{ vault_no_log | default(true) }}"
+  environment:
+    VAULT_ADDR: "{{ vault_cli_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  ansible.builtin.command:
+    argv: "{{ vault_argv + ['write', 'auth/jwt/role/' + vault_jwt_dynamic_role_name, '-'] }}"
+    stdin: "{{ _vault_jwt_dynamic_role | to_json }}"
