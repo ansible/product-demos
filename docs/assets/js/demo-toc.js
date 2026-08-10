@@ -15,7 +15,7 @@
    *  8. Why it matters
    *  9. Presenter walkthrough
    * 10. Talking points
-   * 11. Related demos
+   * 11. See other <category> demos  (layout CTA → filtered catalog)
    */
 
   /* Move Workflow and Video into the detail-body, right after the lead

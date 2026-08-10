@@ -3,12 +3,20 @@ layout: default
 mermaid: true
 ---
 {% assign demo = site.data.demos | where: "slug", page.demo_slug | first %}
+{% case demo.category %}
+  {% when 'openshift' %}
+    {% assign category_label = 'OpenShift' %}
+  {% when 'network' %}
+    {% assign category_label = 'Network' %}
+  {% else %}
+    {% assign category_label = demo.category | capitalize %}
+{% endcase %}
 
 <div class="detail-hero">
   <div class="detail-hero__row">
     <div class="detail-hero__content">
       <div class="detail-hero__main">
-        <p class="detail-status detail-status--active">{{ demo.category | capitalize }}</p>
+        <p class="detail-status detail-status--active">{{ category_label }}</p>
         <h1>{{ demo.title }}</h1>
         <p class="subtitle">{{ demo.subtitle }}</p>
       </div>
@@ -27,6 +35,13 @@ mermaid: true
 <section class="detail-section" id="description">
   <div class="detail-body">
     {{ content }}
+
+    {% if demo.category %}
+    <h2 id="see-other-demos">See other {{ category_label }} demos</h2>
+    <p class="detail-see-other">
+      <a href="{{ '/' | relative_url }}?category={{ demo.category }}">Browse all {{ category_label }} demos →</a>
+    </p>
+    {% endif %}
   </div>
 </section>
 
