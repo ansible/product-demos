@@ -27,6 +27,7 @@ LINK_RE = re.compile(r"(\[[^\]]*\])\(([^)]+)\)")
 # Mermaid fences stay in source READMEs for GitHub.com; Pages renders
 # diagrams from demos.yml via the layout <pre class="mermaid"> include.
 MERMAID_FENCE_RE = re.compile(r"```mermaid\n.*?```\n*", re.DOTALL)
+WORKFLOW_HEADING_RE = re.compile(r"^## Workflow\s*\n+", re.MULTILINE)
 
 
 def rewrite_links(body: str, readme_path: str) -> str:
@@ -73,7 +74,9 @@ for demo in demos:
 
     body = rewrite_links(body, readme)
     if demo.get("workflow_mermaid"):
+        # Diagram + Workflow heading come from the layout; keep step lists.
         body = MERMAID_FENCE_RE.sub("", body)
+        body = WORKFLOW_HEADING_RE.sub("", body)
 
     fm_lines = [
         "---",

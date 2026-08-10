@@ -19,11 +19,10 @@
    */
 
   /* Move Workflow and Video into the detail-body, right after the lead
-     paragraph(s) and before the first <h2>. Layout Workflow is a <section>;
-     markdown may also have ## Workflow (step list) — merge that in so the
-     TOC only has one Workflow entry and steps sit under the diagram. */
+     paragraph(s) and before the first <h2>. Prefer section#workflow so a
+     leftover markdown heading id cannot win. */
   if (body) {
-    var workflow = document.getElementById('workflow');
+    var workflow = document.querySelector('section#workflow');
     var video = document.getElementById('video');
     var firstH2 = body.querySelector('h2');
 
@@ -34,16 +33,37 @@
       if (workflow) {
         body.insertBefore(workflow, video || firstH2);
 
+        /* Build strips ## Workflow + mermaid fences. Step lists then sit
+           either before Prerequisites (workflow-first docs) or under the
+           Survey table — fold both into the layout Workflow section. */
+        var stop = null;
         body.querySelectorAll('h2').forEach(function (h2) {
-          if (h2 === workflow.querySelector('h2')) return;
-          if (h2.textContent.trim().toLowerCase() !== 'workflow') return;
-          var node = h2.nextElementSibling;
-          while (node && node.tagName !== 'H2') {
+          if (stop || h2.closest('section#workflow')) return;
+          var t = h2.textContent.trim().toLowerCase();
+          if (t === 'prerequisites' ||
+              t.indexOf('configure credentials') === 0 ||
+              t === 'survey prompts' ||
+              t === 'job templates') {
+            stop = h2;
+          }
+        });
+        if (stop) {
+          var node = body.firstElementChild;
+          while (node && node !== stop) {
             var next = node.nextElementSibling;
-            workflow.appendChild(node);
+            if (node !== workflow && node !== video &&
+                (node.tagName === 'OL' || node.tagName === 'UL')) {
+              workflow.appendChild(node);
+            }
             node = next;
           }
-          h2.remove();
+        }
+        Array.prototype.slice.call(body.children).forEach(function (el) {
+          if ((el.tagName === 'OL' || el.tagName === 'UL') &&
+              el.previousElementSibling &&
+              el.previousElementSibling.tagName === 'TABLE') {
+            workflow.appendChild(el);
+          }
         });
       }
     }
