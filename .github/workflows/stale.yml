@@ -1,0 +1,53 @@
+---
+name: "Close stale issues and PRs"
+
+on:
+  schedule:
+    - cron: "30 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          # ── Pull Requests ──────────────────────────────────
+          days-before-pr-stale: 45
+          days-before-pr-close: 14
+          stale-pr-label: "stale"
+          stale-pr-message: >
+            This pull request has had no activity for 45 days and has been
+            marked **stale**.  It will be closed in 14 days unless there is
+            new activity.  If this PR is still relevant, please push an
+            update or leave a comment explaining the current status.
+          close-pr-message: >
+            This pull request has been closed due to inactivity.  Feel free
+            to re-open it if you'd like to continue the work — we're happy
+            to review when it's ready.
+
+          # ── Issues ─────────────────────────────────────────
+          days-before-issue-stale: 90
+          days-before-issue-close: 30
+          stale-issue-label: "stale"
+          stale-issue-message: >
+            This issue has had no activity for 90 days and has been marked
+            **stale**.  It will be closed in 30 days unless there is new
+            activity.  If this issue is still relevant, please leave a
+            comment explaining the current status.
+          close-issue-message: >
+            This issue has been closed due to inactivity.  If the problem
+            persists or the feature is still needed, please open a new issue
+            and reference this one.
+
+          # ── Exemptions ─────────────────────────────────────
+          exempt-issue-labels: "pinned,security,enhancement"
+          exempt-pr-labels: "pinned,security"
+          exempt-all-milestones: true
+
+          # ── Rate limiting ──────────────────────────────────
+          operations-per-run: 100
