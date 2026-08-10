@@ -5,20 +5,24 @@ A workflow that provisions a complete Active Directory environment from scratch 
 
 ## Workflow
 
-```
-Create Keypair ──→ Create VPC ──→ Create DC          ──┐
-                              ├──→ Create Computer 1  ──┼──→ Inventory Sync ──→ Test Connectivity
-                              └──→ Create Computer 2  ──┘         │
-                                                                   ↓
-                                                            Create Domain
-                                                                   │
-                                                            Join Domain ──→ Domain Inventory Sync
-                                                                                    │
-                                                            ┌───────────────────────┘
-                                                            ├──→ PowerShell Validation
-                                                            └──→ Kerberos Validation
-
-                                        (any failure) ──→ Cleanup Resources
+```mermaid
+graph LR
+  A["🔑 Create Keypair"] --> B["🌐 Create VPC"]
+  B --> C["🪟 Create DC"]
+  B --> D["🪟 Create Computer 1"]
+  B --> E["🪟 Create Computer 2"]
+  C --> F["🔄 Inventory Sync"]
+  D --> F
+  E --> F
+  F --> G["🔌 Test Connectivity"]
+  G --> H["🏰 Create Domain"]
+  H --> I["🤝 Join Domain"]
+  I --> J["🔄 Domain Inventory Sync"]
+  J --> K["⚡ PowerShell Validation"]
+  J --> L["🔐 Kerberos Validation"]
+  G -. "any failure" .-> M["🧹 Cleanup Resources"]
+  H -. "any failure" .-> M
+  I -. "any failure" .-> M
 ```
 
 1. **Create Keypair + VPC** — Provisions AWS infrastructure

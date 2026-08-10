@@ -16,12 +16,15 @@ Tears down everything created by Deploy Cloud Stack in AWS — terminates all fi
 
 ## Workflow
 
-```
-Delete aws-dc ───────────┐
-Delete aws_win1 ─────────┤
-Delete aws_rhel8 ────────┼──→ Delete VPC ──┐
-Delete aws_rhel9 ────────┤                 ├──→ Sync Inventory
-Delete reports ──────────┘    Delete Key ──┘
+```mermaid
+graph LR
+  A["💥 Delete aws-dc"] --> F["🌐 Delete VPC"]
+  B["💥 Delete aws_win1"] --> F
+  C["💥 Delete aws_rhel8"] --> F
+  D["💥 Delete aws_rhel9"] --> F
+  E["💥 Delete reports"] --> F
+  F --> H["🔄 Sync Inventory"]
+  G["🔑 Delete Key"] --> H
 ```
 
 1. Terminates all five stack VMs **in parallel**

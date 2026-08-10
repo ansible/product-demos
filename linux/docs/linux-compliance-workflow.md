@@ -5,8 +5,9 @@ A workflow that ties together compliance reporting, inventory refresh, and enfor
 
 ## Workflow
 
-```
-Compliance Report ──→ Update Inventory ──→ Compliance Enforce
+```mermaid
+graph LR
+  A["📋 Compliance Report"] --> B["🔄 Update Inventory"] --> C["🔧 Compliance Enforce"]
 ```
 
 1. **Compliance Report** — Runs an OpenSCAP scan against the chosen profile and generates an HTML report

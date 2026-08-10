@@ -26,15 +26,18 @@ Enterprise-grade patching workflow with snapshot safety, parallel RHEL and Windo
 
 ## Workflow
 
-```
-Snapshot EC2
-├──→ Pre-check RHEL ──→ Patch RHEL
-│       ├─ (success) Post-check RHEL ──────────┐
-│       └─ (failure) Restore from Snapshot      │
-├──→ Pre-check Windows ──→ Patch Windows       │
-│       ├─ (success) Post-check Windows ───────┼──→ Compliance Report
-│       └─ (failure) Restore from Snapshot      │
-└───────────────────────────────────────────────┘
+```mermaid
+graph LR
+  A["📸 Snapshot EC2"] --> B["🔍 Pre-check RHEL"]
+  A --> C["🔍 Pre-check Windows"]
+  B --> D["🩹 Patch RHEL"]
+  C --> E["🩹 Patch Windows"]
+  D -->|success| F["✅ Post-check RHEL"]
+  D -->|failure| G["⏪ Restore from Snapshot"]
+  E -->|success| H["✅ Post-check Windows"]
+  E -->|failure| I["⏪ Restore from Snapshot"]
+  F --> J["📊 Compliance Report"]
+  H --> J
 ```
 
 1. **Snapshot** — EBS snapshots of all target instances for recovery

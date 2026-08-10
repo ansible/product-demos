@@ -16,6 +16,15 @@ End-to-end Satellite patching workflow for development environments. Syncs the S
 |--------|----------|------|----------|
 | Email | `email` | text | Yes |
 
+## Workflow
+
+```mermaid
+graph LR
+  A["🔄 Satellite Inventory"] --> B["📦 Publish Content View"]
+  B --> C["🩹 Patching"]
+  C --> D["📧 Submit Feedback"]
+```
+
 ## Workflow nodes
 
 | Step | Template | Description |

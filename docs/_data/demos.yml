@@ -141,6 +141,23 @@
     playbooks: 4
   url: /demos/cloud-destroy-stack/
   github_path: cloud/setup.yml
+  workflow_mermaid: |
+    graph LR
+      A["💥 Delete aws-dc"] --> F["🌐 Delete VPC"]
+      B["💥 Delete aws_win1"] --> F
+      C["💥 Delete aws_rhel8"] --> F
+      D["💥 Delete aws_rhel9"] --> F
+      E["💥 Delete reports"] --> F
+      F --> H["🔄 Sync Inventory"]
+      G["🔑 Delete Key"] --> H
+      style A fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style B fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style C fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style D fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style E fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style F fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style G fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style H fill:#2d1f4e,stroke:#a78bfa,color:#fff
 
 - slug: cloud-create-vpc
   readme_path: cloud/docs/cloud-create-vpc.md
@@ -648,6 +665,12 @@
     playbooks: 3
   url: /demos/linux-compliance-workflow/
   github_path: linux/setup.yml
+  workflow_mermaid: |
+    graph LR
+      A["📋 Compliance Report"] --> B["🔄 Update Inventory"] --> C["🔧 Compliance Enforce"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#2d2d2d,stroke:#888,color:#fff
+      style C fill:#3d1a1a,stroke:#cc0000,color:#fff
 
 # ─── Windows ────────────────────────────────────────────────────────
 
@@ -918,6 +941,37 @@
     playbooks: 8
   url: /demos/windows-setup-ad-domain/
   github_path: windows/setup.yml
+  workflow_mermaid: |
+    graph LR
+      A["🔑 Create Keypair"] --> B["🌐 Create VPC"]
+      B --> C["🪟 Create DC"]
+      B --> D["🪟 Create Computer 1"]
+      B --> E["🪟 Create Computer 2"]
+      C --> F["🔄 Inventory Sync"]
+      D --> F
+      E --> F
+      F --> G["🔌 Test Connectivity"]
+      G --> H["🏰 Create Domain"]
+      H --> I["🤝 Join Domain"]
+      I --> J["🔄 Domain Inventory Sync"]
+      J --> K["⚡ PowerShell Validation"]
+      J --> L["🔐 Kerberos Validation"]
+      G -. "any failure" .-> M["🧹 Cleanup Resources"]
+      H -. "any failure" .-> M
+      I -. "any failure" .-> M
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style C fill:#1a2744,stroke:#2b88d8,color:#fff
+      style D fill:#1a2744,stroke:#2b88d8,color:#fff
+      style E fill:#1a2744,stroke:#2b88d8,color:#fff
+      style F fill:#2d2d2d,stroke:#888,color:#fff
+      style G fill:#162c46,stroke:#58a6ff,color:#fff
+      style H fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style I fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style J fill:#2d2d2d,stroke:#888,color:#fff
+      style K fill:#162c46,stroke:#58a6ff,color:#fff
+      style L fill:#162c46,stroke:#58a6ff,color:#fff
+      style M fill:#4a1a1a,stroke:#ef4444,color:#fff
 
 # ─── Network ────────────────────────────────────────────────────────
 
@@ -1010,6 +1064,19 @@
     playbooks: 5
   url: /demos/network-panos-workflow/
   github_path: network/panos/deploy.yml
+  workflow_mermaid: |
+    graph LR
+      A["🚀 Deploy"] --> B["🔄 Inventory Sync"]
+      B --> C["🔥 Configure Firewall"]
+      C --> D["🛡️ Configure Security Rule"]
+      D --> E["🌐 Configure Webserver"]
+      E -. "teardown" .-> F["🧹 Cleanup"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#2d2d2d,stroke:#888,color:#fff
+      style C fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style D fill:#162c46,stroke:#58a6ff,color:#fff
+      style E fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style F fill:#4a1a1a,stroke:#ef4444,color:#fff
 
 # ─── OpenShift ──────────────────────────────────────────────────────
 
@@ -1136,6 +1203,16 @@
     workflows: 1
     playbooks: 3
   github_path: openshift/setup.yml
+  workflow_mermaid: |
+    graph LR
+      A["🐧 Deploy RHEL8 VM"] --> C["🔄 Update Inventory"]
+      B["🐧 Deploy RHEL9 VM"] --> C
+      A -. "failure" .-> D["🎫 Ticket — Instance Failed"]
+      B -. "failure" .-> D
+      style A fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style B fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style C fill:#2d2d2d,stroke:#888,color:#fff
+      style D fill:#4a1a1a,stroke:#ef4444,color:#fff
 
 - slug: openshift-cnv-patch-workflow
   readme_path: openshift/docs/openshift-cnv-patch-workflow.md
@@ -1157,6 +1234,22 @@
     workflows: 1
     playbooks: 5
   github_path: openshift/setup.yml
+  workflow_mermaid: |
+    graph LR
+      A["📸 Take Snapshot"] --> B["📂 Project Sync"]
+      A --> C["🔄 Inventory Sync"]
+      B --> D["🩹 Patch Instance"]
+      C --> D
+      D -->|success| E["✅ Done"]
+      D -->|failure| F["⏪ Restore from Snapshot"]
+      F -->|failure| G["🎫 Ticket — Restore Failed"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#2d2d2d,stroke:#888,color:#fff
+      style C fill:#2d2d2d,stroke:#888,color:#fff
+      style D fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style E fill:#162c46,stroke:#58a6ff,color:#fff
+      style F fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style G fill:#4a1a1a,stroke:#ef4444,color:#fff
 
 # ─── Satellite ──────────────────────────────────────────────────────
 
@@ -1251,3 +1344,12 @@
     workflows: 1
     playbooks: 5
   github_path: satellite/setup.yml
+  workflow_mermaid: |
+    graph LR
+      A["🔄 Satellite Inventory"] --> B["📦 Publish Content View"]
+      B --> C["🩹 Patching"]
+      C --> D["📧 Submit Feedback"]
+      style A fill:#2d2d2d,stroke:#888,color:#fff
+      style B fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style C fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style D fill:#162c46,stroke:#58a6ff,color:#fff

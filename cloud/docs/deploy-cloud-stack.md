@@ -19,13 +19,21 @@ Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Wind
 
 ## Workflow
 
-```
-Create Keypair ──┐
-                 ├──→ EC2 Stats ──→ aws-dc (Windows Full)     ──┐
-Create VPC ──────┘            ├──→ aws_win1 (Windows Core)   ──┤
-                              ├──→ aws_rhel8 (RHEL 8)        ──┼──→ Sync Inventory ──→ VPC Report
-                              ├──→ aws_rhel9 (RHEL 9)        ──┤
-                              └──→ reports (RHEL 9)           ──┘
+```mermaid
+graph LR
+  A["🔑 Create Keypair"] --> C["📊 EC2 Stats"]
+  B["🌐 Create VPC"] --> C
+  C --> D["🪟 aws-dc\n(Windows Full)"]
+  C --> E["🪟 aws_win1\n(Windows Core)"]
+  C --> F["🐧 aws_rhel8\n(RHEL 8)"]
+  C --> G["🐧 aws_rhel9\n(RHEL 9)"]
+  C --> H["📋 reports\n(RHEL 9)"]
+  D --> I["🔄 Sync Inventory"]
+  E --> I
+  F --> I
+  G --> I
+  H --> I
+  I --> J["📄 VPC Report"]
 ```
 
 1. Creates keypair `aws-test-key` (public key derived from APD Machine Credential private key)

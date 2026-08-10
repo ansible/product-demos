@@ -5,10 +5,13 @@ A workflow that provisions a Palo Alto Networks virtual firewall in AWS, configu
 
 ## Workflow
 
-```
-Deploy ──→ Inventory Sync ──→ Configure Firewall ──→ Configure Security Rule ──→ Configure Webserver
-                                                                                        │
-                                                                                  Cleanup (teardown)
+```mermaid
+graph LR
+  A["🚀 Deploy"] --> B["🔄 Inventory Sync"]
+  B --> C["🔥 Configure Firewall"]
+  C --> D["🛡️ Configure Security Rule"]
+  D --> E["🌐 Configure Webserver"]
+  E -. "teardown" .-> F["🧹 Cleanup"]
 ```
 
 1. **Deploy** — Provisions the PAN-OS virtual firewall, bastion host, and webserver in AWS

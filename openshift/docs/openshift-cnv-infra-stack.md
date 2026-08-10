@@ -5,11 +5,12 @@ Deploys the full OpenShift CNV infrastructure stack -- installs the OpenShift Vi
 
 ## Workflow
 
-```
-Deploy RHEL8 VM ──┐
-                  ├──→ Update Inventory
-Deploy RHEL9 VM ──┘
-    (failure) ──→ Ticket - Instance Failed
+```mermaid
+graph LR
+  A["🐧 Deploy RHEL8 VM"] --> C["🔄 Update Inventory"]
+  B["🐧 Deploy RHEL9 VM"] --> C
+  A -. "failure" .-> D["🎫 Ticket — Instance Failed"]
+  B -. "failure" .-> D
 ```
 
 1. **Deploy VMs** (parallel) — Provisions RHEL 8 and RHEL 9 VMs on CNV

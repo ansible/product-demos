@@ -5,12 +5,15 @@ Patching workflow for RHEL VMs running on OpenShift Virtualization. Similar to t
 
 ## Workflow
 
-```
-Take Snapshot ──→ Project Sync  ──┐
-              ├──→ Inventory Sync ┴──→ Patch Instance
-                                        ├─ (success) done
-                                        └─ (failure) Restore from Snapshot
-                                                       └─ (failure) Ticket - Restore Failed
+```mermaid
+graph LR
+  A["📸 Take Snapshot"] --> B["📂 Project Sync"]
+  A --> C["🔄 Inventory Sync"]
+  B --> D["🩹 Patch Instance"]
+  C --> D
+  D -->|success| E["✅ Done"]
+  D -->|failure| F["⏪ Restore from Snapshot"]
+  F -->|failure| G["🎫 Ticket — Restore Failed"]
 ```
 
 1. **Take Snapshot** — Creates VM snapshots for recovery
