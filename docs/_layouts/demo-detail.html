@@ -3,14 +3,7 @@ layout: default
 mermaid: true
 ---
 {% assign demo = site.data.demos | where: "slug", page.demo_slug | first %}
-{% case demo.category %}
-  {% when 'openshift' %}
-    {% assign category_label = 'OpenShift' %}
-  {% when 'network' %}
-    {% assign category_label = 'Network' %}
-  {% else %}
-    {% assign category_label = demo.category | capitalize %}
-{% endcase %}
+{% assign category_label = demo.category | capitalize %}
 
 <div class="detail-hero">
   <div class="detail-hero__row">

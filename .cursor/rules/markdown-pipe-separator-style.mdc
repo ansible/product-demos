@@ -1,0 +1,18 @@
+---
+description: Standardize pipe-like separators in docs prose
+globs: "**/docs/*.md, README.md"
+alwaysApply: false
+---
+
+# Markdown pipe separator style
+
+To prevent AI flip-flopping and kramdown/table parsing issues, use this convention:
+
+- In normal prose (especially bold job template names), use the **U+01C0 separator**: `ǀ`
+  - Example: `**APD ǀ Single demo setup**`
+- Use ASCII pipe `|` only when it is real syntax:
+  - Markdown tables
+  - Mermaid flowchart edge labels/conditions
+  - shell/regex/code snippets where `|` is required
+
+Do **not** change `ǀ` back to `|` in prose-only text.
