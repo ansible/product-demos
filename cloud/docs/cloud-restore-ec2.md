@@ -6,7 +6,7 @@ Restores EC2 instance volumes from the most recent EBS snapshot. This is the rol
 ## Prerequisites
 
 - AWS credential configured
-- A previous snapshot taken with **Cloud | AWS | Snapshot EC2**
+- A previous snapshot taken with **Cloud ǀ AWS ǀ Snapshot EC2**
 
 ## Survey prompts
 

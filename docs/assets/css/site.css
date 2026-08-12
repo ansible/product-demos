@@ -1078,6 +1078,20 @@ html:not([data-theme="dark"]) .demo-card:hover {
   text-decoration: underline;
 }
 
+.detail-see-other {
+  margin: 0 0 8px;
+  max-width: 720px;
+}
+.detail-see-other a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+}
+.detail-see-other a:hover {
+  text-decoration: underline;
+}
+
 .detail-back-to-all {
   margin-top: 48px;
   padding-top: 24px;
@@ -1138,6 +1152,9 @@ html:not([data-theme="dark"]) .demo-card:hover {
   background: transparent;
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
+
+/* Edge label colors are applied post-render by JS in default.html.
+   Do not add fill/color/background rules here — they fight inline !important. */
 
 .btn {
   display: inline-flex;

@@ -1,7 +1,7 @@
 **/ansible-navigator.log
 **/navigator-output/
 **/ansible-builder.log
-**/vault*.yml 
+**/vault*.yml
 sean_login_info.yml
 .DS_Store
 .idea/
@@ -18,9 +18,6 @@ roles/*
 .ansible/
 **/tmp/
 execution_environments/context/
-
-# Vault install demo - not a vault file with secrets
-!openshift/vault.yml
 
 # Build artifact — source of truth is <section>/docs/<slug>.md
 docs/demos/*/index.md

@@ -50,6 +50,23 @@ ansible-navigator run -m stdout install-apd.yml
 >     --eei quay.io/ansible-product-demos/apd-ee-27:latest
 > ```
 
+#### Quick-start one-liner (no environment variables needed)
+
+You can pass all credentials directly as extra vars instead of exporting environment variables. This is useful for a quick setup or when running from a shared machine:
+
+```bash
+ansible-navigator run install-apd.yml \
+  --eei quay.io/ansible-product-demos/apd-ee-27:latest \
+  -e aap_hostname=https://your-aap-server.example.com \
+  -e aap_username=admin \
+  -e aap_password='your-password' \
+  -e '{"aap_validate_certs": false}' \
+  -m stdout
+```
+
+> [!IMPORTANT]
+> If your AAP deployment uses self-signed or untrusted TLS certificates, `aap_validate_certs` must be set to the boolean `false` (not the string `"false"`).  Use the JSON syntax shown above: `-e '{"aap_validate_certs": false}'`
+
 ### Use a pre-installed APD environment on the Red Hat Demo Platform (account required)
 
 For Red Hat associates and partners, there is an Ansible Product Demos catalog item [available on demo.redhat.com](https://red.ht/apd-sandbox) that provides a pre-installed environment for demo purposes.  An existing account is required for access to the Red Hat Demo Platform system.

@@ -20,7 +20,7 @@ Repo playbook: [`openshift/cnv/snapshot.yml`](../../../../../../openshift/cnv/sn
 
 ## Requirements
 
-- Ansible 2.14+
+- ansible-core >= 2.16.0
 - Target: OpenShift cluster with OpenShift Virtualization (CNV) installed
 - `kubernetes.core` and `redhat.openshift_virtualization` collections
 - An attached "OpenShift Credential" (type `OpenShift or Kubernetes API Bearer Token`) so `K8S_AUTH_HOST` / `K8S_AUTH_API_KEY` / `K8S_AUTH_VERIFY_SSL` are injected

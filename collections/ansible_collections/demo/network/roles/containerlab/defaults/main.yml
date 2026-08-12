@@ -1,0 +1,44 @@
+---
+# AWS infrastructure
+clab_aws_region: us-east-2
+clab_aws_instance_type: c8i.2xlarge
+clab_aws_image_filter: 'RHEL-9*HVM-*Hourly*'
+clab_aws_image_owners: "309956199498"
+clab_aws_image_architecture: x86_64
+clab_aws_ebs_size_gb: 100
+clab_aws_ebs_device: /dev/sdf
+clab_aws_ebs_nvme_device: /dev/nvme0n1
+clab_aws_ebs_mount: /mnt/images
+clab_aws_vpc_name: clab-vpc
+clab_aws_vpc_cidr: "10.0.0.0/16"
+clab_aws_subnet_name: clab-subnet
+clab_aws_subnet_cidr: "10.0.1.0/24"
+clab_aws_sg_name: clab-sg
+clab_aws_keypair_name: clab-key
+clab_aws_rt_name: clab-rt
+clab_aws_admin_user: ec2-user
+clab_aws_owner_tag: apd-demo
+clab_aws_purpose_tag: containerlab
+
+_azs:
+  us-east-2:
+    - us-east-2a
+    - us-east-2b
+    - us-east-2c
+  us-west-2:
+    - us-west-2a
+    - us-west-2b
+    - us-west-2c
+
+# Podman / image configuration
+clab_podman_image_path: /mnt/images
+clab_podman_user_storage_content: |
+  [storage]
+  driver = "overlay"
+  graphroot = "/mnt/images/storage"
+clab_images:
+  - "registry.gitlab.com/redhatautomation/cat8:17.13.01a"
+  - "registry.gitlab.com/redhatautomation/nexus10-ee:10.5.3.F"
+
+# Containerlab topology
+clab_topology: product_demos

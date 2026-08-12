@@ -61,10 +61,23 @@
     }
   }
 
-  function activateCategory(category) {
+  function syncCategoryUrl(category) {
+    var url = new URL(window.location.href);
+    if (category === 'all') {
+      url.searchParams.delete('category');
+    } else {
+      url.searchParams.set('category', category);
+    }
+    history.replaceState(null, '', url);
+  }
+
+  function activateCategory(category, updateUrl) {
     activeCategory = category;
     setActivePill(category);
     applyFilters();
+    if (updateUrl !== false) {
+      syncCategoryUrl(category);
+    }
   }
 
   categoryPills.forEach(function (pill) {
@@ -106,5 +119,13 @@
     });
   });
 
-  applyFilters();
+  var initialCategory = new URLSearchParams(window.location.search).get('category');
+  if (
+    initialCategory &&
+    document.querySelector('[data-filter-category="' + initialCategory + '"]')
+  ) {
+    activateCategory(initialCategory, false);
+  } else {
+    applyFilters();
+  }
 })();

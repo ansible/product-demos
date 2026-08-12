@@ -1,6 +1,6 @@
 ---
-- name: IOS XE Compliance
-  hosts: "{{ _hosts | default('ios') }}"
+- name: IOS-XE Compliance Check
+  hosts: "{{ _hosts | default('clab_ios') }}"
   vars:
     ignore_all_errors: false
     ansible_command_timeout: 60

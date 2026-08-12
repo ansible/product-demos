@@ -17,11 +17,11 @@ Typical sequence: `install_k8s` -> `configure_jwt_auth` (optional) -> `configure
 
 Because the demo targets OpenShift from `localhost` (no managed host filesystem), connection details and generated userpass credentials are exported with `ansible.builtin.set_stats` for AAP job artifact visualization. **Demo only -- do not publish tokens or passwords via `set_stats` in production;** store them in a credential or secret manager instead.
 
-Repo playbook: [`openshift/vault.yml`](../../../../../../openshift/vault.yml).
+Repo playbook: [`openshift/hashi_vault.yml`](../../../../../../openshift/hashi_vault.yml).
 
 ## Requirements
 
-- Ansible 2.14+
+- ansible-core >= 2.16.0
 - Target: OpenShift cluster access
 - `kubernetes.core` collection
 - `oc` and Helm CLI available to the controller

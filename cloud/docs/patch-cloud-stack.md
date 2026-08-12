@@ -5,8 +5,8 @@ Enterprise-grade patching workflow with snapshot safety, parallel RHEL and Windo
 
 ## Prerequisites
 
-- **If using RHDP (demo.redhat.com):** Run **APD | Multi-demo setup** to configure all demo categories at once, or run **APD | Single demo setup** and choose `cloud` — either option configures the cloud patching templates and credentials. AWS and APD Machine credentials are pre-configured for you.
-- **If using your own installation:** Run **APD | Single demo setup** and choose `cloud`. You will also need to configure the **AWS** credential (Access Key + Secret Key), add an SSH private key and Windows username/password to **APD Machine Credential**, and ensure you have the target VMs, VPC, and keypair provisioned.
+- **If using RHDP (demo.redhat.com):** Run **APD ǀ Multi-demo setup** to configure all demo categories at once, or run **APD ǀ Single demo setup** and choose `cloud` — either option configures the cloud patching templates and credentials. AWS and APD Machine credentials are pre-configured for you.
+- **If using your own installation:** Run **APD ǀ Single demo setup** and choose `cloud`. You will also need to configure the **AWS** credential (Access Key + Secret Key), add an SSH private key and Windows username/password to **APD Machine Credential**, and ensure you have the target VMs, VPC, and keypair provisioned.
 - Run **Deploy Cloud Stack in AWS** to create the five target VMs (aws_rhel8, aws_rhel9, aws-dc, aws_win1, reports)
 - **RHSM Registration credential:** Fill in your Red Hat org ID and activation key (see credential setup below). **Without this, all RHEL patching steps are skipped** — the workflow still succeeds but only Windows hosts actually get patched. RHEL hosts will show as SKIPPED/UNREGISTERED in the output and compliance report.
 
@@ -26,15 +26,21 @@ Enterprise-grade patching workflow with snapshot safety, parallel RHEL and Windo
 
 ## Workflow
 
-```
-Snapshot EC2
-├──→ Pre-check RHEL ──→ Patch RHEL
-│       ├─ (success) Post-check RHEL ──────────┐
-│       └─ (failure) Restore from Snapshot      │
-├──→ Pre-check Windows ──→ Patch Windows       │
-│       ├─ (success) Post-check Windows ───────┼──→ Compliance Report
-│       └─ (failure) Restore from Snapshot      │
-└───────────────────────────────────────────────┘
+```mermaid
+graph LR
+  S["🏠 Start"]
+  S --> A
+  A["📸 Snapshot EC2"] --> B["🔍 Pre-check RHEL"]
+  A --> C["🔍 Pre-check Windows"]
+  B --> D["🩹 Patch RHEL"]
+  C --> E["🩹 Patch Windows"]
+  D -->|success| F["✅ Post-check RHEL"]
+  D -->|failure| G["⏪ Restore from Snapshot"]
+  E -->|success| H["✅ Post-check Windows"]
+  E -->|failure| I["⏪ Restore from Snapshot"]
+  F --> J["📊 Compliance Report"]
+  H --> J
+  style S fill:#212427,stroke:#8a8d90,color:#fff
 ```
 
 1. **Snapshot** — EBS snapshots of all target instances for recovery
@@ -67,7 +73,7 @@ Snapshot EC2
 
 ## Presenter walkthrough
 
-1. **Run setup:** On RHDP (Red Hat Demo Platform), run **APD | Multi-demo setup** to configure everything. On your own install, run **APD | Single demo setup** → choose `cloud`. Then fill in the **RHSM Registration** credential with your org ID and activation key (see credential setup above).
+1. **Run setup:** On RHDP (Red Hat Demo Platform), run **APD ǀ Multi-demo setup** to configure everything. On your own install, run **APD ǀ Single demo setup** → choose `cloud`. Then fill in the **RHSM Registration** credential with your org ID and activation key (see credential setup above).
 2. **Deploy the stack:** Launch **Deploy Cloud Stack in AWS** to create the five target VMs. Wait for it to complete and verify the hosts appear in inventory.
 3. **Set the stage:** Show the audience the five VMs in AAP inventory (aws_rhel8, aws_rhel9, aws-dc, aws_win1, reports). Point out it's a mixed Linux/Windows fleet.
 4. **Launch the workflow:** Navigate to Templates → Patch Cloud Stack in AWS. Fill in the survey with a real RHSA/CVE and KB (defaults work). Launch.

@@ -5,8 +5,8 @@ Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Wind
 
 ## Prerequisites
 
-- **If using RHDP (demo.redhat.com):** Run **APD | Multi-demo setup** to configure all templates and credentials. AWS and APD Machine credentials are pre-configured for you.
-- **If using your own installation:** Run **APD | Single demo setup** and choose `cloud`. Configure the **AWS** credential with your Access Key and Secret Key, and add an SSH private key to **APD Machine Credential**.
+- **If using RHDP (demo.redhat.com):** Run **APD ǀ Multi-demo setup** to configure all templates and credentials. AWS and APD Machine credentials are pre-configured for you.
+- **If using your own installation:** Run **APD ǀ Single demo setup** and choose `cloud`. Configure the **AWS** credential with your Access Key and Secret Key, and add an SSH private key to **APD Machine Credential**.
 
 ## Survey prompts
 
@@ -19,13 +19,25 @@ Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Wind
 
 ## Workflow
 
-```
-Create Keypair ──┐
-                 ├──→ EC2 Stats ──→ aws-dc (Windows Full)     ──┐
-Create VPC ──────┘            ├──→ aws_win1 (Windows Core)   ──┤
-                              ├──→ aws_rhel8 (RHEL 8)        ──┼──→ Sync Inventory ──→ VPC Report
-                              ├──→ aws_rhel9 (RHEL 9)        ──┤
-                              └──→ reports (RHEL 9)           ──┘
+```mermaid
+graph LR
+  S["🏠 Start"]
+  S --> A
+  S --> B
+  A["🔑 Create Keypair"] --> C["📊 EC2 Stats"]
+  B["🌐 Create VPC"] --> C
+  C --> D["🪟 aws-dc\n(Windows Full)"]
+  C --> E["🪟 aws_win1\n(Windows Core)"]
+  C --> F["🐧 aws_rhel8\n(RHEL 8)"]
+  C --> G["🐧 aws_rhel9\n(RHEL 9)"]
+  C --> H["📋 reports\n(RHEL 9)"]
+  D --> I["🔄 Sync Inventory"]
+  E --> I
+  F --> I
+  G --> I
+  H --> I
+  I --> J["📄 VPC Report"]
+  style S fill:#212427,stroke:#8a8d90,color:#fff
 ```
 
 1. Creates keypair `aws-test-key` (public key derived from APD Machine Credential private key)

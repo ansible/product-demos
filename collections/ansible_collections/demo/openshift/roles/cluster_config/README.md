@@ -16,7 +16,7 @@ Repo playbook: [`openshift/cnv/install.yml`](../../../../../../openshift/cnv/ins
 
 ## Requirements
 
-- Ansible 2.14+
+- ansible-core >= 2.16.0
 - Target: OpenShift cluster access
 - `redhat.openshift` and `kubernetes.core` collections
 - An attached "OpenShift Credential" (type `OpenShift or Kubernetes API Bearer Token`) so `K8S_AUTH_HOST` / `K8S_AUTH_API_KEY` / `K8S_AUTH_VERIFY_SSL` are injected
