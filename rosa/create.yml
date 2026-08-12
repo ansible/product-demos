@@ -22,13 +22,26 @@
       changed_when: false
       no_log: true
 
+    - name: Ensure ROSA account roles exist
+      ansible.builtin.command:
+        cmd: >-
+          rosa create account-roles
+          --mode=auto
+          --yes
+      register: _account_roles
+      changed_when: "'Created' in _account_roles.stdout"
+
+    - name: Display account roles output
+      ansible.builtin.debug:
+        msg: "{{ _account_roles.stderr_lines + _account_roles.stdout_lines }}"
+
     - name: Build cluster creation command
       ansible.builtin.set_fact:
         _rosa_create_cmd: >-
           rosa create cluster
           --cluster-name={{ rosa_cluster_name }}
           --region={{ rosa_aws_region | default('us-east-1') }}
-          --compute-nodes={{ rosa_compute_nodes | default(2) }}
+          --replicas={{ rosa_compute_nodes | default(2) }}
           --compute-machine-type={{ rosa_compute_machine_type | default('m5.xlarge') }}
           {{ '--multi-az' if (rosa_multi_az | default(false)) | bool else '' }}
           {{ ('--version=' + rosa_version) if (rosa_version | default('')) | length > 0 else '' }}
@@ -56,5 +69,5 @@
       ansible.builtin.debug:
         msg: >-
           Cluster '{{ rosa_cluster_name }}' creation initiated at {{ now(utc=true) }}.
-          Expected ready in 30-45 minutes. TTL tag: {{ rosa_ttl }}.
+          Expected ready in 30-45 minutes. TTL tag: {{ rosa_ttl | default('4h') }}.
           COST WARNING: Cluster incurs charges from creation until destruction.
