@@ -19,5 +19,6 @@ Backs up running configurations from containerlab NX-OS and IOS-XE devices using
 
 | Demo | Description |
 |------|-------------|
+| 🚀 [Deploy Containerlab Stack](./network-deploy-containerlab-stack.md) | Provision the lab before backing up devices |
 | 🌐 [Configure Devices](./network-configuration.md) | Apply configurations that you may want to back up first |
 | 🌐 [Report](./network-report.md) | Generate a device report alongside backups |

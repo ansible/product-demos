@@ -41,8 +41,8 @@ Device connectivity is handled via an **SSH Proxy** credential type that routes 
 
 | Workflow | Description |
 |----------|-------------|
-| [**Deploy Containerlab Stack**](#getting-started) | Provision an AWS hypervisor, deploy the containerlab topology, and sync the inventory. |
-| [**Destroy Containerlab Stack**](#getting-started) | Tear down the containerlab topology and delete all AWS resources (VPC, subnet, security group, EC2 instance, keypair). |
+| [**Deploy Containerlab Stack**](docs/network-deploy-containerlab-stack.md) | Provision an AWS hypervisor, deploy the containerlab topology, and sync the inventory. |
+| [**Destroy Containerlab Stack**](docs/network-destroy-containerlab-stack.md) | Tear down the containerlab topology and delete all AWS resources (VPC, subnet, security group, EC2 instance, keypair). |
 | [**Palo Alto Firewall Demo**](docs/network-panos-workflow.md) | End-to-end Palo Alto firewall workflow: deploy, configure, validate, and clean up a PAN-OS instance. |
 
 ## Job Templates

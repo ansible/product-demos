@@ -27,5 +27,6 @@ Options: `clab_ios` (default), `cat8kv`
 
 | Demo | Description |
 |------|-------------|
+| 🚀 [Deploy Containerlab Stack](./network-deploy-containerlab-stack.md) | Provision the lab before running STIG checks |
 | 🐧 [DISA STIG](../../linux/docs/linux-disa-stig.md) | DISA STIG hardening for RHEL servers |
 | 🪟 [DISA STIG](../../windows/docs/windows-disa-stig.md) | DISA STIG hardening for Windows servers |

@@ -27,5 +27,6 @@ Options: `containerlab` (all devices), `clab_nxos`, `clab_ios`
 
 | Demo | Description |
 |------|-------------|
+| 🚀 [Deploy Containerlab Stack](./network-deploy-containerlab-stack.md) | Provision the lab before reporting |
 | 🌐 [Configure Devices](./network-configuration.md) | Apply baseline configurations before generating a report |
 | 🌐 [Backup](./network-backup.md) | Back up configurations alongside reporting |

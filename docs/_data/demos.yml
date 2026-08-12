@@ -996,6 +996,72 @@
 
 # ─── Network ────────────────────────────────────────────────────────
 
+- slug: network-deploy-containerlab-stack
+  readme_path: network/docs/network-deploy-containerlab-stack.md
+  title: "Deploy Containerlab Stack"
+  subtitle: "Nested-virt hypervisor, n9kv + cat8kv, inventory sync"
+  category: network
+  status: active
+  author: "Matthew Fernandez <matferna@redhat.com>"
+  featured: true
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+    - Containerlab
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0d9488 0%, #065f54 100%)"
+    icon: "🚀"
+  blurb: "Provision an AWS nested-virt hypervisor, deploy a containerlab Cisco lab (n9kv + cat8kv), and sync ContainerLab Inventory."
+  stats:
+    workflows: 1
+    playbooks: 2
+  url: /demos/network-deploy-containerlab-stack/
+  github_path: network/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["🖥️ Provision Hypervisor"] --> B["📦 Deploy Topology"]
+      B --> C["🔄 Sync ContainerLab Inventory"]
+      A -. "on failure" .-> D["📋 Submit Feedback"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style C fill:#162c46,stroke:#58a6ff,color:#fff
+      style D fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: network-destroy-containerlab-stack
+  readme_path: network/docs/network-destroy-containerlab-stack.md
+  title: "Destroy Containerlab Stack"
+  category: network
+  status: active
+  author: "Matthew Fernandez <matferna@redhat.com>"
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+    - Containerlab
+  thumbnail:
+    gradient: "linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)"
+    icon: "💥"
+  blurb: "Tear down the containerlab topology and delete the AWS hypervisor, VPC, subnet, security group, and keypair."
+  stats:
+    workflows: 1
+    playbooks: 2
+  url: /demos/network-destroy-containerlab-stack/
+  github_path: network/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["📦 Teardown Topology"] -->|always| B["💥 Teardown Hypervisor"]
+      style A fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style B fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
 - slug: network-configuration
   readme_path: network/docs/network-configuration.md
   url: /demos/network-configuration/

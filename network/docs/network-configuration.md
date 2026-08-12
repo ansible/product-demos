@@ -25,6 +25,7 @@ Applies baseline configuration to containerlab network devices (Cisco NX-OS and 
 
 | Demo | Description |
 |------|-------------|
+| 🚀 [Deploy Containerlab Stack](./network-deploy-containerlab-stack.md) | Provision the lab before configuring devices |
 | 🌐 [Report](./network-report.md) | Generate a device report after applying configurations |
 | 🌐 [DISA STIG](./network-disa-stig.md) | Run compliance checks after establishing a baseline |
 | 🌐 [Backup](./network-backup.md) | Back up device configs after making changes |
