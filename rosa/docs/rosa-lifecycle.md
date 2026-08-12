@@ -54,13 +54,13 @@ Token expiration: Tokens are long-lived but check [Red Hat's documentation](http
 
 ### 3. Execution Environment
 
-The `ROSA Lifecycle EE` must be available on AAP. It is registered during demo setup but the image must be pre-built and pushed:
+The `ROSA Lifecycle EE` must be available on AAP. It is registered during demo setup and pulled from:
 
 ```
 quay.io/acme_corp/rosa-ee:latest
 ```
 
-See [Execution Environment Build Instructions](#building-the-execution-environment) below.
+This image is maintained in a separate repository and includes `rosa`, `aws`, `oc`, and `jq` CLIs.
 
 ## Launch Sequence (AAP UI)
 
@@ -196,51 +196,20 @@ If a cluster creation or destruction fails partway, check AWS console for:
 
 Use `rosa delete cluster --cluster=<name> --best-effort` for stuck deletions.
 
-## Building the Execution Environment
-
-From the `execution_environments/` directory:
+## Verifying the Execution Environment
 
 ```bash
-# Prerequisites
-podman login registry.redhat.io
-export ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN="<token>"
-export ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN="<token>"
+podman pull quay.io/acme_corp/rosa-ee:latest
 
-# Build
-./build-rosa.sh
-
-# Verify tools inside the EE
 podman run --rm quay.io/acme_corp/rosa-ee:latest rosa version
 podman run --rm quay.io/acme_corp/rosa-ee:latest aws --version
 podman run --rm quay.io/acme_corp/rosa-ee:latest oc version --client
 podman run --rm quay.io/acme_corp/rosa-ee:latest jq --version
-
-# Push to registry
-podman manifest push --all quay.io/acme_corp/rosa-ee:<tag>
-podman manifest push --all quay.io/acme_corp/rosa-ee:latest
-```
-
-## Smoke Test Commands (inside EE)
-
-```bash
-# Run interactively inside the EE
-podman run --rm -it quay.io/acme_corp/rosa-ee:latest bash
-
-# Verify all required tools
-rosa version
-aws --version
-oc version --client
-jq --version
-python3.12 -c "import boto3; print(boto3.__version__)"
-
-# Verify ansible and collections
-ansible --version
-ansible-galaxy collection list | grep -E "amazon.aws|ansible.utils"
 ```
 
 ## Demo Setup in AAP
 
-After the EE is built and pushed, run the standard APD setup:
+Run the standard APD setup:
 
 ```bash
 ansible-navigator run setup_demo.yml \

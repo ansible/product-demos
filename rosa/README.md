@@ -20,7 +20,7 @@ Demonstrates automated ROSA cluster lifecycle management through Ansible Automat
 
 ## Prerequisites
 
-1. **ROSA Lifecycle EE** — built and pushed to `quay.io/acme_corp/rosa-ee:latest`
+1. **ROSA Lifecycle EE** — `podman pull quay.io/acme_corp/rosa-ee:latest`
 2. **AWS Credential** — IAM user/role with ROSA permissions (see docs)
 3. **ROSA Token Credential** — API token from [console.redhat.com](https://console.redhat.com/openshift/token/rosa)
 4. **AWS service quotas** — sufficient EC2, VPC, ELB limits in target region
