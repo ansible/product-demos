@@ -9,7 +9,7 @@
     aap_hostname: '{{ lookup("env", "AAP_HOSTNAME") | default(omit, true) }}'
     aap_username: '{{ lookup("env", "AAP_USERNAME") | default(omit, true) }}'
     aap_password: '{{ lookup("env", "AAP_PASSWORD") | default(omit, true) }}'
-    # set to empty string when not set to avoid issues with omit sentinal during subsequent use
+    # set to empty string when not set to avoid issues with omit sentinel during subsequent use
     aap_token: '{{ lookup("env", "AAP_TOKEN") | default("", true) }}'
     aap_validate_certs: '{{ lookup("env", "AAP_VALIDATE_CERTS") | default(false, true) }}'
 
