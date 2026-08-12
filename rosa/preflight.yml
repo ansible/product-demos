@@ -99,14 +99,14 @@
       ansible.builtin.debug:
         msg: "{{ _rosa_quota.stdout }}"
 
-    - name: Check available Elastic IPs
+    - name: Count total allocated EIPs
       ansible.builtin.command:
         cmd: >-
           aws ec2 describe-addresses
-          --query "Addresses[?AssociationId==null] | length(@)"
+          --query "length(Addresses)"
           --output text
       changed_when: false
-      register: _free_eips
+      register: _total_eips
 
     - name: Check EIP quota
       ansible.builtin.command:
@@ -119,22 +119,24 @@
       changed_when: false
       register: _eip_quota
 
-    - name: Count total allocated EIPs
+    - name: Count unassociated EIPs (releasable)
       ansible.builtin.command:
         cmd: >-
           aws ec2 describe-addresses
-          --query "length(Addresses)"
+          --query "Addresses[?AssociationId==null] | length(@)"
           --output text
       changed_when: false
-      register: _total_eips
+      register: _free_eips
 
     - name: Display EIP status
       ansible.builtin.debug:
         msg: >-
-          Elastic IPs — allocated: {{ _total_eips.stdout | trim }},
-          unassociated: {{ _free_eips.stdout | trim }},
-          quota: {{ _eip_quota.stdout | trim }}.
-          ROSA requires at least 1 available EIP.
+          EIP quota: {{ _eip_quota.stdout | trim }},
+          allocated: {{ _total_eips.stdout | trim }},
+          free quota slots: {{ (_eip_quota.stdout | trim | int) - (_total_eips.stdout | trim | int) }},
+          unassociated (releasable): {{ _free_eips.stdout | trim }}.
+          ROSA needs free quota slots to allocate its own EIPs.
+          The create job will release an unassociated EIP if needed.
 
     - name: Check if cluster already exists
       ansible.builtin.command:
