@@ -35,6 +35,58 @@
       ansible.builtin.debug:
         msg: "{{ _account_roles.stderr_lines + _account_roles.stdout_lines }}"
 
+    - name: Check for available Elastic IPs
+      ansible.builtin.command:
+        cmd: >-
+          aws ec2 describe-addresses
+          --query "Addresses[?AssociationId==null] | length(@)"
+          --output text
+      changed_when: false
+      register: _free_eips
+
+    - name: Count total allocated EIPs
+      ansible.builtin.command:
+        cmd: >-
+          aws ec2 describe-addresses
+          --query "length(Addresses)"
+          --output text
+      changed_when: false
+      register: _total_eips
+
+    - name: Check EIP quota
+      ansible.builtin.command:
+        cmd: >-
+          aws service-quotas get-service-quota
+          --service-code ec2
+          --quota-code L-0263D0A3
+          --query "Quota.Value"
+          --output text
+      changed_when: false
+      register: _eip_quota
+
+    - name: Allocate an Elastic IP for ROSA
+      when: (_free_eips.stdout | trim | int) < 1 and (_total_eips.stdout | trim | int) < (_eip_quota.stdout | trim | int)
+      ansible.builtin.command:
+        cmd: >-
+          aws ec2 allocate-address
+          --domain vpc
+          --tag-specifications
+          'ResourceType=elastic-ip,Tags=[{Key=Name,Value=rosa-{{ rosa_cluster_name }}},{Key=managed-by,Value=aap-product-demos}]'
+      register: _eip_alloc
+      changed_when: true
+
+    - name: Display EIP allocation result
+      when: _eip_alloc is not skipped
+      ansible.builtin.debug:
+        msg: "Allocated EIP: {{ (_eip_alloc.stdout | from_json).PublicIp }}"
+
+    - name: Fail if no EIPs available and cannot allocate
+      when: (_free_eips.stdout | trim | int) < 1 and (_total_eips.stdout | trim | int) >= (_eip_quota.stdout | trim | int) and _eip_alloc is skipped
+      ansible.builtin.fail:
+        msg: >-
+          No Elastic IPs available and quota ({{ _eip_quota.stdout | trim }}) is exhausted.
+          Release unused EIPs or request a quota increase in AWS console.
+
     - name: Build cluster creation command
       ansible.builtin.set_fact:
         _rosa_create_cmd: >-

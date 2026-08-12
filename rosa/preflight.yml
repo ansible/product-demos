@@ -99,6 +99,43 @@
       ansible.builtin.debug:
         msg: "{{ _rosa_quota.stdout }}"
 
+    - name: Check available Elastic IPs
+      ansible.builtin.command:
+        cmd: >-
+          aws ec2 describe-addresses
+          --query "Addresses[?AssociationId==null] | length(@)"
+          --output text
+      changed_when: false
+      register: _free_eips
+
+    - name: Check EIP quota
+      ansible.builtin.command:
+        cmd: >-
+          aws service-quotas get-service-quota
+          --service-code ec2
+          --quota-code L-0263D0A3
+          --query "Quota.Value"
+          --output text
+      changed_when: false
+      register: _eip_quota
+
+    - name: Count total allocated EIPs
+      ansible.builtin.command:
+        cmd: >-
+          aws ec2 describe-addresses
+          --query "length(Addresses)"
+          --output text
+      changed_when: false
+      register: _total_eips
+
+    - name: Display EIP status
+      ansible.builtin.debug:
+        msg: >-
+          Elastic IPs — allocated: {{ _total_eips.stdout | trim }},
+          unassociated: {{ _free_eips.stdout | trim }},
+          quota: {{ _eip_quota.stdout | trim }}.
+          ROSA requires at least 1 available EIP.
+
     - name: Check if cluster already exists
       ansible.builtin.command:
         cmd: rosa describe cluster --cluster={{ rosa_cluster_name }} --region={{ rosa_aws_region }}
