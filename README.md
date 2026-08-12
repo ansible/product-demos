@@ -12,6 +12,7 @@ The Ansible Product Demos (APD) project is a set of Ansible demos that run on th
 | [Cloud](cloud/README.md) | Demo for infrastructure and cloud provisioning automation |
 | [Network](network/README.md) | Network automation demos |
 | [OpenShift](openshift/README.md) | OpenShift automation demos |
+| [ROSA](rosa/README.md) | ROSA (Red Hat OpenShift on AWS) cluster lifecycle demos |
 | [Satellite](satellite/README.md) | Demos of automation with Red Hat Satellite Server |
 
 ## Demo catalog

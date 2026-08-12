@@ -1,240 +1,84 @@
-# ROSA Lifecycle Demo — Operator Runbook
+# ROSA — Cluster Lifecycle
 
-## Overview
+Automated Red Hat OpenShift Service on AWS (ROSA) cluster lifecycle management: preflight validation, creation, readiness verification, and safe destruction — all orchestrated through AAP workflows.
 
-This demo showcases automated Red Hat OpenShift Service on AWS (ROSA) cluster lifecycle management via Ansible Automation Platform (AAP). It provides a complete create-to-destroy cycle suitable for live demonstrations.
+## Prerequisites
 
-## Architecture
+- AWS credential configured with [ROSA STS required IAM permissions](https://docs.openshift.com/rosa/rosa_planning/rosa-sts-aws-prereqs.html)
+- ROSA Token credential (obtain offline token from https://console.redhat.com/openshift/token/rosa)
+- ROSA Lifecycle EE available (`quay.io/acme_corp/rosa-ee:latest`)
+- Sufficient AWS service quotas (EC2, VPC, ELB, EIP) in target region
 
-```
-┌─────────────────────────────────────────────────────────┐
-│           ROSA | Lifecycle (Create) Workflow             │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────┐  │
-│  │  Preflight   │───▶│    Create    │───▶│   Wait   │  │
-│  │   Checks     │    │   Cluster    │    │ for Ready│  │
-│  └──────┬───────┘    └──────┬───────┘    └────┬─────┘  │
-│         │ fail              │ fail             │ fail   │
-│         ▼                   ▼                  ▼        │
-│  ┌──────────────┐    ┌──────────────────────────────┐   │
-│  │  Feedback:   │    │   Destroy on Failure          │   │
-│  │  Preflight   │    │   (cleanup, then feedback)    │   │
-│  │  Failed      │    └──────────────────────────────┘   │
-│  └──────────────┘                                       │
-└─────────────────────────────────────────────────────────┘
-```
+## Configure credentials
 
-## Credential Setup
+| Credential | Type | Where to get it |
+|------------|------|-----------------|
+| AWS | Amazon Web Services | IAM console — Access Key + Secret |
+| ROSA Token | ROSA Token (custom) | https://console.redhat.com/openshift/token/rosa → "use API tokens" → Load token |
 
-### 1. AWS Credential (Amazon Web Services type)
+## Survey prompts
 
-The standard AWS credential used by other Cloud demos. Must have permissions for:
-- EC2 (instances, VPCs, subnets, security groups, EIPs)
-- IAM (create/delete roles, policies, OIDC providers)
-- ELB (load balancers for cluster ingress)
-- CloudFormation (ROSA uses CF stacks)
-- STS (AssumeRole for ROSA STS mode)
-- Route53 (if using custom domains)
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Cluster Name | `rosa_cluster_name` | text | Yes |
+| AWS Region | `rosa_aws_region` | multiplechoice | Yes |
+| Compute Nodes | `rosa_compute_nodes` | multiplechoice | Yes |
+| Machine Type | `rosa_compute_machine_type` | multiplechoice | Yes |
+| OpenShift Version | `rosa_version` | text | No |
+| Cluster TTL | `rosa_ttl` | text | Yes |
+| Owner Tag | `rosa_owner_tag` | text | Yes |
 
-**Minimum IAM policy**: Use the [ROSA STS required policies](https://docs.openshift.com/rosa/rosa_planning/rosa-sts-aws-prereqs.html#rosa-sts-aws-requirements-minimum_rosa-sts-aws-prereqs) from Red Hat documentation.
+## Job templates
 
-**In AAP**: Navigate to Resources → Credentials → `AWS`. Set Access Key and Secret Key.
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| ROSA ǀ Preflight Checks | [`rosa/preflight.yml`](../preflight.yml) | Validates credentials, permissions, quotas, EIP availability, and name conflicts |
+| ROSA ǀ Create Cluster | [`rosa/create.yml`](../create.yml) | Creates account roles, ensures EIP quota, and initiates STS-mode cluster creation |
+| ROSA ǀ Wait for Ready | [`rosa/wait.yml`](../wait.yml) | Polls cluster status until ready, creates cluster-admin credentials |
+| ROSA ǀ Destroy Cluster | [`rosa/destroy.yml`](../destroy.yml) | Tears down cluster, operator roles, and OIDC provider (idempotent) |
 
-### 2. ROSA Token Credential (custom type)
+## Why it matters
 
-| Field | Value |
-|-------|-------|
-| Credential Type | ROSA Token |
-| ROSA API Token | Obtain from https://console.redhat.com/openshift/token/rosa |
+ROSA cluster provisioning involves multiple AWS services, IAM role chains, and a 30-40 minute wait. Manual creation is error-prone and forgetting teardown leads to significant cost. This demo shows how AAP:
 
-**In AAP**: Resources → Credentials → Create → Type: `ROSA Token` → paste token.
+- **Gates creation** with deterministic preflight checks (fail fast, not 30 minutes in)
+- **Automates AWS prerequisites** (account roles, EIP quota management)
+- **Provides self-service** via surveys with guardrails (naming conventions, TTL tags)
+- **Ensures cleanup** via destroy-on-failure workflow paths
+- **Reduces cost risk** with idempotent destruction and orphaned resource guidance
 
-Token expiration: Tokens are long-lived but check [Red Hat's documentation](https://console.redhat.com/openshift/token/rosa) for renewal procedures.
+## Presenter walkthrough
 
-### 3. Execution Environment
+1. Show the **ROSA ǀ Lifecycle (Create)** workflow visualization — highlight the destroy-on-failure safety path
+2. Launch the workflow; while waiting (~35 min), discuss the preflight output and what it validated
+3. Show the cluster in the [Red Hat OpenShift console](https://console.redhat.com/openshift) once ready
+4. Log in using the cluster-admin credentials from the Wait job output
+5. Demonstrate **ROSA ǀ Lifecycle (Destroy)** to show clean teardown
 
-The `ROSA Lifecycle EE` must be available on AAP. It is registered during demo setup and pulled from:
+## Talking points
 
-```
-quay.io/acme_corp/rosa-ee:latest
-```
+- ROSA is a jointly-managed service: Red Hat manages the control plane, AWS provides the infrastructure
+- STS mode means no long-lived credentials are stored in the cluster
+- AAP handles the multi-step orchestration that would otherwise require a runbook
+- Tagging strategy enables cost attribution and automated cleanup audits
+- The same pattern works for any managed Kubernetes service (EKS, ARO, GKE)
 
-This image is maintained in a separate repository and includes `rosa`, `aws`, `oc`, and `jq` CLIs.
+## Expected timings
 
-## Launch Sequence (AAP UI)
+| Phase | Duration |
+|-------|----------|
+| Preflight | 1-2 min |
+| Create (initiate) | 2-3 min |
+| Wait for ready | 30-40 min |
+| Destroy | 15-25 min |
 
-### Creating a Cluster
+## Cost warning
 
-1. Navigate to **Resources → Templates**
-2. Find **ROSA | Lifecycle (Create)** workflow
-3. Click **Launch** (rocket icon)
-4. Fill the survey:
-   - **Cluster Name**: `apd-rosa-demo` (or custom, following naming convention)
-   - **AWS Region**: Select target region
-   - **Compute Nodes**: `2` for demos (minimum cost)
-   - **Machine Type**: `m5.xlarge` (sufficient for demos)
-   - **OpenShift Version**: Leave blank for latest
-   - **Cluster TTL**: `4h` (tag only; set reminder to destroy)
-   - **Owner Tag**: Your identifier
-5. Click **Launch**
-6. Monitor workflow visualization for progress
+ROSA clusters cost ~$0.55/hour (control plane + 2× m5.xlarge). Always destroy after demos.
 
-**Expected timeline**: ~35-45 minutes total
-- Preflight: 1-2 minutes
-- Create initiation: 1-2 minutes
-- Wait for ready: 30-40 minutes
+## Related demos
 
-### Destroying a Cluster
-
-1. Navigate to **Resources → Templates**
-2. Find **ROSA | Lifecycle (Destroy)** workflow
-3. Click **Launch**
-4. Confirm the cluster name and region match what was created
-5. Click **Launch**
-
-**Expected timeline**: ~15-25 minutes
-
-## Expected Timings
-
-| Phase | Duration | Notes |
-|-------|----------|-------|
-| Preflight checks | 1-2 min | Fast fail if issues exist |
-| Cluster creation (initiate) | 1-2 min | API call only |
-| Cluster ready (wait) | 30-40 min | ROSA control plane + compute |
-| Cluster destruction | 10-20 min | Includes role/OIDC cleanup |
-| **Total create cycle** | **~35-45 min** | Plan presentations accordingly |
-| **Total destroy cycle** | **~15-25 min** | |
-
-## Cost Estimates
-
-| Resource | Approximate Cost |
-|----------|-----------------|
-| ROSA control plane | $0.171/hour |
-| m5.xlarge (per node) | ~$0.192/hour |
-| 2-node cluster total | ~$0.555/hour |
-| **4-hour demo** | **~$2.22** |
-| **Forgotten overnight (12h)** | **~$6.66** |
-
-**Critical**: Always destroy clusters after demos. Set calendar reminders.
-
-## Naming Convention
-
-All ROSA clusters created by this demo must follow:
-
-```
-apd-rosa-<purpose>
-```
-
-Examples:
-- `apd-rosa-demo` — standard demo cluster
-- `apd-rosa-summit` — event-specific cluster
-- `apd-rosa-test` — testing/validation
-
-## Tagging Strategy
-
-Every cluster is tagged with:
-
-| Tag | Value | Purpose |
-|-----|-------|---------|
-| `owner` | Survey input | Cost attribution |
-| `managed-by` | `aap-product-demos` | Identifies automation-managed resources |
-| `ttl` | Survey input (e.g., `4h`) | Expected lifetime for cleanup audits |
-
-## Safety Guardrails
-
-1. **Preflight gate**: Cluster creation cannot proceed without passing all checks
-2. **Destroy on failure**: If creation or readiness fails, automatic destroy is triggered
-3. **Idempotent destroy**: Safe to re-run destroy even if cluster is already gone
-4. **STS mode**: No long-lived IAM credentials stored in the cluster
-5. **Naming convention**: Prevents accidental targeting of production clusters
-6. **TTL tags**: Enable automated cost-control audits
-
-## Troubleshooting
-
-### Preflight Failures
-
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `Missing required variables` | Survey not filled or credential not attached | Verify credential attachments on job template |
-| `AWS STS get-caller-identity failed` | Invalid/expired AWS credentials | Update AWS credential in AAP |
-| `rosa login failed` | Invalid/expired ROSA token | Regenerate at console.redhat.com/openshift/token/rosa |
-| `rosa verify permissions` failed | IAM policy too restrictive | Apply ROSA minimum IAM policy |
-| `rosa verify quota` failed | AWS service quota exceeded | Request quota increase in AWS console |
-| `Cluster already exists` | Name conflict | Destroy existing cluster or use different name |
-
-### Creation Failures
-
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `OCM account not eligible` | ROSA not enabled on RH account | Enable ROSA at console.redhat.com |
-| `Insufficient quota for... ` | EC2/ELB/VPC limits | Increase AWS quotas |
-| `Error creating network` | VPC/subnet CIDR conflicts | Try different region or clean up VPCs |
-| Timeout during wait | Cluster stuck in `installing` | Check ROSA console; may need manual delete |
-
-### Destruction Failures
-
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `Cluster not found` | Already deleted (safe) | No action needed |
-| Timeout during destroy poll | AWS resources stuck deleting | Check CloudFormation in AWS console |
-| Operator role cleanup failed | Roles already removed | Safe to ignore |
-| OIDC cleanup failed | Provider already removed | Safe to ignore |
-
-### Orphaned Resource Checklist
-
-If a cluster creation or destruction fails partway, check AWS console for:
-
-- [ ] **CloudFormation stacks** matching the cluster name
-- [ ] **IAM roles** with prefix matching cluster ID
-- [ ] **OIDC providers** in IAM → Identity providers
-- [ ] **VPCs** tagged with `kubernetes.io/cluster/<name>`
-- [ ] **Elastic IPs** in the cluster's region
-- [ ] **Load Balancers** (NLB/ALB) from ingress
-- [ ] **S3 buckets** (OIDC configuration bucket)
-- [ ] **Route53 hosted zones** (if custom domain used)
-
-Use `rosa delete cluster --cluster=<name> --best-effort` for stuck deletions.
-
-## Verifying the Execution Environment
-
-```bash
-podman pull quay.io/acme_corp/rosa-ee:latest
-
-podman run --rm quay.io/acme_corp/rosa-ee:latest rosa version
-podman run --rm quay.io/acme_corp/rosa-ee:latest aws --version
-podman run --rm quay.io/acme_corp/rosa-ee:latest oc version --client
-podman run --rm quay.io/acme_corp/rosa-ee:latest jq --version
-```
-
-## Demo Setup in AAP
-
-Run the standard APD setup:
-
-```bash
-ansible-navigator run setup_demo.yml \
-  -e demo=rosa \
-  --pae false \
-  --mode stdout \
-  --eei quay.io/ansible-product-demos/apd-ee-26:latest
-```
-
-Or select **rosa** in the AAP **APD | Single demo setup** job template survey.
-
-This creates:
-- ROSA Token credential type and placeholder credential
-- ROSA Lifecycle EE definition
-- All 4 job templates
-- Both lifecycle workflows
-
-## Cleanup Verification Checklist
-
-After destroying a cluster, verify:
-
-- [ ] `rosa list clusters` shows no matching cluster
-- [ ] AWS CloudFormation → no stacks with cluster name
-- [ ] AWS IAM → Roles → no `<cluster-name>-*` roles
-- [ ] AWS IAM → Identity providers → no matching OIDC
-- [ ] AWS VPC → no orphaned VPCs with cluster tags
-- [ ] AWS EC2 → no orphaned instances
-- [ ] AWS ELB → no orphaned load balancers
+| Demo | Description |
+|------|-------------|
+| [Deploy Cloud Stack in AWS](../cloud/docs/deploy-cloud-stack.md) | Provision EC2 infrastructure for Linux/Windows demos |
+| [OpenShift CNV](../openshift/docs/openshift-cnv.md) | Run VMs on an existing OpenShift cluster |

@@ -1,6 +1,6 @@
 ---
 # Ansible Product Demos – Demo Catalog
-# 62 demos across 6 categories
+# 63 demos across 7 categories
 
 # ─── Featured ───────────────────────────────────────────────────────
 
@@ -1386,4 +1386,48 @@
       style B fill:#2d1f4e,stroke:#a78bfa,color:#fff
       style C fill:#3d1a1a,stroke:#cc0000,color:#fff
       style D fill:#162c46,stroke:#58a6ff,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+# ─── ROSA ──────────────────────────────────────────────────────────
+
+- slug: rosa-lifecycle
+  readme_path: rosa/docs/rosa-lifecycle.md
+  title: "ROSA — Cluster Lifecycle"
+  subtitle: "Provision and destroy ROSA clusters with full preflight safety"
+  category: rosa
+  status: active
+  featured: false
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+    - OpenShift
+    - ROSA
+    - Lifecycle
+  thumbnail:
+    gradient: "linear-gradient(135deg, #ee0000 0%, #820000 100%)"
+    icon: "🌹"
+  blurb: "Automated ROSA cluster lifecycle: preflight checks, STS creation, readiness verification, and safe destruction with destroy-on-failure guardrails."
+  stats:
+    workflows: 2
+    playbooks: 4
+  url: /demos/rosa-lifecycle/
+  github_path: rosa/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["✅ Preflight Checks"] --> B["🚀 Create Cluster"]
+      B --> C["⏳ Wait for Ready"]
+      B -->|failure| D["💣 Destroy on Failure"]
+      C -->|failure| D
+      A -->|failure| E["📧 Preflight Failed"]
+      D -->|always| F["📧 Creation Failed"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#3d1a1a,stroke:#f87171,color:#fff
+      style C fill:#162c46,stroke:#58a6ff,color:#fff
+      style D fill:#4a1a1a,stroke:#cc0000,color:#fff
+      style E fill:#2d2d2d,stroke:#888,color:#fff
+      style F fill:#2d2d2d,stroke:#888,color:#fff
       style S fill:#212427,stroke:#8a8d90,color:#fff
