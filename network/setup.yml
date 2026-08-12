@@ -1,22 +1,6 @@
 ---
 user_message:
 
-controller_execution_environments:
-  - name: Networking Execution Environment
-    image: quay.io/nleiva/ee-network-image
-    organization: Ansible Product Demos (APD)
-
-controller_projects:
-  - name: Network Golden Configs
-    organization: Ansible Product Demos (APD)
-    scm_type: git
-    scm_url: https://github.com/nleiva/ansible-net-modules
-    update_project: true
-    wait: false
-    controller_request_timeout: 20
-    controller_configuration_async_retries: 40
-    default_environment: Networking Execution Environment
-
 controller_credential_types:
   - name: SSH Proxy
     description: Designed for connecting to a managed node through a bastion host
@@ -110,14 +94,95 @@ controller_credentials:
     inputs:
       ssh_proxy_host: REPLACEME
       ssh_proxy_username: ec2-user
+  - name: Containerlab Device Access
+    description: Admin credentials for containerlab network devices (n9kv, cat8kv)
+    organization: Ansible Product Demos (APD)
+    credential_type: SSH Proxy
+    inputs:
+      ssh_proxy_host: REPLACEME
+      ssh_proxy_username: admin
+      ssh_proxy_password: "admin@123"
+  - name: Containerlab SSH
+    description: SSH key for the containerlab hypervisor, updated by the provision playbook
+    organization: Ansible Product Demos (APD)
+    credential_type: Machine
+    update_secrets: false
+    state: exists
+    inputs:
+      username: ec2-user
+
+controller_inventories:
+  - name: ContainerLab Inventory
+    organization: Ansible Product Demos (APD)
+    description: Containerlab network devices discovered via AWS EC2
+
+controller_hosts:
+  - name: n9kv
+    inventory: ContainerLab Inventory
+    enabled: true
+  - name: cat8kv
+    inventory: ContainerLab Inventory
+    enabled: true
+
+controller_groups:
+  - name: clab_nxos
+    inventory: ContainerLab Inventory
+    hosts:
+      - n9kv
+    variables:
+      ansible_port: 2122
+      ansible_network_os: cisco.nxos.nxos
+  - name: clab_ios
+    inventory: ContainerLab Inventory
+    hosts:
+      - cat8kv
+    variables:
+      ansible_port: 2123
+      ansible_network_os: cisco.ios.ios
+  - name: clab_switches
+    inventory: ContainerLab Inventory
+    hosts:
+      - n9kv
+  - name: clab_routers
+    inventory: ContainerLab Inventory
+    hosts:
+      - cat8kv
+  - name: containerlab
+    inventory: ContainerLab Inventory
+    children:
+      - clab_nxos
+      - clab_ios
+    variables:
+      ansible_user: !unsafe '{{ ssh_proxy_username }}'
+      ansible_password: !unsafe '{{ ssh_proxy_password }}'
+      ansible_connection: ansible.netcommon.network_cli
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
 
 controller_inventory_sources:
-  - name: DevNet always-on sandboxes
-    source: scm
-    inventory: Ansible Product Demos Inventory
-    overwrite: true
-    source_project: Ansible Product Demos
-    source_path: network/hosts
+  - name: ContainerLab Hypervisor
+    organization: Ansible Product Demos (APD)
+    source: ec2
+    inventory: ContainerLab Inventory
+    credential: AWS
+    overwrite: false
+    overwrite_vars: true
+    update_on_launch: false
+    source_vars:
+      regions:
+        - us-east-2
+        - us-west-2
+      filters:
+        tag:deployment: containerlab
+        instance-state-name: running
+      compose:
+        ansible_host: public_ip_address
+        ansible_user: "'ec2-user'"
+      hostnames:
+        - tag:Name
+      keyed_groups:
+        - key: tags['deployment']
+          prefix: clab
+
   - name: Panos Demo Instances
     organization: Ansible Product Demos (APD)
     source: ec2
@@ -137,54 +202,120 @@ controller_inventory_sources:
           prefix: panos_role
 
 controller_templates:
-  - name: NETWORK | Configuration
+  - name: "NETWORK | Containerlab | Provision Hypervisor"
+    job_type: run
     organization: Ansible Product Demos (APD)
-    inventory: Ansible Product Demos Inventory
-    survey_enabled: true
-    project: Network Golden Configs
-    playbook: main.yml
     credentials:
-      - APD Machine Credential
-    execution_environment: Networking Execution Environment
+      - AWS
+      - AAP Credential
+    project: Ansible Product Demos
+    playbook: network/provision_hypervisor.yml
+    inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    ask_limit_on_launch: true
-    use_fact_cache: true
+    survey_enabled: true
     survey:
       name: ''
       description: ''
       spec:
-        - question_name: What resource would you like to configure?
+        - question_name: AWS Region
           type: multiplechoice
-          variable: rm
+          variable: clab_aws_region
           required: true
+          default: us-east-2
           choices:
-            - acls
-            - banner
-            - bgp_global
-            - hostname
-            - l3_interface
-            - logging
-            - ntp
-            - ospfv2
-            - prefix_lists
-            - snmp
-            - user
+            - us-east-2
+            - us-west-2
+        - question_name: Instance Type
+          type: multiplechoice
+          variable: clab_aws_instance_type
+          required: true
+          default: c8i.2xlarge
+          choices:
+            - c8i.2xlarge
+            - c8i.4xlarge
+        - question_name: Owner
+          type: text
+          variable: clab_aws_owner_tag
+          required: true
+          default: apd-demo
+
+  - name: "NETWORK | Containerlab | Deploy Topology"
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - Containerlab SSH
+      - AAP Credential
+    project: Ansible Product Demos
+    playbook: network/deploy_containerlab.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+
+  - name: "NETWORK | Containerlab | Teardown Topology"
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - Containerlab SSH
+    project: Ansible Product Demos
+    playbook: network/teardown_containerlab.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+
+  - name: "NETWORK | Containerlab | Configure Devices"
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - Containerlab Device Access
+    project: Ansible Product Demos
+    playbook: network/configure_devices.yml
+    inventory: ContainerLab Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+
+  - name: "NETWORK | Containerlab | Teardown Hypervisor"
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+    project: Ansible Product Demos
+    playbook: network/teardown_hypervisor.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: clab_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-2
+            - us-west-2
 
   - name: "NETWORK | Report"
-    job_type: check
+    job_type: run
     organization: Ansible Product Demos (APD)
-    inventory: Ansible Product Demos Inventory
+    inventory: ContainerLab Inventory
     project: "Ansible Product Demos"
     playbook: "network/report.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    execution_environment: Networking Execution Environment
-    use_fact_cache: true
     credentials:
-      - APD Machine Credential
+      - Containerlab Device Access
     survey_enabled: true
     survey:
       name: ''
@@ -193,37 +324,48 @@ controller_templates:
         - question_name: What devices do you want to include in the report?
           type: multiplechoice
           variable: _hosts
-          default: routers
+          default: containerlab
           required: true
           choices:
-            - sandbox-iosxe-latest-1.cisco.com
-            - sandbox-iosxr-1.cisco.com
-            - sandbox-nxos-1.cisco.com
-            - routers
+            - containerlab
+            - clab_nxos
+            - clab_ios
 
   - name: "NETWORK | DISA STIG"
     job_type: check
     organization: Ansible Product Demos (APD)
-    inventory: Ansible Product Demos Inventory
+    inventory: ContainerLab Inventory
     project: "Ansible Product Demos"
     playbook: "network/compliance.yml"
     credentials:
-      - APD Machine Credential
+      - Containerlab Device Access
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
     ask_job_type_on_launch: true
     survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: What IOS-XE devices do you want to check?
+          type: multiplechoice
+          variable: _hosts
+          default: clab_ios
+          required: true
+          choices:
+            - clab_ios
+            - cat8kv
 
   - name: "NETWORK | Backup"
     job_type: run
     organization: Ansible Product Demos (APD)
-    inventory: Ansible Product Demos Inventory
+    inventory: ContainerLab Inventory
     project: "Ansible Product Demos"
     playbook: "network/backup.yml"
     credentials:
-      - APD Machine Credential
+      - Containerlab Device Access
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -356,6 +498,121 @@ controller_workflows:
         identifier: Configure Webserver
         unified_job_template:
           name: NETWORK | Panos | Configure Webserver
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+
+  - name: "NETWORK | Deploy Containerlab Stack"
+    description: Provision hypervisor then deploy containerlab topology
+    inventory: Ansible Product Demos Inventory
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: clab_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-2
+            - us-west-2
+        - question_name: Instance Type
+          type: multiplechoice
+          variable: clab_aws_instance_type
+          required: true
+          default: c8i.2xlarge
+          choices:
+            - c8i.2xlarge
+            - c8i.4xlarge
+        - question_name: Owner
+          type: text
+          variable: clab_aws_owner_tag
+          required: true
+          default: apd-demo
+    workflow_nodes:
+      - identifier: Provision Hypervisor
+        related:
+          success_nodes:
+            - identifier: Deploy Topology
+          failure_nodes:
+            - identifier: Ticket - Provision Failed
+        unified_job_template:
+          name: NETWORK | Containerlab | Provision Hypervisor
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+      - identifier: Deploy Topology
+        related:
+          success_nodes:
+            - identifier: Sync ContainerLab Inventory
+        unified_job_template:
+          name: NETWORK | Containerlab | Deploy Topology
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+      - identifier: Sync ContainerLab Inventory
+        unified_job_template:
+          inventory:
+            name: ContainerLab Inventory
+            organization:
+              name: Ansible Product Demos (APD)
+              type: organization
+            type: inventory
+          name: ContainerLab Hypervisor
+          type: inventory_source
+      - identifier: Ticket - Provision Failed
+        unified_job_template:
+          name: SUBMIT FEEDBACK
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+        extra_data:
+          feedback: Failed to provision containerlab hypervisor
+
+  - name: "NETWORK | Destroy Containerlab Stack"
+    description: Tear down containerlab topology and all AWS resources
+    inventory: Ansible Product Demos Inventory
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: clab_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-2
+            - us-west-2
+    workflow_nodes:
+      - identifier: Teardown Topology
+        related:
+          always_nodes:
+            - identifier: Teardown Hypervisor
+        unified_job_template:
+          name: NETWORK | Containerlab | Teardown Topology
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+      - identifier: Teardown Hypervisor
+        unified_job_template:
+          name: NETWORK | Containerlab | Teardown Hypervisor
           organization:
             name: Ansible Product Demos (APD)
             type: organization

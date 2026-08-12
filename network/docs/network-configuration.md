@@ -1,29 +1,30 @@
-# Golden Configuration
+# Configure Devices
 
 
-Deploys golden configurations to Cisco IOS, IOS-XR, and NX-OS network devices using Ansible resource modules. Pulls configurations from a separate Git repository (Network Golden Configs) and applies them to the network devices.
+Applies baseline configuration to containerlab network devices (Cisco NX-OS and IOS-XE) using Ansible Network Resource Modules. Configures banners, NTP servers, and SNMP settings to demonstrate how Ansible standardizes configuration across different network operating systems.
 
 ## Prerequisites
 
-- Network devices in inventory (Cisco IOS, IOS-XR, and/or NX-OS)
-- Network credentials configured
-- Run **APD ǀ Single demo setup** with `network`
-
-## Survey prompts
-
-| Prompt | Variable | Type | Required |
-|--------|----------|------|----------|
-| Server Name or Pattern | `_hosts` | text | Yes |
+- Containerlab stack deployed via the **NETWORK ǀ Deploy Containerlab Stack** workflow
+- **Containerlab Device Access** credential configured
+- ContainerLab Inventory synced with hypervisor IP
 
 ## Job templates
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| NETWORK | Configuration | `(Network Golden Configs project)` | Applies golden configurations to network devices using Ansible resource modules |
+| NETWORK ǀ Containerlab ǀ Configure Devices | [`network/configure_devices.yml`](../configure_devices.yml) | Applies banner, NTP, and SNMP configuration to containerlab NX-OS and IOS-XE devices |
+
+## Why it matters
+
+- Demonstrates Ansible Network Resource Modules applying the same logical configuration (NTP, SNMP, banners) across different Cisco platforms
+- Shows how a single job template can configure heterogeneous network environments consistently
+- Baseline configuration is a common first step before compliance checks or reporting
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🌐 [Report](./network-report.md) | Generate a network report after applying configurations |
-| 🌐 [Backup](./network-backup.md) | Back up device configs before making changes |
+| 🌐 [Report](./network-report.md) | Generate a device report after applying configurations |
+| 🌐 [DISA STIG](./network-disa-stig.md) | Run compliance checks after establishing a baseline |
+| 🌐 [Backup](./network-backup.md) | Back up device configs after making changes |
