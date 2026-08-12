@@ -263,7 +263,7 @@
               "admin@PA-VM>":
                 - "configure"
                 - "exit"
-              "admin@PA-VM  #":
+              "admin@PA-VM#":
                 - "set mgt-config users admin password"
                 - "commit"
                 - "exit"
