@@ -1,0 +1,19 @@
+---
+name: product_demos
+topology:
+  kinds:
+    cisco_c8000v:
+      image: registry.gitlab.com/redhatautomation/cat8:17.13.01a
+    cisco_n9kv:
+      image: registry.gitlab.com/redhatautomation/nexus10-ee:10.5.3.F
+  nodes:
+    n9kv:
+      kind: cisco_n9kv
+      startup-config: configs/n9kv/startup-config.cfg
+      ports:
+        - "2122:22"
+    cat8kv:
+      kind: cisco_c8000v
+      startup-config: configs/cat8kv/startup-config.cfg
+      ports:
+        - "2123:22"

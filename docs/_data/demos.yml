@@ -999,19 +999,18 @@
 - slug: network-configuration
   readme_path: network/docs/network-configuration.md
   url: /demos/network-configuration/
-  title: "Golden Configuration"
+  title: "Configure Devices"
   category: network
   status: active
   tags:
     - Playbook
-    - Survey
   thumbnail:
     gradient: "linear-gradient(135deg, #38b000 0%, #006400 100%)"
     icon: "🌐"
-  blurb: "Deploy golden configurations for ACLs, BGP, OSPF, NTP, SNMP, and more to Cisco IOS, IOSXR, and NXOS devices."
+  blurb: "Apply baseline banner, NTP, and SNMP configuration to containerlab Cisco NX-OS and IOS-XE devices."
   stats:
     playbooks: 1
-  github_path: network/setup.yml
+  github_path: network/configure_devices.yml
 
 - slug: network-report
   readme_path: network/docs/network-report.md
@@ -1026,7 +1025,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)"
     icon: "🌐"
-  blurb: "Gather facts from Cisco network devices and generate an HTML report with code versions and L1/L2/L3 configuration."
+  blurb: "Gather facts from containerlab Cisco NX-OS and IOS-XE devices and display hostname, version, model, and interfaces."
   stats:
     playbooks: 1
   github_path: network/report.yml
@@ -1039,12 +1038,13 @@
   status: active
   tags:
     - Playbook
+    - Survey
     - Compliance
     - Security
   thumbnail:
     gradient: "linear-gradient(135deg, #43a047 0%, #2e7d32 100%)"
     icon: "🌐"
-  blurb: "Run the DISA STIG role against network devices to audit and enforce configuration compliance."
+  blurb: "Run the DISA STIG role against containerlab IOS-XE devices to audit and enforce configuration compliance."
   stats:
     playbooks: 1
   github_path: network/compliance.yml
@@ -1060,7 +1060,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #38b000 0%, #006400 100%)"
     icon: "🌐"
-  blurb: "Back up network device configurations using Red Hat validated content and publish to a report server."
+  blurb: "Back up running configurations from containerlab NX-OS and IOS-XE devices to the execution node."
   stats:
     playbooks: 1
   github_path: network/backup.yml

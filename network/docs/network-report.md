@@ -1,29 +1,31 @@
 # Report
 
 
-Generates an HTML network report by gathering facts from Cisco IOS, IOS-XR, and NX-OS devices. Collects interface, routing, and system information using the platform-specific facts modules and renders them into a browsable report.
+Gathers facts from containerlab Cisco NX-OS and IOS-XE devices and displays a summary of each device including hostname, OS version, model, serial number, and interface addresses.
 
 ## Prerequisites
 
-- Network devices in inventory
-- Network credentials configured
-- A `reports` host for publishing the HTML report
+- Containerlab stack deployed via the **NETWORK ǀ Deploy Containerlab Stack** workflow
+- **Containerlab Device Access** credential configured
+- ContainerLab Inventory synced with hypervisor IP
 
 ## Survey prompts
 
 | Prompt | Variable | Type | Required |
 |--------|----------|------|----------|
-| Server Name or Pattern | `_hosts` | text | Yes |
+| What devices do you want to include in the report? | `_hosts` | multiplechoice | Yes |
+
+Options: `containerlab` (all devices), `clab_nxos`, `clab_ios`
 
 ## Job templates
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| NETWORK ǀ Report | [`network/report.yml`](../report.yml) | Gathers facts from Cisco IOS, IOS-XR, and NX-OS devices and generates an HTML report |
+| NETWORK ǀ Report | [`network/report.yml`](../report.yml) | Gathers facts from containerlab Cisco NX-OS and IOS-XE devices and displays a device summary |
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| 🌐 [Golden Configuration](./network-configuration.md) | Apply configurations before generating a report |
+| 🌐 [Configure Devices](./network-configuration.md) | Apply baseline configurations before generating a report |
 | 🌐 [Backup](./network-backup.md) | Back up configurations alongside reporting |

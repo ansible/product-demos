@@ -1,0 +1,17 @@
+---
+namespace: demo
+name: network
+version: 1.0.0+08122601
+readme: README.md
+authors:
+  - Ansible Product Demos (https://github.com/ansible/product-demos)
+description: Roles supporting containerlab network demos in ansible-product-demos.
+license:
+  - GPL-3.0-or-later
+tags:
+  - apd
+  - networking
+  - infrastructure
+repository: https://github.com/ansible/product-demos
+issues: https://github.com/ansible/product-demos/issues
+...
