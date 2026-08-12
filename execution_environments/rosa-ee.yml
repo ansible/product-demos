@@ -1,0 +1,44 @@
+---
+version: 3
+images:
+  base_image:
+    name: registry.redhat.io/ansible-automation-platform-26/ee-minimal-rhel9:latest
+dependencies:
+  galaxy: requirements-rosa.yml
+  system:
+    - python3.12-devel [platform:rpm]
+    - unzip [platform:rpm]
+    - tar [platform:rpm]
+    - gzip [platform:rpm]
+    - jq [platform:rpm]
+  python:
+    - boto3>=1.28.0
+    - botocore>=1.31.0
+  python_interpreter:
+    python_path: /usr/bin/python3.12
+
+additional_build_files:
+  - src: ansible.cfg
+    dest: configs
+
+options:
+  package_manager_path: /usr/bin/microdnf
+
+additional_build_steps:
+  prepend_base:
+    - RUN $PKGMGR -y update && $PKGMGR clean all
+  prepend_galaxy:
+    - ADD _build/configs/ansible.cfg /etc/ansible/ansible.cfg
+    - ARG ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN
+    - ARG ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN
+  append_final:
+    # AWS CLI v2
+    - RUN curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip && unzip -q /tmp/awscliv2.zip -d /tmp && /tmp/aws/install && rm -rf /tmp/aws /tmp/awscliv2.zip
+    # ROSA CLI
+    - RUN curl -fsSL "https://mirror.openshift.com/pub/openshift-v4/clients/rosa/latest/rosa-linux.tar.gz" | tar xz -C /usr/local/bin rosa && chmod +x /usr/local/bin/rosa
+    # OpenShift client (for cluster verification)
+    - ARG OPENSHIFT_CLIENT_RPM
+    - RUN curl -o /tmp/openshift-clients.rpm $OPENSHIFT_CLIENT_RPM && rpm -Uvh /tmp/openshift-clients.rpm && rm -f /tmp/openshift-clients.rpm
+    # Cleanup build deps
+    - RUN microdnf remove -y python3.12-devel && microdnf clean all
+...

@@ -1,0 +1,71 @@
+---
+- name: ROSA | Create Cluster
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    rosa_cluster_name: "{{ rosa_cluster_name | default('') }}"
+    rosa_aws_region: "{{ rosa_aws_region | default('us-east-1') }}"
+    rosa_version: "{{ rosa_version | default('') }}"
+    rosa_compute_nodes: "{{ rosa_compute_nodes | default(2) }}"
+    rosa_compute_machine_type: "{{ rosa_compute_machine_type | default('m5.xlarge') }}"
+    rosa_multi_az: "{{ rosa_multi_az | default(false) }}"
+    rosa_ttl: "{{ rosa_ttl | default('4h') }}"
+    rosa_owner_tag: "{{ rosa_owner_tag | default('apd-demo') }}"
+
+  tasks:
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - rosa_cluster_name | length > 0
+          - rosa_aws_region | length > 0
+          - rosa_token is defined and rosa_token | length > 0
+        fail_msg: "Missing required variables for cluster creation."
+
+    - name: Log in to ROSA
+      ansible.builtin.command:
+        cmd: rosa login --token={{ rosa_token }}
+      changed_when: false
+      no_log: true
+
+    - name: Determine ROSA version flag
+      ansible.builtin.set_fact:
+        _version_flag: "{{ ('--version=' + rosa_version) if rosa_version | length > 0 else '' }}"
+
+    - name: Build cluster creation command
+      ansible.builtin.set_fact:
+        _rosa_create_cmd: >-
+          rosa create cluster
+          --cluster-name={{ rosa_cluster_name }}
+          --region={{ rosa_aws_region }}
+          --compute-nodes={{ rosa_compute_nodes }}
+          --compute-machine-type={{ rosa_compute_machine_type }}
+          {{ '--multi-az' if rosa_multi_az | bool else '' }}
+          {{ _version_flag }}
+          --tags=owner:{{ rosa_owner_tag }},managed-by:aap-product-demos,ttl:{{ rosa_ttl }}
+          --watch=false
+          --sts
+          --mode=auto
+          --yes
+
+    - name: Display create command (sanitized)
+      ansible.builtin.debug:
+        msg: "{{ _rosa_create_cmd }}"
+
+    - name: Create ROSA cluster
+      ansible.builtin.command:
+        cmd: "{{ _rosa_create_cmd }}"
+      register: _rosa_create
+      changed_when: "'Cluster' in _rosa_create.stdout"
+
+    - name: Display create output
+      ansible.builtin.debug:
+        msg: "{{ _rosa_create.stdout_lines }}"
+
+    - name: Record cluster creation timestamp
+      ansible.builtin.debug:
+        msg: >-
+          Cluster '{{ rosa_cluster_name }}' creation initiated at {{ now(utc=true) }}.
+          Expected ready in 30-45 minutes. TTL tag: {{ rosa_ttl }}.
+          COST WARNING: Cluster incurs charges from creation until destruction.

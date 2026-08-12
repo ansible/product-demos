@@ -1,0 +1,362 @@
+---
+controller_credential_types:
+  - name: ROSA Token
+    kind: cloud
+    inputs:
+      fields:
+        - id: rosa_token
+          type: string
+          label: ROSA API Token
+          secret: true
+          help_text: >-
+            Obtain from https://console.redhat.com/openshift/token/rosa.
+            This token authenticates the ROSA CLI with Red Hat OpenShift Cluster Manager.
+      required:
+        - rosa_token
+    injectors:
+      extra_vars:
+        rosa_token: !unsafe '{{ rosa_token }}'
+
+controller_credentials:
+  - name: ROSA Token
+    credential_type: ROSA Token
+    organization: Ansible Product Demos (APD)
+    update_secrets: false
+    state: exists
+    inputs:
+      rosa_token: REPLACEME
+
+controller_execution_environments:
+  - name: ROSA Lifecycle EE
+    image: quay.io/acme_corp/rosa-ee:latest
+    organization: Ansible Product Demos (APD)
+    pull: missing
+
+controller_templates:
+  - name: ROSA | Preflight Checks
+    description: >-
+      Validates AWS credentials, ROSA token, permissions, quota,
+      and checks for existing cluster name conflicts.
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    execution_environment: ROSA Lifecycle EE
+    credentials:
+      - AWS
+      - ROSA Token
+    project: Ansible Product Demos
+    playbook: rosa/preflight.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Cluster Name
+          question_description: >-
+            Lowercase alphanumeric + hyphens, max 54 chars. Convention: apd-rosa-<purpose>
+          type: text
+          variable: rosa_cluster_name
+          required: true
+          default: apd-rosa-demo
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: rosa_aws_region
+          required: true
+          default: us-east-1
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-2
+            - eu-west-1
+
+  - name: ROSA | Create Cluster
+    description: >-
+      Initiates ROSA cluster creation with STS mode.
+      Does NOT wait for readiness—use the workflow or Wait job.
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    execution_environment: ROSA Lifecycle EE
+    credentials:
+      - AWS
+      - ROSA Token
+    project: Ansible Product Demos
+    playbook: rosa/create.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Cluster Name
+          question_description: Must match what was validated in preflight.
+          type: text
+          variable: rosa_cluster_name
+          required: true
+          default: apd-rosa-demo
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: rosa_aws_region
+          required: true
+          default: us-east-1
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-2
+            - eu-west-1
+        - question_name: Compute Nodes
+          type: multiplechoice
+          variable: rosa_compute_nodes
+          required: true
+          default: "2"
+          choices:
+            - "2"
+            - "3"
+            - "4"
+        - question_name: Machine Type
+          type: multiplechoice
+          variable: rosa_compute_machine_type
+          required: true
+          default: m5.xlarge
+          choices:
+            - m5.xlarge
+            - m5.2xlarge
+            - m5.4xlarge
+        - question_name: OpenShift Version (blank = latest)
+          type: text
+          variable: rosa_version
+          required: false
+          default: ''
+        - question_name: Cluster TTL (e.g. 4h, 8h)
+          question_description: Tag for cost tracking. Actual deletion requires Destroy job.
+          type: text
+          variable: rosa_ttl
+          required: true
+          default: "4h"
+        - question_name: Owner Tag
+          question_description: Identifies who owns this cluster for cost/cleanup.
+          type: text
+          variable: rosa_owner_tag
+          required: true
+          default: apd-demo
+
+  - name: ROSA | Wait for Ready
+    description: >-
+      Polls cluster status until ready (default timeout: 60min).
+      Creates cluster-admin credentials on success.
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    execution_environment: ROSA Lifecycle EE
+    credentials:
+      - AWS
+      - ROSA Token
+    project: Ansible Product Demos
+    playbook: rosa/wait.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    timeout: 3900
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Cluster Name
+          type: text
+          variable: rosa_cluster_name
+          required: true
+          default: apd-rosa-demo
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: rosa_aws_region
+          required: true
+          default: us-east-1
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-2
+            - eu-west-1
+
+  - name: ROSA | Destroy Cluster
+    description: >-
+      Destroys a ROSA cluster and cleans up STS operator roles
+      and OIDC provider. Idempotent (safe to run if cluster is gone).
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    execution_environment: ROSA Lifecycle EE
+    credentials:
+      - AWS
+      - ROSA Token
+    project: Ansible Product Demos
+    playbook: rosa/destroy.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    timeout: 2100
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Cluster Name
+          type: text
+          variable: rosa_cluster_name
+          required: true
+          default: apd-rosa-demo
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: rosa_aws_region
+          required: true
+          default: us-east-1
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-2
+            - eu-west-1
+
+controller_workflows:
+  - name: ROSA | Lifecycle (Create)
+    description: >-
+      End-to-end ROSA cluster creation: preflight checks, create,
+      wait for readiness. On failure, attempts cleanup via destroy.
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Cluster Name
+          question_description: >-
+            Convention: apd-rosa-<purpose>. Lowercase, alphanumeric + hyphens, max 54 chars.
+          type: text
+          variable: rosa_cluster_name
+          required: true
+          default: apd-rosa-demo
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: rosa_aws_region
+          required: true
+          default: us-east-1
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-2
+            - eu-west-1
+        - question_name: Compute Nodes
+          type: multiplechoice
+          variable: rosa_compute_nodes
+          required: true
+          default: "2"
+          choices:
+            - "2"
+            - "3"
+            - "4"
+        - question_name: Machine Type
+          type: multiplechoice
+          variable: rosa_compute_machine_type
+          required: true
+          default: m5.xlarge
+          choices:
+            - m5.xlarge
+            - m5.2xlarge
+            - m5.4xlarge
+        - question_name: OpenShift Version (blank = latest)
+          type: text
+          variable: rosa_version
+          required: false
+          default: ''
+        - question_name: Cluster TTL
+          type: text
+          variable: rosa_ttl
+          required: true
+          default: "4h"
+        - question_name: Owner Tag
+          type: text
+          variable: rosa_owner_tag
+          required: true
+          default: apd-demo
+    simplified_workflow_nodes:
+      - identifier: Preflight Checks
+        unified_job_template: ROSA | Preflight Checks
+        success_nodes:
+          - Create Cluster
+        failure_nodes:
+          - Preflight Failed
+      - identifier: Create Cluster
+        unified_job_template: ROSA | Create Cluster
+        success_nodes:
+          - Wait for Ready
+        failure_nodes:
+          - Destroy on Failure
+      - identifier: Wait for Ready
+        unified_job_template: ROSA | Wait for Ready
+        failure_nodes:
+          - Destroy on Failure
+      - identifier: Destroy on Failure
+        unified_job_template: ROSA | Destroy Cluster
+        always_nodes:
+          - Creation Failed
+      - identifier: Preflight Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: >-
+            ROSA preflight checks failed. Check AWS credentials,
+            ROSA token, and service quotas.
+      - identifier: Creation Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: >-
+            ROSA cluster creation failed. Destroy attempted for cleanup.
+            Check job output for details.
+
+  - name: ROSA | Lifecycle (Destroy)
+    description: >-
+      Safely destroys a ROSA cluster with confirmation.
+      Idempotent—safe to run even if cluster no longer exists.
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Cluster Name
+          question_description: >-
+            Name of the ROSA cluster to destroy.
+          type: text
+          variable: rosa_cluster_name
+          required: true
+          default: apd-rosa-demo
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: rosa_aws_region
+          required: true
+          default: us-east-1
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-2
+            - eu-west-1
+    simplified_workflow_nodes:
+      - identifier: Destroy Cluster
+        unified_job_template: ROSA | Destroy Cluster
+        failure_nodes:
+          - Destroy Failed
+      - identifier: Destroy Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: >-
+            ROSA cluster destruction failed. Manual cleanup may be required.
+            Check AWS console for orphaned resources (VPCs, IAM roles, CloudFormation stacks).

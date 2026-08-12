@@ -1,0 +1,123 @@
+---
+- name: ROSA | Preflight Checks
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    rosa_cluster_name: "{{ rosa_cluster_name | default('') }}"
+    rosa_aws_region: "{{ rosa_aws_region | default('us-east-1') }}"
+
+  tasks:
+    - name: Validate required variables are set
+      ansible.builtin.assert:
+        that:
+          - rosa_cluster_name | length > 0
+          - rosa_aws_region | length > 0
+          - rosa_token is defined and rosa_token | length > 0
+        fail_msg: >-
+          Missing required variables. Ensure rosa_cluster_name, rosa_aws_region,
+          and rosa_token (via ROSA Token credential) are provided.
+        success_msg: All required variables are present.
+
+    - name: Validate cluster name format (lowercase alphanumeric + hyphens, max 54 chars)
+      ansible.builtin.assert:
+        that:
+          - rosa_cluster_name is regex('^[a-z][a-z0-9-]{0,53}$')
+        fail_msg: >-
+          Cluster name '{{ rosa_cluster_name }}' is invalid. Must start with a lowercase
+          letter, contain only lowercase alphanumeric characters and hyphens, max 54 characters.
+
+    - name: Verify AWS CLI is available
+      ansible.builtin.command:
+        cmd: aws --version
+      changed_when: false
+      register: _aws_version
+
+    - name: Display AWS CLI version
+      ansible.builtin.debug:
+        msg: "{{ _aws_version.stdout }}"
+
+    - name: Verify ROSA CLI is available
+      ansible.builtin.command:
+        cmd: rosa version
+      changed_when: false
+      register: _rosa_version
+
+    - name: Display ROSA CLI version
+      ansible.builtin.debug:
+        msg: "{{ _rosa_version.stdout }}"
+
+    - name: Verify AWS identity (STS caller identity)
+      ansible.builtin.command:
+        cmd: aws sts get-caller-identity --region {{ rosa_aws_region }}
+      changed_when: false
+      register: _aws_identity
+      environment:
+        AWS_DEFAULT_REGION: "{{ rosa_aws_region }}"
+
+    - name: Parse AWS identity
+      ansible.builtin.set_fact:
+        aws_caller_identity: "{{ _aws_identity.stdout | from_json }}"
+
+    - name: Display AWS identity
+      ansible.builtin.debug:
+        msg: >-
+          Account: {{ aws_caller_identity.Account }},
+          ARN: {{ aws_caller_identity.Arn }}
+
+    - name: Log in to ROSA
+      ansible.builtin.command:
+        cmd: rosa login --token={{ rosa_token }}
+      changed_when: false
+      no_log: true
+
+    - name: Verify ROSA token / whoami
+      ansible.builtin.command:
+        cmd: rosa whoami
+      changed_when: false
+      register: _rosa_whoami
+
+    - name: Display ROSA identity
+      ansible.builtin.debug:
+        msg: "{{ _rosa_whoami.stdout }}"
+
+    - name: Run ROSA preflight verification
+      ansible.builtin.command:
+        cmd: rosa verify permissions --region {{ rosa_aws_region }}
+      changed_when: false
+      register: _rosa_permissions
+
+    - name: Display permissions check result
+      ansible.builtin.debug:
+        msg: "{{ _rosa_permissions.stdout }}"
+
+    - name: Verify ROSA quota
+      ansible.builtin.command:
+        cmd: rosa verify quota --region {{ rosa_aws_region }}
+      changed_when: false
+      register: _rosa_quota
+
+    - name: Display quota check result
+      ansible.builtin.debug:
+        msg: "{{ _rosa_quota.stdout }}"
+
+    - name: Check if cluster already exists
+      ansible.builtin.command:
+        cmd: rosa describe cluster --cluster={{ rosa_cluster_name }} --region={{ rosa_aws_region }}
+      changed_when: false
+      register: _existing_cluster
+      failed_when: false
+
+    - name: Warn if cluster already exists
+      ansible.builtin.fail:
+        msg: >-
+          A cluster named '{{ rosa_cluster_name }}' already exists in region {{ rosa_aws_region }}.
+          Destroy it first or choose a different name.
+      when: _existing_cluster.rc == 0
+
+    - name: Preflight checks passed
+      ansible.builtin.debug:
+        msg: >-
+          All preflight checks passed. Ready to create ROSA cluster
+          '{{ rosa_cluster_name }}' in {{ rosa_aws_region }}.

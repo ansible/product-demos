@@ -1,0 +1,8 @@
+---
+collections:
+  - name: amazon.aws
+    version: ">=9.0.0"
+  - name: ansible.utils
+    version: ">=5.0.0"
+  - name: infra.aap_configuration
+    version: ">=3.0.0"

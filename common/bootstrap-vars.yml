@@ -131,6 +131,7 @@ controller_templates:
             - cloud
             - network
             - openshift
+            - rosa
             - satellite
 
   - name: "APD | Multi-demo setup"
@@ -148,12 +149,13 @@ controller_templates:
           type: multiselect
           variable: demos
           required: true
-          default: "cloud\nlinux\nnetwork\nopenshift\nwindows"
+          default: "cloud\nlinux\nnetwork\nopenshift\nrosa\nwindows"
           choices:
             - cloud
             - linux
             - network
             - openshift
+            - rosa
             - satellite
             - windows
 

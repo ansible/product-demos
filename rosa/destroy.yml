@@ -1,0 +1,121 @@
+---
+- name: ROSA | Destroy Cluster
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    rosa_cluster_name: "{{ rosa_cluster_name | default('') }}"
+    rosa_aws_region: "{{ rosa_aws_region | default('us-east-1') }}"
+    rosa_destroy_wait: "{{ rosa_destroy_wait | default(true) }}"
+    rosa_destroy_timeout: "{{ rosa_destroy_timeout | default(1800) }}"
+    rosa_poll_interval: "{{ rosa_poll_interval | default(60) }}"
+
+  tasks:
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - rosa_cluster_name | length > 0
+          - rosa_token is defined and rosa_token | length > 0
+        fail_msg: "Missing required variables for cluster destruction."
+
+    - name: Log in to ROSA
+      ansible.builtin.command:
+        cmd: rosa login --token={{ rosa_token }}
+      changed_when: false
+      no_log: true
+
+    - name: Check cluster exists before destruction
+      ansible.builtin.command:
+        cmd: rosa describe cluster --cluster={{ rosa_cluster_name }} --region={{ rosa_aws_region }} -o json
+      changed_when: false
+      register: _cluster_check
+      failed_when: false
+
+    - name: Skip destruction if cluster does not exist
+      when: _cluster_check.rc != 0
+      block:
+        - name: Report cluster not found
+          ansible.builtin.debug:
+            msg: >-
+              Cluster '{{ rosa_cluster_name }}' not found in region {{ rosa_aws_region }}.
+              Nothing to destroy. This is safe (idempotent).
+
+        - name: End play early
+          ansible.builtin.meta: end_play
+
+    - name: Display cluster info before destruction
+      ansible.builtin.debug:
+        msg:
+          - "Destroying cluster: {{ rosa_cluster_name }}"
+          - "Current state: {{ (_cluster_check.stdout | from_json).status.state | default('unknown') }}"
+          - "Region: {{ rosa_aws_region }}"
+
+    - name: Destroy ROSA cluster
+      ansible.builtin.command:
+        cmd: >-
+          rosa delete cluster
+          --cluster={{ rosa_cluster_name }}
+          --region={{ rosa_aws_region }}
+          --yes
+      register: _rosa_destroy
+      changed_when: "'is being deleted' in _rosa_destroy.stdout or 'Cluster' in _rosa_destroy.stdout"
+
+    - name: Display destruction output
+      ansible.builtin.debug:
+        msg: "{{ _rosa_destroy.stdout_lines }}"
+
+    - name: Wait for cluster destruction to complete
+      when: rosa_destroy_wait | bool
+      block:
+        - name: Poll cluster status until removed
+          ansible.builtin.command:
+            cmd: rosa describe cluster --cluster={{ rosa_cluster_name }} --region={{ rosa_aws_region }} -o json
+          changed_when: false
+          register: _destroy_status
+          until: _destroy_status.rc != 0
+          retries: "{{ (rosa_destroy_timeout | int / rosa_poll_interval | int) | int }}"
+          delay: "{{ rosa_poll_interval | int }}"
+          failed_when: false
+
+        - name: Verify cluster is gone
+          ansible.builtin.assert:
+            that:
+              - _destroy_status.rc != 0
+            fail_msg: >-
+              Cluster '{{ rosa_cluster_name }}' still exists after {{ rosa_destroy_timeout }}s.
+              Manual intervention may be required.
+            success_msg: "Cluster '{{ rosa_cluster_name }}' has been fully removed."
+
+    - name: Clean up STS operator roles
+      ansible.builtin.command:
+        cmd: >-
+          rosa delete operator-roles
+          --cluster={{ rosa_cluster_name }}
+          --region={{ rosa_aws_region }}
+          --mode=auto
+          --yes
+      register: _operator_roles_cleanup
+      changed_when: "'Deleted' in _operator_roles_cleanup.stdout"
+      failed_when: false
+
+    - name: Clean up OIDC provider
+      ansible.builtin.command:
+        cmd: >-
+          rosa delete oidc-provider
+          --cluster={{ rosa_cluster_name }}
+          --region={{ rosa_aws_region }}
+          --mode=auto
+          --yes
+      register: _oidc_cleanup
+      changed_when: "'Deleted' in _oidc_cleanup.stdout"
+      failed_when: false
+
+    - name: Final destruction summary
+      ansible.builtin.debug:
+        msg:
+          - "Cluster '{{ rosa_cluster_name }}' destruction complete."
+          - "Operator roles cleanup: {{ 'success' if _operator_roles_cleanup.rc == 0 else 'skipped/failed (verify manually)' }}"
+          - "OIDC provider cleanup: {{ 'success' if _oidc_cleanup.rc == 0 else 'skipped/failed (verify manually)' }}"
+          - "IMPORTANT: Verify no orphaned resources remain in AWS console."
+          - "Check CloudFormation stacks, IAM roles, and VPCs in {{ rosa_aws_region }}."

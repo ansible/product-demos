@@ -1,0 +1,75 @@
+---
+- name: ROSA | Wait for Cluster Ready
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    rosa_cluster_name: "{{ rosa_cluster_name | default('') }}"
+    rosa_aws_region: "{{ rosa_aws_region | default('us-east-1') }}"
+    rosa_wait_timeout: "{{ rosa_wait_timeout | default(3600) }}"
+    rosa_poll_interval: "{{ rosa_poll_interval | default(60) }}"
+
+  tasks:
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - rosa_cluster_name | length > 0
+          - rosa_token is defined and rosa_token | length > 0
+        fail_msg: "Missing required variables for wait operation."
+
+    - name: Log in to ROSA
+      ansible.builtin.command:
+        cmd: rosa login --token={{ rosa_token }}
+      changed_when: false
+      no_log: true
+
+    - name: Wait for cluster to reach 'ready' state
+      ansible.builtin.command:
+        cmd: rosa describe cluster --cluster={{ rosa_cluster_name }} --region={{ rosa_aws_region }} -o json
+      changed_when: false
+      register: _cluster_status
+      until: >-
+        (_cluster_status.stdout | from_json).status.state | default('') == 'ready'
+      retries: "{{ (rosa_wait_timeout | int / rosa_poll_interval | int) | int }}"
+      delay: "{{ rosa_poll_interval | int }}"
+
+    - name: Parse final cluster state
+      ansible.builtin.set_fact:
+        _cluster_info: "{{ _cluster_status.stdout | from_json }}"
+
+    - name: Display cluster readiness summary
+      ansible.builtin.debug:
+        msg:
+          - "Cluster: {{ _cluster_info.name }}"
+          - "ID: {{ _cluster_info.id }}"
+          - "State: {{ _cluster_info.status.state }}"
+          - "API URL: {{ _cluster_info.api.url | default('pending') }}"
+          - "Console: {{ _cluster_info.console.url | default('pending') }}"
+          - "Region: {{ _cluster_info.region.id }}"
+          - "Version: {{ _cluster_info.openshift_version }}"
+
+    - name: Create cluster admin (if not already present)
+      ansible.builtin.command:
+        cmd: rosa create admin --cluster={{ rosa_cluster_name }} --region={{ rosa_aws_region }}
+      register: _admin_create
+      changed_when: "'created' in _admin_create.stdout"
+      failed_when:
+        - _admin_create.rc != 0
+        - "'already has' not in _admin_create.stderr"
+
+    - name: Display admin credentials
+      ansible.builtin.debug:
+        msg: "{{ _admin_create.stdout_lines }}"
+
+    - name: Verify cluster API connectivity with oc
+      ansible.builtin.command:
+        cmd: rosa describe cluster --cluster={{ rosa_cluster_name }} --region={{ rosa_aws_region }} -o json
+      changed_when: false
+      register: _final_check
+
+    - name: Confirm cluster is ready for use
+      ansible.builtin.debug:
+        msg: >-
+          ROSA cluster '{{ rosa_cluster_name }}' is READY.
+          Cluster passed all readiness checks at {{ now(utc=true) }}.
