@@ -4,18 +4,8 @@
   connection: local
   gather_facts: false
 
-  vars:
-    rosa_cluster_name: "{{ rosa_cluster_name | default('') }}"
-    rosa_aws_region: "{{ rosa_aws_region | default('us-east-1') }}"
-    rosa_version: "{{ rosa_version | default('') }}"
-    rosa_compute_nodes: "{{ rosa_compute_nodes | default(2) }}"
-    rosa_compute_machine_type: "{{ rosa_compute_machine_type | default('m5.xlarge') }}"
-    rosa_multi_az: "{{ rosa_multi_az | default(false) }}"
-    rosa_ttl: "{{ rosa_ttl | default('4h') }}"
-    rosa_owner_tag: "{{ rosa_owner_tag | default('apd-demo') }}"
-
   environment:
-    AWS_DEFAULT_REGION: "{{ rosa_aws_region }}"
+    AWS_DEFAULT_REGION: "{{ rosa_aws_region | default('us-east-1') }}"
 
   tasks:
     - name: Validate required variables
@@ -32,21 +22,17 @@
       changed_when: false
       no_log: true
 
-    - name: Determine ROSA version flag
-      ansible.builtin.set_fact:
-        _version_flag: "{{ ('--version=' + rosa_version) if rosa_version | length > 0 else '' }}"
-
     - name: Build cluster creation command
       ansible.builtin.set_fact:
         _rosa_create_cmd: >-
           rosa create cluster
           --cluster-name={{ rosa_cluster_name }}
-          --region={{ rosa_aws_region }}
-          --compute-nodes={{ rosa_compute_nodes }}
-          --compute-machine-type={{ rosa_compute_machine_type }}
-          {{ '--multi-az' if rosa_multi_az | bool else '' }}
-          {{ _version_flag }}
-          --tags=owner:{{ rosa_owner_tag }},managed-by:aap-product-demos,ttl:{{ rosa_ttl }}
+          --region={{ rosa_aws_region | default('us-east-1') }}
+          --compute-nodes={{ rosa_compute_nodes | default(2) }}
+          --compute-machine-type={{ rosa_compute_machine_type | default('m5.xlarge') }}
+          {{ '--multi-az' if (rosa_multi_az | default(false)) | bool else '' }}
+          {{ ('--version=' + rosa_version) if (rosa_version | default('')) | length > 0 else '' }}
+          --tags=owner:{{ rosa_owner_tag | default('apd-demo') }},managed-by:aap-product-demos,ttl:{{ rosa_ttl | default('4h') }}
           --watch=false
           --sts
           --mode=auto

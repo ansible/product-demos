@@ -4,15 +4,8 @@
   connection: local
   gather_facts: false
 
-  vars:
-    rosa_cluster_name: "{{ rosa_cluster_name | default('') }}"
-    rosa_aws_region: "{{ rosa_aws_region | default('us-east-1') }}"
-    rosa_destroy_wait: "{{ rosa_destroy_wait | default(true) }}"
-    rosa_destroy_timeout: "{{ rosa_destroy_timeout | default(1800) }}"
-    rosa_poll_interval: "{{ rosa_poll_interval | default(60) }}"
-
   environment:
-    AWS_DEFAULT_REGION: "{{ rosa_aws_region }}"
+    AWS_DEFAULT_REGION: "{{ rosa_aws_region | default('us-east-1') }}"
 
   tasks:
     - name: Validate required variables
@@ -69,7 +62,7 @@
         msg: "{{ _rosa_destroy.stdout_lines }}"
 
     - name: Wait for cluster destruction to complete
-      when: rosa_destroy_wait | bool
+      when: (rosa_destroy_wait | default(true)) | bool
       block:
         - name: Poll cluster status until removed
           ansible.builtin.command:
@@ -77,8 +70,8 @@
           changed_when: false
           register: _destroy_status
           until: _destroy_status.rc != 0
-          retries: "{{ (rosa_destroy_timeout | int / rosa_poll_interval | int) | int }}"
-          delay: "{{ rosa_poll_interval | int }}"
+          retries: "{{ ((rosa_destroy_timeout | default(1800)) | int / (rosa_poll_interval | default(60)) | int) | int }}"
+          delay: "{{ (rosa_poll_interval | default(60)) | int }}"
           failed_when: false
 
         - name: Verify cluster is gone
@@ -86,7 +79,7 @@
             that:
               - _destroy_status.rc != 0
             fail_msg: >-
-              Cluster '{{ rosa_cluster_name }}' still exists after {{ rosa_destroy_timeout }}s.
+              Cluster '{{ rosa_cluster_name }}' still exists after {{ rosa_destroy_timeout | default(1800) }}s.
               Manual intervention may be required.
             success_msg: "Cluster '{{ rosa_cluster_name }}' has been fully removed."
 

@@ -4,14 +4,8 @@
   connection: local
   gather_facts: false
 
-  vars:
-    rosa_cluster_name: "{{ rosa_cluster_name | default('') }}"
-    rosa_aws_region: "{{ rosa_aws_region | default('us-east-1') }}"
-    rosa_wait_timeout: "{{ rosa_wait_timeout | default(3600) }}"
-    rosa_poll_interval: "{{ rosa_poll_interval | default(60) }}"
-
   environment:
-    AWS_DEFAULT_REGION: "{{ rosa_aws_region }}"
+    AWS_DEFAULT_REGION: "{{ rosa_aws_region | default('us-east-1') }}"
 
   tasks:
     - name: Validate required variables
@@ -34,8 +28,8 @@
       register: _cluster_status
       until: >-
         (_cluster_status.stdout | from_json).status.state | default('') == 'ready'
-      retries: "{{ (rosa_wait_timeout | int / rosa_poll_interval | int) | int }}"
-      delay: "{{ rosa_poll_interval | int }}"
+      retries: "{{ ((rosa_wait_timeout | default(3600)) | int / (rosa_poll_interval | default(60)) | int) | int }}"
+      delay: "{{ (rosa_poll_interval | default(60)) | int }}"
 
     - name: Parse final cluster state
       ansible.builtin.set_fact:

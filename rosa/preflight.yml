@@ -4,12 +4,8 @@
   connection: local
   gather_facts: false
 
-  vars:
-    rosa_cluster_name: "{{ rosa_cluster_name | default('') }}"
-    rosa_aws_region: "{{ rosa_aws_region | default('us-east-1') }}"
-
   environment:
-    AWS_DEFAULT_REGION: "{{ rosa_aws_region }}"
+    AWS_DEFAULT_REGION: "{{ rosa_aws_region | default('us-east-1') }}"
 
   tasks:
     - name: Validate required variables are set
