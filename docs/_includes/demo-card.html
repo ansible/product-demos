@@ -21,7 +21,7 @@
     </div>
     <div class="demo-card__body">
       <div class="demo-card__meta">
-        <span class="demo-card__category">{{ demo.category }}</span>
+        <span class="demo-card__category">{% if demo.category == 'rosa' %}ROSA{% else %}{{ demo.category }}{% endif %}</span>
         <span class="demo-card__status demo-card__status--active">Active</span>
       </div>
       <h3 class="demo-card__title">{{ demo.title }}</h3>

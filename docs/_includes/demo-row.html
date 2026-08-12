@@ -19,7 +19,7 @@
     <div class="demo-row__title"><a href="{{ row_href }}">{{ demo.title }}</a></div>
     <div class="demo-row__blurb">{{ demo.blurb }}</div>
   </td>
-  <td class="demo-row__category">{{ demo.category | capitalize }}</td>
+  <td class="demo-row__category">{% if demo.category == 'rosa' %}ROSA{% else %}{{ demo.category | capitalize }}{% endif %}</td>
   <td>
     <div class="demo-row__tags">
       {% for tag in demo.tags limit:3 %}

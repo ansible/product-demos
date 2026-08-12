@@ -36,7 +36,7 @@ description: Browse Ansible Product Demos for Red Hat Ansible Automation Platfor
         {% endif %}
       {% endfor %}
       {% if cat_count > 0 %}
-        <button type="button" class="filter-pill filter-pill--status" data-filter-category="{{ cat }}">{{ cat | capitalize }} <span class="count">{{ cat_count }}</span></button>
+      <button type="button" class="filter-pill filter-pill--status" data-filter-category="{{ cat }}">{% if cat == 'rosa' %}ROSA{% else %}{{ cat | capitalize }}{% endif %} <span class="count">{{ cat_count }}</span></button>
       {% endif %}
     {% endfor %}
   </div>
