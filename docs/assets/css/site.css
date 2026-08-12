@@ -1153,18 +1153,8 @@ html:not([data-theme="dark"]) .demo-card:hover {
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.workflow-diagram .mermaid .edgeLabel rect {
-  fill: var(--bg-body) !important;
-  opacity: 1 !important;
-}
-
-.workflow-diagram .mermaid .edgeLabel p,
-.workflow-diagram .mermaid .edgeLabel span {
-  color: var(--text-primary) !important;
-  background: var(--bg-body) !important;
-  border-radius: 4px;
-  padding: 1px 4px;
-}
+/* Edge label colors are applied post-render by JS in default.html.
+   Do not add fill/color/background rules here — they fight inline !important. */
 
 .btn {
   display: inline-flex;
