@@ -44,7 +44,7 @@ Defaults live in `defaults/main.yml`.
 | `create_vm_vm_deployment` / `create_vm_vm_environment` / `create_vm_vm_owner` / `create_vm_vm_purpose` | `default` / `default` / `ansible` / `demo` | Tags used both for idempotency lookups and on the created instance |
 | `create_vm_aws_image_filter` | `RHEL-9*HVM-*Hourly*` | AMI name filter for `ec2_ami_info` |
 | `create_vm_aws_image_architecture` | `x86_64` | AMI architecture filter |
-| `create_vm_aws_userdata_template` | unset | Template name (`<name>.j2` in `templates/`) rendered as EC2 user-data; must be supplied (for example by `cloud/blueprints/windows_full.yml`, which sets it to `aws_windows_userdata`) -- RHEL blueprints don't set it, and the older `cloud/blueprints/windows.yml` sets the legacy unprefixed `aws_userdata_template` instead, which this role's `create_vm` no longer reads |
+| `create_vm_aws_userdata_template` | `default` | Template name (`<name>.j2` in `templates/`) rendered as EC2 user-data; defaults to `default` (`templates/default.j2`). Windows blueprints such as `cloud/blueprints/windows_full.yml` override it to `aws_windows_userdata`. The older `cloud/blueprints/windows.yml` sets the legacy unprefixed `aws_userdata_template` instead, which this role's `create_vm` no longer reads |
 
 `instance_id`, `instance_type`, and `tags` are required caller-supplied variables for `resize_ec2` / `snapshot_vm` / `restore_vm` / `destroy_vm` (not set in `defaults/main.yml`).
 

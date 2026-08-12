@@ -12,14 +12,14 @@ Register a RHEL host with Red Hat Satellite using an activation key, replacing a
     - demo.satellite.register_host
 ```
 
-The activation key defaults to `RHEL<major version>_<env>` (for example `RHEL9_dev`), so the target host's Satellite organization must have a matching activation key. RHSM repos are chosen per OS release from `vars/RedHat7.yml` / `vars/RedHat8.yml`; RHEL 9 hosts fall back to whatever activation key content view defines by default (no OS-specific repo file is shipped for RHEL 9).
+The activation key defaults to `RHEL<major version>_<env>` (for example `RHEL8_dev`), so the target host's Satellite organization must have a matching activation key. RHSM repos are chosen per OS release from `vars/RedHat7.yml` / `vars/RedHat8.yml`. RHEL 9 is not supported today: `tasks/main.yml` asserts major version is `7` or `8`, and no `vars/RedHat9.yml` is shipped.
 
 Repo playbook: [`satellite/server_register.yml`](../../../../../../satellite/server_register.yml).
 
 ## Requirements
 
 - ansible-core >= 2.16.0
-- Target: RHEL 7/8/9 host reachable over SSH with `become`
+- Target: RHEL 7 or 8 host reachable over SSH with `become` (RHEL 9 is asserted out)
 - `community.general` collection (`redhat_subscription`, `rhsm_repository`)
 - `ansible.posix` collection (`authorized_key`)
 - Network access from the target host to the Satellite server (`satellite_url`) and a valid activation key for the host's org

@@ -10,5 +10,5 @@ This collection is not published to Ansible Galaxy or Automation Hub; it exists 
 
 | Role | Description |
 |------|-------------|
-| [register_host](roles/register_host/) | Register a RHEL host with Red Hat Satellite via an activation key, enable repos, and install remote execution tooling. |
+| [register_host](roles/register_host/README.md) | Register a RHEL host with Red Hat Satellite via an activation key, enable repos, and install remote execution tooling. |
 | [scap_client](roles/scap_client/README.md) | Configure a client to run OpenSCAP compliance policies using configuration obtained from Satellite/Foreman. |

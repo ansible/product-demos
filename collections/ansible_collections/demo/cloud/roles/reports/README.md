@@ -10,7 +10,7 @@ Create an S3-hosted static website bucket, sync a local report directory into it
 
 `tasks/main.yml` always creates/configures the bucket and syncs `files/`, then dynamically includes `{{ reports_aws_report }}.yml` (`vpc` by default) to build the report-specific content before uploading `index.html`.
 
-This role is not currently referenced by a top-level repo playbook; it is invoked directly via `demo.cloud.reports` when a VPC report is needed (see the `Cloud / AWS | VPC Report` job template).
+This role is not currently referenced by any repo playbook or job template. The active `Cloud | AWS | VPC Report` path uses [`cloud/cloud_report.yml`](../../../../../../cloud/cloud_report.yml) with `demo.cloud.retrieve_info` → `demo.cloud.template` → `demo.cloud.build_report_s3` instead. Kept for direct use or future wiring.
 
 ## Requirements
 
