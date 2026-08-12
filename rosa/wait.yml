@@ -10,6 +10,9 @@
     rosa_wait_timeout: "{{ rosa_wait_timeout | default(3600) }}"
     rosa_poll_interval: "{{ rosa_poll_interval | default(60) }}"
 
+  environment:
+    AWS_DEFAULT_REGION: "{{ rosa_aws_region }}"
+
   tasks:
     - name: Validate required variables
       ansible.builtin.assert:

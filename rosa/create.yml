@@ -14,6 +14,9 @@
     rosa_ttl: "{{ rosa_ttl | default('4h') }}"
     rosa_owner_tag: "{{ rosa_owner_tag | default('apd-demo') }}"
 
+  environment:
+    AWS_DEFAULT_REGION: "{{ rosa_aws_region }}"
+
   tasks:
     - name: Validate required variables
       ansible.builtin.assert:

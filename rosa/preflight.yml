@@ -8,6 +8,9 @@
     rosa_cluster_name: "{{ rosa_cluster_name | default('') }}"
     rosa_aws_region: "{{ rosa_aws_region | default('us-east-1') }}"
 
+  environment:
+    AWS_DEFAULT_REGION: "{{ rosa_aws_region }}"
+
   tasks:
     - name: Validate required variables are set
       ansible.builtin.assert:
@@ -50,11 +53,9 @@
 
     - name: Verify AWS identity (STS caller identity)
       ansible.builtin.command:
-        cmd: aws sts get-caller-identity --region {{ rosa_aws_region }}
+        cmd: aws sts get-caller-identity
       changed_when: false
       register: _aws_identity
-      environment:
-        AWS_DEFAULT_REGION: "{{ rosa_aws_region }}"
 
     - name: Parse AWS identity
       ansible.builtin.set_fact:
