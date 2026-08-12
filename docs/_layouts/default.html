@@ -86,6 +86,13 @@
         el.style.setProperty('color', '#ffffff', 'important');
         el.style.setProperty('margin', '0');
       });
+      document.querySelectorAll('[id^="mermaid-"] .edgeLabel rect').forEach(function(el) {
+        el.setAttribute('fill', 'transparent');
+        el.setAttribute('opacity', '0');
+      });
+      document.querySelectorAll('[id^="mermaid-"] .edgeLabel foreignObject').forEach(function(el) {
+        el.style.setProperty('overflow', 'visible');
+      });
       document.querySelectorAll('[id^="mermaid-"] .edgeLabel p').forEach(function(el) {
         el.style.setProperty('background-color', 'rgba(232, 232, 232, 0.8)', 'important');
         el.style.setProperty('color', '#000000', 'important');
