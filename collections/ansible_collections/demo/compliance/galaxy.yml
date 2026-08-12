@@ -1,0 +1,17 @@
+---
+namespace: demo
+name: compliance
+version: 1.0.0+08062601
+readme: README.md
+authors:
+  - Ansible Product Demos (https://github.com/ansible/product-demos)
+description: Roles supporting STIG compliance automation demos in ansible-product-demos.
+license:
+  - GPL-3.0-or-later
+tags:
+  - apd
+  - compliance
+  - security
+repository: https://github.com/ansible/product-demos
+issues: https://github.com/ansible/product-demos/issues
+...

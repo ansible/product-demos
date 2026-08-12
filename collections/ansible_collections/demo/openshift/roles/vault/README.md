@@ -21,7 +21,7 @@ Repo playbook: [`openshift/hashi_vault.yml`](../../../../../../openshift/hashi_v
 
 ## Requirements
 
-- Ansible 2.14+
+- ansible-core >= 2.16.0
 - Target: OpenShift cluster access
 - `kubernetes.core` collection
 - `oc` and Helm CLI available to the controller
