@@ -1,6 +1,6 @@
 ---
 # Ansible Product Demos – Demo Catalog
-# 63 demos across 7 categories
+# 67 demos across 7 categories
 
 # ─── Featured ───────────────────────────────────────────────────────
 
@@ -1431,3 +1431,79 @@
       style E fill:#2d2d2d,stroke:#888,color:#fff
       style F fill:#2d2d2d,stroke:#888,color:#fff
       style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: rosa-preflight
+  readme_path: rosa/docs/rosa-lifecycle.md
+  url: /demos/rosa-preflight/
+  title: "ROSA — Preflight Checks"
+  category: rosa
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+    - ROSA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0969da 0%, #033d8b 100%)"
+    icon: "🌹"
+  blurb: "Validate AWS identity, ROSA token, EIP quota, and account roles before attempting cluster creation."
+  stats:
+    playbooks: 1
+  github_path: rosa/preflight.yml
+
+- slug: rosa-create
+  readme_path: rosa/docs/rosa-lifecycle.md
+  url: /demos/rosa-create/
+  title: "ROSA — Create Cluster"
+  category: rosa
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+    - ROSA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #d13438 0%, #7a0000 100%)"
+    icon: "🌹"
+  blurb: "Create a ROSA cluster in STS mode with auto-provisioned account roles, EIP management, and configurable compute options."
+  stats:
+    playbooks: 1
+  github_path: rosa/create.yml
+
+- slug: rosa-wait
+  readme_path: rosa/docs/rosa-lifecycle.md
+  url: /demos/rosa-wait/
+  title: "ROSA — Wait for Ready"
+  category: rosa
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+    - ROSA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0097a7 0%, #00606f 100%)"
+    icon: "🌹"
+  blurb: "Poll ROSA cluster status until ready, then create a cluster-admin user and display login credentials."
+  stats:
+    playbooks: 1
+  github_path: rosa/wait.yml
+
+- slug: rosa-destroy
+  readme_path: rosa/docs/rosa-lifecycle.md
+  url: /demos/rosa-destroy/
+  title: "ROSA — Destroy Cluster"
+  category: rosa
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+    - ROSA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)"
+    icon: "🌹"
+  blurb: "Tear down a ROSA cluster by name and wait for full resource cleanup including AWS infrastructure."
+  stats:
+    playbooks: 1
+  github_path: rosa/destroy.yml
