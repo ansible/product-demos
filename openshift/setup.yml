@@ -264,7 +264,7 @@ controller_templates:
 
 controller_workflows:
   - name: OpenShift | CNV | Sync Hosts
-    description: A workflow to update dynamic CNV inventory and wait for hosts to become avilable
+    description: A workflow to update dynamic CNV inventory and wait for hosts to become available
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
