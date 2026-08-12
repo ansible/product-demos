@@ -4,6 +4,11 @@
 Source files are pure markdown (no YAML frontmatter) so they read cleanly on
 GitHub.  This script prepends the required Jekyll frontmatter during the copy.
 
+Relative links are rewritten during copy:
+  - Playbook refs  (../foo.yml)        → GitHub blob links
+  - Same-dir docs  (./other-demo.md)   → ../other-demo/  (Jekyll structure)
+  - Cross-section   (../../linux/docs/linux-foo.md) → ../linux-foo/
+
 Run before `jekyll serve` for local preview. The GitHub Actions workflow runs
 this automatically during CI/CD build.
 
@@ -11,10 +16,53 @@ Usage:
     python3 docs/_scripts/build-demo-pages.py
 """
 import os
+import re
 import yaml
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.chdir(REPO_ROOT)
+
+GITHUB_BLOB = "https://github.com/ansible/product-demos/blob/main"
+LINK_RE = re.compile(r"(\[[^\]]*\])\(([^)]+)\)")
+# Mermaid fences stay in source READMEs for GitHub.com; Pages renders
+# diagrams from demos.yml via the layout <pre class="mermaid"> include.
+MERMAID_FENCE_RE = re.compile(r"```mermaid\n.*?```\n*", re.DOTALL)
+WORKFLOW_HEADING_RE = re.compile(r"^## Workflow\s*\n+", re.MULTILINE)
+# Pages replaces Related demos tables with a category CTA from the layout.
+RELATED_DEMOS_RE = re.compile(
+    r"^## Related demos\s*\n+(?:\|[^\n]*\n)+",
+    re.MULTILINE,
+)
+
+
+def rewrite_links(body: str, readme_path: str) -> str:
+    """Transform relative links from source-doc context to Jekyll site context."""
+    src_dir = os.path.dirname(readme_path)
+
+    def _replace(match: re.Match) -> str:
+        label = match.group(1)
+        url = match.group(2)
+
+        if url.startswith(("http://", "https://", "#", "(")):
+            return match.group(0)
+
+        fragment = ""
+        if "#" in url:
+            url, fragment = url.split("#", 1)
+            fragment = "#" + fragment
+
+        if url.endswith((".yml", ".yaml", ".j2")):
+            resolved = os.path.normpath(os.path.join(src_dir, url))
+            return f"{label}({GITHUB_BLOB}/{resolved}{fragment})"
+
+        if url.endswith(".md"):
+            slug = os.path.splitext(os.path.basename(url))[0]
+            return f"{label}(../{slug}/{fragment})"
+
+        return match.group(0)
+
+    return LINK_RE.sub(_replace, body)
+
 
 with open("docs/_data/demos.yml") as f:
     demos = yaml.safe_load(f)
@@ -29,7 +77,13 @@ for demo in demos:
     with open(readme) as f:
         body = f.read()
 
-    # Build frontmatter from demos.yml metadata
+    body = rewrite_links(body, readme)
+    body = RELATED_DEMOS_RE.sub("", body)
+    if demo.get("workflow_mermaid"):
+        # Diagram + Workflow heading come from the layout; keep step lists.
+        body = MERMAID_FENCE_RE.sub("", body)
+        body = WORKFLOW_HEADING_RE.sub("", body)
+
     fm_lines = [
         "---",
         "layout: demo-detail",

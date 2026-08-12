@@ -63,25 +63,36 @@
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
     var theme = document.documentElement.getAttribute('data-theme');
     var isDark = theme === 'dark' || (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
     mermaid.initialize({
-      startOnLoad: true,
-      theme: isDark ? 'dark' : 'default',
-      themeVariables: isDark ? {
+      startOnLoad: false,
+      theme: 'dark',
+      themeVariables: {
+        background: 'transparent',
         primaryColor: '#1f3a5f',
-        primaryTextColor: '#e6edf3',
-        primaryBorderColor: '#58a6ff',
-        lineColor: '#388bfd',
+        primaryTextColor: '#f0f0f0',
+        primaryBorderColor: isDark ? '#58a6ff' : '#0969da',
+        lineColor: isDark ? '#60a5fa' : '#2563eb',
+        edgeLabelBackground: 'transparent',
         secondaryColor: '#162c46',
-        tertiaryColor: '#0d1117'
-      } : {
-        primaryColor: '#ddf4ff',
-        primaryTextColor: '#1f2328',
-        primaryBorderColor: '#0969da',
-        lineColor: '#0550ae',
-        secondaryColor: '#eef6fc',
-        tertiaryColor: '#f6f8fa'
+        tertiaryColor: isDark ? '#0d1117' : '#162c46'
       }
     });
+
+    var nodes = document.querySelectorAll('.mermaid');
+    if (nodes.length) {
+      await mermaid.run({ nodes: Array.from(nodes) });
+      document.querySelectorAll('[id^="mermaid-"] p').forEach(function(el) {
+        el.style.setProperty('color', '#ffffff', 'important');
+        el.style.setProperty('margin', '0');
+      });
+      document.querySelectorAll('[id^="mermaid-"] .edgeLabel p').forEach(function(el) {
+        el.style.setProperty('background-color', 'rgba(232, 232, 232, 0.8)', 'important');
+        el.style.setProperty('color', '#000000', 'important');
+        el.style.setProperty('padding', '1px 4px');
+        el.style.setProperty('border-radius', '3px');
+      });
+    }
   </script>
   {% endif %}
 

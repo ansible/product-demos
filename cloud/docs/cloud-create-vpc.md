@@ -6,7 +6,7 @@ Provisions an AWS VPC with subnet, internet gateway, route table, and security g
 ## Prerequisites
 
 - AWS credential configured with Access and Secret key
-- Run **APD | Single demo setup** with `cloud` to create the job template
+- Run **APD ǀ Single demo setup** with `cloud` to create the job template
 
 ## Job templates
 

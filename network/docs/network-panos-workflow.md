@@ -5,10 +5,16 @@ A workflow that provisions a Palo Alto Networks virtual firewall in AWS, configu
 
 ## Workflow
 
-```
-Deploy ──→ Inventory Sync ──→ Configure Firewall ──→ Configure Security Rule ──→ Configure Webserver
-                                                                                        │
-                                                                                  Cleanup (teardown)
+```mermaid
+graph LR
+  S["🏠 Start"]
+  S --> A
+  A["🚀 Deploy"] --> B["🔄 Inventory Sync"]
+  B --> C["🔥 Configure Firewall"]
+  C --> D["🛡️ Configure Security Rule"]
+  D --> E["🌐 Configure Webserver"]
+  E -. "teardown" .-> F["🧹 Cleanup"]
+  style S fill:#212427,stroke:#8a8d90,color:#fff
 ```
 
 1. **Deploy** — Provisions the PAN-OS virtual firewall, bastion host, and webserver in AWS
@@ -49,7 +55,7 @@ Deploy ──→ Inventory Sync ──→ Configure Firewall ──→ Configure
 2. **Launch the workflow:** Start the workflow and explain the node sequence: Deploy → (parallel) Inventory Sync and Configure Firewall → Configure Webserver.
 3. **Fill the wait time:** The workflow takes roughly 25 minutes (mostly waiting for the virtual firewall to initialize). Use this time to walk through the architecture diagram and explain the three automation mechanisms: amazon.aws for provisioning, paloaltonetworks.panos for firewall config, and RHEL system roles for the webserver.
 4. **Verify the deployment:** After completion, open the firewall management portal at the management IP (HTTPS). Log in with admin credentials. Open the webserver at the public IP (HTTP) to confirm traffic flows.
-5. **Toggle a security rule:** Launch the **NETWORK | Panos | Configure Security Rule** job template. Accept the defaults to deny traffic. Refresh the webserver tab — it no longer loads.
+5. **Toggle a security rule:** Launch the **NETWORK ǀ Panos ǀ Configure Security Rule** job template. Accept the defaults to deny traffic. Refresh the webserver tab — it no longer loads.
 6. **Show the firewall logs:** In the Palo Alto management portal, navigate to Monitor → Traffic logs. Show the denied traffic entries. 'The firewall is enforcing the rule we just pushed via Ansible.'
 
 ## Talking points
