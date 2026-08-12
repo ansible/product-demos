@@ -1,0 +1,66 @@
+---
+layout: default
+mermaid: true
+---
+{% assign demo = site.data.demos | where: "slug", page.demo_slug | first %}
+{% assign category_label = demo.category | capitalize %}
+
+<div class="detail-hero">
+  <div class="detail-hero__row">
+    <div class="detail-hero__content">
+      <div class="detail-hero__main">
+        <p class="detail-status detail-status--active">{{ category_label }}</p>
+        <h1>{{ demo.title }}</h1>
+        <p class="subtitle">{{ demo.subtitle }}</p>
+      </div>
+    </div>
+    <div class="detail-hero__actions">
+      {% include demo-cta.html demo=demo %}
+    </div>
+  </div>
+  <hr class="detail-divider">
+</div>
+
+<div class="detail-meta-bar">
+  <span class="detail-meta-bar__author">Author: {{ demo.author | default: "Unknown" }}</span>
+</div>
+
+<section class="detail-section" id="description">
+  <div class="detail-body">
+    {{ content }}
+
+    {% if demo.category %}
+    <h2 id="see-other-demos">See other {{ category_label }} demos</h2>
+    <p class="detail-see-other">
+      <a href="{{ '/' | relative_url }}?category={{ demo.category }}">Browse all {{ category_label }} demos →</a>
+    </p>
+    {% endif %}
+  </div>
+</section>
+
+{% if demo.workflow_mermaid %}
+<section class="detail-section" id="workflow">
+  <h2>Workflow</h2>
+  {% include workflow-diagram.html mermaid=demo.workflow_mermaid %}
+</section>
+{% endif %}
+
+{% if demo.video_url %}
+<section class="detail-section" id="video">
+  <h2>Video walkthrough</h2>
+  <div class="detail-video">
+    <iframe src="{{ demo.video_url }}" title="{{ demo.title }} — video walkthrough" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  </div>
+</section>
+{% endif %}
+
+{% if page.special_thanks %}
+<section class="detail-section detail-special-thanks" id="special-thanks">
+  <h2>Special thanks</h2>
+  <p>{{ page.special_thanks }}</p>
+</section>
+{% endif %}
+
+<div class="detail-back-to-all">
+  <a href="{{ '/' | relative_url }}">← All demos</a>
+</div>

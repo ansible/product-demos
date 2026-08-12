@@ -15,29 +15,33 @@
 ## About These Demos
 This category of demos shows examples of linux operations and management with Ansible Automation Platform. The list of demos can be found below. See the [Suggested Usage](#suggested-usage) section of this document for recommendations on how to best use these demos.
 
+### Workflows
+
+| Workflow | Description |
+|----------|-------------|
+| [**Compliance Workflow**](docs/linux-compliance-workflow.md) | End-to-end compliance workflow that generates an OpenSCAP report, refreshes inventory, and enforces remediation on findings. |
+
 ### Jobs
-- [**Linux / Register**](ec2_register.yml) - Register a RHEL server with Red Hat Portal and Insights
-- [**Linux / Troubleshoot**](tshoot.yml) - Run troubleshooting commands to find top CPU and memory users on the system
-- [**Linux / Temporary Sudo**](temp_sudo.yml) - Grant temporary sudo access to a user on the system with time based cleanup
-- [**Linux / Patching**](patching.yml) - Apply updates and/or generate patch report for linux systems
-- [**Linux / Start Service**](service_start.yml) - Start a service on a system
-- [**Linux / Stop Service**](service_stop.yml) - Stop a service on a system
-- [**Linux / Run Shell Script**](run_script.yml) - Run a shell script or command on a system
-- [**Linux / Fact Scan**](https://github.com/ansible/awx-facts-playbooks/blob/master/scan_facts.yml) - Run a fact, package, and service scan against a system and store in fact cache
-- [**Linux / Podman Webserver**](podman.yml) - Install and run a Podman webserver with given text on the home page
-- [**Linux / System Roles**](system_roles.yml) - Apply Linux system roles to servers. Must provide variables and role names.
-- [**Linux / DISA STIG**](compliance.yml) - Apply the RHEL STIG supplemental content from DISA
-- [**Linux / Multi-profile compliance**](compliance-enforce.yml) - Apply remediation from [Compliance as Code](https://github.com/ComplianceAsCode/content) to enforce the requirements of a specified compliance profile
-- [**Linux / Report Compliance**](compliance-report.yml) - Run an OpenSCAP report against a specified compliance profile
-- [**Linux / Insights Compliance Scan**](insights_compliance_scan.yml) - Run a Compliance scan based on the configuration in [Red Hat Insights](https://console.redhat.com)
 
-### Inventory
-
-A dynamic inventory is created to pull inventory hosts from Red Hat Insights. The Systems will be added by their host name therefore adding duplicate systems will cause conflicts in the inventory. Only systems with the tag `purpose=demo` in Red Hat Insights will be added to this inventory. Groups will be created for other tags given to the system.
-
-Groups will also be created for systems with missing security, enhancement and bug updates. The inventory configuration is governed by the [inventory.insights.yml](inventory.insights.yml) file.
-
-> Remember to delete systems from your Red Hat account when you are done with the demo to avoid conflicts with future demos using the same names.
+| Job Template | Description |
+|--------------|-------------|
+| [**Register with Insights**](docs/linux-register-insights.md) | Register a RHEL server with the Red Hat Portal and Insights using an activation key and org ID. |
+| [**Troubleshoot**](docs/linux-troubleshoot.md) | Run troubleshooting commands to find top CPU and memory consumers on a system for incident response. |
+| [**Temporary Sudo**](docs/linux-temporary-sudo.md) | Grant temporary sudo access to a user with automatic time-based cleanup. |
+| [**Patching**](docs/linux-patching.md) | Apply updates or audit for missing patches and produce an HTML report of systems with missing updates. |
+| [**Start Service**](docs/linux-start-service.md) | Start a named service on a target system. |
+| [**Stop Service**](docs/linux-stop-service.md) | Stop a named service on a target system. |
+| [**Run Shell Script**](docs/linux-run-shell-script.md) | Execute a shell script or command across a group of systems as root, with RBAC-controlled access. |
+| [**Fact Scan**](docs/linux-fact-scan.md) | Run a fact, package, and service scan against a system and store results in the AAP fact cache. |
+| [**Podman Webserver**](docs/linux-podman-webserver.md) | Install and run an Apache webserver in a Podman container with a configurable home page message. |
+| [**System Roles**](docs/linux-system-roles.md) | Apply RHEL System Roles (e.g. SELinux, timesync) to servers using the redhat.rhel_system_roles collection. |
+| [**Install Web Console (Cockpit)**](docs/linux-cockpit.md) | Install and configure the RHEL Web Console (Cockpit) using the cockpit system role with minimal, default, or full package sets. |
+| [**Compliance Enforce**](docs/linux-compliance-enforce.md) | Remediate systems that are out of compliance by applying enforcement rules from a compliance scan. |
+| [**DISA STIG**](docs/linux-disa-stig.md) | Apply the RHEL STIG security hardening configuration using DISA Supplemental Automation Content. |
+| [**Multi-profile Compliance**](docs/linux-multi-profile-compliance.md) | Apply remediation from Compliance as Code to enforce CIS, HIPAA, OSPP, PCI-DSS, or STIG compliance profiles. |
+| [**Multi-profile Compliance Report**](docs/linux-compliance-report.md) | Run an OpenSCAP report against a compliance profile and optionally serve results via httpd on the target host. |
+| [**Insights Compliance Scan**](docs/linux-insights-compliance-scan.md) | Run a compliance scan based on profiles configured in Red Hat Insights. Systems must be registered and associated with a profile. |
+| [**Deploy Application**](docs/linux-deploy-application.md) | Install a named application package on target systems. |
 
 ## Post Setup Job Steps
 After running the setup job template, there are a few steps required to make the demos fully functional. See the post setup steps below.
@@ -60,7 +64,7 @@ Edit the `Linux / System Roles` job to include the list of roles that you wish t
 
 **Linux / Temporary Sudo** - Use this job to show how to grant sudo access with automated cleanup to a server. The user must exist on the system. Using the student user is a good example (ie. student1)
 
-**Linux / Patching** - Use this job to apply updates or audit for missing updates and produce an html report of systems with missing updates. See the end of the job for the URL to view the report. In other environments this report could be uploaded to a wiki, email, other system. This demo also shows installing a webserver on a linux server. The report is places on the system defined by the `report_server` variable. By default, `report_server` is configured as `reports`. This may be overridden with `extra_vars` on the Job Template.
+**Linux / Patching** - Use this job to apply updates or audit for missing updates and produce an html report of systems with missing updates. For a more comprehensive patching workflow that includes EC2 snapshots, pre/post verification, automatic rollback, and a compliance report across both RHEL and Windows, see [Patch Cloud Stack in AWS](../cloud/docs/patch-cloud-stack.md) in the Cloud demos. See the end of the job for the URL to view the report. In other environments this report could be uploaded to a wiki, email, other system. This demo also shows installing a webserver on a linux server. The report is places on the system defined by the `report_server` variable. By default, `report_server` is configured as `reports`. This may be overridden with `extra_vars` on the Job Template.
 
 **Linux / Run Shell Script** - Use this job to demonstrate running shell commands or an existing shell script across a group of systems as root. This can be preferred over using Ad-Hoc commands due to the ability to control usage with RBAC. This is helpful in showing the scalable of execution of an existing shell script. It is always recommended to convert shell scripts to playbooks over time. Example usage would be getting the public key used in the environment with the command `cat .ssh/authorized_keys`.
 

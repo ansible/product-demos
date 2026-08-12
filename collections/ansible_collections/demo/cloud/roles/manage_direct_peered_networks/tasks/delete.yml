@@ -1,0 +1,154 @@
+---
+- name: Get VPCs
+  amazon.aws.ec2_vpc_net_info:
+    filters:
+      "tag:deployment": ansible
+      "tag:ansible-role": direct_peered_networks
+    region: "{{ aws_region }}"
+  register: vpc_results
+
+- name: Delete EC2 Instances
+  block:
+    - name: Delete instances
+      amazon.aws.ec2_instance:
+        filters:
+          "tag:deployment": ansible
+          "tag:ansible-role": direct_peered_networks
+        purge_tags: false
+        region: "{{ aws_region }}"
+        state: absent
+
+- name: Remove Network Peering
+  block:
+    - name: Get all vpc peers with specific filters
+      community.aws.ec2_vpc_peering_info:
+        filters:
+          "tag:deployment": ansible
+          "tag:ansible-role": direct_peered_networks
+          status-code:
+            - active
+        region: "{{ aws_region }}"
+      register: vpc_peers
+
+    - name: Delete found peers
+      community.aws.ec2_vpc_peer:
+        peering_id: "{{ item.vpc_peering_connection_id }}"
+        region: "{{ aws_region }}"
+        state: absent
+      loop: "{{ vpc_peers.vpc_peering_connections }}"
+      when: vpc_peers.vpc_peering_connections is defined and (vpc_peers.vpc_peering_connections | length > 0)
+
+- name: Delete NAT Gateways
+  block:
+    - name: Get NAT Gateways
+      amazon.aws.ec2_vpc_nat_gateway_info:
+        filters:
+          "tag:deployment": ansible
+          "tag:ansible-role": direct_peered_networks
+          state:
+            - pending
+            - available
+        region: "{{ aws_region }}"
+      register: natgws
+
+    - name: Delete NAT Gateways
+      amazon.aws.ec2_vpc_nat_gateway:
+        state: absent
+        nat_gateway_id: "{{ item.nat_gateway_id }}"
+        region: "{{ aws_region }}"
+        release_eip: true
+        wait: true
+        wait_timeout: 500
+      loop: "{{ natgws.result }}"
+      when: natgws.result is defined and (natgws.result | length > 0)
+
+- name: Delete Internet Gateways
+  block:
+    - name: Get Internet Gateways
+      amazon.aws.ec2_vpc_igw_info:
+        filters:
+          "tag:deployment": ansible
+          "tag:ansible-role": direct_peered_networks
+        region: "{{ aws_region }}"
+      register: igws
+
+    - name: Delete Internet Gateways
+      amazon.aws.ec2_vpc_igw:
+        region: "{{ aws_region }}"
+        state: absent
+        vpc_id: "{{ item.attachments[0].vpc_id }}"
+      loop: "{{ igws.internet_gateways }}"
+      when: igws.internet_gateways is defined and (igws.internet_gateways | length > 0)
+
+- name: Delete Route Tables
+  block:
+    - name: Get route tables
+      amazon.aws.ec2_vpc_route_table_info:
+        filters:
+          vpc-id: "{{ item.id }}"
+          association.main: false
+        region: "{{ aws_region }}"
+      loop: "{{ vpc_results.vpcs }}"
+      register: route_table_results
+      when: vpc_results.vpcs is defined and (vpc_results.vpcs | length > 0)
+
+    - name: Delete route tables
+      amazon.aws.ec2_vpc_route_table:
+        lookup: id
+        region: "{{ aws_region }}"
+        route_table_id: "{{ item.1.id }}"
+        state: absent
+        vpc_id: "{{ item.1.vpc_id }}"
+      loop: "{{ route_table_results.results | subelements('route_tables', 'skip_missing=True') }}"
+      when: route_table_results.results is defined and (route_table_results.results | length > 0)
+
+- name: Delete Subnets
+  block:
+    - name: Get all vpc subnets
+      amazon.aws.ec2_vpc_subnet_info:
+        filters:
+          vpc-id: "{{ item.id }}"
+        region: "{{ aws_region }}"
+      loop: "{{ vpc_results.vpcs }}"
+      register: subnet_results
+      when: vpc_results.vpcs is defined and (vpc_results.vpcs | length > 0)
+
+    - name: Delete subnets
+      amazon.aws.ec2_vpc_subnet:
+        cidr: "{{ item.1.cidr_block }}"
+        state: absent
+        region: "{{ aws_region }}"
+        vpc_id: "{{ item.1.vpc_id }}"
+      loop: "{{ subnet_results.results | subelements('subnets', 'skip_missing=True') }}"
+      when: subnet_results.results is defined and (subnet_results.results | length > 0)
+
+- name: Delete Security Groups
+  block:
+    - name: Get Security Groups
+      amazon.aws.ec2_security_group_info:
+        filters:
+          vpc-id: "{{ item.id }}"
+          "tag:deployment": ansible
+          "tag:ansible-role": direct_peered_networks
+        region: "{{ aws_region }}"
+      loop: "{{ vpc_results.vpcs }}"
+      register: security_groups
+      when: vpc_results.vpcs is defined and (vpc_results.vpcs | length > 0)
+
+    - name: Delete Security Groups
+      amazon.aws.ec2_security_group:
+        group_id: "{{ item.1.group_id }}"
+        region: "{{ aws_region }}"
+        state: absent
+      loop: "{{ security_groups.results | subelements('security_groups', 'skip_missing=True') }}"
+      when: security_groups.results is defined and (security_groups.results | length > 0)
+
+- name: Delete VPCs
+  amazon.aws.ec2_vpc_net:
+    cidr_block: "{{ item.cidr_block }}"
+    name: "{{ item.tags.Name }}"
+    purge_tags: false
+    region: "{{ aws_region }}"
+    state: absent
+  loop: "{{ vpc_results.vpcs }}"
+  when: vpc_results.vpcs is defined and (vpc_results.vpcs | length > 0)

@@ -1,0 +1,47 @@
+---
+- name: Post-check patch verification - RHEL
+  hosts: "{{ _hosts | default('os_linux') }}"
+  strategy: free
+  become: true
+  gather_facts: false
+
+  vars:
+    _raw_cve_input: "{{ input_cve_ids | default('RHSA-2024:3138, CVE-2024-33599') }}"
+    cve_advisory_ids: "{{ (_raw_cve_input.split(',') | map('trim') | list) if _raw_cve_input is string else _raw_cve_input }}"
+
+  tasks:
+    - name: Ensure RHSM registration
+      ansible.builtin.include_tasks: tasks/rhsm_ensure_registered.yml
+
+    - name: Ensure swap for DNF operations
+      ansible.builtin.include_tasks: tasks/ensure_swap.yml
+      when: rhsm_registered
+
+    - name: Query DNF for targeted advisories after patching
+      ansible.builtin.command: >-
+        dnf updateinfo list --setopt=metadata_expire=7200
+        {{ cve_advisory_ids | map('regex_replace', '^', '--advisory=') | join(' ') }}
+      register: rhel_post_check
+      changed_when: false
+      when: rhsm_registered
+
+    - name: Identify any remaining RHEL advisories
+      ansible.builtin.set_fact:
+        remaining_patches: "{{ cve_advisory_ids | select('in', rhel_post_check.stdout) | list }}"
+      when: rhsm_registered
+
+    - name: Determine RHEL compliance status
+      ansible.builtin.set_fact:
+        is_compliant: "{{ remaining_patches | length == 0 }}"
+      when: rhsm_registered
+
+    - name: Summary of RHEL post-check
+      ansible.builtin.debug:
+        msg: >
+          System: {{ inventory_hostname }} |
+          {% if rhsm_unregistered | default(false) %}
+          Status: SKIPPED (host not registered with RHSM)
+          {% else %}
+          Status: {{ 'COMPLIANT' if is_compliant else 'NON-COMPLIANT' }} |
+          Remaining Issues: {{ remaining_patches | join(', ') if remaining_patches else 'None' }}
+          {% endif %}

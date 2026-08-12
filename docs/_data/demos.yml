@@ -1,0 +1,1389 @@
+---
+# Ansible Product Demos – Demo Catalog
+# 62 demos across 6 categories
+
+# ─── Featured ───────────────────────────────────────────────────────
+
+- slug: patch-cloud-stack
+  readme_path: cloud/docs/patch-cloud-stack.md
+  title: "Patch Cloud Stack in AWS"
+  subtitle: "Snapshot, patch, verify, restore — across RHEL and Windows"
+  category: cloud
+  status: active
+  author: "Joon Paik <jopaik@redhat.com>"
+  special_thanks: "Joon Paik <jopaik@redhat.com> — original patch demo author"
+  video_url: "https://www.youtube.com/embed/20fK6S1CHL0"
+  featured: true
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+    - Patching
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0969da 0%, #033d8b 100%)"
+    icon: "🩹"
+  blurb: "Enterprise-grade patching workflow with EBS snapshots, parallel RHEL and Windows paths, automatic rollback on failure, and a consolidated compliance report."
+  stats:
+    workflows: 1
+    playbooks: 9
+  url: /demos/patch-cloud-stack/
+  github_path: cloud/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["📸 Take Snapshot"] --> B["🔍 Pre-check RHEL"]
+      A --> C["🔍 Pre-check Windows"]
+      B --> D["🩹 Patch RHEL"]
+      C --> E["🩹 Patch Windows"]
+      D -->|success| F["✅ Post-check RHEL"]
+      D -->|failure| G["⏪ Restore RHEL"]
+      E -->|success| H["✅ Post-check Windows"]
+      E -->|failure| I["⏪ Restore Windows"]
+      F -->|always| J["📊 Compliance Report"]
+      H -->|always| J
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#162c46,stroke:#58a6ff,color:#fff
+      style C fill:#162c46,stroke:#58a6ff,color:#fff
+      style D fill:#3d1a1a,stroke:#f87171,color:#fff
+      style E fill:#3d1a1a,stroke:#f87171,color:#fff
+      style F fill:#162c46,stroke:#58a6ff,color:#fff
+      style G fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style H fill:#162c46,stroke:#58a6ff,color:#fff
+      style I fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style J fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: deploy-cloud-stack
+  readme_path: cloud/docs/deploy-cloud-stack.md
+  title: "Deploy Cloud Stack in AWS"
+  subtitle: "VPC, keypair, five VMs, inventory sync — one click"
+  category: cloud
+  status: active
+  author: "Matthew Fernandez <matferna@redhat.com>"
+  featured: true
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0d9488 0%, #065f54 100%)"
+    icon: "🚀"
+  blurb: "One-click workflow to provision a full demo stack — VPC, keypair, and five VMs (2 Windows, 2 RHEL, 1 report server) — with inventory sync and VPC report."
+  stats:
+    workflows: 1
+    playbooks: 7
+  url: /demos/deploy-cloud-stack/
+  github_path: cloud/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      S --> B
+      A["🔑 Create Keypair"] --> C["📊 EC2 Stats"]
+      B["🌐 Create VPC"] --> C
+      C -->|always| D["🪟 aws-dc<br/>windows_full"]
+      C -->|always| E["🪟 aws_win1<br/>windows_core"]
+      C -->|always| F["🐧 aws_rhel8<br/>rhel8"]
+      C -->|always| G["🐧 aws_rhel9<br/>rhel9"]
+      C -->|always| H["📋 reports<br/>rhel9"]
+      D --> I["🔄 Sync Inventory"]
+      E --> I
+      F --> I
+      G --> I
+      H --> I
+      I --> J["📄 VPC Report"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style C fill:#2d2d2d,stroke:#888,color:#fff
+      style D fill:#1a2744,stroke:#2b88d8,color:#fff
+      style E fill:#1a2744,stroke:#2b88d8,color:#fff
+      style F fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style G fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style H fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style I fill:#162c46,stroke:#58a6ff,color:#fff
+      style J fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: contribute
+  readme_path: cloud/docs/contribute.md
+  title: "Contribute a Demo"
+  subtitle: "Fork, build, submit — your demo here"
+  category: cloud
+  status: active
+  featured: true
+  tags:
+    - Contributing
+    - Open Source
+  thumbnail:
+    gradient: "linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%)"
+    icon: "🤝"
+  blurb: "Have a demo idea? Fork the repo, add your playbook, and open a PR. Follow the contributing guide to get started."
+  stats: {}
+  url: /demos/contribute/
+  github_path: CONTRIBUTING.md
+
+# ─── Cloud ──────────────────────────────────────────────────────────
+
+- slug: cloud-destroy-stack
+  readme_path: cloud/docs/cloud-destroy-stack.md
+  title: "Destroy Cloud Stack in AWS"
+  category: cloud
+  status: active
+  author: "Matthew Fernandez <matferna@redhat.com>"
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)"
+    icon: "💥"
+  blurb: "Tear down all five stack VMs, VPC, and keypair created by Deploy Cloud Stack, then sync inventory."
+  stats:
+    workflows: 1
+    playbooks: 4
+  url: /demos/cloud-destroy-stack/
+  github_path: cloud/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      S --> B
+      S --> C
+      S --> D
+      S --> E
+      S --> G
+      A["💥 Delete aws-dc"] --> F["🌐 Delete VPC"]
+      B["💥 Delete aws_win1"] --> F
+      C["💥 Delete aws_rhel8"] --> F
+      D["💥 Delete aws_rhel9"] --> F
+      E["💥 Delete reports"] --> F
+      F --> H["🔄 Sync Inventory"]
+      G["🔑 Delete Key"] --> H
+      style A fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style B fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style C fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style D fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style E fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style F fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style G fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style H fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: cloud-create-vpc
+  readme_path: cloud/docs/cloud-create-vpc.md
+  url: /demos/cloud-create-vpc/
+  title: "AWS — Create VPC"
+  category: cloud
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #00b4d8 0%, #006d77 100%)"
+    icon: "☁️"
+  blurb: "Create an AWS VPC with subnet, security group, and route table in a selected region."
+  stats:
+    playbooks: 1
+  github_path: cloud/create_vpc.yml
+
+- slug: cloud-create-keypair
+  readme_path: cloud/docs/cloud-create-keypair.md
+  url: /demos/cloud-create-keypair/
+  title: "AWS — Create Keypair"
+  category: cloud
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0097a7 0%, #00606f 100%)"
+    icon: "☁️"
+  blurb: "Create an AWS EC2 keypair, deriving the public key from the APD Machine Credential's private key."
+  stats:
+    playbooks: 1
+  github_path: cloud/aws_key.yml
+
+- slug: cloud-create-vm
+  readme_path: cloud/docs/cloud-create-vm.md
+  url: /demos/cloud-create-vm/
+  title: "AWS — Create VM"
+  category: cloud
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #00acc1 0%, #007c91 100%)"
+    icon: "☁️"
+  blurb: "Create an EC2 instance from a blueprint (RHEL 7/8/9, Windows Core/Full, AL2023) with full tagging support."
+  stats:
+    playbooks: 1
+  github_path: cloud/create_vm.yml
+
+- slug: cloud-delete-vm
+  readme_path: cloud/docs/cloud-delete-vm.md
+  url: /demos/cloud-delete-vm/
+  title: "AWS — Delete VM"
+  category: cloud
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #00b4d8 0%, #006d77 100%)"
+    icon: "☁️"
+  blurb: "Terminate an EC2 instance by Name tag and region."
+  stats:
+    playbooks: 1
+  github_path: cloud/delete_vm_by_name.yml
+
+- slug: cloud-resize-ec2
+  readme_path: cloud/docs/cloud-resize-ec2.md
+  url: /demos/cloud-resize-ec2/
+  title: "AWS — Resize EC2"
+  category: cloud
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0097a7 0%, #00606f 100%)"
+    icon: "☁️"
+  blurb: "Change the instance type of a running EC2 instance and refresh the AWS inventory."
+  stats:
+    playbooks: 1
+  github_path: cloud/resize_ec2.yml
+
+- slug: cloud-snapshot-ec2
+  readme_path: cloud/docs/cloud-snapshot-ec2.md
+  url: /demos/cloud-snapshot-ec2/
+  title: "AWS — Snapshot EC2"
+  category: cloud
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #00acc1 0%, #007c91 100%)"
+    icon: "☁️"
+  blurb: "Create EBS snapshots of EC2 instances for backup and recovery."
+  stats:
+    playbooks: 1
+  github_path: cloud/snapshot_ec2.yml
+
+- slug: cloud-restore-ec2
+  readme_path: cloud/docs/cloud-restore-ec2.md
+  url: /demos/cloud-restore-ec2/
+  title: "AWS — Restore EC2 from Snapshot"
+  category: cloud
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #00b4d8 0%, #006d77 100%)"
+    icon: "☁️"
+  blurb: "Restore EC2 instance volumes from their latest EBS snapshot."
+  stats:
+    playbooks: 1
+  github_path: cloud/restore_ec2.yml
+
+- slug: cloud-peer-networking
+  readme_path: cloud/docs/cloud-peer-networking.md
+  url: /demos/cloud-peer-networking/
+  title: "AWS — Peer Networking"
+  category: cloud
+  status: active
+  tags:
+    - Playbook
+    - AWS
+    - Networking
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0097a7 0%, #00606f 100%)"
+    icon: "☁️"
+  blurb: "Create or delete VPC peering infrastructure in AWS for direct network connectivity between VPCs."
+  stats:
+    playbooks: 2
+  github_path: cloud/create_peer_network.yml
+
+- slug: cloud-transit-networking
+  readme_path: cloud/docs/cloud-transit-networking.md
+  url: /demos/cloud-transit-networking/
+  title: "AWS — Transit Networking"
+  category: cloud
+  status: active
+  tags:
+    - Playbook
+    - AWS
+    - Networking
+  thumbnail:
+    gradient: "linear-gradient(135deg, #00acc1 0%, #007c91 100%)"
+    icon: "☁️"
+  blurb: "Create or delete transit gateway infrastructure in AWS for hub-and-spoke network connectivity."
+  stats:
+    playbooks: 2
+  github_path: cloud/create_transit_network.yml
+
+- slug: cloud-vpc-report
+  readme_path: cloud/docs/cloud-vpc-report.md
+  url: /demos/cloud-vpc-report/
+  title: "AWS — VPC Report"
+  category: cloud
+  status: active
+  tags:
+    - Playbook
+    - AWS
+    - Reporting
+  thumbnail:
+    gradient: "linear-gradient(135deg, #00b4d8 0%, #006d77 100%)"
+    icon: "☁️"
+  blurb: "Generate a VPC infrastructure report and publish it to an S3 bucket."
+  stats:
+    playbooks: 1
+  github_path: cloud/cloud_report.yml
+
+# ─── Linux ──────────────────────────────────────────────────────────
+
+- slug: linux-register-insights
+  readme_path: linux/docs/linux-register-insights.md
+  url: /demos/linux-register-insights/
+  title: "Register with Insights"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Insights
+  thumbnail:
+    gradient: "linear-gradient(135deg, #cc0000 0%, #820000 100%)"
+    icon: "🐧"
+  blurb: "Register a RHEL server with the Red Hat Portal and Insights using an activation key and org ID."
+  stats:
+    playbooks: 1
+  github_path: linux/ec2_register.yml
+
+- slug: linux-troubleshoot
+  readme_path: linux/docs/linux-troubleshoot.md
+  url: /demos/linux-troubleshoot/
+  title: "Troubleshoot"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #d13438 0%, #7a0000 100%)"
+    icon: "🐧"
+  blurb: "Run troubleshooting commands to find top CPU and memory consumers on a system for incident response."
+  stats:
+    playbooks: 1
+  github_path: linux/tshoot.yml
+
+- slug: linux-temporary-sudo
+  readme_path: linux/docs/linux-temporary-sudo.md
+  url: /demos/linux-temporary-sudo/
+  title: "Temporary Sudo"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Security
+  thumbnail:
+    gradient: "linear-gradient(135deg, #e60000 0%, #990000 100%)"
+    icon: "🐧"
+  blurb: "Grant temporary sudo access to a user with automatic time-based cleanup."
+  stats:
+    playbooks: 1
+  github_path: linux/temp_sudo.yml
+
+- slug: linux-patching
+  readme_path: linux/docs/linux-patching.md
+  title: "Patching"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Patching
+  thumbnail:
+    gradient: "linear-gradient(135deg, #cc0000 0%, #820000 100%)"
+    icon: "🐧"
+  blurb: "Apply updates or audit for missing patches and produce an HTML report of systems with missing updates."
+  stats:
+    playbooks: 1
+  url: /demos/linux-patching/
+  github_path: linux/patching.yml
+
+- slug: linux-start-service
+  readme_path: linux/docs/linux-start-service.md
+  url: /demos/linux-start-service/
+  title: "Start Service"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #b80000 0%, #660000 100%)"
+    icon: "🐧"
+  blurb: "Start a named service on a target system."
+  stats:
+    playbooks: 1
+  github_path: linux/service_start.yml
+
+- slug: linux-stop-service
+  readme_path: linux/docs/linux-stop-service.md
+  url: /demos/linux-stop-service/
+  title: "Stop Service"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #b80000 0%, #660000 100%)"
+    icon: "🐧"
+  blurb: "Stop a named service on a target system."
+  stats:
+    playbooks: 1
+  github_path: linux/service_stop.yml
+
+- slug: linux-run-shell-script
+  readme_path: linux/docs/linux-run-shell-script.md
+  url: /demos/linux-run-shell-script/
+  title: "Run Shell Script"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #d13438 0%, #7a0000 100%)"
+    icon: "🐧"
+  blurb: "Execute a shell script or command across a group of systems as root, with RBAC-controlled access."
+  stats:
+    playbooks: 1
+  github_path: linux/run_script.yml
+
+- slug: linux-fact-scan
+  readme_path: linux/docs/linux-fact-scan.md
+  url: /demos/linux-fact-scan/
+  title: "Fact Scan"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #e60000 0%, #990000 100%)"
+    icon: "🐧"
+  blurb: "Run a fact, package, and service scan against a system and store results in the AAP fact cache."
+  stats:
+    playbooks: 1
+  github_path: linux/fact_scan.yml
+
+- slug: linux-podman-webserver
+  readme_path: linux/docs/linux-podman-webserver.md
+  url: /demos/linux-podman-webserver/
+  title: "Podman Webserver"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Containers
+  thumbnail:
+    gradient: "linear-gradient(135deg, #cc0000 0%, #820000 100%)"
+    icon: "🐧"
+  blurb: "Install and run an Apache webserver in a Podman container with a configurable home page message."
+  stats:
+    playbooks: 1
+  github_path: linux/podman.yml
+
+- slug: linux-system-roles
+  readme_path: linux/docs/linux-system-roles.md
+  url: /demos/linux-system-roles/
+  title: "System Roles"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - System Roles
+  thumbnail:
+    gradient: "linear-gradient(135deg, #d13438 0%, #7a0000 100%)"
+    icon: "🐧"
+  blurb: "Apply RHEL System Roles (e.g. SELinux, timesync) to servers using the redhat.rhel_system_roles collection."
+  stats:
+    playbooks: 1
+  github_path: linux/system_roles.yml
+
+- slug: linux-cockpit
+  readme_path: linux/docs/linux-cockpit.md
+  url: /demos/linux-cockpit/
+  title: "Install Web Console (Cockpit)"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - System Roles
+  thumbnail:
+    gradient: "linear-gradient(135deg, #e60000 0%, #990000 100%)"
+    icon: "🐧"
+  blurb: "Install and configure the RHEL Web Console (Cockpit) using the cockpit system role with minimal, default, or full package sets."
+  stats:
+    playbooks: 1
+  github_path: linux/system_roles.yml
+
+- slug: linux-compliance-enforce
+  readme_path: linux/docs/linux-compliance-enforce.md
+  url: /demos/linux-compliance-enforce/
+  title: "Compliance Enforce"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #b80000 0%, #660000 100%)"
+    icon: "🐧"
+  blurb: "Remediate systems that are out of compliance by applying enforcement rules from a compliance scan."
+  stats:
+    playbooks: 1
+  github_path: linux/remediate_out_of_compliance.yml
+
+- slug: linux-disa-stig
+  readme_path: linux/docs/linux-disa-stig.md
+  url: /demos/linux-disa-stig/
+  title: "DISA STIG"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Compliance
+    - Security
+  thumbnail:
+    gradient: "linear-gradient(135deg, #cc0000 0%, #820000 100%)"
+    icon: "🐧"
+  blurb: "Apply the RHEL STIG security hardening configuration using DISA Supplemental Automation Content."
+  stats:
+    playbooks: 1
+  github_path: linux/disa_stig.yml
+
+- slug: linux-multi-profile-compliance
+  readme_path: linux/docs/linux-multi-profile-compliance.md
+  url: /demos/linux-multi-profile-compliance/
+  title: "Multi-profile Compliance"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Compliance
+    - Security
+  thumbnail:
+    gradient: "linear-gradient(135deg, #d13438 0%, #7a0000 100%)"
+    icon: "🐧"
+  blurb: "Apply remediation from Compliance as Code to enforce CIS, HIPAA, OSPP, PCI-DSS, or STIG compliance profiles."
+  stats:
+    playbooks: 1
+  github_path: linux/multi_profile_compliance.yml
+
+- slug: linux-compliance-report
+  readme_path: linux/docs/linux-compliance-report.md
+  url: /demos/linux-compliance-report/
+  title: "Multi-profile Compliance Report"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Compliance
+    - Reporting
+  thumbnail:
+    gradient: "linear-gradient(135deg, #e60000 0%, #990000 100%)"
+    icon: "🐧"
+  blurb: "Run an OpenSCAP report against a compliance profile and optionally serve results via httpd on the target host."
+  stats:
+    playbooks: 1
+  github_path: linux/multi_profile_compliance_report.yml
+
+- slug: linux-insights-compliance-scan
+  readme_path: linux/docs/linux-insights-compliance-scan.md
+  url: /demos/linux-insights-compliance-scan/
+  title: "Insights Compliance Scan"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Compliance
+    - Insights
+  thumbnail:
+    gradient: "linear-gradient(135deg, #b80000 0%, #660000 100%)"
+    icon: "🐧"
+  blurb: "Run a compliance scan based on profiles configured in Red Hat Insights. Systems must be registered and associated with a profile."
+  stats:
+    playbooks: 1
+  github_path: linux/insights_compliance_scan.yml
+
+- slug: linux-deploy-application
+  readme_path: linux/docs/linux-deploy-application.md
+  url: /demos/linux-deploy-application/
+  title: "Deploy Application"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #cc0000 0%, #820000 100%)"
+    icon: "🐧"
+  blurb: "Install a named application package on target systems."
+  stats:
+    playbooks: 1
+  github_path: linux/deploy_application.yml
+
+- slug: linux-compliance-workflow
+  readme_path: linux/docs/linux-compliance-workflow.md
+  title: "Compliance Workflow"
+  category: linux
+  status: active
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - Compliance
+    - Reporting
+  thumbnail:
+    gradient: "linear-gradient(135deg, #a80000 0%, #5c0000 100%)"
+    icon: "🐧"
+  blurb: "End-to-end compliance workflow that generates an OpenSCAP report, refreshes inventory, and enforces remediation on findings."
+  stats:
+    workflows: 1
+    playbooks: 3
+  url: /demos/linux-compliance-workflow/
+  github_path: linux/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["📋 Compliance Report"] --> B["🔄 Update Inventory"] --> C["🔧 Compliance Enforce"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#2d2d2d,stroke:#888,color:#fff
+      style C fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+# ─── Windows ────────────────────────────────────────────────────────
+
+- slug: windows-install-iis
+  readme_path: windows/docs/windows-install-iis.md
+  url: /demos/windows-install-iis/
+  title: "Install IIS"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0078d4 0%, #004578 100%)"
+    icon: "🪟"
+  blurb: "Install the IIS web server feature with a configurable index.html page."
+  stats:
+    playbooks: 1
+  github_path: windows/install_iis.yml
+
+- slug: windows-patching
+  readme_path: windows/docs/windows-patching.md
+  title: "Patching"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Patching
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0063b1 0%, #003a6c 100%)"
+    icon: "🪟"
+  blurb: "Apply Windows updates by category (Security, Critical, Service Packs, etc.) with optional reboot control."
+  stats:
+    playbooks: 1
+  url: /demos/windows-patching/
+  github_path: windows/patching.yml
+
+- slug: windows-rollback
+  readme_path: windows/docs/windows-rollback.md
+  url: /demos/windows-rollback/
+  title: "Rollback"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #2b88d8 0%, #005a9e 100%)"
+    icon: "🪟"
+  blurb: "Rollback a Windows deployment or clean up resources with a custom message."
+  stats:
+    playbooks: 1
+  github_path: windows/rollback.yml
+
+- slug: windows-test-connectivity
+  readme_path: windows/docs/windows-test-connectivity.md
+  url: /demos/windows-test-connectivity/
+  title: "Test Connectivity"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0078d4 0%, #004578 100%)"
+    icon: "🪟"
+  blurb: "Verify WinRM connectivity to Windows hosts."
+  stats:
+    playbooks: 1
+  github_path: windows/connect.yml
+
+- slug: windows-chocolatey-multiple
+  readme_path: windows/docs/windows-chocolatey-multiple.md
+  url: /demos/windows-chocolatey-multiple/
+  title: "Chocolatey Install Multiple"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0063b1 0%, #003a6c 100%)"
+    icon: "🪟"
+  blurb: "Install multiple packages using the Chocolatey package manager and verify versions."
+  stats:
+    playbooks: 1
+  github_path: windows/windows_choco_multiple.yml
+
+- slug: windows-chocolatey-specific
+  readme_path: windows/docs/windows-chocolatey-specific.md
+  url: /demos/windows-chocolatey-specific/
+  title: "Chocolatey Install Specific"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #2b88d8 0%, #005a9e 100%)"
+    icon: "🪟"
+  blurb: "Install a single named package using the Chocolatey package manager."
+  stats:
+    playbooks: 1
+  github_path: windows/windows_choco_specific.yml
+
+- slug: windows-run-powershell
+  readme_path: windows/docs/windows-run-powershell.md
+  url: /demos/windows-run-powershell/
+  title: "Run PowerShell"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0078d4 0%, #004578 100%)"
+    icon: "🪟"
+  blurb: "Run an arbitrary PowerShell script on Windows hosts (default: retrieve running services)."
+  stats:
+    playbooks: 1
+  github_path: windows/powershell.yml
+
+- slug: windows-run-powershell-kerberos
+  readme_path: windows/docs/windows-run-powershell-kerberos.md
+  url: /demos/windows-run-powershell-kerberos/
+  title: "Run PowerShell (Kerberos)"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Active Directory
+    - Kerberos
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0063b1 0%, #003a6c 100%)"
+    icon: "🪟"
+  blurb: "Run a PowerShell script on domain-joined Windows hosts using Kerberos authentication."
+  stats:
+    playbooks: 1
+  github_path: windows/powershell.yml
+
+- slug: windows-query-services
+  readme_path: windows/docs/windows-query-services.md
+  url: /demos/windows-query-services/
+  title: "Query Services"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #2b88d8 0%, #005a9e 100%)"
+    icon: "🪟"
+  blurb: "Run a PowerShell script from source control to query running or stopped services."
+  stats:
+    playbooks: 1
+  github_path: windows/powershell_script.yml
+
+- slug: windows-password-requirements
+  readme_path: windows/docs/windows-password-requirements.md
+  url: /demos/windows-password-requirements/
+  title: "Configure Password Requirements"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Security
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0078d4 0%, #004578 100%)"
+    icon: "🪟"
+  blurb: "Configure password complexity requirements using PowerShell Desired State Configuration (DSC)."
+  stats:
+    playbooks: 1
+  github_path: windows/powershell_dsc.yml
+
+- slug: windows-ad-create-domain
+  readme_path: windows/docs/windows-ad-create-domain.md
+  url: /demos/windows-ad-create-domain/
+  title: "AD — Create Domain"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Active Directory
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0063b1 0%, #003a6c 100%)"
+    icon: "🪟"
+  blurb: "Create a new Active Directory domain on a Windows server."
+  stats:
+    playbooks: 1
+  github_path: windows/create_ad_domain.yml
+
+- slug: windows-ad-join-domain
+  readme_path: windows/docs/windows-ad-join-domain.md
+  url: /demos/windows-ad-join-domain/
+  title: "AD — Join Domain"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Active Directory
+  thumbnail:
+    gradient: "linear-gradient(135deg, #2b88d8 0%, #005a9e 100%)"
+    icon: "🪟"
+  blurb: "Join a Windows computer to an existing Active Directory domain."
+  stats:
+    playbooks: 1
+  github_path: windows/join_ad_domain.yml
+
+- slug: windows-ad-new-user
+  readme_path: windows/docs/windows-ad-new-user.md
+  url: /demos/windows-ad-new-user/
+  title: "AD — New User"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Active Directory
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0078d4 0%, #004578 100%)"
+    icon: "🪟"
+  blurb: "Helpdesk portal to create a new user in Active Directory with full contact details."
+  stats:
+    playbooks: 1
+  github_path: windows/helpdesk_new_user_portal.yml
+
+- slug: windows-disa-stig
+  readme_path: windows/docs/windows-disa-stig.md
+  url: /demos/windows-disa-stig/
+  title: "DISA STIG"
+  category: windows
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Compliance
+    - Security
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0063b1 0%, #003a6c 100%)"
+    icon: "🪟"
+  blurb: "Apply Windows Server DISA STIG security hardening configuration."
+  stats:
+    playbooks: 1
+  github_path: windows/compliance.yml
+
+- slug: windows-setup-ad-domain
+  readme_path: windows/docs/windows-setup-ad-domain.md
+  title: "Setup Active Directory Domain"
+  category: windows
+  status: active
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - Active Directory
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #005a9e 0%, #002050 100%)"
+    icon: "🪟"
+  blurb: "One-click workflow to provision a domain controller and two domain-joined Windows hosts in AWS, including Kerberos validation."
+  stats:
+    workflows: 1
+    playbooks: 8
+  url: /demos/windows-setup-ad-domain/
+  github_path: windows/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["🔑 Create Keypair"] --> B["🌐 Create VPC"]
+      B --> C["🪟 Create DC"]
+      B --> D["🪟 Create Computer 1"]
+      B --> E["🪟 Create Computer 2"]
+      C --> F["🔄 Inventory Sync"]
+      D --> F
+      E --> F
+      F --> G["🔌 Test Connectivity"]
+      G --> H["🏰 Create Domain"]
+      H --> I["🤝 Join Domain"]
+      I --> J["🔄 Domain Inventory Sync"]
+      J --> K["⚡ PowerShell Validation"]
+      J --> L["🔐 Kerberos Validation"]
+      G -. "any failure" .-> M["🧹 Cleanup Resources"]
+      H -. "any failure" .-> M
+      I -. "any failure" .-> M
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style C fill:#1a2744,stroke:#2b88d8,color:#fff
+      style D fill:#1a2744,stroke:#2b88d8,color:#fff
+      style E fill:#1a2744,stroke:#2b88d8,color:#fff
+      style F fill:#2d2d2d,stroke:#888,color:#fff
+      style G fill:#162c46,stroke:#58a6ff,color:#fff
+      style H fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style I fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style J fill:#2d2d2d,stroke:#888,color:#fff
+      style K fill:#162c46,stroke:#58a6ff,color:#fff
+      style L fill:#162c46,stroke:#58a6ff,color:#fff
+      style M fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+# ─── Network ────────────────────────────────────────────────────────
+
+- slug: network-configuration
+  readme_path: network/docs/network-configuration.md
+  url: /demos/network-configuration/
+  title: "Configure Devices"
+  category: network
+  status: active
+  tags:
+    - Playbook
+  thumbnail:
+    gradient: "linear-gradient(135deg, #38b000 0%, #006400 100%)"
+    icon: "🌐"
+  blurb: "Apply baseline banner, NTP, and SNMP configuration to containerlab Cisco NX-OS and IOS-XE devices."
+  stats:
+    playbooks: 1
+  github_path: network/configure_devices.yml
+
+- slug: network-report
+  readme_path: network/docs/network-report.md
+  url: /demos/network-report/
+  title: "Report"
+  category: network
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Reporting
+  thumbnail:
+    gradient: "linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)"
+    icon: "🌐"
+  blurb: "Gather facts from containerlab Cisco NX-OS and IOS-XE devices and display hostname, version, model, and interfaces."
+  stats:
+    playbooks: 1
+  github_path: network/report.yml
+
+- slug: network-disa-stig
+  readme_path: network/docs/network-disa-stig.md
+  url: /demos/network-disa-stig/
+  title: "DISA STIG"
+  category: network
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Compliance
+    - Security
+  thumbnail:
+    gradient: "linear-gradient(135deg, #43a047 0%, #2e7d32 100%)"
+    icon: "🌐"
+  blurb: "Run the DISA STIG role against containerlab IOS-XE devices to audit and enforce configuration compliance."
+  stats:
+    playbooks: 1
+  github_path: network/compliance.yml
+
+- slug: network-backup
+  readme_path: network/docs/network-backup.md
+  url: /demos/network-backup/
+  title: "Backup"
+  category: network
+  status: active
+  tags:
+    - Playbook
+  thumbnail:
+    gradient: "linear-gradient(135deg, #38b000 0%, #006400 100%)"
+    icon: "🌐"
+  blurb: "Back up running configurations from containerlab NX-OS and IOS-XE devices to the execution node."
+  stats:
+    playbooks: 1
+  github_path: network/backup.yml
+
+- slug: network-panos-workflow
+  readme_path: network/docs/network-panos-workflow.md
+  title: "Palo Alto Firewall Demo"
+  category: network
+  status: active
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - Palo Alto
+    - Firewall
+  thumbnail:
+    gradient: "linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)"
+    icon: "🔥"
+  blurb: "End-to-end workflow to deploy a Palo Alto firewall instance in AWS, configure security rules, and set up a protected webserver."
+  stats:
+    workflows: 1
+    playbooks: 5
+  url: /demos/network-panos-workflow/
+  github_path: network/panos/deploy.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["🚀 Deploy"] --> B["🔄 Inventory Sync"]
+      B --> C["🔥 Configure Firewall"]
+      C --> D["🛡️ Configure Security Rule"]
+      D --> E["🌐 Configure Webserver"]
+      E -. "teardown" .-> F["🧹 Cleanup"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#2d2d2d,stroke:#888,color:#fff
+      style C fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style D fill:#162c46,stroke:#58a6ff,color:#fff
+      style E fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style F fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+# ─── OpenShift ──────────────────────────────────────────────────────
+
+- slug: openshift-eda-install
+  readme_path: openshift/docs/openshift-eda-install.md
+  url: /demos/openshift-eda-install/
+  title: "EDA — Install Controller"
+  category: openshift
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Event-Driven
+  thumbnail:
+    gradient: "linear-gradient(135deg, #ee0000 0%, #c41e3a 100%)"
+    icon: "⎈"
+  blurb: "Install and deploy an Event-Driven Ansible (EDA) Controller instance using the AAP OpenShift operator."
+  stats:
+    playbooks: 1
+  github_path: openshift/eda/install.yml
+
+- slug: openshift-cnv-install
+  readme_path: openshift/docs/openshift-cnv-install.md
+  url: /demos/openshift-cnv-install/
+  title: "CNV — Install Operator"
+  category: openshift
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Virtualization
+  thumbnail:
+    gradient: "linear-gradient(135deg, #db3a34 0%, #a61c00 100%)"
+    icon: "⎈"
+  blurb: "Install the OpenShift Container Native Virtualization (CNV) operator and all required dependencies."
+  stats:
+    playbooks: 1
+  github_path: openshift/cnv/install.yml
+
+- slug: openshift-cnv-create-vm
+  readme_path: openshift/docs/openshift-cnv-create-vm.md
+  url: /demos/openshift-cnv-create-vm/
+  title: "CNV — Create RHEL VM"
+  category: openshift
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Virtualization
+  thumbnail:
+    gradient: "linear-gradient(135deg, #ee0000 0%, #c41e3a 100%)"
+    icon: "⎈"
+  blurb: "Provision a RHEL 8 or 9 virtual machine in OpenShift Virtualization with SSH keys and RHSM registration."
+  stats:
+    playbooks: 1
+  github_path: openshift/cnv/provision_rhel.yml
+
+- slug: openshift-cnv-delete-vm
+  readme_path: openshift/docs/openshift-cnv-delete-vm.md
+  url: /demos/openshift-cnv-delete-vm/
+  title: "CNV — Delete VM"
+  category: openshift
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Virtualization
+  thumbnail:
+    gradient: "linear-gradient(135deg, #db3a34 0%, #a61c00 100%)"
+    icon: "⎈"
+  blurb: "Delete virtual machines in OpenShift CNV by host string pattern."
+  stats:
+    playbooks: 1
+  github_path: openshift/cnv/delete.yml
+
+- slug: openshift-dev-spaces
+  readme_path: openshift/docs/openshift-dev-spaces.md
+  url: /demos/openshift-dev-spaces/
+  title: "Dev Spaces"
+  category: openshift
+  status: active
+  tags:
+    - Playbook
+  thumbnail:
+    gradient: "linear-gradient(135deg, #ff4444 0%, #cc0000 100%)"
+    icon: "⎈"
+  blurb: "Install and deploy Red Hat OpenShift Dev Spaces for cloud-based development environments."
+  stats:
+    playbooks: 1
+  github_path: openshift/devspaces.yml
+
+- slug: openshift-gitlab
+  readme_path: openshift/docs/openshift-gitlab.md
+  url: /demos/openshift-gitlab/
+  title: "GitLab"
+  category: openshift
+  status: active
+  tags:
+    - Playbook
+  thumbnail:
+    gradient: "linear-gradient(135deg, #ee0000 0%, #c41e3a 100%)"
+    icon: "⎈"
+  blurb: "Install and deploy GitLab on an OpenShift cluster."
+  stats:
+    playbooks: 1
+  github_path: openshift/gitlab.yml
+
+- slug: openshift-cnv-infra-stack
+  readme_path: openshift/docs/openshift-cnv-infra-stack.md
+  url: /demos/openshift-cnv-infra-stack/
+  title: "CNV — Infra Stack"
+  category: openshift
+  status: active
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - Virtualization
+  thumbnail:
+    gradient: "linear-gradient(135deg, #c41e3a 0%, #8b0000 100%)"
+    icon: "⎈"
+  blurb: "Workflow to deploy virtualized infrastructure (RHEL 8 + RHEL 9 VMs) in OpenShift Virtualization with inventory sync."
+  stats:
+    workflows: 1
+    playbooks: 3
+  github_path: openshift/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      S --> B
+      A["🐧 Deploy RHEL8 VM"] --> C["🔄 Update Inventory"]
+      B["🐧 Deploy RHEL9 VM"] --> C
+      A -. "failure" .-> D["🎫 Ticket — Instance Failed"]
+      B -. "failure" .-> D
+      style A fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style B fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style C fill:#2d2d2d,stroke:#888,color:#fff
+      style D fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: openshift-cnv-patch-workflow
+  readme_path: openshift/docs/openshift-cnv-patch-workflow.md
+  url: /demos/openshift-cnv-patch-workflow/
+  title: "CNV — Patch Workflow"
+  category: openshift
+  status: active
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - Virtualization
+    - Patching
+  thumbnail:
+    gradient: "linear-gradient(135deg, #c41e3a 0%, #8b0000 100%)"
+    icon: "⎈"
+  blurb: "Snapshot CNV virtual machines, apply patches, and automatically restore from snapshot on failure."
+  stats:
+    workflows: 1
+    playbooks: 5
+  github_path: openshift/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["📸 Take Snapshot"] --> B["📂 Project Sync"]
+      A --> C["🔄 Inventory Sync"]
+      B --> D["🩹 Patch Instance"]
+      C --> D
+      D -->|success| E["✅ Done"]
+      D -->|failure| F["⏪ Restore from Snapshot"]
+      F -->|failure| G["🎫 Ticket — Restore Failed"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#2d2d2d,stroke:#888,color:#fff
+      style C fill:#2d2d2d,stroke:#888,color:#fff
+      style D fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style E fill:#162c46,stroke:#58a6ff,color:#fff
+      style F fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style G fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+# ─── Satellite ──────────────────────────────────────────────────────
+
+- slug: satellite-register
+  readme_path: satellite/docs/satellite-register.md
+  url: /demos/satellite-register/
+  title: "Register with Satellite"
+  category: satellite
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #7b2ff7 0%, #4a0080 100%)"
+    icon: "🛰️"
+  blurb: "Register a RHEL server with Red Hat Satellite using an activation key in the format RHEL<version>_<environment>."
+  stats:
+    playbooks: 1
+  github_path: satellite/server_register.yml
+
+- slug: satellite-compliance-scan
+  readme_path: satellite/docs/satellite-compliance-scan.md
+  url: /demos/satellite-compliance-scan/
+  title: "Compliance Scan with Satellite"
+  category: satellite
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%)"
+    icon: "🛰️"
+  blurb: "Run an OpenSCAP compliance scan and report results back to Red Hat Satellite."
+  stats:
+    playbooks: 1
+  github_path: satellite/server_openscap.yml
+
+- slug: satellite-publish-content-view
+  readme_path: satellite/docs/satellite-publish-content-view.md
+  url: /demos/satellite-publish-content-view/
+  title: "Publish Content View Version"
+  category: satellite
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Content Management
+  thumbnail:
+    gradient: "linear-gradient(135deg, #8e24aa 0%, #6a1b9a 100%)"
+    icon: "🛰️"
+  blurb: "Publish a new version of a Satellite content view to begin the patching promotion lifecycle."
+  stats:
+    playbooks: 1
+  github_path: satellite/satellite_publish.yml
+
+- slug: satellite-promote-content-view
+  readme_path: satellite/docs/satellite-promote-content-view.md
+  url: /demos/satellite-promote-content-view/
+  title: "Promote Content View Version"
+  category: satellite
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Content Management
+  thumbnail:
+    gradient: "linear-gradient(135deg, #7b2ff7 0%, #4a0080 100%)"
+    icon: "🛰️"
+  blurb: "Promote a content view version from one lifecycle environment to the next (e.g. Dev → QA → Prod)."
+  stats:
+    playbooks: 1
+  github_path: satellite/satellite_promote.yml
+
+- slug: satellite-patch-dev
+  readme_path: satellite/docs/satellite-patch-dev.md
+  url: /demos/satellite-patch-dev/
+  title: "Patch Dev Workflow"
+  category: satellite
+  status: active
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - Patching
+    - Content Management
+  thumbnail:
+    gradient: "linear-gradient(135deg, #6a1b9a 0%, #38006b 100%)"
+    icon: "🛰️"
+  blurb: "End-to-end patching workflow for the Dev environment: sync Satellite inventory, publish content view, check for updates, and apply patches with approval gate."
+  stats:
+    workflows: 1
+    playbooks: 5
+  github_path: satellite/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["🔄 Satellite Inventory"] --> B["📦 Publish Content View"]
+      B --> C["🩹 Patching"]
+      C --> D["📧 Submit Feedback"]
+      style A fill:#2d2d2d,stroke:#888,color:#fff
+      style B fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style C fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style D fill:#162c46,stroke:#58a6ff,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff

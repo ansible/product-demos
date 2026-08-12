@@ -1,6 +1,9 @@
-#!/bin/bash
+#!/bin/bash -x
 
-PYTHON_VARIANT="${USE_PYTHON:-python3.11}"
+# should no longer need this
+#dnf install git-lfs -y
+
+PYTHON_VARIANT="${USE_PYTHON:-python3.12}"
 PATH="$PATH:$HOME/.local/bin"
 
 # install pip
@@ -19,4 +22,4 @@ eval "${PYTHON_VARIANT} -m pip freeze --local"
 git config --global --add safe.directory $(pwd)
 
 # run pre-commit
-pre-commit run --config $(pwd)/.pre-commit-config.yaml --show-diff-on-failure --color=always
+pre-commit run --config $(pwd)/.pre-commit-gh.yml --show-diff-on-failure --color=always

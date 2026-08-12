@@ -1,0 +1,49 @@
+---
+- name: Rollback targeted Windows security patches
+  hosts: "{{ _hosts_windows | default('os_windows') }}"
+  gather_facts: false
+
+  vars:
+    _raw_kb_input: "{{ input_kb_ids | default('KB5044284, KB5044030') }}"
+    target_kb_ids: "{{ (_raw_kb_input.split(',') | map('trim') | list) if _raw_kb_input is string else _raw_kb_input }}"
+
+  tasks:
+    - name: Check KB status and uninstall
+      block:
+        - name: Check which KBs are installed
+          ansible.windows.win_shell: |
+            $id = "{{ item }}".ToUpper().Replace("KB", "")
+            if (Get-HotFix -Id "KB$id" -ErrorAction SilentlyContinue) {
+                return $id
+            } else {
+                exit 1
+            }
+          loop: "{{ target_kb_ids }}"
+          register: hotfix_checks
+          failed_when: false
+          changed_when: false
+
+        - name: Uninstall Windows updates
+          ansible.windows.win_shell: "wusa.exe /uninstall /kb:{{ item.stdout | trim }} /quiet /norestart"
+          loop: "{{ hotfix_checks.results }}"
+          register: uninstall_results
+          when: item.rc == 0
+          failed_when:
+            - uninstall_results.rc not in [0, 3010]
+            - "'is not installed' not in uninstall_results.stderr"
+          changed_when: uninstall_results.rc in [0, 3010]
+
+    - name: Update cacheable reboot flag
+      ansible.builtin.set_fact:
+        windows_reboot_needed: >-
+          {{ uninstall_results.results
+             | selectattr('rc', 'defined')
+             | selectattr('rc', 'equalto', 3010)
+             | list | length > 0 }}
+        cacheable: true
+
+    - name: Final status
+      ansible.builtin.debug:
+        msg:
+          - "Rollback attempted for: {{ target_kb_ids | join(', ') }}"
+          - "Reboot Required: {{ windows_reboot_needed }}"

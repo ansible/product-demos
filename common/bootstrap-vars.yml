@@ -1,10 +1,18 @@
 ---
 # override these with extra vars if needed
-apd_ee_image_version: '25'
 apd_ee_image_tag: latest
+apd_ee_image_version: '{{ _aap_version | replace(".", "") }}'
 apd_ee_image: quay.io/ansible-product-demos/apd-ee-{{ apd_ee_image_version }}:{{ apd_ee_image_tag }}
 apd_git_repo: https://github.com/ansible/product-demos
 apd_git_repo_branch: main
+
+## Disable async for gateway roles to work around ansible.platform 2.7 action plugin
+## incompatibility (redhat-cop/infra.aap_configuration#1368).
+## Remove once the EE ships ansible.platform >= 2.7.20260615.
+gateway_configuration_async_retries: 0
+
+## initial project sync takes a while when the initial EE image pull also occurs
+controller_configuration_projects_async_retries: 90
 
 ## gateway resources
 aap_organizations:
@@ -13,7 +21,7 @@ aap_organizations:
 aap_user_accounts:
   - username: apd-admin
     email: apd-admin@example.invalid
-    password: '{{ lookup("env","AAP_PASSWORD") | default(omit) }}'
+    password: '{{ aap_password | default(omit) }}'
     update_secrets: false
 
 gateway_role_user_assignments:
@@ -29,10 +37,13 @@ controller_credentials:
     update_secrets: false
     state: exists
     inputs:
-      host: '{{ lookup("env", "AAP_HOSTNAME") | default("https://example.invalid") }}'
-      username: '{{ lookup("env", "AAP_USERNAME") | default("admin") }}'
-      password: '{{ lookup("env", "AAP_PASSWORD") | default(omit) }}'
-      verify_ssl: '{{ lookup("env", "AAP_VALIDATE_CERTS") | default(omit) }}'
+      host: '{{ aap_hostname }}'
+      username: '{{ aap_username | default(omit) }}'
+      password: '{{ aap_password | default(omit) }}'
+      oauth_token: '{{ aap_token | default(omit, true) }}'
+      verify_ssl: '{{ aap_validate_certs }}'
+      # setting this is required for 2.7, but causes the install to fail on 2.6
+      request_timeout: '{{ "10" if _aap_version is version("2.7", "==") else omit }}'
 
   - name: Automation Hub Certified Content
     organization: Ansible Product Demos (APD)
@@ -41,7 +52,7 @@ controller_credentials:
     inputs:
       url: https://cloud.redhat.com/api/automation-hub/content/published/
       auth_url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
-      token: '{{ lookup("env","ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN") | default(omit) }}'
+      token: '{{ lookup("env","ANSIBLE_GALAXY_SERVER_CERTIFIED_TOKEN") | default(omit, true) }}'
 
   - name: Automation Hub Validated Content
     organization: Ansible Product Demos (APD)
@@ -50,7 +61,7 @@ controller_credentials:
     inputs:
       url: https://cloud.redhat.com/api/automation-hub/content/published/
       auth_url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
-      token: '{{ lookup("env","ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN") | default(omit) }}'
+      token: '{{ lookup("env","ANSIBLE_GALAXY_SERVER_VALIDATED_TOKEN") | default(omit, true) }}'
 
   - name: APD Machine Credential
     description: Machine credential for Windows (username/password) and Linux (SSH key) instances
@@ -58,9 +69,9 @@ controller_credentials:
     organization: Ansible Product Demos (APD)
     update_secrets: false
     inputs:
-      username: '{{ apd_machine_credential_user | default("REPLACEME") }}'
+      username: '{{ apd_machine_credential_user | default("admin") }}'
       ssh_key_data: '{{ vault_apd_machine_credential_ssh_key | default(omit) }}'
-      password: '{{ vault_apd_machine_credential_password | default("REPLACEME") }}'
+      password: '{{ vault_apd_machine_credential_password | default(omit) }}'
 
   - name: OpenShift Credential
     description: Credential for OpenShift cluster

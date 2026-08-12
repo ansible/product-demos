@@ -1,0 +1,23 @@
+---
+title: Ansible Product Demos
+description: Demo catalog and presenter guides for Red Hat Ansible Automation Platform
+url: https://ansible.github.io
+baseurl: /product-demos
+repository: ansible/product-demos
+
+markdown: kramdown
+theme: null
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+  - node_modules/
+  - README.md
+  - .gitignore
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
