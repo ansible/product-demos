@@ -86,6 +86,7 @@ mock_modules:
   - containers.podman.podman_container
   - containers.podman.podman_image
   - kubernetes.core.k8s
+  - kubernetes.core.k8s_cluster_info
   - kubernetes.core.k8s_info
   - microsoft.ad.domain
   - microsoft.ad.group
