@@ -122,7 +122,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
+      reports_aws_bucket_name: reports-pd-apd
 
   - name: Cloud | AWS | Snapshot EC2
     job_type: run
@@ -210,8 +210,6 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     allow_simultaneous: true
-    extra_vars:
-      create_vm_apd_id: "{{ _deployment_id }}"
     survey_enabled: true
     survey:
       name: ''
@@ -419,38 +417,54 @@ controller_workflows:
       create_vm_aws_vpc_subnet_name: aws-test-subnet
       create_vm_vm_deployment: cloud_stack
       create_vm_vm_purpose: demo
-      create_vm_apd_id: "{{ _deployment_id }}"
-      create_vm_apd_managed_by: "{{ apd_managed_by }}"
     survey_enabled: true
     survey:
       name: ''
       description: ''
       spec:
         - question_name: AWS Region
+          question_description: >-
+            AWS region where the VPC, keypair, and all VMs will be created.
           type: multiplechoice
           variable: create_vm_aws_region
           required: true
+          default: us-east-2
           choices:
             - us-east-1
             - us-east-2
             - us-west-1
             - us-west-2
         - question_name: Owner
+          question_description: >-
+            Value for the EC2 tag key "owner" on all resources this workflow
+            creates. Use your name or team for cost attribution; appears in
+            inventory keyed groups as owner_*.
           type: text
           variable: create_vm_aws_owner_tag
           required: true
+          default: your_name
         - question_name: Environment
+          question_description: >-
+            Value for the EC2 tag key "environment" on each VM (Dev, QA, or
+            Prod). Metadata only—it does not change instance size, patching, or
+            security settings.
           type: multiplechoice
           variable: vm_environment
           required: true
+          default: Prod
           choices:
             - Dev
             - QA
             - Prod
         - question_name: Email
+          question_description: >-
+            Operator contact at launch. Not written to EC2 tags and not consumed
+            by the deploy playbooks today; kept for optional demo-environment
+            tracking. Replace the default with your address.
           type: text
           variable: email
           required: true
+          default: your_name@acme.org
     simplified_workflow_nodes:
       - identifier: Create Keypair
         unified_job_template: Cloud | AWS | Create Keypair
@@ -543,17 +557,18 @@ controller_workflows:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    extra_vars:
-      create_vm_apd_id: "{{ _deployment_id }}"
     survey_enabled: true
     survey:
       name: ''
       description: ''
       spec:
         - question_name: AWS Region
+          question_description: >-
+            AWS region where the cloud stack was deployed.
           type: multiplechoice
           variable: create_vm_aws_region
           required: true
+          default: us-east-2
           choices:
             - us-east-1
             - us-east-2
