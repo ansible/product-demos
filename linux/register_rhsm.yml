@@ -2,7 +2,6 @@
 - name: Register RHEL hosts with RHSM
   hosts: "{{ _hosts | default(omit) }}"
   become: true
-  gather_facts: false
 
   tasks:
     - name: Check OS family
