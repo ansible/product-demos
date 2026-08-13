@@ -1,0 +1,36 @@
+---
+# Prerequisites on the *management* cluster for HyperShift with the KubeVirt provider.
+# Upstream: https://hypershift.pages.dev/how-to/kubevirt/create-kubevirt-cluster/
+# Run this once per cluster (or confirm settings) before "OpenShift | HCP | Deploy".
+#
+# Covers:
+# - Wildcard admission on the default IngressController (needed for nested *.apps routes with baseDomainPassthrough).
+#
+# Does not install: MetalLB, default StorageClass, or OVNKubernetes — verify those separately if capi-provider
+# or other control-plane pods stay Pending (LoadBalancer / PVC / scheduling).
+#
+# LoadBalancer provider (often the missing piece on bare metal / lab clusters):
+# Upstream requires the management cluster to support Service type=LoadBalancer (e.g. MetalLB operator).
+# Without it, Services that request LoadBalancer can stay Pending forever and HyperShift / CAPI provisioning
+# may never complete — this is separate from wildcard Routes. Install/configure MetalLB (or your cloud LB)
+# before expecting HCP to finish. See: https://hypershift.pages.dev/how-to/kubevirt/create-kubevirt-cluster/
+#
+# Hosted etcd PVCs need a bindable StorageClass: either mark one default (oc get storageclass) or set
+# "Etcd StorageClass" on the HCP Deploy job survey.
+- name: HyperShift KubeVirt — management cluster prerequisites
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Allow wildcard DNS routes on default IngressController
+      kubernetes.core.k8s:
+        state: present
+        merge_type: merge
+        definition:
+          apiVersion: operator.openshift.io/v1
+          kind: IngressController
+          metadata:
+            name: default
+            namespace: openshift-ingress-operator
+          spec:
+            routeAdmission:
+              wildcardPolicy: WildcardsAllowed
