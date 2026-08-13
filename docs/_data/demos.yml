@@ -1003,7 +1003,7 @@
   category: network
   status: active
   author: "Matthew Fernandez <matferna@redhat.com>"
-  featured: true
+  featured: false
   is_workflow: true
   tags:
     - Workflow
