@@ -1,9 +1,7 @@
 ---
-- name: Deploy auditd and optional Filebeat for config drift detection
+- name: Deploy auditd and Filebeat for config drift detection
   hosts: "{{ _hosts | default(omit) }}"
   become: true
-  vars:
-    config_drift_deploy_filebeat: "{{ deploy_filebeat | default(false) | bool }}"
 
   tasks:
     - name: Check OS family
@@ -11,6 +9,6 @@
         that: ansible_os_family == 'RedHat'
         fail_msg: This demo supports RHEL hosts only.
 
-    - name: Configure auditd monitoring for sshd_config
+    - name: Configure auditd monitoring and Filebeat for sshd_config
       ansible.builtin.include_role:
         name: demo.config_drift.audit_filebeat

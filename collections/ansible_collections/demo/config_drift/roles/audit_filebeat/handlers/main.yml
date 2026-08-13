@@ -2,3 +2,8 @@
 - name: Reload audit rules
   ansible.builtin.command: augenrules --load
   changed_when: false
+
+- name: Restart Filebeat
+  ansible.builtin.service:
+    name: filebeat
+    state: restarted

@@ -4,8 +4,9 @@ user_message:
     Config drift demo: prerequisite is **Deploy Cloud Stack in AWS** so RHEL
     targets (for example `aws_rhel9`) exist in inventory.
   - >-
-    Stage 1 deploys persistent auditd monitoring only. On **LINUX | Config Drift
-    - Deploy Audit and Filebeat**, leave **Deploy Filebeat** false until Stage 2.
+    Stage 1–2 deploy auditd and Filebeat together via **LINUX | Config Drift
+    - Deploy Audit and Filebeat** against cloud stack RHEL hosts (for example
+    aws_rhel9).
   - >-
     Validate on a target host with `sudo auditctl -l | grep sshd_config` and
     `sudo ausearch -k sshd_config_change -ts recent` after editing sshd_config.
@@ -236,7 +237,8 @@ controller_templates:
   - name: "LINUX | Config Drift - Deploy Audit and Filebeat"
     description: >-
       Deploys persistent auditd rules that watch /etc/ssh/sshd_config for writes
-      and attribute changes. Filebeat shipping is optional (Stage 2).
+      and attribute changes, and installs Filebeat with the auditd module
+      (console output for Stage 2 validation).
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
@@ -258,17 +260,6 @@ controller_templates:
           variable: _hosts
           required: true
           default: aws_rhel9
-        - question_name: Deploy Filebeat
-          question_description: >-
-            Leave false for Stage 1 (auditd only). Enable in Stage 2 after
-            Filebeat configuration is added to this branch.
-          type: multiplechoice
-          variable: deploy_filebeat
-          required: true
-          default: "false"
-          choices:
-            - "true"
-            - "false"
 
 controller_workflows:
   - name: Infrastructure | ROSA - Lifecycle (Create)

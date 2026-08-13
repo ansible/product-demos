@@ -44,7 +44,7 @@ manual configuration change
 ### Setup
 
 1. Run **APD | Single demo setup** with `infrastructure`.
-2. Run **LINUX | Config Drift - Deploy Audit and Filebeat** — `_hosts`: `aws_rhel9`, **Deploy Filebeat**: `false`.
+2. Run **LINUX | Config Drift - Deploy Audit and Filebeat** — `_hosts`: `aws_rhel9`.
 
 ### What was deployed
 
@@ -103,7 +103,39 @@ sudo cp -a /tmp/sshd_config.bak /etc/ssh/sshd_config
 
 ## Stage 2 — Filebeat
 
-*Coming next: Filebeat auditd module, foreground debug with `filebeat -e`.*
+Filebeat is installed and configured automatically by the same job template.
+
+- Elastic 8.x `filebeat` package with the **auditd** module
+- Reads `/var/log/audit/audit.log*`
+- **Console output** (pretty JSON) for validation before Kafka is wired in Stage 3
+
+### Verify Filebeat is running
+
+```bash
+sudo systemctl status filebeat
+sudo journalctl -u filebeat -f
+```
+
+### Trigger a test change and watch events
+
+```bash
+sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+```
+
+In another session on the host:
+
+```bash
+sudo journalctl -u filebeat -f
+```
+
+You should see parsed JSON with audit fields, hostname, and `@timestamp`.
+
+Foreground debug:
+
+```bash
+sudo systemctl stop filebeat
+sudo filebeat -e -c /etc/filebeat/filebeat.yml
+```
 
 ## Stage 3 — Kafka
 

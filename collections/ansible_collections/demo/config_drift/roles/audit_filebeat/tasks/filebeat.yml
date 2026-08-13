@@ -1,7 +1,54 @@
 ---
-# Stage 2 — Filebeat auditd module (enabled via config_drift_deploy_filebeat: true)
-- name: Stage 2 placeholder — Filebeat not implemented yet
+- name: Import Elastic GPG key
+  ansible.builtin.rpm_key:
+    key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: Configure Elastic 8.x yum repository
+  ansible.builtin.yum_repository:
+    name: elastic-8.x
+    description: Elastic repository for 8.x packages
+    baseurl: https://artifacts.elastic.co/packages/8.x/yum
+    gpgcheck: true
+    gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    enabled: true
+
+- name: Install Filebeat package
+  ansible.builtin.dnf:
+    name: filebeat
+    state: present
+    disablerepo: "*"
+    enablerepo: elastic-8.x
+  when: "'filebeat' not in ansible_facts.packages"
+
+- name: Deploy Filebeat main configuration
+  ansible.builtin.template:
+    src: filebeat.yml.j2
+    dest: /etc/filebeat/filebeat.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Filebeat
+
+- name: Deploy Filebeat auditd module configuration
+  ansible.builtin.template:
+    src: auditd.yml.j2
+    dest: /etc/filebeat/modules.d/auditd.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Filebeat
+
+- name: Enable and start Filebeat
+  ansible.builtin.service:
+    name: filebeat
+    state: started
+    enabled: true
+
+- name: Show Filebeat validation command
   ansible.builtin.debug:
-    msg: >-
-      Filebeat deployment is part of Stage 2. Re-run with deploy_filebeat=true
-      after Stage 2 playbooks are added to this branch.
+    msg:
+      - "Filebeat is running with console output (Stage 2 debug mode)."
+      - "On the host, tail events with: sudo journalctl -u filebeat -f"
+      - "Or run foreground debug: sudo filebeat -e -c /etc/filebeat/filebeat.yml"
+      - "Then edit /etc/ssh/sshd_config and watch for parsed audit JSON."

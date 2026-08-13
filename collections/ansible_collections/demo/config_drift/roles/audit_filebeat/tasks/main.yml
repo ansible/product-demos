@@ -1,8 +1,13 @@
 ---
-- name: Ensure audit package is installed
-  ansible.builtin.dnf:
+- name: Gather package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Install audit package
+  ansible.builtin.package:
     name: audit
     state: present
+  when: "'audit' not in ansible_facts.packages"
 
 - name: Ensure auditd is enabled and running
   ansible.builtin.service:
@@ -43,4 +48,3 @@
 
 - name: Configure Filebeat
   ansible.builtin.include_tasks: filebeat.yml
-  when: config_drift_deploy_filebeat | bool
