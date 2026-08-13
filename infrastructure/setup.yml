@@ -33,7 +33,7 @@ controller_execution_environments:
     pull: missing
 
 controller_templates:
-  - name: ROSA | Preflight Checks
+  - name: Infrastructure | ROSA - Preflight Checks
     description: >-
       Validates AWS credentials, ROSA token, permissions, quota,
       and checks for existing cluster name conflicts.
@@ -72,7 +72,7 @@ controller_templates:
             - us-west-2
             - eu-west-1
 
-  - name: ROSA | Create Cluster
+  - name: Infrastructure | ROSA - Create Cluster
     description: >-
       Initiates ROSA cluster creation with STS mode.
       Does NOT wait for readiness—use the workflow or Wait job.
@@ -145,7 +145,7 @@ controller_templates:
           required: true
           default: apd-demo
 
-  - name: ROSA | Wait for Ready
+  - name: Infrastructure | ROSA - Wait for Ready
     description: >-
       Polls cluster status until ready (default timeout: 60min).
       Creates cluster-admin credentials on success.
@@ -183,7 +183,7 @@ controller_templates:
             - us-west-2
             - eu-west-1
 
-  - name: ROSA | Destroy Cluster
+  - name: Infrastructure | ROSA - Destroy Cluster
     description: >-
       Destroys a ROSA cluster and cleans up STS operator roles
       and OIDC provider. Idempotent (safe to run if cluster is gone).
@@ -222,7 +222,7 @@ controller_templates:
             - eu-west-1
 
 controller_workflows:
-  - name: ROSA | Lifecycle (Create)
+  - name: Infrastructure | ROSA - Lifecycle (Create)
     description: >-
       End-to-end ROSA cluster creation: preflight checks, create,
       wait for readiness. On failure, attempts cleanup via destroy.
@@ -287,23 +287,23 @@ controller_workflows:
           default: apd-demo
     simplified_workflow_nodes:
       - identifier: Preflight Checks
-        unified_job_template: ROSA | Preflight Checks
+        unified_job_template: Infrastructure | ROSA - Preflight Checks
         success_nodes:
           - Create Cluster
         failure_nodes:
           - Preflight Failed
       - identifier: Create Cluster
-        unified_job_template: ROSA | Create Cluster
+        unified_job_template: Infrastructure | ROSA - Create Cluster
         success_nodes:
           - Wait for Ready
         failure_nodes:
           - Destroy on Failure
       - identifier: Wait for Ready
-        unified_job_template: ROSA | Wait for Ready
+        unified_job_template: Infrastructure | ROSA - Wait for Ready
         failure_nodes:
           - Destroy on Failure
       - identifier: Destroy on Failure
-        unified_job_template: ROSA | Destroy Cluster
+        unified_job_template: Infrastructure | ROSA - Destroy Cluster
         always_nodes:
           - Creation Failed
       - identifier: Preflight Failed
@@ -319,7 +319,7 @@ controller_workflows:
             ROSA cluster creation failed. Destroy attempted for cleanup.
             Check job output for details.
 
-  - name: ROSA | Lifecycle (Destroy)
+  - name: Infrastructure | ROSA - Lifecycle (Destroy)
     description: >-
       Safely destroys a ROSA cluster with confirmation.
       Idempotent—safe to run even if cluster no longer exists.
@@ -351,7 +351,7 @@ controller_workflows:
             - eu-west-1
     simplified_workflow_nodes:
       - identifier: Destroy Cluster
-        unified_job_template: ROSA | Destroy Cluster
+        unified_job_template: Infrastructure | ROSA - Destroy Cluster
         failure_nodes:
           - Destroy Failed
       - identifier: Destroy Failed
