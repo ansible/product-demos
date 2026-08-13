@@ -44,6 +44,7 @@ mock_modules:
   - amazon.aws.s3_object_info
   - ansible.controller.credential
   - ansible.controller.host
+  - ansible.controller.settings
   - ansible.posix.at
   - ansible.posix.mount
   - ansible.posix.authorized_key
@@ -100,6 +101,7 @@ mock_modules:
   - paloaltonetworks.panos.panos_security_rule
   - paloaltonetworks.panos.panos_zone
   - redhat.openshift.k8s
+  - redhat.openshift.openshift_route
   - redhat.openshift_virtualization.kubevirt_vm_info
   - redhat.satellite.content_view_version
   - redhat.satellite.scap_tailoring_file
