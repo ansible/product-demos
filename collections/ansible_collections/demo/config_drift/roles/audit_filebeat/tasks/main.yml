@@ -1,0 +1,46 @@
+---
+- name: Ensure audit package is installed
+  ansible.builtin.dnf:
+    name: audit
+    state: present
+
+- name: Ensure auditd is enabled and running
+  ansible.builtin.service:
+    name: auditd
+    state: started
+    enabled: true
+
+- name: Deploy persistent sshd_config audit rule
+  ansible.builtin.copy:
+    src: sshd-config.rules
+    dest: "{{ config_drift_audit_rules_path }}"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: Reload audit rules
+
+- name: Load audit rules
+  ansible.builtin.command: augenrules --load
+  changed_when: false
+
+- name: Verify sshd_config audit watch is active
+  ansible.builtin.command: auditctl -l
+  register: config_drift_auditctl_list
+  changed_when: false
+
+- name: Assert sshd_config audit rule is loaded
+  ansible.builtin.assert:
+    that:
+      - config_drift_audit_key in config_drift_auditctl_list.stdout
+      - config_drift_watched_file in config_drift_auditctl_list.stdout
+    fail_msg: >-
+      Expected audit watch for {{ config_drift_watched_file }} with key
+      {{ config_drift_audit_key }} was not found. Run: sudo auditctl -l
+
+- name: Show active audit watches for sshd_config
+  ansible.builtin.debug:
+    msg: "{{ config_drift_auditctl_list.stdout_lines | select('search', 'sshd_config') | list }}"
+
+- name: Configure Filebeat
+  ansible.builtin.include_tasks: filebeat.yml
+  when: config_drift_deploy_filebeat | bool

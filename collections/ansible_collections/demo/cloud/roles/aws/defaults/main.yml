@@ -37,5 +37,7 @@ create_vm_vm_deployment: default
 create_vm_vm_environment: default
 create_vm_vm_owner: ansible
 create_vm_vm_purpose: demo
+create_vm_apd_managed_by: aap-product-demos
+create_vm_apd_id: ""
 create_vm_aws_image_filter: 'RHEL-9*HVM-*Hourly*'
 create_vm_aws_image_architecture: x86_64

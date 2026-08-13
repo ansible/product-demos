@@ -1,4 +1,7 @@
 ---
+_deployment_id: '{{ lookup("ansible.builtin.password", playbook_dir + "/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
+apd_managed_by: aap-product-demos
+
 user_message:
 
 controller_credential_types:
@@ -173,6 +176,8 @@ controller_inventory_sources:
         - us-west-2
       filters:
         tag:deployment: containerlab
+        tag:managed-by: "{{ apd_managed_by }}"
+        tag:apd_id: "{{ _deployment_id }}"
         instance-state-name: running
       compose:
         ansible_host: public_ip_address
@@ -192,6 +197,10 @@ controller_inventory_sources:
     source_vars:
       regions:
         - us-east-2
+      filters:
+        tag:managed-by: "{{ apd_managed_by }}"
+        tag:apd_id: "{{ _deployment_id }}"
+        instance-state-name: running
       compose:
         ansible_host: public_ip_address | default(private_ip_address)
         ansible_user: "'ec2-user'"
@@ -291,6 +300,9 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
     survey_enabled: true
     survey:
       name: ''
@@ -384,6 +396,8 @@ controller_templates:
     job_type: run
     extra_vars:
       aws_region: us-east-2
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
 
   - name: "NETWORK | Panos | Configure Firewall"
     job_type: run

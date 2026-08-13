@@ -12,17 +12,24 @@
           - create_vm_aws_region is defined
         fail_msg: "create_vm_vm_name and create_vm_aws_region are required"
 
+    - name: Set APD EC2 tags for delete lookup
+      ansible.builtin.set_fact:
+        create_vm_apd_id: >-
+          {{ create_vm_apd_id | default(
+             lookup('ansible.builtin.password', playbook_dir + '/../.deployment_id',
+             chars=['ascii_lowercase', 'digits'], length=5), true) }}
+
     - name: Find instance
       amazon.aws.ec2_instance_info:
         region: "{{ create_vm_aws_region }}"
-        filters:
-          "tag:Name": "{{ create_vm_vm_name }}"
-          instance-state-name:
-            - pending
-            - running
-            - shutting-down
-            - stopping
-            - stopped
+        filters: >-
+          {{
+            {
+              'tag:Name': create_vm_vm_name,
+              'tag:apd_id': create_vm_apd_id,
+              'instance-state-name': ['pending', 'running', 'shutting-down', 'stopping', 'stopped']
+            }
+          }}
       register: cloud_stack_instance
 
     - name: Terminate instance

@@ -1,5 +1,6 @@
 ---
-_deployment_id: "{{ lookup('file', playbook_dir + '/.deployment_id') }}"
+_deployment_id: '{{ lookup("ansible.builtin.password", playbook_dir + "/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
+apd_managed_by: aap-product-demos
 
 user_message:
   - >-
@@ -59,6 +60,8 @@ controller_templates:
       aws_region: us-east-1
       dmz_ssh_key_name: aws-test-key
       priv_network_ssh_key_name: aws-test-key
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
 
   - name: Cloud | AWS | Delete Peer Infrastructure
     job_type: run
@@ -89,6 +92,8 @@ controller_templates:
       aws_region: us-east-1
       dmz_ssh_key_name: aws-test-key
       priv_network_ssh_key_name: aws-test-key
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
 
   - name: Cloud | AWS | Delete Transit Infrastructure
     job_type: run
@@ -205,6 +210,8 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     allow_simultaneous: true
+    extra_vars:
+      create_vm_apd_id: "{{ _deployment_id }}"
     survey_enabled: true
     survey:
       name: ''
@@ -412,6 +419,8 @@ controller_workflows:
       create_vm_aws_vpc_subnet_name: aws-test-subnet
       create_vm_vm_deployment: cloud_stack
       create_vm_vm_purpose: demo
+      create_vm_apd_id: "{{ _deployment_id }}"
+      create_vm_apd_managed_by: "{{ apd_managed_by }}"
     survey_enabled: true
     survey:
       name: ''
@@ -534,6 +543,8 @@ controller_workflows:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_apd_id: "{{ _deployment_id }}"
     survey_enabled: true
     survey:
       name: ''

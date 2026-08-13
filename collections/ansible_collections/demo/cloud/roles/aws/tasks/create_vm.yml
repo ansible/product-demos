@@ -10,6 +10,8 @@
       "tag:purpose": "{{ create_vm_vm_purpose }}"
       "tag:ansible-role": create_vm
       "tag:ansible-collection": demo.cloud
+      "tag:managed-by": "{{ create_vm_apd_managed_by }}"
+      "tag:apd_id": "{{ create_vm_apd_id }}"
       instance-state-name:
         - pending
         - running
@@ -100,6 +102,8 @@
           "tag:purpose": "{{ create_vm_vm_purpose }}"
           "tag:ansible-role": create_vm
           "tag:ansible-collection": demo.cloud
+          "tag:managed-by": "{{ create_vm_apd_managed_by }}"
+          "tag:apd_id": "{{ create_vm_apd_id }}"
           instance-state-name:
             - pending
             - running
@@ -123,6 +127,8 @@
           purpose: "{{ create_vm_vm_purpose }}"
           ansible-role: create_vm
           ansible-collection: demo.cloud
+          managed-by: "{{ create_vm_apd_managed_by }}"
+          apd_id: "{{ create_vm_apd_id }}"
         wait: "{{ create_vm_aws_ec2_wait }}"
         vpc_subnet_id: "{{ create_vm_aws_subnet_id }}"
         user_data: "{{ lookup('template', create_vm_aws_userdata_template + '.j2', template_vars=dict(vm_name=create_vm_vm_name)) }}"

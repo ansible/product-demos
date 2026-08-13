@@ -1,0 +1,7 @@
+---
+# Stage 2 — Filebeat auditd module (enabled via config_drift_deploy_filebeat: true)
+- name: Stage 2 placeholder — Filebeat not implemented yet
+  ansible.builtin.debug:
+    msg: >-
+      Filebeat deployment is part of Stage 2. Re-run with deploy_filebeat=true
+      after Stage 2 playbooks are added to this branch.

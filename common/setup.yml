@@ -1,4 +1,7 @@
 ---
+_deployment_id: '{{ lookup("ansible.builtin.password", playbook_dir + "/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
+apd_managed_by: aap-product-demos
+
 # aap_user_accounts and gateway_role_user_assignments are handled by
 # the initial bootstrap (install-apd.yml / bootstrap-vars.yml).
 # Defining them here triggers infra.aap_configuration.gateway_users which
@@ -37,6 +40,10 @@ controller_inventory_sources:
     credential: AWS
     overwrite: true
     source_vars:
+      filters:
+        tag:managed-by: "{{ apd_managed_by }}"
+        tag:apd_id: "{{ _deployment_id }}"
+        instance-state-name: running
       hostnames:
         - tag:Name
       compose:
@@ -59,6 +66,8 @@ controller_inventory_sources:
           prefix: domain
         - key: tags.deployment
           prefix: deployment
+        - key: tags.apd_id
+          prefix: apd
         - key: tags.Compliance
           separator: ''
 
@@ -202,6 +211,9 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_apd_id: "{{ _deployment_id }}"
+      create_vm_apd_managed_by: "{{ apd_managed_by }}"
     survey_enabled: true
     allow_simultaneous: true
     survey:
