@@ -1454,13 +1454,13 @@
       style D fill:#162c46,stroke:#58a6ff,color:#fff
       style S fill:#212427,stroke:#8a8d90,color:#fff
 
-# ─── ROSA ──────────────────────────────────────────────────────────
+# ─── Infrastructure ──────────────────────────────────────────────────
 
 - slug: rosa-lifecycle
   readme_path: rosa/docs/rosa-lifecycle.md
-  title: "ROSA — Cluster Lifecycle"
+  title: "Infrastructure | ROSA — Cluster Lifecycle"
   subtitle: "Provision and destroy ROSA clusters with full preflight safety"
-  category: rosa
+  category: infrastructure
   status: active
   featured: false
   is_workflow: true
@@ -1501,8 +1501,8 @@
 - slug: rosa-preflight
   readme_path: rosa/docs/rosa-lifecycle.md
   url: /demos/rosa-preflight/
-  title: "ROSA — Preflight Checks"
-  category: rosa
+  title: "Infrastructure | ROSA — Preflight Checks"
+  category: infrastructure
   status: active
   tags:
     - Playbook
@@ -1520,8 +1520,8 @@
 - slug: rosa-create
   readme_path: rosa/docs/rosa-lifecycle.md
   url: /demos/rosa-create/
-  title: "ROSA — Create Cluster"
-  category: rosa
+  title: "Infrastructure | ROSA — Create Cluster"
+  category: infrastructure
   status: active
   tags:
     - Playbook
@@ -1539,8 +1539,8 @@
 - slug: rosa-wait
   readme_path: rosa/docs/rosa-lifecycle.md
   url: /demos/rosa-wait/
-  title: "ROSA — Wait for Ready"
-  category: rosa
+  title: "Infrastructure | ROSA — Wait for Ready"
+  category: infrastructure
   status: active
   tags:
     - Playbook
@@ -1558,8 +1558,8 @@
 - slug: rosa-destroy
   readme_path: rosa/docs/rosa-lifecycle.md
   url: /demos/rosa-destroy/
-  title: "ROSA — Destroy Cluster"
-  category: rosa
+  title: "Infrastructure | ROSA — Destroy Cluster"
+  category: infrastructure
   status: active
   tags:
     - Playbook
