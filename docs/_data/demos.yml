@@ -1498,6 +1498,26 @@
       style F fill:#2d2d2d,stroke:#888,color:#fff
       style S fill:#212427,stroke:#8a8d90,color:#fff
 
+- slug: infrastructure-config-drift
+  readme_path: infrastructure/docs/config-drift.md
+  title: "Infrastructure | Config Drift Remediation"
+  subtitle: "auditd → Filebeat → Kafka → EDA → AAP self-healing"
+  category: infrastructure
+  status: active
+  tags:
+    - EDA
+    - Linux
+    - Kafka
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #ee0000 0%, #7a0000 100%)"
+    icon: "🔄"
+  blurb: "Detect unauthorized sshd_config changes via Linux audit, route events through Kafka, and let Event-Driven Ansible trigger AAP remediation."
+  stats:
+    playbooks: 1
+  url: /demos/infrastructure-config-drift/
+  github_path: infrastructure/setup.yml
+
 - slug: rosa-preflight
   readme_path: infrastructure/docs/rosa-lifecycle.md
   url: /demos/rosa-preflight/

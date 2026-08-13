@@ -1,4 +1,16 @@
 ---
+user_message:
+  - >-
+    Config drift demo: prerequisite is **Deploy Cloud Stack in AWS** so RHEL
+    targets (for example `aws_rhel9`) exist in inventory.
+  - >-
+    Stage 1 deploys persistent auditd monitoring only. On **LINUX | Config Drift
+    - Deploy Audit and Filebeat**, leave **Deploy Filebeat** false until Stage 2.
+  - >-
+    Validate on a target host with `sudo auditctl -l | grep sshd_config` and
+    `sudo ausearch -k sshd_config_change -ts recent` after editing sshd_config.
+    See infrastructure/docs/config-drift.md.
+
 controller_credential_types:
   - name: ROSA Token
     kind: cloud
@@ -220,6 +232,43 @@ controller_templates:
             - us-east-2
             - us-west-2
             - eu-west-1
+
+  - name: "LINUX | Config Drift - Deploy Audit and Filebeat"
+    description: >-
+      Deploys persistent auditd rules that watch /etc/ssh/sshd_config for writes
+      and attribute changes. Filebeat shipping is optional (Stage 2).
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/config-drift/playbooks/deploy_audit_filebeat.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          question_description: >-
+            Limit to RHEL hosts from the cloud stack, for example aws_rhel9 or aws_rhel*
+          type: text
+          variable: _hosts
+          required: true
+          default: aws_rhel9
+        - question_name: Deploy Filebeat
+          question_description: >-
+            Leave false for Stage 1 (auditd only). Enable in Stage 2 after
+            Filebeat configuration is added to this branch.
+          type: multiplechoice
+          variable: deploy_filebeat
+          required: true
+          default: "false"
+          choices:
+            - "true"
+            - "false"
 
 controller_workflows:
   - name: Infrastructure | ROSA - Lifecycle (Create)

@@ -1,6 +1,7 @@
 # demo.config_drift
 
-Ansible collection supporting the **Event-Driven Configuration Drift Remediation** demo.
+Ansible collection supporting the **Infrastructure | Config Drift Remediation** demo
+  (`infrastructure/config-drift/`).
 
 ## Roles
 

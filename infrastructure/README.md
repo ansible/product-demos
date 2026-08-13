@@ -4,6 +4,17 @@
 
 This category covers automated provisioning and lifecycle management of IT infrastructure through Ansible Automation Platform. This includes any infrastructure that APD may provision for demo purposes — managed platforms, lab environments, shared services, and supporting resources.
 
+### Event-Driven Configuration Drift Remediation
+
+Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route events through Kafka, and let Event-Driven Ansible trigger AAP remediation.
+
+| Resource | Description |
+|----------|-------------|
+| [**Config Drift Demo**](docs/config-drift.md) | Stage-by-stage setup, validation commands, and live demo script |
+| **LINUX ǀ Config Drift - Deploy Audit and Filebeat** | Deploy persistent auditd watch (Stage 1; Filebeat in Stage 2) |
+
+**Prerequisite:** [Deploy Cloud Stack in AWS](../cloud/docs/deploy-cloud-stack.md) for RHEL targets (`aws_rhel9`, etc.).
+
 ### ROSA (Red Hat OpenShift Service on AWS)
 
 #### Workflows
