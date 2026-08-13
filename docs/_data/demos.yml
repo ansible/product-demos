@@ -1,6 +1,6 @@
 ---
 # Ansible Product Demos – Demo Catalog
-# 62 demos across 6 categories
+# 67 demos across 7 categories
 
 # ─── Featured ───────────────────────────────────────────────────────
 
@@ -996,6 +996,72 @@
 
 # ─── Network ────────────────────────────────────────────────────────
 
+- slug: network-deploy-containerlab-stack
+  readme_path: network/docs/network-deploy-containerlab-stack.md
+  title: "Deploy Containerlab Stack"
+  subtitle: "Nested-virt hypervisor, n9kv + cat8kv, inventory sync"
+  category: network
+  status: active
+  author: "Matthew Fernandez <matferna@redhat.com>"
+  featured: false
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+    - Containerlab
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0d9488 0%, #065f54 100%)"
+    icon: "🚀"
+  blurb: "Provision an AWS nested-virt hypervisor, deploy a containerlab Cisco lab (n9kv + cat8kv), and sync ContainerLab Inventory."
+  stats:
+    workflows: 1
+    playbooks: 2
+  url: /demos/network-deploy-containerlab-stack/
+  github_path: network/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["🖥️ Provision Hypervisor"] --> B["📦 Deploy Topology"]
+      B --> C["🔄 Sync ContainerLab Inventory"]
+      A -. "on failure" .-> D["📋 Submit Feedback"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style C fill:#162c46,stroke:#58a6ff,color:#fff
+      style D fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: network-destroy-containerlab-stack
+  readme_path: network/docs/network-destroy-containerlab-stack.md
+  title: "Destroy Containerlab Stack"
+  category: network
+  status: active
+  author: "Matthew Fernandez <matferna@redhat.com>"
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+    - Containerlab
+  thumbnail:
+    gradient: "linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)"
+    icon: "💥"
+  blurb: "Tear down the containerlab topology and delete the AWS hypervisor, VPC, subnet, security group, and keypair."
+  stats:
+    workflows: 1
+    playbooks: 2
+  url: /demos/network-destroy-containerlab-stack/
+  github_path: network/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["📦 Teardown Topology"] -->|always| B["💥 Teardown Hypervisor"]
+      style A fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style B fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
 - slug: network-configuration
   readme_path: network/docs/network-configuration.md
   url: /demos/network-configuration/
@@ -1387,3 +1453,123 @@
       style C fill:#3d1a1a,stroke:#cc0000,color:#fff
       style D fill:#162c46,stroke:#58a6ff,color:#fff
       style S fill:#212427,stroke:#8a8d90,color:#fff
+
+# ─── Infrastructure ──────────────────────────────────────────────────
+
+- slug: rosa-lifecycle
+  readme_path: infrastructure/docs/rosa-lifecycle.md
+  title: "Infrastructure | ROSA — Cluster Lifecycle"
+  subtitle: "Provision and destroy ROSA clusters with full preflight safety"
+  category: infrastructure
+  status: active
+  featured: false
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+    - OpenShift
+    - ROSA
+    - Lifecycle
+  thumbnail:
+    gradient: "linear-gradient(135deg, #ee0000 0%, #820000 100%)"
+    icon: "🌹"
+  blurb: "Automated ROSA cluster lifecycle: preflight checks, STS creation, readiness verification, and safe destruction with destroy-on-failure guardrails."
+  stats:
+    workflows: 2
+    playbooks: 4
+  url: /demos/rosa-lifecycle/
+  github_path: infrastructure/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["✅ Preflight Checks"] --> B["🚀 Create Cluster"]
+      B --> C["⏳ Wait for Ready"]
+      B -->|failure| D["💣 Destroy on Failure"]
+      C -->|failure| D
+      A -->|failure| E["📧 Preflight Failed"]
+      D -->|always| F["📧 Creation Failed"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#3d1a1a,stroke:#f87171,color:#fff
+      style C fill:#162c46,stroke:#58a6ff,color:#fff
+      style D fill:#4a1a1a,stroke:#cc0000,color:#fff
+      style E fill:#2d2d2d,stroke:#888,color:#fff
+      style F fill:#2d2d2d,stroke:#888,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: rosa-preflight
+  readme_path: infrastructure/docs/rosa-lifecycle.md
+  url: /demos/rosa-preflight/
+  title: "Infrastructure | ROSA — Preflight Checks"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+    - ROSA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0969da 0%, #033d8b 100%)"
+    icon: "🌹"
+  blurb: "Validate AWS identity, ROSA token, EIP quota, and account roles before attempting cluster creation."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/rosa/preflight.yml
+
+- slug: rosa-create
+  readme_path: infrastructure/docs/rosa-lifecycle.md
+  url: /demos/rosa-create/
+  title: "Infrastructure | ROSA — Create Cluster"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+    - ROSA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #d13438 0%, #7a0000 100%)"
+    icon: "🌹"
+  blurb: "Create a ROSA cluster in STS mode with auto-provisioned account roles, EIP management, and configurable compute options."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/rosa/create.yml
+
+- slug: rosa-wait
+  readme_path: infrastructure/docs/rosa-lifecycle.md
+  url: /demos/rosa-wait/
+  title: "Infrastructure | ROSA — Wait for Ready"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+    - ROSA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0097a7 0%, #00606f 100%)"
+    icon: "🌹"
+  blurb: "Poll ROSA cluster status until ready, then create a cluster-admin user and display login credentials."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/rosa/wait.yml
+
+- slug: rosa-destroy
+  readme_path: infrastructure/docs/rosa-lifecycle.md
+  url: /demos/rosa-destroy/
+  title: "Infrastructure | ROSA — Destroy Cluster"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+    - ROSA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)"
+    icon: "🌹"
+  blurb: "Tear down a ROSA cluster by name and wait for full resource cleanup including AWS infrastructure."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/rosa/destroy.yml
