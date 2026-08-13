@@ -2,7 +2,7 @@
 
 ## About These Demos
 
-This category covers automated infrastructure provisioning and lifecycle management through Ansible Automation Platform. Unlike the [Cloud](../cloud/README.md) demos which manage individual AWS resources (VMs, VPCs, keypairs) or the [OpenShift](../openshift/README.md) demos which assume a cluster already exists, these demos provision and destroy managed platforms end-to-end.
+This category covers automated provisioning and lifecycle management of IT infrastructure through Ansible Automation Platform. This includes any infrastructure that APD may provision for demo purposes — managed platforms, lab environments, shared services, and supporting resources.
 
 ### ROSA (Red Hat OpenShift Service on AWS)
 

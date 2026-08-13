@@ -8,6 +8,7 @@ Automated Red Hat OpenShift Service on AWS (ROSA) cluster lifecycle management: 
 - ROSA Token credential (obtain offline token from https://console.redhat.com/openshift/token/rosa)
 - ROSA Lifecycle EE available (`quay.io/acme_corp/rosa-ee:latest`)
 - Sufficient AWS service quotas (EC2, VPC, ELB, EIP) in target region
+  - **EIP**: ROSA requires at least 1 free Elastic IP quota slot (default account quota is 5). If you already have 5 EIPs allocated, [request a quota increase](https://docs.aws.amazon.com/servicequotas/latest/userguide/request-quota-increase.html) for the **EC2 → Elastic IP addresses** service quota (quota code `L-0263D0A3`) or release unused EIPs before creating a cluster
 
 ## Configure credentials
 
