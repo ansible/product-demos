@@ -307,7 +307,7 @@ controller_templates:
       - OpenShift Credential
       - AAP Credential
 
-  - name: Infrastructure | OPA - Deploy Open Policy Agent
+  - name: Infrastructure | OPA - Deploy Open Policy Agent on OpenShift
     description: >-
       Deploys Open Policy Agent on OpenShift and configures AAP's
       Policy as Code settings to use the new OPA server. All .rego
