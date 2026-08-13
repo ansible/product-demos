@@ -32,10 +32,10 @@ Automated Red Hat OpenShift Service on AWS (ROSA) cluster lifecycle management: 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| ROSA ǀ Preflight Checks | [`rosa/preflight.yml`](../preflight.yml) | Validates credentials, permissions, quotas, EIP availability, and name conflicts |
-| ROSA ǀ Create Cluster | [`rosa/create.yml`](../create.yml) | Creates account roles, ensures EIP quota, and initiates STS-mode cluster creation |
-| ROSA ǀ Wait for Ready | [`rosa/wait.yml`](../wait.yml) | Polls cluster status until ready, creates cluster-admin credentials |
-| ROSA ǀ Destroy Cluster | [`rosa/destroy.yml`](../destroy.yml) | Tears down cluster, operator roles, and OIDC provider (idempotent) |
+| ROSA ǀ Preflight Checks | [`infrastructure/rosa/preflight.yml`](../rosa/preflight.yml) | Validates credentials, permissions, quotas, EIP availability, and name conflicts |
+| ROSA ǀ Create Cluster | [`infrastructure/rosa/create.yml`](../rosa/create.yml) | Creates account roles, ensures EIP quota, and initiates STS-mode cluster creation |
+| ROSA ǀ Wait for Ready | [`infrastructure/rosa/wait.yml`](../rosa/wait.yml) | Polls cluster status until ready, creates cluster-admin credentials |
+| ROSA ǀ Destroy Cluster | [`infrastructure/rosa/destroy.yml`](../rosa/destroy.yml) | Tears down cluster, operator roles, and OIDC provider (idempotent) |
 
 ## Why it matters
 

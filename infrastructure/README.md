@@ -1,17 +1,19 @@
-# ROSA Demos
+# Infrastructure Demos
 
 ## About These Demos
 
-This category demonstrates automated ROSA (Red Hat OpenShift Service on AWS) cluster lifecycle management through Ansible Automation Platform. Unlike the [OpenShift](../openshift/README.md) demos which assume a cluster already exists, these demos provision and destroy the cluster itself.
+This category covers automated infrastructure provisioning and lifecycle management through Ansible Automation Platform. Unlike the [Cloud](../cloud/README.md) demos which manage individual AWS resources (VMs, VPCs, keypairs) or the [OpenShift](../openshift/README.md) demos which assume a cluster already exists, these demos provision and destroy managed platforms end-to-end.
 
-### Workflows
+### ROSA (Red Hat OpenShift Service on AWS)
+
+#### Workflows
 
 | Workflow | Description |
 |----------|-------------|
 | [**ROSA Cluster Lifecycle (Create)**](docs/rosa-lifecycle.md) | End-to-end cluster creation: preflight checks, account role setup, EIP management, cluster creation, and readiness verification with destroy-on-failure safety path |
 | **ROSA Cluster Lifecycle (Destroy)** | Safe cluster teardown with operator role and OIDC provider cleanup (idempotent) |
 
-### Jobs
+#### Jobs
 
 | Job Template | Description |
 |--------------|-------------|
@@ -22,7 +24,7 @@ This category demonstrates automated ROSA (Red Hat OpenShift Service on AWS) clu
 
 ## Post Setup
 
-After running `APD | Single demo setup` with `demo: rosa`:
+After running `APD | Single demo setup` with `demo: infrastructure`:
 
 ### Configure Credentials
 

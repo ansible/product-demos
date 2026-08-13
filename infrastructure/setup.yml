@@ -44,7 +44,7 @@ controller_templates:
       - AWS
       - ROSA Token
     project: Ansible Product Demos
-    playbook: rosa/preflight.yml
+    playbook: infrastructure/rosa/preflight.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -83,7 +83,7 @@ controller_templates:
       - AWS
       - ROSA Token
     project: Ansible Product Demos
-    playbook: rosa/create.yml
+    playbook: infrastructure/rosa/create.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -156,7 +156,7 @@ controller_templates:
       - AWS
       - ROSA Token
     project: Ansible Product Demos
-    playbook: rosa/wait.yml
+    playbook: infrastructure/rosa/wait.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -194,7 +194,7 @@ controller_templates:
       - AWS
       - ROSA Token
     project: Ansible Product Demos
-    playbook: rosa/destroy.yml
+    playbook: infrastructure/rosa/destroy.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
