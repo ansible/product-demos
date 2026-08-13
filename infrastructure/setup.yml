@@ -4,9 +4,9 @@ user_message:
     Config drift demo: prerequisite is **Deploy Cloud Stack in AWS** so RHEL
     targets (for example `aws_rhel9`) exist in inventory.
   - >-
-    Stage 1–2 deploy auditd and Filebeat together via **LINUX | Config Drift
-    - Deploy Audit and Filebeat** against cloud stack RHEL hosts (for example
-    aws_rhel9).
+    Prerequisite: run **Deploy Cloud Stack in AWS** so RHEL targets exist.
+    Run **LINUX | Register RHEL with RHSM** before config drift if hosts are
+    not registered (needed for Filebeat package install via dnf).
   - >-
     Validate on a target host with `sudo auditctl -l | grep sshd_config` and
     `sudo ausearch -k sshd_config_change -ts recent` after editing sshd_config.

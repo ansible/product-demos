@@ -3,10 +3,32 @@ user_message:
   - Update the 'activation_key' and 'org_id' extra variables for 'LINUX | Register with Insights'. https://access.redhat.com/management/activation_keys
   - Update Credential for Insights Inventory with Red Hat account.
   - Add variables for system_roles. https://console.redhat.com/ansible/automation-hub/repo/published/redhat/rhel_system_roles
+  - >-
+    Update the 'RHSM Registration' credential with your Red Hat org ID and
+    activation key for 'LINUX | Register RHEL with RHSM' and patch demos.
+    https://access.redhat.com/management/activation_keys
 
 # "!unsafe" used to pass raw jinja2 through to the injector definition, see
 # https://github.com/redhat-cop/controller_configuration/tree/devel/roles/credential_types#formating-injectors
 controller_credential_types:
+  - name: RHSM Activation Key
+    kind: cloud
+    inputs:
+      fields:
+        - id: rhsm_org_id
+          type: string
+          label: Organization ID
+        - id: rhsm_activation_key
+          type: string
+          label: Activation Key
+          secret: true
+      required:
+        - rhsm_org_id
+        - rhsm_activation_key
+    injectors:
+      extra_vars:
+        rhsm_org_id: !unsafe '{{ rhsm_org_id }}'
+        rhsm_activation_key: !unsafe '{{ rhsm_activation_key }}'
   - name: Insights Collection
     description: Insights credential that can be used with SCM-based inventory sources
     kind: cloud
@@ -25,6 +47,14 @@ controller_credential_types:
         INSIGHTS_PASSWORD: !unsafe '{{ insights_password }}'
 
 controller_credentials:
+  - name: RHSM Registration
+    credential_type: RHSM Activation Key
+    organization: Ansible Product Demos (APD)
+    update_secrets: false
+    state: exists
+    inputs:
+      rhsm_org_id: REPLACEME
+      rhsm_activation_key: REPLACEME
   - name: Insights Inventory
     credential_type: Insights Collection
     organization: Ansible Product Demos (APD)
@@ -81,6 +111,34 @@ controller_templates:
           type: text
           variable: org_id
           required: true
+
+  - name: "LINUX | Register RHEL with RHSM"
+    description: >-
+      Register unregistered RHEL hosts with Red Hat Subscription Manager using
+      the RHSM Registration credential. Shared prerequisite for patch, config
+      drift, and other demos that need working dnf repositories.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: linux/register_rhsm.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
+      - RHSM Registration
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          question_description: >-
+            Cloud stack RHEL hosts, for example aws_rhel9 or aws_rhel*
+          type: text
+          variable: _hosts
+          required: true
+          default: aws_rhel9
 
   - name: "LINUX | Troubleshoot"
     job_type: run

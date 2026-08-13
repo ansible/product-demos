@@ -14,9 +14,15 @@ manual configuration change
 ## Prerequisites
 
 - **Deploy Cloud Stack in AWS** — `aws_rhel9` (or similar) in inventory
-- **APD | Single demo setup** — category `infrastructure`
+- **APD | Single demo setup** — category `infrastructure` or `linux`
+- **RHSM Registration** credential — org ID and activation key (see **LINUX | Register RHEL with RHSM**)
 - **Automation Decisions (EDA)** on AAP (Stages 4–5)
 - SSH access via **APD Machine Credential**
+
+Recommended order after cloud stack deploy:
+
+1. **LINUX | Register RHEL with RHSM** — `_hosts`: `aws_rhel9` (or `aws_rhel*`)
+2. **LINUX | Config Drift - Deploy Audit and Filebeat**
 
 ## Job templates
 

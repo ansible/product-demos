@@ -1,0 +1,22 @@
+---
+- name: Register RHEL hosts with RHSM
+  hosts: "{{ _hosts | default(omit) }}"
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Check OS family
+      ansible.builtin.assert:
+        that: ansible_os_family == 'RedHat'
+        fail_msg: This job supports RHEL hosts only.
+
+    - name: Ensure RHSM registration
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/../cloud/tasks/rhsm_ensure_registered.yml"
+
+    - name: Report RHSM registration status
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }}: {{
+            'registered with RHSM' if rhsm_registered | default(false)
+            else 'not registered — update the RHSM Registration credential in AAP'
+          }}
