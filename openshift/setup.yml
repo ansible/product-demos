@@ -215,6 +215,55 @@ controller_templates:
           default: "openshift-cnv-rhel*"
           required: true
 
+  - name: OpenShift | Automation Orchestrator | Install
+    description: >-
+      Deploys Automation Orchestrator on an existing OpenShift cluster using
+      aapctl. Installs CloudNativePG operator, PostgreSQL database, and the
+      AO operator in a single automated step.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "openshift/ao/install.yml"
+    execution_environment: AO Execution Environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    timeout: 3600
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Release Channel
+          question_description: >-
+            stable for production-grade releases; early-access for evaluation only
+            (no SLA, no upgrade path).
+          type: multiplechoice
+          variable: ao_operator_channel
+          required: true
+          default: candidate
+          choices:
+            - candidate
+            - stable
+            - early-access
+    credentials:
+      - OpenShift Credential
+
+  - name: OpenShift | Automation Orchestrator | Uninstall
+    description: >-
+      Removes Automation Orchestrator, CloudNativePG cluster, operators,
+      and both namespaces.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "openshift/ao/uninstall.yml"
+    execution_environment: AO Execution Environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - OpenShift Credential
+
   - name: OpenShift | Dev Spaces
     job_type: run
     inventory: Ansible Product Demos Inventory

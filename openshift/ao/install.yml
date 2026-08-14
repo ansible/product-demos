@@ -1,0 +1,194 @@
+---
+- name: Deploy Automation Orchestrator via aapctl
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    ao_channel: "{{ ao_operator_channel | default('candidate') }}"
+    ao_namespace: automation-orchestrator
+
+    _k8s_host: "{{ lookup('env', 'K8S_AUTH_HOST') | default('', true) }}"
+    _k8s_token: "{{ lookup('env', 'K8S_AUTH_API_KEY') | default('', true) }}"
+    _k8s_verify_ssl: "{{ lookup('env', 'K8S_AUTH_VERIFY_SSL') | default('true', true) | bool }}"
+
+    _ca_raw: "{{ lookup('env', 'K8S_AUTH_SSL_CA_CERT') | default('', true) }}"
+    _ca_is_inline: "{{ _ca_raw is search('BEGIN CERTIFICATE') }}"
+
+  tasks:
+    - name: Verify AAP credential env vars are set
+      ansible.builtin.assert:
+        that:
+          - _k8s_host | length > 0
+          - _k8s_token | length > 0
+        fail_msg: >-
+          K8S_AUTH_HOST and K8S_AUTH_API_KEY must be set.
+          Attach an 'OpenShift or Kubernetes API Bearer Token' credential to this job template.
+
+    - name: Verify aapctl is present in the execution environment
+      ansible.builtin.command:
+        cmd: aapctl version
+      register: _aapctl_version
+      changed_when: false
+      failed_when: _aapctl_version.rc != 0
+
+    - name: Show aapctl version
+      ansible.builtin.debug:
+        var: _aapctl_version.stdout
+
+    - name: Deploy Automation Orchestrator
+      block:
+
+        # --- CA handling -------------------------------------------------
+        - name: Create temp file for inline CA certificate
+          ansible.builtin.tempfile:
+            state: file
+            suffix: .crt
+          register: _ca_tmp
+          when: _ca_is_inline | bool
+
+        - name: Write inline CA certificate
+          ansible.builtin.copy:
+            dest: "{{ _ca_tmp.path }}"
+            mode: '0600'
+            content: "{{ _ca_raw }}"
+          when: _ca_is_inline | bool
+
+        - name: Resolve the CA path to use
+          ansible.builtin.set_fact:
+            _ca_path: >-
+              {{ (_ca_tmp.path if (_ca_is_inline | bool) else _ca_raw) | default('', true) }}
+
+        - name: Confirm the CA file actually exists
+          ansible.builtin.stat:
+            path: "{{ _ca_path }}"
+          register: _ca_stat
+          when: _ca_path | length > 0
+
+        - name: Fail if a CA was supplied but is not readable
+          ansible.builtin.assert:
+            that:
+              - _ca_stat.stat.exists
+            fail_msg: "K8S_AUTH_SSL_CA_CERT resolved to '{{ _ca_path }}' but no such file exists."
+          when: _ca_path | length > 0
+
+        # --- kubeconfig --------------------------------------------------
+        - name: Assemble kubeconfig structure
+          ansible.builtin.set_fact:
+            _kubeconfig_data:
+              apiVersion: v1
+              kind: Config
+              current-context: target
+              clusters:
+                - name: target
+                  cluster: >-
+                    {{
+                      {'server': _k8s_host}
+                      | combine(
+                          {'certificate-authority': _ca_path} if _ca_path | length > 0
+                          else ({'insecure-skip-tls-verify': true} if not _k8s_verify_ssl else {})
+                        )
+                    }}
+              contexts:
+                - name: target
+                  context:
+                    cluster: target
+                    user: aap
+              users:
+                - name: aap
+                  user:
+                    token: "{{ _k8s_token }}"
+          no_log: true
+
+        - name: Create temp file for kubeconfig
+          ansible.builtin.tempfile:
+            state: file
+            suffix: .kubeconfig
+          register: _kubeconfig_tmp
+
+        - name: Write kubeconfig
+          ansible.builtin.copy:
+            dest: "{{ _kubeconfig_tmp.path }}"
+            mode: '0600'
+            content: "{{ _kubeconfig_data | to_nice_yaml(indent=2) }}"
+          no_log: true
+
+        - name: Sanity check the generated kubeconfig
+          ansible.builtin.command:
+            cmd: kubectl --kubeconfig {{ _kubeconfig_tmp.path }} version -o json
+          register: _kubecheck
+          changed_when: false
+          failed_when: false
+
+        - name: Warn if the kubeconfig could not reach the cluster
+          ansible.builtin.debug:
+            msg: >-
+              kubectl smoke test returned rc={{ _kubecheck.rc }}.
+              If aapctl fails next, start here. stderr: {{ _kubecheck.stderr | default('') }}
+          when: _kubecheck.rc != 0
+
+        # --- install -----------------------------------------------------
+        - name: Install Automation Orchestrator
+          ansible.builtin.command:
+            cmd: >-
+              aapctl install ao
+              --kubeconfig {{ _kubeconfig_tmp.path }}
+              --set cloudnative-pg-operator.enabled=true
+              --set automation-orchestrator-operator.channel={{ ao_channel }}
+          register: aapctl_result
+          changed_when: >-
+            aapctl_result.rc == 0
+            and ('already installed' not in (aapctl_result.stdout | default('') | lower))
+
+        - name: Show aapctl output
+          ansible.builtin.debug:
+            var: aapctl_result.stdout_lines
+
+        # --- discover the route -----------------------------------------
+        - name: Wait for the Automation Orchestrator Route
+          kubernetes.core.k8s_info:
+            api_version: route.openshift.io/v1
+            kind: Route
+            namespace: "{{ ao_namespace }}"
+          register: ao_routes
+          until: ao_routes.resources | default([]) | length > 0
+          retries: 30
+          delay: 10
+          ignore_errors: true
+
+        - name: Display access information
+          ansible.builtin.debug:
+            msg: >-
+              {{
+                ['Automation Orchestrator deployment complete.']
+                + (ao_routes.resources
+                   | map(attribute='spec.host')
+                   | map('regex_replace', '^', 'URL: https://')
+                   | list)
+                + ['Username: admin',
+                   "Password: oc get secret automation-orchestrator-initial-admin-password"
+                   ~ " -n " ~ ao_namespace ~ " -o jsonpath='{.data.password}' | base64 -d"]
+              }}
+          when: ao_routes.resources | default([]) | length > 0
+
+        - name: Warn if no Route appeared
+          ansible.builtin.debug:
+            msg: >-
+              aapctl completed but no Route was found in {{ ao_namespace }} after 5 minutes.
+              Check the operator's status with:
+              oc get csv,pods -n {{ ao_namespace }}
+          when: ao_routes.resources | default([]) | length == 0
+
+      always:
+        - name: Clean up generated credentials
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          loop: >-
+            {{
+              [_kubeconfig_tmp.path | default(''), _ca_tmp.path | default('')]
+              | reject('equalto', '')
+              | list
+            }}
+          loop_control:
+            label: "{{ item }}"
