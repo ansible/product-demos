@@ -36,8 +36,8 @@ This category covers automated provisioning and lifecycle management of IT infra
 
 | Job Template | Description |
 |--------------|-------------|
-| **OPA ǀ Deploy Open Policy Agent** | Deploys OPA on OpenShift, loads bundled Rego policies into a ConfigMap, and configures AAP's Policy as Code settings |
-| **OPA ǀ Add Policy** | Uploads a Rego policy to OPA via the REST API (in-memory only, does not persist across pod restarts) |
+| **Infrastructure | OPA - Deploy Open Policy Agent on OpenShift** | Deploys a demo (non-production) OPA on OpenShift, loads bundled Rego policies into a ConfigMap, and configures AAP's Policy as Code settings |
+| **Infrastructure | OPA - Add Policy** | Uploads a Rego policy to OPA via the REST API (in-memory only, does not persist across pod restarts) |
 
 ## Post Setup
 

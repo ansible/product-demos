@@ -1,6 +1,6 @@
 # OPA — Policy as Code
 
-Demonstrate AAP's Policy as Code feature using Open Policy Agent (OPA) deployed on OpenShift. The demo deploys an OPA server, loads Rego policies, and configures AAP to evaluate policies before allowing jobs to run.
+Demonstrate AAP's Policy as Code feature using Open Policy Agent (OPA) deployed on OpenShift. The demo deploys an OPA server, loads Rego policies, and configures AAP to evaluate policies before allowing jobs to run.  The OPA server is not configured for production use as it does not require authentication.
 
 ## Prerequisites
 
@@ -81,7 +81,7 @@ policy_as_code_vars:
 
 ## Presenter walkthrough
 
-1. Run **Infrastructure | OPA - Deploy Open Policy Agent** — accept the defaults or customize the namespace and image. After the job completes, confirm the OPA server URL in the output
+1. Run **Infrastructure | OPA - Deploy Open Policy Agent on OpenShift** — accept the defaults or customize the namespace and image. After the job completes, confirm the OPA server URL in the output
 2. Apply the `apd/deny_all` policy to the demo organization in AAP (Access → Organizations → edit → Policy enforcement → set OPA query path to `apd/deny_all`)
 3. Run any job template in that organization — show that it is denied with the message "'Deny all' policy is in effect"
 4. Change the organization's policy to `apd/common_policies` — run a job as a regular user to show it is now allowed (no `policy_as_code_vars` configured, so the policy allows all jobs by default)

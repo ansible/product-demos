@@ -44,9 +44,7 @@
             name: opa-policy
             namespace: '{{ _opa_namespace }}'
             labels: '{{ _opa_labels }}'
-          data: '{{ _opa_policy_data }}'
-      register: _opa_configmap
-      when: _opa_policy_data | default({}) | length > 0
+          data: '{{ _opa_policy_data | default({}) }}'
 
     - name: Create OPA Deployment
       redhat.openshift.k8s:
