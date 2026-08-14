@@ -99,6 +99,7 @@
             cmd: >-
               aapctl uninstall ao
               --kubeconfig {{ _kubeconfig_tmp.path }}
+              --set cloudnative-pg-operator.enabled=true
               -y
           register: aapctl_result
           changed_when: aapctl_result.rc == 0

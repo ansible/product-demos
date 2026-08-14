@@ -156,20 +156,25 @@
           delay: 10
           ignore_errors: true
 
+        - name: Get admin password
+          kubernetes.core.k8s_info:
+            api_version: v1
+            kind: Secret
+            name: automation-orchestrator-initial-admin-password
+            namespace: "{{ ao_namespace }}"
+          register: admin_secret
+          ignore_errors: true
+
         - name: Display access information
           ansible.builtin.debug:
-            msg: >-
-              {{
-                ['Automation Orchestrator deployment complete.']
-                + (ao_routes.resources
-                   | map(attribute='spec.host')
-                   | map('regex_replace', '^', 'URL: https://')
-                   | list)
-                + ['Username: admin',
-                   "Password: oc get secret automation-orchestrator-initial-admin-password"
-                   ~ " -n " ~ ao_namespace ~ " -o jsonpath='{.data.password}' | base64 -d"]
-              }}
-          when: ao_routes.resources | default([]) | length > 0
+            msg:
+              - "Automation Orchestrator deployment complete."
+              - "URL: https://{{ ao_routes.resources[0].spec.host }}"
+              - "Username: admin"
+              - "Password: {{ admin_secret.resources[0].data.password | b64decode }}"
+          when:
+            - ao_routes.resources | default([]) | length > 0
+            - admin_secret.resources | default([]) | length > 0
 
         - name: Warn if no Route appeared
           ansible.builtin.debug:
