@@ -1,7 +1,11 @@
 ---
 - name: Register RHEL hosts with RHSM
-  hosts: "{{ _hosts | default(omit) }}"
+  hosts: "{{ _hosts | default('aws_rhel9') }}"
   become: true
+  ignore_unreachable: true
+
+  vars:
+    ansible_python_interpreter: auto_silent
 
   tasks:
     - name: Check OS family

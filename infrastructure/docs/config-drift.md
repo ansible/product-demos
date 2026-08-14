@@ -21,8 +21,20 @@ manual configuration change
 
 Recommended order after cloud stack deploy:
 
-1. **LINUX | Register RHEL with RHSM** — `_hosts`: `aws_rhel9` (or `aws_rhel*`)
-2. **LINUX | Config Drift - Deploy Audit and Filebeat**
+1. **LINUX | Register RHEL with RHSM** — `_hosts`: `aws_rhel9` or `aws_rhel*`
+2. **LINUX | Config Drift - Deploy Audit and Filebeat** — same `_hosts` value
+
+### Host targeting
+
+| Pattern | Hosts matched | Use when |
+|---------|---------------|----------|
+| `aws_rhel9` | One RHEL 9 worker | Quick single-host demo |
+| `aws_rhel*` | `aws_rhel8` + `aws_rhel9` | Filebeat/auditd on every RHEL **worker** VM |
+| `reports` | Report server only | Not a config-drift target — different role in the stack |
+
+`aws_rhel*` does **not** match `reports`. If your job run includes `reports`, you used a broader limit than `aws_rhel*` (for example a group or `*`).
+
+Unreachable hosts are skipped (`ignore_unreachable`) so one bad SSH target does not block the rest of the fleet.
 
 ## Job templates
 

@@ -134,7 +134,9 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           question_description: >-
-            Cloud stack RHEL hosts, for example aws_rhel9 or aws_rhel*
+            aws_rhel9 for a single-host demo, or aws_rhel* to register every
+            RHEL worker VM (aws_rhel8 and aws_rhel9). Unreachable hosts are
+            skipped. reports is a separate host and is not matched by aws_rhel*.
           type: text
           variable: _hosts
           required: true

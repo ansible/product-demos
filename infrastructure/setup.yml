@@ -238,7 +238,8 @@ controller_templates:
     description: >-
       Deploys persistent auditd rules that watch /etc/ssh/sshd_config for writes
       and attribute changes, and installs Filebeat with the auditd module
-      (console output for Stage 2 validation).
+      (console output for Stage 2 validation). Use aws_rhel9 for one host or
+      aws_rhel* for every RHEL worker VM in the cloud stack.
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
@@ -255,7 +256,9 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           question_description: >-
-            Limit to RHEL hosts from the cloud stack, for example aws_rhel9 or aws_rhel*
+            aws_rhel9 for a single-host demo, or aws_rhel* for every RHEL
+            worker VM (aws_rhel8 and aws_rhel9). Unreachable hosts are skipped.
+            reports is a separate host and is not matched by aws_rhel*.
           type: text
           variable: _hosts
           required: true
