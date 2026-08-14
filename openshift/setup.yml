@@ -223,7 +223,7 @@ controller_templates:
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
-    playbook: "openshift/ao/install.yml"
+    playbook: "infrastructure/ao/install.yml"
     execution_environment: AO Execution Environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -256,7 +256,7 @@ controller_templates:
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
-    playbook: "openshift/ao/uninstall.yml"
+    playbook: "infrastructure/ao/uninstall.yml"
     execution_environment: AO Execution Environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
