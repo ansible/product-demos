@@ -108,6 +108,15 @@
           ansible.builtin.debug:
             var: aapctl_result.stdout_lines
 
+        - name: Note that resource cleanup continues in the background
+          ansible.builtin.debug:
+            msg: >-
+              aapctl has requested removal of Automation Orchestrator.
+              OpenShift is now tearing down the remaining resources in the
+              background; this typically completes within a few minutes.
+              Automation Orchestrator may remain reachable until the route
+              and its pods are fully removed.
+
       always:
         - name: Clean up generated credentials
           ansible.builtin.file:

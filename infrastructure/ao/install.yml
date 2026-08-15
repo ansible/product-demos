@@ -172,6 +172,7 @@
               - "URL: https://{{ ao_routes.resources[0].spec.host }}"
               - "Username: admin"
               - "Password: {{ admin_secret.resources[0].data.password | b64decode }}"
+              - "Note: login may fail for a minute or two after deploy — retry if it errors."
           when:
             - ao_routes.resources | default([]) | length > 0
             - admin_secret.resources | default([]) | length > 0
