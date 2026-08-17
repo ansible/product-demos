@@ -25,12 +25,24 @@ controller_credentials:
     state: exists
     inputs:
       rosa_token: REPLACEME
+  - name: OpenShift Credential
+    organization: Ansible Product Demos (APD)
+    credential_type: OpenShift or Kubernetes API Bearer Token
+    update_secrets: false
+    state: exists
+    inputs:
+      host: CHANGEME
+      bearer_token: CHANGEME
+      verify_ssl: false
 
 controller_execution_environments:
   - name: ROSA Lifecycle EE
     image: quay.io/acme_corp/rosa-ee:latest
     organization: Ansible Product Demos (APD)
     pull: missing
+  - name: AO Execution Environment
+    image: quay.io/acme_corp/ao-ee:latest
+    organization: Ansible Product Demos (APD)
 
 controller_templates:
   - name: Infrastructure | ROSA - Preflight Checks
@@ -220,6 +232,55 @@ controller_templates:
             - us-east-2
             - us-west-2
             - eu-west-1
+
+  - name: Infrastructure | Automation Orchestrator | Install
+    description: >-
+      Deploys Automation Orchestrator on an existing OpenShift cluster using
+      aapctl. Installs CloudNativePG operator, PostgreSQL database, and the
+      AO operator in a single automated step.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "infrastructure/ao/install.yml"
+    execution_environment: AO Execution Environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    timeout: 3600
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Release Channel
+          question_description: >-
+            stable for production-grade releases; early-access for evaluation only
+            (no SLA, no upgrade path).
+          type: multiplechoice
+          variable: ao_operator_channel
+          required: true
+          default: candidate
+          choices:
+            - candidate
+            - stable
+            - early-access
+    credentials:
+      - OpenShift Credential
+
+  - name: Infrastructure | Automation Orchestrator | Uninstall
+    description: >-
+      Removes Automation Orchestrator, CloudNativePG cluster, operators,
+      and both namespaces.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "infrastructure/ao/uninstall.yml"
+    execution_environment: AO Execution Environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - OpenShift Credential
 
 controller_workflows:
   - name: Infrastructure | ROSA - Lifecycle (Create)
