@@ -17,11 +17,11 @@
       ansible.builtin.set_fact:
         _vault_tasks: "{{ (vault_operation == 'install') | ternary(_vault_install_tasks, _vault_uninstall_tasks) }}"
 
-    - name: Run demo.openshift.vault
+    - name: Run demo.infrastructure.vault
       loop: "{{ _vault_tasks }}"
       loop_control:
         loop_var: function
         label: "{{ function }}"
       ansible.builtin.include_role:
-        name: demo.openshift.vault
+        name: demo.infrastructure.vault
         tasks_from: "{{ function }}"
