@@ -1,0 +1,59 @@
+---
+
+controller_workflows:
+  - name: 1 - VMware / Generate WinPE Image Scenario
+    description: >
+      This workflow provisions a Windows system, generates a WinPE image,
+      uploads it to VMware datastore, and then removes the provisioned VM.
+      It demonstrates the process of creating and deploying a WinPE image
+      in a VMware environment.
+    organization: Default
+    extra_vars:
+      infra_template_name: windows-2022-standard
+    simplified_workflow_nodes:
+      - identifier: Provision Infrastructure
+        unified_job_template: Provision Infrastructure
+        credentials:
+          - VMware Credential
+          - Windows Machine Credential
+        extra_data:
+          provider: vmware
+          scenario: winpe
+          infra_template_name: windows-2022-standard
+        success_nodes:
+          - Generate WinPE
+      - identifier: Generate WinPE
+        unified_job_template: Generate WinPE
+        inventory: VMware Inventory
+        credentials:
+          - VMware Credential
+          - Windows Machine Credential
+        limit: vmware_tag_app_name_winpe
+        extra_data:
+          create_winpe_destination_file_location: iso_upload
+          create_winpe_enable_autostart: true
+          create_winpe_enable_powershell_modules: false
+          create_winpe_enable_script_debug: false
+          create_winpe_load_drivers: false
+        success_nodes:
+          - Upload WinPE ISO
+      - identifier: Upload WinPE ISO
+        unified_job_template: Upload WinPE ISO
+        inventory: VMware Inventory
+        credentials:
+          - VMware Credential
+          - Windows Machine Credential
+        limit: vmware_tag_app_name_winpe
+        extra_data:
+          provider: vmware
+        success_nodes:
+          - Remove Infrastructure
+      - identifier: Remove Infrastructure
+        unified_job_template: Remove Infrastructure
+        inventory: VMware Inventory
+        credentials:
+          - VMware Credential
+          - Windows Machine Credential
+        limit: vmware_tag_app_name_winpe
+        extra_data:
+          provider: vmware

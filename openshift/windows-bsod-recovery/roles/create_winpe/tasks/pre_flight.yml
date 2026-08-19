@@ -1,0 +1,33 @@
+---
+- name: check adk iso file if a path is specified
+  ansible.windows.win_stat:
+    path: "{{ create_winpe_win_adk_iso_path }}"
+  register: adk_iso_file
+  when:
+    - create_winpe_win_adk_iso_path is defined
+    - create_winpe_win_adk_iso_path | length
+
+- name: check winpe addon iso file if a path is specified
+  ansible.windows.win_stat:
+    path: "{{ create_winpe_win_adk_winpe_addon_iso_path }}"
+  register: winpe_addon_iso_file
+  when:
+    - create_winpe_win_adk_winpe_addon_iso_path is defined
+    - create_winpe_win_adk_winpe_addon_iso_path | length
+
+- name: clean up temp files
+  ansible.windows.win_file:
+    path: "{{ create_winpe_temp_directory }}\\{{ item }}"
+    state: absent
+  loop:
+    - winpeshl.ini
+    - winprep.cmd
+    - init.cmd
+    - create_winpe.ps1
+    - "{{ create_winpe_name }}.iso"
+    - "{{ create_winpe_name }}_no_prompt.iso"
+
+- name: clean winpe files
+  ansible.windows.win_file:
+    path: C:\{{ create_winpe_name }}
+    state: absent

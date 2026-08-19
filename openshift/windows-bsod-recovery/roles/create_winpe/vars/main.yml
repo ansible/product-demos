@@ -1,0 +1,23 @@
+---
+
+create_winpe_os_level: "{{ (ansible_distribution | regex_findall('^.* ([0-9]{1,4}|[0-9]{1}[.]?[0-9]{1}) .*'))[0] | replace('.', '_') }}"
+
+create_winpe_os_product_type: "{{ ansible_os_product_type | default('workstation') }}"
+
+create_winpe_win_adk_download_url: >-
+  {{ create_winpe_win_adk["win_" + create_winpe_os_level].download_url | default(create_winpe_win_adk["win_10"].download_url) }}
+create_winpe_win_adk_product_id: >-
+  {{ create_winpe_win_adk["win_" + create_winpe_os_level].product_id | default(create_winpe_win_adk["win_10"].product_id) }}
+create_winpe_win_adk_features: >-
+  {{ create_winpe_win_adk["win_" + create_winpe_os_level].features | default(create_winpe_win_adk["win_10"].features) }}
+
+create_winpe_win_adk_winpe_addon_download_url: >-
+  {{ create_winpe_win_adk_winpe_addon["win_" + create_winpe_os_level].download_url | default(create_winpe_win_adk_winpe_addon["win_10"].download_url) }}
+create_winpe_win_adk_winpe_addon_product_id: >-
+  {{ create_winpe_win_adk_winpe_addon["win_" + create_winpe_os_level].product_id | default(create_winpe_win_adk_winpe_addon["win_10"].product_id) }}
+create_winpe_win_adk_winpe_addon_features: >-
+  {{ create_winpe_win_adk_winpe_addon["win_" + create_winpe_os_level].features | default(create_winpe_win_adk_winpe_addon["win_10"].features) }}
+
+create_winpe_arch: "{{ create_winpe_architectures[ansible_architecture2] | default('amd64') }}"
+
+create_winpe_virtio_directory: '{{ create_winpe_virtio_directory_mapping["win_" + create_winpe_os_level] }}'

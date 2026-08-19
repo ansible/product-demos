@@ -1,0 +1,29 @@
+---
+- name: authenticate with cluster
+  ansible.builtin.include_role:
+    name: oatakan.openshift-add-auth-config
+  vars:
+    oc_auth_type: api
+
+- name: boot winpe
+  block:
+    - name: attach winpe iso
+      ansible.builtin.include_tasks: attach_iso.yml
+
+    - name: restart vm
+      ansible.builtin.include_tasks: restart_vm.yml
+
+    - name: wait for vm to shutdown gracefully
+      ansible.builtin.include_tasks: wait_for_vm_stop.yml
+
+    - name: detach winpe iso and start vm
+      ansible.builtin.include_tasks: detach_iso.yml
+
+  always:
+    - name: clear authentication
+      ansible.builtin.include_role:
+        name: oatakan.openshift-add-auth-config
+      vars:
+        oc_auth_type: api
+        auth_action: logout
+      when: kubevirt_boot_winpe_kubevirt_clear_auth_key

@@ -1,0 +1,12 @@
+---
+- name: generate winpe
+  hosts: all
+  become_method: ansible.builtin.runas
+  become: false
+  vars:
+    create_winpe_temp_directory: "{{ ansible_env.TEMP }}"
+    create_winpe_name: winpe_bsod_recovery_fix
+    create_winpe_init_file: oh_no_bsod_fix.cmd
+
+  roles:
+    - create_winpe

@@ -1,0 +1,71 @@
+---
+- name: ensure vm is shutdown
+  community.vmware.vmware_guest:
+    hostname: "{{ lookup('env', 'VMWARE_HOST') }}"
+    username: "{{ lookup('env', 'VMWARE_USER') }}"
+    password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
+    validate_certs: false
+    name: "{{ item }}"
+    uuid: "{{ hostvars[item].config.uuid }}"
+    state: shutdownguest
+  async: 7200
+  poll: 0
+  register: vms_shutdown
+  loop: "{{ ansible_play_hosts }}"
+  when:
+    - nodes is defined
+    - hostvars[item].config.uuid is defined
+    - hostvars[item].config.name is defined
+    - (nodes | json_query(query)) | length > 0
+  vars:
+    query: "@[?name==`{{ hostvars[item].config.name }}`]"
+
+- name: wait for vms to be powered off
+  ansible.builtin.async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: vm_shutdown
+  until: vm_shutdown.finished
+  retries: "{{ vmware_boot_winpe_instance_wait_retry_limit }}"
+  delay: 10
+  failed_when: false
+  loop: "{{ vms_shutdown.results }}"
+  when:
+    - nodes is defined
+    - vms_shutdown.results is defined
+    - item.ansible_job_id is defined
+
+- name: for shutdown if needed
+  block:
+    - name: ensure vm is powered-off
+      community.vmware.vmware_guest:
+        hostname: "{{ lookup('env', 'VMWARE_HOST') }}"
+        username: "{{ lookup('env', 'VMWARE_USER') }}"
+        password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
+        validate_certs: false
+        name: "{{ item }}"
+        uuid: "{{ hostvars[item].config.uuid }}"
+        state: poweredoff
+      async: 7200
+      poll: 0
+      register: vms_powered_off
+      loop: "{{ ansible_play_hosts }}"
+      when:
+        - nodes is defined
+        - hostvars[item].config.uuid is defined
+        - hostvars[item].config.name is defined
+        - (nodes | json_query(query)) | length > 0
+      vars:
+        query: "@[?name==`{{ hostvars[item].config.name }}`]"
+
+    - name: wait for vms to be powered off
+      ansible.builtin.async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: vm_powered_off
+      until: vm_powered_off.finished
+      retries: "{{ vmware_boot_winpe_instance_wait_retry_limit }}"
+      delay: 10
+      loop: "{{ vms_powered_off.results }}"
+      when:
+        - nodes is defined
+        - vms_powered_off.results is defined
+        - item.ansible_job_id is defined

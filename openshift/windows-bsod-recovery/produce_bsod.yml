@@ -1,0 +1,5 @@
+---
+- name: produce bsod (testing purposes)
+  hosts: all
+  roles:
+    - oh_no_bsod

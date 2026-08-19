@@ -1,0 +1,32 @@
+---
+
+controller_templates:
+  - name: Generate WinPE
+    description: Generates WinPE image on the provisioned Windows system
+    organization: Default
+    project: ansible-windows-0-day-bsod-recovery-fix
+    playbook: generate_winpe.yml
+    extra_vars:
+      create_winpe_destination_file_location: iso_upload
+      create_winpe_enable_autostart: true
+      create_winpe_enable_powershell_modules: false
+      create_winpe_enable_script_debug: false
+      create_winpe_load_drivers: false
+    execution_environment: ansible-base-ee-dev
+    ask_credential_on_launch: true
+    ask_inventory_on_launch: true
+    ask_limit_on_launch: true
+    ask_variables_on_launch: true
+
+  - name: Upload WinPE ISO
+    description: Uploads the generated WinPE ISO to VMware/OpenShift Virtualization
+    organization: Default
+    project: ansible-windows-0-day-bsod-recovery-fix
+    playbook: upload_winpe_iso.yml
+    extra_vars:
+      provider: vmware
+    execution_environment: ansible-base-ee-dev
+    ask_credential_on_launch: true
+    ask_inventory_on_launch: true
+    ask_limit_on_launch: true
+    ask_variables_on_launch: true

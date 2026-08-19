@@ -1,0 +1,91 @@
+---
+- name: run pre-flight tasks
+  ansible.builtin.include_tasks: pre_flight.yml
+
+- name: show os level
+  ansible.builtin.debug:
+    msg: "{{ create_winpe_os_level }}"
+
+- name: set create_winpe_name
+  ansible.builtin.set_fact:
+    create_winpe_name: "{{ create_winpe_name }}_ps"
+  when: create_winpe_enable_powershell_modules | bool
+
+- name: set create_winpe_name with debug
+  ansible.builtin.set_fact:
+    create_winpe_name: "{{ create_winpe_name }}_debug"
+  when: create_winpe_enable_script_debug | bool
+
+- name: install adk and winpe addon
+  ansible.builtin.include_tasks: install.yml
+
+- name: copy winpeshl.ini file
+  ansible.windows.win_copy:
+    src: winpeshl.ini
+    dest: "{{ create_winpe_temp_directory }}\\winpeshl.ini"
+  when: create_winpe_enable_autostart | bool
+
+- name: create winprep.cmd file
+  ansible.windows.win_copy:
+    src: winprep.cmd
+    dest: "{{ create_winpe_temp_directory }}\\winprep.cmd"
+
+- name: create init.cmd file
+  ansible.windows.win_copy:
+    src: "{{ create_winpe_init_file }}"
+    dest: "{{ create_winpe_temp_directory }}\\init.cmd"
+
+- name: load drivers
+  ansible.builtin.include_tasks: install_drivers.yml
+  when: create_winpe_load_drivers | bool
+
+- name: create a working copy of the windows pe files
+  ansible.windows.win_shell: >
+    "..\Deployment Tools\DandISetEnv.bat"
+    & copype {{ create_winpe_arch }} C:\{{ create_winpe_name }}
+  args:
+    executable: cmd
+    chdir: C:\ADK\Assessment and Deployment Kit\Windows Preinstallation Environment
+    creates: C:\{{ create_winpe_name }}
+
+- name: copy script file
+  ansible.windows.win_template:
+    src: create_winpe.ps1
+    dest: "{{ create_winpe_temp_directory }}\\create_winpe.ps1"
+
+- name: copy files and modules into winpe
+  ansible.windows.win_shell: "{{ create_winpe_temp_directory }}\\create_winpe.ps1"
+  register: copy_files_and_modules
+
+- name: show the results of create_winpe.ps1 script
+  ansible.builtin.debug:
+    msg: "{{ copy_files_and_modules.stdout }}"
+
+- name: create winpe iso file
+  ansible.windows.win_shell: >
+    "..\Deployment Tools\DandISetEnv.bat" &
+    MakeWinPEMedia /ISO C:\{{ create_winpe_name }} {{ create_winpe_temp_directory }}\{{ create_winpe_name }}.iso
+  args:
+    executable: cmd
+    chdir: C:\ADK\Assessment and Deployment Kit\Windows Preinstallation Environment
+
+- name: remove boot prompts
+  block:
+    - name: remove boot prompt (bios)
+      ansible.windows.win_file:
+        path: C:\{{ create_winpe_name }}\media\Boot\Bootfix.bin
+        state: absent
+
+    - name: replace efifsys.bin file (uefi)
+      ansible.windows.win_copy:
+        src: C:\ADK\Assessment and Deployment Kit\Deployment Tools\{{ create_winpe_arch }}\Oscdimg\efisys_noprompt.bin
+        dest: C:\{{ create_winpe_name }}\fwfiles\efisys.bin
+        remote_src: true
+
+- name: create winpe no prompt iso file
+  ansible.windows.win_shell: >
+    "..\Deployment Tools\DandISetEnv.bat" &
+    MakeWinPEMedia /ISO C:\{{ create_winpe_name }} {{ create_winpe_temp_directory }}\{{ create_winpe_name }}_no_prompt.iso
+  args:
+    executable: cmd
+    chdir: C:\ADK\Assessment and Deployment Kit\Windows Preinstallation Environment

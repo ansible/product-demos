@@ -1,0 +1,12 @@
+---
+- name: provision node(s)
+  hosts: localhost
+  become: false
+  vars:
+    provider: vmware
+    scenario: winpe
+  vars_files:
+    - node-config/{{ scenario }}/node-{{ provider }}.yml
+
+  roles:
+    - ansible-role-{{ provider }}
