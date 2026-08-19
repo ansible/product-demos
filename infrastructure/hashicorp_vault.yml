@@ -25,3 +25,11 @@
       ansible.builtin.include_role:
         name: demo.infrastructure.vault
         tasks_from: "{{ function }}"
+
+    - name: Display Vault connection details for demo purposes
+      when: vault_operation == 'install'
+      ansible.builtin.set_fact:
+        vault_connection_details:
+          vault_addr: "{{ vault_addr }}"
+          vault_fqdn: "{{ vault_fqdn }}"
+          vault_root_token: "{{ vault_k8s_dev_root_token }}"
