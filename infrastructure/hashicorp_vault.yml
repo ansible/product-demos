@@ -31,5 +31,4 @@
       ansible.builtin.set_fact:
         vault_connection_details:
           vault_addr: "{{ vault_addr }}"
-          vault_fqdn: "{{ vault_fqdn }}"
           vault_root_token: "{{ vault_token }}"
