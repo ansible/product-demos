@@ -141,6 +141,10 @@
 # DEMO ONLY: publishing generated passwords via set_stats is convenient for AAP
 # job artifact visualization on localhost (no persistent host). Do not do this
 # in production -- store credentials in a credential/secret manager instead.
+- name: Export generated userpass credentials for playbook output
+  ansible.builtin.set_fact:
+    vault_userpass_credentials: "{{ _vault_userpass_generated_users }}"
+
 - name: Export generated userpass credentials for job artifacts
   when: (_vault_userpass_generated_users | default([]) | length) > 0
   ansible.builtin.set_stats:
