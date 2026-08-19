@@ -32,3 +32,4 @@
         vault_connection_details:
           vault_addr: "{{ vault_addr }}"
           vault_root_token: "{{ vault_token }}"
+          userpass_credentials: "{{ vault_userpass_credentials | default('N/A') }}"
