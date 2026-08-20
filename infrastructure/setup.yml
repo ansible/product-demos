@@ -247,23 +247,8 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     timeout: 3600
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: Release Channel
-          question_description: >-
-            stable for production-grade releases; early-access for evaluation only
-            (no SLA, no upgrade path).
-          type: multiplechoice
-          variable: ao_operator_channel
-          required: true
-          default: candidate
-          choices:
-            - candidate
-            - stable
-            - early-access
+    extra_vars:
+      ao_operator_channel: stable
     credentials:
       - OpenShift Credential
 
