@@ -66,6 +66,9 @@ policy_as_code_vars:
   allow_superuser: true
 ```
 
+> [!NOTE]
+> The demo policies use the `policy_as_code_vars` extra_vars for convenience, but these can be overridden when a job template is configured to prompt for extra_vars on launch.  In a production scenario, either the prompt on launch for extra_vars should be disabled on a job template that passes variables in to OPA for processing, or static policies that cannot be modified through AAP should be used.
+
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `maintenance_window_start` | Start of the allowed execution window (HH:MM, 24-hour) | Not set (no restriction) |
@@ -89,6 +92,7 @@ policy_as_code_vars:
 6. Add `policy_as_code_vars` to the organization or job template's extra_vars with a maintenance window that excludes the current time — run the job to show it is denied with a message indicating the allowed window
 7. Adjust the maintenance window to include the current time and re-run to show it is allowed
 8. Optionally use **Infrastructure | OPA - Add Policy** to upload a custom policy via the REST API, demonstrating runtime policy updates without redeployment
+  - If you customized the namespace in Step 1, be sure to use the same namespace value when adding a policy
 
 ## Talking points
 
