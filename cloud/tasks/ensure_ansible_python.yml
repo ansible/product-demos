@@ -1,16 +1,38 @@
 ---
-# RHEL 8 may only have platform-python 3.6 until the python3 package is installed.
-# Product Demos EE (ansible-core 2.17+) requires Python 3.8+ on managed hosts.
-- name: Install Python 3 when /usr/bin/python3 is missing
-  ansible.builtin.raw: >-
-    test -x /usr/bin/python3 ||
-    (dnf install -y python3 && test -x /usr/bin/python3)
+# RHEL 8 ships python3 (3.6) and platform-python (3.6). Product Demos EE
+# (ansible-core 2.17+) requires Python 3.8+ on managed hosts.
+- name: Ensure a supported Python is installed for Ansible modules
+  ansible.builtin.raw: |
+    set -e
+    for py in /usr/bin/python3.9 /usr/bin/python3; do
+      if [ -x "$py" ] && "$py" -c 'import sys; sys.exit(0 if sys.version_info[:2] >= (3, 8) else 1)'; then
+        exit 0
+      fi
+    done
+    dnf install -y python39
+    /usr/bin/python3.9 -c 'import sys; sys.exit(0 if sys.version_info[:2] >= (3, 8) else 1)'
   register: _ensure_ansible_python
   changed_when: >-
     'Installing' in (_ensure_ansible_python.stdout | default(''))
     or 'Upgrading' in (_ensure_ansible_python.stdout | default(''))
   failed_when: _ensure_ansible_python.rc != 0
 
-- name: Pin Ansible module interpreter to Python 3
+- name: Detect Ansible module interpreter path
+  ansible.builtin.raw: |
+    for py in /usr/bin/python3.9 /usr/bin/python3; do
+      if [ -x "$py" ] && "$py" -c 'import sys; sys.exit(0 if sys.version_info[:2] >= (3, 8) else 1)'; then
+        echo "$py"
+        exit 0
+      fi
+    done
+    exit 1
+  register: _ansible_python_path
+  changed_when: false
+  failed_when: _ansible_python_path.rc != 0
+
+- name: Pin Ansible module interpreter
   ansible.builtin.set_fact:
-    ansible_python_interpreter: /usr/bin/python3
+    ansible_python_interpreter: "{{ _ansible_python_path.stdout_lines | last | trim }}"
+
+- name: Reset SSH connection to apply Python interpreter
+  ansible.builtin.meta: reset_connection

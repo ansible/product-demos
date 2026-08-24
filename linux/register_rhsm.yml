@@ -6,7 +6,7 @@
   gather_facts: false
 
   vars:
-    ansible_python_interpreter: /usr/bin/python3
+    ansible_python_interpreter: /usr/bin/python3.9
 
   tasks:
     - name: Ensure Python 3 is available for Ansible
