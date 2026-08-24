@@ -1,0 +1,9 @@
+---
+# RHEL 8 may only have platform-python 3.6 until the python3 package is installed.
+# Product Demos EE (ansible-core 2.17+) requires Python 3.8+ on managed hosts.
+- name: Install Python 3 when /usr/bin/python3 is missing
+  ansible.builtin.raw: test -x /usr/bin/python3 || dnf install -y python3
+  register: _ensure_ansible_python
+  changed_when: >-
+    'Installing' in (_ensure_ansible_python.stdout | default(''))
+    or 'Upgrading' in (_ensure_ansible_python.stdout | default(''))
