@@ -1,0 +1,31 @@
+---
+# Ensures at least 1 GB of swap is available.
+# Small EC2 instances (t2.micro/small) often have no swap, causing
+# DNF metadata operations to be OOM-killed (rc: -9).
+
+- name: Check for existing swap
+  ansible.builtin.command: swapon --show --noheadings
+  register: _swap_check
+  changed_when: false
+  failed_when: false
+
+- name: Create 1 GB swap file
+  when: _swap_check.stdout | length == 0
+  block:
+    - name: Allocate swap file
+      ansible.builtin.command: dd if=/dev/zero of=/swapfile bs=1M count=1024
+      args:
+        creates: /swapfile
+
+    - name: Set swap file permissions
+      ansible.builtin.file:
+        path: /swapfile
+        mode: "0600"
+
+    - name: Format swap file
+      ansible.builtin.command: mkswap /swapfile
+      changed_when: true
+
+    - name: Enable swap file
+      ansible.builtin.command: swapon /swapfile
+      changed_when: true

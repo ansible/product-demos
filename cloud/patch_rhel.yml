@@ -1,0 +1,44 @@
+---
+- name: Patch specific RHEL CVEs
+  hosts: "{{ _hosts | default('os_linux') }}"
+  strategy: free
+  become: true
+  gather_facts: false
+
+  vars:
+    _raw_cve_input: "{{ input_cve_ids | default('RHSA-2024:3138, CVE-2024-33599') }}"
+    cve_advisory_ids: "{{ (_raw_cve_input.split(',') | map('trim') | list) if _raw_cve_input is string else _raw_cve_input }}"
+
+  tasks:
+    - name: Ensure RHSM registration
+      ansible.builtin.include_tasks: tasks/rhsm_ensure_registered.yml
+
+    - name: Ensure swap for DNF operations
+      ansible.builtin.include_tasks: tasks/ensure_swap.yml
+      when: rhsm_registered
+
+    - name: Apply specific advisories via dnf
+      ansible.builtin.command:
+        cmd: "dnf update --setopt=metadata_expire=7200 --advisory={{ cve_advisory_ids | join(' --advisory=') }} -y"
+      register: dnf_result
+      changed_when: "'Nothing to do' not in dnf_result.stdout"
+      when: rhsm_registered
+
+    - name: Check if reboot is required
+      ansible.builtin.command: needs-restarting -r
+      register: reboot_check
+      failed_when: false
+      changed_when: false
+      when: rhsm_registered
+
+    - name: Set reboot_required fact
+      ansible.builtin.set_fact:
+        reboot_required: "{{ reboot_check.rc | default(0) != 0 }}"
+        cacheable: true
+
+    - name: Report status
+      ansible.builtin.debug:
+        msg:
+          - "Target Advisories: {{ cve_advisory_ids | join(', ') }}"
+          - "Patching status: {{ 'SKIPPED (host not registered with RHSM)' if rhsm_unregistered | default(false) else ('Changes applied' if dnf_result.changed else 'No updates needed') }}"
+          - "Reboot required: {{ reboot_required }}"

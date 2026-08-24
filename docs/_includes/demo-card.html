@@ -1,0 +1,47 @@
+{% if demo.url %}
+  {% assign card_href = demo.url | relative_url %}
+{% elsif demo.github_path %}
+  {% assign card_href = "https://github.com/" | append: site.repository | append: "/blob/main/" | append: demo.github_path %}
+{% else %}
+  {% assign card_href = "#" %}
+{% endif %}
+
+<article
+  class="demo-card{% if include.featured %} demo-card--featured{% endif %}"
+  data-status="{{ demo.status }}"
+  data-category="{{ demo.category }}"
+  data-search="{{ demo.title | downcase }} {{ demo.subtitle | downcase }} {{ demo.blurb | downcase }} {{ demo.category | downcase }} {% for tag in demo.tags %}{{ tag | downcase }} {% endfor %}"
+>
+  <a href="{{ card_href }}" class="demo-card__link">
+    <div class="demo-card__thumb" style="background: {{ demo.thumbnail.gradient }};">
+      <span class="demo-card__icon">{{ demo.thumbnail.icon }}</span>
+      {% if demo.is_workflow %}
+        <span class="demo-card__badge demo-card__badge--level">Workflow</span>
+      {% endif %}
+    </div>
+    <div class="demo-card__body">
+      <div class="demo-card__meta">
+        <span class="demo-card__category">{{ demo.category | capitalize }}</span>
+        <span class="demo-card__status demo-card__status--active">Active</span>
+      </div>
+      <h3 class="demo-card__title">{{ demo.title }}</h3>
+      <p class="demo-card__blurb">{{ demo.blurb }}</p>
+      {% if demo.tags %}
+        <div class="demo-card__tags">
+          {% for tag in demo.tags %}
+            <span class="tag" data-tag="{{ tag }}">{{ tag }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <div class="demo-card__stats">
+        {% if demo.stats.workflows > 0 %}
+          <span>{{ demo.stats.workflows }} workflow{% if demo.stats.workflows != 1 %}s{% endif %}</span>
+        {% endif %}
+        {% if demo.stats.playbooks > 0 %}
+          <span>{{ demo.stats.playbooks }} playbook{% if demo.stats.playbooks != 1 %}s{% endif %}</span>
+        {% endif %}
+        {% if demo.author %}<span class="demo-card__author">{{ demo.author }}</span>{% endif %}
+      </div>
+    </div>
+  </a>
+</article>

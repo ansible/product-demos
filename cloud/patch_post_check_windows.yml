@@ -1,0 +1,49 @@
+---
+- name: Post-check patch verification - Windows
+  hosts: "{{ _hosts_windows | default('os_windows') }}"
+  gather_facts: false
+
+  vars:
+    _raw_kb_input: "{{ input_kb_ids | default('KB5044284, KB5044030') }}"
+    target_kb_ids: "{{ (_raw_kb_input.split(',') | map('trim') | list) if _raw_kb_input is string else _raw_kb_input }}"
+
+  tasks:
+    - name: Search WUA for remaining applicable updates
+      ansible.windows.win_updates:
+        category_names:
+          - SecurityUpdates
+          - CriticalUpdates
+        state: searched
+      register: win_post_search
+
+    - name: Verify all targeted KBs in one pass
+      ansible.windows.win_shell: |
+        $targetKBs = @({{ target_kb_ids | map('regex_replace', '^', "'") | map('regex_replace', '$', "'") | join(',') }})
+        $allMissing = @({{ win_post_search.updates | map(attribute='kb') | flatten | map('regex_replace', '^', "'") | map('regex_replace', '$', "'") | join(',') }})
+        $hotfixes = Get-HotFix | Select-Object -ExpandProperty HotFixID
+        $remaining = @()
+        foreach ($kb in $targetKBs) {
+            $id = $kb.ToUpper().Replace("KB", "")
+            $installed = $hotfixes -match $id
+            $needed = $allMissing -contains $id
+            if (-not $installed -and $needed) { $remaining += $kb }
+        }
+        Write-Output ($remaining -join ",")
+      register: kb_post_result
+      changed_when: false
+
+    - name: Identify any remaining Windows KBs
+      ansible.builtin.set_fact:
+        remaining_patches: "{{ (kb_post_result.stdout | trim).split(',') | select if (kb_post_result.stdout | trim) else [] }}"
+
+    - name: Determine Windows compliance status
+      ansible.builtin.set_fact:
+        is_compliant: "{{ remaining_patches | length == 0 }}"
+
+    - name: Summary of Windows post-check
+      ansible.builtin.debug:
+        msg: >
+          System: {{ inventory_hostname }} |
+          Status: {{ 'COMPLIANT' if is_compliant else 'NON-COMPLIANT' }} |
+          Remaining Issues: {{ remaining_patches | join(', ') if remaining_patches else 'None' }}
+      failed_when: not is_compliant

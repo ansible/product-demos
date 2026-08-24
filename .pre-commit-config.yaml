@@ -4,7 +4,11 @@ repos:
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
-        exclude: rhel[89]STIG/.*$
+        exclude: >
+          (?x)^(
+            collections/ansible_collections/demo/compliance/roles/.*|
+            .*/rhel[89]STIG/.*
+          )$
 
       - id: check-yaml
         exclude: \.j2.(yaml|yml)$|\.(yaml|yml).j2$
@@ -14,16 +18,33 @@ repos:
       - id: check-json
       - id: check-symlinks
 
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        args: ["-L", "sumbit,UserA,bootup,nd"]
+        exclude: >
+          (?x)^(
+            collections/ansible_collections/demo/compliance/roles/.*|
+            .*/rhel[89]STIG/.*
+          )$
+        additional_dependencies:
+          - tomli
+
   - repo: local
     hooks:
       - id: ansible-lint
-        name: ansible-navigator lint --eei quay.io/ansible-product-demos/apd-ee-25:latest --mode stdout
+        name: ansible-navigator lint --eei quay.io/ansible-product-demos/apd-ee-26:latest --mode stdout
         language: python
-        entry: bash -c "ansible-navigator lint --eei quay.io/ansible-product-demos/apd-ee-25 -v --force-color --mode stdout"
+        entry: bash -c "ansible-navigator lint --eei quay.io/ansible-product-demos/apd-ee-26 -v --force-color --mode stdout"
 
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 23.11.0
     hooks:
       - id: black
-        exclude: rhel[89]STIG/.*$
+        exclude: >
+          (?x)^(
+            collections/ansible_collections/demo/compliance/roles/.*|
+            .*/rhel[89]STIG/.*
+          )$
 ...

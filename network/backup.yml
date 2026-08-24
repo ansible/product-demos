@@ -1,63 +1,51 @@
 ---
-- name: Create network reports server
-  hosts: reports
-  become: true
-
-  tasks:
-    - name: Build report server
-      ansible.builtin.include_role:
-        name: "{{ item }}"
-      loop:
-        - demo.patching.report_server
-
-    - name: Create a backup directory if it does not exist
-      run_once: true
-      ansible.builtin.file:
-        path: "/var/www/html/backups"
-        state: directory
-        owner: ec2-user
-        group: ec2-user
-        mode: '0755'
-
-- name: Play to Backup Cisco Always-On Network Devices
-  hosts: routers
+- name: Wait for Containerlab Devices
+  hosts: localhost
+  connection: local
   gather_facts: false
-  vars:
-    report_server: reports
-    backup_dir: "/tmp/network_backups"
 
   tasks:
-    - name: Network Backup and Resource Manager
-      ansible.builtin.include_role:
-        name: network.backup.run
-      vars:  # noqa var-naming[no-role-prefix]
-        operation: backup
-        type: full
-        data_store:
-          local: "{{ backup_dir }}"
+    - name: Wait for n9kv SSH to be ready
+      ansible.builtin.wait_for:
+        host: "{{ hostvars['n9kv']['ansible_host'] }}"
+        port: 2122
+        search_regex: SSH
+        delay: 10
+        timeout: 600
 
-    # This task removes the Current configuration... from the top of IOS routers show run
-    - name: Remove non config lines - regexp
-      delegate_to: localhost
-      ansible.builtin.lineinfile:
-        path: "{{ backup_dir }}/{{ inventory_hostname }}.txt"
-        line: "Building configuration..."
-        state: absent
+    - name: Wait for cat8kv SSH to be ready
+      ansible.builtin.wait_for:
+        host: "{{ hostvars['cat8kv']['ansible_host'] }}"
+        port: 2123
+        search_regex: SSH
+        delay: 10
+        timeout: 600
 
-    - name: Copy backup file
-      delegate_to: "{{ report_server }}"
-      ansible.builtin.copy:
-        src: "{{ backup_dir }}/{{ inventory_hostname }}.txt"
-        dest: "/var/www/html/backups/{{ inventory_hostname }}.cfg"
+- name: Backup Containerlab Network Devices
+  hosts: containerlab
+  gather_facts: false
+
+  vars:
+    backup_dir: /tmp/network_backups
+
+  tasks:
+    - name: Backup IOS-XE configuration
+      cisco.ios.ios_config:
         backup: true
-        owner: ec2-user
-        group: ec2-user
-        mode: '0644'
+        backup_options:
+          dir_path: "{{ backup_dir }}"
+          filename: "{{ inventory_hostname }}.cfg"
+      when: ansible_network_os == 'cisco.ios.ios'
 
-    - name: Review backup on report server
-      delegate_to: "{{ report_server }}"
+    - name: Backup NX-OS configuration
+      cisco.nxos.nxos_config:
+        backup: true
+        backup_options:
+          dir_path: "{{ backup_dir }}"
+          filename: "{{ inventory_hostname }}.cfg"
+      when: ansible_network_os == 'cisco.nxos.nxos'
+
+    - name: Display backup location
       run_once: true
       ansible.builtin.debug:
-        msg: "To review backed up configurations, go to http://{{ ansible_host }}/backups/"
-
-...
+        msg: "Backups saved to {{ backup_dir }}/ on the execution node"

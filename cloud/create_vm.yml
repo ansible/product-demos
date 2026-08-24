@@ -1,0 +1,46 @@
+---
+- name: Create VM Demo
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - "blueprints/{{ vm_blueprint }}.yml"
+  tasks:
+    - name: Fail if variables not defined
+      ansible.builtin.assert:
+        that:
+          - create_vm_aws_vpc_subnet_name is defined
+          - create_vm_aws_keypair_name is defined
+          - create_vm_aws_securitygroup_name is defined
+        fail_msg: "Required variables not set"
+
+    - name: Set blueprint name tag
+      ansible.builtin.set_fact:
+        create_vm_vm_blueprint: "{{ vm_blueprint }}"
+      when: create_vm_vm_blueprint | default('') | length == 0
+
+    - name: Map vm_deployment to create_vm_vm_deployment
+      ansible.builtin.set_fact:
+        create_vm_vm_deployment: "{{ vm_deployment }}"
+      when:
+        - vm_deployment is defined
+        - create_vm_vm_deployment is not defined or create_vm_vm_deployment | length == 0
+
+    - name: Map vm_environment to create_vm_vm_environment
+      ansible.builtin.set_fact:
+        create_vm_vm_environment: "{{ vm_environment }}"
+      when:
+        - vm_environment is defined
+        - create_vm_vm_environment is not defined or create_vm_vm_environment | length == 0
+
+    - name: Map create_vm_aws_owner_tag to create_vm_vm_owner
+      ansible.builtin.set_fact:
+        create_vm_vm_owner: "{{ create_vm_aws_owner_tag }}"
+      when:
+        - create_vm_aws_owner_tag is defined
+        - create_vm_vm_owner is not defined or create_vm_vm_owner | length == 0
+
+    - name: Include create vm role
+      ansible.builtin.include_role:
+        name: demo.cloud.aws
+        tasks_from: create_vm

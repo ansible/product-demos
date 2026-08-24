@@ -1,0 +1,18 @@
+---
+namespace: demo
+name: patching
+version: 1.0.0+08062601
+readme: README.md
+authors:
+  - Ansible Product Demos (https://github.com/ansible/product-demos)
+description: Roles and modules supporting patching and reporting demos in ansible-product-demos.
+license:
+  - GPL-3.0-or-later
+tags:
+  - apd
+  - patching
+  - linux
+  - windows
+repository: https://github.com/ansible/product-demos
+issues: https://github.com/ansible/product-demos/issues
+...

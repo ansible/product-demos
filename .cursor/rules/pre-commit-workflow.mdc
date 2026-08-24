@@ -1,0 +1,14 @@
+---
+description: Run product-demos pre-commit before considering Ansible/YAML work complete
+alwaysApply: true
+---
+
+# Pre-commit gate for product-demos
+
+When changing playbooks, roles, AAP setup YAML, or collections in this repo, run pre-commit before handing work back:
+
+```bash
+python3 -m pre_commit run --config .pre-commit-gh.yml --files $(git diff --name-only -- '*.yml' '*.yaml' '*.j2' | tr '\n' ' ')
+```
+
+CI uses `.github/workflows/pre-commit.yml` with the `pull_request` event (not `pull_request_target`) so fork PRs are linted without privileged checkout. See `.github/workflows/README.md` for the short why.

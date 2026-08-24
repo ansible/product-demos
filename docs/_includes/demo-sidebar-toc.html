@@ -1,0 +1,6 @@
+{% assign demo = site.data.demos | where: "slug", page.demo_slug | first %}
+
+<nav class="demo-toc" aria-label="On this page">
+  <p class="nav-heading">On this page</p>
+  <!-- TOC links are built dynamically by demo-toc.js -->
+</nav>

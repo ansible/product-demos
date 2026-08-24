@@ -1,0 +1,132 @@
+---
+- name: Uninstall Automation Orchestrator via aapctl
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    _k8s_host: "{{ lookup('env', 'K8S_AUTH_HOST') | default('', true) }}"
+    _k8s_token: "{{ lookup('env', 'K8S_AUTH_API_KEY') | default('', true) }}"
+    _k8s_verify_ssl: "{{ lookup('env', 'K8S_AUTH_VERIFY_SSL') | default('true', true) | bool }}"
+
+    _ca_raw: "{{ lookup('env', 'K8S_AUTH_SSL_CA_CERT') | default('', true) }}"
+    _ca_is_inline: "{{ _ca_raw is search('BEGIN CERTIFICATE') }}"
+
+  tasks:
+    - name: Verify AAP credential env vars are set
+      ansible.builtin.assert:
+        that:
+          - _k8s_host | length > 0
+          - _k8s_token | length > 0
+        fail_msg: >-
+          K8S_AUTH_HOST and K8S_AUTH_API_KEY must be set.
+          Attach an 'OpenShift or Kubernetes API Bearer Token' credential to this job template.
+
+    - name: Verify aapctl is present in the execution environment
+      ansible.builtin.command:
+        cmd: aapctl version
+      register: _aapctl_version
+      changed_when: false
+      failed_when: _aapctl_version.rc != 0
+
+    - name: Uninstall Automation Orchestrator
+      block:
+
+        # --- CA handling -------------------------------------------------
+        - name: Create temp file for inline CA certificate
+          ansible.builtin.tempfile:
+            state: file
+            suffix: .crt
+          register: _ca_tmp
+          when: _ca_is_inline | bool
+
+        - name: Write inline CA certificate
+          ansible.builtin.copy:
+            dest: "{{ _ca_tmp.path }}"
+            mode: '0600'
+            content: "{{ _ca_raw }}"
+          when: _ca_is_inline | bool
+
+        - name: Resolve the CA path to use
+          ansible.builtin.set_fact:
+            _ca_path: >-
+              {{ (_ca_tmp.path if (_ca_is_inline | bool) else _ca_raw) | default('', true) }}
+
+        # --- kubeconfig --------------------------------------------------
+        - name: Assemble kubeconfig structure
+          ansible.builtin.set_fact:
+            _kubeconfig_data:
+              apiVersion: v1
+              kind: Config
+              current-context: target
+              clusters:
+                - name: target
+                  cluster: >-
+                    {{
+                      {'server': _k8s_host}
+                      | combine(
+                          {'certificate-authority': _ca_path} if _ca_path | length > 0
+                          else ({'insecure-skip-tls-verify': true} if not _k8s_verify_ssl else {})
+                        )
+                    }}
+              contexts:
+                - name: target
+                  context:
+                    cluster: target
+                    user: aap
+              users:
+                - name: aap
+                  user:
+                    token: "{{ _k8s_token }}"
+          no_log: true
+
+        - name: Create temp file for kubeconfig
+          ansible.builtin.tempfile:
+            state: file
+            suffix: .kubeconfig
+          register: _kubeconfig_tmp
+
+        - name: Write kubeconfig
+          ansible.builtin.copy:
+            dest: "{{ _kubeconfig_tmp.path }}"
+            mode: '0600'
+            content: "{{ _kubeconfig_data | to_nice_yaml(indent=2) }}"
+          no_log: true
+
+        # --- uninstall ---------------------------------------------------
+        - name: Uninstall Automation Orchestrator
+          ansible.builtin.command:
+            cmd: >-
+              aapctl uninstall ao
+              --kubeconfig {{ _kubeconfig_tmp.path }}
+              --set cloudnative-pg-operator.enabled=true
+              -y
+          register: aapctl_result
+          changed_when: aapctl_result.rc == 0
+
+        - name: Show aapctl output
+          ansible.builtin.debug:
+            var: aapctl_result.stdout_lines
+
+        - name: Note that resource cleanup continues in the background
+          ansible.builtin.debug:
+            msg: >-
+              aapctl has requested removal of Automation Orchestrator.
+              OpenShift is now tearing down the remaining resources in the
+              background; this typically completes within a few minutes.
+              Automation Orchestrator may remain reachable until the route
+              and its pods are fully removed.
+
+      always:
+        - name: Clean up generated credentials
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          loop: >-
+            {{
+              [_kubeconfig_tmp.path | default(''), _ca_tmp.path | default('')]
+              | reject('equalto', '')
+              | list
+            }}
+          loop_control:
+            label: "{{ item }}"

@@ -4,86 +4,89 @@
 - [Network Demos](#network-demos)
   - [Table of Contents](#table-of-contents)
   - [About These Demos](#about-these-demos)
-    - [Project](#project)
-    - [Inventory](#inventory)
+  - [Infrastructure](#infrastructure)
+  - [Getting Started](#getting-started)
+  - [Workflows](#workflows)
+  - [Job Templates](#job-templates)
   - [Suggested Usage](#suggested-usage)
 
 ## About These Demos
-This category of demos shows examples of network operations and management with Ansible Automation Platform. The list of demos can be found below. See the [Suggested Usage](#suggested-usage) section of this document for recommendations on how to best use these demos.
-- [**NETWORK / Configuration**](https://github.com/nleiva/ansible-net-modules/blob/main/main.yml) - Deploy golden configurations for different resources to Cisco IOS, IOSXR, and NXOS.
+This category of demos shows examples of network operations and management with Ansible Automation Platform. The demos run against Cisco NX-OS and IOS-XE devices hosted in a [containerlab](https://containerlab.dev/) topology on AWS, providing a fully self-contained environment with no external dependencies.
 
-To run the demos, deploy them using Infrastructure as Code, run either the "Product Demos | Multi-demo setup" or the "Product Demos | Single demo setup" and select 'Network' in the "Product Demos" deployment, or utilize the steps in the repo level README.
+## Infrastructure
 
-### Project
+The network demos use containerlab to run virtual Cisco devices as containers on an AWS EC2 hypervisor with nested virtualization enabled.
 
-These demos leverage playbooks from a [git repo](https://github.com/nleiva/ansible-net-modules) that is added as the **`Network Golden Configs`** Project in your Ansible Controller. Review this repo for the playbooks to configure different resources and network config templates that will be configured.
+| Component | Details |
+|-----------|---------|
+| **Hypervisor** | RHEL 9 on AWS EC2 (c8i.2xlarge) with nested virtualization |
+| **Container Runtime** | Podman |
+| **NX-OS Device** | Cisco Nexus 9000v (`n9kv`) — SSH on port 2122 |
+| **IOS-XE Device** | Cisco Catalyst 8000v (`cat8kv`) — SSH on port 2123 |
+| **Regions** | us-east-2, us-west-2 |
 
-### Inventory
+Device connectivity is handled via an **SSH Proxy** credential type that routes connections through the hypervisor to the containerlab devices. A dedicated **ContainerLab Inventory** holds the device hosts and group variables.
 
-These demos leverage "always-on" instances for Cisco IOS, IOSXR, and NXOS from [Cisco DevNet Sandboxes](https://developer.cisco.com/docs/sandbox/#!getting-started/always-on-sandboxes). These instances are shared and do not provide admin access but they are instantly avaible all the time meaning no setup time is required.
+## Getting Started
 
-A **`Demo Inventory`** is created when setting up these demos and a dynamic source is added to populate the Always-On instances. Review the inventory file [here](https://github.com/nleiva/ansible-net-modules/blob/main/hosts).  Demo Inventory is the default inventory for **`Product Demos`**.
+1. Deploy the demos using the "Product Demos | Multi-demo setup" or "Product Demos | Single demo setup" and select **Network**.
+2. Run the **NETWORK ǀ Deploy Containerlab Stack** workflow to provision the infrastructure. This will:
+   - Provision an EC2 hypervisor with nested virtualization
+   - Deploy the containerlab topology (n9kv + cat8kv)
+   - Sync the ContainerLab Inventory with the hypervisor IP
+3. Once the stack is up, run the demo job templates (Report, Backup, DISA STIG, Configure Devices).
+4. When finished, run **NETWORK ǀ Destroy Containerlab Stack** to tear down all AWS resources.
+
+## Workflows
+
+| Workflow | Description |
+|----------|-------------|
+| [**Deploy Containerlab Stack**](docs/network-deploy-containerlab-stack.md) | Provision an AWS hypervisor, deploy the containerlab topology, and sync the inventory. |
+| [**Destroy Containerlab Stack**](docs/network-destroy-containerlab-stack.md) | Tear down the containerlab topology and delete all AWS resources (VPC, subnet, security group, EC2 instance, keypair). |
+| [**Palo Alto Firewall Demo**](docs/network-panos-workflow.md) | End-to-end Palo Alto firewall workflow: deploy, configure, validate, and clean up a PAN-OS instance. |
+
+## Job Templates
+
+### Containerlab Lifecycle
+
+| Job Template | Description |
+|--------------|-------------|
+| **Provision Hypervisor** | Create AWS VPC, subnet, security group, keypair, and launch a RHEL 9 EC2 instance with nested virtualization enabled. |
+| **Deploy Topology** | Install podman and containerlab on the hypervisor, pull device images, and start the n9kv + cat8kv topology. |
+| **Configure Devices** | Apply baseline configuration (banner, NTP, SNMP) to the containerlab NX-OS and IOS-XE devices. |
+| **Teardown Topology** | Destroy the running containerlab topology on the hypervisor. |
+| **Teardown Hypervisor** | Terminate the EC2 instance and remove all associated AWS resources. |
+
+### Demo Jobs
+
+| Job Template | Description |
+|--------------|-------------|
+| **Report** | Gather facts from containerlab Cisco devices and display device information including hostname, OS version, model, serial number, and interfaces. |
+| **DISA STIG** | Run the DISA STIG role against the IOS-XE device to assess configuration compliance. Runs in check mode by default. |
+| **Backup** | Back up running configurations from containerlab NX-OS and IOS-XE devices using native Cisco collection modules. |
+
+### Palo Alto
+
+| Job Template | Description |
+|--------------|-------------|
+| **Panos \| Deploy** | Deploy a PAN-OS firewall instance and web server on AWS. |
+| **Panos \| Configure Firewall** | Configure the PAN-OS firewall with network and security settings. |
+| **Panos \| Configure Security Rule** | Create or modify a security rule on the PAN-OS firewall. |
+| **Panos \| Configure Webserver** | Configure the web server behind the firewall. |
+| **Panos \| Cleanup** | Remove all Palo Alto demo AWS resources. |
 
 ## Suggested Usage
 
-**NETWORK / Report** - Use this job to gather facts from Cisco Network devices and create a report with information about the device such as code version, along with configuration information about layers 1, 2, and 3.  This shows how Ansible can be used to gather facts and build reports.  Generating html pages is just one potential output.  This information can be used in a number of ways, such as integration with different network management tools.
-  - to run this you will first need to run the **`Deploy Cloud Stack in AWS`** job template to deploy the report server.  If using a demo.redhat.com Product Demos instance you should use the public key provided in the demo page in the Bastion Host Credentials section. If you are using a different environment, you may need to update the "Demo Credential".
+**Deploy the stack first** — Run the **NETWORK ǀ Deploy Containerlab Stack** workflow before any other network demo. The workflow provisions infrastructure and populates the ContainerLab Inventory. Provisioning takes approximately 10-15 minutes while device images are pulled and virtual devices boot.
 
-**NETWORK / Configuration** - Use this job to execute different [Ansible Network Resource Modules](https://docs.ansible.com/ansible/latest/network/user_guide/network_resource_modules.html) to deploy golden configs. Below is a list of the different resources the can be configured with a link to their golden config.
-  - [acls](https://github.com/nleiva/ansible-net-modules/blob/main/acls.cfg)
-  - [banner](https://github.com/nleiva/ansible-net-modules/blob/main/banner.cfg)
-  - [bgp_global](https://github.com/nleiva/ansible-net-modules/blob/main/bgp_global.cfg)
-  - [hostname](https://github.com/nleiva/ansible-net-modules/blob/main/hostname.cfg)
-  - [l3_interface](https://github.com/nleiva/ansible-net-modules/blob/main/l3_interface.cfg)
-  - [logging](https://github.com/nleiva/ansible-net-modules/blob/main/logging.cfg)
-  - [ntp](https://github.com/nleiva/ansible-net-modules/blob/main/ntp.cfg)
-  - [ospfv2](https://github.com/nleiva/ansible-net-modules/blob/main/ospfv2.cfg)
-  - [prefix_lists](https://github.com/nleiva/ansible-net-modules/blob/main/prefix_lists.cfg)
-  - [snmp](https://github.com/nleiva/ansible-net-modules/blob/main/snmp.cfg)
-  - [user](https://github.com/nleiva/ansible-net-modules/blob/main/user.cfg)
+**NETWORK ǀ Configure Devices** — Run this after deploying the stack to apply baseline device configuration (NTP, SNMP, banners) using Cisco Network Resource Modules. This demonstrates how Ansible standardizes configuration across different network operating systems.
 
-**NETWORK / DISA STIG** - Use this job to run the DISA STIG role (in check mode) and show how Ansible can be used for configuration compliance of network devices.  Click into tasks to see what is changed for each compliance rule, i.e.:
-{
-  "changed": true,
-  "warnings": [
-    "To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device"
-  ],
-  "commands": [
-    "ip http max-connections 2"
-  ],
-  "updates": [
-    "ip http max-connections 2"
-  ],
-  "banners": {},
-  "invocation": {
-    "module_args": {
-      "defaults": true,
-      "lines": [
-        "ip http max-connections 2"
-      ],
-      "match": "line",
-      "replace": "line",
-      "multiline_delimiter": "@",
-      "backup": false,
-      "save_when": "never",
-      "src": null,
-      "parents": null,
-      "before": null,
-      "after": null,
-      "running_config": null,
-      "intended_config": null,
-      "backup_options": null,
-      "diff_against": null,
-      "diff_ignore_lines": null
-    }
-  },
-  "_ansible_no_log": false
-}
+**NETWORK ǀ Report** — Gather facts from the containerlab devices and display a summary of each device. Shows how Ansible can collect and present network device information for reporting and auditing.
 
-**NETWORK / BACKUP** - Use this job to show how Ansible can be used to backup network devices using Red Hat validated content. Job Template will create a backup file on the reports server where they can be viewed as a webpage.  This is just an example - backups can also be sent to other repositories such as a Git repo (Github, Gitlab, etc).
+**NETWORK ǀ DISA STIG** — Run in check mode (default) to show how Ansible assesses compliance against DISA STIG rules on IOS-XE devices. Click into tasks to see what would change for each compliance rule.
 
-To run this demo, you will need to complete a couple of prerequisites:
-  - to run this you will first need to run the **`Deploy Cloud Stack in AWS`** job template to deploy the report server.
-  - If using a demo.redhat.com Product Demos instance you should use the public key provided in the demo page in the 'Bastion Host Credentials' section. If you are using a different environment, you may need to update the "Demo Credential".
-  - This works with Product Demos for AAP v2.5; which includes the "Product Demos EE" includes the \
-  network.backup collection.
+**NETWORK ǀ Backup** — Back up device configurations using the native `cisco.ios.ios_config` and `cisco.nxos.nxos_config` modules. Backups are saved on the execution node. This demonstrates how Ansible can automate configuration backup across heterogeneous network environments.
+
+**NETWORK ǀ Panos** — See the [Palo Alto README](./panos/README.md) for usage instructions.
+
+**Clean up when done** — Run the **NETWORK ǀ Destroy Containerlab Stack** workflow to remove all AWS resources and avoid unnecessary costs.
