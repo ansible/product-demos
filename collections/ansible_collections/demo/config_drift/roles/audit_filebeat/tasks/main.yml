@@ -3,6 +3,17 @@
   ansible.builtin.package:
     name: audit
     state: present
+  when: ansible_distribution_major_version | int != 8
+
+- name: Install audit package on RHEL 8
+  ansible.builtin.command:
+    cmd: dnf install -y audit
+  register: config_drift_audit_pkg
+  changed_when: >-
+    'Installing' in (config_drift_audit_pkg.stdout | default(''))
+    or 'Upgrading' in (config_drift_audit_pkg.stdout | default(''))
+  failed_when: config_drift_audit_pkg.rc != 0
+  when: ansible_distribution_major_version | int == 8
 
 - name: Ensure auditd is enabled and running
   ansible.builtin.service:

@@ -19,6 +19,17 @@
     state: present
     disablerepo: "*"
     enablerepo: elastic-8.x
+  when: ansible_distribution_major_version | int != 8
+
+- name: Install Filebeat package on RHEL 8
+  ansible.builtin.command:
+    cmd: dnf install -y filebeat --disablerepo=* --enablerepo=elastic-8.x
+  register: config_drift_filebeat_pkg
+  changed_when: >-
+    'Installing' in (config_drift_filebeat_pkg.stdout | default(''))
+    or 'Upgrading' in (config_drift_filebeat_pkg.stdout | default(''))
+  failed_when: config_drift_filebeat_pkg.rc != 0
+  when: ansible_distribution_major_version | int == 8
 
 - name: Deploy Filebeat main configuration
   ansible.builtin.template:
