@@ -17,3 +17,10 @@ roles/*
 .ansible/
 **/tmp/
 execution_environments/context/
+
+# Build artifact — source of truth is <section>/docs/<slug>.md
+docs/demos/*/index.md
+
+# Leftover export from jopaik/patch_demo clone
+.patch_demo_export/
+

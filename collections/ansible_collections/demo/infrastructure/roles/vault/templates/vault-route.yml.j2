@@ -1,0 +1,17 @@
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: vault
+  namespace: "{{ vault_k8s_namespace }}"
+spec:
+  host: "{{ vault_fqdn }}"
+  to:
+    kind: Service
+    name: "{{ vault_k8s_release_name }}"
+    weight: 100
+  port:
+    targetPort: 8200
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

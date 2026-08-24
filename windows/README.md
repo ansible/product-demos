@@ -20,22 +20,30 @@ This category of demos shows examples of Windows Server operations and managemen
 ### Known Issues
 We are currently investigating an intermittent connectivity issue related to the credentials for Windows hosts. If encountered, re-provision your demo environment. You can track the issue and related work [here](https://github.com/ansible/product-demos/issues/176).
 
+### Workflows
+
+| Workflow | Description |
+|----------|-------------|
+| [**Setup Active Directory Domain**](docs/windows-setup-ad-domain.md) | One-click workflow to provision a domain controller and two domain-joined Windows hosts in AWS, including Kerberos validation. |
+
 ### Jobs
 
-- [**WINDOWS / Install IIS**](install_iis.yml) - Install IIS feature with a configurable index.html
-- [**WINDOWS / Patching**](patching.yml) - Apply Windows updates by category and create report
-- [**WINDOWS / Chocolatey install multiple**](windows_choco_multiple.yml) - Install multiple packages using Chocolatey and check versions
-- [**WINDOWS / Chocolatey install specific**](windows_choco_specific.yml) - Install a single given package using Chocolatey
-- [**WINDOWS / Arbitrary Powershell**](arbitrary_powershell.yml) - Run given Powershell script (default: retrieve cat fact from API)
-- [**WINDOWS / Powershell Script**](powershell_script.yml) - Run a Powershell script stored in source control to query services
-- [**WINDOWS / Powershell DSC configuring password requirements**](powershell_dsc.yml) - Configure password complexity with Powershell desired state config
-- [**WINDOWS / Create Active Directory Domain**](create_ad_domain.yml) - Create a new AD Domain
-- [**WINDOWS / Helpdesk new user portal**](helpdesk_new_user_portal.yml) - Create user in AD Domain
-- [**WINDOWS / Join Active Directory Domain**](join_ad_domain.yml) - Join computer to AD Domain
-
-### Workflows
-- [**Setup Active Directory Domain**](setup_domain_workflow.md) - A workflow to create a domain controller with two domain-joined Windows hosts
-- [**Patch Cloud Stack in AWS**](../cloud/README.md#patch-cloud-stack-in-aws) - (Cloud demo) Snapshot, patch, post-check, and compliance report for both Windows and RHEL EC2 instances
+| Job Template | Description |
+|--------------|-------------|
+| [**Install IIS**](docs/windows-install-iis.md) | Install the IIS web server feature with a configurable index.html page. |
+| [**Patching**](docs/windows-patching.md) | Apply Windows updates by category (Security, Critical, Service Packs, etc.) with optional reboot control. |
+| [**Rollback**](docs/windows-rollback.md) | Rollback a Windows deployment or clean up resources with a custom message. |
+| [**Test Connectivity**](docs/windows-test-connectivity.md) | Verify WinRM connectivity to Windows hosts. |
+| [**Chocolatey Install Multiple**](docs/windows-chocolatey-multiple.md) | Install multiple packages using the Chocolatey package manager and verify versions. |
+| [**Chocolatey Install Specific**](docs/windows-chocolatey-specific.md) | Install a single named package using the Chocolatey package manager. |
+| [**Run PowerShell**](docs/windows-run-powershell.md) | Run an arbitrary PowerShell script on Windows hosts (default: retrieve running services). |
+| [**Run PowerShell (Kerberos)**](docs/windows-run-powershell-kerberos.md) | Run a PowerShell script on domain-joined Windows hosts using Kerberos authentication. |
+| [**Query Services**](docs/windows-query-services.md) | Run a PowerShell script from source control to query running or stopped services. |
+| [**Configure Password Requirements**](docs/windows-password-requirements.md) | Configure password complexity requirements using PowerShell Desired State Configuration (DSC). |
+| [**AD — Create Domain**](docs/windows-ad-create-domain.md) | Create a new Active Directory domain on a Windows server. |
+| [**AD — Join Domain**](docs/windows-ad-join-domain.md) | Join a Windows computer to an existing Active Directory domain. |
+| [**AD — New User**](docs/windows-ad-new-user.md) | Helpdesk portal to create a new user in Active Directory with full contact details. |
+| [**DISA STIG**](docs/windows-disa-stig.md) | Apply Windows Server DISA STIG security hardening configuration. |
 
 ## Suggested Usage
 
@@ -43,9 +51,9 @@ We are currently investigating an intermittent connectivity issue related to the
 
 **WINDOWS / Create Active Directory Domain** - This job can take some to complete. It is recommended to run ahead of time if you would like to demo creating a helpdesk user.
 
-**WINDOWS / Helpdesk new user portal** - This job is dependant on the Create Active Directory Domain completing before users can be created.
+**WINDOWS / Helpdesk new user portal** - This job is dependent on the Create Active Directory Domain completing before users can be created.
 
-**WINDOWS / Join Active Directory Domain** - This job is dependant on the Create Active Directory Domain completing before computers can be joined.
+**WINDOWS / Join Active Directory Domain** - This job is dependent on the Create Active Directory Domain completing before computers can be joined.
 
 ## Connecting to Windows Hosts \[credssp\]
 

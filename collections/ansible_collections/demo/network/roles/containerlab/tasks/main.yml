@@ -1,0 +1,4 @@
+---
+- name: Set containerlab files path
+  ansible.builtin.set_fact:
+    clab_files_path: "{{ role_path }}/files/clab/"

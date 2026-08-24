@@ -12,6 +12,7 @@ The Ansible Product Demos (APD) project is a set of Ansible demos that run on th
 | [Cloud](cloud/README.md) | Demo for infrastructure and cloud provisioning automation |
 | [Network](network/README.md) | Network automation demos |
 | [OpenShift](openshift/README.md) | OpenShift automation demos |
+| [Infrastructure](infrastructure/README.md) | Infrastructure provisioning demos (ROSA cluster lifecycle, etc.) |
 | [Satellite](satellite/README.md) | Demos of automation with Red Hat Satellite Server |
 
 ## Demo catalog
@@ -42,6 +43,30 @@ export AAP_PASSWORD=<admin_user_password>
 ```
 ansible-navigator run -m stdout install-apd.yml
 ```
+
+> [!NOTE]
+> The execution environment used with the install-apd.yml playbook must match the version of the AAP deployment where APD is being installed.  The ansible-navigator configuration defaults to the EE image aligned with AAP 2.6.  To install on an AAP 2.7 deployment, use the `--eei` option to use the related EE image:
+> ```
+> ansible-navigator run -m stdout install-apd.yml \
+>     --eei quay.io/ansible-product-demos/apd-ee-27:latest
+> ```
+
+#### Quick-start one-liner (no environment variables needed)
+
+You can pass all credentials directly as extra vars instead of exporting environment variables. This is useful for a quick setup or when running from a shared machine:
+
+```bash
+ansible-navigator run install-apd.yml \
+  --eei quay.io/ansible-product-demos/apd-ee-27:latest \
+  -e aap_hostname=https://your-aap-server.example.com \
+  -e aap_username=admin \
+  -e aap_password='your-password' \
+  -e '{"aap_validate_certs": false}' \
+  -m stdout
+```
+
+> [!IMPORTANT]
+> If your AAP deployment uses self-signed or untrusted TLS certificates, `aap_validate_certs` must be set to the boolean `false` (not the string `"false"`).  Use the JSON syntax shown above: `-e '{"aap_validate_certs": false}'`
 
 ### Use a pre-installed APD environment on the Red Hat Demo Platform (account required)
 

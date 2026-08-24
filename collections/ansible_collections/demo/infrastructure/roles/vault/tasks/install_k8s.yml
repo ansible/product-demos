@@ -1,0 +1,183 @@
+# Deploy Vault on OpenShift via the HashiCorp Helm chart.
+# The Kubernetes/Helm deployment automation this task is based on was
+# originally authored by Matt Fernandez (deploy-vault.yml, see
+# https://github.com/l3acon/aap-vault), and was carried forward via
+# demo.zero_trust.vault (https://github.com/zjleblanc/ansible-zero-trust).
+#
+# Authentication uses the "OpenShift Credential" (OpenShift or Kubernetes API
+# Bearer Token) attached to the job template, which injects K8S_AUTH_HOST /
+# K8S_AUTH_API_KEY / K8S_AUTH_VERIFY_SSL. kubernetes.core / helm modules read those
+# env vars directly. vault_cli passes the same values to oc as --server /
+# --token / --insecure-skip-tls-verify (no kubeconfig).
+---
+- name: Require OpenShift Bearer Token credential environment variables
+  ansible.builtin.assert:
+    that:
+      - lookup('ansible.builtin.env', 'K8S_AUTH_HOST') | length > 0
+      - lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY') | length > 0
+    fail_msg: >-
+      Missing K8S_AUTH_HOST and/or K8S_AUTH_API_KEY. Attach an
+      "OpenShift or Kubernetes API Bearer Token" credential to the job
+      template (injects K8S_AUTH_HOST, K8S_AUTH_API_KEY, K8S_AUTH_VERIFY_SSL).
+
+- name: Discover OpenShift ingress domain for cluster base URL
+  when: vault_k8s_cluster_base_url is not defined or vault_k8s_cluster_base_url | length == 0
+  register: _vault_k8s_ingress
+  failed_when: false
+  kubernetes.core.k8s_info:
+    api_version: config.openshift.io/v1
+    kind: Ingress
+    name: cluster
+
+- name: Set cluster base URL from OpenShift ingress domain
+  when:
+    - vault_k8s_cluster_base_url is not defined or vault_k8s_cluster_base_url | length == 0
+    - _vault_k8s_ingress is defined and not (_vault_k8s_ingress is failed)
+    - (_vault_k8s_ingress.resources | default([]) | length > 0)
+    - (_vault_k8s_ingress.resources[0].spec.domain | default('') | length > 0)
+  ansible.builtin.set_fact:
+    # Ingress domain is apps.<base>; store the bare cluster base for later.
+    vault_k8s_cluster_base_url: "{{ _vault_k8s_ingress.resources[0].spec.domain }}"
+
+- name: Normalize cluster base URL
+  when: vault_k8s_cluster_base_url is defined and vault_k8s_cluster_base_url | length > 0
+  vars:
+    # Accept scheme/host forms and either cluster.example.com or apps.cluster.example.com.
+    # Strip every leading apps. so FQDN composition never produces apps.apps.
+    _vault_k8s_base_raw: >-
+      {{ vault_k8s_cluster_base_url | urlsplit('hostname')
+         if ('://' in vault_k8s_cluster_base_url)
+         else (vault_k8s_cluster_base_url | regex_replace('^https?://', '') | regex_replace('/+$', '')) }}
+  ansible.builtin.set_fact:
+    vault_k8s_cluster_base_url: "{{ _vault_k8s_base_raw | regex_replace('^(apps\\.)+', '') }}"
+
+- name: Require cluster base URL
+  ansible.builtin.assert:
+    fail_msg: >-
+      Set vault_k8s_cluster_base_url (e.g. cluster.example.com or
+      apps.cluster.example.com). It is discovered automatically from
+      config.openshift.io/v1 Ingress/cluster when unset; set it explicitly
+      if that discovery fails or is unavailable.
+    that:
+      - vault_k8s_cluster_base_url is defined
+      - vault_k8s_cluster_base_url | length > 0
+
+- name: Set Vault FQDN and external address facts
+  vars:
+    # OpenShift Routes are <name>.<ingress domain> == <name>.apps.<base>.
+    _vault_k8s_host: "{{ vault_k8s_release_name }}.apps.{{ vault_k8s_cluster_base_url }}"
+  ansible.builtin.set_fact:
+    vault_fqdn: "{{ _vault_k8s_host }}"
+    vault_addr: "https://{{ _vault_k8s_host }}"
+
+- name: Create Vault namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ vault_k8s_namespace }}"
+    state: present
+
+- name: Add HashiCorp Helm repository
+  kubernetes.core.helm_repository:
+    name: "{{ vault_k8s_helm_repo_name }}"
+    repo_url: "{{ vault_k8s_helm_repo_url }}"
+    state: present
+
+- name: Deploy Vault via Helm
+  kubernetes.core.helm:
+    name: "{{ vault_k8s_release_name }}"
+    chart_ref: "{{ vault_k8s_helm_chart }}"
+    release_namespace: "{{ vault_k8s_namespace }}"
+    create_namespace: true
+    values: "{{ lookup('ansible.builtin.template', 'vault-helm-values.yml.j2') | from_yaml }}"
+    wait: true
+    wait_timeout: "{{ vault_k8s_helm_timeout }}"
+    state: present
+
+- name: Create Vault Route for external access
+  when: vault_k8s_route_enabled | bool
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'vault-route.yml.j2') | from_yaml }}"
+
+- name: Wait for Vault pod to be ready
+  register: vault_pods
+  until: >-
+    vault_pods.resources | length > 0 and
+    vault_pods.resources[0].status.containerStatuses | default([])
+    | selectattr('ready', 'equalto', true) | list | length > 0
+  retries: "{{ vault_k8s_wait_retries | int }}"
+  delay: "{{ vault_k8s_wait_delay | int }}"
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ vault_k8s_namespace }}"
+    label_selectors:
+      - app.kubernetes.io/name=vault
+      - component=server
+    field_selectors:
+      - status.phase=Running
+
+- name: Verify Vault is accessible
+  register: vault_health
+  until: vault_health is not failed
+  retries: "{{ vault_k8s_health_retries | int }}"
+  delay: "{{ vault_k8s_health_delay | int }}"
+  ansible.builtin.uri:
+    url: "{{ vault_addr }}/v1/sys/health"
+    method: GET
+    status_code:
+      - 200
+      - 429
+      - 472
+      - 473
+      - 501
+      - 503
+    validate_certs: "{{ vault_validate_certs }}"
+
+- name: Display Vault status
+  ansible.builtin.debug:
+    msg: >-
+      Vault is running at {{ vault_addr }}
+      (initialized={{ vault_health.json.initialized | default('unknown') }},
+      sealed={{ vault_health.json.sealed | default('unknown') }})
+
+- name: Set vault_token from Helm chart root token
+  no_log: "{{ vault_no_log | default(true) }}"
+  ansible.builtin.set_fact:
+    vault_token: "{{ vault_k8s_dev_root_token }}"
+
+# DEMO ONLY: publishing the root token via set_stats is convenient for AAP job
+# artifact visualization. Do not do this in production -- treat tokens as secrets
+- name: Export Vault connection details for job artifacts
+  ansible.builtin.set_stats:
+    data:
+      vault_addr: "{{ vault_addr }}"
+      vault_root_token: "{{ vault_k8s_dev_root_token }}"
+
+- name: Set vault CLI base fact for Kubernetes deployment
+  no_log: "{{ vault_no_log | default(true) }}"
+  vars:
+    _k8s_auth_host: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}"
+    _k8s_auth_api_key: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY') }}"
+    _k8s_auth_verify_ssl: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_VERIFY_SSL') | default('true', true) | bool }}"
+  ansible.builtin.set_fact:
+    # No kubeconfig: pass Bearer Token credential env vars as oc flags.
+    vault_cli_base: >-
+      oc
+      --server={{ _k8s_auth_host }}
+      --token={{ _k8s_auth_api_key }}
+      {% if not (_k8s_auth_verify_ssl | bool) %}--insecure-skip-tls-verify{% endif %}
+      exec -i
+      -n {{ vault_k8s_namespace }}
+      {{ vault_k8s_pod_name }}
+      -- env
+      VAULT_ADDR=http://127.0.0.1:{{ vault_port }}
+      VAULT_SKIP_VERIFY=1
+      vault
+
+- name: Set vault CLI facts for Kubernetes deployment
+  no_log: "{{ vault_no_log | default(true) }}"
+  ansible.builtin.set_fact:
+    vault_cli: "{{ vault_cli_base }}"
+    vault_cli_addr: "{{ vault_addr }}"

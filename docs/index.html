@@ -5,11 +5,11 @@ description: Browse Ansible Product Demos for Red Hat Ansible Automation Platfor
 ---
 
 {% assign all_demos = site.data.demos %}
-{% assign categories = "cloud,linux,windows,network,openshift,satellite" | split: "," %}
+{% assign categories = "cloud,linux,windows,network,openshift,satellite,infrastructure" | split: "," %}
 
 <div class="hero">
   <h1>Ansible Product Demos</h1>
-  <p>Hands-on demos for Red Hat solution architects and consultants. Order a pre-built environment on <a href="https://red.ht/apd-sandbox" style="color:#4ade80;text-decoration:underline;">demo.redhat.com</a> or install on any AAP deployment.</p>
+  <p>Hands-on demos for Red Hat solution architects and consultants. Order a pre-built environment on <a href="https://red.ht/apd-sandbox" class="hero__link">demo.redhat.com</a> or install on any AAP deployment.</p>
   <div class="search-bar">
     <svg class="search-bar__icon" viewBox="0 0 24 24" aria-hidden="true">
       <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
@@ -36,7 +36,7 @@ description: Browse Ansible Product Demos for Red Hat Ansible Automation Platfor
         {% endif %}
       {% endfor %}
       {% if cat_count > 0 %}
-        <button type="button" class="filter-pill filter-pill--status" data-filter-category="{{ cat }}">{{ cat | capitalize }} <span class="count">{{ cat_count }}</span></button>
+      <button type="button" class="filter-pill filter-pill--status" data-filter-category="{{ cat }}">{{ cat | capitalize }} <span class="count">{{ cat_count }}</span></button>
       {% endif %}
     {% endfor %}
   </div>
