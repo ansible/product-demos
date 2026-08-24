@@ -10,7 +10,7 @@
 
   tasks:
     - name: Ensure Python 3 is available for Ansible
-      ansible.builtin.include_tasks: "{{ playbook_dir }}/../../cloud/tasks/ensure_ansible_python.yml"
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/../../../cloud/tasks/ensure_ansible_python.yml"
 
     - name: Gather facts
       ansible.builtin.setup:
