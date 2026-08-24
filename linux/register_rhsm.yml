@@ -5,7 +5,7 @@
   ignore_unreachable: true
 
   vars:
-    ansible_python_interpreter: auto_silent
+    ansible_python_interpreter: /usr/libexec/platform-python
 
   tasks:
     - name: Check OS family
