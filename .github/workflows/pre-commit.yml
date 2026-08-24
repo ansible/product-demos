@@ -4,10 +4,14 @@ on:
   - push
   - pull_request
 
+# all other scopes (issues, PRs, etc.) become 'none'
+permissions:
+  contents: read
+
 jobs:
-  pre-commit-25:
+  pre-commit-27:
     container:
-      image: quay.io/ansible-product-demos/apd-ee-26
+      image: quay.io/ansible-product-demos/apd-ee-27
       options: --user root
     runs-on: ubuntu-latest
     steps:
