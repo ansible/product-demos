@@ -247,23 +247,8 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     timeout: 3600
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: Release Channel
-          question_description: >-
-            stable for production-grade releases; early-access for evaluation only
-            (no SLA, no upgrade path).
-          type: multiplechoice
-          variable: ao_operator_channel
-          required: true
-          default: candidate
-          choices:
-            - candidate
-            - stable
-            - early-access
+    extra_vars:
+      ao_operator_channel: stable
     credentials:
       - OpenShift Credential
 
@@ -281,6 +266,106 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - OpenShift Credential
+
+  - name: Infrastructure | HashiCorp Vault
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "infrastructure/hashicorp_vault.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Operation
+          type: multiplechoice
+          variable: vault_operation
+          required: true
+          default: install
+          choices:
+            - install
+            - uninstall
+    credentials:
+      - OpenShift Credential
+      - AAP Credential
+
+  - name: Infrastructure | OPA - Deploy Open Policy Agent on OpenShift
+    description: >-
+      Deploys Open Policy Agent on OpenShift and configures AAP's
+      Policy as Code settings to use the new OPA server. All .rego
+      policy files are loaded into a ConfigMap and mounted into the
+      OPA container.
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - OpenShift Credential
+      - AAP Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/opa/deploy-opa.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: OPA namespace
+          question_description: >-
+            OpenShift project/namespace for the OPA deployment
+          type: text
+          variable: opa_namespace
+          required: true
+          default: opa
+        - question_name: OPA container image
+          type: text
+          variable: opa_image
+          required: true
+          default: docker.io/openpolicyagent/opa:latest-static
+
+  - name: Infrastructure | OPA - Add Policy
+    description: >-
+      Uploads a Rego policy to OPA via the REST API. Policies added
+      this way are stored in memory only and will not survive an OPA
+      pod restart.
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - OpenShift Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/opa/add-policy.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: OPA namespace
+          question_description: >-
+            OpenShift project/namespace where OPA is deployed
+          type: text
+          variable: opa_namespace
+          required: true
+          default: opa
+        - question_name: Policy name
+          question_description: >-
+            Unique identifier for the policy (e.g. aap_syntax_check)
+          type: text
+          variable: opa_policy_name
+          required: true
+        - question_name: Rego policy text
+          question_description: >-
+            Rego policy code to upload to OPA
+          type: textarea
+          variable: opa_policy_text
+          required: true
 
 controller_workflows:
   - name: Infrastructure | ROSA - Lifecycle (Create)

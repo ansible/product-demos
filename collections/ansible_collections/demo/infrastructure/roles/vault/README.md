@@ -1,4 +1,4 @@
-# demo.openshift.vault
+# demo.infrastructure.vault
 
 Deploy, initialize, and configure HashiCorp Vault on OpenShift via the HashiCorp Helm chart. Supports AAP OIDC JWT workload identity, KV secrets, and userpass auth.
 
@@ -9,7 +9,7 @@ Invoke with `include_role` and `tasks_from` -- do not call the role without sele
 ```yaml
 - name: Deploy Vault on OpenShift
   ansible.builtin.include_role:
-    name: demo.openshift.vault
+    name: demo.infrastructure.vault
     tasks_from: install_k8s
 ```
 
@@ -17,7 +17,7 @@ Typical sequence: `install_k8s` -> `configure_jwt_auth` (optional) -> `configure
 
 Because the demo targets OpenShift from `localhost` (no managed host filesystem), connection details and generated userpass credentials are exported with `ansible.builtin.set_stats` for AAP job artifact visualization. **Demo only -- do not publish tokens or passwords via `set_stats` in production;** store them in a credential or secret manager instead.
 
-Repo playbook: [`openshift/hashi_vault.yml`](../../../../../../openshift/hashi_vault.yml).
+Repo playbook: [`infrastructure/hashicorp_vault.yml`](../../../../../../infrastructure/hashicorp_vault.yml).
 
 ## Requirements
 
@@ -65,5 +65,5 @@ GPL-3.0-or-later
 
 ## Authors and Acknowledgments
 
-- **Zachary LeBlanc** -- author of the original upstream role, [demo.zero_trust.vault](https://github.com/zjleblanc/ansible-zero-trust/tree/main/collections/ansible_collections/demo/zero_trust/roles/vault); this role is adapted from it for `demo.openshift`.
+- **Zachary LeBlanc** -- author of the original upstream role, [demo.zero_trust.vault](https://github.com/zjleblanc/ansible-zero-trust/tree/main/collections/ansible_collections/demo/zero_trust/roles/vault); this role is adapted from it for `demo.infrastructure`.
 - **Matt Fernandez** -- original author of the Kubernetes/Helm deployment automation used in `tasks/install_k8s.yml`, from [l3acon/aap-vault](https://github.com/l3acon/aap-vault) (`deploy-vault.yml`).

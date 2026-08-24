@@ -5,7 +5,7 @@
   gather_facts: false
 
   vars:
-    ao_channel: "{{ ao_operator_channel | default('candidate') }}"
+    ao_channel: "{{ ao_operator_channel | default('stable') }}"
     ao_namespace: automation-orchestrator
 
     _k8s_host: "{{ lookup('env', 'K8S_AUTH_HOST') | default('', true) }}"

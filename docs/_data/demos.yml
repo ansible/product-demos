@@ -1573,3 +1573,64 @@
   stats:
     playbooks: 1
   github_path: infrastructure/rosa/destroy.yml
+
+- slug: opa-policy-as-code
+  readme_path: infrastructure/docs/opa-policy-as-code.md
+  title: "Infrastructure | OPA — Policy as Code"
+  subtitle: "Enforce governance policies on AAP job execution with Open Policy Agent"
+  category: infrastructure
+  status: active
+  featured: false
+  tags:
+    - Playbook
+    - Survey
+    - OpenShift
+    - OPA
+    - Policy
+    - Governance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #566b78 0%, #2c3e50 100%)"
+    icon: "🛡️"
+  blurb: "Deploy Open Policy Agent on OpenShift and configure AAP Policy as Code to enforce maintenance windows, superuser restrictions, and custom Rego policies."
+  stats:
+    playbooks: 2
+  url: /demos/opa-policy-as-code/
+  github_path: infrastructure/setup.yml
+
+- slug: opa-deploy
+  readme_path: infrastructure/docs/opa-policy-as-code.md
+  url: /demos/opa-deploy/
+  title: "Infrastructure | OPA — Deploy Open Policy Agent"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - OpenShift
+    - OPA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #566b78 0%, #2c3e50 100%)"
+    icon: "🛡️"
+  blurb: "Deploy OPA on OpenShift with bundled Rego policies and configure AAP's Policy as Code settings."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/opa/deploy-opa.yml
+
+- slug: opa-add-policy
+  readme_path: infrastructure/docs/opa-policy-as-code.md
+  url: /demos/opa-add-policy/
+  title: "Infrastructure | OPA — Add Policy"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - OpenShift
+    - OPA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #566b78 0%, #2c3e50 100%)"
+    icon: "🛡️"
+  blurb: "Upload a custom Rego policy to a running OPA server via the REST API at runtime."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/opa/add-policy.yml

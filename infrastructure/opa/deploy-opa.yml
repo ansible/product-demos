@@ -1,0 +1,174 @@
+---
+- name: OPA | Deploy Open Policy Agent
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    _opa_namespace: '{{ opa_namespace | default("opa") }}'
+    _opa_image: '{{ opa_image | default("docker.io/openpolicyagent/opa:latest-static") }}'
+    _opa_labels:
+      app: opa
+      app.kubernetes.io/name: opa
+      app.kubernetes.io/component: policy-engine
+      app.kubernetes.io/managed-by: ansible
+
+  tasks:
+    - name: Verify OpenShift cluster connectivity
+      kubernetes.core.k8s_cluster_info:
+      register: _cluster_info
+
+    - name: Display cluster connection info
+      ansible.builtin.debug:
+        msg: 'Connected to cluster at {{ _cluster_info.connection.host }}'
+
+    - name: Create OPA project
+      redhat.openshift.k8s:
+        api_version: project.openshift.io/v1
+        kind: Project
+        name: '{{ _opa_namespace }}'
+        state: present
+
+    - name: Load policy files from policies directory
+      ansible.builtin.set_fact:
+        _opa_policy_data: '{{ _opa_policy_data | default({}) | combine({item | basename: lookup("file", item)}) }}'
+      loop: '{{ query("fileglob", "policies/*.rego") }}'
+
+    - name: Create policy ConfigMap
+      redhat.openshift.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: opa-policy
+            namespace: '{{ _opa_namespace }}'
+            labels: '{{ _opa_labels }}'
+          data: '{{ _opa_policy_data | default({}) }}'
+
+    - name: Create OPA Deployment
+      redhat.openshift.k8s:
+        state: present
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: opa
+            namespace: '{{ _opa_namespace }}'
+            labels: '{{ _opa_labels }}'
+          spec:
+            selector:
+              matchLabels:
+                app: opa
+            template:
+              metadata:
+                labels: '{{ _opa_labels }}'
+                annotations:
+                  policy-checksum: '{{ (_opa_policy_data | default({})) | to_json | hash("sha256") }}'
+              spec:
+                containers:
+                  - name: opa
+                    image: '{{ _opa_image }}'
+                    args: >-
+                      {{
+                        ['run', '--server', '--addr=0.0.0.0:8181', '--log-level=info']
+                        + (_opa_policy_data | default({}) | sort | map('regex_replace', '^', '/policies/') | list)
+                      }}
+                    ports:
+                      - containerPort: 8181
+                        name: http
+                        protocol: TCP
+                    livenessProbe:
+                      httpGet:
+                        path: /health
+                        port: http
+                      initialDelaySeconds: 10
+                      periodSeconds: 15
+                    readinessProbe:
+                      httpGet:
+                        path: /health
+                        port: http
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      requests:
+                        cpu: 100m
+                        memory: 128Mi
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                    volumeMounts:
+                      - name: opa-policy
+                        mountPath: /policies
+                        readOnly: true
+                volumes:
+                  - name: opa-policy
+                    configMap:
+                      name: opa-policy
+
+    - name: Create OPA Service
+      redhat.openshift.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: opa
+            namespace: '{{ _opa_namespace }}'
+            labels: '{{ _opa_labels }}'
+          spec:
+            selector:
+              app: opa
+            ports:
+              - name: http
+                port: 8181
+                targetPort: http
+                protocol: TCP
+
+    - name: Create OPA Route
+      redhat.openshift.openshift_route:
+        service: opa
+        namespace: '{{ _opa_namespace }}'
+        termination: edge
+        labels: '{{ _opa_labels }}'
+        state: present
+      register: _opa_route
+
+    - name: Wait for OPA rollout to complete
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        name: opa
+        namespace: '{{ _opa_namespace }}'
+      register: _opa_deployment
+      retries: 30
+      delay: 10
+      until:
+        - _opa_deployment.resources | length > 0
+        - (_opa_deployment.resources[0].status.readyReplicas | default(0) | int) >= 1
+
+    - name: Configure AAP Policy as Code settings
+      ansible.controller.settings:
+        settings:
+          OPA_HOST: '{{ _opa_route.result.spec.host }}'
+          OPA_PORT: 443
+          OPA_SSL: true
+          OPA_AUTH_TYPE: None
+          OPA_AUTH_TOKEN: ''
+
+    - name: Display OPA deployment information
+      ansible.builtin.debug:
+        msg:
+          - "========================================="
+          - "OPA Server Deployed on OpenShift"
+          - "========================================="
+          - "Namespace: {{ _opa_namespace }}"
+          - "Image: {{ _opa_image }}"
+          - "---"
+          - "Route: https://{{ _opa_route.result.spec.host }}"
+          - "API endpoint: https://{{ _opa_route.result.spec.host }}/v1"
+          - "Health check: https://{{ _opa_route.result.spec.host }}/health"
+          - "========================================="
+
+...
+# vim: ft=yaml.ansible
