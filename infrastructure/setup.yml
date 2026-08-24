@@ -395,7 +395,7 @@ controller_templates:
           type: text
           variable: _hosts
           required: true
-          default: aws_rhel9
+          default: aws_rhel*
 
 controller_workflows:
   - name: Infrastructure | ROSA - Lifecycle (Create)

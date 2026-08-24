@@ -140,7 +140,7 @@ controller_templates:
           type: text
           variable: _hosts
           required: true
-          default: aws_rhel9
+          default: aws_rhel*
 
   - name: "LINUX | Troubleshoot"
     job_type: run

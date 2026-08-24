@@ -21,8 +21,8 @@ manual configuration change
 
 Recommended order after cloud stack deploy:
 
-1. **LINUX | Register RHEL with RHSM** — `_hosts`: `aws_rhel9` or `aws_rhel*`
-2. **LINUX | Config Drift - Deploy Audit and Filebeat** — same `_hosts` value
+1. **LINUX | Register RHEL with RHSM** — default `_hosts`: `aws_rhel*`
+2. **LINUX | Config Drift - Deploy Audit and Filebeat** — default `_hosts`: `aws_rhel*`
 
 ### Host targeting
 

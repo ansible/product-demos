@@ -13,7 +13,7 @@ Registers RHEL hosts with Red Hat Subscription Manager using an activation key a
 
 | Prompt | Variable | Type | Default | Description |
 |--------|----------|------|---------|-------------|
-| Server Name or Pattern | `_hosts` | text | `aws_rhel9` | `aws_rhel9` for one host, or `aws_rhel*` for every RHEL worker VM |
+| Server Name or Pattern | `_hosts` | text | `aws_rhel*` | Every RHEL worker VM (`aws_rhel8` and `aws_rhel9`) |
 
 ## Job templates
 
