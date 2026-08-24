@@ -62,7 +62,7 @@ Unreachable hosts are skipped (`ignore_unreachable`) so one bad SSH target does 
 ### Setup
 
 1. Run **APD | Single demo setup** with `infrastructure`.
-2. Run **LINUX | Config Drift - Deploy Audit and Filebeat** — `_hosts`: `aws_rhel9`.
+2. Run **LINUX | Config Drift - Deploy Audit and Filebeat** — default `_hosts`: `aws_rhel*`.
 
 ### What was deployed
 
