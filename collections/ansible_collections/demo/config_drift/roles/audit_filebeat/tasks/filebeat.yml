@@ -19,7 +19,6 @@
     state: present
     disablerepo: "*"
     enablerepo: elastic-8.x
-  when: "'filebeat' not in ansible_facts.packages"
 
 - name: Deploy Filebeat main configuration
   ansible.builtin.template:

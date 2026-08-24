@@ -1,13 +1,8 @@
 ---
-- name: Gather package facts
-  ansible.builtin.package_facts:
-    manager: auto
-
 - name: Install audit package
   ansible.builtin.package:
     name: audit
     state: present
-  when: "'audit' not in ansible_facts.packages"
 
 - name: Ensure auditd is enabled and running
   ansible.builtin.service:
