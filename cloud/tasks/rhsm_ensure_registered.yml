@@ -13,6 +13,9 @@
 #   rhsm_registered: bool  – true when the host has valid RHSM identity
 #   rhsm_unregistered: bool – inverse, for convenience in Jinja conditionals
 
+- name: Ensure RHEL 8 uses platform-python for Ansible modules
+  ansible.builtin.include_tasks: use_platform_python_on_rhel8.yml
+
 - name: Skip RHSM check if status already cached
   when: rhsm_registered is defined and rhsm_registered
   ansible.builtin.debug:

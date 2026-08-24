@@ -8,6 +8,9 @@
     ansible_python_interpreter: auto_silent
 
   tasks:
+    - name: Ensure RHEL 8 uses platform-python for Ansible modules
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/../../../cloud/tasks/use_platform_python_on_rhel8.yml"
+
     - name: Check OS family
       ansible.builtin.assert:
         that: ansible_os_family == 'RedHat'
