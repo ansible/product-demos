@@ -52,11 +52,6 @@ controller_inventory_sources:
       compose:
         ansible_host: public_ip_address
         ansible_user: ec2-user
-        ansible_python_interpreter: >-
-          '/usr/libexec/platform-python' if tags.get('blueprint', '') == 'rhel9'
-          else '/usr/bin/python3.9' if tags.get('blueprint', '') == 'rhel8'
-          else '/usr/bin/python3' if platform_details == 'Red Hat Enterprise Linux'
-          else omit
         ansible_winrm_kerberos_hostname_override: tags.Name + '.ansible.local' if platform_details == 'Windows' else omit
       groups:
         cloud_aws: true
@@ -82,10 +77,6 @@ controller_groups:
     inventory: Ansible Product Demos Inventory
     variables:
       ansible_user: ec2-user
-  - name: os_linux
-    inventory: Ansible Product Demos Inventory
-    variables:
-      ansible_python_interpreter: /usr/bin/python3.9
   - name: os_windows
     inventory: Ansible Product Demos Inventory
     variables:

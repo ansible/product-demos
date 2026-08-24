@@ -3,18 +3,11 @@
   hosts: "{{ _hosts | default('aws_rhel*') }}"
   become: true
   ignore_unreachable: true
-  gather_facts: false
 
   vars:
-    ansible_python_interpreter: /usr/bin/python3.9
+    ansible_python_interpreter: auto_silent
 
   tasks:
-    - name: Ensure Python 3 is available for Ansible
-      ansible.builtin.include_tasks: "{{ playbook_dir }}/../../../cloud/tasks/ensure_ansible_python.yml"
-
-    - name: Gather facts
-      ansible.builtin.setup:
-
     - name: Check OS family
       ansible.builtin.assert:
         that: ansible_os_family == 'RedHat'

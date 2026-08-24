@@ -3,4 +3,3 @@ create_vm_aws_image_owners: 309956199498
 create_vm_aws_instance_size: t3.medium
 create_vm_aws_image_architecture: x86_64
 create_vm_aws_image_filter: 'RHEL-8*HVM-*Hourly*'
-create_vm_aws_userdata_template: rhel8_userdata
