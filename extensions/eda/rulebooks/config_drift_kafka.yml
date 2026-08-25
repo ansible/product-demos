@@ -12,18 +12,18 @@
   rules:
     - name: Remediate sshd_config drift detected in audit stream
       condition: >-
-        event.message is defined
-        and event.message is search("sshd_config_change")
-        and event.message is search("type=SYSCALL")
+        event.body.message is defined
+        and event.body.message is search("sshd_config_change")
+        and event.body.message is search("type=SYSCALL")
       throttle:
         once_within: 60 seconds
         group_by_attributes:
-          - host.ip
+          - body.host.ip
       action:
         run_job_template:
           name: "LINUX | SSHD Configuration Remediation"
           organization: "Ansible Product Demos (APD)"
           job_args:
             extra_vars:
-              config_drift_target_ip: "{{ event.host.ip[0] }}"
-              config_drift_audit_message: "{{ event.message }}"
+              config_drift_target_ip: "{{ event.body.host.ip[0] }}"
+              config_drift_audit_message: "{{ event.body.message }}"
