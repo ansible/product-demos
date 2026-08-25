@@ -534,7 +534,6 @@ controller_workflows:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    ask_variables_on_launch: true
     simplified_workflow_nodes:
       - identifier: Install AO
         unified_job_template: Infrastructure | Automation Orchestrator | Install
