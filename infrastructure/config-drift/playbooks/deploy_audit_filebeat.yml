@@ -43,5 +43,3 @@
     - name: Configure auditd monitoring and Filebeat for sshd_config
       ansible.builtin.include_role:
         name: demo.config_drift.audit_filebeat
-      vars:
-        config_drift_kafka_brokers: "{{ config_drift_kafka_brokers | default('') }}"
