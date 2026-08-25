@@ -56,6 +56,13 @@
       ansible.builtin.set_fact:
         create_vm_vm_owner: apd-demo
       when: create_vm_vm_owner is not defined
+
+    - name: Ensure AWS keypair exists in EC2
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/../../../cloud/tasks/ensure_aws_keypair.yml"
+      vars:
+        aws_key_name: "{{ create_vm_aws_keypair_name }}"
+        aws_keypair_owner: "{{ create_vm_vm_owner }}"
+
     - name: Create or reuse Kafka EC2 instance
       ansible.builtin.include_role:
         name: demo.cloud.aws
@@ -66,14 +73,13 @@
         region: "{{ create_vm_aws_region }}"
         filters:
           "tag:Name": "{{ create_vm_vm_name }}"
-          "tag:blueprint": "{{ create_vm_vm_blueprint }}"
-          "tag:deployment": "{{ create_vm_vm_deployment }}"
-          "tag:owner": "{{ create_vm_vm_owner }}"
-          "tag:purpose": "{{ create_vm_vm_purpose }}"
-          "tag:managed-by": "{{ create_vm_apd_managed_by }}"
-          "tag:apd": "{{ create_vm_apd_demo_tag }}"
-          instance-state-name: running
+          instance-state-name:
+            - pending
+            - running
       register: config_drift_kafka_instance
+      until: config_drift_kafka_instance.instances | length > 0
+      retries: 12
+      delay: 5
 
     - name: Assert Kafka instance is running
       ansible.builtin.assert:
