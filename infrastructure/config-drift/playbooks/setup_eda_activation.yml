@@ -233,6 +233,37 @@
             organization: "{{ config_drift_apd_organization }}"
             image_url: "{{ config_drift_eda_decision_environment_image }}"
 
+    - name: Ensure EDA AAP credential exists for run_job_template actions
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.eda_credentials
+      vars:
+        eda_credentials:
+          - name: AAP Credential
+            description: RH AAP credential for config drift rulebook job launches
+            organization: "{{ config_drift_apd_organization }}"
+            credential_type: Red Hat Ansible Automation Platform
+            inputs:
+              host: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') }}"
+              oauth_token: >-
+                {{
+                  lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN')
+                  | default(lookup('ansible.builtin.env', 'AAP_TOKEN'), true)
+                  | default(omit, true)
+                }}
+              username: >-
+                {{
+                  lookup('ansible.builtin.env', 'CONTROLLER_USERNAME')
+                  | default(lookup('ansible.builtin.env', 'AAP_USERNAME'), true)
+                  | default(omit, true)
+                }}
+              password: >-
+                {{
+                  lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD')
+                  | default(lookup('ansible.builtin.env', 'AAP_PASSWORD'), true)
+                  | default(omit, true)
+                }}
+              verify_ssl: "{{ lookup('ansible.builtin.env', 'CONTROLLER_VERIFY_SSL') | default(false) | bool }}"
+
     - name: Configure EDA rulebook activation
       ansible.builtin.include_role:
         name: infra.aap_configuration.eda_rulebook_activations
@@ -246,6 +277,8 @@
             project: "{{ config_drift_eda_project }}"
             rulebook: "{{ config_drift_eda_rulebook }}"
             decision_environment: "{{ config_drift_eda_decision_environment }}"
+            eda_credentials:
+              - AAP Credential
             enabled: true
             restart_policy: always
             extra_vars:
