@@ -243,6 +243,30 @@
                 }}
               verify_ssl: "{{ lookup('ansible.builtin.env', 'CONTROLLER_VERIFY_SSL') | default(false) | bool }}"
 
+    - name: Look up existing config drift rulebook activation
+      ansible.eda.rulebook_activation_info:
+        name: "{{ config_drift_eda_activation_name }}"
+      register: config_drift_existing_activation
+
+    - name: Disable existing config drift rulebook activation before update
+      ansible.eda.rulebook_activation:
+        name: "{{ config_drift_eda_activation_name }}"
+        organization: "{{ config_drift_apd_organization }}"
+        state: disabled
+      when: config_drift_existing_activation.activations | length > 0
+
+    - name: Wait for config drift rulebook activation to stop
+      ansible.eda.rulebook_activation_info:
+        name: "{{ config_drift_eda_activation_name }}"
+      register: config_drift_activation_stop_wait
+      until: >-
+        not config_drift_activation_stop_wait.activations[0].is_enabled
+        and config_drift_activation_stop_wait.activations[0].status
+        not in ['running', 'starting', 'pending']
+      retries: 30
+      delay: 10
+      when: config_drift_existing_activation.activations | length > 0
+
     - name: Configure EDA rulebook activation
       ansible.builtin.include_role:
         name: infra.aap_configuration.eda_rulebook_activations
