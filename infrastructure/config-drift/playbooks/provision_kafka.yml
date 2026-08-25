@@ -98,13 +98,35 @@
         ansible_user: ec2-user
         groups: kafka_broker
         kafka_private_ip: "{{ config_drift_kafka_private_ip }}"
+        kafka_public_ip: "{{ config_drift_kafka_public_ip }}"
 
     - name: Show Kafka broker endpoints
       ansible.builtin.debug:
         msg:
           - "Public IP: {{ config_drift_kafka_public_ip }}"
           - "Private IP (use for Filebeat): {{ config_drift_kafka_private_ip }}:9092"
+          - "Public IP (use for EDA): {{ config_drift_kafka_public_ip }}:9095"
           - "Sync AWS inventory, then run LINUX | Config Drift with Filebeat output set to kafka."
+
+    - name: Look up demo security group for Kafka external listener
+      amazon.aws.ec2_security_group_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          group-name: "{{ create_vm_aws_securitygroup_name }}"
+      register: config_drift_kafka_security_group
+
+    - name: Allow external Kafka listener port for EDA consumers
+      when: config_drift_kafka_security_group.security_groups | length > 0
+      amazon.aws.ec2_security_group:
+        name: "{{ create_vm_aws_securitygroup_name }}"
+        region: "{{ create_vm_aws_region }}"
+        vpc_id: "{{ config_drift_kafka_security_group.security_groups[0].vpc_id }}"
+        purge_rules: false
+        rules:
+          - proto: tcp
+            ports:
+              - 9095
+            cidr_ip: 0.0.0.0/0
 
 - name: Deploy Podman KRaft Kafka on broker host
   hosts: kafka_broker
@@ -121,3 +143,4 @@
         name: demo.config_drift.kafka_queue
       vars:
         kafka_private_ip: "{{ hostvars[inventory_hostname]['kafka_private_ip'] }}"
+        kafka_public_ip: "{{ hostvars[inventory_hostname]['kafka_public_ip'] }}"

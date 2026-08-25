@@ -23,6 +23,48 @@
   ansible.builtin.set_fact:
     config_drift_kafka_advertise_host: >-
       {{ kafka_private_ip | default(ansible_facts['default_ipv4']['address']) }}
+    config_drift_kafka_external_advertise_host: >-
+      {{ kafka_public_ip | default(ansible_facts['default_ipv4']['address']) }}
+
+- name: Build Kafka listener configuration
+  ansible.builtin.set_fact:
+    config_drift_kafka_listeners: >-
+      {{
+        'PLAINTEXT://0.0.0.0:' ~ config_drift_kafka_port
+        ~ ',PLAINTEXT_LOCAL://127.0.0.1:' ~ config_drift_kafka_local_port
+        ~ (
+          ',EXTERNAL://0.0.0.0:' ~ config_drift_kafka_external_port
+          if kafka_public_ip is defined
+          else ''
+        )
+        ~ ',CONTROLLER://127.0.0.1:9093'
+      }}
+    config_drift_kafka_advertised_listeners: >-
+      {{
+        'PLAINTEXT://' ~ config_drift_kafka_advertise_host ~ ':' ~ config_drift_kafka_port
+        ~ ',PLAINTEXT_LOCAL://127.0.0.1:' ~ config_drift_kafka_local_port
+        ~ (
+          ',EXTERNAL://' ~ config_drift_kafka_external_advertise_host ~ ':' ~ config_drift_kafka_external_port
+          if kafka_public_ip is defined
+          else ''
+        )
+      }}
+    config_drift_kafka_listener_security_protocol_map: >-
+      {{
+        'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_LOCAL:PLAINTEXT'
+        ~ (',EXTERNAL:PLAINTEXT' if kafka_public_ip is defined else '')
+      }}
+
+- name: Allow external Kafka port from EDA consumers
+  ansible.posix.firewalld:
+    port: "{{ config_drift_kafka_external_port }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  when:
+    - kafka_public_ip is defined
+    - "'firewalld.service' in ansible_facts.services"
+    - ansible_facts.services['firewalld.service'].state == 'running'
 
 - name: Run single-node KRaft Kafka broker
   containers.podman.podman_container:
@@ -30,16 +72,15 @@
     image: "{{ config_drift_kafka_image }}"
     state: started
     restart_policy: always
-    ports:
-      - "{{ config_drift_kafka_port }}:{{ config_drift_kafka_port }}"
+    ports: "{{ [config_drift_kafka_port ~ ':' ~ config_drift_kafka_port] + ([config_drift_kafka_external_port ~ ':' ~ config_drift_kafka_external_port] if kafka_public_ip is defined else []) }}"
     env:
       CLUSTER_ID: "{{ config_drift_kafka_cluster_id }}"
       KAFKA_NODE_ID: "1"
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:{{ config_drift_kafka_port }},PLAINTEXT_LOCAL://127.0.0.1:{{ config_drift_kafka_local_port }},CONTROLLER://127.0.0.1:9093"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://{{ config_drift_kafka_advertise_host }}:{{ config_drift_kafka_port }},PLAINTEXT_LOCAL://127.0.0.1:{{ config_drift_kafka_local_port }}"
+      KAFKA_LISTENERS: "{{ config_drift_kafka_listeners }}"
+      KAFKA_ADVERTISED_LISTENERS: "{{ config_drift_kafka_advertised_listeners }}"
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_LOCAL:PLAINTEXT"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "{{ config_drift_kafka_listener_security_protocol_map }}"
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@127.0.0.1:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
@@ -124,5 +165,9 @@
   ansible.builtin.debug:
     msg:
       - "Kafka broker listening on {{ config_drift_kafka_advertise_host }}:{{ config_drift_kafka_port }}"
+      - >-
+        External listener:
+        {{ config_drift_kafka_external_advertise_host }}:{{ config_drift_kafka_external_port }}
+        {{ '(EDA)' if kafka_public_ip is defined else '(not configured)' }}
       - "Topic: {{ config_drift_kafka_topic }}"
       - "Topics: {{ config_drift_kafka_topic_list.stdout_lines }}"

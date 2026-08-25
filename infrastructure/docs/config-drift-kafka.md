@@ -26,12 +26,13 @@ Wire Filebeat audit events from your RHEL workers into a dedicated `aws_kafka` b
 | EC2 host | `aws_kafka` (RHEL 9, `t3.medium`) |
 | Broker image | `docker.io/apache/kafka:3.9.0` (Podman KRaft) |
 | Worker-facing listener | `PRIVATE_IP:9092` (`PLAINTEXT`) |
+| EDA-facing listener | `PUBLIC_IP:9095` (`EXTERNAL`) |
 | Local admin listener | `127.0.0.1:9094` (`PLAINTEXT_LOCAL`) |
 | Topic | `linux-audit-events` |
 | Provision job | **Infrastructure \| AWS - Provision Kafka Queue** |
 | Filebeat job | **LINUX \| Config Drift - Deploy Audit and Filebeat** (output: `kafka`) |
 
-Workers ship to the broker **private IP** on port `9092`. Admin commands on the broker host use `127.0.0.1:9094` so they do not fight the advertised listener.
+Workers ship to the broker **private IP** on port `9092`. EDA rulebook activations on AAP use the broker **public IP** on port `9095` because activation pods run outside the demo VPC. Admin commands on the broker host use `127.0.0.1:9094`.
 
 ## Step 1 — Provision the broker
 

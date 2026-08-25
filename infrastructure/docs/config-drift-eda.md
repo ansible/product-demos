@@ -41,7 +41,8 @@ The setup job reads `aws_kafka` from inventory and creates (or updates) EDA acti
 
 | Activation setting | Source |
 |--------------------|--------|
-| `config_drift_kafka_broker_host` | `aws_kafka` private IP from inventory |
+| `config_drift_kafka_broker_host` | `aws_kafka` public IP from inventory |
+| `config_drift_kafka_broker_port` | `9095` (external listener for EDA) |
 | `config_drift_kafka_topic` | `linux-audit-events` |
 | Decision environment | **Product Demos DE** (`de-minimal-rhel9`, includes `ansible-rulebook`) |
 
@@ -93,6 +94,7 @@ The rulebook condition requires both `sshd_config_change` and `type=SYSCALL` to 
 | Activation Failed, 0 rules | Decision environment must include `ansible-rulebook`; Controller EEs such as Product Demos EE will not work |
 | `404` on `/api/v2/config/` in activation log | EDA AAP credential host must include `/api/controller` on AAP 2.7 gateway deployments |
 | No events in activation log | Filebeat output is `kafka`; consumer on broker shows `sshd_config_change` events |
+| `KafkaConnectionError` on private IP | Re-run Kafka provision for external listener; EDA must use public IP `:9095` |
 | Job not launched | Activation enabled; rulebook condition matches your test event |
 | Remediation job fails host lookup | Sync AWS inventory; worker `private_ip_address` must match `event.host.ip[0]` |
 | Job runs but sshd unchanged | Check remediation job stdout; `sshd -t` must pass before reload |
