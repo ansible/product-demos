@@ -11,11 +11,6 @@
     config_drift_eda_activation_name: config_drift_kafka
     config_drift_kafka_topic: linux-audit-events
     config_drift_apd_organization: Ansible Product Demos (APD)
-    config_drift_controller_api_base: >-
-      {{ lookup('ansible.builtin.env', 'AAP_HOSTNAME') | regex_replace('/$', '') }}
-    config_drift_controller_api_token: "{{ lookup('ansible.builtin.env', 'AAP_TOKEN') }}"
-    config_drift_controller_validate_certs: >-
-      {{ lookup('ansible.builtin.env', 'AAP_VALIDATE_CERTS') | default('false') | bool }}
 
   tasks:
     - name: Resolve Kafka broker from inventory
@@ -36,21 +31,21 @@
           AWS - Provision Kafka Queue, sync AWS inventory, then re-run this job.
 
     - name: Look up Ansible Product Demos Controller project via API
-      ansible.builtin.uri:
-        url: >-
-          {{ config_drift_controller_api_base }}/api/controller/v2/projects/?name={{
-          config_drift_eda_project | urlencode }}
-        method: GET
-        headers:
-          Authorization: "Bearer {{ config_drift_controller_api_token }}"
-        return_content: true
-        status_code: 200
-        validate_certs: "{{ config_drift_controller_validate_certs }}"
-      register: config_drift_projects_api
+      ansible.builtin.set_fact:
+        config_drift_controller_project: >-
+          {{
+            query(
+              'ansible.controller.controller_api',
+              'projects',
+              query_params={'name': config_drift_eda_project},
+              expect_one=true,
+              return_objects=true
+            ) | first
+          }}
 
     - name: Assert Controller project exists for EDA SCM mirror
       ansible.builtin.assert:
-        that: config_drift_projects_api.json.results | length > 0
+        that: config_drift_controller_project.scm_url | default('') | length > 0
         fail_msg: >-
           Controller project {{ config_drift_eda_project }} was not found.
           Sync the Ansible Product Demos Controller project before running
@@ -58,30 +53,30 @@
 
     - name: Set EDA SCM facts from Controller project
       ansible.builtin.set_fact:
-        config_drift_eda_scm_url: "{{ config_drift_projects_api.json.results[0].scm_url }}"
-        config_drift_eda_scm_branch: "{{ config_drift_projects_api.json.results[0].scm_branch }}"
+        config_drift_eda_scm_url: "{{ config_drift_controller_project.scm_url }}"
+        config_drift_eda_scm_branch: "{{ config_drift_controller_project.scm_branch }}"
         config_drift_eda_scm_credential: >-
           {{
-            config_drift_projects_api.json.results[0].summary_fields.credential.name
+            config_drift_controller_project.summary_fields.credential.name
             | default('', true)
           }}
 
     - name: Look up Product Demos EE from Controller via API
-      ansible.builtin.uri:
-        url: >-
-          {{ config_drift_controller_api_base }}/api/controller/v2/execution_environments/?name={{
-          config_drift_eda_decision_environment | urlencode }}
-        method: GET
-        headers:
-          Authorization: "Bearer {{ config_drift_controller_api_token }}"
-        return_content: true
-        status_code: 200
-        validate_certs: "{{ config_drift_controller_validate_certs }}"
-      register: config_drift_execution_environments_api
+      ansible.builtin.set_fact:
+        config_drift_controller_execution_environment: >-
+          {{
+            query(
+              'ansible.controller.controller_api',
+              'execution_environments',
+              query_params={'name': config_drift_eda_decision_environment},
+              expect_one=true,
+              return_objects=true
+            ) | first
+          }}
 
     - name: Assert decision environment image is available
       ansible.builtin.assert:
-        that: config_drift_execution_environments_api.json.results | length > 0
+        that: config_drift_controller_execution_environment.image | default('') | length > 0
         fail_msg: >-
           Execution environment {{ config_drift_eda_decision_environment }}
           was not found in Controller.
@@ -89,7 +84,7 @@
     - name: Set decision environment image from Controller EE
       ansible.builtin.set_fact:
         config_drift_eda_decision_environment_image: >-
-          {{ config_drift_execution_environments_api.json.results[0].image }}
+          {{ config_drift_controller_execution_environment.image }}
 
     - name: Show EDA activation parameters
       ansible.builtin.debug:
