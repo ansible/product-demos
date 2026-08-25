@@ -57,8 +57,27 @@
 
 - name: Show Filebeat validation command
   ansible.builtin.debug:
-    msg:
-      - "Filebeat is running with console output (Stage 2 debug mode)."
-      - "On the host, tail events with: sudo journalctl -u filebeat -f"
-      - "Or run foreground debug: sudo filebeat -e -c /etc/filebeat/filebeat.yml"
-      - "Then edit /etc/ssh/sshd_config and watch for parsed audit JSON."
+    msg: >-
+      {{
+        [
+          'Filebeat is shipping audit events to Kafka topic '
+          ~ config_drift_kafka_topic
+          ~ ' at '
+          ~ config_drift_kafka_brokers
+          ~ '.',
+          'On the Kafka host, consume events with:',
+          'podman exec kafka /opt/kafka/bin/kafka-console-consumer.sh'
+          ~ ' --bootstrap-server localhost:9092'
+          ~ ' --topic '
+          ~ config_drift_kafka_topic
+          ~ ' --from-beginning',
+          'Then edit /etc/ssh/sshd_config on a RHEL worker and watch for JSON.',
+        ]
+        if config_drift_filebeat_output == 'kafka'
+        else [
+          'Filebeat is running with console output (Stage 2 debug mode).',
+          'On the host, tail events with: sudo journalctl -u filebeat -f',
+          'Or run foreground debug: sudo filebeat -e -c /etc/filebeat/filebeat.yml',
+          'Then edit /etc/ssh/sshd_config and watch for parsed audit JSON.',
+        ]
+      }}

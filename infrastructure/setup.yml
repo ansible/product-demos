@@ -367,12 +367,78 @@ controller_templates:
           variable: opa_policy_text
           required: true
 
+  - name: "Infrastructure | AWS - Provision Kafka Queue"
+    description: >-
+      Provisions a dedicated aws_kafka EC2 instance and deploys single-node
+      Podman KRaft Kafka with topic linux-audit-events.
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - APD Machine Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/config-drift/playbooks/provision_kafka.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Owner
+          question_description: >-
+            Must match the owner tag on your existing cloud stack VMs.
+          type: text
+          variable: create_vm_aws_owner_tag
+          required: true
+          default: your_name
+        - question_name: Environment
+          type: multiplechoice
+          variable: create_vm_vm_environment
+          required: true
+          default: Prod
+          choices:
+            - Dev
+            - QA
+            - Prod
+        - question_name: Deployment
+          type: text
+          variable: create_vm_vm_deployment
+          required: true
+          default: cloud_stack
+        - question_name: Subnet
+          type: text
+          variable: create_vm_aws_vpc_subnet_name
+          required: true
+          default: aws-test-subnet
+        - question_name: Security Group
+          type: text
+          variable: create_vm_aws_securitygroup_name
+          required: true
+          default: aws-test-sg
+        - question_name: SSH Keypair
+          type: text
+          variable: create_vm_aws_keypair_name
+          required: true
+          default: aws-test-key
+
   - name: "LINUX | Config Drift - Deploy Audit and Filebeat"
     description: >-
       Deploys persistent auditd rules that watch /etc/ssh/sshd_config for writes
-      and attribute changes, and installs Filebeat with the auditd module
-      (console output for Stage 2 validation). Default survey target is aws_rhel*
-      (aws_rhel8 and aws_rhel9); use aws_rhel9 for a single-host run.
+      and attribute changes, and installs Filebeat with the auditd module.
+      Use Filebeat output kafka after provisioning the Kafka queue.
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
@@ -396,6 +462,14 @@ controller_templates:
           variable: _hosts
           required: true
           default: aws_rhel*
+        - question_name: Filebeat output
+          type: multiplechoice
+          variable: config_drift_filebeat_output
+          required: true
+          default: console
+          choices:
+            - console
+            - kafka
 
 controller_workflows:
   - name: Infrastructure | ROSA - Lifecycle (Create)

@@ -40,8 +40,8 @@ Unreachable hosts are skipped (`ignore_unreachable`) so one bad SSH target does 
 
 | Template | Playbook | Stage |
 |----------|----------|-------|
-| LINUX ǀ Config Drift - Deploy Audit and Filebeat | [`infrastructure/config-drift/playbooks/deploy_audit_filebeat.yml`](../config-drift/playbooks/deploy_audit_filebeat.yml) | 1–2 |
-| Infrastructure ǀ AWS - Provision Kafka Queue | *planned* | 3 |
+| LINUX ǀ Config Drift - Deploy Audit and Filebeat | [`infrastructure/config-drift/playbooks/deploy_audit_filebeat.yml`](../config-drift/playbooks/deploy_audit_filebeat.yml) | 1–2, 3 (kafka output) |
+| Infrastructure ǀ AWS - Provision Kafka Queue | [`infrastructure/config-drift/playbooks/provision_kafka.yml`](../config-drift/playbooks/provision_kafka.yml) | 3 |
 | Infrastructure ǀ Setup Rulebook for Kafka Queue - Config Drift & Remediation | *planned* | 4 |
 | LINUX ǀ SSHD Configuration Remediation | *planned* | 5 |
 
@@ -50,8 +50,8 @@ Unreachable hosts are skipped (`ignore_unreachable`) so one bad SSH target does 
 | Stage | Component | Status |
 |-------|-----------|--------|
 | 1 | auditd persistent watch on `/etc/ssh/sshd_config` | **Implemented** |
-| 2 | Filebeat auditd module (console debug) | Planned |
-| 3 | Kafka on dedicated AWS EC2 (Podman KRaft) | Planned |
+| 2 | Filebeat auditd module (console or Kafka output) | **Implemented** |
+| 3 | Kafka on dedicated AWS EC2 (Podman KRaft) | **Implemented** |
 | 4 | EDA rulebook + activation | Planned |
 | 5 | AAP sshd remediation playbook | Planned |
 
@@ -157,7 +157,39 @@ sudo filebeat -e -c /etc/filebeat/filebeat.yml
 
 ## Stage 3 — Kafka
 
-*Coming next: dedicated EC2 + Podman KRaft, topic `linux-audit-events`.*
+### Provision the broker
+
+1. Run **Infrastructure | AWS - Provision Kafka Queue** with the same region, owner, and deployment tags as your cloud stack (defaults match **Deploy Cloud Stack in AWS**).
+2. Sync **AWS Inventory** so `aws_kafka` appears in the inventory.
+
+This creates (or reuses) an `aws_kafka` EC2 instance and deploys single-node KRaft Kafka with topic `linux-audit-events`.
+
+### Wire Filebeat to Kafka
+
+1. Run **LINUX | Config Drift - Deploy Audit and Filebeat** with:
+   - `_hosts`: `aws_rhel*`
+   - **Filebeat output**: `kafka`
+
+The playbook resolves the broker from inventory host `aws_kafka` (private IP `:9092`).
+
+### Verify events on the broker
+
+On `aws_kafka`:
+
+```bash
+podman exec kafka /opt/kafka/bin/kafka-console-consumer.sh \
+  --bootstrap-server localhost:9092 \
+  --topic linux-audit-events \
+  --from-beginning
+```
+
+On a RHEL worker, trigger a change:
+
+```bash
+sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+```
+
+You should see parsed audit JSON arrive in the Kafka consumer.
 
 ## Stage 4 — Event-Driven Ansible
 

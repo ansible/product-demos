@@ -7,4 +7,5 @@ Ansible collection supporting the **Infrastructure | Config Drift Remediation** 
 
 | Role | Purpose |
 |------|---------|
-| `audit_filebeat` | Persistent auditd rules for `/etc/ssh/sshd_config` and optional Filebeat shipping |
+| `audit_filebeat` | Persistent auditd rules for `/etc/ssh/sshd_config` and Filebeat (console or Kafka output) |
+| `kafka_queue` | Single-node Podman KRaft Kafka broker and `linux-audit-events` topic |

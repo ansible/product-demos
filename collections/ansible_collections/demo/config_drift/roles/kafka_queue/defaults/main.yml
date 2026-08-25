@@ -1,0 +1,7 @@
+---
+config_drift_kafka_image: docker.io/apache/kafka:3.9.0
+config_drift_kafka_container_name: kafka
+config_drift_kafka_port: 9092
+config_drift_kafka_topic: linux-audit-events
+config_drift_kafka_cluster_id: MkU3OEVBNTcwNTJENDM2Qk
+config_drift_kafka_vpc_cidr: 10.0.0.0/16

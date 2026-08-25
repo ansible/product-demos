@@ -3,3 +3,5 @@ config_drift_audit_key: sshd_config_change
 config_drift_audit_rules_path: /etc/audit/rules.d/99-sshd-config.rules
 config_drift_watched_file: /etc/ssh/sshd_config
 config_drift_filebeat_output: console
+config_drift_kafka_topic: linux-audit-events
+config_drift_kafka_brokers: ""

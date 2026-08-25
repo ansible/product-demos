@@ -266,6 +266,7 @@ controller_templates:
             - rhel8
             - rhel7
             - al2023
+            - kafka
         - question_name: Subnet
           type: text
           variable: create_vm_aws_vpc_subnet_name
