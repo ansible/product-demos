@@ -42,6 +42,7 @@
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
       KAFKA_NUM_PARTITIONS: "1"
+      KAFKA_HEAP_OPTS: "{{ config_drift_kafka_broker_heap_opts }}"
 
 - name: Wait for Kafka broker port
   ansible.builtin.wait_for:
@@ -49,28 +50,69 @@
     port: "{{ config_drift_kafka_port }}"
     timeout: 180
 
+- name: Wait for Kafka broker to accept admin requests
+  ansible.builtin.command:
+    argv:
+      - podman
+      - run
+      - --rm
+      - --network
+      - host
+      - -e
+      - "KAFKA_HEAP_OPTS={{ config_drift_kafka_admin_heap_opts }}"
+      - "{{ config_drift_kafka_image }}"
+      - /opt/kafka/bin/kafka-broker-api-versions.sh
+      - --bootstrap-server
+      - "localhost:{{ config_drift_kafka_port }}"
+  register: config_drift_kafka_ready
+  until: config_drift_kafka_ready.rc == 0
+  retries: 24
+  delay: 5
+  changed_when: false
+
 - name: Create linux-audit-events topic
   ansible.builtin.command:
-    cmd: >-
-      podman exec {{ config_drift_kafka_container_name }}
-      /opt/kafka/bin/kafka-topics.sh
-      --create
-      --if-not-exists
-      --topic {{ config_drift_kafka_topic }}
-      --bootstrap-server localhost:{{ config_drift_kafka_port }}
-      --partitions 1
-      --replication-factor 1
+    argv:
+      - podman
+      - run
+      - --rm
+      - --network
+      - host
+      - -e
+      - "KAFKA_HEAP_OPTS={{ config_drift_kafka_admin_heap_opts }}"
+      - "{{ config_drift_kafka_image }}"
+      - /opt/kafka/bin/kafka-topics.sh
+      - --create
+      - --if-not-exists
+      - --topic
+      - "{{ config_drift_kafka_topic }}"
+      - --bootstrap-server
+      - "localhost:{{ config_drift_kafka_port }}"
+      - --partitions
+      - "1"
+      - --replication-factor
+      - "1"
   register: config_drift_kafka_topic_create
+  until: config_drift_kafka_topic_create.rc == 0
+  retries: 6
+  delay: 10
   changed_when: "'Created topic' in (config_drift_kafka_topic_create.stdout | default(''))"
-  failed_when: config_drift_kafka_topic_create.rc != 0
 
 - name: List Kafka topics
   ansible.builtin.command:
-    cmd: >-
-      podman exec {{ config_drift_kafka_container_name }}
-      /opt/kafka/bin/kafka-topics.sh
-      --list
-      --bootstrap-server localhost:{{ config_drift_kafka_port }}
+    argv:
+      - podman
+      - run
+      - --rm
+      - --network
+      - host
+      - -e
+      - "KAFKA_HEAP_OPTS={{ config_drift_kafka_admin_heap_opts }}"
+      - "{{ config_drift_kafka_image }}"
+      - /opt/kafka/bin/kafka-topics.sh
+      - --list
+      - --bootstrap-server
+      - "localhost:{{ config_drift_kafka_port }}"
   register: config_drift_kafka_topic_list
   changed_when: false
 

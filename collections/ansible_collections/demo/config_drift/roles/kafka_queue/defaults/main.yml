@@ -5,3 +5,5 @@ config_drift_kafka_port: 9092
 config_drift_kafka_topic: linux-audit-events
 config_drift_kafka_cluster_id: MkU3OEVBNTcwNTJENDM2Qk
 config_drift_kafka_vpc_cidr: 10.0.0.0/16
+config_drift_kafka_broker_heap_opts: "-Xmx512m -Xms512m"
+config_drift_kafka_admin_heap_opts: "-Xmx256m -Xms256m"
