@@ -13,16 +13,52 @@ manual configuration change
 
 ## Prerequisites
 
-- **Deploy Cloud Stack in AWS** — `aws_rhel9` (or similar) in inventory
-- **APD | Single demo setup** — category `infrastructure` or `linux`
+- **APD | Single demo setup** — categories `cloud` and `infrastructure` (workflow calls **Deploy Cloud Stack in AWS**)
 - **RHSM Registration** credential — org ID and activation key (see **LINUX | Register RHEL with RHSM**)
 - **Automation Decisions (EDA)** on AAP (Stages 4–5)
 - SSH access via **APD Machine Credential**
 
-Recommended order after cloud stack deploy:
+### One-shot setup (recommended)
 
-1. **LINUX | Register RHEL with RHSM** — default `_hosts`: `aws_rhel*`
-2. **LINUX | Config Drift - Deploy Audit and Filebeat** — default `_hosts`: `aws_rhel*`
+Launch **Infrastructure | Config Drift - Full Setup** — a single workflow that:
+
+1. Verifies `aws_rhel8` and `aws_rhel9` are in inventory (or runs **Deploy Cloud Stack in AWS** if missing)
+2. Provisions Kafka (`aws_kafka`)
+3. Syncs AWS inventory
+4. Deploys auditd + Filebeat with Kafka output on `aws_rhel*`
+5. Activates the EDA rulebook
+
+```mermaid
+flowchart LR
+  check[Check Cloud Stack]
+  deploy[Deploy Cloud Stack]
+  kafka[Provision Kafka]
+  sync[Sync Inventory]
+  filebeat[Deploy Filebeat]
+  eda[Setup EDA]
+
+  check -->|success| kafka
+  check -->|failure| deploy
+  deploy --> kafka
+  kafka --> sync --> filebeat --> eda
+```
+
+In the AAP workflow visualizer, the main path runs left to right. **Deploy Cloud Stack** appears on the failure branch below **Check Cloud Stack** when workers are missing.
+
+Survey prompts: AWS region, owner tag, and environment (same as cloud stack deploy).
+
+For the live demo moment, run **LINUX | Config Drift - Introduce SSHD Drift** separately — it is not part of this workflow.
+
+### Manual setup (step by step)
+
+If you prefer individual jobs:
+
+1. **Deploy Cloud Stack in AWS** — `aws_rhel8`, `aws_rhel9` in inventory
+2. **LINUX | Register RHEL with RHSM** — default `_hosts`: `aws_rhel*`
+3. **Infrastructure | AWS - Provision Kafka Queue**
+4. Sync **AWS Inventory**
+5. **LINUX | Config Drift - Deploy Audit and Filebeat** — Filebeat output: `kafka`
+6. **Infrastructure | Setup Rulebook for Kafka Queue - Config Drift & Remediation**
 
 ### Host targeting
 
@@ -40,10 +76,13 @@ Unreachable hosts are skipped (`ignore_unreachable`) so one bad SSH target does 
 
 | Template | Playbook | Stage |
 |----------|----------|-------|
+| **Infrastructure ǀ Config Drift - Full Setup** | workflow | 1–4 (one-shot) |
+| Infrastructure ǀ Config Drift - Check Cloud Stack | [`infrastructure/config-drift/playbooks/check_cloud_stack.yml`](../config-drift/playbooks/check_cloud_stack.yml) | workflow preflight |
 | LINUX ǀ Config Drift - Deploy Audit and Filebeat | [`infrastructure/config-drift/playbooks/deploy_audit_filebeat.yml`](../config-drift/playbooks/deploy_audit_filebeat.yml) | 1–2, 3 (kafka output) |
+| LINUX ǀ Config Drift - Introduce SSHD Drift | [`infrastructure/config-drift/playbooks/drift_sshd.yml`](../config-drift/playbooks/drift_sshd.yml) | demo (live drift) |
 | Infrastructure ǀ AWS - Provision Kafka Queue | [`infrastructure/config-drift/playbooks/provision_kafka.yml`](../config-drift/playbooks/provision_kafka.yml) | 3 |
 | Infrastructure ǀ Setup Rulebook for Kafka Queue - Config Drift & Remediation | [`infrastructure/config-drift/playbooks/setup_eda_activation.yml`](../config-drift/playbooks/setup_eda_activation.yml) | 4 |
-| LINUX ǀ SSHD Configuration Remediation | [`infrastructure/config-drift/playbooks/remediate_sshd.yml`](../config-drift/playbooks/remediate_sshd.yml) | 4–5 |
+| LINUX ǀ SSHD Configuration Remediation | [`infrastructure/config-drift/playbooks/remediate_sshd.yml`](../config-drift/playbooks/remediate_sshd.yml) | 4–5 (EDA-launched) |
 
 ## Build status
 
@@ -61,8 +100,8 @@ Unreachable hosts are skipped (`ignore_unreachable`) so one bad SSH target does 
 
 ### Setup
 
-1. Run **APD | Single demo setup** with `infrastructure`.
-2. Run **LINUX | Config Drift - Deploy Audit and Filebeat** — default `_hosts`: `aws_rhel*`.
+1. Run **APD | Single demo setup** with `cloud` and `infrastructure`.
+2. Run **Infrastructure | Config Drift - Full Setup**, or deploy auditd manually with **LINUX | Config Drift - Deploy Audit and Filebeat** — default `_hosts`: `aws_rhel*`.
 
 ### What was deployed
 

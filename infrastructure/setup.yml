@@ -515,6 +515,20 @@ controller_templates:
     credentials:
       - APD Machine Credential
 
+  - name: "Infrastructure | Config Drift - Check Cloud Stack"
+    description: >-
+      Verifies aws_rhel8 and aws_rhel9 exist in inventory before config drift
+      setup. Used by the Full Setup workflow; fails when the cloud stack must
+      be deployed first.
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/config-drift/playbooks/check_cloud_stack.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+
 controller_workflows:
   - name: Infrastructure | ROSA - Lifecycle (Create)
     description: >-
@@ -654,3 +668,120 @@ controller_workflows:
           feedback: >-
             ROSA cluster destruction failed. Manual cleanup may be required.
             Check AWS console for orphaned resources (VPCs, IAM roles, CloudFormation stacks).
+
+  - name: Infrastructure | Config Drift - Full Setup
+    description: >-
+      One-shot config drift pipeline setup: verify or deploy cloud stack RHEL
+      workers, provision Kafka, sync inventory, deploy auditd and Filebeat with
+      Kafka output, and activate the EDA rulebook. Run Introduce SSHD Drift
+      separately for the live demo.
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_aws_keypair_name: aws-test-key
+      create_vm_aws_securitygroup_name: aws-test-sg
+      create_vm_aws_vpc_subnet_name: aws-test-subnet
+      create_vm_vm_deployment: cloud_stack
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            AWS region for the cloud stack and Kafka broker. Must match an
+            existing stack when workers are already provisioned.
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Owner
+          question_description: >-
+            Must match the owner tag on your existing cloud stack VMs when
+            workers are already provisioned.
+          type: text
+          variable: create_vm_aws_owner_tag
+          required: true
+          default: your_name
+        - question_name: Environment
+          type: multiplechoice
+          variable: vm_environment
+          required: true
+          default: Prod
+          choices:
+            - Dev
+            - QA
+            - Prod
+    workflow_nodes:
+      - identifier: Check Cloud Stack
+        related:
+          success_nodes:
+            - identifier: Provision Kafka
+          failure_nodes:
+            - identifier: Deploy Cloud Stack
+        unified_job_template:
+          name: Infrastructure | Config Drift - Check Cloud Stack
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+      - identifier: Deploy Cloud Stack
+        related:
+          success_nodes:
+            - identifier: Provision Kafka
+        unified_job_template:
+          name: Deploy Cloud Stack in AWS
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: workflow_job_template
+      - identifier: Provision Kafka
+        related:
+          success_nodes:
+            - identifier: Sync Inventory
+        unified_job_template:
+          name: Infrastructure | AWS - Provision Kafka Queue
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+      - identifier: Sync Inventory
+        related:
+          success_nodes:
+            - identifier: Deploy Filebeat
+        unified_job_template:
+          inventory:
+            name: Ansible Product Demos Inventory
+            organization:
+              name: Ansible Product Demos (APD)
+              type: organization
+            type: inventory
+          name: AWS Inventory
+          type: inventory_source
+      - identifier: Deploy Filebeat
+        related:
+          success_nodes:
+            - identifier: Setup EDA
+        unified_job_template:
+          name: LINUX | Config Drift - Deploy Audit and Filebeat
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+        extra_data:
+          _hosts: aws_rhel*
+          config_drift_filebeat_output: kafka
+      - identifier: Setup EDA
+        unified_job_template:
+          name: Infrastructure | Setup Rulebook for Kafka Queue - Config Drift & Remediation
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
