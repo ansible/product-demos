@@ -483,6 +483,7 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    ask_variables_on_launch: true
     credentials:
       - APD Machine Credential
 

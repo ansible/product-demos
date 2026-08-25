@@ -5,6 +5,16 @@
   gather_facts: false
 
   tasks:
+    - name: Resolve remediation variables from EDA event payload
+      ansible.builtin.set_fact:
+        config_drift_target_ip: "{{ ansible_eda.event.body.host.ip[0] }}"
+        config_drift_audit_message: "{{ ansible_eda.event.body.message }}"
+      when:
+        - config_drift_target_ip is not defined or config_drift_target_ip | length == 0
+        - ansible_eda is defined
+        - ansible_eda.event.body.host.ip is defined
+        - ansible_eda.event.body.host.ip | length > 0
+
     - name: Fail if target IP is not defined
       ansible.builtin.assert:
         that:
@@ -12,7 +22,7 @@
           - config_drift_target_ip | length > 0
         fail_msg: >-
           config_drift_target_ip was not provided. EDA should pass
-          event.host.ip[0] from the Kafka audit message.
+          event.body.host.ip[0] from the Kafka audit message.
 
     - name: Look up inventory host by private IP
       ansible.builtin.set_fact:
