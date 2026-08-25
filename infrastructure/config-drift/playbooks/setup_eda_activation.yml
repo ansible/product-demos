@@ -6,7 +6,9 @@
 
   vars:
     config_drift_eda_project: Ansible Product Demos
-    config_drift_eda_decision_environment: Product Demos EE
+    config_drift_eda_decision_environment: Product Demos DE
+    config_drift_eda_decision_environment_image: >-
+      registry.redhat.io/ansible-automation-platform-27/de-minimal-rhel9:latest
     config_drift_eda_rulebook: config_drift_kafka.yml
     config_drift_eda_activation_name: config_drift_kafka
     config_drift_kafka_topic: linux-audit-events
@@ -61,31 +63,6 @@
             | default('', true)
           }}
 
-    - name: Look up Product Demos EE from Controller via API
-      ansible.builtin.set_fact:
-        config_drift_controller_execution_environment: >-
-          {{
-            query(
-              'ansible.controller.controller_api',
-              'execution_environments',
-              query_params={'name': config_drift_eda_decision_environment},
-              expect_one=true,
-              return_objects=true
-            ) | first
-          }}
-
-    - name: Assert decision environment image is available
-      ansible.builtin.assert:
-        that: config_drift_controller_execution_environment.image | default('') | length > 0
-        fail_msg: >-
-          Execution environment {{ config_drift_eda_decision_environment }}
-          was not found in Controller.
-
-    - name: Set decision environment image from Controller EE
-      ansible.builtin.set_fact:
-        config_drift_eda_decision_environment_image: >-
-          {{ config_drift_controller_execution_environment.image }}
-
     - name: Show EDA activation parameters
       ansible.builtin.debug:
         msg:
@@ -93,6 +70,8 @@
           - "Topic: {{ config_drift_kafka_topic }}"
           - "Rulebook: {{ config_drift_eda_rulebook }}"
           - "Activation: {{ config_drift_eda_activation_name }}"
+          - "Decision environment: {{ config_drift_eda_decision_environment }}"
+          - "Decision environment image: {{ config_drift_eda_decision_environment_image }}"
           - "EDA project SCM: {{ config_drift_eda_scm_url }} @ {{ config_drift_eda_scm_branch }}"
 
     - name: Ensure EDA project mirrors Controller SCM

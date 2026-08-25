@@ -43,7 +43,7 @@ The setup job reads `aws_kafka` from inventory and creates (or updates) EDA acti
 |--------------------|--------|
 | `config_drift_kafka_broker_host` | `aws_kafka` private IP from inventory |
 | `config_drift_kafka_topic` | `linux-audit-events` |
-| Decision environment | Product Demos EE |
+| Decision environment | **Product Demos DE** (`de-minimal-rhel9`, includes `ansible-rulebook`) |
 
 ## Step 3 — Verify activation is running
 
@@ -89,7 +89,8 @@ The rulebook condition requires both `sshd_config_change` and `type=SYSCALL` to 
 
 | Symptom | Check |
 |---------|-------|
-| Activation won't start | EDA project synced; decision environment **Product Demos EE** exists |
+| Activation won't start | EDA project synced; decision environment **Product Demos DE** uses `de-minimal-rhel9` (not the Controller EE) |
+| Activation Failed, 0 rules | Decision environment must include `ansible-rulebook`; Controller EEs such as Product Demos EE will not work |
 | No events in activation log | Filebeat output is `kafka`; consumer on broker shows `sshd_config_change` events |
 | Job not launched | Activation enabled; rulebook condition matches your test event |
 | Remediation job fails host lookup | Sync AWS inventory; worker `private_ip_address` must match `event.host.ip[0]` |
