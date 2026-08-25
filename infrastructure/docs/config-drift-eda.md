@@ -91,6 +91,7 @@ The rulebook condition requires both `sshd_config_change` and `type=SYSCALL` to 
 |---------|-------|
 | Activation won't start | EDA project synced; decision environment **Product Demos DE** uses `de-minimal-rhel9` (not the Controller EE) |
 | Activation Failed, 0 rules | Decision environment must include `ansible-rulebook`; Controller EEs such as Product Demos EE will not work |
+| `404` on `/api/v2/config/` in activation log | EDA AAP credential host must include `/api/controller` on AAP 2.7 gateway deployments |
 | No events in activation log | Filebeat output is `kafka`; consumer on broker shows `sshd_config_change` events |
 | Job not launched | Activation enabled; rulebook condition matches your test event |
 | Remediation job fails host lookup | Sync AWS inventory; worker `private_ip_address` must match `event.host.ip[0]` |

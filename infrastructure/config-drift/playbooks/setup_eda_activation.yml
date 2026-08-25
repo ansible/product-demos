@@ -13,6 +13,11 @@
     config_drift_eda_activation_name: config_drift_kafka
     config_drift_kafka_topic: linux-audit-events
     config_drift_apd_organization: Ansible Product Demos (APD)
+    config_drift_eda_aap_credential_host: >-
+      {{
+        lookup('ansible.builtin.env', 'CONTROLLER_HOST')
+        | regex_replace('/$', '')
+      }}/api/controller
 
   tasks:
     - name: Resolve Kafka broker from inventory
@@ -222,7 +227,7 @@
             organization: "{{ config_drift_apd_organization }}"
             credential_type: Red Hat Ansible Automation Platform
             inputs:
-              host: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') }}"
+              host: "{{ config_drift_eda_aap_credential_host }}"
               oauth_token: >-
                 {{
                   lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN')
