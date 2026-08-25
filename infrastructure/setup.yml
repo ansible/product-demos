@@ -267,6 +267,24 @@ controller_templates:
     credentials:
       - OpenShift Credential
 
+  - name: Infrastructure | AO Network Configuration | Install
+    description: >-
+      Allow-lists the AAP gateway and AO route hostnames on Automation
+      Orchestrator's integration URL allow-list and enables private-network
+      OIDC, then restarts the instance so the change takes effect.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "infrastructure/ao/network-access.yml"
+    execution_environment: AO Execution Environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    ask_variables_on_launch: true
+    credentials:
+      - OpenShift Credential
+      - AAP Credential
+
   - name: Infrastructure | HashiCorp Vault
     job_type: run
     inventory: Ansible Product Demos Inventory
@@ -506,3 +524,21 @@ controller_workflows:
           feedback: >-
             ROSA cluster destruction failed. Manual cleanup may be required.
             Check AWS console for orphaned resources (VPCs, IAM roles, CloudFormation stacks).
+
+  - name: Infrastructure | Automation Orchestrator | Install Workflow
+    description: >-
+      Deploys Automation Orchestrator via aapctl, then configures its
+      network access allow-list and OIDC settings so the AAP gateway
+      can reach it.
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    ask_variables_on_launch: true
+    simplified_workflow_nodes:
+      - identifier: Install AO
+        unified_job_template: Infrastructure | Automation Orchestrator | Install
+        success_nodes:
+          - Configure Network Access
+      - identifier: Configure Network Access
+        unified_job_template: Infrastructure | AO Network Configuration | Install
