@@ -1,9 +1,9 @@
 # Event-Driven Configuration Drift Remediation
 
-Production-style demo: a Linux administrator manually changes a protected configuration file, Linux auditing detects the change, Filebeat ships the event to Kafka, Event-Driven Ansible evaluates the signal, and AAP restores the approved configuration.
+Production-style demo: a Linux administrator changes a protected configuration file, Linux auditing detects the change, Filebeat ships the event to Kafka, Event-Driven Ansible evaluates the signal, and AAP restores the approved configuration.
 
 ```text
-manual configuration change
+configuration change
   → Linux audit event (auditd)
   → Filebeat
   → Kafka
@@ -11,11 +11,56 @@ manual configuration change
   → AAP remediation
 ```
 
+## Presenter guide
+
+Two parts: **one-time setup**, then **show the demo**.
+
+### Part 1 — One-time setup
+
+1. Sync the **Ansible Product Demos** project from your fork branch.
+2. Run **APD | Single demo setup** with category `infrastructure` (cloud stack must already exist, or the workflow deploys it for you).
+3. Launch **Infrastructure | Config Drift - Full Setup** and complete the survey (region, owner, environment).
+
+That single workflow:
+
+- Checks whether `aws_rhel8` and `aws_rhel9` are in inventory — if not, runs **Deploy Cloud Stack in AWS** automatically
+- Provisions the Kafka queue (`aws_kafka`)
+- Syncs AWS inventory
+- Deploys auditd + Filebeat on `aws_rhel*` with Kafka output
+- Activates the EDA rulebook (`config_drift_kafka`)
+
+When it finishes, the demo is ready to go.
+
+### Part 2 — Show the demo
+
+**Option A — drift from AAP (recommended for presenters):**
+
+1. Run **LINUX | Config Drift - Introduce SSHD Drift** (default limit `aws_rhel*` hits both RHEL workers).
+2. Watch **Automation Decisions** — activation `config_drift_kafka` consumes the event.
+3. Watch **Automation Execution** — **LINUX | SSHD Configuration Remediation** launches (once per host, throttled to every 15 seconds).
+4. Confirm on the workers: `sudo grep -i Root /etc/ssh/sshd_config` → `PermitRootLogin no`.
+
+**Option B — drift manually on a host:**
+
+```bash
+sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+sudo grep -i Root /etc/ssh/sshd_config
+```
+
+Same EDA → remediation flow follows within ~15 seconds.
+
+### What to say
+
+- **Detection is broad** — any write to `/etc/ssh/sshd_config` triggers the pipeline (audit key `sshd_config_change`).
+- **Remediation is narrow (on purpose)** — the playbook only restores `PermitRootLogin no`. Swap the audit watch, rulebook filter, and remediation playbook to protect any file you want.
+- **No polling** — the OS emits an event; EDA reacts in near real time.
+
 ## Prerequisites
 
-- **APD | Single demo setup** — categories `cloud` and `infrastructure` (workflow calls **Deploy Cloud Stack in AWS**)
+- **Deploy Cloud Stack in AWS** already run, *or* let the Full Setup workflow deploy it for you
+- **APD | Single demo setup** — category `infrastructure`
 - **RHSM Registration** credential — org ID and activation key (see **LINUX | Register RHEL with RHSM**)
-- **Automation Decisions (EDA)** on AAP (Stages 4–5)
+- **Automation Decisions (EDA)** on AAP
 - SSH access via **APD Machine Credential**
 
 ### One-shot setup (recommended)
@@ -100,7 +145,7 @@ Unreachable hosts are skipped (`ignore_unreachable`) so one bad SSH target does 
 
 ### Setup
 
-1. Run **APD | Single demo setup** with `cloud` and `infrastructure`.
+1. Run **APD | Single demo setup** with `infrastructure`.
 2. Run **Infrastructure | Config Drift - Full Setup**, or deploy auditd manually with **LINUX | Config Drift - Deploy Audit and Filebeat** — default `_hosts`: `aws_rhel*`.
 
 ### What was deployed
@@ -209,10 +254,12 @@ Full step-by-step walkthrough: **[Config Drift — Kafka Queue](config-drift-kaf
 
 Full walkthrough: **[Config Drift — EDA](config-drift-eda.md)**.
 
+If you used **Infrastructure | Config Drift - Full Setup**, EDA activation is already configured. Otherwise:
+
 1. Sync the **Ansible Product Demos** EDA project.
 2. Run **Infrastructure | Setup Rulebook for Kafka Queue - Config Drift & Remediation**.
 3. Confirm activation **config_drift_kafka** is running.
-4. Drift `sshd_config` on a worker — **LINUX | SSHD Configuration Remediation** should launch automatically.
+4. Run **LINUX | Config Drift - Introduce SSHD Drift** or edit `sshd_config` on a worker — **LINUX | SSHD Configuration Remediation** should launch automatically.
 
 ## Stage 5 — AAP remediation
 

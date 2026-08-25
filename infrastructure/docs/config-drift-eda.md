@@ -15,10 +15,10 @@ Activate a rulebook that subscribes to Kafka topic `linux-audit-events`, filters
 
 ```text
 Kafka topic linux-audit-events
-  → filter: message contains sshd_config_change and type=SYSCALL
-  → throttle: once per host IP per 60 seconds
+  → filter: event.body.message contains sshd_config_change and type=SYSCALL
+  → throttle: once per host IP per 15 seconds
   → run_job_template: LINUX | SSHD Configuration Remediation
-      extra_vars.config_drift_target_ip = event.host.ip[0]
+      config_drift_target_ip from event.body.host.ip[0]
 ```
 
 Rulebook file: [`extensions/eda/rulebooks/config_drift_kafka.yml`](../../extensions/eda/rulebooks/config_drift_kafka.yml)
@@ -35,7 +35,7 @@ If you prefer to verify first:
 ## Step 2 — Activate the rulebook
 
 1. Run **APD | Single demo setup** with category `infrastructure` (creates job templates).
-2. Run **Infrastructure | Setup Rulebook for Kafka Queue - Config Drift & Remediation**.
+2. Run **Infrastructure | Config Drift - Full Setup** (recommended), or **Infrastructure | Setup Rulebook for Kafka Queue - Config Drift & Remediation** alone.
 
 The setup job reads `aws_kafka` from inventory and creates (or updates) EDA activation `config_drift_kafka` with broker host, topic, and rulebook path.
 
@@ -50,22 +50,22 @@ The setup job reads `aws_kafka` from inventory and creates (or updates) EDA acti
 
 1. **Automation Decisions → Rulebook activations**
 2. Open **config_drift_kafka** — status should be **Running**
-3. Check activation logs for Kafka consumer connection to `PRIVATE_IP:9092`
+3. Check activation logs for Kafka consumer connection to `PUBLIC_IP:9095` (external listener)
 
 ## Step 4 — End-to-end test
 
-1. On a worker, drift `sshd_config`:
+**From AAP (recommended):** run **LINUX | Config Drift - Introduce SSHD Drift** with default limit `aws_rhel*`.
 
-   ```bash
-   sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
-   grep PermitRootLogin /etc/ssh/sshd_config
-   ```
+**Or manually** on a worker, drift `sshd_config`:
 
-2. Watch **Automation Decisions** activation logs — a matching event should appear within seconds.
+```bash
+sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+grep PermitRootLogin /etc/ssh/sshd_config
+```
 
-3. Watch **Automation Execution** — **LINUX | SSHD Configuration Remediation** should launch with `config_drift_target_ip` set to the worker private IP.
-
-4. Confirm remediation on the worker:
+1. Watch **Automation Decisions** activation logs — a matching event should appear within seconds.
+2. Watch **Automation Execution** — **LINUX | SSHD Configuration Remediation** should launch with `config_drift_target_ip` set to the worker private IP.
+3. Confirm remediation on the worker:
 
    ```bash
    grep PermitRootLogin /etc/ssh/sshd_config
@@ -75,12 +75,14 @@ The setup job reads `aws_kafka` from inventory and creates (or updates) EDA acti
 
 ## Event shape EDA matches on
 
-Filebeat publishes JSON like:
+The rulebook reads Filebeat JSON from `event.body`. The `message` field contains the raw audit line; `host.ip[0]` is the worker private IP passed to remediation.
 
 ```json
 {
-  "message": "type=SYSCALL ... key=\"sshd_config_change\" ... SYSCALL=rename ...",
-  "host": { "ip": ["10.0.1.244"], "hostname": "ip-10-0-1-244..." }
+  "body": {
+    "message": "type=SYSCALL ... key=\"sshd_config_change\" ... SYSCALL=rename ...",
+    "host": { "ip": ["10.0.1.244"], "hostname": "ip-10-0-1-244..." }
+  }
 }
 ```
 
@@ -96,7 +98,7 @@ The rulebook condition requires both `sshd_config_change` and `type=SYSCALL` to 
 | No events in activation log | Filebeat output is `kafka`; consumer on broker shows `sshd_config_change` events |
 | `KafkaConnectionError` on private IP | Re-run Kafka provision for external listener; EDA must use public IP `:9095` |
 | Job not launched | Activation enabled; rulebook condition matches your test event |
-| Remediation job fails host lookup | Sync AWS inventory; worker `private_ip_address` must match `event.host.ip[0]` |
+| Remediation job fails host lookup | Sync AWS inventory; worker `private_ip_address` must match `event.body.host.ip[0]` |
 | Job runs but sshd unchanged | Check remediation job stdout; `sshd -t` must pass before reload |
 
 ## Next step

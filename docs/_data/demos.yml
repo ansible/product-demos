@@ -1512,9 +1512,9 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #ee0000 0%, #7a0000 100%)"
     icon: "🔄"
-  blurb: "Detect unauthorized sshd_config changes via Linux audit, route events through Kafka, and let Event-Driven Ansible trigger AAP remediation."
+  blurb: "One-shot setup workflow plus live demo: detect sshd_config drift via auditd and Kafka, then let EDA trigger AAP remediation automatically."
   stats:
-    playbooks: 4
+    playbooks: 6
   url: /demos/infrastructure-config-drift/
   github_path: infrastructure/setup.yml
 
