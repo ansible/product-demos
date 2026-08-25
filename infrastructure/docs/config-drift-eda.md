@@ -25,9 +25,12 @@ Rulebook file: [`extensions/eda/rulebooks/config_drift_kafka.yml`](../../extensi
 
 ## Step 1 — Sync the EDA project
 
+The setup job creates the **Ansible Product Demos** EDA project automatically (mirroring the Controller project's SCM URL and branch) and syncs it. You do not need to create the EDA project manually.
+
+If you prefer to verify first:
+
 1. In AAP, open **Automation Decisions → Projects**.
-2. Open **Ansible Product Demos** (or create an EDA project pointing at this repo/branch).
-3. **Sync** so `extensions/eda/rulebooks/config_drift_kafka.yml` is available.
+2. Confirm **Ansible Product Demos** exists and contains `extensions/eda/rulebooks/config_drift_kafka.yml`.
 
 ## Step 2 — Activate the rulebook
 
