@@ -66,6 +66,35 @@
     - "'firewalld.service' in ansible_facts.services"
     - ansible_facts.services['firewalld.service'].state == 'running'
 
+- name: List ephemeral containers sharing Kafka network namespace
+  ansible.builtin.command:
+    argv:
+      - podman
+      - ps
+      - -aq
+      - --filter
+      - "network=container:{{ config_drift_kafka_container_name }}"
+  register: config_drift_kafka_dependent_containers
+  changed_when: false
+  failed_when: false
+
+- name: Remove ephemeral containers sharing Kafka network namespace
+  ansible.builtin.command:
+    argv:
+      - podman
+      - rm
+      - -f
+      - "{{ item }}"
+  loop: "{{ config_drift_kafka_dependent_containers.stdout_lines }}"
+  when: config_drift_kafka_dependent_containers.stdout_lines | length > 0
+  changed_when: true
+
+- name: Remove existing Kafka broker container before listener updates
+  containers.podman.podman_container:
+    name: "{{ config_drift_kafka_container_name }}"
+    state: absent
+  failed_when: false
+
 - name: Run single-node KRaft Kafka broker
   containers.podman.podman_container:
     name: "{{ config_drift_kafka_container_name }}"
