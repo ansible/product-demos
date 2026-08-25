@@ -148,9 +148,15 @@
           scm_branch: "{{ config_drift_eda_scm_branch }}"
         status_code: 200
         validate_certs: "{{ lookup('ansible.builtin.env', 'CONTROLLER_VERIFY_SSL') | default(false) | bool }}"
-      when: >-
-        config_drift_eda_project_record.scm_branch != config_drift_eda_scm_branch
-        or config_drift_eda_project_record.url != config_drift_eda_scm_url
+
+    - name: Refresh EDA project record after SCM update
+      ansible.eda.project_info:
+        name: "{{ config_drift_eda_project }}"
+      register: config_drift_eda_project_info
+
+    - name: Set EDA project record fact
+      ansible.builtin.set_fact:
+        config_drift_eda_project_record: "{{ config_drift_eda_project_info.projects | first }}"
 
     - name: Trigger EDA project sync
       ansible.builtin.uri:
@@ -193,10 +199,14 @@
 
     - name: Assert EDA project sync succeeded
       ansible.builtin.assert:
-        that: config_drift_eda_project_sync_status.projects[0].import_error | default('') | length == 0
+        that:
+          - config_drift_eda_project_sync_status.projects[0].import_state == 'completed'
+          - config_drift_eda_project_sync_status.projects[0].import_error | default('', true) | length == 0
         fail_msg: >-
-          EDA project sync failed: {{
-          config_drift_eda_project_sync_status.projects[0].import_error | default('unknown error')
+          EDA project sync failed (branch={{
+          config_drift_eda_project_sync_status.projects[0].scm_branch | default('unknown')
+          }}): {{
+          config_drift_eda_project_sync_status.projects[0].import_error | default('unknown error', true)
           }}
 
     - name: Verify config drift rulebook is available in EDA project
