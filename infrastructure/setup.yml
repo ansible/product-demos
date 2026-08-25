@@ -237,7 +237,8 @@ controller_templates:
     description: >-
       Deploys Automation Orchestrator on an existing OpenShift cluster using
       aapctl. Installs CloudNativePG operator, PostgreSQL database, and the
-      AO operator in a single automated step.
+      AO operator in a single automated step. Optionally configures the AAP
+      integration allowlist and OIDC private-network access.
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -251,6 +252,31 @@ controller_templates:
       ao_operator_channel: stable
     credentials:
       - OpenShift Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AAP namespace
+          question_description: >-
+            Namespace where AAP is deployed. Used to discover the AAP
+            gateway Route hostname for the integration allowlist.
+          type: text
+          variable: aap_namespace
+          required: true
+          default: aap
+        - question_name: Configure AAP integration post-install
+          question_description: >-
+            Patches the AO backend/worker/background-worker Deployments with
+            APP_INTEGRATION_URL_ALLOWED_HOSTS and APP_OIDC_ALLOW_PRIVATE_NETWORKS
+            so AO can talk to AAP, including a private/lab AAP gateway.
+          type: multiplechoice
+          variable: ao_configure_aap_integration
+          required: true
+          default: "true"
+          choices:
+            - "true"
+            - "false"
 
   - name: Infrastructure | Automation Orchestrator | Uninstall
     description: >-

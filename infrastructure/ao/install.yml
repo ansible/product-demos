@@ -7,6 +7,9 @@
   vars:
     ao_channel: "{{ ao_operator_channel | default('stable') }}"
     ao_namespace: automation-orchestrator
+    aap_namespace: aap
+    aap_gateway_route_name: aap
+    ao_configure_aap_integration: true
 
     _k8s_host: "{{ lookup('env', 'K8S_AUTH_HOST') | default('', true) }}"
     _k8s_token: "{{ lookup('env', 'K8S_AUTH_API_KEY') | default('', true) }}"
@@ -184,6 +187,14 @@
               Check the operator's status with:
               oc get csv,pods -n {{ ao_namespace }}
           when: ao_routes.resources | default([]) | length == 0
+
+        # --- configure AAP integration -----------------------------------
+        - name: Configure AAP integration environment
+          ansible.builtin.include_tasks:
+            file: tasks/configure_aap_integration.yml
+          when:
+            - ao_configure_aap_integration | default(false) | bool
+            - ao_routes.resources | default([]) | length > 0
 
       always:
         - name: Clean up generated credentials
