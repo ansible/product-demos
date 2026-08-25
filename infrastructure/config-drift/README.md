@@ -12,6 +12,7 @@ Documentation and validation steps: [`../docs/config-drift.md`](../docs/config-d
 | [`playbooks/deploy_audit_filebeat.yml`](playbooks/deploy_audit_filebeat.yml) | Deploy auditd (and later Filebeat) to RHEL hosts |
 | [`playbooks/provision_kafka.yml`](playbooks/provision_kafka.yml) | Provision `aws_kafka` and deploy Podman Kafka |
 | [`playbooks/setup_eda_activation.yml`](playbooks/setup_eda_activation.yml) | Create EDA rulebook activation for Kafka events |
+| [`playbooks/drift_sshd.yml`](playbooks/drift_sshd.yml) | Introduce `PermitRootLogin yes` drift for demo |
 | [`playbooks/remediate_sshd.yml`](playbooks/remediate_sshd.yml) | Restore `sshd_config` after drift |
 | [`filebeat/`](filebeat/) | Filebeat configuration (Stage 2) |
 | [`kafka/`](kafka/) | Podman Kafka stack (Stage 3) |

@@ -456,6 +456,34 @@ controller_templates:
             - console
             - kafka
 
+  - name: "LINUX | Config Drift - Introduce SSHD Drift"
+    description: >-
+      Sets PermitRootLogin yes on RHEL workers to simulate sshd_config drift
+      for the event-driven remediation demo. Prints matching sshd_config lines
+      before and after the change so presenters can run the full flow from AAP.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/config-drift/playbooks/drift_sshd.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          question_description: >-
+            Default is aws_rhel* (aws_rhel8 and aws_rhel9). Use aws_rhel9 for
+            one host only. Unreachable hosts are skipped.
+          type: text
+          variable: _hosts
+          required: true
+          default: aws_rhel*
+
   - name: "Infrastructure | Setup Rulebook for Kafka Queue - Config Drift & Remediation"
     description: >-
       Creates or updates the EDA rulebook activation that listens on Kafka

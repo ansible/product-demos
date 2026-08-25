@@ -16,7 +16,7 @@
         and event.body.message is search("sshd_config_change")
         and event.body.message is search("type=SYSCALL")
       throttle:
-        once_within: 60 seconds
+        once_within: 15 seconds
         group_by_attributes:
           - body.host.ip
       action:
