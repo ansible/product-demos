@@ -119,6 +119,7 @@
       when: config_drift_kafka_security_group.security_groups | length > 0
       amazon.aws.ec2_security_group:
         name: "{{ create_vm_aws_securitygroup_name }}"
+        description: "{{ config_drift_kafka_security_group.security_groups[0].description }}"
         region: "{{ create_vm_aws_region }}"
         vpc_id: "{{ config_drift_kafka_security_group.security_groups[0].vpc_id }}"
         purge_rules: false
