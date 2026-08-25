@@ -4,6 +4,9 @@
     name: podman
     state: present
 
+- name: Gather service facts
+  ansible.builtin.service_facts:
+
 - name: Allow Kafka port from the demo VPC
   ansible.posix.firewalld:
     rich_rule: >-
@@ -12,13 +15,14 @@
     permanent: true
     state: enabled
     immediate: true
-  when: ansible_facts.services['firewalld.service'] is defined
-  failed_when: false
+  when:
+    - "'firewalld.service' in ansible_facts.services"
+    - ansible_facts.services['firewalld.service'].state == 'running'
 
 - name: Determine Kafka advertised listener address
   ansible.builtin.set_fact:
     config_drift_kafka_advertise_host: >-
-      {{ kafka_private_ip | default(ansible_default_ipv4.address) }}
+      {{ kafka_private_ip | default(ansible_facts['default_ipv4']['address']) }}
 
 - name: Run single-node KRaft Kafka broker
   containers.podman.podman_container:
@@ -32,10 +36,16 @@
       CLUSTER_ID: "{{ config_drift_kafka_cluster_id }}"
       KAFKA_NODE_ID: "1"
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:{{ config_drift_kafka_port }},CONTROLLER://0.0.0.0:9093"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://{{ config_drift_kafka_advertise_host }}:{{ config_drift_kafka_port }}"
+      KAFKA_LISTENERS: >-
+        PLAINTEXT://0.0.0.0:{{ config_drift_kafka_port }},
+        PLAINTEXT_LOCAL://127.0.0.1:{{ config_drift_kafka_local_port }},
+        CONTROLLER://127.0.0.1:9093
+      KAFKA_ADVERTISED_LISTENERS: >-
+        PLAINTEXT://{{ config_drift_kafka_advertise_host }}:{{ config_drift_kafka_port }},
+        PLAINTEXT_LOCAL://127.0.0.1:{{ config_drift_kafka_local_port }}
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: >-
+        CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_LOCAL:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@127.0.0.1:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
@@ -57,13 +67,13 @@
       - run
       - --rm
       - --network
-      - host
+      - "container:{{ config_drift_kafka_container_name }}"
       - -e
       - "KAFKA_HEAP_OPTS={{ config_drift_kafka_admin_heap_opts }}"
       - "{{ config_drift_kafka_image }}"
       - /opt/kafka/bin/kafka-broker-api-versions.sh
       - --bootstrap-server
-      - "localhost:{{ config_drift_kafka_port }}"
+      - "127.0.0.1:{{ config_drift_kafka_local_port }}"
   register: config_drift_kafka_ready
   until: config_drift_kafka_ready.rc == 0
   retries: 24
@@ -77,7 +87,7 @@
       - run
       - --rm
       - --network
-      - host
+      - "container:{{ config_drift_kafka_container_name }}"
       - -e
       - "KAFKA_HEAP_OPTS={{ config_drift_kafka_admin_heap_opts }}"
       - "{{ config_drift_kafka_image }}"
@@ -87,7 +97,7 @@
       - --topic
       - "{{ config_drift_kafka_topic }}"
       - --bootstrap-server
-      - "localhost:{{ config_drift_kafka_port }}"
+      - "127.0.0.1:{{ config_drift_kafka_local_port }}"
       - --partitions
       - "1"
       - --replication-factor
@@ -105,14 +115,14 @@
       - run
       - --rm
       - --network
-      - host
+      - "container:{{ config_drift_kafka_container_name }}"
       - -e
       - "KAFKA_HEAP_OPTS={{ config_drift_kafka_admin_heap_opts }}"
       - "{{ config_drift_kafka_image }}"
       - /opt/kafka/bin/kafka-topics.sh
       - --list
       - --bootstrap-server
-      - "localhost:{{ config_drift_kafka_port }}"
+      - "127.0.0.1:{{ config_drift_kafka_local_port }}"
   register: config_drift_kafka_topic_list
   changed_when: false
 
