@@ -1,10 +1,21 @@
+---
 # Configures Automation Orchestrator to talk to AAP, per:
 # https://github.com/lennysh/cheat-sheets/tree/main/automation-orchestrator
----
+
 - name: Derive the OpenShift apps domain from the API host
   ansible.builtin.set_fact:
     _ocp_apps_domain: >-
       {{ (_k8s_host | urlsplit('hostname')) | regex_replace('^api\.', 'apps.') }}
+  when: aap_gateway_host is not defined
+
+- name: Fail if the API host doesn't match the expected api.<cluster-domain> pattern
+  ansible.builtin.assert:
+    that:
+      - _ocp_apps_domain != (_k8s_host | urlsplit('hostname'))
+    fail_msg: >-
+      Could not derive the apps domain from K8S_AUTH_HOST '{{ _k8s_host }}'.
+      Expected a hostname starting with 'api.' per standard OpenShift
+      convention. Pass aap_gateway_host as an extra var to override.
   when: aap_gateway_host is not defined
 
 - name: Derive the AAP gateway hostname
@@ -18,35 +29,48 @@
 
 - name: Set APP_INTEGRATION_URL_ALLOWED_HOSTS on AO deployments
   ansible.builtin.command:
-    cmd: >-
-      kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
-      -n {{ ao_namespace }}
-      set env
-      deployment/automation-orchestrator-backend
-      deployment/automation-orchestrator-worker
-      deployment/automation-orchestrator-background-worker
-      APP_INTEGRATION_URL_ALLOWED_HOSTS={{ _ao_allowed_hosts_json }}
+    argv:
+      - kubectl
+      - --kubeconfig
+      - "{{ _kubeconfig_tmp.path }}"
+      - -n
+      - "{{ ao_namespace }}"
+      - set
+      - env
+      - deployment/automation-orchestrator-backend
+      - deployment/automation-orchestrator-worker
+      - deployment/automation-orchestrator-background-worker
+      - "APP_INTEGRATION_URL_ALLOWED_HOSTS={{ _ao_allowed_hosts_json }}"
   register: _allowlist_result
   changed_when: _allowlist_result.rc == 0
 
 - name: Allow OIDC to private-network AAP gateway
   ansible.builtin.command:
-    cmd: >-
-      kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
-      -n {{ ao_namespace }}
-      set env
-      deployment/automation-orchestrator-backend
-      APP_OIDC_ALLOW_PRIVATE_NETWORKS=true
+    argv:
+      - kubectl
+      - --kubeconfig
+      - "{{ _kubeconfig_tmp.path }}"
+      - -n
+      - "{{ ao_namespace }}"
+      - set
+      - env
+      - deployment/automation-orchestrator-backend
+      - APP_OIDC_ALLOW_PRIVATE_NETWORKS=true
   register: _oidc_result
   changed_when: _oidc_result.rc == 0
 
 - name: Wait for AO deployment rollouts to complete
   ansible.builtin.command:
-    cmd: >-
-      kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
-      -n {{ ao_namespace }}
-      rollout status deployment/automation-orchestrator-{{ item }}
-      --timeout=180s
+    argv:
+      - kubectl
+      - --kubeconfig
+      - "{{ _kubeconfig_tmp.path }}"
+      - -n
+      - "{{ ao_namespace }}"
+      - rollout
+      - status
+      - "deployment/automation-orchestrator-{{ item }}"
+      - --timeout=180s
   loop:
     - backend
     - worker
