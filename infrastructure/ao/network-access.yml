@@ -13,13 +13,13 @@
     # CONTROLLER_HOST/TOWER_HOST are URLs; the allow-list takes bare hostnames.
     ao_aap_hostname: >-
       {{ (aap_hostname
+          | default(lookup('env', 'AAP_HOSTNAME'), true)
           | default(lookup('env', 'CONTROLLER_HOST'), true)
           | default(lookup('env', 'TOWER_HOST'), true)
           | default('', true))
          | trim
-         | regex_replace('^[a-zA-Z][a-zA-Z0-9+.-]*://', '')
-         | regex_replace('/.*$', '')
-         | regex_replace(':[0-9]+$', '') }}
+         | ansible.builtin.urlsplit('hostname')
+         | default('', true) }}
 
     ao_backend: "{{ ao_instance }}-backend"
     ao_deployments:
@@ -42,8 +42,9 @@
         that:
           - ao_aap_hostname | length > 0
         fail_msg: >-
-          Pass -e aap_hostname=aap.example.com, or attach a 'Red Hat Ansible
-          Automation Platform' credential so CONTROLLER_HOST is set.
+          Attach a 'Red Hat Ansible Automation Platform' credential so
+          CONTROLLER_HOST is set, or pass -e aap_hostname=<url> (e.g.
+          https://aap.example.com).
 
     - name: Get the Automation Orchestrator Route
       kubernetes.core.k8s_info:

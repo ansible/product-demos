@@ -237,7 +237,8 @@ controller_templates:
     description: >-
       Deploys Automation Orchestrator on an existing OpenShift cluster using
       aapctl. Installs CloudNativePG operator, PostgreSQL database, and the
-      AO operator in a single automated step.
+      AO operator, then configures network access so the AAP gateway can
+      reach it.
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -251,6 +252,7 @@ controller_templates:
       ao_operator_channel: stable
     credentials:
       - OpenShift Credential
+      - AAP Credential
 
   - name: Infrastructure | Automation Orchestrator | Uninstall
     description: >-
@@ -524,20 +526,3 @@ controller_workflows:
           feedback: >-
             ROSA cluster destruction failed. Manual cleanup may be required.
             Check AWS console for orphaned resources (VPCs, IAM roles, CloudFormation stacks).
-
-  - name: Infrastructure | Automation Orchestrator | Install Workflow
-    description: >-
-      Deploys Automation Orchestrator via aapctl, then configures its
-      network access allow-list and OIDC settings so the AAP gateway
-      can reach it.
-    organization: Ansible Product Demos (APD)
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-    simplified_workflow_nodes:
-      - identifier: Install AO
-        unified_job_template: Infrastructure | Automation Orchestrator | Install
-        success_nodes:
-          - Configure Network Access
-      - identifier: Configure Network Access
-        unified_job_template: Infrastructure | AO Network Configuration | Install
