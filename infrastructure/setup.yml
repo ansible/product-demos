@@ -456,6 +456,36 @@ controller_templates:
             - console
             - kafka
 
+  - name: "Infrastructure | Setup Rulebook for Kafka Queue - Config Drift & Remediation"
+    description: >-
+      Creates or updates the EDA rulebook activation that listens on Kafka
+      topic linux-audit-events for sshd_config_change events and launches
+      SSHD remediation.
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AAP Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/config-drift/playbooks/setup_eda_activation.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+
+  - name: "LINUX | SSHD Configuration Remediation"
+    description: >-
+      Restores PermitRootLogin no on a host identified by private IP from a
+      Kafka audit event. Launched by the config drift EDA rulebook.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/config-drift/playbooks/remediate_sshd.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
+
 controller_workflows:
   - name: Infrastructure | ROSA - Lifecycle (Create)
     description: >-

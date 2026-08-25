@@ -66,11 +66,12 @@
           ~ config_drift_kafka_brokers
           ~ '.',
           'On the Kafka host, consume events with:',
-          'podman exec kafka /opt/kafka/bin/kafka-console-consumer.sh'
-          ~ ' --bootstrap-server localhost:9092'
+          'sudo podman run --rm --network container:kafka docker.io/apache/kafka:3.9.0'
+          ~ ' /opt/kafka/bin/kafka-console-consumer.sh'
+          ~ ' --bootstrap-server 127.0.0.1:9094'
           ~ ' --topic '
           ~ config_drift_kafka_topic
-          ~ ' --from-beginning',
+          ~ ' --from-beginning | grep sshd_config_change',
           'Then edit /etc/ssh/sshd_config on a RHEL worker and watch for JSON.',
         ]
         if config_drift_filebeat_output == 'kafka'

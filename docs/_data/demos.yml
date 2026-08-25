@@ -1514,8 +1514,47 @@
     icon: "🔄"
   blurb: "Detect unauthorized sshd_config changes via Linux audit, route events through Kafka, and let Event-Driven Ansible trigger AAP remediation."
   stats:
-    playbooks: 1
+    playbooks: 4
   url: /demos/infrastructure-config-drift/
+  github_path: infrastructure/setup.yml
+
+- slug: infrastructure-config-drift-kafka
+  readme_path: infrastructure/docs/config-drift-kafka.md
+  title: "Infrastructure | Config Drift — Kafka Queue"
+  subtitle: "Ship sshd_config audit events to a dedicated aws_kafka broker"
+  category: infrastructure
+  status: active
+  tags:
+    - Linux
+    - Kafka
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #231f20 0%, #ee0000 100%)"
+    icon: "📨"
+  blurb: "Provision Podman KRaft Kafka, wire Filebeat to topic linux-audit-events, and validate sshd_config_change events end-to-end."
+  stats:
+    playbooks: 2
+  url: /demos/infrastructure-config-drift-kafka/
+  github_path: infrastructure/setup.yml
+
+- slug: infrastructure-config-drift-eda
+  readme_path: infrastructure/docs/config-drift-eda.md
+  title: "Infrastructure | Config Drift — EDA Rulebook"
+  subtitle: "React to Kafka audit events and auto-remediate sshd_config"
+  category: infrastructure
+  status: active
+  tags:
+    - EDA
+    - Kafka
+    - Linux
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #7a0000 0%, #231f20 100%)"
+    icon: "⚡"
+  blurb: "Activate the config_drift_kafka rulebook to listen on linux-audit-events and launch SSHD remediation when drift is detected."
+  stats:
+    playbooks: 2
+  url: /demos/infrastructure-config-drift-eda/
   github_path: infrastructure/setup.yml
 
 - slug: rosa-preflight

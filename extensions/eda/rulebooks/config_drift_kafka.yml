@@ -1,0 +1,29 @@
+---
+# Listen for Filebeat audit events on Kafka and remediate sshd_config drift.
+# Broker host/topic are passed via activation extra_vars from setup_eda_activation.yml.
+- name: Config drift from Kafka audit events
+  hosts: all
+  sources:
+    - ansible.eda.kafka:
+        host: "{{ config_drift_kafka_broker_host }}"
+        port: "{{ config_drift_kafka_broker_port | default(9092) }}"
+        topic: "{{ config_drift_kafka_topic | default('linux-audit-events') }}"
+        group_id: apd-config-drift
+  rules:
+    - name: Remediate sshd_config drift detected in audit stream
+      condition: >-
+        event.message is defined
+        and event.message is search("sshd_config_change")
+        and event.message is search("type=SYSCALL")
+      throttle:
+        once_within: 60 seconds
+        group_by_attributes:
+          - host.ip
+      action:
+        run_job_template:
+          name: "LINUX | SSHD Configuration Remediation"
+          organization: "Ansible Product Demos (APD)"
+          job_args:
+            extra_vars:
+              config_drift_target_ip: "{{ event.host.ip[0] }}"
+              config_drift_audit_message: "{{ event.message }}"

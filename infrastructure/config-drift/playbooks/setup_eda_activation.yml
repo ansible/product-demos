@@ -1,0 +1,58 @@
+---
+- name: Activate config drift Kafka rulebook in EDA
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    config_drift_eda_project: Ansible Product Demos
+    config_drift_eda_decision_environment: Product Demos EE
+    config_drift_eda_rulebook: extensions/eda/rulebooks/config_drift_kafka.yml
+    config_drift_eda_activation_name: config_drift_kafka
+    config_drift_kafka_topic: linux-audit-events
+
+  tasks:
+    - name: Resolve Kafka broker from inventory
+      ansible.builtin.set_fact:
+        config_drift_kafka_broker_host: >-
+          {{
+            hostvars['aws_kafka']['private_ip_address']
+            | default(hostvars['aws_kafka']['ansible_host'])
+          }}
+
+    - name: Assert Kafka broker is in inventory
+      ansible.builtin.assert:
+        that:
+          - "'aws_kafka' in hostvars"
+          - config_drift_kafka_broker_host | length > 0
+        fail_msg: >-
+          Host aws_kafka was not found in inventory. Run Infrastructure |
+          AWS - Provision Kafka Queue, sync AWS inventory, then re-run this job.
+
+    - name: Show EDA activation parameters
+      ansible.builtin.debug:
+        msg:
+          - "Broker: {{ config_drift_kafka_broker_host }}:9092"
+          - "Topic: {{ config_drift_kafka_topic }}"
+          - "Rulebook: {{ config_drift_eda_rulebook }}"
+          - "Activation: {{ config_drift_eda_activation_name }}"
+
+    - name: Configure EDA rulebook activation
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.eda_rulebook_activations
+      vars:
+        eda_rulebook_activations:
+          - name: "{{ config_drift_eda_activation_name }}"
+            description: >-
+              Listen for sshd_config_change audit events on Kafka topic
+              linux-audit-events and launch SSHD remediation.
+            organization: Ansible Product Demos (APD)
+            project: "{{ config_drift_eda_project }}"
+            rulebook: "{{ config_drift_eda_rulebook }}"
+            decision_environment: "{{ config_drift_eda_decision_environment }}"
+            enabled: true
+            restart_policy: always
+            extra_vars:
+              config_drift_kafka_broker_host: "{{ config_drift_kafka_broker_host }}"
+              config_drift_kafka_broker_port: 9092
+              config_drift_kafka_topic: "{{ config_drift_kafka_topic }}"

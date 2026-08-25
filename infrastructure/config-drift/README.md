@@ -10,8 +10,12 @@ Documentation and validation steps: [`../docs/config-drift.md`](../docs/config-d
 |------|---------|
 | [`auditd/sshd-config.rules`](auditd/sshd-config.rules) | Reference copy of the persistent audit rule |
 | [`playbooks/deploy_audit_filebeat.yml`](playbooks/deploy_audit_filebeat.yml) | Deploy auditd (and later Filebeat) to RHEL hosts |
+| [`playbooks/provision_kafka.yml`](playbooks/provision_kafka.yml) | Provision `aws_kafka` and deploy Podman Kafka |
+| [`playbooks/setup_eda_activation.yml`](playbooks/setup_eda_activation.yml) | Create EDA rulebook activation for Kafka events |
+| [`playbooks/remediate_sshd.yml`](playbooks/remediate_sshd.yml) | Restore `sshd_config` after drift |
 | [`filebeat/`](filebeat/) | Filebeat configuration (Stage 2) |
-| [`kafka/`](kafka/) | Podman Compose Kafka stack (Stage 3) |
+| [`kafka/`](kafka/) | Podman Kafka stack (Stage 3) |
+| [`../../extensions/eda/rulebooks/`](../../extensions/eda/rulebooks/) | EDA rulebooks (Stage 4) |
 | [`collections/.../demo/config_drift`](../../collections/ansible_collections/demo/config_drift) | Ansible role implementation |
 
 AAP job templates and workflows are defined in [`../setup.yml`](../setup.yml).

@@ -42,8 +42,8 @@ Unreachable hosts are skipped (`ignore_unreachable`) so one bad SSH target does 
 |----------|----------|-------|
 | LINUX ǀ Config Drift - Deploy Audit and Filebeat | [`infrastructure/config-drift/playbooks/deploy_audit_filebeat.yml`](../config-drift/playbooks/deploy_audit_filebeat.yml) | 1–2, 3 (kafka output) |
 | Infrastructure ǀ AWS - Provision Kafka Queue | [`infrastructure/config-drift/playbooks/provision_kafka.yml`](../config-drift/playbooks/provision_kafka.yml) | 3 |
-| Infrastructure ǀ Setup Rulebook for Kafka Queue - Config Drift & Remediation | *planned* | 4 |
-| LINUX ǀ SSHD Configuration Remediation | *planned* | 5 |
+| Infrastructure ǀ Setup Rulebook for Kafka Queue - Config Drift & Remediation | [`infrastructure/config-drift/playbooks/setup_eda_activation.yml`](../config-drift/playbooks/setup_eda_activation.yml) | 4 |
+| LINUX ǀ SSHD Configuration Remediation | [`infrastructure/config-drift/playbooks/remediate_sshd.yml`](../config-drift/playbooks/remediate_sshd.yml) | 4–5 |
 
 ## Build status
 
@@ -51,9 +51,9 @@ Unreachable hosts are skipped (`ignore_unreachable`) so one bad SSH target does 
 |-------|-----------|--------|
 | 1 | auditd persistent watch on `/etc/ssh/sshd_config` | **Implemented** |
 | 2 | Filebeat auditd module (console or Kafka output) | **Implemented** |
-| 3 | Kafka on dedicated AWS EC2 (Podman KRaft) | **Implemented** |
-| 4 | EDA rulebook + activation | Planned |
-| 5 | AAP sshd remediation playbook | Planned |
+| 3 | Kafka on dedicated AWS EC2 (Podman KRaft) | **Implemented** — [walkthrough](config-drift-kafka.md) |
+| 4 | EDA rulebook + activation | **Implemented** — [walkthrough](config-drift-eda.md) |
+| 5 | AAP sshd remediation playbook | **Implemented** (basic PermitRootLogin restore) |
 
 ---
 
@@ -157,47 +157,27 @@ sudo filebeat -e -c /etc/filebeat/filebeat.yml
 
 ## Stage 3 — Kafka
 
-### Provision the broker
+Full step-by-step walkthrough: **[Config Drift — Kafka Queue](config-drift-kafka.md)** (provision broker, wire Filebeat, consume and validate `sshd_config_change` events).
 
-1. Run **Infrastructure | AWS - Provision Kafka Queue** with the same region and owner tag as your cloud stack. The job ensures the `aws-test-key` keypair exists in AWS (derived from **APD Machine Credential**, same as **Deploy Cloud Stack in AWS**) before launching the EC2 instance.
-2. Sync **AWS Inventory** so `aws_kafka` appears in the inventory.
+### Quick reference
 
-This creates (or reuses) an `aws_kafka` EC2 instance and deploys single-node KRaft Kafka with topic `linux-audit-events`.
-
-### Wire Filebeat to Kafka
-
-1. Run **LINUX | Config Drift - Deploy Audit and Filebeat** with:
-   - `_hosts`: `aws_rhel*`
-   - **Filebeat output**: `kafka`
-
-The playbook resolves the broker from inventory host `aws_kafka` (private IP `:9092`).
-
-### Verify events on the broker
-
-On `aws_kafka`:
-
-```bash
-podman exec kafka /opt/kafka/bin/kafka-console-consumer.sh \
-  --bootstrap-server localhost:9092 \
-  --topic linux-audit-events \
-  --from-beginning
-```
-
-On a RHEL worker, trigger a change:
-
-```bash
-sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
-```
-
-You should see parsed audit JSON arrive in the Kafka consumer.
+1. Run **Infrastructure | AWS - Provision Kafka Queue** (same region/owner as cloud stack).
+2. Sync **AWS Inventory** so `aws_kafka` appears.
+3. Re-run **LINUX | Config Drift - Deploy Audit and Filebeat** with **Filebeat output**: `kafka`.
+4. On `aws_kafka`, consume topic `linux-audit-events` and filter for `sshd_config_change` (see kafka walkthrough for `9094` admin listener).
 
 ## Stage 4 — Event-Driven Ansible
 
-*Coming next: rulebook under `extensions/eda/rulebooks/` after inspecting real Kafka JSON.*
+Full walkthrough: **[Config Drift — EDA](config-drift-eda.md)**.
+
+1. Sync the **Ansible Product Demos** EDA project.
+2. Run **Infrastructure | Setup Rulebook for Kafka Queue - Config Drift & Remediation**.
+3. Confirm activation **config_drift_kafka** is running.
+4. Drift `sshd_config` on a worker — **LINUX | SSHD Configuration Remediation** should launch automatically.
 
 ## Stage 5 — AAP remediation
 
-*Coming next: `LINUX | SSHD Configuration Remediation` with `sshd -t` validation.*
+**LINUX | SSHD Configuration Remediation** restores `PermitRootLogin no`, validates with `sshd -t`, and reloads `sshd`. It resolves the target host from `config_drift_target_ip` (private IP passed by the EDA rulebook).
 
 ## Why it matters
 
