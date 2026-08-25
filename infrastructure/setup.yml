@@ -382,6 +382,11 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_aws_keypair_name: aws-test-key
+      create_vm_aws_securitygroup_name: aws-test-sg
+      create_vm_aws_vpc_subnet_name: aws-test-subnet
+      create_vm_vm_deployment: cloud_stack
     survey_enabled: true
     survey:
       name: ''
@@ -413,26 +418,6 @@ controller_templates:
             - Dev
             - QA
             - Prod
-        - question_name: Deployment
-          type: text
-          variable: create_vm_vm_deployment
-          required: true
-          default: cloud_stack
-        - question_name: Subnet
-          type: text
-          variable: create_vm_aws_vpc_subnet_name
-          required: true
-          default: aws-test-subnet
-        - question_name: Security Group
-          type: text
-          variable: create_vm_aws_securitygroup_name
-          required: true
-          default: aws-test-sg
-        - question_name: SSH Keypair
-          type: text
-          variable: create_vm_aws_keypair_name
-          required: true
-          default: aws-test-key
 
   - name: "LINUX | Config Drift - Deploy Audit and Filebeat"
     description: >-

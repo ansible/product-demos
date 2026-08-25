@@ -12,6 +12,10 @@
     create_vm_vm_purpose: kafka
     create_vm_apd_managed_by: aap-product-demos
     create_vm_apd_demo_tag: "true"
+    create_vm_aws_keypair_name: aws-test-key
+    create_vm_aws_securitygroup_name: aws-test-sg
+    create_vm_aws_vpc_subnet_name: aws-test-subnet
+    create_vm_vm_deployment: cloud_stack
 
   tasks:
     - name: Fail if cloud networking variables are not defined
@@ -35,6 +39,13 @@
       ansible.builtin.set_fact:
         create_vm_vm_deployment: cloud_stack
       when: create_vm_vm_deployment is not defined
+
+    - name: Default cloud networking for Kafka VM
+      ansible.builtin.set_fact:
+        create_vm_aws_keypair_name: aws-test-key
+        create_vm_aws_securitygroup_name: aws-test-sg
+        create_vm_aws_vpc_subnet_name: aws-test-subnet
+      when: create_vm_aws_keypair_name is not defined
 
     - name: Default environment tag for Kafka VM
       ansible.builtin.set_fact:

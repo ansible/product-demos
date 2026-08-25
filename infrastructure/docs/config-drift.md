@@ -159,7 +159,7 @@ sudo filebeat -e -c /etc/filebeat/filebeat.yml
 
 ### Provision the broker
 
-1. Run **Infrastructure | AWS - Provision Kafka Queue** with the same region, owner, and deployment tags as your cloud stack (defaults match **Deploy Cloud Stack in AWS**).
+1. Run **Infrastructure | AWS - Provision Kafka Queue** with the same region and owner tag as your cloud stack (subnet, security group, keypair, and deployment match **Deploy Cloud Stack in AWS** automatically).
 2. Sync **AWS Inventory** so `aws_kafka` appears in the inventory.
 
 This creates (or reuses) an `aws_kafka` EC2 instance and deploys single-node KRaft Kafka with topic `linux-audit-events`.
