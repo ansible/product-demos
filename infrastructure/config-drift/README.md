@@ -8,7 +8,9 @@ Documentation and validation steps: [`../docs/config-drift.md`](../docs/config-d
 
 | Path | Purpose |
 |------|---------|
-| [`auditd/sshd-config.rules`](auditd/sshd-config.rules) | Reference copy of the persistent audit rule |
+| Path | Purpose |
+|------|---------|
+| [`auditd/`](auditd/) | Pointer to audit rule template in the `audit_filebeat` role |
 | [`playbooks/deploy_audit_filebeat.yml`](playbooks/deploy_audit_filebeat.yml) | Deploy auditd (and later Filebeat) to RHEL hosts |
 | [`playbooks/provision_kafka.yml`](playbooks/provision_kafka.yml) | Provision `aws_kafka` and deploy Podman Kafka |
 | [`playbooks/setup_eda_activation.yml`](playbooks/setup_eda_activation.yml) | Create EDA rulebook activation for Kafka events |

@@ -10,8 +10,9 @@
     config_drift_kafka_topic: linux-audit-events
 
   tasks:
-    - name: Ensure RHEL 8 uses Python 3.9 for Ansible modules
-      ansible.builtin.include_tasks: "{{ playbook_dir }}/../../../cloud/tasks/ensure_python39_on_rhel8.yml"
+    - name: Ensure RHEL 8 uses a supported Python for Ansible modules
+      ansible.builtin.include_role:
+        name: demo.cloud.ensure_rhel8_python
 
     - name: Resolve Kafka broker from inventory
       ansible.builtin.set_fact:

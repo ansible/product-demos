@@ -52,6 +52,7 @@ controller_inventory_sources:
       compose:
         ansible_host: public_ip_address
         ansible_user: ec2-user
+        # ansible-core 2.16 requires Python 3.8+ on targets; RHEL 8 needs python3.9.
         ansible_python_interpreter: >-
           '/usr/bin/python3.9' if tags.get('blueprint', '') == 'rhel8'
           else omit

@@ -121,8 +121,6 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    extra_vars:
-      reports_aws_bucket_name: reports-pd-apd
 
   - name: Cloud | AWS | Snapshot EC2
     job_type: run

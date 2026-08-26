@@ -1,2 +1,0 @@
-# Monitor writes and attribute changes to sshd_config for config drift detection.
--w /etc/ssh/sshd_config -p wa -k sshd_config_change

@@ -8,9 +8,6 @@
     ansible_python_interpreter: auto_silent
 
   tasks:
-    - name: Ensure RHEL 8 uses Python 3.9 for Ansible modules
-      ansible.builtin.include_tasks: "{{ playbook_dir }}/../cloud/tasks/ensure_python39_on_rhel8.yml"
-
     - name: Check OS family
       ansible.builtin.assert:
         that: ansible_os_family == 'RedHat'

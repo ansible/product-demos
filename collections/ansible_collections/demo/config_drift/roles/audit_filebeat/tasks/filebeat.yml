@@ -71,14 +71,19 @@
           ~ ' --bootstrap-server 127.0.0.1:9094'
           ~ ' --topic '
           ~ config_drift_kafka_topic
-          ~ ' --from-beginning | grep sshd_config_change',
-          'Then edit /etc/ssh/sshd_config on a RHEL worker and watch for JSON.',
+          ~ ' --from-beginning | grep '
+          ~ config_drift_audit_key,
+          'Then edit '
+          ~ config_drift_watched_file
+          ~ ' on a RHEL worker and watch for JSON.',
         ]
         if config_drift_filebeat_output == 'kafka'
         else [
           'Filebeat is running with console output (Stage 2 debug mode).',
           'On the host, tail events with: sudo journalctl -u filebeat -f',
           'Or run foreground debug: sudo filebeat -e -c /etc/filebeat/filebeat.yml',
-          'Then edit /etc/ssh/sshd_config and watch for parsed audit JSON.',
+          'Then edit '
+          ~ config_drift_watched_file
+          ~ ' and watch for parsed audit JSON.',
         ]
       }}

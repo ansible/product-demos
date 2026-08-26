@@ -1,6 +1,7 @@
 ---
-# Reference compose for the Stage 3 single-node KRaft broker.
-# The kafka_queue role deploys the same settings with Podman directly.
+# Reference documentation only — not used by AAP jobs. The
+# demo.config_drift.kafka_queue role is the source of truth for deployment.
+# This compose file mirrors the Podman settings for local experimentation.
 services:
   kafka:
     image: docker.io/apache/kafka:3.9.0

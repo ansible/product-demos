@@ -3,8 +3,6 @@
   hosts: localhost
   connection: local
   gather_facts: false
-  vars_files:
-    - "{{ playbook_dir }}/../../../cloud/blueprints/kafka.yml"
   vars:
     create_vm_vm_name: aws_kafka
     vm_blueprint: kafka
@@ -67,6 +65,11 @@
       ansible.builtin.include_role:
         name: demo.cloud.aws
         tasks_from: create_vm
+      vars:
+        create_vm_aws_image_owners: 309956199498
+        create_vm_aws_instance_size: t3.medium
+        create_vm_aws_image_architecture: x86_64
+        create_vm_aws_image_filter: 'RHEL-9*HVM-*Hourly*'
 
     - name: Look up Kafka EC2 instance details
       amazon.aws.ec2_instance_info:
