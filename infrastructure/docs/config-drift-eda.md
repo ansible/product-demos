@@ -15,11 +15,14 @@ Activate a rulebook that subscribes to Kafka topic `linux-audit-events`, filters
 
 ```text
 Kafka topic linux-audit-events
-  → filter: event.body.message contains sshd_config_change and type=SYSCALL
+  → filter: sshd_config_change, type=SYSCALL, SYSCALL=rename
+  → exclude: comm=platform-python (Ansible remediation writes)
   → throttle: once per host IP per 15 seconds
   → run_job_template: LINUX | SSHD Configuration Remediation
       config_drift_target_ip from event.body.host.ip[0]
 ```
+
+Remediation writes also emit audit events. Without the `platform-python` exclusion, EDA can re-fire every 15 seconds when the throttle window expires — a feedback loop, not true recursion.
 
 Rulebook file: [`extensions/eda/rulebooks/config_drift_kafka.yml`](../../extensions/eda/rulebooks/config_drift_kafka.yml)
 
