@@ -402,6 +402,9 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    extra_vars:
+      _report_server: reports
+    limit: all
 
 controller_workflows:
   - name: Deploy Cloud Stack in AWS
@@ -632,6 +635,7 @@ controller_workflows:
     extra_vars:
       _hosts: aws_rhel*
       _hosts_windows: aws_win*
+      _report_server: reports
     survey_enabled: true
     survey:
       name: ''
@@ -714,4 +718,7 @@ controller_workflows:
         unified_job_template: Cloud | AWS | Restore EC2 from Snapshot
       - identifier: Compliance Report
         unified_job_template: Cloud | AWS | Patch Compliance Report
+        extra_data:
+          _report_server: reports
+        limit: all
         all_parents_must_converge: true

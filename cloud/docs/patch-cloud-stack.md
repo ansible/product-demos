@@ -63,7 +63,7 @@ graph LR
 | Cloud ǀ AWS ǀ Patch Windows | [`cloud/patch_windows.yml`](../patch_windows.yml) | Installs specific KB updates via win_updates |
 | Cloud ǀ AWS ǀ Patch Post-check Windows | [`cloud/patch_post_check_windows.yml`](../patch_post_check_windows.yml) | Verifies KBs are installed after patching |
 | Cloud ǀ AWS ǀ Restore EC2 from Snapshot | [`cloud/restore_ec2.yml`](../restore_ec2.yml) | Restores EC2 volumes from latest EBS snapshot |
-| Cloud ǀ AWS ǀ Patch Compliance Report | [`cloud/patch_compliance_report.yml`](../patch_compliance_report.yml) | Generates HTML compliance dashboard on the reports server |
+| Cloud ǀ AWS ǀ Patch Compliance Report | [`cloud/patch_compliance_report.yml`](../patch_compliance_report.yml) | Generates HTML compliance dashboard on the `reports` server (`_report_server`; not part of `_hosts`) |
 
 ## Why it matters
 
