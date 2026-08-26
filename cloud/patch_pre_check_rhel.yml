@@ -1,6 +1,6 @@
 ---
 - name: Pre-check patch applicability - RHEL
-  hosts: "{{ _hosts | default('os_linux') }}"
+  hosts: "{{ _hosts | default('aws_rhel*') }}"
   strategy: free
   become: true
   gather_facts: false

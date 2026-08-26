@@ -630,8 +630,8 @@ controller_workflows:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      _hosts: os_linux
-      _hosts_windows: os_windows
+      _hosts: aws_rhel*
+      _hosts_windows: aws_win*
     survey_enabled: true
     survey:
       name: ''
@@ -647,6 +647,23 @@ controller_workflows:
             - us-east-2
             - us-west-1
             - us-west-2
+        - question_name: RHEL hosts
+          question_description: >-
+            Host pattern for RHEL snapshot/pre-check/patch/post-check.
+            aws_rhel* matches aws_rhel8 and aws_rhel9. reports and aws_kafka
+            are not matched.
+          type: text
+          variable: _hosts
+          required: true
+          default: aws_rhel*
+        - question_name: Windows hosts
+          question_description: >-
+            Host pattern for Windows pre-check/patch/post-check.
+            aws_win* matches aws_win1. aws-dc is not matched.
+          type: text
+          variable: _hosts_windows
+          required: true
+          default: aws_win*
         - question_name: RHEL Advisory IDs (comma-separated)
           type: text
           variable: input_cve_ids
