@@ -97,9 +97,27 @@ The rulebook condition requires both `sshd_config_change` and `type=SYSCALL` to 
 | `404` on `/api/v2/config/` in activation log | EDA AAP credential host must include `/api/controller` on AAP 2.7 gateway deployments |
 | No events in activation log | Filebeat output is `kafka`; consumer on broker shows `sshd_config_change` events |
 | `KafkaConnectionError` on private IP | Re-run Kafka provision for external listener; EDA must use public IP `:9095` |
+| EDA worked once, then stopped after cloud stack redeploy | **Deploy Cloud Stack in AWS** used to purge TCP 9095 from `aws-test-sg`; Create VPC now keeps 9095. Re-open the port (re-run **Provision Kafka Queue** or add the SG rule), reset consumer offsets, restart activation — see below |
+| Activation **Failed** right after fixing 9095 | Large Kafka backlog can kill the consumer (`heartbeat expiration`). On `aws_kafka`, reset offsets to latest, then disable and re-enable activation `config_drift_kafka` |
 | Job not launched | Activation enabled; rulebook condition matches your test event |
 | Remediation job fails host lookup | Sync AWS inventory; worker `private_ip_address` must match `event.body.host.ip[0]` |
 | Job runs but sshd unchanged | Check remediation job stdout; `sshd -t` must pass before reload |
+
+### Recover after port 9095 was blocked or backlog crashed activation
+
+1. Confirm **TCP 9095** is open on `aws-test-sg` (`nc -zv aws_kafka_PUBLIC_IP 9095` from your laptop).
+2. On the Kafka host, skip queued audit noise before restarting EDA:
+
+```bash
+sudo podman exec kafka /opt/kafka/bin/kafka-consumer-groups.sh \
+  --bootstrap-server 127.0.0.1:9094 \
+  --group apd-config-drift \
+  --topic linux-audit-events \
+  --reset-offsets --to-latest --execute
+```
+
+3. **Automation Decisions** → disable and re-enable **config_drift_kafka** (or re-run **Setup Rulebook for Kafka Queue - Config Drift & Remediation**).
+4. Drift from **`PermitRootLogin no`** to **`yes`** — not `yes` when already `yes` (no audit event).
 
 ## Next step
 

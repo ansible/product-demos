@@ -200,3 +200,6 @@
         {{ '(EDA)' if kafka_public_ip is defined else '(not configured)' }}
       - "Topic: {{ config_drift_kafka_topic }}"
       - "Topics: {{ config_drift_kafka_topic_list.stdout_lines }}"
+
+- name: Deploy presenter event dashboard
+  ansible.builtin.include_tasks: dashboard.yml

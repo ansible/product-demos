@@ -35,10 +35,11 @@ When it finishes, the demo is ready to go.
 
 **Option A — drift from AAP (recommended for presenters):**
 
-1. Run **LINUX | Config Drift - Introduce SSHD Drift** (default limit `aws_rhel*` hits both RHEL workers).
-2. Watch **Automation Decisions** — activation `config_drift_kafka` consumes the event.
-3. Watch **Automation Execution** — **LINUX | SSHD Configuration Remediation** launches (once per host, throttled to every 15 seconds).
-4. Confirm on the workers: `sudo grep -i Root /etc/ssh/sshd_config` → `PermitRootLogin no`.
+1. Open **http://PUBLIC_IP/** on the Kafka broker (`aws_kafka`) — a live dashboard shows friendly lines like `/etc/ssh/sshd_config modified — event published` when drift happens.
+2. Run **LINUX | Config Drift - Introduce SSHD Drift** (default limit `aws_rhel*` hits both RHEL workers).
+3. Watch **Automation Decisions** — activation `config_drift_kafka` consumes the event.
+4. Watch **Automation Execution** — **LINUX | SSHD Configuration Remediation** launches (once per host, throttled to every 15 seconds).
+5. Confirm on the workers: `sudo grep -i Root /etc/ssh/sshd_config` → `PermitRootLogin no`.
 
 **Option B — drift manually on a host:**
 
@@ -249,6 +250,8 @@ Full step-by-step walkthrough: **[Config Drift — Kafka Queue](config-drift-kaf
 2. Sync **AWS Inventory** so `aws_kafka` appears.
 3. Re-run **LINUX | Config Drift - Deploy Audit and Filebeat** with **Filebeat output**: `kafka`.
 4. On `aws_kafka`, consume topic `linux-audit-events` and filter for `sshd_config_change` (see kafka walkthrough for `9094` admin listener).
+
+**Presenter note:** Kafka and the cloud stack share `aws-test-sg`. **Deploy Cloud Stack in AWS** (Create VPC) now includes TCP **9095** for EDA. If EDA stops firing after an idempotent cloud redeploy on an older environment, see [Kafka troubleshooting](config-drift-kafka.md#security-group-and-idempotent-cloud-deploy) and [EDA recovery](config-drift-eda.md#recover-after-port-9095-was-blocked-or-backlog-crashed-activation).
 
 ## Stage 4 — Event-Driven Ansible
 

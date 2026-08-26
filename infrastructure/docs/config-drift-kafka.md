@@ -59,9 +59,25 @@ Re-run **LINUX \| Config Drift - Deploy Audit and Filebeat**:
 
 This rewrites `/etc/filebeat/filebeat.yml` on each worker to publish to `aws_kafka:9092`. Auditd rules are unchanged.
 
-## Step 4 — Consume events on the broker
+## Step 4 — Watch events (presenter dashboard)
 
-SSH to `aws_kafka` (public IP from the provision job output or inventory).
+After **Infrastructure \| AWS - Provision Kafka Queue**, open the live dashboard on the broker public IP:
+
+```text
+http://PUBLIC_IP/
+```
+
+The page auto-refreshes every few seconds. When someone edits `/etc/ssh/sshd_config` on a worker, you should see a green line like:
+
+```text
+/etc/ssh/sshd_config modified on 10.0.1.244 — event published
+```
+
+That is the same filter the EDA rulebook uses (`sshd_config_change` + `type=SYSCALL`). Open AAP next and confirm remediation fired.
+
+### Manual consumer (optional)
+
+SSH to `aws_kafka` if you prefer the raw Kafka stream.
 
 Start a consumer on the **local admin listener** (`9094`):
 
@@ -152,6 +168,13 @@ Filebeat does **not** filter at the source — it ships all audit events. Stage 
 | Consumer shows noise only | Run the `grep sshd_config_change` filter; then edit `sshd_config` |
 | `podman ps` empty as `ec2-user` | Broker runs in **root** podman — use `sudo podman ps` |
 | Broker crash-loop | `sudo podman logs kafka` — listener config must use `CONTROLLER://127.0.0.1:9093` |
+| EDA cannot connect after redeploying cloud stack | **Deploy Cloud Stack in AWS** manages `aws-test-sg` and now keeps TCP **9095** open for EDA. On older revisions, re-run **Infrastructure \| AWS - Provision Kafka Queue** to re-add the rule, or add TCP 9095 inbound on `aws-test-sg` manually. Verify with `nc -zv PUBLIC_IP 9095` from outside the VPC. |
+
+### Security group and idempotent cloud deploy
+
+Kafka and the cloud stack share **`aws-test-sg`**. **Cloud \| AWS \| Create VPC** (`cloud/create_vpc.yml`) defines the full inbound rule set for that group. Port **9095** is included so EDA can reach the Kafka **EXTERNAL** listener after you re-run **Deploy Cloud Stack in AWS** for an idempotency demo.
+
+If you provisioned Kafka before this rule was in Create VPC, one **Provision Kafka Queue** run still adds 9095 with `purge_rules: false`. After that, Create VPC and Kafka provision agree on the same SG.
 
 ## Next step
 

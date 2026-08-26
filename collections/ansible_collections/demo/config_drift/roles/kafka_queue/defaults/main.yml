@@ -9,3 +9,5 @@ config_drift_kafka_cluster_id: MkU3OEVBNTcwNTJENDM2Qk
 config_drift_kafka_vpc_cidr: 10.0.0.0/16
 config_drift_kafka_broker_heap_opts: "-Xmx1g -Xms1g"
 config_drift_kafka_admin_heap_opts: "-Xmx256m -Xms128m"
+config_drift_kafka_dashboard_enabled: true
+config_drift_kafka_dashboard_port: 80

@@ -31,7 +31,7 @@
           - "'httpd.service' in ansible_facts.services"
         fail_msg: >-
           ACME App is not installed on this host.
-          Run Infrastructure | ACME App - Setup first.
+          Run Infrastructure | Configuration management - ACME App - Setup first.
 
     - name: Render ACME App page
       ansible.builtin.include_tasks: "{{ playbook_dir }}/../tasks/render.yml"

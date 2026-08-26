@@ -109,6 +109,7 @@
           - "Public IP: {{ config_drift_kafka_public_ip }}"
           - "Private IP (use for Filebeat): {{ config_drift_kafka_private_ip }}:9092"
           - "Public IP (use for EDA): {{ config_drift_kafka_public_ip }}:9095"
+          - "Presenter dashboard: http://{{ config_drift_kafka_public_ip }}/"
           - "Sync AWS inventory, then run LINUX | Config Drift with Filebeat output set to kafka."
 
     - name: Look up demo security group for Kafka external listener

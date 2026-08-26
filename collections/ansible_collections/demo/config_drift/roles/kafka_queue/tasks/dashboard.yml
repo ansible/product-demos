@@ -1,0 +1,41 @@
+---
+- name: Install event dashboard script
+  ansible.builtin.copy:
+    src: event_dashboard.py
+    dest: /usr/local/bin/config-drift-kafka-event-dashboard.py
+    mode: "0755"
+  when: config_drift_kafka_dashboard_enabled
+
+- name: Install event dashboard systemd unit
+  ansible.builtin.template:
+    src: config-drift-kafka-dashboard.service.j2
+    dest: /etc/systemd/system/config-drift-kafka-dashboard.service
+    mode: "0644"
+  when: config_drift_kafka_dashboard_enabled
+
+- name: Allow HTTP for event dashboard
+  ansible.posix.firewalld:
+    port: "{{ config_drift_kafka_dashboard_port }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  when:
+    - config_drift_kafka_dashboard_enabled
+    - "'firewalld.service' in ansible_facts.services"
+    - ansible_facts.services['firewalld.service'].state == 'running'
+
+- name: Enable and start event dashboard
+  ansible.builtin.systemd:
+    name: config-drift-kafka-dashboard
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: config_drift_kafka_dashboard_enabled
+
+- name: Stop event dashboard when disabled
+  ansible.builtin.systemd:
+    name: config-drift-kafka-dashboard
+    enabled: false
+    state: stopped
+    daemon_reload: true
+  when: not config_drift_kafka_dashboard_enabled

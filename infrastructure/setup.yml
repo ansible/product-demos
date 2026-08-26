@@ -369,7 +369,7 @@ controller_templates:
           variable: opa_policy_text
           required: true
 
-  - name: "Infrastructure | ACME App - Setup"
+  - name: "Infrastructure | Configuration management - ACME App - Setup"
     description: >-
       Installs httpd on aws_rhel9 and renders the approved ACME storefront
       from a Jinja2 template. Click Launch with the default host to deploy
@@ -408,7 +408,7 @@ controller_templates:
           required: true
           default: aws_rhel9
 
-  - name: "Infrastructure | ACME App - Update Configuration"
+  - name: "Infrastructure | Configuration management - ACME App - Update Configuration"
     description: >-
       Re-renders the ACME storefront Jinja2 template with survey variables.
       Change knobs to update the live page without reinstalling httpd.

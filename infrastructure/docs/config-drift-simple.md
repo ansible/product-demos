@@ -1,6 +1,6 @@
 # Infrastructure | Simple Config Drift
 
-Ansible owns one HTML file. **Infrastructure ǀ ACME App - Setup** installs a tiny ACME storefront on `aws_rhel9` and writes the approved baseline. **Infrastructure ǀ ACME App - Update Configuration** re-renders the same Jinja2 template with survey knobs so the live page changes. Re-run Setup to restore the baseline. No Kafka, EDA, or auditd — this is the teaching step before [Event-Driven Config Drift Remediation](config-drift.md).
+Ansible owns one HTML file. **Infrastructure ǀ Configuration management - ACME App - Setup** installs a tiny ACME storefront on `aws_rhel9` and writes the approved baseline. **Infrastructure ǀ Configuration management - ACME App - Update Configuration** re-renders the same Jinja2 template with survey knobs so the live page changes. Re-run Setup to restore the baseline. No Kafka, EDA, or auditd — this is the teaching step before [Event-Driven Config Drift Remediation](config-drift.md).
 
 ```mermaid
 flowchart LR
@@ -25,7 +25,7 @@ flowchart LR
 
 ## Survey prompts
 
-### Infrastructure ǀ ACME App - Setup
+### Infrastructure ǀ Configuration management - ACME App - Setup
 
 | Prompt | Variable | Type | Default |
 |--------|----------|------|---------|
@@ -33,7 +33,7 @@ flowchart LR
 
 Baseline storefront vars are pinned on the job template as extra vars (company, theme, product, price, and so on). Click Launch.
 
-### Infrastructure ǀ ACME App - Update Configuration
+### Infrastructure ǀ Configuration management - ACME App - Update Configuration
 
 | Prompt | Variable | Type | Default |
 |--------|----------|------|---------|
@@ -55,8 +55,8 @@ Environment choices: Production, Staging, Development. Theme choices: redhat, na
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Infrastructure ǀ ACME App - Setup | [`infrastructure/acme-app/playbooks/setup.yml`](../acme-app/playbooks/setup.yml) | Installs httpd, copies CSS, renders the approved baseline |
-| Infrastructure ǀ ACME App - Update Configuration | [`infrastructure/acme-app/playbooks/configure.yml`](../acme-app/playbooks/configure.yml) | Re-renders [`index.html.j2`](../acme-app/playbooks/templates/index.html.j2) with survey vars |
+| Infrastructure ǀ Configuration management - ACME App - Setup | [`infrastructure/acme-app/playbooks/setup.yml`](../acme-app/playbooks/setup.yml) | Installs httpd, copies CSS, renders the approved baseline |
+| Infrastructure ǀ Configuration management - ACME App - Update Configuration | [`infrastructure/acme-app/playbooks/configure.yml`](../acme-app/playbooks/configure.yml) | Re-renders [`index.html.j2`](../acme-app/playbooks/templates/index.html.j2) with survey vars |
 
 ## Why it matters
 
@@ -66,11 +66,11 @@ Environment choices: Production, Staging, Development. Theme choices: redhat, na
 
 ## Presenter walkthrough
 
-1. Launch **Infrastructure ǀ ACME App - Setup** with the default host `aws_rhel9`.
+1. Launch **Infrastructure ǀ Configuration management - ACME App - Setup** with the default host `aws_rhel9`.
 2. Open the URL from the job output (`http://<aws_rhel9 public IP>/`) — ACME Corp, Production, Super Widget at $19.99.
-3. Launch **Infrastructure ǀ ACME App - Update Configuration**. Change environment to Staging, theme to navy, and the product name or price.
+3. Launch **Infrastructure ǀ Configuration management - ACME App - Update Configuration**. Change environment to Staging, theme to navy, and the product name or price.
 4. Refresh the browser — same template, new values.
-5. Re-run **Infrastructure ǀ ACME App - Setup** — the approved baseline is back.
+5. Re-run **Infrastructure ǀ Configuration management - ACME App - Setup** — the approved baseline is back.
 
 ## Talking points
 
