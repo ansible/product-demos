@@ -368,6 +368,130 @@ controller_templates:
           variable: opa_policy_text
           required: true
 
+  - name: "Infrastructure | ACME App - Setup"
+    description: >-
+      Installs httpd on aws_rhel9 and renders the approved ACME storefront
+      from a Jinja2 template. Click Launch with the default host to deploy
+      the baseline page.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/acme-app/playbooks/setup.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
+    extra_vars:
+      acme_app_company: ACME Corp
+      acme_app_tagline: Widgets you can trust
+      acme_app_environment: Production
+      acme_app_theme: redhat
+      acme_app_banner: Welcome to the ACME storefront
+      acme_app_product: Super Widget
+      acme_app_price: "$19.99"
+      acme_app_product_blurb: Our flagship widget. Built to last.
+      acme_app_sku: ACME-1001
+      acme_app_footer: Managed by Ansible Automation Platform
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          question_description: >-
+            Default is aws_rhel9 for a single-host demo. The ACME App is
+            installed on this host only.
+          type: text
+          variable: _hosts
+          required: true
+          default: aws_rhel9
+
+  - name: "Infrastructure | ACME App - Update Configuration"
+    description: >-
+      Re-renders the ACME storefront Jinja2 template with survey variables.
+      Change knobs to update the live page without reinstalling httpd.
+      Run Setup first.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/acme-app/playbooks/configure.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          question_description: >-
+            Same host as Setup. Default is aws_rhel9.
+          type: text
+          variable: _hosts
+          required: true
+          default: aws_rhel9
+        - question_name: Company name
+          type: text
+          variable: acme_app_company
+          required: true
+          default: ACME Corp
+        - question_name: Tagline
+          type: text
+          variable: acme_app_tagline
+          required: true
+          default: Widgets you can trust
+        - question_name: Environment
+          type: multiplechoice
+          variable: acme_app_environment
+          required: true
+          default: Production
+          choices:
+            - Production
+            - Staging
+            - Development
+        - question_name: Theme
+          type: multiplechoice
+          variable: acme_app_theme
+          required: true
+          default: redhat
+          choices:
+            - redhat
+            - navy
+            - forest
+        - question_name: Promo banner
+          type: textarea
+          variable: acme_app_banner
+          required: true
+          default: Welcome to the ACME storefront
+        - question_name: Featured product
+          type: text
+          variable: acme_app_product
+          required: true
+          default: Super Widget
+        - question_name: Price
+          type: text
+          variable: acme_app_price
+          required: true
+          default: "$19.99"
+        - question_name: Product blurb
+          type: textarea
+          variable: acme_app_product_blurb
+          required: true
+          default: Our flagship widget. Built to last.
+        - question_name: SKU
+          type: text
+          variable: acme_app_sku
+          required: true
+          default: ACME-1001
+        - question_name: Footer
+          type: text
+          variable: acme_app_footer
+          required: true
+          default: Managed by Ansible Automation Platform
+
   - name: "Infrastructure | AWS - Provision Kafka Queue"
     description: >-
       Provisions a dedicated aws_kafka EC2 instance and deploys single-node

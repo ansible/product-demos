@@ -1498,6 +1498,37 @@
       style F fill:#2d2d2d,stroke:#888,color:#fff
       style S fill:#212427,stroke:#8a8d90,color:#fff
 
+- slug: infrastructure-simple-config-drift
+  readme_path: infrastructure/docs/config-drift-simple.md
+  title: "Infrastructure | Simple Config Drift"
+  subtitle: "ACME App desired-state with Jinja2"
+  category: infrastructure
+  status: active
+  tags:
+    - Linux
+    - Survey
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1a365d 0%, #ee0000 100%)"
+    icon: "🛒"
+  blurb: "Install a tiny ACME storefront on aws_rhel9, then change the live page from a survey that re-renders one Jinja template."
+  stats:
+    playbooks: 2
+  url: /demos/infrastructure-simple-config-drift/
+  github_path: infrastructure/setup.yml
+  workflow_mermaid: |
+    flowchart LR
+      setup["ACME App Setup"]
+      httpd["httpd on aws_rhel9"]
+      page["index.html from Jinja"]
+      survey["Update Configuration survey"]
+      browser["Browser port 80"]
+
+      setup --> httpd
+      setup --> page
+      survey -->|"same template, overloaded vars"| page
+      page --> browser
+
 - slug: infrastructure-config-drift
   readme_path: infrastructure/docs/config-drift.md
   title: "Infrastructure | Config Drift Remediation"

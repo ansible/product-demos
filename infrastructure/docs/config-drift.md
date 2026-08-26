@@ -1,6 +1,6 @@
 # Event-Driven Configuration Drift Remediation
 
-Production-style demo: a Linux administrator changes a protected configuration file, Linux auditing detects the change, Filebeat ships the event to Kafka, Event-Driven Ansible evaluates the signal, and AAP restores the approved configuration.
+Production-style demo: a Linux administrator changes a protected configuration file, Linux auditing detects the change, Filebeat ships the event to Kafka, Event-Driven Ansible evaluates the signal, and AAP restores the approved configuration. For a click-to-launch storefront that shows Ansible owning a Jinja template (no Kafka or EDA), start with **[Simple Config Drift](config-drift-simple.md)**.
 
 ```text
 configuration change
