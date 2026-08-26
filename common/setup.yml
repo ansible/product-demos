@@ -216,6 +216,9 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_apd_managed_by: aap-product-demos
+      create_vm_apd_demo_tag: "true"
     survey_enabled: true
     allow_simultaneous: true
     survey:

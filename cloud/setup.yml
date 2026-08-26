@@ -448,6 +448,8 @@ controller_workflows:
       create_vm_aws_vpc_subnet_name: aws-test-subnet
       create_vm_vm_deployment: cloud_stack
       create_vm_vm_purpose: demo
+      create_vm_apd_managed_by: aap-product-demos
+      create_vm_apd_demo_tag: "true"
     survey_enabled: true
     survey:
       name: ''
