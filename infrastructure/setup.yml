@@ -237,7 +237,8 @@ controller_templates:
     description: >-
       Deploys Automation Orchestrator on an existing OpenShift cluster using
       aapctl. Installs CloudNativePG operator, PostgreSQL database, and the
-      AO operator in a single automated step.
+      AO operator, then configures network access so the AAP gateway can
+      reach it.
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -251,6 +252,7 @@ controller_templates:
       ao_operator_channel: stable
     credentials:
       - OpenShift Credential
+      - AAP Credential
 
   - name: Infrastructure | Automation Orchestrator | Uninstall
     description: >-
@@ -266,6 +268,24 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - OpenShift Credential
+
+  - name: Infrastructure | AO Network Configuration | Install
+    description: >-
+      Allow-lists the AAP gateway and AO route hostnames on Automation
+      Orchestrator's integration URL allow-list and enables private-network
+      OIDC, then restarts the instance so the change takes effect.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "infrastructure/ao/network-access.yml"
+    execution_environment: AO Execution Environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    ask_variables_on_launch: true
+    credentials:
+      - OpenShift Credential
+      - AAP Credential
 
   - name: Infrastructure | HashiCorp Vault
     job_type: run

@@ -198,3 +198,6 @@
             }}
           loop_control:
             label: "{{ item }}"
+
+- name: Configure Automation Orchestrator network access
+  ansible.builtin.import_playbook: network-access.yml
