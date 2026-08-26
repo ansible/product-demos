@@ -7,6 +7,21 @@
   register: config_drift_kafka_dashboard_script
   when: config_drift_kafka_dashboard_enabled
 
+- name: Install event dashboard asset directory
+  ansible.builtin.file:
+    path: /usr/local/share/config-drift-kafka-dashboard
+    state: directory
+    mode: "0755"
+  when: config_drift_kafka_dashboard_enabled
+
+- name: Install Ansible icon for event dashboard
+  ansible.builtin.copy:
+    src: ansible-icon.png
+    dest: /usr/local/share/config-drift-kafka-dashboard/ansible-icon.png
+    mode: "0644"
+  register: config_drift_kafka_dashboard_assets
+  when: config_drift_kafka_dashboard_enabled
+
 - name: Install event dashboard systemd unit
   ansible.builtin.template:
     src: config-drift-kafka-dashboard.service.j2
@@ -40,7 +55,7 @@
     daemon_reload: true
   when:
     - config_drift_kafka_dashboard_enabled
-    - config_drift_kafka_dashboard_script is changed
+    - config_drift_kafka_dashboard_script is changed or config_drift_kafka_dashboard_assets is changed
 
 - name: Stop event dashboard when disabled
   ansible.builtin.systemd:

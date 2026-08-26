@@ -18,6 +18,10 @@ CONTAINER = os.environ.get("CONFIG_DRIFT_KAFKA_CONTAINER", "kafka")
 PORT = int(os.environ.get("CONFIG_DRIFT_DASHBOARD_PORT", "80"))
 MAX_EVENTS = int(os.environ.get("CONFIG_DRIFT_DASHBOARD_MAX_EVENTS", "50"))
 THROTTLE_SECONDS = int(os.environ.get("CONFIG_DRIFT_DASHBOARD_THROTTLE", "20"))
+ICON_PATH = os.environ.get(
+    "CONFIG_DRIFT_DASHBOARD_ICON",
+    "/usr/local/share/config-drift-kafka-dashboard/ansible-icon.png",
+)
 
 events = deque(maxlen=MAX_EVENTS)
 events_lock = threading.Lock()
@@ -150,10 +154,15 @@ HTML_PAGE = """<!DOCTYPE html>
     .reset-btn:hover { background: #f0f0f0; }
     .waiting { padding: 1rem 1.25rem; background: #fff; border: 1px dashed #bbb; border-radius: 8px; }
     .event { margin: 0.75rem 0; padding: 1rem 1.25rem; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
-    .event.drift { background: #e8f5e9; border-left: 6px solid #2e7d32; }
-    .event.remediation { background: #e3f2fd; border-left: 6px solid #1565c0; }
-    .event strong { display: block; font-size: 1.15rem; margin-bottom: 0.35rem; }
-    .event span { color: #555; font-size: 0.95rem; }
+    .event-row { display: flex; align-items: flex-start; gap: 0.75rem; }
+    .event.drift { background: #fdecea; border-left: 6px solid #c62828; }
+    .event.remediation { background: #e8f5e9; border-left: 6px solid #2e7d32; }
+    .warning-icon {
+      width: 28px; height: 28px; flex-shrink: 0; color: #c62828;
+    }
+    .ansible-icon { width: 28px; height: 28px; flex-shrink: 0; display: block; }
+    .event-body strong { display: block; font-size: 1.15rem; margin-bottom: 0.35rem; }
+    .event-body span { color: #555; font-size: 0.95rem; }
     .footer { margin-top: 2rem; font-size: 0.9rem; color: #666; }
   </style>
 </head>
@@ -163,12 +172,24 @@ HTML_PAGE = """<!DOCTYPE html>
     <button type="button" class="reset-btn" id="reset">Reset</button>
   </div>
   <p class="lead">
-    Edit <code>/etc/ssh/sshd_config</code> on a RHEL worker. One save shows one green line here
-  (audit emits many syscalls; we collapse them). A blue line appears when AAP remediation runs.
+    Edit <code>/etc/ssh/sshd_config</code> on a RHEL worker.
+    <strong>Red + warning</strong> = drift detected and published to Kafka.
+    <strong>Green + Ansible</strong> = remediation fixed it.
   </p>
   <div id="events" class="waiting">Waiting for sshd_config changes…</div>
   <p class="footer">Topic: linux-audit-events · sshd_config_change · 20s throttle per host</p>
   <script>
+    const WARNING_ICON = `<svg class="warning-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path fill="currentColor" d="M12 2L1 21h22L12 2zm0 3.2L19.5 19h-15L12 5.2z"/>
+      <path fill="currentColor" d="M11 9h2v6h-2zm0 8h2v2h-2z"/>
+    </svg>`;
+    const ANSIBLE_ICON = `<img class="ansible-icon" src="/ansible-icon.png" alt="" />`;
+
+    function eventHtml(e) {
+      const icon = e.kind === 'drift' ? WARNING_ICON : ANSIBLE_ICON;
+      return `<div class="event ${e.kind}"><div class="event-row">${icon}<div class="event-body"><strong>${e.headline}</strong><span>${e.detail} · ${e.time}</span></div></div></div>`;
+    }
+
     async function refresh() {
       const res = await fetch('/api/events');
       const data = await res.json();
@@ -179,9 +200,7 @@ HTML_PAGE = """<!DOCTYPE html>
         return;
       }
       root.className = '';
-      root.innerHTML = data.map(e =>
-        `<div class="event ${e.kind}"><strong>${e.headline}</strong><span>${e.detail} · ${e.time}</span></div>`
-      ).join('');
+      root.innerHTML = data.map(eventHtml).join('');
     }
     async function resetDashboard() {
       await fetch('/api/reset', { method: 'POST' });
@@ -212,6 +231,20 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.end_headers()
             self.wfile.write(HTML_PAGE.encode())
+            return
+
+        if self.path == "/ansible-icon.png":
+            try:
+                with open(ICON_PATH, "rb") as icon_file:
+                    icon_data = icon_file.read()
+            except OSError:
+                self.send_response(404)
+                self.end_headers()
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", "image/png")
+            self.end_headers()
+            self.wfile.write(icon_data)
             return
 
         self.send_response(404)
