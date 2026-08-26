@@ -50,46 +50,46 @@ def friendly_event(body: dict) -> Optional[dict]:
 
 def consume_kafka() -> None:
     while True:
-    cmd = [
-        "podman",
-        "run",
-        "--rm",
-        "--network",
-        f"container:{CONTAINER}",
-        "-e",
-        "KAFKA_HEAP_OPTS=-Xmx256m -Xms128m",
-        KAFKA_IMAGE,
-        "/opt/kafka/bin/kafka-console-consumer.sh",
-        "--bootstrap-server",
-        BOOTSTRAP,
-        "--topic",
-        TOPIC,
-    ]
-    proc = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
-        text=True,
-        bufsize=1,
-    )
-    if proc.stdout is None:
-        continue
-
-    for line in proc.stdout:
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            body = json.loads(line)
-        except json.JSONDecodeError:
+        cmd = [
+            "podman",
+            "run",
+            "--rm",
+            "--network",
+            f"container:{CONTAINER}",
+            "-e",
+            "KAFKA_HEAP_OPTS=-Xmx256m -Xms128m",
+            KAFKA_IMAGE,
+            "/opt/kafka/bin/kafka-console-consumer.sh",
+            "--bootstrap-server",
+            BOOTSTRAP,
+            "--topic",
+            TOPIC,
+        ]
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+            bufsize=1,
+        )
+        if proc.stdout is None:
             continue
 
-        event = friendly_event(body)
-        if event is None:
-            continue
+        for line in proc.stdout:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                body = json.loads(line)
+            except json.JSONDecodeError:
+                continue
 
-        with events_lock:
-            events.appendleft(event)
+            event = friendly_event(body)
+            if event is None:
+                continue
+
+            with events_lock:
+                events.appendleft(event)
 
 
 HTML_PAGE = """<!DOCTYPE html>
