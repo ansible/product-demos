@@ -38,7 +38,7 @@ When it finishes, the demo is ready to go.
 1. Open **http://PUBLIC_IP/** on the Kafka broker (`aws_kafka`) — a live dashboard shows friendly lines like `/etc/ssh/sshd_config modified — event published` when drift happens.
 2. Run **LINUX | Config Drift - Introduce SSHD Drift** (default limit `aws_rhel*` hits both RHEL workers).
 3. Watch **Automation Decisions** — activation `config_drift_kafka` consumes the event.
-4. Watch **Automation Execution** — **LINUX | SSHD Configuration Remediation** launches (once per host, throttled to every 15 seconds).
+4. Watch **Automation Execution** — **LINUX | SSHD Configuration Remediation** launches (once per host, throttled to every 20 seconds).
 5. Confirm on the workers: `sudo grep -i Root /etc/ssh/sshd_config` → `PermitRootLogin no`.
 
 **Option B — drift manually on a host:**
@@ -48,12 +48,13 @@ sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
 sudo grep -i Root /etc/ssh/sshd_config
 ```
 
-Same EDA → remediation flow follows within ~15 seconds.
+Same EDA → remediation flow follows within ~20 seconds.
 
 ### What to say
 
 - **Detection is broad** — any write to `/etc/ssh/sshd_config` triggers the pipeline (audit key `sshd_config_change`).
-- **Remediation is narrow (on purpose)** — the playbook only restores `PermitRootLogin no`. Swap the audit watch, rulebook filter, and remediation playbook to protect any file you want.
+- **Remediation is narrow (on purpose)** — the playbook only restores one line (`PermitRootLogin no`). That keeps the first demo easy to explain.
+- **Graduate to the whole file** — swap the remediation playbook for a Jinja template that owns the full `sshd_config` (same idea as [Simple Config Drift](config-drift-simple.md)), widen the audit watch if needed, and keep the same Kafka → EDA path.
 - **No polling** — the OS emits an event; EDA reacts in near real time.
 
 ## Prerequisites

@@ -57,44 +57,26 @@
   gather_facts: false
 
   tasks:
-    - name: Read current PermitRootLogin setting
-      ansible.builtin.command:
-        cmd: grep -iE '^#?PermitRootLogin' /etc/ssh/sshd_config
-      register: config_drift_sshd_current
-      changed_when: false
-      failed_when: false
-
     - name: Restore PermitRootLogin to approved value
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?PermitRootLogin'
         line: PermitRootLogin no
         backup: true
-      when: config_drift_sshd_current.stdout is not search('no')
 
     - name: Validate sshd configuration
       ansible.builtin.command:
         cmd: sshd -t
       changed_when: false
-      when: config_drift_sshd_current.stdout is not search('no')
 
     - name: Reload sshd when configuration is valid
       ansible.builtin.service:
         name: sshd
         state: reloaded
-      when: config_drift_sshd_current.stdout is not search('no')
-
-    - name: Note when sshd_config was already compliant
-      ansible.builtin.debug:
-        msg: PermitRootLogin already no on {{ inventory_hostname }} — no file change needed.
-      when: config_drift_sshd_current.stdout is search('no')
 
     - name: Show remediation result
       ansible.builtin.debug:
         msg:
-          - >-
-            {{ 'Restored PermitRootLogin no' if config_drift_sshd_current.stdout is not search('no')
-               else 'PermitRootLogin already no (no change)' }}
-            on {{ inventory_hostname }}
+          - "Restored PermitRootLogin no on {{ inventory_hostname }}"
           - "Triggered by audit event from {{ config_drift_target_ip }}"
           - "{{ config_drift_audit_message | default('') | truncate(120, True) }}"

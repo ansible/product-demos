@@ -15,10 +15,8 @@
         event.body.message is defined
         and event.body.message is search("sshd_config_change")
         and event.body.message is search("type=SYSCALL")
-        and event.body.message is search("SYSCALL=rename")
-        and event.body.message is not search("comm=\"platform-python\"")
       throttle:
-        once_within: 15 seconds
+        once_within: 20 seconds
         group_by_attributes:
           - body.host.ip
       action:

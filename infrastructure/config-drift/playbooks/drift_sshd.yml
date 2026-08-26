@@ -35,11 +35,12 @@
           - "$ sudo cat /etc/ssh/sshd_config | grep Root"
           - "{{ config_drift_sshd_before.stdout_lines | default(['(no PermitRootLogin line found)']) }}"
 
-    - name: Set PermitRootLogin to yes (configuration drift)  # noqa: command-instead-of-module
-      ansible.builtin.command:
-        cmd: sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
-      register: config_drift_sshd_drift
-      changed_when: config_drift_sshd_drift.rc == 0
+    - name: Set PermitRootLogin to yes (configuration drift)
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: PermitRootLogin yes
+        backup: true
 
     - name: Validate sshd configuration after drift
       ansible.builtin.command:
@@ -62,4 +63,4 @@
           - >-
             auditd should emit sshd_config_change events to Kafka. Watch for
             LINUX | SSHD Configuration Remediation to launch from EDA within
-            about 15 seconds.
+            about 20 seconds.

@@ -17,7 +17,7 @@ KAFKA_IMAGE = os.environ.get("CONFIG_DRIFT_KAFKA_IMAGE", "docker.io/apache/kafka
 CONTAINER = os.environ.get("CONFIG_DRIFT_KAFKA_CONTAINER", "kafka")
 PORT = int(os.environ.get("CONFIG_DRIFT_DASHBOARD_PORT", "80"))
 MAX_EVENTS = int(os.environ.get("CONFIG_DRIFT_DASHBOARD_MAX_EVENTS", "50"))
-THROTTLE_SECONDS = int(os.environ.get("CONFIG_DRIFT_DASHBOARD_THROTTLE", "15"))
+THROTTLE_SECONDS = int(os.environ.get("CONFIG_DRIFT_DASHBOARD_THROTTLE", "20"))
 
 events = deque(maxlen=MAX_EVENTS)
 events_lock = threading.Lock()
@@ -127,6 +127,12 @@ def consume_kafka() -> None:
                 events.appendleft(event)
 
 
+def clear_dashboard() -> None:
+    with events_lock:
+        events.clear()
+        last_shown.clear()
+
+
 HTML_PAGE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -134,8 +140,14 @@ HTML_PAGE = """<!DOCTYPE html>
   <title>Config Drift Events</title>
   <style>
     body { font-family: system-ui, sans-serif; margin: 2rem; background: #f4f6f8; color: #1a1a1a; }
+    .header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
     h1 { margin-bottom: 0.25rem; }
     .lead { color: #444; max-width: 48rem; margin-bottom: 1.5rem; }
+    .reset-btn {
+      padding: 0.5rem 1rem; font-size: 0.95rem; font-weight: 600;
+      border: 1px solid #bbb; border-radius: 6px; background: #fff; cursor: pointer;
+    }
+    .reset-btn:hover { background: #f0f0f0; }
     .waiting { padding: 1rem 1.25rem; background: #fff; border: 1px dashed #bbb; border-radius: 8px; }
     .event { margin: 0.75rem 0; padding: 1rem 1.25rem; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
     .event.drift { background: #e8f5e9; border-left: 6px solid #2e7d32; }
@@ -146,13 +158,16 @@ HTML_PAGE = """<!DOCTYPE html>
   </style>
 </head>
 <body>
-  <h1>Config Drift Event Stream</h1>
+  <div class="header">
+    <h1>Config Drift Event Stream</h1>
+    <button type="button" class="reset-btn" id="reset">Reset</button>
+  </div>
   <p class="lead">
     Edit <code>/etc/ssh/sshd_config</code> on a RHEL worker. One save shows one green line here
   (audit emits many syscalls; we collapse them). A blue line appears when AAP remediation runs.
   </p>
   <div id="events" class="waiting">Waiting for sshd_config changes…</div>
-  <p class="footer">Topic: linux-audit-events · sshd_config_change · SYSCALL=rename · 15s throttle per host</p>
+  <p class="footer">Topic: linux-audit-events · sshd_config_change · 20s throttle per host</p>
   <script>
     async function refresh() {
       const res = await fetch('/api/events');
@@ -168,6 +183,11 @@ HTML_PAGE = """<!DOCTYPE html>
         `<div class="event ${e.kind}"><strong>${e.headline}</strong><span>${e.detail} · ${e.time}</span></div>`
       ).join('');
     }
+    async function resetDashboard() {
+      await fetch('/api/reset', { method: 'POST' });
+      refresh();
+    }
+    document.getElementById('reset').addEventListener('click', resetDashboard);
     setInterval(refresh, 500);
     refresh();
   </script>
@@ -192,6 +212,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.end_headers()
             self.wfile.write(HTML_PAGE.encode())
+            return
+
+        self.send_response(404)
+        self.end_headers()
+
+    def do_POST(self) -> None:
+        if self.path == "/api/reset":
+            clear_dashboard()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(b'{"ok":true}')
             return
 
         self.send_response(404)
