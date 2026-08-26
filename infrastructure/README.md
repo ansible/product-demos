@@ -30,7 +30,7 @@ Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route eve
 |--------------|-------------|
 | **ROSA ǀ Preflight Checks** | Validates AWS credentials, ROSA token, IAM permissions, service quotas, EIP availability, and cluster name conflicts |
 | **ROSA ǀ Create Cluster** | Creates account roles, frees EIP quota if needed, and initiates STS-mode ROSA cluster creation |
-| **ROSA ǀ Wait for Ready** | Polls cluster status until ready (~30-40 min), then creates cluster-admin credentials |
+| **ROSA ǀ Wait for Ready** | Polls cluster status until ready (~30-45 min, timeout 90 min), then creates cluster-admin credentials |
 | **ROSA ǀ Destroy Cluster** | Destroys the cluster, STS operator roles, and OIDC provider; safe to run if cluster is already gone |
 
 ### HashiCorp Vault
@@ -85,7 +85,7 @@ Launch **ROSA ǀ Lifecycle (Create)** workflow and fill the survey:
 | **Cluster TTL** | Tag for cost tracking (e.g. `4h`) |
 | **Owner Tag** | Your identifier for cost attribution |
 
-**Timeline:** ~35-45 minutes total. Plan presentations accordingly.
+**Timeline:** ~35-50 minutes total. Plan presentations accordingly.
 
 ### Destroy a ROSA Cluster
 

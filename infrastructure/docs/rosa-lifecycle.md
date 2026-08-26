@@ -41,7 +41,7 @@ Automated Red Hat OpenShift Service on AWS (ROSA) cluster lifecycle management: 
 
 ## Why it matters
 
-ROSA cluster provisioning involves multiple AWS services, IAM role chains, and a 30-40 minute wait. Manual creation is error-prone and forgetting teardown leads to significant cost. This demo shows how AAP:
+ROSA cluster provisioning involves multiple AWS services, IAM role chains, and a 30-45 minute wait. Manual creation is error-prone and forgetting teardown leads to significant cost. This demo shows how AAP:
 
 - **Gates creation** with deterministic preflight checks (fail fast, not 30 minutes in)
 - **Automates AWS prerequisites** (account roles, EIP quota management)
@@ -71,7 +71,7 @@ ROSA cluster provisioning involves multiple AWS services, IAM role chains, and a
 |-------|----------|
 | Preflight | 1-2 min |
 | Create (initiate) | 2-3 min |
-| Wait for ready | 30-40 min |
+| Wait for ready | 30-45 min (timeout 90 min) |
 | Destroy | 15-40 min (timeout 60 min) |
 
 ## Cost warning

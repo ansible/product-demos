@@ -159,7 +159,8 @@ controller_templates:
 
   - name: Infrastructure | ROSA - Wait for Ready
     description: >-
-      Polls cluster status until ready (default timeout: 60min).
+      Polls cluster status until ready (default timeout: 90min).
+      Fails immediately if the cluster enters error or uninstalling.
       Creates cluster-admin credentials on success.
     job_type: run
     organization: Ansible Product Demos (APD)
@@ -173,7 +174,7 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    timeout: 3900
+    timeout: 5700
     survey_enabled: true
     survey:
       name: ''
