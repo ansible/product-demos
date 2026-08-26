@@ -198,7 +198,8 @@ controller_templates:
   - name: Infrastructure | ROSA - Destroy Cluster
     description: >-
       Destroys a ROSA cluster and cleans up STS operator roles
-      and OIDC provider. Idempotent (safe to run if cluster is gone).
+      and OIDC provider. Waits up to 60min for uninstall.
+      Idempotent (safe to run if cluster is gone).
     job_type: run
     organization: Ansible Product Demos (APD)
     execution_environment: ROSA Lifecycle EE
@@ -211,7 +212,7 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    timeout: 2100
+    timeout: 3900
     survey_enabled: true
     survey:
       name: ''

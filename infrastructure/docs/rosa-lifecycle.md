@@ -72,7 +72,7 @@ ROSA cluster provisioning involves multiple AWS services, IAM role chains, and a
 | Preflight | 1-2 min |
 | Create (initiate) | 2-3 min |
 | Wait for ready | 30-40 min |
-| Destroy | 15-25 min |
+| Destroy | 15-40 min (timeout 60 min) |
 
 ## Cost warning
 

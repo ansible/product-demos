@@ -91,7 +91,7 @@ Launch **ROSA ǀ Lifecycle (Create)** workflow and fill the survey:
 
 Launch **ROSA ǀ Lifecycle (Destroy)** workflow with the same cluster name and region.
 
-**Timeline:** ~15-25 minutes.
+**Timeline:** ~15-40 minutes (job waits up to 60 minutes).
 
 ### Cost Warning
 
