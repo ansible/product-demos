@@ -47,8 +47,8 @@ controller_execution_environments:
 controller_templates:
   - name: Infrastructure | ROSA - Preflight Checks
     description: >-
-      Validates AWS credentials, ROSA token, permissions, quota,
-      and checks for existing cluster name conflicts.
+      Validates AWS credentials, ROSA token, permissions, EIP and VPC
+      quota, and checks for existing cluster name conflicts.
     job_type: run
     organization: Ansible Product Demos (APD)
     execution_environment: ROSA Lifecycle EE

@@ -1571,7 +1571,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #0969da 0%, #033d8b 100%)"
     icon: "🌹"
-  blurb: "Validate AWS identity, ROSA token, EIP quota, and account roles before attempting cluster creation."
+  blurb: "Validate AWS identity, ROSA token, EIP and VPC quota, and account roles before attempting cluster creation."
   stats:
     playbooks: 1
   github_path: infrastructure/rosa/preflight.yml
