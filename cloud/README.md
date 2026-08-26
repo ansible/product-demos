@@ -113,8 +113,9 @@ Launch the workflow and complete the survey:
 | Prompt | Purpose |
 |--------|---------|
 | **AWS Region** | Region where the stack is deployed |
-| **RHEL hosts** | Host pattern for RHEL nodes (default `aws_rhel*`; does not match `reports` or `aws_kafka`) |
-| **Windows hosts** | Host pattern for Windows nodes (default `aws_win*`; does not match `aws-dc`) |
+| **RHEL hosts** | Workload VMs for the RHEL path (default `aws_rhel8:aws_rhel9`) |
+| **Windows hosts** | Workload VMs for the Windows path (default `aws-dc:aws_win1`) |
+| **Report server** | Host that publishes the HTML dashboard (default `reports`; not patched) |
 | **RHEL Advisory IDs** | Comma-separated RHSA/CVE IDs to patch (e.g. `RHSA-2024:3138, CVE-2024-33599`) |
 | **Windows KB IDs** | Comma-separated KB IDs to patch (e.g. `KB5044284, KB5044030`) |
 

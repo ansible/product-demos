@@ -133,6 +133,10 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      _hosts: aws_rhel8:aws_rhel9
+      _hosts_windows: aws-dc:aws_win1
+    limit: all
     survey_enabled: true
     survey:
       name: ''
@@ -152,6 +156,12 @@ controller_templates:
           type: text
           variable: _hosts
           required: false
+          default: aws_rhel8:aws_rhel9
+        - question_name: Specify Windows hosts
+          type: text
+          variable: _hosts_windows
+          required: false
+          default: aws-dc:aws_win1
 
   - name: Cloud | AWS | Restore EC2 from Snapshot
     job_type: run
@@ -164,6 +174,10 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      _hosts: aws_rhel8:aws_rhel9
+      _hosts_windows: aws-dc:aws_win1
+    limit: all
     survey_enabled: true
     survey:
       name: ''
@@ -183,6 +197,12 @@ controller_templates:
           type: text
           variable: _hosts
           required: false
+          default: aws_rhel8:aws_rhel9
+        - question_name: Specify Windows hosts
+          type: text
+          variable: _hosts_windows
+          required: false
+          default: aws-dc:aws_win1
 
   - name: Cloud | AWS | Display EC2 Stats
     job_type: run
@@ -292,6 +312,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch RHEL
     job_type: run
@@ -306,6 +327,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Post-check RHEL
     job_type: run
@@ -320,6 +342,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Rollback RHEL
     job_type: run
@@ -334,6 +357,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Pre-check Windows
     job_type: run
@@ -347,6 +371,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Windows
     job_type: run
@@ -360,6 +385,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Post-check Windows
     job_type: run
@@ -373,6 +399,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Rollback Windows
     job_type: run
@@ -386,6 +413,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Compliance Report
     job_type: run
@@ -401,6 +429,8 @@ controller_templates:
     notification_templates_error: Telemetry
     use_fact_cache: true
     extra_vars:
+      _hosts: aws_rhel8:aws_rhel9
+      _hosts_windows: aws-dc:aws_win1
       _report_server: reports
     limit: all
 
@@ -631,8 +661,8 @@ controller_workflows:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      _hosts: aws_rhel*
-      _hosts_windows: aws_win*
+      _hosts: aws_rhel8:aws_rhel9
+      _hosts_windows: aws-dc:aws_win1
       _report_server: reports
     survey_enabled: true
     survey:
@@ -651,21 +681,28 @@ controller_workflows:
             - us-west-2
         - question_name: RHEL hosts
           question_description: >-
-            Host pattern for RHEL snapshot/pre-check/patch/post-check.
-            aws_rhel* matches aws_rhel8 and aws_rhel9. reports and aws_kafka
-            are not matched.
+            Workload VMs to snapshot and patch on the RHEL path.
+            Default is aws_rhel8:aws_rhel9. Does not include reports or aws_kafka.
           type: text
           variable: _hosts
           required: true
-          default: aws_rhel*
+          default: aws_rhel8:aws_rhel9
         - question_name: Windows hosts
           question_description: >-
-            Host pattern for Windows pre-check/patch/post-check.
-            aws_win* matches aws_win1. aws-dc is not matched.
+            Workload VMs to snapshot and patch on the Windows path.
+            Default is aws-dc:aws_win1 (both cloud-stack Windows hosts).
           type: text
           variable: _hosts_windows
           required: true
-          default: aws_win*
+          default: aws-dc:aws_win1
+        - question_name: Report server
+          question_description: >-
+            Host that publishes the HTML compliance dashboard. Not patched.
+            Default is reports.
+          type: text
+          variable: _report_server
+          required: true
+          default: reports
         - question_name: RHEL Advisory IDs (comma-separated)
           type: text
           variable: input_cve_ids

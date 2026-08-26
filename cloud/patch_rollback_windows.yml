@@ -1,6 +1,6 @@
 ---
 - name: Rollback targeted Windows security patches
-  hosts: "{{ _hosts_windows | default('aws_win*') }}"
+  hosts: "{{ _hosts_windows | default('aws-dc:aws_win1') }}"
   gather_facts: false
 
   vars:

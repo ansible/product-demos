@@ -1,6 +1,6 @@
 ---
 - name: Rollback specific RHEL CVE advisories
-  hosts: "{{ _hosts | default('aws_rhel*') }}"
+  hosts: "{{ _hosts | default('aws_rhel8:aws_rhel9') }}"
   become: true
   gather_facts: false
 

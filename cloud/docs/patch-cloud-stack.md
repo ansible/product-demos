@@ -21,8 +21,9 @@ Enterprise-grade patching workflow with snapshot safety, parallel RHEL and Windo
 | Prompt | Variable | Type | Required | Default |
 |--------|----------|------|----------|---------|
 | AWS Region | `aws_region` | multiplechoice | Yes | `us-east-1` |
-| RHEL hosts | `_hosts` | text | Yes | `aws_rhel*` (`aws_rhel8`, `aws_rhel9`; not `reports` or `aws_kafka`) |
-| Windows hosts | `_hosts_windows` | text | Yes | `aws_win*` (`aws_win1`; not `aws-dc`) |
+| RHEL hosts | `_hosts` | text | Yes | `aws_rhel8:aws_rhel9` |
+| Windows hosts | `_hosts_windows` | text | Yes | `aws-dc:aws_win1` |
+| Report server | `_report_server` | text | Yes | `reports` |
 | RHEL Advisory IDs | `input_cve_ids` | text | Yes | `RHSA-2024:3138, CVE-2024-33599` |
 | Windows KB IDs | `input_kb_ids` | text | Yes | `KB5044284, KB5044030` |
 
@@ -77,8 +78,8 @@ graph LR
 
 1. **Run setup:** On RHDP (Red Hat Demo Platform), run **APD ǀ Multi-demo setup** to configure everything. On your own install, run **APD ǀ Single demo setup** → choose `cloud`. Then fill in the **RHSM Registration** credential with your org ID and activation key (see credential setup above).
 2. **Deploy the stack:** Launch **Deploy Cloud Stack in AWS** to create the five target VMs. Wait for it to complete and verify the hosts appear in inventory.
-3. **Set the stage:** Show the audience the five VMs in AAP inventory (aws_rhel8, aws_rhel9, aws-dc, aws_win1, reports). Point out it's a mixed Linux/Windows fleet. The patch workflow targets `aws_rhel*` and `aws_win*` — worker VMs only, not `reports`, `aws_kafka`, or `aws-dc`.
-4. **Launch the workflow:** Navigate to Templates → Patch Cloud Stack in AWS. Host patterns default to the worker VMs; fill in a real RHSA/CVE and KB (defaults work). Launch.
+3. **Set the stage:** Show the audience the five VMs in AAP inventory (aws_rhel8, aws_rhel9, aws-dc, aws_win1, reports). Point out it's a mixed Linux/Windows fleet. The workflow patches the four workload VMs and publishes the dashboard on `reports`. `aws_kafka` is out of scope.
+4. **Launch the workflow:** Navigate to Templates → Patch Cloud Stack in AWS. Host lists default to the cloud-stack VMs; fill in a real RHSA/CVE and KB (defaults work). Launch.
 5. **Snapshot step:** While it runs, explain that the first node takes EBS snapshots of the target instances — this is the safety net. 'If anything goes wrong during patching, we restore to this point.'
 6. **Parallel paths:** Point out the RHEL and Windows pre-checks running simultaneously. 'One workflow, two operating systems, zero extra effort.'
 7. **Pre-check results:** Show the debug output — which advisories are applicable, which hosts are already compliant. 'We check before we change.' *Note: If RHSM is not configured, RHEL hosts will show SKIPPED here — this is expected. Without RHSM registration, the hosts can't query Red Hat advisory repos, so all RHEL steps (pre-check, patch, post-check, rollback) are skipped. Windows patching proceeds normally regardless.*
