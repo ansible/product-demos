@@ -4,6 +4,7 @@
     src: event_dashboard.py
     dest: /usr/local/bin/config-drift-kafka-event-dashboard.py
     mode: "0755"
+  register: config_drift_kafka_dashboard_script
   when: config_drift_kafka_dashboard_enabled
 
 - name: Install event dashboard systemd unit
@@ -31,6 +32,15 @@
     state: started
     daemon_reload: true
   when: config_drift_kafka_dashboard_enabled
+
+- name: Restart event dashboard to load script changes
+  ansible.builtin.systemd:
+    name: config-drift-kafka-dashboard
+    state: restarted
+    daemon_reload: true
+  when:
+    - config_drift_kafka_dashboard_enabled
+    - config_drift_kafka_dashboard_script is changed
 
 - name: Stop event dashboard when disabled
   ansible.builtin.systemd:
