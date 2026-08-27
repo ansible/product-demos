@@ -1131,6 +1131,24 @@
     playbooks: 1
   github_path: network/backup.yml
 
+- slug: network-troubleshoot-containerlab
+  readme_path: network/docs/network-troubleshoot-containerlab.md
+  url: /demos/network-troubleshoot-containerlab/
+  title: "Troubleshoot Containerlab"
+  category: network
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Troubleshooting
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)"
+    icon: "🌐"
+  blurb: "Collect hypervisor, containerlab, and podman diagnostics through AAP when manual SSH is unavailable."
+  stats:
+    playbooks: 1
+  github_path: network/troubleshoot_containerlab.yml
+
 - slug: network-panos-workflow
   readme_path: network/docs/network-panos-workflow.md
   title: "Palo Alto Firewall Demo"

@@ -9,6 +9,8 @@ Backs up running configurations from containerlab NX-OS and IOS-XE devices using
 - **Containerlab Device Access** credential configured
 - ContainerLab Inventory synced with hypervisor IP
 
+If Backup times out waiting for device SSH, run **NETWORK ǀ Containerlab ǀ Troubleshoot** first.
+
 ## Job templates
 
 | Template | Playbook | Description |
