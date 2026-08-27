@@ -47,6 +47,7 @@
         ansible_user: "{{ clab_aws_admin_user }}"
         ansible_ssh_private_key_file: "{{ (lookup('ansible.builtin.env', 'AWX_HOST') | length > 0) | ternary(omit, playbook_dir + '/' + clab_aws_keypair_name + '.pem') }}"
         ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        clab_host_ip: "{{ clab_host_ip }}"
         groups: clab_hosts
 
 - name: Probe Device Ports from Execution Node
@@ -203,23 +204,20 @@
             podman logs --tail 20 "${name}" || echo "No logs available for ${name}"
             echo
           done
-      environment:
-        DOCKER_HOST: "{{ clab_podman_socket }}"
-      become: false
       register: clab_container_logs
       changed_when: false
       failed_when: false
-      when: clab_inspect.rc == 0
 
     - name: Display recent container logs
       ansible.builtin.debug:
         msg: "{{ clab_container_logs.stdout_lines | default(['No container logs collected']) }}"
-      when: clab_container_logs is defined
 
     - name: Summarize likely next steps
       ansible.builtin.debug:
         msg:
+          - "Hypervisor: {{ clab_host_ip }} ({{ ansible_host }})"
           - "If external port 2122 or 2123 is closed but local probes succeed, check the AWS security group."
           - "If local probes fail, rerun NETWORK | Containerlab | Deploy Topology."
+          - "If a container shows unhealthy but SSH responds, retry the day-2 job or redeploy the topology."
           - "If podman containers are exited, inspect logs above and redeploy the topology."
           - "Day-2 demos require ContainerLab Inventory hosts to use ansible_host {{ clab_host_ip }}."
