@@ -289,6 +289,19 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: clab_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-2
+            - us-west-2
 
   - name: "NETWORK | Containerlab | Troubleshoot"
     job_type: run

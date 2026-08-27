@@ -21,6 +21,7 @@
     - name: Set host IP from discovery
       ansible.builtin.set_fact:
         clab_host_ip: "{{ clab_discovered.instances[0].public_ip_address }}"
+        clab_instance_id: "{{ clab_discovered.instances[0].instance_id }}"
       when:
         - clab_host_ip is not defined
         - clab_discovered.instances | length > 0
@@ -30,6 +31,26 @@
         msg: "No running containerlab hypervisor found; skipping topology teardown"
       when: clab_host_ip is not defined
 
+    - name: Verify hypervisor SSH is reachable from execution node
+      ansible.builtin.wait_for:
+        host: "{{ clab_host_ip }}"
+        port: 22
+        timeout: 30
+      register: clab_hypervisor_ssh_check
+      failed_when: false
+      when: clab_host_ip is defined
+
+    - name: Warn when hypervisor SSH is unreachable
+      ansible.builtin.debug:
+        msg: >-
+          Hypervisor {{ clab_instance_id | default('unknown') }} at {{ clab_host_ip }} is
+          unreachable on SSH port 22. Skipping containerlab destroy on the host. Run
+          NETWORK | Containerlab | Teardown Hypervisor or the Destroy Containerlab Stack
+          workflow to remove the EC2 instance and AWS resources.
+      when:
+        - clab_host_ip is defined
+        - clab_hypervisor_ssh_check.failed
+
     - name: Add hypervisor to inventory
       ansible.builtin.add_host:
         name: clab-hypervisor
@@ -37,8 +58,11 @@
         ansible_user: "{{ clab_aws_admin_user }}"
         ansible_ssh_private_key_file: "{{ (lookup('ansible.builtin.env', 'AWX_HOST') | length > 0) | ternary(omit, playbook_dir + '/' + clab_aws_keypair_name + '.pem') }}"
         ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        clab_host_ip: "{{ clab_host_ip }}"
         groups: clab_hosts
-      when: clab_host_ip is defined
+      when:
+        - clab_host_ip is defined
+        - not (clab_hypervisor_ssh_check.failed | default(false))
 
 - name: Destroy Containerlab Topology on Hypervisor
   hosts: clab_hosts
