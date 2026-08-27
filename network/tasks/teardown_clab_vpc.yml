@@ -1,0 +1,44 @@
+---
+- name: Delete subnet in clab VPC
+  amazon.aws.ec2_vpc_subnet:
+    state: absent
+    vpc_id: "{{ clab_vpc_id }}"
+    cidr: "{{ clab_aws_subnet_cidr }}"
+    region: "{{ clab_aws_region }}"
+
+- name: Find route tables in clab VPC
+  amazon.aws.ec2_vpc_route_table_info:
+    region: "{{ clab_aws_region }}"
+    filters:
+      vpc-id: "{{ clab_vpc_id }}"
+      "tag:Name": "{{ clab_aws_rt_name }}"
+  register: clab_route_tables
+
+- name: Delete route tables in clab VPC
+  amazon.aws.ec2_vpc_route_table:
+    state: absent
+    route_table_id: "{{ item.route_table_id }}"
+    region: "{{ clab_aws_region }}"
+  loop: "{{ clab_route_tables.route_tables | default([]) }}"
+  loop_control:
+    label: "{{ item.route_table_id }}"
+
+- name: Delete security group in clab VPC
+  amazon.aws.ec2_security_group:
+    state: absent
+    name: "{{ clab_aws_sg_name }}"
+    region: "{{ clab_aws_region }}"
+    vpc_id: "{{ clab_vpc_id }}"
+  failed_when: false
+
+- name: Delete internet gateway in clab VPC
+  amazon.aws.ec2_vpc_igw:
+    state: absent
+    vpc_id: "{{ clab_vpc_id }}"
+    region: "{{ clab_aws_region }}"
+
+- name: Delete clab VPC
+  amazon.aws.ec2_vpc_net:
+    state: absent
+    vpc_id: "{{ clab_vpc_id }}"
+    region: "{{ clab_aws_region }}"
