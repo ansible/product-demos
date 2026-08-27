@@ -11,13 +11,16 @@
     clab_aws_region: "{{ clab_aws_region | default('us-east-2') }}"
     clab_aws_instance_type: "{{ clab_aws_instance_type | default('c8i.2xlarge') }}"
     aws_owner_tag: "{{ clab_aws_owner_tag | default('apd-demo') }}"
-    apd_managed_by: "{{ apd_managed_by | default('aap-product-demos') }}"
-    apd_id: >-
-      {{ apd_id | default(
-         lookup('ansible.builtin.password', playbook_dir + '/../.deployment_id',
-         chars=['ascii_lowercase', 'digits'], length=5), true) }}
 
   tasks:
+    - name: Set deployment metadata defaults
+      ansible.builtin.set_fact:
+        apd_managed_by: "{{ apd_managed_by | default('aap-product-demos') }}"
+        apd_id: >-
+          {{ apd_id | default(
+             lookup('ansible.builtin.password', playbook_dir + '/../.deployment_id',
+             chars=['ascii_lowercase', 'digits'], length=5), true) }}
+
     - name: Validate region selection
       ansible.builtin.assert:
         that:
