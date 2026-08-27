@@ -1,0 +1,223 @@
+---
+- name: Discover Containerlab Hypervisor
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  roles:
+    - role: demo.network.containerlab
+
+  tasks:
+    - name: Discover hypervisor IP from EC2 tags
+      amazon.aws.ec2_instance_info:
+        region: "{{ clab_aws_region | default('us-east-2') }}"
+        filters:
+          "tag:deployment": containerlab
+          "tag:purpose": "{{ clab_aws_purpose_tag }}"
+          instance-state-name: running
+      register: clab_discovered
+      when: clab_host_ip is not defined
+
+    - name: Set host IP from discovery
+      ansible.builtin.set_fact:
+        clab_host_ip: "{{ clab_discovered.instances[0].public_ip_address }}"
+        clab_instance_id: "{{ clab_discovered.instances[0].instance_id }}"
+      when:
+        - clab_host_ip is not defined
+        - clab_discovered.instances | length > 0
+
+    - name: Fail when no running hypervisor is found
+      ansible.builtin.fail:
+        msg: >-
+          No running containerlab hypervisor found in {{ clab_aws_region | default('us-east-2') }}.
+          Run NETWORK | Deploy Containerlab Stack or pass clab_host_ip as an extra variable.
+      when: clab_host_ip is not defined
+
+    - name: Display hypervisor summary
+      ansible.builtin.debug:
+        msg:
+          - "Hypervisor public IP: {{ clab_host_ip }}"
+          - "Instance ID: {{ clab_instance_id | default('not discovered') }}"
+          - "Region: {{ clab_aws_region | default('us-east-2') }}"
+
+    - name: Add hypervisor to inventory
+      ansible.builtin.add_host:
+        name: clab-hypervisor
+        ansible_host: "{{ clab_host_ip }}"
+        ansible_user: "{{ clab_aws_admin_user }}"
+        ansible_ssh_private_key_file: "{{ (lookup('ansible.builtin.env', 'AWX_HOST') | length > 0) | ternary(omit, playbook_dir + '/' + clab_aws_keypair_name + '.pem') }}"
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        clab_host_ip: "{{ clab_host_ip }}"
+        groups: clab_hosts
+
+- name: Probe Device Ports from Execution Node
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Check external reachability of device SSH ports
+      ansible.builtin.wait_for:
+        host: "{{ clab_host_ip }}"
+        port: "{{ item.port }}"
+        timeout: 5
+      register: clab_external_port_check
+      failed_when: false
+      loop:
+        - port: 22
+          label: hypervisor SSH
+        - port: 2122
+          label: n9kv SSH
+        - port: 2123
+          label: cat8kv SSH
+
+    - name: Display external port probe results
+      ansible.builtin.debug:
+        msg: >-
+          {{ item.item.label }} ({{ clab_host_ip }}:{{ item.item.port }}):
+          {{ 'open' if item.failed is false else 'closed or filtered' }}
+      loop: "{{ clab_external_port_check.results }}"
+      loop_control:
+        label: "{{ item.item.label }}"
+
+- name: Collect Containerlab Diagnostics on Hypervisor
+  hosts: clab-hypervisor
+  become: true
+  gather_facts: true
+
+  roles:
+    - role: demo.network.containerlab
+
+  vars:
+    clab_topology_dir: "/root/clab/{{ clab_topology }}"
+    clab_podman_socket: "unix:///run/user/1000/podman/podman.sock"
+
+  tasks:
+    - name: Collect hypervisor health facts
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          echo "=== uptime ==="
+          uptime
+          echo "=== memory ==="
+          free -h
+          echo "=== disk ==="
+          df -h {{ clab_aws_ebs_mount }} / /
+      register: clab_hypervisor_health
+      changed_when: false
+
+    - name: Display hypervisor health facts
+      ansible.builtin.debug:
+        msg: "{{ clab_hypervisor_health.stdout_lines }}"
+
+    - name: Check listening ports for SSH services
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          ss -tlnp | grep -E ':22 |:2122 |:2123 ' || true
+      register: clab_listening_ports
+      changed_when: false
+
+    - name: Display listening ports
+      ansible.builtin.debug:
+        msg: "{{ clab_listening_ports.stdout_lines | default(['No matching listeners found']) }}"
+
+    - name: Get containerlab version
+      ansible.builtin.command:
+        cmd: containerlab version
+      register: clab_version
+      changed_when: false
+      failed_when: false
+
+    - name: Display containerlab version
+      ansible.builtin.debug:
+        msg: "{{ clab_version.stdout_lines | default(['containerlab not installed']) }}"
+
+    - name: Inspect containerlab topology
+      ansible.builtin.command:
+        cmd: containerlab inspect -t {{ clab_topology }} --all
+        chdir: "{{ clab_topology_dir }}"
+      environment:
+        DOCKER_HOST: "{{ clab_podman_socket }}"
+      register: clab_inspect
+      changed_when: false
+      failed_when: false
+
+    - name: Display containerlab inspect output
+      ansible.builtin.debug:
+        msg: "{{ clab_inspect.stdout_lines | default(['containerlab inspect failed']) }}"
+
+    - name: List podman containers for ec2-user
+      ansible.builtin.command:
+        cmd: podman ps -a --format "table {{ '{{' }}.Names{{ '}}' }}\t{{ '{{' }}.Status{{ '}}' }}\t{{ '{{' }}.Ports{{ '}}' }}"
+      environment:
+        DOCKER_HOST: "{{ clab_podman_socket }}"
+      become: false
+      register: clab_podman_user
+      changed_when: false
+      failed_when: false
+
+    - name: Display ec2-user podman containers
+      ansible.builtin.debug:
+        msg: "{{ clab_podman_user.stdout_lines | default(['No podman containers found for ec2-user']) }}"
+
+    - name: List root podman containers
+      ansible.builtin.command:
+        cmd: podman ps -a --format "table {{ '{{' }}.Names{{ '}}' }}\t{{ '{{' }}.Status{{ '}}' }}\t{{ '{{' }}.Ports{{ '}}' }}"
+      register: clab_podman_root
+      changed_when: false
+      failed_when: false
+
+    - name: Display root podman containers
+      ansible.builtin.debug:
+        msg: "{{ clab_podman_root.stdout_lines | default(['No root podman containers found']) }}"
+
+    - name: Probe device SSH locally on hypervisor
+      ansible.builtin.wait_for:
+        host: 127.0.0.1
+        port: "{{ item.port }}"
+        search_regex: SSH
+        timeout: 5
+      register: clab_local_port_check
+      failed_when: false
+      loop:
+        - port: 2122
+          label: n9kv
+        - port: 2123
+          label: cat8kv
+
+    - name: Display local device SSH probe results
+      ansible.builtin.debug:
+        msg: >-
+          {{ item.item.label }} (127.0.0.1:{{ item.item.port }}):
+          {{ 'SSH responding' if item.failed is false else 'not responding' }}
+      loop: "{{ clab_local_port_check.results }}"
+      loop_control:
+        label: "{{ item.item.label }}"
+
+    - name: Collect recent logs for topology containers
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          for name in $(podman ps -a --format '{{ '{{' }}.Names{{ '}}' }}' | grep -E 'n9kv|cat8kv' || true); do
+            echo "=== ${name} (last 20 lines) ==="
+            podman logs --tail 20 "${name}" || echo "No logs available for ${name}"
+            echo
+          done
+      register: clab_container_logs
+      changed_when: false
+      failed_when: false
+
+    - name: Display recent container logs
+      ansible.builtin.debug:
+        msg: "{{ clab_container_logs.stdout_lines | default(['No container logs collected']) }}"
+
+    - name: Summarize likely next steps
+      ansible.builtin.debug:
+        msg:
+          - "Hypervisor: {{ clab_host_ip }} ({{ ansible_host }})"
+          - "If external port 2122 or 2123 is closed but local probes succeed, check the AWS security group."
+          - "If local probes fail, rerun NETWORK | Containerlab | Deploy Topology."
+          - "If a container shows unhealthy but SSH responds, retry the day-2 job or redeploy the topology."
+          - "If podman containers are exited, inspect logs above and redeploy the topology."
+          - "Day-2 demos require ContainerLab Inventory hosts to use ansible_host {{ clab_host_ip }}."

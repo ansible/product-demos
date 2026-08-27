@@ -1,4 +1,7 @@
 ---
+apd_managed_by: aap-product-demos
+apd_demo_tag: "true"
+
 # aap_user_accounts and gateway_role_user_assignments are handled by
 # the initial bootstrap (install-apd.yml / bootstrap-vars.yml).
 # Defining them here triggers infra.aap_configuration.gateway_users which
@@ -40,11 +43,19 @@ controller_inventory_sources:
     credential: AWS
     overwrite: true
     source_vars:
+      filters:
+        tag:managed-by: "{{ apd_managed_by }}"
+        tag:apd: "{{ apd_demo_tag }}"
+        instance-state-name: running
       hostnames:
         - tag:Name
       compose:
         ansible_host: public_ip_address
         ansible_user: ec2-user
+        # ansible-core 2.16 requires Python 3.8+ on targets; RHEL 8 needs python3.9.
+        ansible_python_interpreter: >-
+          '/usr/bin/python3.9' if tags.get('blueprint', '') == 'rhel8'
+          else omit
         ansible_winrm_kerberos_hostname_override: tags.Name + '.ansible.local' if platform_details == 'Windows' else omit
       groups:
         cloud_aws: true
@@ -205,6 +216,9 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_apd_managed_by: aap-product-demos
+      create_vm_apd_demo_tag: "true"
     survey_enabled: true
     allow_simultaneous: true
     survey:
@@ -256,6 +270,7 @@ controller_templates:
             - rhel8
             - rhel7
             - al2023
+            - kafka
         - question_name: Subnet
           type: text
           variable: create_vm_aws_vpc_subnet_name

@@ -18,11 +18,14 @@ Enterprise-grade patching workflow with snapshot safety, parallel RHEL and Windo
 
 ## Survey prompts
 
-| Prompt | Variable | Type | Required |
-|--------|----------|------|----------|
-| AWS Region | `aws_region` | multiplechoice | Yes |
-| RHEL Advisory IDs | `input_cve_ids` | text | Yes |
-| Windows KB IDs | `input_kb_ids` | text | Yes |
+| Prompt | Variable | Type | Required | Default |
+|--------|----------|------|----------|---------|
+| AWS Region | `aws_region` | multiplechoice | Yes | `us-east-1` |
+| RHEL hosts | `_hosts` | text | Yes | `aws_rhel8:aws_rhel9` |
+| Windows hosts | `_hosts_windows` | text | Yes | `aws-dc:aws_win1` |
+| Report server | `_report_server` | text | Yes | `reports` |
+| RHEL Advisory IDs | `input_cve_ids` | text | Yes | `RHSA-2024:3138, CVE-2024-33599` |
+| Windows KB IDs | `input_kb_ids` | text | Yes | `KB5044284, KB5044030` |
 
 ## Workflow
 
@@ -61,7 +64,7 @@ graph LR
 | Cloud ǀ AWS ǀ Patch Windows | [`cloud/patch_windows.yml`](../patch_windows.yml) | Installs specific KB updates via win_updates |
 | Cloud ǀ AWS ǀ Patch Post-check Windows | [`cloud/patch_post_check_windows.yml`](../patch_post_check_windows.yml) | Verifies KBs are installed after patching |
 | Cloud ǀ AWS ǀ Restore EC2 from Snapshot | [`cloud/restore_ec2.yml`](../restore_ec2.yml) | Restores EC2 volumes from latest EBS snapshot |
-| Cloud ǀ AWS ǀ Patch Compliance Report | [`cloud/patch_compliance_report.yml`](../patch_compliance_report.yml) | Generates HTML compliance dashboard on the reports server |
+| Cloud ǀ AWS ǀ Patch Compliance Report | [`cloud/patch_compliance_report.yml`](../patch_compliance_report.yml) | Generates HTML compliance dashboard on the `reports` server (`_report_server`; not part of `_hosts`) |
 
 ## Why it matters
 
@@ -75,9 +78,9 @@ graph LR
 
 1. **Run setup:** On RHDP (Red Hat Demo Platform), run **APD ǀ Multi-demo setup** to configure everything. On your own install, run **APD ǀ Single demo setup** → choose `cloud`. Then fill in the **RHSM Registration** credential with your org ID and activation key (see credential setup above).
 2. **Deploy the stack:** Launch **Deploy Cloud Stack in AWS** to create the five target VMs. Wait for it to complete and verify the hosts appear in inventory.
-3. **Set the stage:** Show the audience the five VMs in AAP inventory (aws_rhel8, aws_rhel9, aws-dc, aws_win1, reports). Point out it's a mixed Linux/Windows fleet.
-4. **Launch the workflow:** Navigate to Templates → Patch Cloud Stack in AWS. Fill in the survey with a real RHSA/CVE and KB (defaults work). Launch.
-5. **Snapshot step:** While it runs, explain that the first node takes EBS snapshots of all instances — this is the safety net. 'If anything goes wrong during patching, we restore to this point.'
+3. **Set the stage:** Show the audience the five VMs in AAP inventory (aws_rhel8, aws_rhel9, aws-dc, aws_win1, reports). Point out it's a mixed Linux/Windows fleet. The workflow patches the four workload VMs and publishes the dashboard on `reports`. `aws_kafka` is out of scope.
+4. **Launch the workflow:** Navigate to Templates → Patch Cloud Stack in AWS. Host lists default to the cloud-stack VMs; fill in a real RHSA/CVE and KB (defaults work). Launch.
+5. **Snapshot step:** While it runs, explain that the first node takes EBS snapshots of the target instances — this is the safety net. 'If anything goes wrong during patching, we restore to this point.'
 6. **Parallel paths:** Point out the RHEL and Windows pre-checks running simultaneously. 'One workflow, two operating systems, zero extra effort.'
 7. **Pre-check results:** Show the debug output — which advisories are applicable, which hosts are already compliant. 'We check before we change.' *Note: If RHSM is not configured, RHEL hosts will show SKIPPED here — this is expected. Without RHSM registration, the hosts can't query Red Hat advisory repos, so all RHEL steps (pre-check, patch, post-check, rollback) are skipped. Windows patching proceeds normally regardless.*
 8. **Patching:** The patch nodes apply only the targeted advisories. 'We're not running yum update — we're applying specific CVE fixes with an audit trail.'

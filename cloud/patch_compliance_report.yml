@@ -1,6 +1,6 @@
 ---
 - name: Gather patch compliance data
-  hosts: "{{ _hosts | default('os_linux') }}:{{ _hosts_windows | default('os_windows') }}"
+  hosts: "{{ _hosts | default('aws_rhel8:aws_rhel9') }}:{{ _hosts_windows | default('aws-dc:aws_win1') }}"
   gather_facts: true
 
   vars:
@@ -145,7 +145,7 @@
     cve_advisory_ids: "{{ (_raw_cve_input.split(',') | map('trim') | list) if _raw_cve_input is string else _raw_cve_input }}"
     _raw_kb_input: "{{ input_kb_ids | default('KB5044284, KB5044030') }}"
     target_kb_ids: "{{ (_raw_kb_input.split(',') | map('trim') | list) if _raw_kb_input is string else _raw_kb_input }}"
-    audit_hosts: "{{ groups[_hosts | default('os_linux')] | default([]) + groups[_hosts_windows | default('os_windows')] | default([]) }}"
+    audit_hosts: "{{ (query('inventory_hostnames', _hosts | default('aws_rhel8:aws_rhel9')) + query('inventory_hostnames', _hosts_windows | default('aws-dc:aws_win1'))) | unique | list }}"
 
   tasks:
     - name: Ensure swap for DNF operations

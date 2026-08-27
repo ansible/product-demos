@@ -1,0 +1,30 @@
+---
+# ansible-core 2.16+ still requires Python 3.8+ on managed nodes. RHEL 8
+# platform-python is 3.6; install and pin python3.9 before module execution.
+- name: Gather distribution facts when needed for RHEL 8 check
+  ansible.builtin.setup:
+    gather_subset:
+      - distribution
+  when: ansible_distribution is not defined
+
+- name: Configure Python 3.9 for Ansible on RHEL 8
+  when:
+    - ansible_distribution == 'RedHat'
+    - ansible_distribution_major_version | string == '8'
+  block:
+    - name: Ensure Python 3.9 is installed on RHEL 8
+      ansible.builtin.raw: |
+        set -e
+        if [ -x /usr/bin/python3.9 ]; then exit 0; fi
+        dnf install -y python39
+      register: _rhel8_python39
+      changed_when: >-
+        'Installing' in (_rhel8_python39.stdout | default(''))
+        or 'Upgrading' in (_rhel8_python39.stdout | default(''))
+
+    - name: Pin Python 3.9 for Ansible modules on RHEL 8
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: /usr/bin/python3.9
+
+    - name: Reset SSH connection to apply RHEL 8 interpreter
+      ansible.builtin.meta: reset_connection

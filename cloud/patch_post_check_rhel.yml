@@ -1,6 +1,6 @@
 ---
 - name: Post-check patch verification - RHEL
-  hosts: "{{ _hosts | default('os_linux') }}"
+  hosts: "{{ _hosts | default('aws_rhel8:aws_rhel9') }}"
   strategy: free
   become: true
   gather_facts: false

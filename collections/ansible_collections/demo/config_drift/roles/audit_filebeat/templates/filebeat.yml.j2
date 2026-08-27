@@ -1,0 +1,23 @@
+---
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+
+{% if config_drift_filebeat_output == 'kafka' %}
+output.kafka:
+  hosts: ["{{ config_drift_kafka_brokers }}"]
+  topic: "{{ config_drift_kafka_topic }}"
+  required_acks: 1
+  compression: gzip
+{% else %}
+output.console:
+  enabled: true
+  pretty: true
+{% endif %}
+
+logging.level: info
+logging.to_files: false

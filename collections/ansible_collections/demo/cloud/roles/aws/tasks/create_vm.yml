@@ -1,4 +1,9 @@
 ---
+- name: Force APD inventory tag strings
+  ansible.builtin.set_fact:
+    create_vm_apd_managed_by: aap-product-demos
+    create_vm_apd_demo_tag: "true"
+
 - name: Check if the VM is already provisioned
   amazon.aws.ec2_instance_info:
     filters:
@@ -10,6 +15,8 @@
       "tag:purpose": "{{ create_vm_vm_purpose }}"
       "tag:ansible-role": create_vm
       "tag:ansible-collection": demo.cloud
+      "tag:managed-by": "{{ create_vm_apd_managed_by }}"
+      "tag:apd": "{{ create_vm_apd_demo_tag }}"
       instance-state-name:
         - pending
         - running
@@ -100,6 +107,8 @@
           "tag:purpose": "{{ create_vm_vm_purpose }}"
           "tag:ansible-role": create_vm
           "tag:ansible-collection": demo.cloud
+          "tag:managed-by": "{{ create_vm_apd_managed_by }}"
+          "tag:apd": "{{ create_vm_apd_demo_tag }}"
           instance-state-name:
             - pending
             - running
@@ -123,6 +132,8 @@
           purpose: "{{ create_vm_vm_purpose }}"
           ansible-role: create_vm
           ansible-collection: demo.cloud
+          managed-by: aap-product-demos
+          apd: "true"
         wait: "{{ create_vm_aws_ec2_wait }}"
         vpc_subnet_id: "{{ create_vm_aws_subnet_id }}"
         user_data: "{{ lookup('template', create_vm_aws_userdata_template + '.j2', template_vars=dict(vm_name=create_vm_vm_name)) }}"
@@ -141,3 +152,16 @@
           priv_network_private_ip: "{{ create_vm_aws_ec2_instance.instances[0].private_ip_address | default('') }}"
           public_ip: "{{ create_vm_aws_ec2_instance.instances[0].public_ip_address | default('') }}"
       when: create_vm_aws_ec2_instance.instances is defined and create_vm_aws_ec2_instance.instances | length > 0
+
+- name: Collect instance ids for APD tags
+  ansible.builtin.set_fact:
+    create_vm_tag_instance_ids: "{{ ((create_vm_existing_vm.instances | default([])) + (create_vm_aws_ec2_instance.instances | default([]) if create_vm_aws_ec2_instance is defined else [])) | map(attribute='instance_id') | unique | list }}"
+
+- name: Ensure APD inventory tags
+  amazon.aws.ec2_tag:
+    region: "{{ create_vm_aws_region }}"
+    resource: "{{ item }}"
+    tags:
+      managed-by: aap-product-demos
+      apd: "true"
+  loop: "{{ create_vm_tag_instance_ids | default([]) }}"

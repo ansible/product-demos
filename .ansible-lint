@@ -45,6 +45,10 @@ mock_modules:
   - ansible.controller.credential
   - ansible.controller.host
   - ansible.controller.settings
+  - ansible.eda.project_info
+  - ansible.eda.rulebook_info
+  - ansible.eda.rulebook_activation
+  - ansible.eda.rulebook_activation_info
   - ansible.posix.at
   - ansible.posix.mount
   - ansible.posix.authorized_key

@@ -75,6 +75,7 @@
               - 88  # Kerberos Authentication
               - 3389  # RDP
               - 9090  # Cockpit
+              - 9095  # Kafka EDA external listener (aws_kafka config drift)
             cidr_ip: 0.0.0.0/0
           - proto: icmp
             to_port: -1

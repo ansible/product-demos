@@ -1,0 +1,87 @@
+---
+- name: Find network interfaces in clab VPC
+  amazon.aws.ec2_eni_info:
+    region: "{{ clab_aws_region }}"
+    filters:
+      vpc-id: "{{ clab_vpc_id }}"
+  register: clab_vpc_enis
+
+- name: Delete available network interfaces in clab VPC
+  amazon.aws.ec2_eni:
+    state: absent
+    eni_id: "{{ clab_eni.id }}"
+    region: "{{ clab_aws_region }}"
+  loop: "{{ clab_vpc_enis.network_interfaces | default([]) | selectattr('status', 'equalto', 'available') | list }}"
+  loop_control:
+    loop_var: clab_eni
+    label: "{{ clab_eni.id }}"
+  failed_when: false
+
+- name: Find all subnets in clab VPC
+  amazon.aws.ec2_vpc_subnet_info:
+    region: "{{ clab_aws_region }}"
+    filters:
+      vpc-id: "{{ clab_vpc_id }}"
+  register: clab_vpc_subnets
+
+- name: Delete all subnets in clab VPC
+  amazon.aws.ec2_vpc_subnet:
+    state: absent
+    subnet_id: "{{ clab_subnet.subnet_id }}"
+    region: "{{ clab_aws_region }}"
+  loop: "{{ clab_vpc_subnets.subnets | default([]) }}"
+  loop_control:
+    loop_var: clab_subnet
+    label: "{{ clab_subnet.subnet_id }}"
+
+- name: Delete internet gateway in clab VPC
+  amazon.aws.ec2_vpc_igw:
+    state: absent
+    vpc_id: "{{ clab_vpc_id }}"
+    region: "{{ clab_aws_region }}"
+
+- name: Find route tables in clab VPC
+  amazon.aws.ec2_vpc_route_table_info:
+    region: "{{ clab_aws_region }}"
+    filters:
+      vpc-id: "{{ clab_vpc_id }}"
+  register: clab_route_tables
+
+- name: Delete custom route tables in clab VPC
+  amazon.aws.ec2_vpc_route_table:
+    state: absent
+    vpc_id: "{{ clab_vpc_id }}"
+    route_table_id: "{{ clab_route_table.route_table_id }}"
+    region: "{{ clab_aws_region }}"
+  when: clab_route_table.associations | selectattr('main', 'defined') | selectattr('main') | list | length == 0
+  loop: "{{ clab_route_tables.route_tables | default([]) }}"
+  loop_control:
+    loop_var: clab_route_table
+    label: "{{ clab_route_table.route_table_id }}"
+  failed_when: false
+
+- name: Find security groups in clab VPC
+  amazon.aws.ec2_security_group_info:
+    region: "{{ clab_aws_region }}"
+    filters:
+      vpc-id: "{{ clab_vpc_id }}"
+  register: clab_vpc_security_groups
+
+- name: Delete non-default security groups in clab VPC
+  amazon.aws.ec2_security_group:
+    state: absent
+    group_id: "{{ clab_security_group.group_id }}"
+    region: "{{ clab_aws_region }}"
+  loop: >-
+    {{ clab_vpc_security_groups.security_groups | default([])
+       | rejectattr('group_name', 'equalto', 'default') | list }}
+  loop_control:
+    loop_var: clab_security_group
+    label: "{{ clab_security_group.group_id }}"
+  failed_when: false
+
+- name: Delete clab VPC
+  amazon.aws.ec2_vpc_net:
+    state: absent
+    vpc_id: "{{ clab_vpc_id }}"
+    region: "{{ clab_aws_region }}"

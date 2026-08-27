@@ -43,7 +43,7 @@ Provisioning takes approximately 10–15 minutes while device images pull and vi
 |----------|----------|-------------|
 | NETWORK ǀ Deploy Containerlab Stack | [`network/setup.yml`](../setup.yml) | Workflow that provisions hypervisor, deploys topology, and syncs inventory |
 | NETWORK ǀ Containerlab ǀ Provision Hypervisor | [`network/provision_hypervisor.yml`](../provision_hypervisor.yml) | Creates AWS networking and the nested-virt EC2 hypervisor |
-| NETWORK ǀ Containerlab ǀ Deploy Topology | [`network/deploy_containerlab.yml`](../deploy_containerlab.yml) | Installs containerlab and starts the n9kv + cat8kv topology |
+| NETWORK ǀ Containerlab ǀ Deploy Topology | [`network/deploy_containerlab.yml`](../deploy_containerlab.yml) | Installs containerlab and starts the n9kv + cat8kv topology. Can also run standalone to redeploy the lab on an existing hypervisor; it discovers the running EC2 instance by tag. |
 
 ## Why it matters
 
@@ -59,6 +59,8 @@ Provisioning takes approximately 10–15 minutes while device images pull and vi
 3. **While it runs:** Explain nested virt, containerlab, and the two platforms (NX-OS n9kv on port 2122, IOS-XE cat8kv on port 2123).
 4. **Inventory sync:** After success, open **ContainerLab Inventory** and show the hypervisor/device hosts.
 5. **Transition:** Run **NETWORK ǀ Containerlab ǀ Configure Devices**, then Report, Backup, or DISA STIG.
+
+If a device misbehaves later, rerun **NETWORK ǀ Containerlab ǀ Deploy Topology** by itself with the AWS Region survey. It discovers the existing hypervisor automatically and redeploys the topology without reprovisioning AWS infrastructure.
 
 ## Related demos
 
