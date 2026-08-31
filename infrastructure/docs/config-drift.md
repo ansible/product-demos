@@ -18,12 +18,12 @@ Two parts: **one-time setup**, then **show the demo**.
 ### Part 1 — One-time setup
 
 1. Sync the **Ansible Product Demos** project from your fork branch.
-2. Run **APD | Single demo setup** with category `infrastructure` (cloud stack must already exist, or the workflow deploys it for you).
+2. Run **APD | Single demo setup** with category `infrastructure`.
 3. Launch **Infrastructure | Config Drift - Full Setup** and complete the survey (region, owner, environment).
 
 That single workflow:
 
-- Checks whether `aws_rhel8` and `aws_rhel9` are in inventory — if not, runs **Deploy Cloud Stack in AWS** automatically
+- Checks whether `aws_rhel8` and `aws_rhel9` are in inventory — if not, stops with a message to run **Deploy Cloud Stack in AWS** first
 - Provisions the Kafka queue (`aws_kafka`)
 - Syncs AWS inventory
 - Deploys auditd + Filebeat on `aws_rhel*` with Kafka output
@@ -59,7 +59,7 @@ Same EDA → remediation flow follows within ~20 seconds.
 
 ## Prerequisites
 
-- **Deploy Cloud Stack in AWS** already run, *or* let the Full Setup workflow deploy it for you
+- **Deploy Cloud Stack in AWS** already run (`aws_rhel8`, `aws_rhel9` in inventory)
 - **APD | Single demo setup** — category `infrastructure`
 - **RHSM Registration** credential — org ID and activation key (see **LINUX | Register RHEL with RHSM**)
 - **Automation Decisions (EDA)** on AAP
@@ -69,7 +69,7 @@ Same EDA → remediation flow follows within ~20 seconds.
 
 Launch **Infrastructure | Config Drift - Full Setup** — a single workflow that:
 
-1. Verifies `aws_rhel8` and `aws_rhel9` are in inventory (or runs **Deploy Cloud Stack in AWS** if missing)
+1. Verifies `aws_rhel8` and `aws_rhel9` are in inventory (fails with guidance if missing)
 2. Provisions Kafka (`aws_kafka`)
 3. Syncs AWS inventory
 4. Deploys auditd + Filebeat with Kafka output on `aws_rhel*`
@@ -78,19 +78,18 @@ Launch **Infrastructure | Config Drift - Full Setup** — a single workflow that
 ```mermaid
 flowchart LR
   check[Check Cloud Stack]
-  deploy[Deploy Cloud Stack]
+  feedback[Cloud stack required]
   kafka[Provision Kafka]
   sync[Sync Inventory]
   filebeat[Deploy Filebeat]
   eda[Setup EDA]
 
   check -->|success| kafka
-  check -->|failure| deploy
-  deploy --> kafka
+  check -->|failure| feedback
   kafka --> sync --> filebeat --> eda
 ```
 
-In the AAP workflow visualizer, the main path runs left to right. **Deploy Cloud Stack** appears on the failure branch below **Check Cloud Stack** when workers are missing.
+In the AAP workflow visualizer, the main path runs left to right. When workers are missing, **Check Cloud Stack** fails to a feedback node that tells you to run **Deploy Cloud Stack in AWS** first.
 
 Survey prompts: AWS region, owner tag, and environment (same as cloud stack deploy).
 
