@@ -2,8 +2,10 @@
 - name: Generate OpenSCAP compliance report
   hosts: '{{ _hosts | default(omit) }}'
   become: true
+  gather_facts: false
 
   vars:
+    ansible_python_interpreter: auto_silent
     openscap_packages:
       - openscap-scanner
       - openscap-utils
@@ -13,6 +15,13 @@
     use_httpd: true
 
   tasks:
+    - name: Ensure RHEL 8 uses a supported Python for Ansible modules
+      ansible.builtin.include_role:
+        name: demo.cloud.ensure_rhel8_python
+
+    - name: Gather facts
+      ansible.builtin.setup:
+
     - name: Assert memory meets minimum requirements
       ansible.builtin.assert:
         that:
