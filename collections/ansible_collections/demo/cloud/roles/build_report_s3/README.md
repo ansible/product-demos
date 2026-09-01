@@ -23,12 +23,13 @@ Repo playbook: [`cloud/cloud_report.yml`](../../../../../../cloud/cloud_report.y
 
 ## Role Variables
 
-Defaults live in `vars/main.yml`.
+Defaults live in `defaults/main.yml`.
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `reports_aws_bucket_name` | `aws-cloud-report` | S3 bucket created/configured as a static website |
-| `reports_aws_region` | `us-west-1` | AWS region for the bucket |
+| `reports_aws_bucket_prefix` | first 4 chars of `AWS_ACCESS_KEY_ID` (lowercased) | Used to derive a globally unique bucket name |
+| `reports_aws_bucket_name` | `{{ reports_aws_bucket_prefix }}-reports` | S3 bucket created/configured as a static website |
+| `reports_aws_region` | `us-east-1` | AWS region for the bucket |
 
 ## Entry points
 
