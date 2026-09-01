@@ -46,7 +46,12 @@
           ansible.builtin.dnf:
             name: httpd
             state: present
-          notify: Restart httpd
+
+        - name: Start and enable httpd
+          ansible.builtin.service:
+            name: httpd
+            state: started
+            enabled: true
 
         - name: Override report directory
           ansible.builtin.set_fact:
@@ -70,6 +75,10 @@
             path: /etc/httpd/conf.d/welcome.conf
             state: absent
           notify: Restart httpd
+
+    - name: Flush handlers before publishing report URL
+      ansible.builtin.meta: flush_handlers
+      when: use_httpd | bool
 
     - name: Ensure report directory exists
       ansible.builtin.file:
