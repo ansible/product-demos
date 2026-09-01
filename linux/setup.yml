@@ -525,6 +525,8 @@ controller_templates:
 
   - name: "LINUX | Multi-profile Compliance Report"
     job_type: run
+    organization: Ansible Product Demos (APD)
+    execution_environment: TMM AWS EE
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "linux/multi_profile_compliance_report.yml"
