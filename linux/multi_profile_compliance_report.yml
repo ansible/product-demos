@@ -3,6 +3,7 @@
   hosts: '{{ _hosts | default(omit) }}'
   become: true
   gather_facts: false
+  serial: 1
 
   vars:
     ansible_python_interpreter: auto_silent
@@ -25,9 +26,14 @@
     - name: Assert memory meets minimum requirements
       ansible.builtin.assert:
         that:
-          - ansible_memfree_mb >= 1000
+          - ansible_memory_mb.nocache.free >= 1000
           - ansible_memtotal_mb >= 2000
-        fail_msg: "OpenSCAP is a memory intensive operation, the specified enepoint does not meet minimum requirements. See https://access.redhat.com/articles/6999111 for details."
+        fail_msg: >-
+          OpenSCAP is a memory intensive operation and this host does not meet
+          minimum requirements (need >= 1 GB available and 2 GB total RAM).
+          See https://access.redhat.com/articles/6999111 for details.
+          Current available: {{ ansible_memory_mb.nocache.free }} MB,
+          total: {{ ansible_memtotal_mb }} MB.
 
     - name: Get our facts straight
       ansible.builtin.set_fact:
