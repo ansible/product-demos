@@ -67,14 +67,19 @@
           ansible.builtin.service_facts:
 
         - name: Enable firewall http service
-          ansible.posix.firewalld:
-            service: http
-            state: enabled
-            immediate: true
-            permanent: true
+          ansible.builtin.command: firewall-cmd --permanent --add-service=http
+          register: _firewalld_http
+          changed_when: "'ALREADY_ENABLED' not in (_firewalld_http.stdout | default(''))"
           when:
             - "'firewalld.service' in ansible_facts.services"
             - ansible_facts.services["firewalld.service"].state == "running"
+
+        - name: Reload firewalld for http service
+          ansible.builtin.command: firewall-cmd --reload
+          when:
+            - "'firewalld.service' in ansible_facts.services"
+            - ansible_facts.services["firewalld.service"].state == "running"
+            - _firewalld_http is changed
 
         - name: Disable httpd welcome page
           ansible.builtin.file:
