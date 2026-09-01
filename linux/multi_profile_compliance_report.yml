@@ -75,6 +75,7 @@
 
         - name: Reload firewalld for http service
           ansible.builtin.command: firewall-cmd --reload
+          changed_when: true
           when:
             - "'firewalld.service' in ansible_facts.services"
             - ansible_facts.services["firewalld.service"].state == "running"
