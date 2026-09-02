@@ -4,7 +4,6 @@
   become: true
   gather_facts: false
   vars:
-    ansible_python_interpreter: auto_silent
     compliance_profile: undef
 
   tasks:
