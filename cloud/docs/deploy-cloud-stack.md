@@ -53,6 +53,16 @@ graph LR
 - Mixed OS fleet (RHEL 8, RHEL 9, Windows Server) reflects real customer environments
 - Dynamic inventory automatically imports all provisioned VMs into AAP
 
+## Manual SSH access
+
+Linux VMs launch with the `aws-test-key` EC2 keypair (public key derived from **APD Machine Credential**). AAP cannot export that private key after it is saved.
+
+To SSH in with **your own** key (for example Ed25519), run [**LINUX | Add SSH Public Key**](../../linux/docs/linux-install-ssh-key.md) against `aws_rhel*` or a single host, then connect as `ec2-user`:
+
+```bash
+ssh -i ~/.ssh/your-private-key ec2-user@<instance-ip>
+```
+
 ## Presenter walkthrough
 
 1. **Show the survey:** Walk through each field — region, owner, environment. Explain how surveys make self-service provisioning safe.
@@ -68,4 +78,5 @@ graph LR
 |------|-------------|
 | 🩹 [Patch Cloud Stack in AWS](./patch-cloud-stack.md) | Run this after deploying to demonstrate day-2 patching |
 | 💥 [Destroy Cloud Stack in AWS](./cloud-destroy-stack.md) | Tear down everything when done |
+| 🐧 [Add SSH Public Key](../../linux/docs/linux-install-ssh-key.md) | Add your public key for manual SSH to RHEL hosts |
 | 🐧 [Fact Scan](../../linux/docs/linux-fact-scan.md) | Gather facts from the newly deployed RHEL hosts |
