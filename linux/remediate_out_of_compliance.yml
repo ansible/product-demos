@@ -3,8 +3,6 @@
   hosts: "{{ compliance_profile | default('stig') | upper }}_OUT_OF_COMPLIANCE"
   become: true
   gather_facts: false
-  vars:
-    ansible_python_interpreter: auto_silent
 
   tasks:
     - name: Ensure RHEL 8 uses a supported Python for Ansible modules
