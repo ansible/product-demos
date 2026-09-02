@@ -289,6 +289,47 @@ controller_templates:
           variable: shell_script
           required: true
 
+  - name: "LINUX | Add SSH Public Key"
+    description: >-
+      Add an SSH public key to a Linux user's authorized_keys file on one or
+      more hosts. Useful for granting manual SSH access across demo VMs.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: linux/install_ssh_key.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          question_description: >-
+            aws_rhel9 for one host, or aws_rhel* to add the key to every
+            matching RHEL worker.
+          type: text
+          variable: _hosts
+          required: true
+        - question_name: SSH User
+          question_description: >-
+            Linux account that should receive the key. Use ec2-user for RHEL
+            EC2 instances in the cloud stack.
+          type: text
+          variable: ssh_user
+          required: true
+          default: ec2-user
+        - question_name: SSH Public Key
+          question_description: >-
+            Paste the full public key line, for example ssh-ed25519 AAAA...
+            comment.
+          type: textarea
+          variable: ssh_public_key
+          required: true
+
   - name: "LINUX | Fact Scan"
     project: "Ansible Product Demos"
     playbook: linux/fact_scan.yml

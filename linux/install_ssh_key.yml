@@ -1,0 +1,27 @@
+---
+- name: Add SSH Public Key
+  hosts: "{{ _hosts | default(omit) }}"
+  become: true
+  gather_facts: false
+  vars:
+    ssh_user: ec2-user
+    ssh_public_key: undef
+
+  tasks:
+    - name: Validate SSH public key was provided
+      ansible.builtin.assert:
+        that:
+          - ssh_public_key is defined
+          - ssh_public_key | trim | length > 0
+        fail_msg: Provide a full SSH public key line in the survey (for example, ssh-ed25519 AAAA... comment).
+
+    - name: Install SSH public key for user
+      ansible.posix.authorized_key:
+        user: "{{ ssh_user }}"
+        state: present
+        key: "{{ ssh_public_key | trim }}"
+        exclusive: false
+
+    - name: Confirm key installation
+      ansible.builtin.debug:
+        msg: "Installed SSH public key for {{ ssh_user }} on {{ inventory_hostname }}."

@@ -478,6 +478,23 @@
     playbooks: 1
   github_path: linux/run_script.yml
 
+- slug: linux-install-ssh-key
+  readme_path: linux/docs/linux-install-ssh-key.md
+  url: /demos/linux-install-ssh-key/
+  title: "Add SSH Public Key"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #d13438 0%, #7a0000 100%)"
+    icon: "🐧"
+  blurb: "Add an SSH public key to a Linux user's authorized_keys file on one or more hosts."
+  stats:
+    playbooks: 1
+  github_path: linux/install_ssh_key.yml
+
 - slug: linux-fact-scan
   readme_path: linux/docs/linux-fact-scan.md
   url: /demos/linux-fact-scan/
