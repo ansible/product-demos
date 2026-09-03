@@ -35,7 +35,7 @@ controller_credentials:
     credential_type: Red Hat Ansible Automation Platform
     organization: Ansible Product Demos (APD)
     update_secrets: false
-    state: exists
+    state: present
     inputs:
       host: '{{ aap_hostname }}'
       username: '{{ aap_username | default(omit) }}'
