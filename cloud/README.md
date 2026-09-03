@@ -60,6 +60,8 @@ When bootstrapping AAP manually, you can pre-load the SSH key with the `vault_ap
 
 For standalone runs of **Cloud / AWS | Create Keypair**, paste a public key in the optional survey field only if **APD Machine Credential** does not include a private key.
 
+To add **your own** public key for manual SSH to demo Linux hosts (without exporting the credential private key), run [**LINUX | Add SSH Public Key**](../linux/docs/linux-install-ssh-key.md) after the stack is deployed.
+
 ## Suggested Usage
 
 ### Deploy Cloud Stack in AWS

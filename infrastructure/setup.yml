@@ -664,8 +664,8 @@ controller_templates:
   - name: "Infrastructure | Config Drift - Check Cloud Stack"
     description: >-
       Verifies aws_rhel8 and aws_rhel9 exist in inventory before config drift
-      setup. Used by the Full Setup workflow; fails when the cloud stack must
-      be deployed first.
+      setup. Used by the Full Setup workflow; fails when Deploy Cloud Stack in
+      AWS must be run first.
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
@@ -817,9 +817,10 @@ controller_workflows:
 
   - name: Infrastructure | Config Drift - Full Setup
     description: >-
-      One-shot config drift pipeline setup: verify or deploy cloud stack RHEL
-      workers, provision Kafka, sync inventory, deploy auditd and Filebeat with
-      Kafka output, and activate the EDA rulebook. Run Introduce SSHD Drift
+      One-shot config drift pipeline setup: verify cloud stack RHEL workers are
+      in inventory, provision Kafka, sync inventory, deploy auditd and Filebeat
+      with Kafka output, and activate the EDA rulebook. Run Deploy Cloud Stack
+      in AWS first if aws_rhel8/aws_rhel9 are missing. Run Introduce SSHD Drift
       separately for the live demo.
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
@@ -871,23 +872,25 @@ controller_workflows:
           success_nodes:
             - identifier: Provision Kafka
           failure_nodes:
-            - identifier: Deploy Cloud Stack
+            - identifier: Cloud Stack Required
         unified_job_template:
           name: Infrastructure | Config Drift - Check Cloud Stack
           organization:
             name: Ansible Product Demos (APD)
             type: organization
           type: job_template
-      - identifier: Deploy Cloud Stack
-        related:
-          success_nodes:
-            - identifier: Provision Kafka
+      - identifier: Cloud Stack Required
         unified_job_template:
-          name: Deploy Cloud Stack in AWS
+          name: SUBMIT FEEDBACK
           organization:
             name: Ansible Product Demos (APD)
             type: organization
-          type: workflow_job_template
+          type: job_template
+        extra_data:
+          feedback: >-
+            aws_rhel8 and aws_rhel9 were not found in inventory. Run Deploy
+            Cloud Stack in AWS first, then re-launch Infrastructure | Config
+            Drift - Full Setup.
       - identifier: Provision Kafka
         related:
           success_nodes:

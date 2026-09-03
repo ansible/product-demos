@@ -1,4 +1,15 @@
 ---
+- name: Resolve report bucket name from AWS account ID
+  when: not reports_aws_bucket_name
+  block:
+    - name: Get AWS account ID
+      amazon.aws.aws_caller_info:
+      register: reports_aws_caller_info
+
+    - name: Set report bucket name
+      ansible.builtin.set_fact:
+        reports_aws_bucket_name: "reports-pd-{{ reports_aws_caller_info.account }}"
+
 - name: Create report bucket
   amazon.aws.s3_bucket:
     name: "{{ reports_aws_bucket_name }}"
