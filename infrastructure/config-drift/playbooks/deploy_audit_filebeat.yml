@@ -1,0 +1,46 @@
+---
+- name: Deploy auditd and Filebeat for config drift detection
+  hosts: "{{ _hosts | default('aws_rhel*') }}"
+  become: true
+  ignore_unreachable: true
+
+  vars:
+    ansible_python_interpreter: auto_silent
+    config_drift_filebeat_output: "{{ config_drift_filebeat_output | default('console') }}"
+    config_drift_kafka_topic: linux-audit-events
+
+  tasks:
+    - name: Ensure RHEL 8 uses a supported Python for Ansible modules
+      ansible.builtin.include_role:
+        name: demo.cloud.ensure_rhel8_python
+
+    - name: Resolve Kafka broker from inventory
+      ansible.builtin.set_fact:
+        config_drift_kafka_brokers: >-
+          {{
+            (hostvars['aws_kafka']['private_ip_address']
+             | default(hostvars['aws_kafka']['ansible_host']))
+            ~ ':9092'
+          }}
+      when:
+        - config_drift_filebeat_output == 'kafka'
+        - "'aws_kafka' in hostvars"
+
+    - name: Assert Kafka broker is available when Filebeat output is kafka
+      ansible.builtin.assert:
+        that:
+          - config_drift_kafka_brokers | length > 0
+        fail_msg: >-
+          config_drift_filebeat_output is kafka but host aws_kafka was not found
+          in inventory. Run Infrastructure | AWS - Provision Kafka Queue, sync
+          AWS inventory, then re-run this job with Filebeat output set to kafka.
+      when: config_drift_filebeat_output == 'kafka'
+
+    - name: Check OS family
+      ansible.builtin.assert:
+        that: ansible_os_family == 'RedHat'
+        fail_msg: This demo supports RHEL hosts only.
+
+    - name: Configure auditd monitoring and Filebeat for sshd_config
+      ansible.builtin.include_role:
+        name: demo.config_drift.audit_filebeat

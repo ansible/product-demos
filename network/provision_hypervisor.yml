@@ -13,6 +13,14 @@
     aws_owner_tag: "{{ clab_aws_owner_tag | default('apd-demo') }}"
 
   tasks:
+    - name: Set deployment metadata defaults
+      ansible.builtin.set_fact:
+        apd_managed_by: "{{ apd_managed_by | default('aap-product-demos') }}"
+        apd_id: >-
+          {{ apd_id | default(
+             lookup('ansible.builtin.password', playbook_dir + '/../.deployment_id',
+             chars=['ascii_lowercase', 'digits'], length=5), true) }}
+
     - name: Validate region selection
       ansible.builtin.assert:
         that:
@@ -20,6 +28,25 @@
         fail_msg: >-
           Region '{{ clab_aws_region }}' is not supported.
           Use 'us-east-2' or 'us-west-2'.
+
+    - name: Discover existing containerlab hypervisor
+      amazon.aws.ec2_instance_info:
+        region: "{{ clab_aws_region }}"
+        filters:
+          "tag:deployment": containerlab
+          "tag:purpose": "{{ clab_aws_purpose_tag }}"
+          instance-state-name: running
+      register: clab_existing
+
+    - name: Stop when a containerlab hypervisor is already running
+      ansible.builtin.fail:
+        msg: >-
+          A containerlab hypervisor is already running in {{ clab_aws_region }}
+          ({{ clab_existing.instances[0].public_ip_address }},
+          {{ clab_existing.instances[0].instance_id }}).
+          Run NETWORK | Containerlab | Deploy Topology to refresh the lab topology,
+          or NETWORK | Destroy Containerlab Stack before provisioning again.
+      when: clab_existing.instances | length > 0
 
     - name: Create VPC
       amazon.aws.ec2_vpc_net:
@@ -167,6 +194,8 @@
           owner: "{{ aws_owner_tag }}"
           purpose: "{{ clab_aws_purpose_tag }}"
           deployment: containerlab
+          managed-by: "{{ apd_managed_by | default('aap-product-demos') }}"
+          apd_id: "{{ apd_id }}"
         wait: true
       register: clab_ec2
 

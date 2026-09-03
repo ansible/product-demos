@@ -1,0 +1,161 @@
+---
+- name: Configure Automation Orchestrator network access
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    ao_namespace: automation-orchestrator
+    ao_instance: automation-orchestrator
+    ao_extra_hosts: []
+
+    # AAP gateway hostname, from the AAP credential on the job template.
+    # CONTROLLER_HOST is a URL; the allow-list takes a bare hostname.
+    ao_aap_hostname: >-
+      {{ (aap_hostname
+          | default(lookup('env', 'AAP_HOSTNAME'), true)
+          | default(lookup('env', 'CONTROLLER_HOST'), true)
+          | default('', true))
+         | trim
+         | ansible.builtin.urlsplit('hostname')
+         | default('', true) }}
+
+    ao_backend: "{{ ao_instance }}-backend"
+    ao_deployments:
+      - "{{ ao_instance }}-backend"
+      - "{{ ao_instance }}-worker"
+      - "{{ ao_instance }}-background-worker"
+
+    ao_env_all:
+      - name: APP_INTEGRATION_URL_ALLOWED_HOSTS
+        value: "{{ ao_allowed_hosts | to_json }}"
+    ao_env_backend:
+      - name: APP_OIDC_ALLOW_PRIVATE_NETWORKS
+        value: "true"
+
+    ao_restart_stamp: "{{ now(utc=true, fmt='%Y-%m-%dT%H:%M:%SZ') }}"
+
+  tasks:
+    - name: Verify the AAP gateway hostname is known
+      ansible.builtin.assert:
+        that:
+          - ao_aap_hostname | length > 0
+        fail_msg: >-
+          Attach a 'Red Hat Ansible Automation Platform' credential so
+          CONTROLLER_HOST is set, or pass -e aap_hostname=<url> (e.g.
+          https://aap.example.com).
+
+    - name: Get the Automation Orchestrator Route
+      kubernetes.core.k8s_info:
+        api_version: route.openshift.io/v1
+        kind: Route
+        name: "{{ ao_instance }}"
+        namespace: "{{ ao_namespace }}"
+      register: ao_route
+      until: ao_route.resources | default([]) | length > 0
+      retries: 10
+      delay: 6
+
+    - name: Get the Automation Orchestrator application Deployments
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        name: "{{ item }}"
+        namespace: "{{ ao_namespace }}"
+      register: ao_deploy
+      until: ao_deploy.resources | default([]) | length > 0
+      retries: 10
+      delay: 6
+      loop: "{{ ao_deployments }}"
+
+    - name: Build the integration allow-list
+      ansible.builtin.set_fact:
+        ao_allowed_hosts: >-
+          {{ ([ao_aap_hostname] + [ao_route.resources[0].spec.host] + ao_extra_hosts)
+             | unique | list }}
+
+    # env merges on 'name', so operator-set variables are left alone. The
+    # allow-list must reach both workers, not just the backend.
+    - name: Allow private-network OIDC and allowlist the AAP and AO hosts
+      kubernetes.core.k8s:
+        state: patched
+        merge_type: strategic-merge
+        api_version: apps/v1
+        kind: Deployment
+        name: "{{ item.metadata.name }}"
+        namespace: "{{ ao_namespace }}"
+        wait: true
+        wait_timeout: 300
+        definition:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "{{ item.spec.template.spec.containers[0].name }}"
+                    env: >-
+                      {{ ao_env_all
+                         + (ao_env_backend if item.metadata.name == ao_backend else []) }}
+      notify: restart automation orchestrator
+      loop: "{{ ao_deploy.results | map(attribute='resources') | flatten }}"
+      loop_control:
+        label: "{{ item.metadata.name }}"
+
+    - name: Show the allow-list
+      ansible.builtin.debug:
+        var: ao_allowed_hosts
+
+    - name: Get admin password
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Secret
+        name: automation-orchestrator-initial-admin-password
+        namespace: "{{ ao_namespace }}"
+      register: admin_secret
+      ignore_errors: true
+
+    - name: Display access information
+      ansible.builtin.debug:
+        msg:
+          - "Automation Orchestrator deployment complete."
+          - "URL: https://{{ ao_route.resources[0].spec.host }}"
+          - "Username: admin"
+          - "Password: {{ admin_secret.resources[0].data.password | b64decode }}"
+          - "Note: login may fail for a minute or two after deploy — retry if it errors."
+      when:
+        - admin_secret.resources | default([]) | length > 0
+
+  handlers:
+    # The three patched above roll themselves; this catches ui, redis
+    # and temporal so nothing keeps the old OIDC client behavior.
+    - name: List the rest of the Deployments in the instance
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        namespace: "{{ ao_namespace }}"
+        label_selectors:
+          - "app.kubernetes.io/instance={{ ao_instance }}"
+      register: ao_all
+      listen: restart automation orchestrator
+
+    - name: Restart the rest of the Deployments
+      kubernetes.core.k8s:
+        state: patched
+        merge_type: strategic-merge
+        api_version: apps/v1
+        kind: Deployment
+        name: "{{ item.metadata.name }}"
+        namespace: "{{ ao_namespace }}"
+        wait: true
+        wait_timeout: 300
+        definition:
+          spec:
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/restartedAt: "{{ ao_restart_stamp }}"
+      loop: >-
+        {{ ao_all.resources | default([])
+           | rejectattr('metadata.name', 'in', ao_deployments) | list }}
+      loop_control:
+        label: "{{ item.metadata.name }}"
+      listen: restart automation orchestrator

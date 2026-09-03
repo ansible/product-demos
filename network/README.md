@@ -55,6 +55,7 @@ Device connectivity is handled via an **SSH Proxy** credential type that routes 
 | **Deploy Topology** | Install podman and containerlab on the hypervisor, pull device images, and start the n9kv + cat8kv topology. |
 | **Configure Devices** | Apply baseline configuration (banner, NTP, SNMP) to the containerlab NX-OS and IOS-XE devices. |
 | **Teardown Topology** | Destroy the running containerlab topology on the hypervisor. |
+| **Troubleshoot** | Collect hypervisor, containerlab, and podman diagnostics through AAP when manual SSH is unavailable. |
 | **Teardown Hypervisor** | Terminate the EC2 instance and remove all associated AWS resources. |
 
 ### Demo Jobs

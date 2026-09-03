@@ -8,14 +8,66 @@
     - role: demo.network.containerlab
 
   tasks:
+    - name: Discover hypervisor IP from EC2 tags
+      amazon.aws.ec2_instance_info:
+        region: "{{ clab_aws_region | default('us-east-2') }}"
+        filters:
+          "tag:deployment": containerlab
+          "tag:purpose": "{{ clab_aws_purpose_tag }}"
+          instance-state-name: running
+      register: clab_discovered
+      when: clab_host_ip is not defined
+
+    - name: Set host IP from discovery
+      ansible.builtin.set_fact:
+        clab_host_ip: "{{ clab_discovered.instances[0].public_ip_address }}"
+        clab_instance_id: "{{ clab_discovered.instances[0].instance_id }}"
+      when:
+        - clab_host_ip is not defined
+        - clab_discovered.instances | length > 0
+
+    - name: Warn when multiple containerlab hypervisors are running
+      ansible.builtin.debug:
+        msg: >-
+          Found {{ clab_discovered.instances | length }} running containerlab hypervisors in
+          {{ clab_aws_region | default('us-east-2') }}. Using
+          {{ clab_instance_id | default('unknown') }} at {{ clab_host_ip }}.
+      when:
+        - clab_discovered.instances is defined
+        - clab_discovered.instances | length > 1
+
     - name: Validate required variables
       ansible.builtin.assert:
         that:
           - clab_host_ip is defined
           - clab_aws_keypair_name is defined
         fail_msg: >-
-          clab_host_ip and clab_aws_keypair_name must be set.
-          Run provision_hypervisor.yml first or pass them as extra vars.
+          No running containerlab hypervisor found in {{ clab_aws_region | default('us-east-2') }}.
+          Run NETWORK | Deploy Containerlab Stack first or pass clab_host_ip as an extra variable.
+
+    - name: Display hypervisor target
+      ansible.builtin.debug:
+        msg:
+          - "Deploying topology on hypervisor {{ clab_host_ip }}"
+          - "Instance ID: {{ clab_instance_id | default('not discovered') }}"
+          - "Region: {{ clab_aws_region | default('us-east-2') }}"
+
+    - name: Verify hypervisor SSH is reachable from execution node
+      ansible.builtin.wait_for:
+        host: "{{ clab_host_ip }}"
+        port: 22
+        timeout: 30
+      register: clab_hypervisor_ssh_check
+      failed_when: false
+
+    - name: Stop when hypervisor SSH is unreachable
+      ansible.builtin.fail:
+        msg: >-
+          Hypervisor {{ clab_instance_id | default('unknown') }} at {{ clab_host_ip }} is tagged
+          running in AWS but SSH port 22 is unreachable from the execution node. Reboot the
+          instance in the EC2 console, verify its security group allows TCP 22, or run
+          NETWORK | Destroy Containerlab Stack and redeploy the full stack.
+      when: clab_hypervisor_ssh_check.failed
 
     - name: Add hypervisor to inventory
       ansible.builtin.add_host:
@@ -24,6 +76,7 @@
         ansible_user: "{{ clab_aws_admin_user }}"
         ansible_ssh_private_key_file: "{{ (lookup('ansible.builtin.env', 'AWX_HOST') | length > 0) | ternary(omit, playbook_dir + '/' + clab_aws_keypair_name + '.pem') }}"
         ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        clab_host_ip: "{{ clab_host_ip }}"
         groups: clab_hosts
 
 - name: Configure Hypervisor and Deploy Topology

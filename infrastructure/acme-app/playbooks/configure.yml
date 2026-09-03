@@ -1,0 +1,41 @@
+---
+- name: Update ACME App configuration from survey
+  hosts: "{{ _hosts | default('aws_rhel9') }}"
+  become: true
+
+  vars:
+    ansible_python_interpreter: auto_silent
+
+  tasks:
+    - name: Load ACME App baseline defaults
+      ansible.builtin.include_vars: "{{ playbook_dir }}/../defaults.yml"
+
+    - name: Check OS family
+      ansible.builtin.assert:
+        that: ansible_os_family == 'RedHat'
+        fail_msg: This demo supports RHEL hosts only.
+
+    - name: Stat ACME App document root
+      ansible.builtin.stat:
+        path: /var/www/html
+      register: acme_app_docroot
+
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert ACME App Setup has been run
+      ansible.builtin.assert:
+        that:
+          - acme_app_docroot.stat.exists
+          - acme_app_docroot.stat.isdir
+          - "'httpd.service' in ansible_facts.services"
+        fail_msg: >-
+          ACME App is not installed on this host.
+          Run Infrastructure | Configuration management - ACME App - Setup first.
+
+    - name: Render ACME App page
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/../tasks/render.yml"
+
+    - name: Show ACME App URL
+      ansible.builtin.debug:
+        msg: "ACME App is available at http://{{ ansible_host }}/"

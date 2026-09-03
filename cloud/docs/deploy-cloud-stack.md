@@ -10,12 +10,12 @@ Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Wind
 
 ## Survey prompts
 
-| Prompt | Variable | Type | Required |
-|--------|----------|------|----------|
-| AWS Region | `create_vm_aws_region` | multiplechoice | Yes |
-| Owner | `create_vm_aws_owner_tag` | text | Yes |
-| Environment | `vm_environment` | multiplechoice | Yes |
-| Email | `email` | text | Yes |
+| Prompt | Variable | Type | Default | Description |
+|--------|----------|------|---------|-------------|
+| AWS Region | `create_vm_aws_region` | multiplechoice | `us-east-2` | Region for the VPC, keypair, and all VMs |
+| Owner | `create_vm_aws_owner_tag` | text | `your_name` | EC2 tag `owner` on all resources (cost attribution; inventory group `owner_*`) |
+| Environment | `vm_environment` | multiplechoice | `Prod` | EC2 tag `environment` on each VM (`Dev`, `QA`, or `Prod`)—metadata only |
+| Email | `email` | text | `your_name@acme.org` | Operator contact; **not** applied as an EC2 tag and **not** used by deploy playbooks today |
 
 ## Workflow
 
@@ -42,7 +42,7 @@ graph LR
 
 1. Creates keypair `aws-test-key` (public key derived from APD Machine Credential private key)
 2. Creates VPC `aws-test-vpc` with subnet, security group, and route table
-3. Deploys five VMs **in parallel** from blueprints
+3. Deploys five VMs **in parallel** from blueprints (each tagged `apd=true` and `managed-by=aap-product-demos` for inventory import)
 4. Syncs AWS dynamic inventory so new hosts appear in AAP
 5. Publishes VPC infrastructure report to S3
 

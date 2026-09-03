@@ -1,0 +1,8 @@
+---
+# Kafka broker blueprint — mirrors rhel9.yml today but kept separate so
+# infrastructure sizing, AMI, or OS requirements can diverge from app workers
+# without coupling aws_kafka to the rhel9 worker blueprint tag.
+create_vm_aws_image_owners: 309956199498
+create_vm_aws_instance_size: t3.medium
+create_vm_aws_image_architecture: x86_64
+create_vm_aws_image_filter: 'RHEL-9*HVM-*Hourly*'

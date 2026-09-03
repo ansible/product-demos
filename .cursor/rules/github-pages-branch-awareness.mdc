@@ -1,0 +1,16 @@
+---
+description: Ensure GitHub Pages changes are made on the deploy branch, not feature branches
+globs: docs/**
+alwaysApply: false
+---
+
+# GitHub Pages: work on the deploy branch
+
+This repo's GitHub Pages site deploys from the **`main`** branch (`/docs` directory). Changes to `docs/` on feature/PR branches will **not** be visible on the live site until merged.
+
+When making or debugging GitHub Pages changes (layouts, CSS, JS, Mermaid, Jekyll config):
+
+1. **Check the current branch first** (`git branch --show-current`).
+2. If on a feature branch, warn the user: "This won't be visible on the deployed Pages site until merged to `main`."
+3. For iterative visual debugging (CSS, Mermaid, JS rendering), prefer working directly on `main` or use a local Jekyll server — do NOT iterate on a PR branch expecting the deployed site to update.
+4. If the user is comparing the live site against local changes, confirm they're looking at the correct deployment source before debugging further.

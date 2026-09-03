@@ -26,8 +26,10 @@ graph LR
   style S fill:#212427,stroke:#8a8d90,color:#fff
 ```
 
-1. **Teardown Topology** — Runs `containerlab destroy` on the hypervisor (skipped cleanly if no hypervisor is found)
+1. **Teardown Topology** — Runs `containerlab destroy` on the hypervisor when SSH is reachable; skips cleanly if the host is unreachable or not found
 2. **Teardown Hypervisor** — Always runs next: terminates the EC2 instance and removes VPC, subnet, security group, and keypair
+
+If the hypervisor SSH key is lost or the instance is hung, run **NETWORK ǀ Containerlab ǀ Teardown Hypervisor** directly or use the **Destroy Containerlab Stack** workflow, which always proceeds to AWS cleanup.
 
 ## Job templates
 

@@ -40,6 +40,11 @@
         - create_vm_aws_owner_tag is defined
         - create_vm_vm_owner is not defined or create_vm_vm_owner | length == 0
 
+    - name: Set APD EC2 tags
+      ansible.builtin.set_fact:
+        create_vm_apd_managed_by: aap-product-demos
+        create_vm_apd_demo_tag: "true"
+
     - name: Include create vm role
       ansible.builtin.include_role:
         name: demo.cloud.aws
