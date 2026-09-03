@@ -2,6 +2,7 @@
 - name: Generate OpenSCAP compliance report
   hosts: '{{ _hosts | default(omit) }}'
   become: true
+  gather_facts: false
 
   vars:
     openscap_packages:
@@ -13,12 +14,24 @@
     use_httpd: true
 
   tasks:
+    - name: Ensure RHEL 8 uses a supported Python for Ansible modules
+      ansible.builtin.include_role:
+        name: demo.cloud.ensure_rhel8_python
+
+    - name: Gather facts
+      ansible.builtin.setup:
+
     - name: Assert memory meets minimum requirements
       ansible.builtin.assert:
         that:
-          - ansible_memfree_mb >= 1000
+          - ansible_memory_mb.nocache.free >= 1000
           - ansible_memtotal_mb >= 2000
-        fail_msg: "OpenSCAP is a memory intensive operation, the specified enepoint does not meet minimum requirements. See https://access.redhat.com/articles/6999111 for details."
+        fail_msg: >-
+          OpenSCAP is a memory intensive operation and this host does not meet
+          minimum requirements (need >= 1 GB available and 2 GB total RAM).
+          See https://access.redhat.com/articles/6999111 for details.
+          Current available: {{ ansible_memory_mb.nocache.free }} MB,
+          total: {{ ansible_memtotal_mb }} MB.
 
     - name: Get our facts straight
       ansible.builtin.set_fact:
@@ -37,7 +50,12 @@
           ansible.builtin.dnf:
             name: httpd
             state: present
-          notify: Restart httpd
+
+        - name: Start and enable httpd
+          ansible.builtin.service:
+            name: httpd
+            state: started
+            enabled: true
 
         - name: Override report directory
           ansible.builtin.set_fact:
@@ -47,20 +65,30 @@
           ansible.builtin.service_facts:
 
         - name: Enable firewall http service
-          ansible.posix.firewalld:
-            service: http
-            state: enabled
-            immediate: true
-            permanent: true
+          ansible.builtin.command: firewall-cmd --permanent --add-service=http
+          register: _firewalld_http
+          changed_when: "'ALREADY_ENABLED' not in (_firewalld_http.stdout | default(''))"
           when:
             - "'firewalld.service' in ansible_facts.services"
             - ansible_facts.services["firewalld.service"].state == "running"
+
+        - name: Reload firewalld for http service
+          ansible.builtin.command: firewall-cmd --reload
+          changed_when: true
+          when:
+            - "'firewalld.service' in ansible_facts.services"
+            - ansible_facts.services["firewalld.service"].state == "running"
+            - _firewalld_http is changed
 
         - name: Disable httpd welcome page
           ansible.builtin.file:
             path: /etc/httpd/conf.d/welcome.conf
             state: absent
           notify: Restart httpd
+
+    - name: Flush handlers before publishing report URL
+      ansible.builtin.meta: flush_handlers
+      when: use_httpd | bool
 
     - name: Ensure report directory exists
       ansible.builtin.file:
@@ -96,6 +124,8 @@
       when: use_httpd | bool
 
     - name: Tag instance as {{ compliance_profile | upper }}_OUT_OF_COMPLIANCE  # noqa name[template]
+      vars:
+        ansible_python_interpreter: "{{ ansible_playbook_python }}"
       delegate_to: localhost
       amazon.aws.ec2_tag:
         region: "{{ placement.region }}"
