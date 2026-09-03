@@ -1,0 +1,89 @@
+---
+- name: Import Elastic GPG key
+  ansible.builtin.rpm_key:
+    key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: Configure Elastic 8.x yum repository
+  ansible.builtin.yum_repository:
+    name: elastic-8.x
+    description: Elastic repository for 8.x packages
+    baseurl: https://artifacts.elastic.co/packages/8.x/yum
+    gpgcheck: true
+    gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    enabled: true
+
+- name: Install Filebeat package
+  ansible.builtin.dnf:
+    name: filebeat
+    state: present
+    disablerepo: "*"
+    enablerepo: elastic-8.x
+  when: ansible_distribution_major_version | int != 8
+
+- name: Install Filebeat package on RHEL 8
+  ansible.builtin.command:
+    cmd: dnf install -y filebeat --disablerepo=* --enablerepo=elastic-8.x
+  register: config_drift_filebeat_pkg
+  changed_when: >-
+    'Installing' in (config_drift_filebeat_pkg.stdout | default(''))
+    or 'Upgrading' in (config_drift_filebeat_pkg.stdout | default(''))
+  failed_when: config_drift_filebeat_pkg.rc != 0
+  when: ansible_distribution_major_version | int == 8
+
+- name: Deploy Filebeat main configuration
+  ansible.builtin.template:
+    src: filebeat.yml.j2
+    dest: /etc/filebeat/filebeat.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Filebeat
+
+- name: Deploy Filebeat auditd module configuration
+  ansible.builtin.template:
+    src: auditd.yml.j2
+    dest: /etc/filebeat/modules.d/auditd.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Filebeat
+
+- name: Enable and start Filebeat
+  ansible.builtin.service:
+    name: filebeat
+    state: started
+    enabled: true
+
+- name: Show Filebeat validation command
+  ansible.builtin.debug:
+    msg: >-
+      {{
+        [
+          'Filebeat is shipping audit events to Kafka topic '
+          ~ config_drift_kafka_topic
+          ~ ' at '
+          ~ config_drift_kafka_brokers
+          ~ '.',
+          'On the Kafka host, consume events with:',
+          'sudo podman run --rm --network container:kafka docker.io/apache/kafka:3.9.0'
+          ~ ' /opt/kafka/bin/kafka-console-consumer.sh'
+          ~ ' --bootstrap-server 127.0.0.1:9094'
+          ~ ' --topic '
+          ~ config_drift_kafka_topic
+          ~ ' --from-beginning | grep '
+          ~ config_drift_audit_key,
+          'Then edit '
+          ~ config_drift_watched_file
+          ~ ' on a RHEL worker and watch for JSON.',
+        ]
+        if config_drift_filebeat_output == 'kafka'
+        else [
+          'Filebeat is running with console output (Stage 2 debug mode).',
+          'On the host, tail events with: sudo journalctl -u filebeat -f',
+          'Or run foreground debug: sudo filebeat -e -c /etc/filebeat/filebeat.yml',
+          'Then edit '
+          ~ config_drift_watched_file
+          ~ ' and watch for parsed audit JSON.',
+        ]
+      }}

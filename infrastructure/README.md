@@ -4,6 +4,17 @@
 
 This category covers automated provisioning and lifecycle management of IT infrastructure through Ansible Automation Platform. This includes any infrastructure that APD may provision for demo purposes — managed platforms, lab environments, shared services, and supporting resources.
 
+### Event-Driven Configuration Drift Remediation
+
+Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route events through Kafka, and let Event-Driven Ansible trigger AAP remediation.
+
+| Resource | Description |
+|----------|-------------|
+| [**Config Drift Demo**](docs/config-drift.md) | Stage-by-stage setup, validation commands, and live demo script |
+| **LINUX ǀ Config Drift - Deploy Audit and Filebeat** | Deploy persistent auditd watch (Stage 1; Filebeat in Stage 2) |
+
+**Prerequisite:** [Deploy Cloud Stack in AWS](../cloud/docs/deploy-cloud-stack.md) for RHEL targets (`aws_rhel9`, etc.).
+
 ### ROSA (Red Hat OpenShift Service on AWS)
 
 #### Workflows
@@ -19,7 +30,7 @@ This category covers automated provisioning and lifecycle management of IT infra
 |--------------|-------------|
 | **ROSA ǀ Preflight Checks** | Validates AWS credentials, ROSA token, IAM permissions, service quotas, EIP availability, and cluster name conflicts |
 | **ROSA ǀ Create Cluster** | Creates account roles, frees EIP quota if needed, and initiates STS-mode ROSA cluster creation |
-| **ROSA ǀ Wait for Ready** | Polls cluster status until ready (~30-40 min), then creates cluster-admin credentials |
+| **ROSA ǀ Wait for Ready** | Polls cluster status until ready (~30-45 min, timeout 90 min), then creates cluster-admin credentials |
 | **ROSA ǀ Destroy Cluster** | Destroys the cluster, STS operator roles, and OIDC provider; safe to run if cluster is already gone |
 
 ### HashiCorp Vault
@@ -74,13 +85,13 @@ Launch **ROSA ǀ Lifecycle (Create)** workflow and fill the survey:
 | **Cluster TTL** | Tag for cost tracking (e.g. `4h`) |
 | **Owner Tag** | Your identifier for cost attribution |
 
-**Timeline:** ~35-45 minutes total. Plan presentations accordingly.
+**Timeline:** ~35-50 minutes total. Plan presentations accordingly.
 
 ### Destroy a ROSA Cluster
 
 Launch **ROSA ǀ Lifecycle (Destroy)** workflow with the same cluster name and region.
 
-**Timeline:** ~15-25 minutes.
+**Timeline:** ~15-40 minutes (job waits up to 60 minutes).
 
 ### Cost Warning
 

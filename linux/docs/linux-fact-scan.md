@@ -26,3 +26,4 @@ Scans hosts and gathers package and service facts. This populates the AAP fact c
 |------|-------------|
 | 🐧 [Troubleshoot](./linux-troubleshoot.md) | Active troubleshooting beyond passive fact gathering |
 | 🚀 [Deploy Cloud Stack in AWS](../../cloud/docs/deploy-cloud-stack.md) | Deploy hosts to scan |
+| 🐧 [Add SSH Public Key](./linux-install-ssh-key.md) | Add your public key before SSH troubleshooting |

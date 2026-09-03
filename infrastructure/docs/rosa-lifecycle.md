@@ -9,6 +9,7 @@ Automated Red Hat OpenShift Service on AWS (ROSA) cluster lifecycle management: 
 - ROSA Lifecycle EE available (`quay.io/acme_corp/rosa-ee:latest`)
 - Sufficient AWS service quotas (EC2, VPC, ELB, EIP) in target region
   - **EIP**: ROSA requires at least 1 free Elastic IP quota slot (default account quota is 5). If you already have 5 EIPs allocated, [request a quota increase](https://docs.aws.amazon.com/servicequotas/latest/userguide/request-quota-increase.html) for the **EC2 → Elastic IP addresses** service quota (quota code `L-0263D0A3`) or release unused EIPs before creating a cluster
+  - **VPC**: ROSA requires at least 1 free VPC quota slot (default is 5 per region). Cluster create runs an AMI access check that allocates a temporary VPC; if the region is at quota, create fails with `CLUSTERS-MGMT-400`. Preflight fails fast when no slots remain. Delete unused VPCs or [request a quota increase](https://docs.aws.amazon.com/servicequotas/latest/userguide/request-quota-increase.html) for **VPC → VPCs per Region** (quota code `L-F678F1CE`)
 
 ## Configure credentials
 
@@ -33,14 +34,14 @@ Automated Red Hat OpenShift Service on AWS (ROSA) cluster lifecycle management: 
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| ROSA ǀ Preflight Checks | [`infrastructure/rosa/preflight.yml`](../rosa/preflight.yml) | Validates credentials, permissions, quotas, EIP availability, and name conflicts |
+| ROSA ǀ Preflight Checks | [`infrastructure/rosa/preflight.yml`](../rosa/preflight.yml) | Validates credentials, permissions, quotas, EIP and VPC availability, and name conflicts |
 | ROSA ǀ Create Cluster | [`infrastructure/rosa/create.yml`](../rosa/create.yml) | Creates account roles, ensures EIP quota, and initiates STS-mode cluster creation |
 | ROSA ǀ Wait for Ready | [`infrastructure/rosa/wait.yml`](../rosa/wait.yml) | Polls cluster status until ready, creates cluster-admin credentials |
 | ROSA ǀ Destroy Cluster | [`infrastructure/rosa/destroy.yml`](../rosa/destroy.yml) | Tears down cluster, operator roles, and OIDC provider (idempotent) |
 
 ## Why it matters
 
-ROSA cluster provisioning involves multiple AWS services, IAM role chains, and a 30-40 minute wait. Manual creation is error-prone and forgetting teardown leads to significant cost. This demo shows how AAP:
+ROSA cluster provisioning involves multiple AWS services, IAM role chains, and a 30-45 minute wait. Manual creation is error-prone and forgetting teardown leads to significant cost. This demo shows how AAP:
 
 - **Gates creation** with deterministic preflight checks (fail fast, not 30 minutes in)
 - **Automates AWS prerequisites** (account roles, EIP quota management)
@@ -70,8 +71,8 @@ ROSA cluster provisioning involves multiple AWS services, IAM role chains, and a
 |-------|----------|
 | Preflight | 1-2 min |
 | Create (initiate) | 2-3 min |
-| Wait for ready | 30-40 min |
-| Destroy | 15-25 min |
+| Wait for ready | 30-45 min (timeout 90 min) |
+| Destroy | 15-40 min (timeout 60 min) |
 
 ## Cost warning
 

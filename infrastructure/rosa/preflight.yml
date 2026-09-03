@@ -138,6 +138,61 @@
           ROSA needs free quota slots to allocate its own EIPs.
           The create job will release an unassociated EIP if needed.
 
+    - name: Count VPCs in region
+      ansible.builtin.command:
+        cmd: >-
+          aws ec2 describe-vpcs
+          --query "length(Vpcs)"
+          --output text
+      changed_when: false
+      register: _total_vpcs
+
+    - name: Check VPC quota
+      ansible.builtin.command:
+        cmd: >-
+          aws service-quotas get-service-quota
+          --service-code vpc
+          --quota-code L-F678F1CE
+          --query "Quota.Value"
+          --output text
+      changed_when: false
+      register: _vpc_quota
+
+    - name: Calculate available VPC quota slots
+      ansible.builtin.set_fact:
+        _vpc_slots_free: "{{ (_vpc_quota.stdout | trim | int) - (_total_vpcs.stdout | trim | int) }}"
+
+    - name: Display VPC status
+      ansible.builtin.debug:
+        msg: >-
+          VPC quota: {{ _vpc_quota.stdout | trim }},
+          allocated: {{ _total_vpcs.stdout | trim }},
+          free slots: {{ _vpc_slots_free }}.
+          ROSA needs at least 1 free VPC slot for AMI access checks
+          and cluster networking.
+
+    - name: List VPCs when quota is exhausted
+      ansible.builtin.command:
+        cmd: >-
+          aws ec2 describe-vpcs
+          --query "Vpcs[].[VpcId,CidrBlock,IsDefault,Tags[?Key=='Name']|[0].Value]"
+          --output text
+      changed_when: false
+      register: _vpc_list
+      when: _vpc_slots_free | int < 1
+
+    - name: Fail if VPC quota is exhausted
+      ansible.builtin.fail:
+        msg: >-
+          VPC quota is full in {{ rosa_aws_region }}
+          ({{ _total_vpcs.stdout | trim }}/{{ _vpc_quota.stdout | trim }}).
+          ROSA create fails with CLUSTERS-MGMT-400 (AMI access check)
+          when no VPC slots remain. Delete unused VPCs or request a
+          quota increase for VPCs per Region (L-F678F1CE).
+          Current VPCs:
+          {{ _vpc_list.stdout }}
+      when: _vpc_slots_free | int < 1
+
     - name: Check if cluster already exists
       ansible.builtin.command:
         cmd: rosa describe cluster --cluster={{ rosa_cluster_name }} --region={{ rosa_aws_region }}

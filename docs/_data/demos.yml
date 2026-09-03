@@ -478,6 +478,23 @@
     playbooks: 1
   github_path: linux/run_script.yml
 
+- slug: linux-install-ssh-key
+  readme_path: linux/docs/linux-install-ssh-key.md
+  url: /demos/linux-install-ssh-key/
+  title: "Add SSH Public Key"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #d13438 0%, #7a0000 100%)"
+    icon: "🐧"
+  blurb: "Add an SSH public key to a Linux user's authorized_keys file on one or more hosts."
+  stats:
+    playbooks: 1
+  github_path: linux/install_ssh_key.yml
+
 - slug: linux-fact-scan
   readme_path: linux/docs/linux-fact-scan.md
   url: /demos/linux-fact-scan/
@@ -1131,6 +1148,24 @@
     playbooks: 1
   github_path: network/backup.yml
 
+- slug: network-troubleshoot-containerlab
+  readme_path: network/docs/network-troubleshoot-containerlab.md
+  url: /demos/network-troubleshoot-containerlab/
+  title: "Troubleshoot Containerlab"
+  category: network
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Troubleshooting
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)"
+    icon: "🌐"
+  blurb: "Collect hypervisor, containerlab, and podman diagnostics through AAP when manual SSH is unavailable."
+  stats:
+    playbooks: 1
+  github_path: network/troubleshoot_containerlab.yml
+
 - slug: network-panos-workflow
   readme_path: network/docs/network-panos-workflow.md
   title: "Palo Alto Firewall Demo"
@@ -1498,6 +1533,96 @@
       style F fill:#2d2d2d,stroke:#888,color:#fff
       style S fill:#212427,stroke:#8a8d90,color:#fff
 
+- slug: infrastructure-simple-config-drift
+  readme_path: infrastructure/docs/config-drift-simple.md
+  title: "Infrastructure | Simple Config Drift"
+  subtitle: "ACME App desired-state with Jinja2"
+  category: infrastructure
+  status: active
+  tags:
+    - Linux
+    - Survey
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1a365d 0%, #ee0000 100%)"
+    icon: "🛒"
+  blurb: "Install a tiny ACME storefront on aws_rhel9, then change the live page from a survey that re-renders one Jinja template."
+  stats:
+    playbooks: 2
+  url: /demos/infrastructure-simple-config-drift/
+  github_path: infrastructure/setup.yml
+  workflow_mermaid: |
+    flowchart LR
+      setup["ACME App Setup"]
+      httpd["httpd on aws_rhel9"]
+      page["index.html from Jinja"]
+      survey["Update Configuration survey"]
+      browser["Browser port 80"]
+
+      setup --> httpd
+      setup --> page
+      survey -->|"same template, overloaded vars"| page
+      page --> browser
+
+- slug: infrastructure-config-drift
+  readme_path: infrastructure/docs/config-drift.md
+  title: "Infrastructure | Config Drift Remediation"
+  subtitle: "auditd → Filebeat → Kafka → EDA → AAP self-healing"
+  category: infrastructure
+  status: active
+  tags:
+    - EDA
+    - Linux
+    - Kafka
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #ee0000 0%, #7a0000 100%)"
+    icon: "🔄"
+  blurb: "One-shot setup workflow plus live demo: detect sshd_config drift via auditd and Kafka, then let EDA trigger AAP remediation automatically."
+  stats:
+    playbooks: 6
+  url: /demos/infrastructure-config-drift/
+  github_path: infrastructure/setup.yml
+
+- slug: infrastructure-config-drift-kafka
+  readme_path: infrastructure/docs/config-drift-kafka.md
+  title: "Infrastructure | Config Drift — Kafka Queue"
+  subtitle: "Ship sshd_config audit events to a dedicated aws_kafka broker"
+  category: infrastructure
+  status: active
+  tags:
+    - Linux
+    - Kafka
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #231f20 0%, #ee0000 100%)"
+    icon: "📨"
+  blurb: "Provision Podman KRaft Kafka, wire Filebeat to topic linux-audit-events, and validate sshd_config_change events end-to-end."
+  stats:
+    playbooks: 2
+  url: /demos/infrastructure-config-drift-kafka/
+  github_path: infrastructure/setup.yml
+
+- slug: infrastructure-config-drift-eda
+  readme_path: infrastructure/docs/config-drift-eda.md
+  title: "Infrastructure | Config Drift — EDA Rulebook"
+  subtitle: "React to Kafka audit events and auto-remediate sshd_config"
+  category: infrastructure
+  status: active
+  tags:
+    - EDA
+    - Kafka
+    - Linux
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #7a0000 0%, #231f20 100%)"
+    icon: "⚡"
+  blurb: "Activate the config_drift_kafka rulebook to listen on linux-audit-events and launch SSHD remediation when drift is detected."
+  stats:
+    playbooks: 2
+  url: /demos/infrastructure-config-drift-eda/
+  github_path: infrastructure/setup.yml
+
 - slug: rosa-preflight
   readme_path: infrastructure/docs/rosa-lifecycle.md
   url: /demos/rosa-preflight/
@@ -1512,7 +1637,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #0969da 0%, #033d8b 100%)"
     icon: "🌹"
-  blurb: "Validate AWS identity, ROSA token, EIP quota, and account roles before attempting cluster creation."
+  blurb: "Validate AWS identity, ROSA token, EIP and VPC quota, and account roles before attempting cluster creation."
   stats:
     playbooks: 1
   github_path: infrastructure/rosa/preflight.yml

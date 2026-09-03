@@ -1,0 +1,19 @@
+[Unit]
+Description=Config drift Kafka event dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=CONFIG_DRIFT_KAFKA_TOPIC={{ config_drift_kafka_topic }}
+Environment=CONFIG_DRIFT_KAFKA_BOOTSTRAP=127.0.0.1:{{ config_drift_kafka_local_port }}
+Environment=CONFIG_DRIFT_KAFKA_IMAGE={{ config_drift_kafka_image }}
+Environment=CONFIG_DRIFT_KAFKA_CONTAINER={{ config_drift_kafka_container_name }}
+Environment=CONFIG_DRIFT_DASHBOARD_PORT={{ config_drift_kafka_dashboard_port }}
+Environment=CONFIG_DRIFT_DASHBOARD_ICON=/usr/local/share/config-drift-kafka-dashboard/ansible-icon.png
+ExecStart=/usr/local/bin/config-drift-kafka-event-dashboard.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

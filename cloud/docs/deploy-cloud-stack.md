@@ -10,12 +10,12 @@ Provisions the full demo infrastructure in AWS: VPC, keypair, five VMs (two Wind
 
 ## Survey prompts
 
-| Prompt | Variable | Type | Required |
-|--------|----------|------|----------|
-| AWS Region | `create_vm_aws_region` | multiplechoice | Yes |
-| Owner | `create_vm_aws_owner_tag` | text | Yes |
-| Environment | `vm_environment` | multiplechoice | Yes |
-| Email | `email` | text | Yes |
+| Prompt | Variable | Type | Default | Description |
+|--------|----------|------|---------|-------------|
+| AWS Region | `create_vm_aws_region` | multiplechoice | `us-east-2` | Region for the VPC, keypair, and all VMs |
+| Owner | `create_vm_aws_owner_tag` | text | `your_name` | EC2 tag `owner` on all resources (cost attribution; inventory group `owner_*`) |
+| Environment | `vm_environment` | multiplechoice | `Prod` | EC2 tag `environment` on each VM (`Dev`, `QA`, or `Prod`)—metadata only |
+| Email | `email` | text | `your_name@acme.org` | Operator contact; **not** applied as an EC2 tag and **not** used by deploy playbooks today |
 
 ## Workflow
 
@@ -42,7 +42,7 @@ graph LR
 
 1. Creates keypair `aws-test-key` (public key derived from APD Machine Credential private key)
 2. Creates VPC `aws-test-vpc` with subnet, security group, and route table
-3. Deploys five VMs **in parallel** from blueprints
+3. Deploys five VMs **in parallel** from blueprints (each tagged `apd=true` and `managed-by=aap-product-demos` for inventory import)
 4. Syncs AWS dynamic inventory so new hosts appear in AAP
 5. Publishes VPC infrastructure report to S3
 
@@ -52,6 +52,16 @@ graph LR
 - Configuration-as-code for infrastructure — the entire stack is defined in playbooks and blueprints
 - Mixed OS fleet (RHEL 8, RHEL 9, Windows Server) reflects real customer environments
 - Dynamic inventory automatically imports all provisioned VMs into AAP
+
+## Manual SSH access
+
+Linux VMs launch with the `aws-test-key` EC2 keypair (public key derived from **APD Machine Credential**). AAP cannot export that private key after it is saved.
+
+To SSH in with **your own** key (for example Ed25519), run [**LINUX | Add SSH Public Key**](../../linux/docs/linux-install-ssh-key.md) against `aws_rhel*` or a single host, then connect as `ec2-user`:
+
+```bash
+ssh -i ~/.ssh/your-private-key ec2-user@<instance-ip>
+```
 
 ## Presenter walkthrough
 
@@ -68,4 +78,5 @@ graph LR
 |------|-------------|
 | 🩹 [Patch Cloud Stack in AWS](./patch-cloud-stack.md) | Run this after deploying to demonstrate day-2 patching |
 | 💥 [Destroy Cloud Stack in AWS](./cloud-destroy-stack.md) | Tear down everything when done |
+| 🐧 [Add SSH Public Key](../../linux/docs/linux-install-ssh-key.md) | Add your public key for manual SSH to RHEL hosts |
 | 🐧 [Fact Scan](../../linux/docs/linux-fact-scan.md) | Gather facts from the newly deployed RHEL hosts |

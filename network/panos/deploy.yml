@@ -7,6 +7,13 @@
   vars_files:
     - vars/infra.yml
 
+  vars:
+    apd_managed_by: "{{ apd_managed_by | default('aap-product-demos') }}"
+    apd_id: >-
+      {{ apd_id | default(
+         lookup('ansible.builtin.password', playbook_dir + '/../../.deployment_id',
+         chars=['ascii_lowercase', 'digits'], length=5), true) }}
+
   tasks:
     - name: Create EC2 Key Pair
       register: r_ec2_key_new
@@ -183,6 +190,8 @@
           prefix: "{{ panos_demo_prefix }}"
           owner: "{{ panos_demo_owner }}"
           created_by: ansible
+          managed-by: "{{ apd_managed_by }}"
+          apd_id: "{{ apd_id }}"
           role: firewall
         wait: true
         wait_timeout: 600
@@ -339,6 +348,8 @@
               prefix: "{{ panos_demo_prefix }}"
               owner: "{{ panos_demo_owner }}"
               created_by: ansible
+              managed-by: "{{ apd_managed_by }}"
+              apd_id: "{{ apd_id }}"
               role: bastion
             wait: true
             wait_timeout: 600
@@ -399,6 +410,8 @@
               prefix: "{{ panos_demo_prefix }}"
               owner: "{{ panos_demo_owner }}"
               created_by: ansible
+              managed-by: "{{ apd_managed_by }}"
+              apd_id: "{{ apd_id }}"
               role: webserver
             wait: true
             wait_timeout: 600

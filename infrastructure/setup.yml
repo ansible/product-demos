@@ -47,8 +47,8 @@ controller_execution_environments:
 controller_templates:
   - name: Infrastructure | ROSA - Preflight Checks
     description: >-
-      Validates AWS credentials, ROSA token, permissions, quota,
-      and checks for existing cluster name conflicts.
+      Validates AWS credentials, ROSA token, permissions, EIP and VPC
+      quota, and checks for existing cluster name conflicts.
     job_type: run
     organization: Ansible Product Demos (APD)
     execution_environment: ROSA Lifecycle EE
@@ -159,7 +159,8 @@ controller_templates:
 
   - name: Infrastructure | ROSA - Wait for Ready
     description: >-
-      Polls cluster status until ready (default timeout: 60min).
+      Polls cluster status until ready (default timeout: 90min).
+      Fails immediately if the cluster enters error or uninstalling.
       Creates cluster-admin credentials on success.
     job_type: run
     organization: Ansible Product Demos (APD)
@@ -169,6 +170,45 @@ controller_templates:
       - ROSA Token
     project: Ansible Product Demos
     playbook: infrastructure/rosa/wait.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    timeout: 5700
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Cluster Name
+          type: text
+          variable: rosa_cluster_name
+          required: true
+          default: apd-rosa-demo
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: rosa_aws_region
+          required: true
+          default: us-east-1
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-2
+            - eu-west-1
+
+  - name: Infrastructure | ROSA - Destroy Cluster
+    description: >-
+      Destroys a ROSA cluster and cleans up STS operator roles
+      and OIDC provider. Waits up to 60min for uninstall.
+      Idempotent (safe to run if cluster is gone).
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    execution_environment: ROSA Lifecycle EE
+    credentials:
+      - AWS
+      - ROSA Token
+    project: Ansible Product Demos
+    playbook: infrastructure/rosa/destroy.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -195,49 +235,12 @@ controller_templates:
             - us-west-2
             - eu-west-1
 
-  - name: Infrastructure | ROSA - Destroy Cluster
-    description: >-
-      Destroys a ROSA cluster and cleans up STS operator roles
-      and OIDC provider. Idempotent (safe to run if cluster is gone).
-    job_type: run
-    organization: Ansible Product Demos (APD)
-    execution_environment: ROSA Lifecycle EE
-    credentials:
-      - AWS
-      - ROSA Token
-    project: Ansible Product Demos
-    playbook: infrastructure/rosa/destroy.yml
-    inventory: Ansible Product Demos Inventory
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-    timeout: 2100
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: Cluster Name
-          type: text
-          variable: rosa_cluster_name
-          required: true
-          default: apd-rosa-demo
-        - question_name: AWS Region
-          type: multiplechoice
-          variable: rosa_aws_region
-          required: true
-          default: us-east-1
-          choices:
-            - us-east-1
-            - us-east-2
-            - us-west-2
-            - eu-west-1
-
   - name: Infrastructure | Automation Orchestrator | Install
     description: >-
       Deploys Automation Orchestrator on an existing OpenShift cluster using
       aapctl. Installs CloudNativePG operator, PostgreSQL database, and the
-      AO operator in a single automated step.
+      AO operator, then configures network access so the AAP gateway can
+      reach it.
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -251,6 +254,7 @@ controller_templates:
       ao_operator_channel: stable
     credentials:
       - OpenShift Credential
+      - AAP Credential
 
   - name: Infrastructure | Automation Orchestrator | Uninstall
     description: >-
@@ -266,6 +270,24 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - OpenShift Credential
+
+  - name: Infrastructure | AO Network Configuration | Install
+    description: >-
+      Allow-lists the AAP gateway and AO route hostnames on Automation
+      Orchestrator's integration URL allow-list and enables private-network
+      OIDC, then restarts the instance so the change takes effect.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "infrastructure/ao/network-access.yml"
+    execution_environment: AO Execution Environment
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    ask_variables_on_launch: true
+    credentials:
+      - OpenShift Credential
+      - AAP Credential
 
   - name: Infrastructure | HashiCorp Vault
     job_type: run
@@ -366,6 +388,292 @@ controller_templates:
           type: textarea
           variable: opa_policy_text
           required: true
+
+  - name: "Infrastructure | Configuration management - ACME App - Setup"
+    description: >-
+      Installs httpd on aws_rhel9 and renders the approved ACME storefront
+      from a Jinja2 template. Click Launch with the default host to deploy
+      the baseline page.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/acme-app/playbooks/setup.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
+    extra_vars:
+      acme_app_company: ACME Corp
+      acme_app_tagline: Widgets you can trust
+      acme_app_environment: Production
+      acme_app_theme: redhat
+      acme_app_banner: Welcome to the ACME storefront
+      acme_app_product: Super Widget
+      acme_app_price: "$19.99"
+      acme_app_product_blurb: Our flagship widget. Built to last.
+      acme_app_sku: ACME-1001
+      acme_app_footer: Managed by Ansible Automation Platform
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          question_description: >-
+            Default is aws_rhel9 for a single-host demo. The ACME App is
+            installed on this host only.
+          type: text
+          variable: _hosts
+          required: true
+          default: aws_rhel9
+
+  - name: "Infrastructure | Configuration management - ACME App - Update Configuration"
+    description: >-
+      Re-renders the ACME storefront Jinja2 template with survey variables.
+      Change knobs to update the live page without reinstalling httpd.
+      Run Setup first.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/acme-app/playbooks/configure.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          question_description: >-
+            Same host as Setup. Default is aws_rhel9.
+          type: text
+          variable: _hosts
+          required: true
+          default: aws_rhel9
+        - question_name: Company name
+          type: text
+          variable: acme_app_company
+          required: true
+          default: ACME Corp
+        - question_name: Tagline
+          type: text
+          variable: acme_app_tagline
+          required: true
+          default: Widgets you can trust
+        - question_name: Environment
+          type: multiplechoice
+          variable: acme_app_environment
+          required: true
+          default: Production
+          choices:
+            - Production
+            - Staging
+            - Development
+        - question_name: Theme
+          type: multiplechoice
+          variable: acme_app_theme
+          required: true
+          default: redhat
+          choices:
+            - redhat
+            - navy
+            - forest
+        - question_name: Promo banner
+          type: textarea
+          variable: acme_app_banner
+          required: true
+          default: Welcome to the ACME storefront
+        - question_name: Featured product
+          type: text
+          variable: acme_app_product
+          required: true
+          default: Super Widget
+        - question_name: Price
+          type: text
+          variable: acme_app_price
+          required: true
+          default: "$19.99"
+        - question_name: Product blurb
+          type: textarea
+          variable: acme_app_product_blurb
+          required: true
+          default: Our flagship widget. Built to last.
+        - question_name: SKU
+          type: text
+          variable: acme_app_sku
+          required: true
+          default: ACME-1001
+        - question_name: Footer
+          type: text
+          variable: acme_app_footer
+          required: true
+          default: Managed by Ansible Automation Platform
+
+  - name: "Infrastructure | AWS - Provision Kafka Queue"
+    description: >-
+      Provisions a dedicated aws_kafka EC2 instance and deploys single-node
+      Podman KRaft Kafka with topic linux-audit-events.
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - APD Machine Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/config-drift/playbooks/provision_kafka.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_aws_keypair_name: aws-test-key
+      create_vm_aws_securitygroup_name: aws-test-sg
+      create_vm_aws_vpc_subnet_name: aws-test-subnet
+      create_vm_vm_deployment: cloud_stack
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Owner
+          question_description: >-
+            Must match the owner tag on your existing cloud stack VMs.
+          type: text
+          variable: create_vm_aws_owner_tag
+          required: true
+          default: your_name
+        - question_name: Environment
+          type: multiplechoice
+          variable: create_vm_vm_environment
+          required: true
+          default: Prod
+          choices:
+            - Dev
+            - QA
+            - Prod
+
+  - name: "LINUX | Config Drift - Deploy Audit and Filebeat"
+    description: >-
+      Deploys persistent auditd rules that watch /etc/ssh/sshd_config for writes
+      and attribute changes, and installs Filebeat with the auditd module.
+      Use Filebeat output kafka after provisioning the Kafka queue.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/config-drift/playbooks/deploy_audit_filebeat.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          question_description: >-
+            Default is aws_rhel* (aws_rhel8 and aws_rhel9). Use aws_rhel9 for
+            one host only. Unreachable hosts are skipped. reports is not matched
+            by aws_rhel*.
+          type: text
+          variable: _hosts
+          required: true
+          default: aws_rhel*
+        - question_name: Filebeat output
+          type: multiplechoice
+          variable: config_drift_filebeat_output
+          required: true
+          default: console
+          choices:
+            - console
+            - kafka
+
+  - name: "LINUX | Config Drift - Introduce SSHD Drift"
+    description: >-
+      Sets PermitRootLogin yes on RHEL workers to simulate sshd_config drift
+      for the event-driven remediation demo. Prints matching sshd_config lines
+      before and after the change so presenters can run the full flow from AAP.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/config-drift/playbooks/drift_sshd.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          question_description: >-
+            Default is aws_rhel* (aws_rhel8 and aws_rhel9). Use aws_rhel9 for
+            one host only. Unreachable hosts are skipped.
+          type: text
+          variable: _hosts
+          required: true
+          default: aws_rhel*
+
+  - name: "Infrastructure | Setup Rulebook for Kafka Queue - Config Drift & Remediation"
+    description: >-
+      Creates or updates the EDA rulebook activation that listens on Kafka
+      topic linux-audit-events for sshd_config_change events and launches
+      SSHD remediation.
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AAP Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/config-drift/playbooks/setup_eda_activation.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+
+  - name: "LINUX | SSHD Configuration Remediation"
+    description: >-
+      Restores PermitRootLogin no on a host identified by private IP from a
+      Kafka audit event. Launched by the config drift EDA rulebook.
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/config-drift/playbooks/remediate_sshd.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    ask_variables_on_launch: true
+    credentials:
+      - APD Machine Credential
+
+  - name: "Infrastructure | Config Drift - Check Cloud Stack"
+    description: >-
+      Verifies aws_rhel8 and aws_rhel9 exist in inventory before config drift
+      setup. Used by the Full Setup workflow; fails when Deploy Cloud Stack in
+      AWS must be run first.
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/config-drift/playbooks/check_cloud_stack.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
 
 controller_workflows:
   - name: Infrastructure | ROSA - Lifecycle (Create)
@@ -506,3 +814,123 @@ controller_workflows:
           feedback: >-
             ROSA cluster destruction failed. Manual cleanup may be required.
             Check AWS console for orphaned resources (VPCs, IAM roles, CloudFormation stacks).
+
+  - name: Infrastructure | Config Drift - Full Setup
+    description: >-
+      One-shot config drift pipeline setup: verify cloud stack RHEL workers are
+      in inventory, provision Kafka, sync inventory, deploy auditd and Filebeat
+      with Kafka output, and activate the EDA rulebook. Run Deploy Cloud Stack
+      in AWS first if aws_rhel8/aws_rhel9 are missing. Run Introduce SSHD Drift
+      separately for the live demo.
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_aws_keypair_name: aws-test-key
+      create_vm_aws_securitygroup_name: aws-test-sg
+      create_vm_aws_vpc_subnet_name: aws-test-subnet
+      create_vm_vm_deployment: cloud_stack
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            AWS region for the cloud stack and Kafka broker. Must match an
+            existing stack when workers are already provisioned.
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Owner
+          question_description: >-
+            Must match the owner tag on your existing cloud stack VMs when
+            workers are already provisioned.
+          type: text
+          variable: create_vm_aws_owner_tag
+          required: true
+          default: your_name
+        - question_name: Environment
+          type: multiplechoice
+          variable: vm_environment
+          required: true
+          default: Prod
+          choices:
+            - Dev
+            - QA
+            - Prod
+    workflow_nodes:
+      - identifier: Check Cloud Stack
+        related:
+          success_nodes:
+            - identifier: Provision Kafka
+          failure_nodes:
+            - identifier: Cloud Stack Required
+        unified_job_template:
+          name: Infrastructure | Config Drift - Check Cloud Stack
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+      - identifier: Cloud Stack Required
+        unified_job_template:
+          name: SUBMIT FEEDBACK
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+        extra_data:
+          feedback: >-
+            aws_rhel8 and aws_rhel9 were not found in inventory. Run Deploy
+            Cloud Stack in AWS first, then re-launch Infrastructure | Config
+            Drift - Full Setup.
+      - identifier: Provision Kafka
+        related:
+          success_nodes:
+            - identifier: Sync Inventory
+        unified_job_template:
+          name: Infrastructure | AWS - Provision Kafka Queue
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+      - identifier: Sync Inventory
+        related:
+          success_nodes:
+            - identifier: Deploy Filebeat
+        unified_job_template:
+          inventory:
+            name: Ansible Product Demos Inventory
+            organization:
+              name: Ansible Product Demos (APD)
+              type: organization
+            type: inventory
+          name: AWS Inventory
+          type: inventory_source
+      - identifier: Deploy Filebeat
+        related:
+          success_nodes:
+            - identifier: Setup EDA
+        unified_job_template:
+          name: LINUX | Config Drift - Deploy Audit and Filebeat
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template
+        extra_data:
+          _hosts: aws_rhel*
+          config_drift_filebeat_output: kafka
+      - identifier: Setup EDA
+        unified_job_template:
+          name: Infrastructure | Setup Rulebook for Kafka Queue - Config Drift & Remediation
+          organization:
+            name: Ansible Product Demos (APD)
+            type: organization
+          type: job_template

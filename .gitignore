@@ -16,6 +16,8 @@ roles/*
 .cache/
 .ansible/
 **/tmp/
+__pycache__/
+*.pyc
 execution_environments/context/
 
 # Build artifact — source of truth is <section>/docs/<slug>.md

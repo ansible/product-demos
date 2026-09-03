@@ -21,19 +21,30 @@
       changed_when: false
       no_log: true
 
-    - name: Wait for cluster to reach 'ready' state
+    - name: Wait for cluster to reach a terminal state
       ansible.builtin.command:
         cmd: rosa describe cluster --cluster={{ rosa_cluster_name }} --region={{ rosa_aws_region }} -o json
       changed_when: false
       register: _cluster_status
       until: >-
-        (_cluster_status.stdout | from_json).status.state | default('') == 'ready'
-      retries: "{{ ((rosa_wait_timeout | default(3600)) | int / (rosa_poll_interval | default(60)) | int) | int }}"
+        (_cluster_status.stdout | from_json).status.state | default('')
+        in ['ready', 'error', 'uninstalling']
+      retries: "{{ ((rosa_wait_timeout | default(5400)) | int / (rosa_poll_interval | default(60)) | int) | int }}"
       delay: "{{ (rosa_poll_interval | default(60)) | int }}"
 
     - name: Parse final cluster state
       ansible.builtin.set_fact:
         _cluster_info: "{{ _cluster_status.stdout | from_json }}"
+
+    - name: Fail if cluster provision did not reach ready
+      ansible.builtin.fail:
+        msg: >-
+          Cluster '{{ rosa_cluster_name }}' is '{{ _cluster_info.status.state }}'
+          ({{ _cluster_info.status.description | default('no description') }}).
+          provision_error_code: {{ _cluster_info.status.provision_error_code | default('n/a') }}.
+          provision_error_message: {{ _cluster_info.status.provision_error_message | default('n/a') }}.
+          Check 'rosa logs install --cluster {{ rosa_cluster_name }}' or OpenShift Cluster Manager.
+      when: _cluster_info.status.state != 'ready'
 
     - name: Display cluster readiness summary
       ansible.builtin.debug:

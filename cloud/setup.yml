@@ -1,5 +1,6 @@
 ---
-_deployment_id: "{{ lookup('file', playbook_dir + '/.deployment_id') }}"
+_deployment_id: '{{ lookup("ansible.builtin.password", playbook_dir + "/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
+apd_managed_by: aap-product-demos
 
 user_message:
   - >-
@@ -59,6 +60,8 @@ controller_templates:
       aws_region: us-east-1
       dmz_ssh_key_name: aws-test-key
       priv_network_ssh_key_name: aws-test-key
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
 
   - name: Cloud | AWS | Delete Peer Infrastructure
     job_type: run
@@ -89,6 +92,8 @@ controller_templates:
       aws_region: us-east-1
       dmz_ssh_key_name: aws-test-key
       priv_network_ssh_key_name: aws-test-key
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
 
   - name: Cloud | AWS | Delete Transit Infrastructure
     job_type: run
@@ -116,8 +121,6 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
-    extra_vars:
-      reports_aws_bucket_name: reports-pd-{{ _deployment_id }}
 
   - name: Cloud | AWS | Snapshot EC2
     job_type: run
@@ -130,6 +133,10 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      _hosts: aws_rhel8:aws_rhel9
+      _hosts_windows: aws-dc:aws_win1
+    limit: all
     survey_enabled: true
     survey:
       name: ''
@@ -149,6 +156,12 @@ controller_templates:
           type: text
           variable: _hosts
           required: false
+          default: aws_rhel8:aws_rhel9
+        - question_name: Specify Windows hosts
+          type: text
+          variable: _hosts_windows
+          required: false
+          default: aws-dc:aws_win1
 
   - name: Cloud | AWS | Restore EC2 from Snapshot
     job_type: run
@@ -161,6 +174,10 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      _hosts: aws_rhel8:aws_rhel9
+      _hosts_windows: aws-dc:aws_win1
+    limit: all
     survey_enabled: true
     survey:
       name: ''
@@ -180,6 +197,12 @@ controller_templates:
           type: text
           variable: _hosts
           required: false
+          default: aws_rhel8:aws_rhel9
+        - question_name: Specify Windows hosts
+          type: text
+          variable: _hosts_windows
+          required: false
+          default: aws-dc:aws_win1
 
   - name: Cloud | AWS | Display EC2 Stats
     job_type: run
@@ -289,6 +312,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch RHEL
     job_type: run
@@ -303,6 +327,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Post-check RHEL
     job_type: run
@@ -317,6 +342,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Rollback RHEL
     job_type: run
@@ -331,6 +357,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Pre-check Windows
     job_type: run
@@ -344,6 +371,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Windows
     job_type: run
@@ -357,6 +385,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Post-check Windows
     job_type: run
@@ -370,6 +399,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Rollback Windows
     job_type: run
@@ -383,6 +413,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    limit: all
 
   - name: Cloud | AWS | Patch Compliance Report
     job_type: run
@@ -397,6 +428,11 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     use_fact_cache: true
+    extra_vars:
+      _hosts: aws_rhel8:aws_rhel9
+      _hosts_windows: aws-dc:aws_win1
+      _report_server: reports
+    limit: all
 
 controller_workflows:
   - name: Deploy Cloud Stack in AWS
@@ -412,36 +448,56 @@ controller_workflows:
       create_vm_aws_vpc_subnet_name: aws-test-subnet
       create_vm_vm_deployment: cloud_stack
       create_vm_vm_purpose: demo
+      create_vm_apd_managed_by: aap-product-demos
+      create_vm_apd_demo_tag: "true"
     survey_enabled: true
     survey:
       name: ''
       description: ''
       spec:
         - question_name: AWS Region
+          question_description: >-
+            AWS region where the VPC, keypair, and all VMs will be created.
           type: multiplechoice
           variable: create_vm_aws_region
           required: true
+          default: us-east-2
           choices:
             - us-east-1
             - us-east-2
             - us-west-1
             - us-west-2
         - question_name: Owner
+          question_description: >-
+            Value for the EC2 tag key "owner" on all resources this workflow
+            creates. Use your name or team for cost attribution; appears in
+            inventory keyed groups as owner_*.
           type: text
           variable: create_vm_aws_owner_tag
           required: true
+          default: your_name
         - question_name: Environment
+          question_description: >-
+            Value for the EC2 tag key "environment" on each VM (Dev, QA, or
+            Prod). Metadata only—it does not change instance size, patching, or
+            security settings.
           type: multiplechoice
           variable: vm_environment
           required: true
+          default: Prod
           choices:
             - Dev
             - QA
             - Prod
         - question_name: Email
+          question_description: >-
+            Operator contact at launch. Not written to EC2 tags and not consumed
+            by the deploy playbooks today; kept for optional demo-environment
+            tracking. Replace the default with your address.
           type: text
           variable: email
           required: true
+          default: your_name@acme.org
     simplified_workflow_nodes:
       - identifier: Create Keypair
         unified_job_template: Cloud | AWS | Create Keypair
@@ -540,9 +596,12 @@ controller_workflows:
       description: ''
       spec:
         - question_name: AWS Region
+          question_description: >-
+            AWS region where the cloud stack was deployed.
           type: multiplechoice
           variable: create_vm_aws_region
           required: true
+          default: us-east-2
           choices:
             - us-east-1
             - us-east-2
@@ -604,8 +663,9 @@ controller_workflows:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      _hosts: os_linux
-      _hosts_windows: os_windows
+      _hosts: aws_rhel8:aws_rhel9
+      _hosts_windows: aws-dc:aws_win1
+      _report_server: reports
     survey_enabled: true
     survey:
       name: ''
@@ -621,6 +681,30 @@ controller_workflows:
             - us-east-2
             - us-west-1
             - us-west-2
+        - question_name: RHEL hosts
+          question_description: >-
+            Workload VMs to snapshot and patch on the RHEL path.
+            Default is aws_rhel8:aws_rhel9. Does not include reports or aws_kafka.
+          type: text
+          variable: _hosts
+          required: true
+          default: aws_rhel8:aws_rhel9
+        - question_name: Windows hosts
+          question_description: >-
+            Workload VMs to snapshot and patch on the Windows path.
+            Default is aws-dc:aws_win1 (both cloud-stack Windows hosts).
+          type: text
+          variable: _hosts_windows
+          required: true
+          default: aws-dc:aws_win1
+        - question_name: Report server
+          question_description: >-
+            Host that publishes the HTML compliance dashboard. Not patched.
+            Default is reports.
+          type: text
+          variable: _report_server
+          required: true
+          default: reports
         - question_name: RHEL Advisory IDs (comma-separated)
           type: text
           variable: input_cve_ids
@@ -671,4 +755,7 @@ controller_workflows:
         unified_job_template: Cloud | AWS | Restore EC2 from Snapshot
       - identifier: Compliance Report
         unified_job_template: Cloud | AWS | Patch Compliance Report
+        extra_data:
+          _report_server: reports
+        limit: all
         all_parents_must_converge: true

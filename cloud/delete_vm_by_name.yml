@@ -16,7 +16,8 @@
       amazon.aws.ec2_instance_info:
         region: "{{ create_vm_aws_region }}"
         filters:
-          "tag:Name": "{{ create_vm_vm_name }}"
+          tag:Name: "{{ create_vm_vm_name }}"
+          tag:apd: "{{ create_vm_apd_demo_tag | default('true') }}"
           instance-state-name:
             - pending
             - running
