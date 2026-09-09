@@ -1,0 +1,98 @@
+---
+- name: Preflight AAP HA/DR OpenShift sites
+  hosts: localhost
+  gather_facts: false
+  vars:
+    aap_hadr_required_contexts:
+      - "{{ aap_hadr_primary_context }}"
+      - "{{ aap_hadr_standby_context }}"
+  tasks:
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - aap_hadr_namespace | length > 0
+          - aap_hadr_primary_context | length > 0
+          - aap_hadr_standby_context | length > 0
+          - aap_hadr_primary_context != aap_hadr_standby_context
+        fail_msg: >-
+          Provide distinct OpenShift contexts and a non-empty AAP namespace.
+
+    - name: Query OpenShift version on both sites
+      kubernetes.core.k8s_cluster_info:
+        context: "{{ item }}"
+      loop: "{{ aap_hadr_required_contexts }}"
+      register: aap_hadr_cluster_info
+      changed_when: false
+
+    - name: Verify both sites are OpenShift 4.14 or newer
+      ansible.builtin.assert:
+        that:
+          - item.version.server.major | int >= 4
+          - item.version.server.major | int > 4 or item.version.server.minor | int >= 14
+        fail_msg: "{{ item.item }} does not meet the OpenShift 4.14+ baseline."
+      loop: "{{ aap_hadr_cluster_info.results }}"
+
+    - name: Verify AAP namespace exists on both sites
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Namespace
+        name: "{{ aap_hadr_namespace }}"
+        context: "{{ item }}"
+      loop: "{{ aap_hadr_required_contexts }}"
+      register: aap_hadr_namespaces
+      changed_when: false
+
+    - name: Require the AAP namespace on both sites
+      ansible.builtin.assert:
+        that:
+          - item.resources | length == 1
+        fail_msg: "Namespace {{ aap_hadr_namespace }} is missing on {{ item.item }}."
+      loop: "{{ aap_hadr_namespaces.results }}"
+
+    - name: Verify required operators are installed
+      kubernetes.core.k8s_info:
+        api_version: operators.coreos.com/v1alpha1
+        kind: ClusterServiceVersion
+        namespace: "{{ aap_hadr_namespace }}"
+        context: "{{ item }}"
+      loop: "{{ aap_hadr_required_contexts }}"
+      register: aap_hadr_csvs
+      changed_when: false
+
+    - name: Report operator readiness
+      ansible.builtin.debug:
+        msg:
+          site: "{{ item.item }}"
+          succeeded_csvs: >-
+            {{ item.resources | selectattr('status.phase', 'defined') |
+            selectattr('status.phase', 'equalto', 'Succeeded') |
+            map(attribute='metadata.name') | list }}
+      loop: "{{ aap_hadr_csvs.results }}"
+
+    - name: Check required API resources exist
+      kubernetes.core.k8s_info:
+        api_version: "{{ item.api_version }}"
+        kind: "{{ item.kind }}"
+        context: "{{ item.context }}"
+      loop:
+        - api_version: ansible.com/v1alpha1
+          kind: AnsibleAutomationPlatform
+          context: "{{ aap_hadr_primary_context }}"
+        - api_version: ansible.com/v1alpha1
+          kind: AnsibleAutomationPlatform
+          context: "{{ aap_hadr_standby_context }}"
+        - api_version: postgresql.cnpg.io/v1
+          kind: Cluster
+          context: "{{ aap_hadr_primary_context }}"
+        - api_version: postgresql.cnpg.io/v1
+          kind: Cluster
+          context: "{{ aap_hadr_standby_context }}"
+      register: aap_hadr_resources
+      changed_when: false
+
+    - name: Require AAP and CNPG resources
+      ansible.builtin.assert:
+        that:
+          - item.resources | length > 0
+        fail_msg: "{{ item.item.kind }} is missing on {{ item.item.context }}."
+      loop: "{{ aap_hadr_resources.results }}"
