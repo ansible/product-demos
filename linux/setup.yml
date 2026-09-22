@@ -74,6 +74,8 @@ controller_inventory_sources:
 
 controller_templates:
   - name: "LINUX | Register with Insights"
+    labels:
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -117,6 +119,8 @@ controller_templates:
       Register unregistered RHEL hosts with Red Hat Subscription Manager using
       the RHSM Registration credential. Shared prerequisite for patch, config
       drift, and other demos that need working dnf repositories.
+    labels:
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
@@ -143,6 +147,8 @@ controller_templates:
           default: aws_rhel*
 
   - name: "LINUX | Troubleshoot"
+    labels:
+      - linux
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -164,6 +170,8 @@ controller_templates:
           required: true
 
   - name: "LINUX | Temporary Sudo"
+    labels:
+      - linux
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -193,6 +201,8 @@ controller_templates:
           required: true
 
   - name: "LINUX | Patching"
+    labels:
+      - rhel
     job_type: check
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -216,6 +226,8 @@ controller_templates:
           required: true
 
   - name: "LINUX | Start Service"
+    labels:
+      - linux
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -241,6 +253,8 @@ controller_templates:
           required: true
 
   - name: "LINUX | Stop Service"
+    labels:
+      - linux
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -266,6 +280,8 @@ controller_templates:
           required: true
 
   - name: "LINUX | Run Shell Script"
+    labels:
+      - linux
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -293,6 +309,8 @@ controller_templates:
     description: >-
       Add an SSH public key to a Linux user's authorized_keys file on one or
       more hosts. Useful for granting manual SSH access across demo VMs.
+    labels:
+      - linux
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
@@ -331,6 +349,8 @@ controller_templates:
           required: true
 
   - name: "LINUX | Fact Scan"
+    labels:
+      - linux
     project: "Ansible Product Demos"
     playbook: linux/fact_scan.yml
     inventory: Ansible Product Demos Inventory
@@ -352,6 +372,8 @@ controller_templates:
           required: true
 
   - name: "LINUX | Podman Webserver"
+    labels:
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -377,6 +399,8 @@ controller_templates:
           default: "This is Apache webserver running in a container with podman"
 
   - name: "LINUX | System Roles"
+    labels:
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -404,6 +428,8 @@ controller_templates:
           required: true
 
   - name: "LINUX | Install Web Console (cockpit)"
+    labels:
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -438,6 +464,9 @@ controller_templates:
           required: true
 
   - name: "LINUX | Compliance Enforce"
+    labels:
+      - compliance
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -460,6 +489,9 @@ controller_templates:
           required: true
 
   - name: "LINUX | DISA STIG"
+    labels:
+      - compliance
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -482,6 +514,9 @@ controller_templates:
           required: true
 
   - name: "LINUX | Multi-profile Compliance"
+    labels:
+      - compliance
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -524,6 +559,9 @@ controller_templates:
             - stig
 
   - name: "LINUX | Multi-profile Compliance Report"
+    labels:
+      - compliance
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -563,6 +601,9 @@ controller_templates:
           default: "true"
 
   - name: "LINUX | Insights Compliance Scan"
+    labels:
+      - compliance
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -588,6 +629,8 @@ controller_templates:
           default: "No"
 
   - name: "LINUX | Deploy Application"
+    labels:
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -615,6 +658,9 @@ controller_templates:
 controller_workflows:
   - name: "Linux | Compliance Workflow"
     description: A workflow to generate a SCAP report and run enforce on findings
+    labels:
+      - compliance
+      - rhel
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry

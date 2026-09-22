@@ -69,6 +69,8 @@ controller_credentials:
 
 controller_templates:
   - name: "WINDOWS | Install IIS"
+    labels:
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -93,6 +95,9 @@ controller_templates:
           required: true
 
   - name: "WINDOWS | Patching"
+    labels:
+      - patching
+      - windows
     use_fact_cache: true
     job_type: check
     ask_job_type_on_launch: true
@@ -140,6 +145,9 @@ controller_templates:
             - 'No'
 
   - name: "WINDOWS | Rollback"
+    labels:
+      - patching
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -164,6 +172,8 @@ controller_templates:
           required: false
 
   - name: "WINDOWS | Test Connectivity"
+    labels:
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -184,6 +194,8 @@ controller_templates:
           required: false
 
   - name: "WINDOWS | Chocolatey install multiple"
+    labels:
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -204,6 +216,8 @@ controller_templates:
           required: false
 
   - name: "WINDOWS | Chocolatey install specific"
+    labels:
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -228,6 +242,8 @@ controller_templates:
           required: true
 
   - name: "WINDOWS | Run PowerShell"
+    labels:
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -253,6 +269,8 @@ controller_templates:
           required: true
 
   - name: "WINDOWS | Run PowerShell | Kerberos"
+    labels:
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -276,6 +294,8 @@ controller_templates:
           required: true
 
   - name: "WINDOWS | Query Services"
+    labels:
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -304,6 +324,8 @@ controller_templates:
             - 'Stopped'
 
   - name: "WINDOWS | Configuring Password Requirements"
+    labels:
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -324,6 +346,8 @@ controller_templates:
           required: false
 
   - name: "WINDOWS | AD | Create Domain"
+    labels:
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -345,6 +369,8 @@ controller_templates:
           required: false
 
   - name: "WINDOWS | AD | Join Domain"
+    labels:
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -371,6 +397,8 @@ controller_templates:
           description: Inventory hostname for domain controller previously established using the Create Domain template
 
   - name: "WINDOWS | AD | New User"
+    labels:
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -415,6 +443,9 @@ controller_templates:
           required: false
 
   - name: "WINDOWS | DISA STIG"
+    labels:
+      - compliance
+      - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -437,6 +468,10 @@ controller_templates:
 controller_workflows:
   - name: Setup Active Directory Domain
     description: A workflow to create a domain controller with two domain-joined Windows hosts.
+    labels:
+      - aws.ec2
+      - aws.vpc
+      - windows
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
