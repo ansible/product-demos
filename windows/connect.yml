@@ -2,14 +2,6 @@
 - name: Connectivity test
   hosts: "{{ _hosts | default('os_windows') }}"
   gather_facts: false
-  # Defaults when limiting to one host (survey _hosts): group vars are not always
-  # merged before Ansible picks the connection plugin (SSH was used on port 22).
-  vars:
-    ansible_connection: winrm
-    ansible_user: ec2-user
-    ansible_port: 5986
-    ansible_winrm_transport: credssp
-    ansible_winrm_server_cert_validation: ignore
 
   tasks:
     - name: Wait 600 seconds for target connection to become reachable/usable
