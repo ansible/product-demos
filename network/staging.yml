@@ -7,6 +7,17 @@
     new_image_ios: "c8000v-universalk9.{{ new_version }}.SPA.bin"
 
   tasks:
+    - name: Display current IOS version
+      cisco.ios.ios_command:
+        commands: show version
+      register: current_version
+      when: ansible_network_os == 'cisco.ios.ios'
+
+    - name: Show current IOS version
+      ansible.builtin.debug:
+        msg: "{{ current_version.stdout_lines[0] }}"
+      when: ansible_network_os == 'cisco.ios.ios'
+
     - name: Enable scp
       cisco.ios.ios_config:
         lines:
