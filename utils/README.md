@@ -2,12 +2,12 @@
 
 ## AAP Domains Bookmarklet
 
-The AAP UI allows grouping job templates and workflows into domains based on labels. Domain configuration is stored in the browser's local storage, so it doesn't transfer between browsers or AAP instances. These tools let you generate a bookmarklet to import the [APD domain configuration](domains.json) into a new browser or AAP deployment.
+The AAP UI allows grouping job templates and workflows into domains based on labels. Domain configuration is stored in the browser's local storage, so it doesn't transfer between browsers or AAP instances. These tools let you generate a bookmarklet to import the [APD domain configuration](apd-domains.json) into a new browser or AAP deployment.
 
 ### Files
 
-- **`generate-bookmarklet.sh`** — Generates a `javascript:` bookmarklet URL from `domains.json`.
-- **`domains.json`** — The domains configuration to import. Edit this file to change the domain groupings if needed.
+- **`generate-bookmarklet.sh`** — Generates a `javascript:` bookmarklet URL from `apd-domains.json`.
+- **`apd-domains.json`** — The domains configuration to import. Edit this file to change the domain groupings if needed.
 - **`apd-domain-bookmarklet.js`** - Pre-populated javascript bookmarklet URL that can be used instead of generating one.
 
 ### Generating the import bookmarklet
@@ -16,7 +16,7 @@ The AAP UI allows grouping job templates and workflows into domains based on lab
 ./utils/generate-bookmarklet.sh
 ```
 
-This outputs a `javascript:` URL from `domains.json`. Copy the entire output, then create a bookmark for it using the steps below.  
+This outputs a `javascript:` URL from `apd-domains.json`. Copy the entire output, then create a bookmark for it using the steps below.  
 
 Alternately, use the content of `apd-domains-bookmarklet.js` directly in the browser bookmark configured below.
 
