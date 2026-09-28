@@ -109,6 +109,40 @@ controller_groups:
         -o ProxyCommand="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
         -i {{ lookup('env', 'SSH_PROXY_KEY') }} -W %h:%p -q {{ ssh_proxy_username }}@{{ ssh_proxy_host }}"
 
+controller_labels:
+  - name: aws.ec2
+    organization: Ansible Product Demos (APD)
+  - name: aws.rosa
+    organization: Ansible Product Demos (APD)
+  - name: aws.vpc
+    organization: Ansible Product Demos (APD)
+  - name: compliance
+    organization: Ansible Product Demos (APD)
+  - name: containerlab
+    organization: Ansible Product Demos (APD)
+  - name: eda
+    organization: Ansible Product Demos (APD)
+  - name: infrastructure
+    organization: Ansible Product Demos (APD)
+  - name: linux
+    organization: Ansible Product Demos (APD)
+  - name: network
+    organization: Ansible Product Demos (APD)
+  - name: openshift
+    organization: Ansible Product Demos (APD)
+  - name: orchestrator
+    organization: Ansible Product Demos (APD)
+  - name: patching
+    organization: Ansible Product Demos (APD)
+  - name: policy-as-code
+    organization: Ansible Product Demos (APD)
+  - name: rhel
+    organization: Ansible Product Demos (APD)
+  - name: satellite
+    organization: Ansible Product Demos (APD)
+  - name: windows
+    organization: Ansible Product Demos (APD)
+
 controller_templates:
   - name: SUBMIT FEEDBACK
     job_type: run
@@ -135,6 +169,8 @@ controller_templates:
           required: true
 
   - name: Cloud | AWS | Create VPC
+    labels:
+      - aws.vpc
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -165,6 +201,8 @@ controller_templates:
           required: true
 
   - name: Cloud | AWS | Create Keypair
+    labels:
+      - aws.ec2
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -205,6 +243,8 @@ controller_templates:
             line (for example, from ~/.ssh/id_rsa.pub).
 
   - name: Cloud | AWS | Create VM
+    labels:
+      - aws.ec2
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -296,6 +336,8 @@ controller_templates:
           required: false
 
   - name: Cloud | AWS | Delete VM
+    labels:
+      - aws.ec2
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -326,6 +368,8 @@ controller_templates:
           required: true
 
   - name: Cloud | AWS | Resize EC2
+    labels:
+      - aws.ec2
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -356,7 +400,6 @@ controller_templates:
           type: text
           variable: _hosts
           required: true
-
         - question_name: Specify target instance type
           type: text
           variable: instance_type

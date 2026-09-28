@@ -77,6 +77,9 @@ controller_inventory_sources:
 
 controller_templates:
   - name: LINUX | Register with Satellite
+    labels:
+      - rhel
+      - satellite
     project: Ansible Product Demos
     playbook: satellite/server_register.yml
     inventory: Ansible Product Demos Inventory
@@ -107,10 +110,13 @@ controller_templates:
           required: true
 
   - name: LINUX | Compliance Scan with Satellite
+    labels:
+      - compliance
+      - rhel
+      - satellite
     project: Ansible Product Demos
     playbook: satellite/server_openscap.yml
     inventory: Ansible Product Demos Inventory
-    # execution_environment: Ansible Engine 2.9 execution environment
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -130,6 +136,8 @@ controller_templates:
           required: false
 
   - name: SATELLITE | Publish Content View Version
+    labels:
+      - satellite
     project: Ansible Product Demos
     playbook: satellite/satellite_publish.yml
     inventory: Ansible Product Demos Inventory
@@ -152,6 +160,8 @@ controller_templates:
           required: true
 
   - name: SATELLITE | Promote Content View Version
+    labels:
+      - satellite
     project: Ansible Product Demos
     playbook: satellite/satellite_promote.yml
     inventory: Ansible Product Demos Inventory
@@ -182,6 +192,8 @@ controller_templates:
           required: true
 
   - name: SETUP | Satellite
+    labels:
+      - satellite
     project: Ansible Product Demos
     playbook: satellite/setup_satellite.yml
     inventory: Ansible Product Demos Inventory
@@ -202,6 +214,10 @@ controller_launch_jobs:
 
 controller_workflows:
   - name: Patch Dev
+    labels:
+      - patching
+      - rhel
+      - satellite
     description: A workflow to patch the dev environment
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
