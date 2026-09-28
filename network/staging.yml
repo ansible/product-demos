@@ -57,7 +57,7 @@
       when:
         - ansible_network_os == 'cisco.ios.ios'
         - new_image_ios not in check_image.stdout[0]
-      no_log: true
+      #no_log: true
 
     - name: Display SCP transfer result
       ansible.builtin.debug:
