@@ -65,6 +65,8 @@ Device connectivity is handled via an **SSH Proxy** credential type that routes 
 | **Report** | Gather facts from containerlab Cisco devices and display device information including hostname, OS version, model, serial number, and interfaces. |
 | **DISA STIG** | Run the DISA STIG role against the IOS-XE device to assess configuration compliance. Runs in check mode by default. |
 | **Backup** | Back up running configurations from containerlab NX-OS and IOS-XE devices using native Cisco collection modules. |
+| **Staging** | Stage a new IOS-XE image to the IOS-XE device bootflash via SCP, then verify the file integrity with a SHA-512 hash check. Must be run before **Upgrade**. |
+| **Upgrade** | Install and activate the staged IOS-XE image, reload the device, and verify the new version is running. Requires **Staging** to have completed successfully first. |
 
 ### Palo Alto
 
@@ -87,6 +89,10 @@ Device connectivity is handled via an **SSH Proxy** credential type that routes 
 **NETWORK ǀ DISA STIG** — Run in check mode (default) to show how Ansible assesses compliance against DISA STIG rules on IOS-XE devices. Click into tasks to see what would change for each compliance rule.
 
 **NETWORK ǀ Backup** — Back up device configurations using the native `cisco.ios.ios_config` and `cisco.nxos.nxos_config` modules. Backups are saved on the execution node. This demonstrates how Ansible can automate configuration backup across heterogeneous network environments.
+
+**NETWORK ǀ Staging** — Stage a new IOS-XE image onto the cat8kv device. The playbook first waits for containerlab device SSH availability, then enables SCP on the IOS-XE device, transfers the image to bootflash, and verifies the file integrity with a SHA-512 hash check. This job must be run **before** the Upgrade job — the upgrade will fail if no image has been staged. Requires `new_image_ios`, `new_version`, `sha_hash`, `scp_server`, `scp_user`, and `scp_password` variables to be set (via extra vars or a survey).
+
+**NETWORK ǀ Upgrade** — Install and activate the previously staged IOS-XE image on the cat8kv device. The playbook sets the boot system to the new image, runs `install add activate commit`, waits for the device to reload, and then verifies the new version is running. **You must run Staging first** — the upgrade checks that the image exists in bootflash and will fail if it is missing. Requires `new_image_ios` and `image_upgrade` variables.
 
 **NETWORK ǀ Panos** — See the [Palo Alto README](./panos/README.md) for usage instructions.
 

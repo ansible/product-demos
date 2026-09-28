@@ -81,6 +81,26 @@ controller_credential_types:
           password: !unsafe '{{ panos_password | default(omit) }}'
           username: !unsafe '{{ panos_username | default(omit) }}'
 
+  - name: SCP
+    description: SCP credentials for transferring files to network devices
+    kind: cloud
+    inputs:
+      fields:
+        - id: scp_user
+          label: SCP Username
+          type: string
+        - id: scp_password
+          label: SCP Password
+          secret: true
+          type: string
+      required:
+        - scp_user
+        - scp_password
+    injectors:
+      extra_vars:
+        scp_user: !unsafe '{{ scp_user }}'
+        scp_password: !unsafe '{{ scp_password }}'
+
 controller_credentials:
   - name: Palo Alto Firewall Admin
     description: Palo Alto administrator credentials used by the paloaltonetworks.panos collection
@@ -105,6 +125,13 @@ controller_credentials:
       ssh_proxy_host: REPLACEME
       ssh_proxy_username: admin
       ssh_proxy_password: "admin@123"
+  - name: SCP Credential
+    description: SCP credentials for staging IOS images to network devices
+    organization: Ansible Product Demos (APD)
+    credential_type: SCP
+    inputs:
+      scp_user: scp_user  # gitleaks:allow
+      scp_password: scp_password  # gitleaks:allow
   - name: Containerlab SSH
     description: SSH key for the containerlab hypervisor, updated by the provision playbook
     organization: Ansible Product Demos (APD)
@@ -442,9 +469,26 @@ controller_templates:
     playbook: "network/staging.yml"
     credentials:
       - Containerlab Device Access
+      - SCP Credential
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    extra_vars:
+      scp_server: 172.20.20.11
+      sha_hash: >-
+        1627b090a42872b9b92d5fdd31f69356bf0f766cd24bcd2ccdc3c1b1bf642d965057288e49ecba96d8d683ecfc116c9a2f7381c739d60c23380ada498cea9f76
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Which IOS version to stage?
+          type: multiplechoice
+          variable: image_staging
+          required: true
+          default: 17.15.01a
+          choices:
+            - 17.15.01a
 
   - name: "NETWORK | Upgrade"
     job_type: run
@@ -457,6 +501,18 @@ controller_templates:
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Which IOS version for to upgrade?
+          type: multiplechoice
+          variable: image_upgrade
+          required: true
+          default: 17.15.01a
+          choices:
+            - 17.15.01a
 
   - name: "NETWORK | Panos | Deploy"
     playbook: network/panos/deploy.yml

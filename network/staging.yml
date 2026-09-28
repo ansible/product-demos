@@ -1,84 +1,123 @@
 ---
-- name: Playbook to stage/scp router bootflash
-  hosts: rtr1 
-  gather_facts: False
- 
+- name: Wait for Containerlab Devices
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
   tasks:
+    - name: Wait for n9kv SSH to be ready
+      ansible.builtin.wait_for:
+        host: "{{ hostvars['n9kv']['ansible_host'] }}"
+        port: 2122
+        search_regex: SSH
+        delay: 10
+        timeout: 600
 
-  - name: Enable scp
-    cisco.ios.ios_config:
-      lines: 
-      - ip scp server enable
-      - ip ssh window-size 131072 
-      - ip tcp window-size 131072
-      
-  - name: Check if image already exist in bootflash
-    cisco.ios.ios_command:
-      commands: 'dir bootflash: | include {{ new_image_ios }}'
-    register: check_image
+    - name: Wait for cat8kv SSH to be ready
+      ansible.builtin.wait_for:
+        host: "{{ hostvars['cat8kv']['ansible_host'] }}"
+        port: 2123
+        search_regex: SSH
+        delay: 10
+        timeout: 600
 
-  - name: Display check_image output
-    ansible.builtin.debug:
-      msg: "Image check output: '{{ check_image.stdout[0] }}' | Image found: {{ new_image_ios in check_image.stdout[0] }}"
-    when: new_image_ios in check_image.stdout[0]
+- name: Stage IOS Image to Router Bootflash
+  hosts: containerlab
+  gather_facts: false
+  vars:
+    new_version: "{{ image_staging }}"
+    new_image_ios: "c8000v-universalk9.{{ new_version }}.SPA.bin"
 
-  - name: Please wait for the IOS image to transfer
-    ansible.builtin.debug:
-      msg: "Please wait for the image | c8000v-universalk9.{{ new_version }}.SPA.bin | to transfer..."
-    when: new_image_ios not in check_image.stdout[0]
+  tasks:
+    - name: Enable scp
+      cisco.ios.ios_config:
+        lines:
+          - ip scp server enable
+          - ip ssh window-size 131072
+          - ip tcp window-size 131072
+      when: ansible_network_os == 'cisco.ios.ios'
 
-  - name: Push new image from project to bootflash
-    vars:
-      ansible_command_timeout: 1200
-    ansible.netcommon.cli_command:
-      command: "copy scp: flash: vrf clab-mgmt"
-      check_all: true
-      prompt:
-        - 'Address or name of remote host'
-        - 'Source username'
-        - 'Source filename'
-        - 'Destination filename'
-        - 'Password:'
-      answer:
-        - '{{ scp_server }}'
-        - '{{ scp_user }}'
-        - '{{ new_image_ios }}'
-        - '{{ new_image_ios }}'
-        - '{{ scp_password }}'
-    register: cisco_changed
-    when:
-    - new_image_ios not in check_image.stdout[0]
-    - inventory_hostname in groups['cisco']
-    no_log: true
+    - name: Check if image already exist in bootflash
+      cisco.ios.ios_command:
+        commands: 'dir bootflash: | include {{ new_image_ios }}'
+      register: check_image
+      when: ansible_network_os == 'cisco.ios.ios'
 
-  - name: Display SCP transfer result
-    ansible.builtin.debug:
-      msg: "{{ cisco_changed.stdout }}"
-    when: cisco_changed is not skipped
+    - name: Display check_image output
+      ansible.builtin.debug:
+        msg: "Image check output: '{{ check_image.stdout[0] }}' | Image found: {{ new_image_ios in check_image.stdout[0] }}"
+      when:
+        - ansible_network_os == 'cisco.ios.ios'
+        - new_image_ios in check_image.stdout[0]
 
-  - name: Please wait for the SHA512 Hash Verification
-    ansible.builtin.debug:
-      msg: "Please wait for the SHA512 Hash Verification for {{ sha_hash }} ..."
-    when: new_image_ios not in check_image.stdout[0]
+    - name: Please wait for the IOS image to transfer
+      ansible.builtin.debug:
+        msg: "Please wait for the image | c8000v-universalk9.{{ new_version }}.SPA.bin | to transfer..."
+      when:
+        - ansible_network_os == 'cisco.ios.ios'
+        - new_image_ios not in check_image.stdout[0]
 
+    - name: Push new image from project to bootflash
+      vars:
+        ansible_command_timeout: 1200
+      ansible.netcommon.cli_command:
+        command: "copy scp: flash: vrf clab-mgmt"
+        check_all: true
+        prompt:
+          - 'Address or name of remote host'
+          - 'Source username'
+          - 'Source filename'
+          - 'Destination filename'
+          - 'Password:'
+        answer:
+          - '{{ scp_server }}'
+          - '{{ scp_user }}'
+          - '{{ new_image_ios }}'
+          - '{{ new_image_ios }}'
+          - '{{ scp_password }}'
+      register: cisco_changed
+      when:
+        - ansible_network_os == 'cisco.ios.ios'
+        - new_image_ios not in check_image.stdout[0]
+      no_log: true
 
-  - name: Verify SHA512 Hash of Image File
-    vars:
-      ansible_command_timeout: 1200
-    ios_command:
-      commands: 'verify /sha512 bootflash:/{{ new_image_ios }} {{ sha_hash }}'
-    register: sha_hash_verification_results
-  
-  - name: Set SHA512_hash_verification to pass/fail
-    ansible.builtin.set_fact:
-      sha_hash_verification: "pass"
-    when: sha_hash_verification_results.stdout[0].find('Verified') != -1
+    - name: Display SCP transfer result
+      ansible.builtin.debug:
+        msg: "{{ cisco_changed.stdout }}"
+      when:
+        - ansible_network_os == 'cisco.ios.ios'
+        - cisco_changed is not skipped
 
-  - name: Print SHA512_hash_verification 
-    debug:
-      var: sha_hash_verification
-      
-  - name: Print SHA512_hash_verification 
-    fail:
-      msg: "SHA512 Hash Check Fails. Please check the uploaded image!"
-    when: sha_hash_verification_results.stdout[0].find('Verified') == -1
+    - name: Please wait for the SHA512 Hash Verification
+      ansible.builtin.debug:
+        msg: "Please wait for the SHA512 Hash Verification for {{ sha_hash }} ..."
+      when:
+        - ansible_network_os == 'cisco.ios.ios'
+        - new_image_ios not in check_image.stdout[0]
+
+    - name: Verify SHA512 Hash of Image File
+      vars:
+        ansible_command_timeout: 1200
+      cisco.ios.ios_command:
+        commands: 'verify /sha512 bootflash:/{{ new_image_ios }} {{ sha_hash }}'
+      register: sha_hash_verification_results
+      when: ansible_network_os == 'cisco.ios.ios'
+
+    - name: Set SHA512_hash_verification to pass/fail
+      ansible.builtin.set_fact:
+        sha_hash_verification: "pass"
+      when:
+        - ansible_network_os == 'cisco.ios.ios'
+        - sha_hash_verification_results.stdout[0].find('Verified') != -1
+
+    - name: Print SHA512_hash_verification
+      ansible.builtin.debug:
+        var: sha_hash_verification
+      when: ansible_network_os == 'cisco.ios.ios'
+
+    - name: Print SHA512_hash_verification
+      ansible.builtin.fail:
+        msg: "SHA512 Hash Check Fails. Please check the uploaded image!"
+      when:
+        - ansible_network_os == 'cisco.ios.ios'
+        - sha_hash_verification_results.stdout[0].find('Verified') == -1
