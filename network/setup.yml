@@ -239,6 +239,12 @@ controller_inventory_sources:
 
 controller_templates:
   - name: "NETWORK | Containerlab | Provision Hypervisor"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - containerlab
+      - infrastructure
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -278,6 +284,12 @@ controller_templates:
           default: apd-demo
 
   - name: "NETWORK | Containerlab | Deploy Topology"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - containerlab
+      - infrastructure
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -305,6 +317,12 @@ controller_templates:
             - us-west-2
 
   - name: "NETWORK | Containerlab | Teardown Topology"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - containerlab
+      - infrastructure
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -331,6 +349,12 @@ controller_templates:
             - us-west-2
 
   - name: "NETWORK | Containerlab | Troubleshoot"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - containerlab
+      - infrastructure
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -357,6 +381,9 @@ controller_templates:
             - us-west-2
 
   - name: "NETWORK | Containerlab | Configure Devices"
+    labels:
+      - containerlab
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -369,6 +396,12 @@ controller_templates:
     notification_templates_error: Telemetry
 
   - name: "NETWORK | Containerlab | Teardown Hypervisor"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - containerlab
+      - infrastructure
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -397,6 +430,8 @@ controller_templates:
             - us-west-2
 
   - name: "NETWORK | Report"
+    labels:
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: ContainerLab Inventory
@@ -423,6 +458,9 @@ controller_templates:
             - clab_ios
 
   - name: "NETWORK | DISA STIG"
+    labels:
+      - compliance
+      - network
     job_type: check
     organization: Ansible Product Demos (APD)
     inventory: ContainerLab Inventory
@@ -450,6 +488,8 @@ controller_templates:
             - cat8kv
 
   - name: "NETWORK | Backup"
+    labels:
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: ContainerLab Inventory
@@ -515,6 +555,11 @@ controller_templates:
             - 17.15.01a
 
   - name: "NETWORK | Panos | Deploy"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - infrastructure
+      - network
     playbook: network/panos/deploy.yml
     project: Ansible Product Demos
     credentials:
@@ -532,6 +577,8 @@ controller_templates:
       apd_managed_by: "{{ apd_managed_by }}"
 
   - name: "NETWORK | Panos | Configure Firewall"
+    labels:
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
@@ -542,6 +589,8 @@ controller_templates:
       - Palo Alto Firewall Admin
 
   - name: "NETWORK | Panos | Configure Security Rule"
+    labels:
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
@@ -578,6 +627,8 @@ controller_templates:
             - "false"
 
   - name: "NETWORK | Panos | Configure Webserver"
+    labels:
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
@@ -589,6 +640,11 @@ controller_templates:
       - Palo Alto Bastion
 
   - name: "NETWORK | Panos | Cleanup"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - infrastructure
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
@@ -603,6 +659,11 @@ controller_templates:
 controller_workflows:
   - name: "NETWORK | Panos | Demo Firewall Workflow"
     description: A workflow to provision a firewall, web server, and security rule
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - infrastructure
+      - network
     inventory: Ansible Product Demos Inventory
     organization: Ansible Product Demos (APD)
     workflow_nodes:
@@ -651,6 +712,12 @@ controller_workflows:
 
   - name: "NETWORK | Deploy Containerlab Stack"
     description: Provision hypervisor then deploy containerlab topology
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - containerlab
+      - infrastructure
+      - network
     inventory: Ansible Product Demos Inventory
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
@@ -727,6 +794,11 @@ controller_workflows:
 
   - name: "NETWORK | Destroy Containerlab Stack"
     description: Tear down containerlab topology and all AWS resources
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - infrastructure
+      - network
     inventory: Ansible Product Demos Inventory
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
