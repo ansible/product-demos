@@ -1763,7 +1763,7 @@
 - slug: automation-orchestrator
   readme_path: infrastructure/docs/automation-orchestrator.md
   title: "Infrastructure | Automation Orchestrator — Provisioning"
-  subtitle: "Deploy Automation Orchestrator on OpenShift with aapctl from AAP"
+  subtitle: "One-click AO install — already wired on demo.redhat.com"
   category: infrastructure
   status: active
   featured: false
@@ -1775,7 +1775,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
     icon: "🎼"
-  blurb: "Install Automation Orchestrator on an existing OpenShift cluster via aapctl, configure AAP network allow-listing, and tear it down cleanly when the demo is done."
+  blurb: "On the RHDP catalog item, credentials and OpenShift are preconfigured — launch Install, grab the admin URL from the job output, and you are in."
   stats:
     playbooks: 3
   url: /demos/automation-orchestrator/
@@ -1808,7 +1808,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
     icon: "🎼"
-  blurb: "Deploy Automation Orchestrator with CloudNativePG and configure AAP network access in one job."
+  blurb: "Launch Install on RHDP — no survey, credentials already attached. Job output has the AO URL and admin password."
   stats:
     playbooks: 1
   github_path: infrastructure/ao/install.yml
@@ -1826,7 +1826,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
     icon: "🎼"
-  blurb: "Allow-list the AAP gateway and AO route, enable private-network OIDC, and restart the instance."
+  blurb: "Optional re-run of allow-listing — Install already does this for you on demo.redhat.com."
   stats:
     playbooks: 1
   github_path: infrastructure/ao/network-access.yml
@@ -1844,7 +1844,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
     icon: "🎼"
-  blurb: "Remove Automation Orchestrator, CloudNativePG, operators, and namespaces via aapctl."
+  blurb: "One-click teardown when the demo is done — keeps the shared RHDP cluster clean."
   stats:
     playbooks: 1
   github_path: infrastructure/ao/uninstall.yml

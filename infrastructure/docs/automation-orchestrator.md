@@ -1,75 +1,66 @@
 # Automation Orchestrator — Provisioning
 
-Deploy Red Hat Automation Orchestrator on an existing OpenShift cluster from AAP. The install job runs `aapctl`, stands up CloudNativePG plus the AO operator, then allow-lists the AAP gateway so Controller and Orchestrator can talk to each other. Uninstall tears the stack down cleanly when the demo is done.
+Turn on Automation Orchestrator with one job. On the [Ansible Product Demos catalog item](https://red.ht/apd-sandbox) from [demo.redhat.com](https://demo.redhat.com), OpenShift, credentials, and the AO execution environment are already wired up — launch **Infrastructure ǀ Automation Orchestrator ǀ Install**, wait for it to finish, and use the URL and admin password from the job output.
+
+Under the hood the playbook runs `aapctl`, stands up CloudNativePG plus the AO operator, and allow-lists the AAP gateway so Controller and Orchestrator can talk. You do not need to do any of that by hand on RHDP.
 
 ## Prerequisites
 
-- OpenShift cluster with privileges to create namespaces, operators, Deployments, Secrets, and Routes
-- **OpenShift Credential** configured in AAP (OpenShift or Kubernetes API Bearer Token)
-- **AAP Credential** configured in AAP (gateway URL + credentials — used to build the integration allow-list)
-- **AO Execution Environment** available (`quay.io/acme_corp/ao-ee:latest`) — must include `aapctl` and `kubectl`
-- **APD ǀ Single demo setup** — category `infrastructure` (creates the AO job templates and EE)
+- **If using RHDP (demo.redhat.com):** Nothing extra. OpenShift, the **OpenShift Credential**, the **AAP Credential**, and the **AO Execution Environment** ship with the catalog item. Run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** → `infrastructure`) if the AO templates are not visible yet, then launch Install.
+- **If using your own installation:** You need an OpenShift cluster, OpenShift + AAP credentials in AAP, the AO EE (`quay.io/acme_corp/ao-ee:latest`), and **APD ǀ Single demo setup** with category `infrastructure`.
 
 ## Configure credentials
 
-| Credential | Type | Where to get it |
-|------------|------|-----------------|
-| OpenShift Credential | OpenShift or Kubernetes API Bearer Token | OpenShift console — Service Account or user token with cluster-admin (or equivalent) |
-| AAP Credential | Red Hat Ansible Automation Platform | AAP instance — admin credentials; `CONTROLLER_HOST` must be reachable from AO |
+| Credential | Type | On demo.redhat.com |
+|------------|------|--------------------|
+| OpenShift Credential | OpenShift or Kubernetes API Bearer Token | Pre-configured |
+| AAP Credential | Red Hat Ansible Automation Platform | Pre-configured |
+
+Only set these yourself if you are running APD outside RHDP.
 
 ## Survey prompts
 
-These job templates do not use surveys. Install pins the operator channel as an extra var; Network Configuration prompts for extra vars on launch when you need overrides.
+No surveys. Click Launch on Install — defaults are fine.
 
-### Infrastructure ǀ Automation Orchestrator ǀ Install
-
-| Variable | Type | Default | Notes |
-|----------|------|---------|-------|
-| `ao_operator_channel` | extra var | `stable` | Operator subscription channel passed to `aapctl install ao` |
-
-### Infrastructure ǀ AO Network Configuration ǀ Install
-
-| Variable | Type | Required | Notes |
-|----------|------|----------|-------|
-| `aap_hostname` | extra var | No | Override AAP gateway URL if the attached AAP credential does not set `CONTROLLER_HOST` / `AAP_HOSTNAME` |
-| `ao_extra_hosts` | extra var | No | Additional hostnames to add to `APP_INTEGRATION_URL_ALLOWED_HOSTS` (list) |
-
-### Infrastructure ǀ Automation Orchestrator ǀ Uninstall
-
-No prompts — attach the OpenShift credential and launch.
+| Template | Variable | Default | When to change it |
+|----------|----------|---------|-------------------|
+| Install | `ao_operator_channel` | `stable` | Rarely — only if you need a non-stable operator channel |
+| Network Configuration | `aap_hostname` / `ao_extra_hosts` | from AAP credential | Only if you re-run network config with overrides |
+| Uninstall | — | — | No prompts |
 
 ## Job templates
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Infrastructure ǀ Automation Orchestrator ǀ Install | [`infrastructure/ao/install.yml`](../ao/install.yml) | Runs `aapctl install ao` (CloudNativePG + AO operator), waits for the Route, prints admin URL/password, then runs network access configuration |
-| Infrastructure ǀ AO Network Configuration ǀ Install | [`infrastructure/ao/network-access.yml`](../ao/network-access.yml) | Allow-lists AAP + AO hostnames, enables private-network OIDC, restarts AO Deployments |
-| Infrastructure ǀ Automation Orchestrator ǀ Uninstall | [`infrastructure/ao/uninstall.yml`](../ao/uninstall.yml) | Runs `aapctl` uninstall to remove AO, the CloudNativePG cluster, operators, and namespaces |
+| Infrastructure ǀ Automation Orchestrator ǀ Install | [`infrastructure/ao/install.yml`](../ao/install.yml) | One-click deploy: `aapctl install ao`, wait for the Route, print admin URL/password, configure network access |
+| Infrastructure ǀ AO Network Configuration ǀ Install | [`infrastructure/ao/network-access.yml`](../ao/network-access.yml) | Re-run allow-listing / private-network OIDC if needed (Install already does this) |
+| Infrastructure ǀ Automation Orchestrator ǀ Uninstall | [`infrastructure/ao/uninstall.yml`](../ao/uninstall.yml) | Tear down AO when the demo is done |
 
 ## Why it matters
 
-- **Day-0 to day-1 in one job** — Operators, database, and network allow-listing ship together so the demo is usable as soon as the job succeeds
-- **Credential-driven** — The same OpenShift + AAP credentials pattern used elsewhere in APD; no manual kubeconfig on the controller
-- **Safe teardown** — Uninstall is a first-class template so shared demo clusters do not accumulate orphaned AO namespaces
+- **Demo-ready on RHDP** — Catalog item already has the cluster and credentials; the story is “press Launch,” not “assemble a platform”
+- **Day-0 to day-1 in one job** — Operators, database, and AAP allow-listing finish before the job succeeds
+- **Clean exit** — Uninstall is a first-class template so shared lab clusters do not keep orphaned AO namespaces
 
 ## Presenter walkthrough
 
-1. Confirm an OpenShift cluster is available and the **OpenShift Credential** + **AAP Credential** are attached to the install template
-2. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install** — expect several minutes while operators and the Route come up (job timeout is 60 minutes)
-3. From the job output, copy the AO URL, `admin` username, and initial password — open the URL in a browser (login may fail for a minute or two after deploy; retry)
-4. Optionally re-run **Infrastructure ǀ AO Network Configuration ǀ Install** if you change the AAP gateway hostname or need extra allow-listed hosts
-5. When finished, launch **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** to remove AO and related operators/namespaces
+1. Order the Ansible Product Demos item from [demo.redhat.com](https://red.ht/apd-sandbox) (or open your existing lab)
+2. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install** — no survey answers required; it takes several minutes (timeout is 60 minutes)
+3. When the job succeeds, open the AO URL from the job output and log in as `admin` with the printed password (retry for a minute or two if login fails right after deploy)
+4. When finished, launch **Infrastructure ǀ Automation Orchestrator ǀ Uninstall**
+
+Skip the Network Configuration template unless you changed the AAP gateway or need extra allow-listed hosts — Install already ran it.
 
 ## Talking points
 
-- Automation Orchestrator is installed with `aapctl`, the supported CLI path — AAP is driving the same tool an admin would use on the command line
-- Network configuration is not optional for AAP integration: AO must trust the gateway hostname (and its own Route) on the integration URL allow-list
-- Private-network OIDC is enabled so AAP and AO can authenticate when they share a private OpenShift network
-- The AO EE (`quay.io/acme_corp/ao-ee:latest`) packages `aapctl` so Controller does not need cluster-admin tools baked into the default EE
+- This is the supported path: AAP drives `aapctl`, the same CLI an admin would use
+- On RHDP the hard parts (OpenShift access, credentials, EE with `aapctl`) are already done — the demo is the install itself
+- Network allow-listing is included so AAP and AO can integrate immediately after Install succeeds
+- Uninstall keeps the shared demo cluster tidy for the next presenter
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| [ROSA Cluster Lifecycle](./rosa-lifecycle.md) | Provision an OpenShift cluster on AWS to use as the AO deployment target |
-| [OPA — Policy as Code](./opa-policy-as-code.md) | Deploy another OpenShift-backed control-plane component from AAP |
+| [ROSA Cluster Lifecycle](./rosa-lifecycle.md) | Provision an OpenShift cluster on AWS when you are not using the RHDP catalog item |
+| [OPA — Policy as Code](./opa-policy-as-code.md) | Another OpenShift-backed control-plane component launched from AAP |
