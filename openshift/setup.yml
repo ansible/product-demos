@@ -21,6 +21,68 @@ controller_inventory_sources:
     overwrite: true
 
 controller_templates:
+  - name: OpenShift | AAP HA/DR | Preflight
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "openshift/aap-hadr/preflight.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - OpenShift Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: 'Read-only validation of both OpenShift sites and required operators.'
+      spec:
+        - question_name: AAP namespace
+          type: text
+          variable: aap_hadr_namespace
+          default: aap
+          required: true
+        - question_name: Primary OpenShift context
+          type: text
+          variable: aap_hadr_primary_context
+          default: cluster-a
+          required: true
+        - question_name: Standby OpenShift context
+          type: text
+          variable: aap_hadr_standby_context
+          default: cluster-b
+          required: true
+
+  - name: OpenShift | AAP HA/DR | Verify
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "openshift/aap-hadr/verify.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - OpenShift Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: 'Read-only validation of AAP active/passive state.'
+      spec:
+        - question_name: AAP namespace
+          type: text
+          variable: aap_hadr_namespace
+          default: aap
+          required: true
+        - question_name: Primary OpenShift context
+          type: text
+          variable: aap_hadr_primary_context
+          default: cluster-a
+          required: true
+        - question_name: Standby OpenShift context
+          type: text
+          variable: aap_hadr_standby_context
+          default: cluster-b
+          required: true
+
   - name: OpenShift | EDA | Install Controller
     job_type: run
     inventory: Ansible Product Demos Inventory

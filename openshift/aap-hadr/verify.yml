@@ -1,0 +1,55 @@
+---
+- name: Verify AAP HA/DR OpenShift sites
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Read AAP resources
+      kubernetes.core.k8s_info:
+        api_version: ansible.com/v1alpha1
+        kind: AnsibleAutomationPlatform
+        namespace: "{{ aap_hadr_namespace }}"
+        context: "{{ item.context }}"
+      loop:
+        - name: primary
+          context: "{{ aap_hadr_primary_context }}"
+        - name: standby
+          context: "{{ aap_hadr_standby_context }}"
+      register: aap_hadr_platforms
+      changed_when: false
+
+    - name: Require exactly one AAP resource per site
+      ansible.builtin.assert:
+        that:
+          - item.resources | length == 1
+        fail_msg: "Expected one AAP resource on {{ item.item.name }}."
+      loop: "{{ aap_hadr_platforms.results }}"
+
+    - name: Read CNPG resources
+      kubernetes.core.k8s_info:
+        api_version: postgresql.cnpg.io/v1
+        kind: Cluster
+        namespace: "{{ aap_hadr_namespace }}"
+        context: "{{ item }}"
+      loop:
+        - "{{ aap_hadr_primary_context }}"
+        - "{{ aap_hadr_standby_context }}"
+      register: aap_hadr_cnpg
+      changed_when: false
+
+    - name: Report AAP and database state
+      ansible.builtin.debug:
+        msg:
+          site: "{{ item.0.item.name }}"
+          aap_name: "{{ item.0.resources[0].metadata.name }}"
+          aap_idle: "{{ item.0.resources[0].spec.idle_aap | default('unset') }}"
+          aap_conditions: "{{ item.0.resources[0].status.conditions | default([]) }}"
+          cnpg_clusters: "{{ item.1.resources | map(attribute='metadata.name') | list }}"
+      loop: "{{ aap_hadr_platforms.results | zip(aap_hadr_cnpg.results) | list }}"
+
+    - name: Enforce active/passive AAP state
+      ansible.builtin.assert:
+        that:
+          - aap_hadr_platforms.results[0].resources[0].spec.idle_aap | bool == aap_hadr_expected_primary_idle | bool
+          - aap_hadr_platforms.results[1].resources[0].spec.idle_aap | bool == aap_hadr_expected_standby_idle | bool
+        fail_msg: >-
+          AAP idle_aap state does not match the expected active/passive topology.

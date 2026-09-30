@@ -1,0 +1,7 @@
+---
+aap_hadr_namespace: aap
+aap_hadr_primary_context: cluster-a
+aap_hadr_standby_context: cluster-b
+aap_hadr_expected_primary_idle: false
+aap_hadr_expected_standby_idle: true
+aap_hadr_replication_lag_seconds: 60
