@@ -1,0 +1,74 @@
+{
+  "state": {
+    "domains": [
+      {
+        "name": "AWS",
+        "labels": [
+          { "name": "aws.ec2" },
+          { "name": "aws.rosa" },
+          { "name": "aws.vpc" }
+        ]
+      },
+      {
+        "name": "Compliance",
+        "labels": [
+          { "name": "compliance" },
+          { "name": "patching" },
+          { "name": "policy-as-code" }
+        ]
+      },
+      {
+        "name": "EDA",
+        "labels": [
+          { "name": "eda" }
+        ]
+      },
+      {
+        "name": "Infrastructure",
+        "labels": [
+          { "name": "infrastructure" }
+        ]
+      },
+      {
+        "name": "Linux",
+        "labels": [
+          { "name": "linux" },
+          { "name": "rhel" }
+        ]
+      },
+      {
+        "name": "Network",
+        "labels": [
+          { "name": "containerlab" },
+          { "name": "network" }
+        ]
+      },
+      {
+        "name": "OpenShift",
+        "labels": [
+          { "name": "openshift" }
+        ]
+      },
+      {
+        "name": "Orchestrator",
+        "labels": [
+          { "name": "orchestrator" }
+        ]
+      },
+      {
+        "name": "Satellite",
+        "labels": [
+          { "name": "satellite" }
+        ]
+      },
+      {
+        "name": "Windows",
+        "labels": [
+          { "name": "windows" }
+        ]
+      }
+    ],
+    "activeDomains": []
+  },
+  "version": 0
+}
