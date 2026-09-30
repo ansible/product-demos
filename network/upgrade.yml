@@ -1,0 +1,98 @@
+---
+- name: Upgrade Router IOS Image
+  hosts: "{{ _hosts | default('clab_ios') }}"
+  gather_facts: false
+  vars:
+    new_version: "{{ image_upgrade }}"
+    new_image_ios: "c8000v-universalk9.{{ new_version }}.SPA.bin"
+
+  tasks:
+    - name: Change boot system to load new image next reload
+      cisco.ios.ios_config:
+        lines:
+          - "boot system bootflash:packages.conf"
+        before:
+          - 'no boot system'
+        save_when: always
+      when: ansible_network_os == 'cisco.ios.ios'
+
+    - name: Check if correct image still exist in bootflash, if not FAIL the playbook
+      cisco.ios.ios_command:
+        commands: 'dir bootflash: | include {{ new_image_ios }}'
+      register: check_image
+      failed_when: check_image.stdout[0].find(new_image_ios) == -1
+      when: ansible_network_os == 'cisco.ios.ios'
+
+    - name: Please wait for Install mode to complete the IOS upgrade
+      ansible.builtin.debug:
+        msg: "Please wait for Install mode to complete the IOS upgrade to version: {{ new_image_ios }}..."
+      when: ansible_network_os == 'cisco.ios.ios'
+
+    - name: Install new version with activate and commit
+      vars:
+        ansible_command_timeout: 1200
+      cisco.ios.ios_command:
+        commands:
+          - command: install add file bootflash:{{ new_image_ios }} activate commit
+            prompt:
+              - 'This operation may require a reload of the system. Do you want to proceed\? \[y/n]'
+            answer:
+              - 'y'
+      register: install_activate_output
+      when: ansible_network_os == 'cisco.ios.ios'
+
+    - name: Display install activate output
+      ansible.builtin.debug:
+        var: install_activate_output.stdout_lines
+      when: ansible_network_os == 'cisco.ios.ios'
+
+    - name: Please wait for the router to reboot
+      ansible.builtin.debug:
+        msg: "Please wait for {{ inventory_hostname }} to reboot..."
+      when:
+        - ansible_network_os == 'cisco.ios.ios'
+        - "'No Change' not in install_activate_output.stdout[0]"
+
+    - name: Wait for SSH port to come back
+      ansible.builtin.wait_for:
+        host: "{{ ansible_host }}"
+        port: "{{ ansible_port }}"
+        delay: 60
+        timeout: 550
+      connection: local
+      when:
+        - ansible_network_os == 'cisco.ios.ios'
+        - "'No Change' not in install_activate_output.stdout[0]"
+
+    - name: Wait for IOS-XE to be fully ready
+      cisco.ios.ios_command:
+        commands: show version
+      register: post_reboot_version
+      retries: 10
+      delay: 30
+      until: post_reboot_version is not failed
+      when:
+        - ansible_network_os == 'cisco.ios.ios'
+        - "'No Change' not in install_activate_output.stdout[0]"
+
+- name: Confirm Bootloader After Reload
+  hosts: "{{ _hosts | default('clab_ios') }}"
+  gather_facts: false
+  vars:
+    new_version: "{{ image_upgrade }}"
+    new_image_ios: "c8000v-universalk9.{{ new_version }}.SPA.bin"
+
+  tasks:
+    - name: Show bootloader config
+      cisco.ios.ios_command:
+        commands: 'sh version'
+      register: version2
+      when: ansible_network_os == 'cisco.ios.ios'
+
+    - name: Assert bootloader config changed
+      ansible.builtin.assert:
+        that:
+          - "new_version in version2['stdout'][0]"
+        fail_msg: "{{ new_version }} is not present"
+        success_msg: "{{ new_version }} is present"
+      when: ansible_network_os == 'cisco.ios.ios'

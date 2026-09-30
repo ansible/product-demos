@@ -49,6 +49,7 @@ mock_modules:
   - ansible.eda.rulebook_info
   - ansible.eda.rulebook_activation
   - ansible.eda.rulebook_activation_info
+  - ansible.netcommon.cli_command
   - ansible.posix.at
   - ansible.posix.mount
   - ansible.posix.authorized_key
@@ -71,6 +72,7 @@ mock_modules:
   - ansible.windows.win_user
   - chocolatey.chocolatey.win_chocolatey
   - cisco.ios.ios_banner
+  - cisco.ios.ios_command
   - cisco.ios.ios_config
   - cisco.ios.ios_facts
   - cisco.ios.ios_ntp_global
