@@ -27,5 +27,5 @@
       {% endfor %}
     </div>
   </td>
-  <td class="demo-row__author">{% if demo.author %}{{ demo.author }}{% endif %}</td>
+  <td class="demo-row__author">{% if demo.author %}{% if demo.author_url %}<a href="{{ demo.author_url }}" target="_blank" rel="noopener" onclick="event.stopPropagation()">{{ demo.author }}</a>{% else %}{{ demo.author }}{% endif %}{% endif %}</td>
 </tr>

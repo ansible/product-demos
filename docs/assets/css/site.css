@@ -963,6 +963,16 @@ html:not([data-theme="dark"]) .demo-card:hover {
   font-style: italic;
 }
 
+.detail-meta-bar__author a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.detail-meta-bar__author a:hover {
+  color: var(--link, #58a6ff);
+}
+
 .detail-special-thanks {
   border-top: 1px solid var(--border);
   padding-top: 24px;
