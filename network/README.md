@@ -65,6 +65,8 @@ Device connectivity is handled via an **SSH Proxy** credential type that routes 
 | **Report** | Gather facts from containerlab Cisco devices and display device information including hostname, OS version, model, serial number, and interfaces. |
 | **DISA STIG** | Run the DISA STIG role against the IOS-XE device to assess configuration compliance. Runs in check mode by default. |
 | **Backup** | Back up running configurations from containerlab NX-OS and IOS-XE devices using native Cisco collection modules. |
+| **Staging** | Stage a new IOS-XE image to the IOS-XE device bootflash via SCP, then verify the file integrity with a SHA-512 hash check. Must be run before **Upgrade**. |
+| **Upgrade** | Install and activate the staged IOS-XE image, reload the device, and verify the new version is running. Requires **Staging** to have completed successfully first. |
 
 ### Palo Alto
 
@@ -88,6 +90,24 @@ Device connectivity is handled via an **SSH Proxy** credential type that routes 
 
 **NETWORK ǀ Backup** — Back up device configurations using the native `cisco.ios.ios_config` and `cisco.nxos.nxos_config` modules. Backups are saved on the execution node. This demonstrates how Ansible can automate configuration backup across heterogeneous network environments.
 
+**NETWORK ǀ Staging** — Stage a new IOS-XE image onto the cat8kv device. Enables SCP on the IOS-XE device, transfers the image to bootflash, and verifies the file integrity with a SHA-512 hash check. This job must be run **before** the Upgrade job — the upgrade will fail if no image has been staged. The IOS version is selected via a survey (`image_staging`), and several variables are pre-configured in the job template extra variables (`scp_server`, `sha_hash`) and the SCP credential (`scp_user`, `scp_password`). The playbook derives `new_version` and `new_image_ios` automatically from the survey selection.
+
+**NETWORK ǀ Upgrade** — Install and activate the previously staged IOS-XE image on the cat8kv device. The playbook sets the boot system to the new image, runs `install add activate commit`, waits for the device to reload, and then verifies the new version is running. **You must run Staging first** — the upgrade checks that the image exists in bootflash and will fail if it is missing. The IOS version is selected via a survey (`image_upgrade`), and the playbook derives `new_version` and `new_image_ios` automatically from the survey selection. Note: the upgrade and reboot process may take approximately 10 minutes to complete. Also in rare instances the reboot will show the original version if the router container fails and respawns during the reboot. Just run the upgrade again and it should be fine.
+
 **NETWORK ǀ Panos** — See the [Palo Alto README](./panos/README.md) for usage instructions.
 
 **Clean up when done** — Run the **NETWORK ǀ Destroy Containerlab Stack** workflow to remove all AWS resources and avoid unnecessary costs.
+
+## Troubleshooting
+
+### Receptor Pod Connection Refused
+
+If a job fails with an error like:
+
+```
+Error with pod's stdout: Error getting pod aap/automation-job-XX-xxxxx.
+Error: Get "https://172.231.0.1:443/api/v1/namespaces/aap/pods/automation-job-XX-xxxxx":
+dial tcp 172.231.0.1:443: connect: connection refused
+```
+
+This means the execution environment pod lost connectivity to the Kubernetes API server. Common causes include API server pressure, node resource exhaustion, or network policies blocking egress from the `aap` namespace. Try relaunching the job template — if the error is intermittent it is usually transient and a relaunch will succeed. If it persists, check `oc get co`, `oc get nodes`, and `oc get networkpolicy -n aap` to verify the cluster and network are healthy.
