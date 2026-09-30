@@ -20,7 +20,7 @@
       cisco.ios.ios_command:
         commands: 'dir bootflash: | include {{ new_image_ios }}'
       register: check_image
-      failed_when: check_image.stdout[0].find( new_image_ios ) == -1
+      failed_when: check_image.stdout[0].find(new_image_ios) == -1
       when: ansible_network_os == 'cisco.ios.ios'
 
     - name: Please wait for Install mode to complete the IOS upgrade
