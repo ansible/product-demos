@@ -22,7 +22,13 @@ mermaid: true
 </div>
 
 <div class="detail-meta-bar">
-  <span class="detail-meta-bar__author">Author: {{ demo.author | default: "Unknown" }}</span>
+  <span class="detail-meta-bar__author">Author:
+    {% if demo.author_url and demo.author %}
+      <a href="{{ demo.author_url }}" target="_blank" rel="noopener">{{ demo.author }}</a>
+    {% else %}
+      {{ demo.author | default: "Unknown" }}
+    {% endif %}
+  </span>
 </div>
 
 <section class="detail-section" id="description">
