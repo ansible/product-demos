@@ -17,3 +17,16 @@ topology:
       startup-config: configs/cat8kv/startup-config.cfg
       ports:
         - "2123:22"
+    scp-server:      
+      kind: linux
+      image: registry.gitlab.com/redhatautomation/linux-file:latest
+      mgmt-ipv4: 172.20.20.11
+      exec:
+        - apt-get update
+        - apt-get install -y openssh-server
+        - mkdir -p /var/run/sshd
+        - useradd -m -s /bin/bash scpuser
+        - echo 'scpuser:scpuser' | chpasswd  # local containerlab password only
+        - sed -i 's/.*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+        - /usr/sbin/sshd
+    

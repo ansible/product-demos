@@ -1,7 +1,7 @@
 ---
 - name: Gather patch compliance data
   hosts: "{{ _hosts | default('aws_rhel8:aws_rhel9') }}:{{ _hosts_windows | default('aws-dc:aws_win1') }}"
-  gather_facts: true
+  gather_facts: false
 
   vars:
     _raw_cve_input: "{{ input_cve_ids | default('RHSA-2024:3138, CVE-2024-33599') }}"
@@ -10,6 +10,14 @@
     target_kb_ids: "{{ (_raw_kb_input.split(',') | map('trim') | list) if _raw_kb_input is string else _raw_kb_input }}"
 
   tasks:
+    - name: Bootstrap Python 3.9 on RHEL 8
+      ansible.builtin.include_role:
+        name: demo.cloud.ensure_rhel8_python
+      when: ansible_connection | default('ssh') != 'winrm'
+
+    - name: Gather facts
+      ansible.builtin.setup:
+
     - name: Clear stale facts from previous runs
       ansible.builtin.set_fact:
         compliance_status: null

@@ -49,6 +49,10 @@ controller_templates:
     description: >-
       Validates AWS credentials, ROSA token, permissions, EIP and VPC
       quota, and checks for existing cluster name conflicts.
+    labels:
+      - aws.rosa
+      - openshift
+      - infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     execution_environment: ROSA Lifecycle EE
@@ -88,6 +92,10 @@ controller_templates:
     description: >-
       Initiates ROSA cluster creation with STS mode.
       Does NOT wait for readiness—use the workflow or Wait job.
+    labels:
+      - aws.rosa
+      - openshift
+      - infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     execution_environment: ROSA Lifecycle EE
@@ -162,6 +170,10 @@ controller_templates:
       Polls cluster status until ready (default timeout: 90min).
       Fails immediately if the cluster enters error or uninstalling.
       Creates cluster-admin credentials on success.
+    labels:
+      - aws.rosa
+      - openshift
+      - infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     execution_environment: ROSA Lifecycle EE
@@ -201,6 +213,10 @@ controller_templates:
       Destroys a ROSA cluster and cleans up STS operator roles
       and OIDC provider. Waits up to 60min for uninstall.
       Idempotent (safe to run if cluster is gone).
+    labels:
+      - aws.rosa
+      - openshift
+      - infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     execution_environment: ROSA Lifecycle EE
@@ -241,6 +257,9 @@ controller_templates:
       aapctl. Installs CloudNativePG operator, PostgreSQL database, and the
       AO operator, then configures network access so the AAP gateway can
       reach it.
+    labels:
+      - infrastructure
+      - orchestrator
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -260,6 +279,9 @@ controller_templates:
     description: >-
       Removes Automation Orchestrator, CloudNativePG cluster, operators,
       and both namespaces.
+    labels:
+      - infrastructure
+      - orchestrator
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -276,6 +298,9 @@ controller_templates:
       Allow-lists the AAP gateway and AO route hostnames on Automation
       Orchestrator's integration URL allow-list and enables private-network
       OIDC, then restarts the instance so the change takes effect.
+    labels:
+      - infrastructure
+      - orchestrator
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -290,6 +315,9 @@ controller_templates:
       - AAP Credential
 
   - name: Infrastructure | HashiCorp Vault
+    labels:
+      - infrastructure
+      - openshift
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -320,6 +348,11 @@ controller_templates:
       Policy as Code settings to use the new OPA server. All .rego
       policy files are loaded into a ConfigMap and mounted into the
       OPA container.
+    labels:
+      - compliance
+      - infrastructure
+      - openshift
+      - policy-as-code
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -354,6 +387,10 @@ controller_templates:
       Uploads a Rego policy to OPA via the REST API. Policies added
       this way are stored in memory only and will not survive an OPA
       pod restart.
+    labels:
+      - compliance
+      - infrastructure
+      - policy-as-code
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -394,6 +431,8 @@ controller_templates:
       Installs httpd on aws_rhel9 and renders the approved ACME storefront
       from a Jinja2 template. Click Launch with the default host to deploy
       the baseline page.
+    labels:
+      - infrastructure
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
@@ -433,6 +472,8 @@ controller_templates:
       Re-renders the ACME storefront Jinja2 template with survey variables.
       Change knobs to update the live page without reinstalling httpd.
       Run Setup first.
+    labels:
+      - infrastructure
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
@@ -517,6 +558,10 @@ controller_templates:
     description: >-
       Provisions a dedicated aws_kafka EC2 instance and deploys single-node
       Podman KRaft Kafka with topic linux-audit-events.
+    labels:
+      - aws.ec2
+      - eda
+      - infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -570,6 +615,10 @@ controller_templates:
       Deploys persistent auditd rules that watch /etc/ssh/sshd_config for writes
       and attribute changes, and installs Filebeat with the auditd module.
       Use Filebeat output kafka after provisioning the Kafka queue.
+    labels:
+      - compliance
+      - eda
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
@@ -607,6 +656,10 @@ controller_templates:
       Sets PermitRootLogin yes on RHEL workers to simulate sshd_config drift
       for the event-driven remediation demo. Prints matching sshd_config lines
       before and after the change so presenters can run the full flow from AAP.
+    labels:
+      - compliance
+      - eda
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
@@ -635,6 +688,10 @@ controller_templates:
       Creates or updates the EDA rulebook activation that listens on Kafka
       topic linux-audit-events for sshd_config_change events and launches
       SSHD remediation.
+    labels:
+      - compliance
+      - eda
+      - infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -650,6 +707,10 @@ controller_templates:
     description: >-
       Restores PermitRootLogin no on a host identified by private IP from a
       Kafka audit event. Launched by the config drift EDA rulebook.
+    labels:
+      - compliance
+      - eda
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: Ansible Product Demos
@@ -666,6 +727,10 @@ controller_templates:
       Verifies aws_rhel8 and aws_rhel9 exist in inventory before config drift
       setup. Used by the Full Setup workflow; fails when Deploy Cloud Stack in
       AWS must be run first.
+    labels:
+      - compliance
+      - eda
+      - infrastructure
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
@@ -680,6 +745,9 @@ controller_workflows:
     description: >-
       End-to-end ROSA cluster creation: preflight checks, create,
       wait for readiness. On failure, attempts cleanup via destroy.
+    labels:
+      - aws.rosa
+      - infrastructure
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -777,6 +845,9 @@ controller_workflows:
     description: >-
       Safely destroys a ROSA cluster with confirmation.
       Idempotent—safe to run even if cluster no longer exists.
+    labels:
+      - aws.rosa
+      - infrastructure
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -822,6 +893,10 @@ controller_workflows:
       with Kafka output, and activate the EDA rulebook. Run Deploy Cloud Stack
       in AWS first if aws_rhel8/aws_rhel9 are missing. Run Introduce SSHD Drift
       separately for the live demo.
+    labels:
+      - compliance
+      - eda
+      - infrastructure
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
