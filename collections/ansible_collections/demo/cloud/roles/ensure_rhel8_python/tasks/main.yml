@@ -4,6 +4,12 @@
 #
 # The raw module runs over SSH without needing a Python interpreter on the
 # managed node, so it can bootstrap Python 3.9 before any other module runs.
+
+# Detection is intentionally broad (/etc/redhat-release "release 8") so
+# clones like Rocky/CentOS Stream 8 also get python39 installed.  The
+# interpreter pin and connection reset below are gated on
+# ansible_distribution == 'RedHat' so only genuine RHEL 8 hosts change
+# their runtime interpreter.
 - name: Ensure Python 3.9 is installed on RHEL 8
   ansible.builtin.raw: |
     set -e
@@ -31,5 +37,6 @@
 - name: Reset SSH connection to apply RHEL 8 interpreter
   ansible.builtin.meta: reset_connection
   when:
+    - _rhel8_python39 is changed  # noqa: no-handler
     - ansible_distribution == 'RedHat'
     - ansible_distribution_major_version | string == '8'
