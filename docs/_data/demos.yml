@@ -1759,3 +1759,92 @@
   stats:
     playbooks: 1
   github_path: infrastructure/opa/add-policy.yml
+
+- slug: automation-orchestrator
+  readme_path: infrastructure/docs/automation-orchestrator.md
+  title: "Infrastructure | Automation Orchestrator — Provisioning"
+  subtitle: "Deploy Automation Orchestrator on OpenShift with aapctl from AAP"
+  category: infrastructure
+  status: active
+  featured: false
+  tags:
+    - Playbook
+    - OpenShift
+    - Orchestrator
+    - Provisioning
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
+    icon: "🎼"
+  blurb: "Install Automation Orchestrator on an existing OpenShift cluster via aapctl, configure AAP network allow-listing, and tear it down cleanly when the demo is done."
+  stats:
+    playbooks: 3
+  url: /demos/automation-orchestrator/
+  github_path: infrastructure/setup.yml
+  workflow_mermaid: |
+    flowchart LR
+      S["🏠 Start"]
+      S --> A["🎼 Install AO via aapctl"]
+      A --> B["🛣 Wait for Route"]
+      B --> C["🔗 Network allow-list + OIDC"]
+      C --> D["🔑 Admin URL + password"]
+      D --> E["🧹 Uninstall when done"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#162c46,stroke:#58a6ff,color:#fff
+      style C fill:#1a3d2e,stroke:#3dd68c,color:#fff
+      style D fill:#2d2d2d,stroke:#888,color:#fff
+      style E fill:#3d1a1a,stroke:#f87171,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: automation-orchestrator-install
+  readme_path: infrastructure/docs/automation-orchestrator.md
+  url: /demos/automation-orchestrator-install/
+  title: "Infrastructure | Automation Orchestrator — Install"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - OpenShift
+    - Orchestrator
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
+    icon: "🎼"
+  blurb: "Deploy Automation Orchestrator with CloudNativePG and configure AAP network access in one job."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/ao/install.yml
+
+- slug: automation-orchestrator-network
+  readme_path: infrastructure/docs/automation-orchestrator.md
+  url: /demos/automation-orchestrator-network/
+  title: "Infrastructure | Automation Orchestrator — Network Configuration"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - OpenShift
+    - Orchestrator
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
+    icon: "🎼"
+  blurb: "Allow-list the AAP gateway and AO route, enable private-network OIDC, and restart the instance."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/ao/network-access.yml
+
+- slug: automation-orchestrator-uninstall
+  readme_path: infrastructure/docs/automation-orchestrator.md
+  url: /demos/automation-orchestrator-uninstall/
+  title: "Infrastructure | Automation Orchestrator — Uninstall"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - OpenShift
+    - Orchestrator
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
+    icon: "🎼"
+  blurb: "Remove Automation Orchestrator, CloudNativePG, operators, and namespaces via aapctl."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/ao/uninstall.yml
