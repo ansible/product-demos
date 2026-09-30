@@ -1767,6 +1767,7 @@
   category: infrastructure
   status: active
   featured: false
+  author: "Roger Lopez (https://github.com/rlopez133)"
   tags:
     - Playbook
     - OpenShift
@@ -1801,6 +1802,7 @@
   title: "Infrastructure | Automation Orchestrator — Install"
   category: infrastructure
   status: active
+  author: "Roger Lopez (https://github.com/rlopez133)"
   tags:
     - Playbook
     - OpenShift
@@ -1819,6 +1821,7 @@
   title: "Infrastructure | Automation Orchestrator — Network Configuration"
   category: infrastructure
   status: active
+  author: "Roger Lopez (https://github.com/rlopez133)"
   tags:
     - Playbook
     - OpenShift
@@ -1837,6 +1840,7 @@
   title: "Infrastructure | Automation Orchestrator — Uninstall"
   category: infrastructure
   status: active
+  author: "Roger Lopez (https://github.com/rlopez133)"
   tags:
     - Playbook
     - OpenShift
