@@ -77,16 +77,23 @@ controller_inventory_sources:
         - key: tags.Compliance
           separator: ''
 
+# Leaf groups must exist before parents that reference them as children.
+# controller_host_groups submits creates async in one batch; creating a
+# parent before its children fails on a fresh controller (see #365).
+# setup_demo.yml also creates aws_* leaves in a prior pass so the parent
+# create cannot race even within that async batch.
 controller_groups:
+  - name: aws_rhel
+    inventory: Ansible Product Demos Inventory
+  - name: aws_linux
+    inventory: Ansible Product Demos Inventory
+  - name: aws_windows
+    inventory: Ansible Product Demos Inventory
   - name: os_linux
     inventory: Ansible Product Demos Inventory
     children:
       - "aws_linux"
       - "aws_rhel"
-  - name: aws_rhel
-    inventory: Ansible Product Demos Inventory
-  - name: aws_linux
-    inventory: Ansible Product Demos Inventory
   - name: os_windows
     inventory: Ansible Product Demos Inventory
     children:
@@ -96,8 +103,6 @@ controller_groups:
       ansible_winrm_transport: credssp
       ansible_winrm_server_cert_validation: ignore
       ansible_port: 5986
-  - name: aws_windows
-    inventory: Ansible Product Demos Inventory
   - name: domain_ansible_local
     inventory: Ansible Product Demos Inventory
     variables:

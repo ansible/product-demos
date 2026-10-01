@@ -14,6 +14,16 @@
       ansible.builtin.set_fact:
         _deployment_id: '{{ lookup("ansible.builtin.password", "{{ playbook_dir }}/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
 
+    # aws_* leaves must exist before os_linux / os_windows parents reference
+    # them. dispatch -> controller_host_groups fires the full list async with
+    # loop_delay 0, so a single pass races on a fresh controller (#365).
+    - name: Create AWS leaf inventory groups before parent groups
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_host_groups
+      vars:
+        controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
+        controller_groups: "{{ controller_groups | selectattr('name', 'match', '^aws_') | list }}"
+
     - name: Create common demo resources
       ansible.builtin.include_role:
         name: infra.aap_configuration.dispatch
