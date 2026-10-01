@@ -17,12 +17,20 @@
     # aws_* leaves must exist before os_linux / os_windows parents reference
     # them. dispatch -> controller_host_groups fires the full list async with
     # loop_delay 0, so a single pass races on a fresh controller (#365).
+    # Pass an explicit list (do not filter controller_groups): selectattr
+    # re-templates the whole list and blows up on !unsafe Jinja in other groups.
     - name: Create AWS leaf inventory groups before parent groups
       ansible.builtin.include_role:
         name: infra.aap_configuration.controller_host_groups
       vars:
         controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
-        controller_groups: "{{ controller_groups | selectattr('name', 'match', '^aws_') | list }}"
+        controller_groups:
+          - name: aws_rhel
+            inventory: Ansible Product Demos Inventory
+          - name: aws_linux
+            inventory: Ansible Product Demos Inventory
+          - name: aws_windows
+            inventory: Ansible Product Demos Inventory
 
     - name: Create common demo resources
       ansible.builtin.include_role:
