@@ -23,28 +23,22 @@
               disabled: false
               allow_write_operations: '{{ aap_mcp_allow_write_operations | bool }}'
 
-    - name: Check AAP MCP server status
-      block:
-        - name: Wait for AAP MCP server to be enabled
-          kubernetes.core.k8s_info:
-            api_version: aap.ansible.com/v1alpha1
-            kind: AnsibleAutomationPlatform
-            name: "{{ aap_custom_resource_name }}"
-            namespace: "{{ aap_custom_resource_namespace }}"
-          register: _cr_status
-          until:
-            - (_cr_status.resources[0].status.conditions | default([])
-               | selectattr('type', 'equalto', 'Successful')
-               | selectattr('status', 'equalto', 'True') | list | length) > 0
-            - (_cr_status.resources[0].status.conditions | default([])
-               | selectattr('type', 'equalto', 'Running')
-               | selectattr('status', 'equalto', 'False') | list | length) > 0
-          retries: 30
-          delay: 10
-      rescue:
-        - name: Debug
-          ansible.builtin.debug:
-            var: _cr_status
+    - name: Wait for AAP MCP server to be ready (10+ minutes)
+      kubernetes.core.k8s_info:
+        api_version: aap.ansible.com/v1alpha1
+        kind: AnsibleAutomationPlatform
+        name: "{{ aap_custom_resource_name }}"
+        namespace: "{{ aap_custom_resource_namespace }}"
+      register: _cr_status
+      until:
+        - (_cr_status.resources[0].status.conditions | default([])
+           | selectattr('type', 'equalto', 'Successful')
+           | selectattr('status', 'equalto', 'True') | list | length) > 0
+        - (_cr_status.resources[0].status.conditions | default([])
+           | selectattr('type', 'equalto', 'Running')
+           | selectattr('status', 'equalto', 'False') | list | length) > 0
+      retries: 30
+      delay: 30
 
     - name: Fetch the OpenShift Route for the MCP server
       kubernetes.core.k8s_info:
