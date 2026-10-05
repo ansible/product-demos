@@ -1,5 +1,5 @@
 ---
-- name: Add AAP MCP server to AAP operator deployment
+- name: Enable AAP operator MCP server
   hosts: localhost
   connection: local
   gather_facts: false
@@ -23,24 +23,7 @@
               disabled: false
               allow_write_operations: '{{ aap_mcp_allow_write_operations | bool }}'
 
-    - name: Wait for AAP MCP server to be ready (10+ minutes)
-      kubernetes.core.k8s_info:
-        api_version: aap.ansible.com/v1alpha1
-        kind: AnsibleAutomationPlatform
-        name: "{{ aap_custom_resource_name }}"
-        namespace: "{{ aap_custom_resource_namespace }}"
-      register: _cr_status
-      until:
-        - (_cr_status.resources[0].status.conditions | default([])
-           | selectattr('type', 'equalto', 'Successful')
-           | selectattr('status', 'equalto', 'True') | list | length) > 0
-        - (_cr_status.resources[0].status.conditions | default([])
-           | selectattr('type', 'equalto', 'Running')
-           | selectattr('status', 'equalto', 'False') | list | length) > 0
-      retries: 30
-      delay: 30
-
-    - name: Fetch the OpenShift Route for the MCP server
+    - name: Wait for the AAP MCP server route to be available
       kubernetes.core.k8s_info:
         api_version: route.openshift.io/v1
         kind: Route
@@ -48,6 +31,9 @@
         label_selectors:
           - "app.kubernetes.io/component=mcp"
       register: _mcp_route
+      until: _mcp_route.resources | length > 0
+      retries: 15
+      delay: 30
 
     - name: Debug
       ansible.builtin.debug:
