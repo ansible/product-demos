@@ -781,6 +781,39 @@ controller_templates:
             - "true"
             - "false"
 
+  - name: "Infrastructure | Disable AAP MCP server on operator deployment"
+    description: >-
+      Disables the AAP MCP server on an operator deployment by patching the
+      AnsibleAutomationPlatform custom resource definition to set mcp.disabled: true.
+    labels:
+      - infrastructure
+      - openshift
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    credentials:
+      - OpenShift Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/aap-mcp-operator-disable.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AAP custom resource name
+          type: text
+          variable: aap_custom_resource_name
+          required: true
+          default: aap
+        - question_name: AAP custom resource namespace
+          type: text
+          variable: aap_custom_resource_namespace
+          required: true
+          default: aap
+
 controller_workflows:
   - name: Infrastructure | ROSA - Lifecycle (Create)
     description: >-
