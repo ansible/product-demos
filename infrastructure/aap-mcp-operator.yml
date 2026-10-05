@@ -32,11 +32,13 @@
             name: "{{ aap_custom_resource_name }}"
             namespace: "{{ aap_custom_resource_namespace }}"
           register: _cr_status
-          until: >
-            _cr_status.resources[0].status.mcp is defined and
-            _cr_status.resources[0].status.conditions | default([])
-                | selectattr('type', 'equalto', 'Successful')
-                | selectattr('status', 'equalto', 'True') | list | length > 0
+          until:
+            - (aap_cr_status.resources[0].status.conditions | default([])
+               | selectattr('type', 'equalto', 'Successful')
+               | selectattr('status', 'equalto', 'True') | list | length) > 0
+            - (aap_cr_status.resources[0].status.conditions | default([])
+               | selectattr('type', 'equalto', 'Running')
+               | selectattr('status', 'equalto', 'False') | list | length) > 0
           retries: 30
           delay: 10
       rescue:
@@ -48,7 +50,7 @@
       kubernetes.core.k8s_info:
         api_version: route.openshift.io/v1
         kind: Route
-        namespace: "{{ aap_namespace }}"
+        namespace: "{{ aap_custom_resource_namespace }}"
         label_selectors:
           - "app.kubernetes.io/component=mcp"
       register: _mcp_route
