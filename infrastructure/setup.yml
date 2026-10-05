@@ -750,6 +750,8 @@ controller_templates:
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
+    credentials:
+      - OpenShift Credential
     project: Ansible Product Demos
     playbook: infrastructure/aap-mcp-operator.yml
     notification_templates_started: Telemetry
