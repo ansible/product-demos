@@ -27,9 +27,8 @@
       kubernetes.core.k8s_info:
         api_version: route.openshift.io/v1
         kind: Route
+        name: '{{ aap_custom_resource_name }}-mcp'
         namespace: "{{ aap_custom_resource_namespace }}"
-        label_selectors:
-          - "app.kubernetes.io/managed-by=ansible-mcp-server-operator"
       register: _mcp_route
       until: _mcp_route.resources | length > 0
       retries: 15

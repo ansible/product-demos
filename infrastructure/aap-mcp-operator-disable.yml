@@ -21,13 +21,20 @@
             mcp:
               disabled: true
 
+    - name: Delete the AnsibleMCPServer custom resource
+      kubernetes.core.k8s:
+        state: absent
+        api_version: mcpserver.ansible.com/v1alpha1
+        kind: AnsibleMCPServer
+        name: '{{ aap_custom_resource_name }}-mcp'
+        namespace: '{{ aap_custom_resource_namespace }}'
+
     - name: Wait for the AAP MCP server route to be removed
       kubernetes.core.k8s_info:
         api_version: route.openshift.io/v1
         kind: Route
+        name: '{{ aap_custom_resource_name }}-mcp'
         namespace: "{{ aap_custom_resource_namespace }}"
-        label_selectors:
-          - "app.kubernetes.io/managed-by=ansible-mcp-server-operator"
       register: _mcp_route
       until: _mcp_route.resources | length == 0
       retries: 15
