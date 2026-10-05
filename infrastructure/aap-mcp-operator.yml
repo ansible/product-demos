@@ -12,13 +12,11 @@
   tasks:
     - name: Patch AAP custom resource with MCP spec
       kubernetes.core.k8s:
-        state: present
+        state: patched
         api_version: aap.ansible.com/v1alpha1
         kind: AnsibleAutomationPlatform
         name: '{{ aap_custom_resource_name }}'
         namespace: '{{ aap_custom_resource_namespace }}'
-        type:
-          - merge
         definition:
           spec:
             mcp:
