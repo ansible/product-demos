@@ -35,8 +35,8 @@
       retries: 15
       delay: 30
 
-    - name: Debug
+    - name: Print MCP server URL
       ansible.builtin.debug:
-        var: _mcp_route
+        msg: "AAP MCP server URL: https://{{ _mcp_route.resources[0].spec.host }}"
 
 ...
