@@ -1,0 +1,36 @@
+---
+- name: Disable AAP operator MCP server
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    aap_custom_resource_name: aap
+    aap_custom_resource_namespace: aap
+
+  tasks:
+    - name: Patch AAP custom resource to disable MCP
+      kubernetes.core.k8s:
+        state: patched
+        api_version: aap.ansible.com/v1alpha1
+        kind: AnsibleAutomationPlatform
+        name: '{{ aap_custom_resource_name }}'
+        namespace: '{{ aap_custom_resource_namespace }}'
+        definition:
+          spec:
+            mcp:
+              disabled: true
+
+    - name: Wait for the AAP MCP server route to be removed
+      kubernetes.core.k8s_info:
+        api_version: route.openshift.io/v1
+        kind: Route
+        namespace: "{{ aap_custom_resource_namespace }}"
+        label_selectors:
+          - "app.kubernetes.io/managed-by=ansible-mcp-server-operator"
+      register: _mcp_route
+      until: _mcp_route.resources | length == 0
+      retries: 15
+      delay: 30
+
+...
