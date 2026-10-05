@@ -740,6 +740,45 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
 
+  - name: "Infrastructure | Enable AAP MCP server on operator deployment"
+    description: >-
+      Enables the AAP MCP server on an operator deployment by patching the
+      AnsibleAutomationPlatform custom resource definition to add the mcp spec.
+    labels:
+      - infrastructure
+      - openshift
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    project: Ansible Product Demos
+    playbook: infrastructure/aap-mcp-operator.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AAP custom resource name
+          type: text
+          variable: aap_custom_resource_name
+          required: true
+          default: aap
+        - question_name: AAP custom resource namespace
+          type: text
+          variable: aap_custom_resource_namespace
+          required: true
+          default: aap
+        - question_name: Enable MCP write operations?
+          type: multiplechoice
+          variable: aap_mcp_allow_write_operations
+          required: true
+          default: "true"
+          choices:
+            - "true"
+            - "false"
+
 controller_workflows:
   - name: Infrastructure | ROSA - Lifecycle (Create)
     description: >-

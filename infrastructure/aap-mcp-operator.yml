@@ -1,0 +1,62 @@
+---
+- name: Add AAP MCP server to AAP operator deployment
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    aap_custom_resource_name: aap
+    aap_custom_resource_namespace: aap
+    aap_mcp_allow_write_operations: true
+
+  tasks:
+    - name: Patch AAP custom resource with MCP spec
+      kubernetes.core.k8s:
+        state: present
+        api_version: aap.ansible.com/v1alpha1
+        kind: AnsibleAutomationPlatform
+        name: '{{ aap_custom_resource_name }}'
+        namespace: '{{ aap_custom_resource_namespace }}'
+        type:
+          - merge
+        definition:
+          spec:
+            mcp:
+              disabled: false
+              allow_write_operations: '{{ aap_mcp_allow_write_operations | bool }}'
+
+    - name: Check AAP MCP server status
+      block:
+        - name: Wait for AAP MCP server to be enabled
+          kubernetes.core.k8s_info:
+            api_version: aap.ansible.com/v1alpha1
+            kind: AnsibleAutomationPlatform
+            name: "{{ aap_custom_resource_name }}"
+            namespace: "{{ aap_custom_resource_namespace }}"
+          register: _cr_status
+          until: >
+            _cr_status.resources[0].status.mcp is defined and
+            _cr_status.resources[0].status.conditions | default([])
+                | selectattr('type', 'equalto', 'Successful')
+                | selectattr('status', 'equalto', 'True') | list | length > 0
+          retries: 30
+          delay: 10
+      rescue:
+        - name: Debug
+          ansible.builtin.debug:
+            var: _cr_status
+
+    - name: Fetch the OpenShift Route for the MCP server
+      kubernetes.core.k8s_info:
+        api_version: route.openshift.io/v1
+        kind: Route
+        namespace: "{{ aap_namespace }}"
+        label_selectors:
+          - "app.kubernetes.io/component=mcp"
+      register: _mcp_route
+
+    - name: Debug
+      ansible.builtin.debug:
+        var: _mcp_route
+
+...
