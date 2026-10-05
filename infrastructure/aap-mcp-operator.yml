@@ -23,13 +23,13 @@
               disabled: false
               allow_write_operations: '{{ aap_mcp_allow_write_operations | bool }}'
 
-    - name: Wait for the AAP MCP server route to be available
+    - name: Wait for the AAP MCP server route to be available (may take a while)
       kubernetes.core.k8s_info:
         api_version: route.openshift.io/v1
         kind: Route
         namespace: "{{ aap_custom_resource_namespace }}"
         label_selectors:
-          - "app.kubernetes.io/component=mcp"
+          - "app.kubernetes.io/managed-by=ansible-mcp-server-operator"
       register: _mcp_route
       until: _mcp_route.resources | length > 0
       retries: 15
