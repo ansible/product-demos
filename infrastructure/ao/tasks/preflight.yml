@@ -1,0 +1,70 @@
+---
+# Soft requirements for enabled demos (cloud stack hard-fail, Mattermost warn).
+- name: Collect demos that require the cloud stack
+  ansible.builtin.set_fact:
+    ao_cloud_stack_demos: >-
+      {{
+        ao_enabled_demos
+        | selectattr('requires_cloud_stack', 'defined')
+        | selectattr('requires_cloud_stack')
+        | list
+      }}
+
+- name: Require aws_rhel9 when a seeded demo needs the cloud stack
+  when: ao_cloud_stack_demos | length > 0
+  block:
+    - name: Look up aws_rhel9 in inventory
+      ansible.builtin.set_fact:
+        ao_aws_rhel9_present: "{{ 'aws_rhel9' in hostvars }}"
+
+    - name: Fail when Deploy Cloud Stack has not created aws_rhel9
+      ansible.builtin.assert:
+        that:
+          - ao_aws_rhel9_present
+        fail_msg: >-
+          Seeded demo(s) {{ ao_cloud_stack_demos | map(attribute='slug') | list | join(', ') }}
+          require host aws_rhel9. Run Deploy Cloud Stack in AWS, sync AWS Inventory,
+          then re-run Infrastructure | Automation Orchestrator | Install.
+
+- name: Collect demos that prefer Mattermost
+  ansible.builtin.set_fact:
+    ao_mattermost_demos: >-
+      {{
+        ao_enabled_demos
+        | selectattr('requires_mattermost', 'defined')
+        | selectattr('requires_mattermost')
+        | list
+      }}
+
+- name: Resolve Mattermost endpoint from inventory when present
+  when: ao_mattermost_demos | length > 0
+  block:
+    - name: Detect aws_mattermost host
+      ansible.builtin.set_fact:
+        ao_mattermost_present: "{{ 'aws_mattermost' in hostvars }}"
+
+    - name: Set Mattermost server from inventory host
+      when: ao_mattermost_present | bool
+      ansible.builtin.set_fact:
+        ao_mattermost_server: >-
+          {{
+            (
+              hostvars['aws_mattermost']['public_ip_address']
+              | default(hostvars['aws_mattermost']['ansible_host'])
+            )
+            ~ ':8065'
+          }}
+        ao_mattermost_api_token: >-
+          {{
+            hostvars['aws_mattermost']['mattermost_bot_token']
+            | default(lookup('env', 'MATTERMOST_BOT_TOKEN'), true)
+            | default('', true)
+          }}
+
+    - name: Warn when Mattermost is not provisioned
+      when: not (ao_mattermost_present | default(false) | bool)
+      ansible.builtin.debug:
+        msg: >-
+          Demo(s) {{ ao_mattermost_demos | map(attribute='slug') | list | join(', ') }}
+          post to Mattermost. Run Infrastructure | AWS - Provision Mattermost, then
+          re-run Install (or set Notify Chatroom extra vars) so chat notifications work.

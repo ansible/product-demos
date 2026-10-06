@@ -201,3 +201,6 @@
 
 - name: Configure Automation Orchestrator network access
   ansible.builtin.import_playbook: network-access.yml
+
+- name: Seed curated Automation Orchestrator demos
+  ansible.builtin.import_playbook: seed.yml

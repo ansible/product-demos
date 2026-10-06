@@ -1,0 +1,120 @@
+---
+# Seed curated AO demos after Install (imported from install.yml).
+# Creates AAP project/JTs only for enabled entries in demos.yml so they
+# do not sprawl into infrastructure/setup.yml.
+- name: Seed Automation Orchestrator demos
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    ao_namespace: automation-orchestrator
+    ao_instance: automation-orchestrator
+    ao_demos_file: "{{ playbook_dir }}/demos.yml"
+
+    _controller_host_raw: >-
+      {{ lookup('env', 'CONTROLLER_HOST') | default(lookup('env', 'AAP_HOSTNAME'), true)
+         | default('', true) | trim }}
+    _controller_host: "{{ _controller_host_raw | regex_replace('/$', '') }}"
+    _controller_oauth_token: "{{ lookup('env', 'CONTROLLER_OAUTH_TOKEN') | default('', true) }}"
+    _controller_username: "{{ lookup('env', 'CONTROLLER_USERNAME') | default('', true) }}"
+    _controller_password: "{{ lookup('env', 'CONTROLLER_PASSWORD') | default('', true) }}"
+
+  tasks:
+    - name: Load curated AO demo catalog
+      ansible.builtin.include_vars:
+        file: "{{ ao_demos_file }}"
+
+    - name: Select enabled demos
+      ansible.builtin.set_fact:
+        ao_enabled_demos: >-
+          {{ ao_demos | selectattr('enabled', 'equalto', true) | list }}
+
+    - name: Skip seeding when no demos are enabled
+      ansible.builtin.meta: end_play
+      when: ao_enabled_demos | length == 0
+
+    - name: Resolve Automation Orchestrator Route
+      kubernetes.core.k8s_info:
+        api_version: route.openshift.io/v1
+        kind: Route
+        name: "{{ ao_instance }}"
+        namespace: "{{ ao_namespace }}"
+      register: ao_seed_route
+      until: ao_seed_route.resources | default([]) | length > 0
+      retries: 20
+      delay: 6
+
+    - name: Get Automation Orchestrator admin password
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Secret
+        name: automation-orchestrator-initial-admin-password
+        namespace: "{{ ao_namespace }}"
+      register: ao_seed_admin_secret
+
+    - name: Require AO route and admin password
+      ansible.builtin.assert:
+        that:
+          - ao_seed_route.resources | default([]) | length > 0
+          - ao_seed_admin_secret.resources | default([]) | length > 0
+          - _controller_host | length > 0
+        fail_msg: >-
+          AO route, admin password secret, and CONTROLLER_HOST (AAP Credential)
+          are required to seed demos.
+
+    - name: Set AO API connection facts
+      ansible.builtin.set_fact:
+        ao_api_host: "{{ ao_seed_route.resources[0].spec.host }}"
+        ao_api_url: "https://{{ ao_seed_route.resources[0].spec.host }}/api/v1"
+        ao_admin_password: >-
+          {{ ao_seed_admin_secret.resources[0].data.password | b64decode }}
+        ao_aap_base_url: "{{ _controller_host }}"
+      no_log: true
+
+    - name: Log in to Automation Orchestrator API
+      ansible.builtin.uri:
+        url: "{{ ao_api_url }}/auth/login"
+        method: POST
+        body_format: json
+        body:
+          username: admin
+          password: "{{ ao_admin_password }}"
+        validate_certs: false
+        status_code: [200]
+      register: ao_login
+      no_log: true
+      until: ao_login.status | default(0) == 200
+      retries: 30
+      delay: 5
+
+    - name: Store AO API token
+      ansible.builtin.set_fact:
+        ao_api_token: "{{ ao_login.json.access_token }}"
+      no_log: true
+
+    - name: Resolve AAP token for AO integration
+      ansible.builtin.include_tasks: tasks/resolve_aap_token.yml
+
+    - name: Wire AO AAP credential and integration
+      ansible.builtin.include_tasks: tasks/wire_aap_integration.yml
+
+    - name: Run demo preflight checks
+      ansible.builtin.include_tasks: tasks/preflight.yml
+
+    - name: Provision AAP project and job templates for enabled demos
+      ansible.builtin.include_tasks: tasks/provision_aap_demos.yml
+
+    - name: Synchronize enabled AO workflow exports
+      ansible.builtin.include_tasks: tasks/sync_demos.yml
+
+    - name: Show seed summary
+      ansible.builtin.debug:
+        msg:
+          - "AO demos seeded: {{ ao_enabled_demos | map(attribute='slug') | list | join(', ') }}"
+          - "AO URL: https://{{ ao_api_host }}"
+          - "AAP project: {{ ao_demos_project_name }}"
+          - >-
+            {{
+              'Mattermost: ' ~ (ao_mattermost_server | default('not provisioned — run Infrastructure | AWS - Provision Mattermost'))
+            }}

@@ -1856,3 +1856,22 @@
   stats:
     playbooks: 1
   github_path: infrastructure/ao/uninstall.yml
+
+- slug: infrastructure-mattermost
+  readme_path: infrastructure/docs/mattermost.md
+  title: "Infrastructure | AWS — Provision Mattermost"
+  subtitle: "Shared Mattermost chat host for AO and other notification demos"
+  category: infrastructure
+  status: active
+  tags:
+    - AWS
+    - Orchestrator
+    - Chat
+  thumbnail:
+    gradient: "linear-gradient(135deg, #231f20 0%, #005c99 100%)"
+    icon: "💬"
+  blurb: "Provision aws_mattermost with Podman Mattermost, create a bot token, and reuse it for AO Notify Chatroom and other demos."
+  stats:
+    playbooks: 1
+  url: /demos/infrastructure-mattermost/
+  github_path: infrastructure/setup.yml

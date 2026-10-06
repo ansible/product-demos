@@ -1,0 +1,235 @@
+---
+# Idempotently create the AAP Orchestrator Demos project and JTs for enabled demos.
+- name: Build Controller API connection facts
+  ansible.builtin.set_fact:
+    ao_controller_api: "{{ _controller_host }}/api/controller/v2"
+    ao_controller_use_token: "{{ _controller_oauth_token | length > 0 }}"
+  no_log: true
+
+- name: Look up APD organization
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/organizations/?name={{ ao_organization | urlencode }}"
+    method: GET
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    validate_certs: false
+    return_content: true
+  register: ao_apd_org_lookup
+  no_log: true
+
+- name: Require APD organization
+  ansible.builtin.assert:
+    that:
+      - ao_apd_org_lookup.json.results | default([]) | length > 0
+    fail_msg: "Organization '{{ ao_organization }}' was not found in Controller."
+
+- name: Store APD organization id
+  ansible.builtin.set_fact:
+    ao_apd_organization_id: "{{ ao_apd_org_lookup.json.results[0].id }}"
+
+- name: Look up demo inventory
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/inventories/?name={{ ao_inventory_name | urlencode }}"
+    method: GET
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    validate_certs: false
+    return_content: true
+  register: ao_inventory_lookup
+  no_log: true
+
+- name: Store inventory id
+  ansible.builtin.set_fact:
+    ao_inventory_id: "{{ (ao_inventory_lookup.json.results | default([{}]))[0].id | default('') }}"
+
+- name: Look up APD Machine Credential
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/credentials/?name={{ ao_machine_credential_name | urlencode }}"
+    method: GET
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    validate_certs: false
+    return_content: true
+  register: ao_machine_cred_lookup
+  no_log: true
+
+- name: Look up AWS credential
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/credentials/?name={{ ao_aws_credential_name | urlencode }}"
+    method: GET
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    validate_certs: false
+    return_content: true
+  register: ao_aws_cred_lookup
+  no_log: true
+
+- name: Store credential ids
+  ansible.builtin.set_fact:
+    ao_machine_credential_id: "{{ (ao_machine_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
+    ao_aws_credential_id: "{{ (ao_aws_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
+
+- name: Look up existing AO demos project
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/projects/?name={{ ao_demos_project_name | urlencode }}"
+    method: GET
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    validate_certs: false
+    return_content: true
+  register: ao_project_lookup
+  no_log: true
+
+- name: Build AO demos project payload
+  ansible.builtin.set_fact:
+    ao_project_payload:
+      name: "{{ ao_demos_project_name }}"
+      description: Playbooks used by curated AO demos (seeded by APD Install)
+      organization: "{{ ao_apd_organization_id }}"
+      scm_type: git
+      scm_url: "{{ ao_demos_repository }}.git"
+      scm_branch: "{{ ao_demos_ref }}"
+      scm_update_on_launch: true
+      scm_delete_on_update: false
+
+- name: Create AO demos project
+  when: ao_project_lookup.json.results | default([]) | length == 0
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/projects/"
+    method: POST
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    body_format: json
+    body: "{{ ao_project_payload }}"
+    validate_certs: false
+    status_code: [200, 201]
+  register: ao_project_create
+  no_log: true
+
+- name: Update AO demos project
+  when: ao_project_lookup.json.results | default([]) | length > 0
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/projects/{{ ao_project_lookup.json.results[0].id }}/"
+    method: PATCH
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    body_format: json
+    body: "{{ ao_project_payload }}"
+    validate_certs: false
+    status_code: [200]
+  register: ao_project_update
+  no_log: true
+
+- name: Store AO demos project id
+  ansible.builtin.set_fact:
+    ao_demos_project_id: >-
+      {{
+        (ao_project_lookup.json.results | default([{}]))[0].id
+        | default(ao_project_create.json.id, true)
+      }}
+
+- name: Trigger AO demos project sync
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/projects/{{ ao_demos_project_id }}/update/"
+    method: POST
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    validate_certs: false
+    status_code: [200, 201, 202, 400]
+  register: ao_project_sync
+  failed_when: false
+  no_log: true
+
+- name: Wait for AO demos project playbooks
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/projects/{{ ao_demos_project_id }}/"
+    method: GET
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    validate_certs: false
+    return_content: true
+  register: ao_project_status
+  until: ao_project_status.json.status | default('') == 'successful'
+  retries: 36
+  delay: 5
+  no_log: true
+
+- name: Flatten enabled job template definitions
+  ansible.builtin.set_fact:
+    ao_jt_defs: >-
+      {{
+        ao_enabled_demos
+        | map(attribute='job_templates')
+        | flatten
+        | list
+      }}
+
+- name: Ensure each demo job template
+  ansible.builtin.include_tasks: ensure_job_template.yml
+  loop: "{{ ao_jt_defs }}"
+  loop_control:
+    loop_var: ao_jt
+    label: "{{ ao_jt.name }}"

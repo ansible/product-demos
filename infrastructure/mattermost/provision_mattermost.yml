@@ -1,0 +1,430 @@
+---
+- name: Provision Mattermost EC2 instance in AWS
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    create_vm_vm_name: aws_mattermost
+    vm_blueprint: mattermost
+    create_vm_vm_blueprint: mattermost
+    create_vm_vm_purpose: mattermost
+    create_vm_apd_managed_by: aap-product-demos
+    create_vm_apd_demo_tag: "true"
+    create_vm_aws_keypair_name: aws-test-key
+    create_vm_aws_securitygroup_name: aws-test-sg
+    create_vm_aws_vpc_subnet_name: aws-test-subnet
+    create_vm_vm_deployment: cloud_stack
+    mattermost_admin_email: admin@example.com
+    mattermost_admin_username: admin
+    mattermost_admin_password: Ansible123!
+    mattermost_team_name: apd
+    mattermost_team_display_name: Ansible Product Demos
+    mattermost_bot_username: apd-bot
+    mattermost_http_port: 8065
+
+  tasks:
+    - name: Fail if cloud networking variables are not defined
+      ansible.builtin.assert:
+        that:
+          - create_vm_aws_vpc_subnet_name is defined
+          - create_vm_aws_keypair_name is defined
+          - create_vm_aws_securitygroup_name is defined
+          - create_vm_aws_region is defined
+        fail_msg: >-
+          Set create_vm_aws_region, create_vm_aws_vpc_subnet_name,
+          create_vm_aws_securitygroup_name, and create_vm_aws_keypair_name
+          (defaults match Deploy Cloud Stack in AWS).
+
+    - name: Map owner tag for EC2 provisioning
+      ansible.builtin.set_fact:
+        create_vm_vm_owner: "{{ create_vm_aws_owner_tag }}"
+      when: create_vm_aws_owner_tag is defined
+
+    - name: Default deployment tag for Mattermost VM
+      ansible.builtin.set_fact:
+        create_vm_vm_deployment: cloud_stack
+      when: create_vm_vm_deployment is not defined
+
+    - name: Default cloud networking for Mattermost VM
+      ansible.builtin.set_fact:
+        create_vm_aws_keypair_name: aws-test-key
+        create_vm_aws_securitygroup_name: aws-test-sg
+        create_vm_aws_vpc_subnet_name: aws-test-subnet
+      when: create_vm_aws_keypair_name is not defined
+
+    - name: Default environment tag for Mattermost VM
+      ansible.builtin.set_fact:
+        create_vm_vm_environment: Prod
+      when: create_vm_vm_environment is not defined
+
+    - name: Default owner tag for Mattermost VM
+      ansible.builtin.set_fact:
+        create_vm_vm_owner: apd-demo
+      when: create_vm_vm_owner is not defined
+
+    - name: Ensure AWS keypair exists in EC2
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/../../cloud/tasks/ensure_aws_keypair.yml"
+      vars:
+        aws_key_name: "{{ create_vm_aws_keypair_name }}"
+        aws_keypair_owner: "{{ create_vm_vm_owner }}"
+
+    - name: Create or reuse Mattermost EC2 instance
+      ansible.builtin.include_role:
+        name: demo.cloud.aws
+        tasks_from: create_vm
+      vars:
+        create_vm_aws_image_owners: 309956199498
+        create_vm_aws_instance_size: t3.medium
+        create_vm_aws_image_architecture: x86_64
+        create_vm_aws_image_filter: 'RHEL-9*HVM-*Hourly*'
+
+    - name: Look up Mattermost EC2 instance details
+      amazon.aws.ec2_instance_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          "tag:Name": "{{ create_vm_vm_name }}"
+          instance-state-name:
+            - pending
+            - running
+      register: mattermost_instance
+      until: mattermost_instance.instances | length > 0
+      retries: 12
+      delay: 5
+
+    - name: Assert Mattermost instance is running
+      ansible.builtin.assert:
+        that: mattermost_instance.instances | length > 0
+        fail_msg: Mattermost EC2 instance aws_mattermost was not found after provisioning.
+
+    - name: Save Mattermost connection details
+      ansible.builtin.set_fact:
+        mattermost_public_ip: "{{ mattermost_instance.instances[0].public_ip_address }}"
+        mattermost_private_ip: "{{ mattermost_instance.instances[0].private_ip_address }}"
+
+    - name: Register Mattermost host for configuration play
+      ansible.builtin.add_host:
+        name: aws_mattermost
+        ansible_host: "{{ mattermost_public_ip }}"
+        ansible_user: ec2-user
+        groups: mattermost_server
+        mattermost_public_ip: "{{ mattermost_public_ip }}"
+        mattermost_private_ip: "{{ mattermost_private_ip }}"
+        mattermost_admin_email: "{{ mattermost_admin_email }}"
+        mattermost_admin_username: "{{ mattermost_admin_username }}"
+        mattermost_admin_password: "{{ mattermost_admin_password }}"
+        mattermost_team_name: "{{ mattermost_team_name }}"
+        mattermost_team_display_name: "{{ mattermost_team_display_name }}"
+        mattermost_bot_username: "{{ mattermost_bot_username }}"
+        mattermost_http_port: "{{ mattermost_http_port }}"
+
+    - name: Look up demo security group for Mattermost HTTP
+      amazon.aws.ec2_security_group_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          group-name: "{{ create_vm_aws_securitygroup_name }}"
+      register: mattermost_security_group
+
+    - name: Allow Mattermost HTTP port
+      when: mattermost_security_group.security_groups | length > 0
+      amazon.aws.ec2_security_group:
+        name: "{{ create_vm_aws_securitygroup_name }}"
+        description: "{{ mattermost_security_group.security_groups[0].description }}"
+        region: "{{ create_vm_aws_region }}"
+        vpc_id: "{{ mattermost_security_group.security_groups[0].vpc_id }}"
+        purge_rules: false
+        rules:
+          - proto: tcp
+            ports:
+              - "{{ mattermost_http_port }}"
+            cidr_ip: 0.0.0.0/0
+
+- name: Deploy Mattermost with Podman
+  hosts: mattermost_server
+  become: true
+  gather_facts: true
+  vars:
+    mattermost_postgres_image: docker.io/library/postgres:15-alpine
+    mattermost_image: docker.io/mattermost/mattermost-team-edition:9.11
+    mattermost_network: mattermost
+    mattermost_postgres_password: mm_pg_pass
+    mattermost_data_dir: /var/lib/mattermost
+
+  tasks:
+    - name: Wait for SSH on new Mattermost instance
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+
+    - name: Install Podman
+      ansible.builtin.package:
+        name: podman
+        state: present
+
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Allow Mattermost port through firewalld
+      ansible.posix.firewalld:
+        port: "{{ mattermost_http_port }}/tcp"
+        permanent: true
+        state: enabled
+        immediate: true
+      when:
+        - "'firewalld.service' in ansible_facts.services"
+        - ansible_facts.services['firewalld.service'].state == 'running'
+
+    - name: Create Mattermost data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - "{{ mattermost_data_dir }}"
+        - "{{ mattermost_data_dir }}/config"
+        - "{{ mattermost_data_dir }}/data"
+        - "{{ mattermost_data_dir }}/logs"
+        - "{{ mattermost_data_dir }}/plugins"
+        - "{{ mattermost_data_dir }}/client/plugins"
+        - "{{ mattermost_data_dir }}/bleve-indexes"
+
+    - name: Ensure Podman network for Mattermost
+      ansible.builtin.command:
+        argv:
+          - podman
+          - network
+          - exists
+          - "{{ mattermost_network }}"
+      register: mattermost_network_exists
+      changed_when: false
+      failed_when: false
+
+    - name: Create Podman network for Mattermost
+      ansible.builtin.command:
+        argv:
+          - podman
+          - network
+          - create
+          - "{{ mattermost_network }}"
+      when: mattermost_network_exists.rc != 0
+      changed_when: true
+
+    - name: Run Mattermost Postgres
+      containers.podman.podman_container:
+        name: mattermost-db
+        image: "{{ mattermost_postgres_image }}"
+        state: started
+        restart_policy: always
+        network: "{{ mattermost_network }}"
+        env:
+          POSTGRES_USER: mmuser
+          POSTGRES_PASSWORD: "{{ mattermost_postgres_password }}"
+          POSTGRES_DB: mattermost
+        volumes:
+          - "{{ mattermost_data_dir }}/db:/var/lib/postgresql/data:Z"
+
+    - name: Wait for Postgres to accept connections
+      ansible.builtin.command:
+        argv:
+          - podman
+          - exec
+          - mattermost-db
+          - pg_isready
+          - -U
+          - mmuser
+          - -d
+          - mattermost
+      register: mattermost_pg_ready
+      until: mattermost_pg_ready.rc == 0
+      retries: 30
+      delay: 2
+      changed_when: false
+
+    - name: Run Mattermost application
+      containers.podman.podman_container:
+        name: mattermost
+        image: "{{ mattermost_image }}"
+        state: started
+        restart_policy: always
+        network: "{{ mattermost_network }}"
+        publish:
+          - "{{ mattermost_http_port }}:8065"
+        env:
+          MM_SQLSETTINGS_DRIVERNAME: postgres
+          MM_SQLSETTINGS_DATASOURCE: >-
+            postgres://mmuser:{{ mattermost_postgres_password }}@mattermost-db:5432/mattermost?sslmode=disable&connect_timeout=10
+          MM_SERVICESETTINGS_SITEURL: "http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}"
+          MM_SERVICESETTINGS_LISTENADDRESS: ":8065"
+          MM_TEAMSETTINGS_ENABLEOPENSERVER: "true"
+          MM_SERVICESETTINGS_ENABLEBOTACCOUNTCREATION: "true"
+        volumes:
+          - "{{ mattermost_data_dir }}/config:/mattermost/config:Z"
+          - "{{ mattermost_data_dir }}/data:/mattermost/data:Z"
+          - "{{ mattermost_data_dir }}/logs:/mattermost/logs:Z"
+          - "{{ mattermost_data_dir }}/plugins:/mattermost/plugins:Z"
+          - "{{ mattermost_data_dir }}/client/plugins:/mattermost/client/plugins:Z"
+          - "{{ mattermost_data_dir }}/bleve-indexes:/mattermost/bleve-indexes:Z"
+
+    - name: Wait for Mattermost HTTP
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/system/ping"
+        method: GET
+        status_code: [200]
+      register: mattermost_ping
+      until: mattermost_ping.status | default(0) == 200
+      retries: 60
+      delay: 5
+
+    - name: Create Mattermost admin user when missing
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/users"
+        method: POST
+        body_format: json
+        body:
+          email: "{{ mattermost_admin_email }}"
+          username: "{{ mattermost_admin_username }}"
+          password: "{{ mattermost_admin_password }}"
+        status_code: [201, 400]
+      register: mattermost_admin_create
+      no_log: true
+
+    - name: Log in as Mattermost admin
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/users/login"
+        method: POST
+        body_format: json
+        body:
+          login_id: "{{ mattermost_admin_username }}"
+          password: "{{ mattermost_admin_password }}"
+        status_code: [200]
+        return_headers: true
+      register: mattermost_login
+      no_log: true
+
+    - name: Store Mattermost session token
+      ansible.builtin.set_fact:
+        mattermost_session_token: "{{ mattermost_login.headers.Token }}"
+      no_log: true
+
+    - name: Create Mattermost team when missing
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/teams"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body:
+          name: "{{ mattermost_team_name }}"
+          display_name: "{{ mattermost_team_display_name }}"
+          type: O
+        status_code: [201, 400]
+      register: mattermost_team_create
+      no_log: true
+
+    - name: List Mattermost teams
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/teams"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        return_content: true
+      register: mattermost_teams
+      no_log: true
+
+    - name: Select Mattermost team id
+      ansible.builtin.set_fact:
+        mattermost_team_id: >-
+          {{
+            (
+              mattermost_teams.json
+              | selectattr('name', 'equalto', mattermost_team_name)
+              | map(attribute='id')
+              | first
+              | default(mattermost_team_create.json.id | default(''), true)
+            )
+          }}
+
+    - name: Create Mattermost bot account
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/bots"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body:
+          username: "{{ mattermost_bot_username }}"
+          display_name: APD Bot
+          description: Ansible Product Demos notification bot
+        status_code: [201, 400]
+      register: mattermost_bot_create
+      no_log: true
+
+    - name: List Mattermost bots
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/bots"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        return_content: true
+      register: mattermost_bots
+      no_log: true
+
+    - name: Select Mattermost bot user id
+      ansible.builtin.set_fact:
+        mattermost_bot_user_id: >-
+          {{
+            (
+              mattermost_bots.json
+              | selectattr('username', 'equalto', mattermost_bot_username)
+              | map(attribute='user_id')
+              | first
+              | default(mattermost_bot_create.json.user_id | default(''), true)
+            )
+          }}
+
+    - name: Create Mattermost bot access token
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/users/{{ mattermost_bot_user_id }}/tokens"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body:
+          description: APD demo notify token
+        status_code: [201]
+      register: mattermost_bot_token
+      no_log: true
+
+    - name: Add bot to Mattermost team
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/teams/{{ mattermost_team_id }}/members"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body:
+          team_id: "{{ mattermost_team_id }}"
+          user_id: "{{ mattermost_bot_user_id }}"
+        status_code: [201, 400]
+      failed_when: false
+      no_log: true
+
+    - name: Persist Mattermost connection facts on the host
+      ansible.builtin.copy:
+        dest: /etc/apd-mattermost.env
+        mode: "0600"
+        content: |
+          MATTERMOST_URL=http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}
+          MATTERMOST_SERVER={{ mattermost_public_ip }}:{{ mattermost_http_port }}
+          MATTERMOST_BOT_TOKEN={{ mattermost_bot_token.json.token }}
+          MATTERMOST_ADMIN_USER={{ mattermost_admin_username }}
+          MATTERMOST_TEAM={{ mattermost_team_name }}
+      no_log: true
+
+    - name: Show Mattermost access information
+      ansible.builtin.debug:
+        msg:
+          - "Mattermost URL: http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}"
+          - "Admin user: {{ mattermost_admin_username }} / {{ mattermost_admin_password }}"
+          - "Team: {{ mattermost_team_name }}"
+          - "Bot token (for Notify Chatroom api_chat_token): {{ mattermost_bot_token.json.token }}"
+          - "mattermost_server extra var: {{ mattermost_public_ip }}:{{ mattermost_http_port }}"
+          - "Sync AWS Inventory so aws_mattermost appears for AO Install seeding."
