@@ -95,15 +95,30 @@
     toc.appendChild(link);
   });
 
-  /* ── Wrap prerequisites list in a callout box ──────────────── */
+  /* ── Wrap prerequisites / info callout boxes ───────────────── */
   allH2s.forEach(function (h2) {
-    if (h2.textContent.trim().toLowerCase() === 'prerequisites') {
-      var ul = h2.nextElementSibling;
-      if (ul && (ul.tagName === 'UL' || ul.tagName === 'OL')) {
-        var box = document.createElement('div');
-        box.className = 'prereq-box';
-        ul.parentNode.insertBefore(box, ul);
-        box.appendChild(ul);
+    var title = h2.textContent.trim().toLowerCase();
+    var next = h2.nextElementSibling;
+    if (!next) return;
+
+    if (title === 'prerequisites' && (next.tagName === 'UL' || next.tagName === 'OL')) {
+      var prereqBox = document.createElement('div');
+      prereqBox.className = 'prereq-box';
+      next.parentNode.insertBefore(prereqBox, next);
+      prereqBox.appendChild(next);
+      return;
+    }
+
+    /* Info callout: wrap following paragraphs/lists until the next h2 */
+    if (title.indexOf("why don't we just provision") === 0) {
+      var infoBox = document.createElement('div');
+      infoBox.className = 'info-box';
+      next.parentNode.insertBefore(infoBox, next);
+      var node = next;
+      while (node && node.tagName !== 'H2') {
+        var move = node;
+        node = node.nextElementSibling;
+        infoBox.appendChild(move);
       }
     }
   });

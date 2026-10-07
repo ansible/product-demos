@@ -876,6 +876,25 @@ html:not([data-theme="dark"]) .demo-card:hover {
   max-width: 720px;
 }
 
+/* Info callout (e.g. "Why don't we just provision everything?") */
+.detail-body .info-box {
+  border: 1px solid var(--border);
+  border-left: 3px solid #58a6ff;
+  border-radius: 8px;
+  background: var(--bg-surface);
+  padding: 16px 20px;
+  max-width: 720px;
+  margin: 0 0 1.5rem;
+}
+
+.detail-body .info-box > :first-child {
+  margin-top: 0;
+}
+
+.detail-body .info-box > :last-child {
+  margin-bottom: 0;
+}
+
 /* 9: Related demos section gets card-like rows */
 .detail-body table:last-of-type tbody tr {
   transition: background 0.15s;
