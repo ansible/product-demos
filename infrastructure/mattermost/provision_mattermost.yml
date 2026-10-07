@@ -648,12 +648,83 @@
           MATTERMOST_TEAM={{ mattermost_team_name }}
       no_log: true
 
+    - name: Export Mattermost connection facts to localhost
+      ansible.builtin.set_fact:
+        mattermost_credential_server: "{{ mattermost_public_ip }}:{{ mattermost_http_port }}"
+        mattermost_credential_token: "{{ mattermost_bot_token.json.token }}"
+      delegate_to: localhost
+      delegate_facts: true
+      no_log: true
+
     - name: Show Mattermost access information
       ansible.builtin.debug:
         msg:
           - "Mattermost URL: http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}"
           - "Admin user: {{ mattermost_admin_username }} / {{ mattermost_admin_password }}"
           - "Team: {{ mattermost_team_name }}"
-          - "Bot token (for Notify Chatroom api_chat_token): {{ mattermost_bot_token.json.token }}"
-          - "mattermost_server extra var: {{ mattermost_public_ip }}:{{ mattermost_http_port }}"
-          - "Sync AWS Inventory so aws_mattermost appears for AO Install seeding."
+          - "Bot token stored in Controller credential 'Mattermost' (also printed below)"
+          - "Bot token: {{ mattermost_bot_token.json.token }}"
+          - "mattermost_server: {{ mattermost_public_ip }}:{{ mattermost_http_port }}"
+          - "Sync AWS Inventory, then re-run AO Install so Notify Chatroom attaches the Mattermost credential."
+
+- name: Publish Mattermost credential to Controller
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    mattermost_credential_name: Mattermost
+    mattermost_credential_organization: Ansible Product Demos (APD)
+  tasks:
+    - name: Require Mattermost connection facts for credential publish
+      ansible.builtin.assert:
+        that:
+          - (mattermost_credential_server | default('') | length) > 0
+          - (mattermost_credential_token | default('') | length) > 0
+        fail_msg: >-
+          Missing Mattermost server/token facts from the configure play.
+          Cannot update the Controller Mattermost credential.
+
+    - name: Ensure Mattermost credential type exists
+      ansible.controller.credential_type:
+        name: "{{ mattermost_credential_name }}"
+        description: >-
+          Mattermost chat endpoint for AO Notify Chatroom and other demos.
+          Filled by Infrastructure | AWS - Provision Mattermost.
+        kind: cloud
+        inputs:
+          fields:
+            - id: mattermost_server
+              type: string
+              label: Mattermost server (host:port)
+              help_text: Example 1.2.3.4:8065 — no http:// prefix.
+            - id: api_chat_token
+              type: string
+              label: Mattermost bot access token
+              secret: true
+          required:
+            - mattermost_server
+            - api_chat_token
+        injectors:
+          extra_vars:
+            mattermost_server: "{{ '{{' }} mattermost_server {{ '}}' }}"
+            api_chat_token: "{{ '{{' }} api_chat_token {{ '}}' }}"
+        state: present
+
+    - name: Upsert Mattermost credential with bot token
+      ansible.controller.credential:
+        name: "{{ mattermost_credential_name }}"
+        description: >-
+          Updated automatically by Infrastructure | AWS - Provision Mattermost.
+        organization: "{{ mattermost_credential_organization }}"
+        credential_type: "{{ mattermost_credential_name }}"
+        inputs:
+          mattermost_server: "{{ mattermost_credential_server }}"
+          api_chat_token: "{{ mattermost_credential_token }}"
+        state: present
+      no_log: true
+
+    - name: Show Mattermost credential publish result
+      ansible.builtin.debug:
+        msg:
+          - "Controller credential '{{ mattermost_credential_name }}' updated."
+          - "Attach it to Notify Chatroom (AO Install does this) or any JT that needs Mattermost."

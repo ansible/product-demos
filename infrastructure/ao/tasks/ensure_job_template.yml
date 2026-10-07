@@ -39,17 +39,6 @@
             {'limit': ao_jt.limit, 'ask_limit_on_launch': true}
             if ao_jt.limit is defined else {}
           )
-        | combine(
-            {
-              'extra_vars': {
-                'mattermost_server': ao_mattermost_server,
-                'api_chat_token': ao_mattermost_api_token | default('')
-              }
-            }
-            if ao_jt.name == 'Notify Chatroom'
-               and (ao_mattermost_server | default('') | length > 0)
-            else {}
-          )
       }}
 
 - name: Create job template {{ ao_jt.name }}
@@ -145,6 +134,30 @@
     body_format: json
     body:
       id: "{{ ao_aws_credential_id | int }}"
+    validate_certs: false
+    status_code: [200, 201, 204, 400]
+  failed_when: false
+  no_log: true
+
+- name: Attach Mattermost credential to {{ ao_jt.name }}
+  when:
+    - "'mattermost' in (ao_jt.credentials | default([]))"
+    - (ao_mattermost_credential_id | default('') | string | length) > 0
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/job_templates/{{ ao_jt_id }}/credentials/"
+    method: POST
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    body_format: json
+    body:
+      id: "{{ ao_mattermost_credential_id | int }}"
     validate_certs: false
     status_code: [200, 201, 204, 400]
   failed_when: false

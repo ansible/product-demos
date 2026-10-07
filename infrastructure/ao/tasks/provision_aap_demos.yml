@@ -92,10 +92,29 @@
   register: ao_aws_cred_lookup
   no_log: true
 
+- name: Look up Mattermost credential
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/credentials/?name={{ ao_mattermost_credential_name | urlencode }}"
+    method: GET
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    validate_certs: false
+    return_content: true
+  register: ao_mattermost_cred_lookup
+  no_log: true
+
 - name: Store credential ids
   ansible.builtin.set_fact:
     ao_machine_credential_id: "{{ (ao_machine_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
     ao_aws_credential_id: "{{ (ao_aws_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
+    ao_mattermost_credential_id: "{{ (ao_mattermost_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
 
 - name: Look up existing AO demos project
   ansible.builtin.uri:

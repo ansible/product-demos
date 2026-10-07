@@ -16,6 +16,28 @@ controller_credential_types:
     injectors:
       extra_vars:
         rosa_token: !unsafe '{{ rosa_token }}'
+  - name: Mattermost
+    description: >-
+      Mattermost chat endpoint for AO Notify Chatroom and other demos.
+      Filled by Infrastructure | AWS - Provision Mattermost.
+    kind: cloud
+    inputs:
+      fields:
+        - id: mattermost_server
+          type: string
+          label: Mattermost server (host:port)
+          help_text: Example 1.2.3.4:8065 — no http:// prefix.
+        - id: api_chat_token
+          type: string
+          label: Mattermost bot access token
+          secret: true
+      required:
+        - mattermost_server
+        - api_chat_token
+    injectors:
+      extra_vars:
+        mattermost_server: !unsafe '{{ mattermost_server }}'
+        api_chat_token: !unsafe '{{ api_chat_token }}'
 
 controller_credentials:
   - name: ROSA Token
@@ -25,6 +47,16 @@ controller_credentials:
     state: exists
     inputs:
       rosa_token: REPLACEME
+  - name: Mattermost
+    credential_type: Mattermost
+    organization: Ansible Product Demos (APD)
+    description: >-
+      Updated automatically by Infrastructure | AWS - Provision Mattermost.
+    update_secrets: false
+    state: exists
+    inputs:
+      mattermost_server: REPLACEME
+      api_chat_token: REPLACEME
   - name: OpenShift Credential
     organization: Ansible Product Demos (APD)
     credential_type: OpenShift or Kubernetes API Bearer Token
@@ -615,7 +647,8 @@ controller_templates:
     description: >-
       Provisions a dedicated aws_mattermost EC2 instance and deploys Mattermost
       (Postgres + team edition) with Podman. Creates an admin user, team, and
-      bot token for AO demo chat notifications and other chat-backed demos.
+      bot token, then upserts the Mattermost Controller credential for Notify
+      Chatroom and other chat-backed demos.
     labels:
       - aws.ec2
       - infrastructure
@@ -625,6 +658,7 @@ controller_templates:
     credentials:
       - AWS
       - APD Machine Credential
+      - AAP Credential
     project: Ansible Product Demos
     playbook: infrastructure/mattermost/provision_mattermost.yml
     inventory: Ansible Product Demos Inventory

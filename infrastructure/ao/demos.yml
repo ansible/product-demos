@@ -12,6 +12,7 @@ ao_aap_credential_name: APD AAP Token
 ao_aap_integration_name: APD AAP
 ao_machine_credential_name: APD Machine Credential
 ao_aws_credential_name: AWS
+ao_mattermost_credential_name: Mattermost
 
 ao_demos:
   - slug: disk-utilization
@@ -49,5 +50,6 @@ ao_demos:
         limit: aws_rhel9
       - name: Notify Chatroom
         playbook: disk-utilization/playbooks/notify_chatroom.yml
-        credentials: []
+        credentials:
+          - mattermost
         ask_variables_on_launch: true

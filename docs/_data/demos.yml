@@ -1870,7 +1870,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #231f20 0%, #005c99 100%)"
     icon: "💬"
-  blurb: "Provision aws_mattermost with Podman Mattermost, create a bot token, and reuse it for AO Notify Chatroom and other demos."
+  blurb: "Provision aws_mattermost with Podman Mattermost, create a bot token, and write it to a Mattermost Controller credential for AO Notify Chatroom and other demos."
   stats:
     playbooks: 1
   url: /demos/infrastructure-mattermost/

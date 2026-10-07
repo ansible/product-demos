@@ -116,7 +116,7 @@
           - "AAP project: {{ ao_demos_project_name }}"
           - >-
             {{
-              'Mattermost: ' ~ (ao_mattermost_server | default('not provisioned — run Infrastructure | AWS - Provision Mattermost'))
+              'Mattermost: ' ~ (ao_mattermost_server | default('not provisioned — run Infrastructure | AWS - Provision Mattermost (updates Mattermost credential)'))
             }}
 
     - name: Warn about missing demo prerequisites

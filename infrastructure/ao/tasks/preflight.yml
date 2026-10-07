@@ -77,7 +77,8 @@
             ao_seed_warnings + [
               'Demo(s) '
               ~ (ao_mattermost_demos | map(attribute='slug') | list | join(', '))
-              ~ ' post to Mattermost. Run Infrastructure | AWS - Provision Mattermost, '
-              ~ 'then set Notify Chatroom extra vars (or re-run Install).'
+              ~ ' post to Mattermost. Run Infrastructure | AWS - Provision Mattermost '
+              ~ '(writes the Mattermost Controller credential), sync inventory, '
+              ~ 'then re-run Install so Notify Chatroom attaches that credential.'
             ]
           }}

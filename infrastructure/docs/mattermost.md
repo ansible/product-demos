@@ -14,6 +14,9 @@ Stand up a shared Mattermost chat server on AWS for demos that post remediation 
 |------------|------|-------|
 | AWS | Amazon Web Services | EC2 create + security group |
 | APD Machine Credential | Machine | SSH as `ec2-user` to configure Podman |
+| AAP Credential | Red Hat Ansible Automation Platform | Lets this job upsert the **Mattermost** custom credential |
+
+The playbook creates/updates a **Mattermost** custom credential (`mattermost_server` + `api_chat_token`) that other job templates attach. AO Install attaches it to **Notify Chatroom**.
 
 ## Survey prompts
 
@@ -32,16 +35,16 @@ Stand up a shared Mattermost chat server on AWS for demos that post remediation 
 ## Why it matters
 
 - One reusable chat endpoint for AO and other demos instead of hard-coded bastion IPs
-- Bot token printed in the job output for **Notify Chatroom** `api_chat_token` / `mattermost_server`
-- Same cloud networking pattern as **Provision Kafka Queue**
+- Bot token stored in the **Mattermost** Controller credential (injects `mattermost_server` / `api_chat_token`)
+- Same cloud networking pattern as **Provision Kafka Queue** / Palo Alto credential write-back
 
 ## Presenter walkthrough
 
 1. Run **Deploy Cloud Stack in AWS** (or reuse an existing stack)
 2. Launch **Infrastructure ǀ AWS - Provision Mattermost** with the same region and owner tag
-3. From the job output, copy the Mattermost URL, admin password, and bot token
+3. Confirm job output shows the **Mattermost** Controller credential was updated
 4. Sync **AWS Inventory**
-5. For AO demos: run **Infrastructure ǀ Automation Orchestrator ǀ Install** (or set Notify Chatroom extra vars manually)
+5. For AO demos: run **Infrastructure ǀ Automation Orchestrator ǀ Install** so **Notify Chatroom** gets the Mattermost credential attached
 
 Default admin login is `apdadmin` / `Ansible123!` (username `admin` is reserved by Mattermost). Change it for long-lived labs.
 
