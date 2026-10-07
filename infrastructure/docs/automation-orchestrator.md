@@ -25,7 +25,10 @@ Still simple — same Install as Path 1 — plus a short setup so curated conten
 | **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)), then sync inventory | Mattermost + Controller credential | Notify Chatroom posts |
 | Matching APD template when a seeded demo catalogs it | AI endpoints or other backends | Only for demos that need them |
 
-Cloud Stack and Mattermost stay opt-in so shared labs are not billed for idle EC2 when you only wanted Path 1.
+<aside class="info-callout" role="note">
+  <span class="info-callout__icon" aria-hidden="true">i</span>
+  <p>Cloud Stack and Mattermost stay opt-in so shared labs are not billed for idle EC2 when you only wanted Path 1.</p>
+</aside>
 
 Then complete **Path 1** (Install + login) and open the seeded workflow you want to show.
 
