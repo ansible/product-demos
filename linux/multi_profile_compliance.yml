@@ -2,10 +2,18 @@
 - name: Apply compliance profile
   hosts: "{{ _hosts | default(omit) }}"
   become: true
+  gather_facts: false
   vars:
     compliance_profile: undef
 
   tasks:
+    - name: Ensure RHEL 8 uses a supported Python for Ansible modules
+      ansible.builtin.include_role:
+        name: demo.cloud.ensure_rhel8_python
+
+    - name: Gather facts
+      ansible.builtin.setup:
+
     - name: Check os type
       ansible.builtin.assert:
         that: "ansible_os_family == 'RedHat'"
