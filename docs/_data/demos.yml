@@ -1763,7 +1763,7 @@
 - slug: automation-orchestrator
   readme_path: infrastructure/docs/automation-orchestrator.md
   title: "Infrastructure | Automation Orchestrator — Hub (Start Here)"
-  subtitle: "Numbered path to AO + disk demo ready to present"
+  subtitle: "Path 1: one JT for AO · Path 2: seed demos that actually run"
   category: infrastructure
   status: active
   featured: false
@@ -1777,23 +1777,24 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
     icon: "🎼"
-  blurb: "Follow the presenter walkthrough: Cloud Stack → Mattermost → AO Install → you are ready to present disk-utilization. Uninstall when done."
+  blurb: "Path 1 is one Install JT for AO. Path 2 adds Cloud Stack + Mattermost so seeded demos (disk-utilization) run end-to-end — then present."
   stats:
     playbooks: 3
   url: /demos/automation-orchestrator/
   github_path: infrastructure/setup.yml
   workflow_mermaid: |
     flowchart LR
-      S["1 Setup templates"] --> CS["2 Cloud Stack"]
-      CS --> MM["3 Mattermost"]
-      MM --> INV["4 Sync inventory"]
-      INV --> I["5 AO Install"]
-      I --> R["Ready to present"]
-      style S fill:#2d2d2d,stroke:#888,color:#fff
-      style CS fill:#1a3d2e,stroke:#3dd68c,color:#fff
-      style MM fill:#1a3d2e,stroke:#3dd68c,color:#fff
-      style INV fill:#2d2d2d,stroke:#888,color:#fff
-      style I fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      P1["Path 1"] --> I1["AO Install"]
+      I1 --> AO["AO ready"]
+      P2["Path 2"] --> REQ["Cloud Stack + Mattermost"]
+      REQ --> I2["AO Install"]
+      I2 --> R["Ready to present"]
+      style P1 fill:#2d2d2d,stroke:#888,color:#fff
+      style I1 fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style AO fill:#162c46,stroke:#58a6ff,color:#fff
+      style P2 fill:#2d2d2d,stroke:#888,color:#fff
+      style REQ fill:#1a3d2e,stroke:#3dd68c,color:#fff
+      style I2 fill:#1e3a5f,stroke:#4a90d9,color:#fff
       style R fill:#162c46,stroke:#58a6ff,color:#fff
 
 - slug: automation-orchestrator-install
