@@ -141,7 +141,7 @@
 - name: Deploy Mattermost with Podman
   hosts: mattermost_server
   become: true
-  gather_facts: true
+  gather_facts: false
   vars:
     mattermost_postgres_image: docker.io/library/postgres:15-alpine
     mattermost_image: docker.io/mattermost/mattermost-team-edition:9.11
@@ -152,7 +152,11 @@
   tasks:
     - name: Wait for SSH on new Mattermost instance
       ansible.builtin.wait_for_connection:
-        timeout: 300
+        delay: 15
+        timeout: 600
+
+    - name: Gather facts after SSH is ready
+      ansible.builtin.setup:
 
     - name: Install Podman
       ansible.builtin.package:
