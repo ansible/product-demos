@@ -1,56 +1,40 @@
 # Automation Orchestrator — Hub (Start Here)
 
-Start here for Automation Orchestrator (AO) on the [Ansible Product Demos catalog item](https://red.ht/apd-sandbox) from [demo.redhat.com](https://demo.redhat.com). OpenShift, credentials, and the AO execution environment are already wired — you do not assemble a platform from scratch.
+Start here for Automation Orchestrator (AO) on the [Ansible Product Demos catalog item](https://red.ht/apd-sandbox) from [demo.redhat.com](https://demo.redhat.com). OpenShift, credentials, and the AO execution environment are already wired.
 
-This page is the **hub**. The three AO job templates are listed below. Optional AWS pieces (cloud stack, Mattermost) are **not** installed by AO Install on purpose — see [Why don't we just provision everything?](#why-dont-we-just-provision-everything).
+## Presenter walkthrough
+
+Do these in order. When you finish step 5, you have **AO + the disk-utilization demo ready to present**.
+
+1. Confirm AO templates exist — if not, run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** → `infrastructure`).
+2. **Deploy Cloud Stack in AWS** → wait until `aws_rhel9` is in inventory (sync **AWS Inventory** if needed).
+3. **Infrastructure ǀ AWS - Provision Mattermost** → confirm Controller credential **Mattermost** was updated ([details](./mattermost.md)).
+4. Sync **AWS Inventory** again.
+5. **Infrastructure ǀ Automation Orchestrator ǀ Install** → from the job output, open the AO URL, log in as `admin` with the printed password, and open the seeded **disk-utilization** workflow.
+
+**You are ready to present** — run the workflow in AO (disk check → remediate → Mattermost notify on channel `apd-notify`).
+
+6. When the session is over → **Infrastructure ǀ Automation Orchestrator ǀ Uninstall**.
+
+Skip Network Configuration on RHDP — Install already ran it.
+
+Only need AO itself (no disk demo / no chat)? Run steps **1** and **5**, then **6** when done. Install **warns** if `aws_rhel9` or Mattermost is missing; it does not fail.
 
 ## The three AO templates
 
 | Template | When to use it | Playbook |
 |----------|----------------|----------|
-| **Infrastructure ǀ Automation Orchestrator ǀ Install** | Main path. Runs `aapctl`, network allow-list, AAP integration, and seeds curated demos from [`demos.yml`](../ao/demos.yml). | [`install.yml`](../ao/install.yml) |
-| **Infrastructure ǀ AO Network Configuration ǀ Install** | Optional re-run of allow-listing / private-network OIDC. **Skip on RHDP** — Install already did this. | [`network-access.yml`](../ao/network-access.yml) |
-| **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** | Tear down AO when the demo is done so the shared cluster stays clean. | [`uninstall.yml`](../ao/uninstall.yml) |
-
-## Prerequisites
-
-- **If using RHDP (demo.redhat.com):** OpenShift, **OpenShift Credential**, **AAP Credential**, and **AO Execution Environment** ship with the catalog item. Run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** → `infrastructure`) if the AO templates are not visible yet.
-- **If using your own installation:** OpenShift cluster, OpenShift + AAP credentials, AO EE (`quay.io/acme_corp/ao-ee:latest`), and **APD ǀ Single demo setup** with category `infrastructure`.
-
-Install alone is enough to get AO up and log in. Extra jobs below are only needed if you want the **seeded demo workflows** (for example disk utilization) to run end-to-end against real hosts and chat.
-
-## Optional — make seeded AO demos work
-
-Install seeds workflows from [`infrastructure/ao/demos.yml`](../ao/demos.yml) (today: **disk-utilization** from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos)). Those JTs use APD inventory and credentials. They are **not required** to open AO — only to run the demo story.
-
-**Full disk demo (recommended order):**
-
-1. **Deploy Cloud Stack in AWS** → wait for `aws_rhel9`
-2. **Infrastructure ǀ AWS - Provision Mattermost** → confirm credential **Mattermost** was updated ([details](./mattermost.md))
-3. Sync **AWS Inventory**
-4. **Infrastructure ǀ Automation Orchestrator ǀ Install**
-5. Open the AO URL from the job output (`admin` + printed password) → run the seeded disk-utilization workflow
-6. When finished → **Uninstall**
-
-Cheat sheet if you only need one piece:
-
-| Need | Run |
-|------|-----|
-| RHEL target for disk check / remediate | **Deploy Cloud Stack in AWS** + sync inventory (`aws_rhel9`) |
-| Mattermost notifications | **Provision Mattermost**, sync inventory, re-run **AO Install** |
-| EBS expand remediation | Same cloud stack + **AWS** credential (Install attaches it when catalogued) |
-
-Install **warns** (does not fail) if `aws_rhel9` or Mattermost is missing.
+| **Infrastructure ǀ Automation Orchestrator ǀ Install** | Step 5 — stands up AO, wires AAP, seeds demos from [`demos.yml`](../ao/demos.yml). | [`install.yml`](../ao/install.yml) |
+| **Infrastructure ǀ AO Network Configuration ǀ Install** | Rare re-run of allow-listing. **Skip on RHDP.** | [`network-access.yml`](../ao/network-access.yml) |
+| **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** | Step 6 — tear down when finished. | [`uninstall.yml`](../ao/uninstall.yml) |
 
 ## Why don't we just provision everything?
 
-AO Install turns on Automation Orchestrator and seeds workflow definitions. It does **not** also launch Cloud Stack, Mattermost, Kafka, or every other lab VM.
+Cloud Stack and Mattermost are **not** part of AO Install on purpose:
 
-- **Cost** — Shared RHDP labs already burn OpenShift + AAP. Auto-creating EC2 for every AO install (even when the presenter only wants the AO UI) would leave idle hosts running and drive up AWS spend.
-- **Choice** — Many presenters only need AO itself. Optional deps stay opt-in: run them when the seeded JT path needs them; skip them when you do not.
-- **Soft preflight** — Missing `aws_rhel9` or Mattermost produces a **warning** at Install time, not a hard failure, so AO still comes up.
-
-If a dependency is missing later, run the matching APD template and re-run Install (or attach the Mattermost credential manually) — you do not need to rebuild AO from scratch.
+- **Cost** — Shared RHDP labs already burn OpenShift + AAP. Auto-creating EC2 on every Install leaves idle hosts and drives AWS spend.
+- **Choice** — Presenters who only want the AO UI skip steps 2–4.
+- **Soft preflight** — Missing deps warn at Install time; AO still comes up.
 
 ## Configure credentials
 
@@ -58,18 +42,16 @@ If a dependency is missing later, run the matching APD template and re-run Insta
 |------------|------|--------------------|
 | OpenShift Credential | OpenShift or Kubernetes API Bearer Token | Pre-configured |
 | AAP Credential | Red Hat Ansible Automation Platform | Pre-configured |
-| Mattermost | Custom (server + webhook id) | Created/updated by **Provision Mattermost** |
+| Mattermost | Custom (server + webhook id) | Created/updated by **Provision Mattermost** (step 3) |
 
 ## Under the hood
 
-Install only seeds demos with `enabled: true` in [`demos.yml`](../ao/demos.yml). It creates project **AAP Orchestrator Demos** and the demo JTs in org **Ansible Product Demos (APD)** (not permanently in `setup.yml`), rewrites workflow `organization_name` from `Default` → APD, attaches **Mattermost** + **Product Demos EE** to **Notify Chatroom** when present, and imports the workflow into AO.
-
-Why this shape: demo-ready on RHDP (“press Launch”), AO boots with a real disk → remediate → notify path, no permanent JT sprawl, Uninstall keeps shared labs clean, and cloud/chat backends stay pay-for-what-you-use. AAP drives `aapctl`; seeding is allowlisted normalize/import; the Mattermost credential holds an **incoming webhook** id for `community.general.mattermost`.
+Install seeds demos with `enabled: true` in [`demos.yml`](../ao/demos.yml) (today: **disk-utilization** from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos)). It creates project **AAP Orchestrator Demos** and demo JTs in org **Ansible Product Demos (APD)**, rewrites workflow `organization_name` from `Default` → APD, attaches **Mattermost** + **Product Demos EE** to **Notify Chatroom** when present, and imports the workflow into AO. AAP drives `aapctl`; the Mattermost credential holds an **incoming webhook** id for `community.general.mattermost`.
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| [AWS Mattermost](./mattermost.md) | Optional chat backend + Controller credential for Notify Chatroom |
-| [ROSA Cluster Lifecycle](./rosa-lifecycle.md) | OpenShift on AWS when you are not using the RHDP catalog item |
-| [OPA — Policy as Code](./opa-policy-as-code.md) | Another OpenShift-backed control-plane component launched from AAP |
+| [AWS Mattermost](./mattermost.md) | Step 3 — chat backend + Controller credential |
+| [ROSA Cluster Lifecycle](./rosa-lifecycle.md) | OpenShift on AWS when you are not using RHDP |
+| [OPA — Policy as Code](./opa-policy-as-code.md) | Another OpenShift-backed control-plane component from AAP |

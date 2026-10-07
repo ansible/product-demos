@@ -1763,7 +1763,7 @@
 - slug: automation-orchestrator
   readme_path: infrastructure/docs/automation-orchestrator.md
   title: "Infrastructure | Automation Orchestrator — Hub (Start Here)"
-  subtitle: "Start here — Install, optional cloud/chat deps, then Uninstall"
+  subtitle: "Numbered path to AO + disk demo ready to present"
   category: infrastructure
   status: active
   featured: false
@@ -1777,24 +1777,25 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
     icon: "🎼"
-  blurb: "Hub for AO on RHDP: what Install / Network / Uninstall do, optional Cloud Stack + Mattermost for seeded demos, and why we do not auto-provision every EC2 dependency."
+  blurb: "Follow the presenter walkthrough: Cloud Stack → Mattermost → AO Install → you are ready to present disk-utilization. Uninstall when done."
   stats:
     playbooks: 3
   url: /demos/automation-orchestrator/
   github_path: infrastructure/setup.yml
   workflow_mermaid: |
     flowchart LR
-      H["🎼 Hub — Start Here"]
-      H --> I["Install AO"]
-      H -.->|"optional for seeded demos"| CS["Deploy Cloud Stack"]
-      H -.->|"optional for chat"| MM["Provision Mattermost"]
-      I --> N["Network config<br/>(usually skip)"]
-      I --> U["Uninstall when done"]
-      style H fill:#1e3a5f,stroke:#4a90d9,color:#fff
-      style I fill:#162c46,stroke:#58a6ff,color:#fff
+      S["1 Setup templates"] --> CS["2 Cloud Stack"]
+      CS --> MM["3 Mattermost"]
+      MM --> INV["4 Sync inventory"]
+      INV --> I["5 AO Install"]
+      I --> R["Ready to present"]
+      R --> U["6 Uninstall"]
+      style S fill:#2d2d2d,stroke:#888,color:#fff
       style CS fill:#1a3d2e,stroke:#3dd68c,color:#fff
       style MM fill:#1a3d2e,stroke:#3dd68c,color:#fff
-      style N fill:#2d2d2d,stroke:#888,color:#fff
+      style INV fill:#2d2d2d,stroke:#888,color:#fff
+      style I fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style R fill:#162c46,stroke:#58a6ff,color:#fff
       style U fill:#3d1a1a,stroke:#f87171,color:#fff
 
 - slug: automation-orchestrator-install
