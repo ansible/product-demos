@@ -16,7 +16,7 @@ Stand up a shared Mattermost chat server on AWS for demos that post remediation 
 | APD Machine Credential | Machine | SSH as `ec2-user` to configure Podman |
 | AAP Credential | Red Hat Ansible Automation Platform | Lets this job upsert the **Mattermost** custom credential |
 
-The playbook creates/updates a **Mattermost** custom credential (`mattermost_server` + `api_chat_token`) that other job templates attach. AO Install attaches it to **Notify Chatroom**.
+The playbook creates/updates a **Mattermost** custom credential (`mattermost_server` + incoming webhook id as `api_chat_token`) that other job templates attach. AO Install attaches it to **Notify Chatroom** and sets that JT to **Product Demos EE** (includes `community.general.mattermost`).
 
 ## Survey prompts
 

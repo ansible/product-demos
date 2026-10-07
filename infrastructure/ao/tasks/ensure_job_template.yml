@@ -39,6 +39,11 @@
             {'limit': ao_jt.limit, 'ask_limit_on_launch': true}
             if ao_jt.limit is defined else {}
           )
+        | combine(
+            {'execution_environment': ao_execution_environment_id | int}
+            if (ao_execution_environment_id | default('') | string | length) > 0
+            else {}
+          )
       }}
 
 - name: Create job template {{ ao_jt.name }}

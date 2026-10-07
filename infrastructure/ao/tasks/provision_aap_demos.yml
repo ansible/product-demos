@@ -116,6 +116,28 @@
     ao_aws_credential_id: "{{ (ao_aws_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
     ao_mattermost_credential_id: "{{ (ao_mattermost_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
 
+- name: Look up Product Demos execution environment
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/execution_environments/?name={{ ao_execution_environment_name | urlencode }}"
+    method: GET
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    validate_certs: false
+    return_content: true
+  register: ao_ee_lookup
+  no_log: true
+
+- name: Store execution environment id
+  ansible.builtin.set_fact:
+    ao_execution_environment_id: "{{ (ao_ee_lookup.json.results | default([{}]))[0].id | default('') }}"
+
 - name: Look up existing AO demos project
   ansible.builtin.uri:
     url: "{{ ao_controller_api }}/projects/?name={{ ao_demos_project_name | urlencode }}"

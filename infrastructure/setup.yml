@@ -29,8 +29,11 @@ controller_credential_types:
           help_text: Example 1.2.3.4:8065 — no http:// prefix.
         - id: api_chat_token
           type: string
-          label: Mattermost bot access token
+          label: Mattermost incoming webhook id
           secret: true
+          help_text: >-
+            Last path segment of /hooks/{id}. Used by community.general.mattermost
+            as api_key (not a bot personal access token).
       required:
         - mattermost_server
         - api_chat_token

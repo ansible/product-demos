@@ -403,13 +403,15 @@
         (mattermost_promote_sql.rc | default(1) | int) != 0
         or 'system_admin' not in (mattermost_promote_sql.stdout | default(''))
 
-    - name: Enable Mattermost bot and user-token settings via mmctl
+    - name: Enable Mattermost bot, token, and webhook settings via mmctl
       ansible.builtin.shell: |
         set -euo pipefail
         podman exec mattermost mmctl --local config set \
           ServiceSettings.EnableBotAccountCreation true
         podman exec mattermost mmctl --local config set \
           ServiceSettings.EnableUserAccessTokens true
+        podman exec mattermost mmctl --local config set \
+          ServiceSettings.EnableIncomingWebhooks true
       args:
         executable: /bin/bash
       register: mattermost_enable_flags
@@ -424,7 +426,7 @@
       ansible.builtin.fail:
         msg: >-
           mmctl could not enable EnableBotAccountCreation /
-          EnableUserAccessTokens
+          EnableUserAccessTokens / EnableIncomingWebhooks
           (rc={{ mattermost_enable_flags.rc }};
           stdout={{ mattermost_enable_flags.stdout | default('') }};
           stderr={{ mattermost_enable_flags.stderr | default('') }}).
@@ -636,6 +638,103 @@
       failed_when: false
       no_log: true
 
+    # community.general.mattermost posts to {url}/hooks/{api_key} (Incoming
+    # Webhook), not a bot personal access token.
+    - name: Create Mattermost notify channel when missing
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/channels"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body:
+          team_id: "{{ mattermost_team_id }}"
+          name: apd-notify
+          display_name: APD Notify
+          type: O
+        status_code: [201, 400]
+      register: mattermost_channel_create
+
+    - name: Resolve Mattermost notify channel id
+      ansible.builtin.uri:
+        url: >-
+          http://127.0.0.1:{{ mattermost_http_port }}/api/v4/teams/{{ mattermost_team_id }}/channels/name/apd-notify
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        return_content: true
+        status_code: [200]
+      register: mattermost_channel
+      when: (mattermost_channel_create.status | default(0) | int) != 201
+
+    - name: Select Mattermost notify channel id
+      ansible.builtin.set_fact:
+        mattermost_channel_id: >-
+          {{
+            mattermost_channel_create.json.id
+            | default(mattermost_channel.json.id | default(''), true)
+          }}
+
+    - name: Require Mattermost notify channel id
+      ansible.builtin.assert:
+        that:
+          - (mattermost_channel_id | default('') | string | length) > 0
+        fail_msg: Could not resolve Mattermost channel id for apd-notify.
+
+    - name: Create Mattermost incoming webhook for Notify Chatroom
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/hooks/incoming"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body:
+          channel_id: "{{ mattermost_channel_id }}"
+          display_name: APD Notify Chatroom
+          description: Incoming webhook for community.general.mattermost / AO demos
+        status_code: [201, 400]
+      register: mattermost_webhook
+      failed_when: false
+      no_log: true
+
+    - name: List Mattermost incoming webhooks when create did not return 201
+      when: (mattermost_webhook.status | default(0) | int) != 201
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/hooks/incoming"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        return_content: true
+        status_code: [200]
+      register: mattermost_webhooks
+
+    - name: Select Mattermost incoming webhook id
+      ansible.builtin.set_fact:
+        mattermost_webhook_id: >-
+          {{
+            mattermost_webhook.json.id
+            | default(
+                (
+                  mattermost_webhooks.json
+                  | default([])
+                  | selectattr('display_name', 'equalto', 'APD Notify Chatroom')
+                  | map(attribute='id')
+                  | first
+                  | default('', true)
+                ),
+                true
+              )
+          }}
+      no_log: true
+
+    - name: Require Mattermost incoming webhook id
+      ansible.builtin.assert:
+        that:
+          - (mattermost_webhook_id | default('') | string | length) > 0
+        fail_msg: >-
+          Could not create or find Mattermost incoming webhook for apd-notify.
+          community.general.mattermost needs url/hooks/{api_key}.
+
     - name: Persist Mattermost connection facts on the host
       ansible.builtin.copy:
         dest: /etc/apd-mattermost.env
@@ -644,14 +743,16 @@
           MATTERMOST_URL=http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}
           MATTERMOST_SERVER={{ mattermost_public_ip }}:{{ mattermost_http_port }}
           MATTERMOST_BOT_TOKEN={{ mattermost_bot_token.json.token }}
+          MATTERMOST_WEBHOOK_ID={{ mattermost_webhook_id }}
           MATTERMOST_ADMIN_USER={{ mattermost_admin_username }}
           MATTERMOST_TEAM={{ mattermost_team_name }}
+          MATTERMOST_CHANNEL=apd-notify
       no_log: true
 
     - name: Export Mattermost connection facts to localhost
       ansible.builtin.set_fact:
         mattermost_credential_server: "{{ mattermost_public_ip }}:{{ mattermost_http_port }}"
-        mattermost_credential_token: "{{ mattermost_bot_token.json.token }}"
+        mattermost_credential_token: "{{ mattermost_webhook_id }}"
       delegate_to: localhost
       delegate_facts: true
       no_log: true
@@ -661,11 +762,11 @@
         msg:
           - "Mattermost URL: http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}"
           - "Admin user: {{ mattermost_admin_username }} / {{ mattermost_admin_password }}"
-          - "Team: {{ mattermost_team_name }}"
-          - "Bot token stored in Controller credential 'Mattermost' (also printed below)"
-          - "Bot token: {{ mattermost_bot_token.json.token }}"
+          - "Team: {{ mattermost_team_name }} / channel: apd-notify"
+          - "Incoming webhook id stored as api_chat_token in Controller credential 'Mattermost'"
+          - "Webhook URL: http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}/hooks/{{ mattermost_webhook_id }}"
           - "mattermost_server: {{ mattermost_public_ip }}:{{ mattermost_http_port }}"
-          - "Sync AWS Inventory, then re-run AO Install so Notify Chatroom attaches the Mattermost credential."
+          - "Re-run AO Install so Notify Chatroom uses Product Demos EE + Mattermost credential."
 
 - name: Publish Mattermost credential to Controller
   hosts: localhost
