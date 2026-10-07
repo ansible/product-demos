@@ -12,7 +12,7 @@ Do these in order. When you finish step 5, you have **AO + the disk-utilization 
 4. Sync **AWS Inventory** again.
 5. **Infrastructure ǀ Automation Orchestrator ǀ Install** → from the job output, open the AO URL, log in as `admin` with the printed password, and open the seeded **disk-utilization** workflow.
 
-**You are ready to present** — run the workflow in AO (disk check → remediate → Mattermost notify on channel `apd-notify`).
+**You are ready to present** — run the workflow in AO (disk check → remediate → Mattermost notify on channel `apd-notify`). For the story, switch tiers, and playbook map, see the upstream walkthrough: [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/).
 
 6. When the session is over → **Infrastructure ǀ Automation Orchestrator ǀ Uninstall**.
 
@@ -52,6 +52,7 @@ Install seeds demos with `enabled: true` in [`demos.yml`](../ao/demos.yml) (toda
 
 | Demo | Description |
 |------|-------------|
+| [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | Upstream AO demo walkthrough (switch tiers, playbooks, video) |
 | [AWS Mattermost](./mattermost.md) | Step 3 — chat backend + Controller credential |
 | [ROSA Cluster Lifecycle](./rosa-lifecycle.md) | OpenShift on AWS when you are not using RHDP |
 | [OPA — Policy as Code](./opa-policy-as-code.md) | Another OpenShift-backed control-plane component from AAP |
