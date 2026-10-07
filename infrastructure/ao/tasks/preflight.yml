@@ -78,7 +78,7 @@
               'Demo(s) '
               ~ (ao_mattermost_demos | map(attribute='slug') | list | join(', '))
               ~ ' post to Mattermost. Run Infrastructure | AWS - Provision Mattermost '
-              ~ '(writes the Mattermost Controller credential), sync inventory, '
+              ~ '(writes the Mattermost Controller credential and syncs AWS Inventory), '
               ~ 'then re-run Install so Notify Chatroom attaches that credential.'
             ]
           }}

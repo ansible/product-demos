@@ -766,6 +766,7 @@
           - "Incoming webhook id stored as api_chat_token in Controller credential 'Mattermost'"
           - "Webhook URL: http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}/hooks/{{ mattermost_webhook_id }}"
           - "mattermost_server: {{ mattermost_public_ip }}:{{ mattermost_http_port }}"
+          - "AWS Inventory sync runs after credential publish so aws_mattermost is in inventory."
           - "Re-run AO Install so Notify Chatroom uses Product Demos EE + Mattermost credential."
 
 - name: Publish Mattermost credential to Controller
@@ -985,3 +986,87 @@
         msg:
           - "Controller credential '{{ mattermost_credential_name }}' updated."
           - "Attach it to Notify Chatroom (AO Install does this) or any JT that needs Mattermost."
+
+    - name: Look up AWS Inventory source
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/inventory_sources/?name={{ 'AWS Inventory' | urlencode }}"
+        method: GET
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        validate_certs: false
+        return_content: true
+        status_code: [200]
+      register: _mm_inv_src_lookup
+
+    - name: Require AWS Inventory source
+      ansible.builtin.assert:
+        that:
+          - _mm_inv_src_lookup.json.results | default([]) | length > 0
+        fail_msg: >-
+          Inventory source 'AWS Inventory' was not found. Re-run common/APD setup
+          so aws_mattermost can sync into Ansible Product Demos Inventory.
+
+    - name: Sync AWS Inventory so aws_mattermost appears
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/inventory_sources/{{ _mm_inv_src_lookup.json.results[0].id }}/update/"
+        method: POST
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        body_format: json
+        body: {}
+        validate_certs: false
+        return_content: true
+        status_code: [202]
+      register: _mm_inv_update
+
+    - name: Wait for AWS Inventory sync to finish
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/inventory_updates/{{ _mm_inv_update.json.id }}/"
+        method: GET
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        validate_certs: false
+        return_content: true
+        status_code: [200]
+      register: _mm_inv_update_status
+      until: >-
+        _mm_inv_update_status.json.status is defined
+        and _mm_inv_update_status.json.status not in ['new', 'pending', 'waiting', 'running']
+      retries: 36
+      delay: 5
+
+    - name: Require AWS Inventory sync succeeded
+      ansible.builtin.assert:
+        that:
+          - _mm_inv_update_status.json.status == 'successful'
+        fail_msg: >-
+          AWS Inventory sync finished with status
+          '{{ _mm_inv_update_status.json.status | default('unknown') }}'.
+          Check the inventory update job in Controller.
+
+    - name: Show AWS Inventory sync result
+      ansible.builtin.debug:
+        msg:
+          - "AWS Inventory synced; aws_mattermost should now be in Ansible Product Demos Inventory."
+          - "No manual inventory sync step is required after Provision Mattermost."

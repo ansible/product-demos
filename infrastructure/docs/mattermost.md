@@ -5,8 +5,7 @@ Stand up a shared Mattermost chat server on AWS for demos that post remediation 
 ## Prerequisites
 
 - **Deploy Cloud Stack in AWS** already run (VPC, subnet, security group, keypair)
-- **AWS** and **APD Machine Credential** configured
-- Sync **AWS Inventory** after this job so `aws_mattermost` appears in inventory
+- **AWS**, **APD Machine Credential**, and **AAP Credential** configured
 
 ## Configure credentials
 
@@ -16,7 +15,7 @@ Stand up a shared Mattermost chat server on AWS for demos that post remediation 
 | APD Machine Credential | Machine | SSH as `ec2-user` to configure Podman |
 | AAP Credential | Red Hat Ansible Automation Platform | Lets this job upsert the **Mattermost** custom credential |
 
-The playbook creates/updates a **Mattermost** custom credential (`mattermost_server` + incoming webhook id as `api_chat_token`) that other job templates attach. AO Install attaches it to **Notify Chatroom** and sets that JT to **Product Demos EE** (includes `community.general.mattermost`).
+The playbook creates/updates a **Mattermost** custom credential (`mattermost_server` + incoming webhook id as `api_chat_token`) that other job templates attach, then syncs **AWS Inventory** so `aws_mattermost` appears without a manual step. AO Install attaches the credential to **Notify Chatroom** and sets that JT to **Product Demos EE** (includes `community.general.mattermost`).
 
 ## Survey prompts
 
@@ -42,9 +41,8 @@ The playbook creates/updates a **Mattermost** custom credential (`mattermost_ser
 
 1. Run **Deploy Cloud Stack in AWS** (or reuse an existing stack)
 2. Launch **Infrastructure ǀ AWS - Provision Mattermost** with the same region and owner tag
-3. Confirm job output shows the **Mattermost** Controller credential was updated
-4. Sync **AWS Inventory**
-5. For AO demos: run **Infrastructure ǀ Automation Orchestrator ǀ Install** so **Notify Chatroom** gets the Mattermost credential attached
+3. Confirm job output shows the **Mattermost** Controller credential was updated and **AWS Inventory** synced
+4. For AO demos: run **Infrastructure ǀ Automation Orchestrator ǀ Install** so **Notify Chatroom** gets the Mattermost credential attached
 
 Default admin login is `apdadmin` / `Ansible123!` (username `admin` is reserved by Mattermost). Change it for long-lived labs.
 

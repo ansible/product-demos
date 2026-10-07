@@ -650,8 +650,8 @@ controller_templates:
     description: >-
       Provisions a dedicated aws_mattermost EC2 instance and deploys Mattermost
       (Postgres + team edition) with Podman. Creates an admin user, team, and
-      bot token, then upserts the Mattermost Controller credential for Notify
-      Chatroom and other chat-backed demos.
+      bot token, upserts the Mattermost Controller credential for Notify
+      Chatroom, then syncs AWS Inventory so aws_mattermost is available.
     labels:
       - aws.ec2
       - infrastructure
