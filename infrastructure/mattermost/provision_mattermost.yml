@@ -608,20 +608,19 @@
         body_format: json
         body:
           description: APD demo notify token
-        status_code: [201, 403, 501]
+        # Mattermost returns 200 (not 201) for user access token create.
+        status_code: [200, 201]
       register: mattermost_bot_token
-      failed_when: false
       no_log: true
 
-    - name: Fail when Mattermost bot token create fails
-      when: (mattermost_bot_token.status | default(0) | int) != 201
-      ansible.builtin.fail:
-        msg: >-
-          Mattermost bot token create failed
+    - name: Require Mattermost bot token value
+      ansible.builtin.assert:
+        that:
+          - (mattermost_bot_token.json.token | default('') | string | length) > 0
+        fail_msg: >-
+          Mattermost bot token response missing token field
           (status={{ mattermost_bot_token.status | default('n/a') }};
-          id={{ mattermost_bot_token.json.id | default('') }};
-          message={{ mattermost_bot_token.json.message | default(mattermost_bot_token.msg | default('')) }}).
-          Ensure ServiceSettings.EnableUserAccessTokens=true.
+          keys={{ mattermost_bot_token.json.keys() | list if mattermost_bot_token.json is mapping else [] }}).
 
     - name: Add bot to Mattermost team
       ansible.builtin.uri:
