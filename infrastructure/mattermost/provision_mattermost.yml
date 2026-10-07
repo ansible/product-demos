@@ -14,8 +14,9 @@
     create_vm_aws_securitygroup_name: aws-test-sg
     create_vm_aws_vpc_subnet_name: aws-test-subnet
     create_vm_vm_deployment: cloud_stack
-    mattermost_admin_email: admin@example.com
-    mattermost_admin_username: admin
+    # Username "admin" is reserved by Mattermost and returns HTTP 400 on create.
+    mattermost_admin_email: apd-admin@example.com
+    mattermost_admin_username: apdadmin
     mattermost_admin_password: Ansible123!
     mattermost_team_name: apd
     mattermost_team_display_name: Ansible Product Demos
@@ -350,22 +351,57 @@
       register: mattermost_admin_create
       no_log: true
 
+    - name: Fail when admin create returned an unexpected 400
+      when:
+        - mattermost_admin_create.status | default(0) == 400
+        - >-
+          'already exists' not in (
+            mattermost_admin_create.json.message | default('')
+            | lower
+          )
+          and 'already exists' not in (
+            mattermost_admin_create.json.id | default('')
+            | lower
+          )
+      ansible.builtin.fail:
+        msg: >-
+          Mattermost admin create failed
+          (status={{ mattermost_admin_create.status }};
+          id={{ mattermost_admin_create.json.id | default('') }};
+          message={{ mattermost_admin_create.json.message | default(mattermost_admin_create.msg) }}).
+          Username 'admin' is reserved — use apdadmin.
+
     - name: Log in as Mattermost admin
       ansible.builtin.uri:
         url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/users/login"
         method: POST
         body_format: json
         body:
-          login_id: "{{ mattermost_admin_username }}"
+          login_id: "{{ mattermost_admin_email }}"
           password: "{{ mattermost_admin_password }}"
         status_code: [200]
         return_headers: true
       register: mattermost_login
       no_log: true
+      failed_when: false
+
+    - name: Fail when Mattermost admin login fails
+      when: mattermost_login.status | default(0) != 200
+      ansible.builtin.fail:
+        msg: >-
+          Mattermost admin login failed
+          (status={{ mattermost_login.status | default('n/a') }};
+          message={{ mattermost_login.json.message | default(mattermost_login.msg | default('unknown')) }}).
+          Try logging into http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}
+          as {{ mattermost_admin_username }} / (see playbook defaults).
 
     - name: Store Mattermost session token
       ansible.builtin.set_fact:
-        mattermost_session_token: "{{ mattermost_login.headers.Token }}"
+        mattermost_session_token: >-
+          {{
+            mattermost_login.headers.Token
+            | default(mattermost_login.headers.token, true)
+          }}
       no_log: true
 
     - name: Create Mattermost team when missing

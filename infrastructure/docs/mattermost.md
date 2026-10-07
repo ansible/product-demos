@@ -43,7 +43,7 @@ Stand up a shared Mattermost chat server on AWS for demos that post remediation 
 4. Sync **AWS Inventory**
 5. For AO demos: run **Infrastructure ǀ Automation Orchestrator ǀ Install** (or set Notify Chatroom extra vars manually)
 
-Default admin login is `admin` / `Ansible123!`. Change it for long-lived labs.
+Default admin login is `apdadmin` / `Ansible123!` (username `admin` is reserved by Mattermost). Change it for long-lived labs.
 
 ## Talking points
 
