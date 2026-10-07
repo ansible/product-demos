@@ -285,6 +285,9 @@
           MM_SERVICESETTINGS_LISTENADDRESS: ":8065"
           MM_TEAMSETTINGS_ENABLEOPENSERVER: "true"
           MM_SERVICESETTINGS_ENABLEBOTACCOUNTCREATION: "true"
+          # mmctl --local needs this to promote apdadmin (API user create is not
+          # always system_admin on re-runs against an existing DB).
+          MM_SERVICESETTINGS_ENABLELOCALMODE: "true"
         volumes:
           - "{{ mattermost_data_dir }}/config:/mattermost/config:Z"
           - "{{ mattermost_data_dir }}/data:/mattermost/data:Z"
@@ -371,8 +374,56 @@
           message={{ mattermost_admin_create.json.message | default(mattermost_admin_create.msg) }}).
           Username 'admin' is reserved — use apdadmin.
 
+    - name: Promote Mattermost admin to system_admin via mmctl local mode
+      ansible.builtin.command:
+        argv:
+          - podman
+          - exec
+          - mattermost
+          - mmctl
+          - --local
+          - user
+          - roles
+          - system_admin
+          - "{{ mattermost_admin_username }}"
+      register: mattermost_promote_admin
+      changed_when: >-
+        'added' in (mattermost_promote_admin.stdout | default('') | lower)
+        or 'system_admin' in (mattermost_promote_admin.stdout | default('') | lower)
+      failed_when: false
+      retries: 12
+      delay: 5
+      until: mattermost_promote_admin.rc == 0
+
+    - name: Fail when Mattermost admin promote fails
+      when: (mattermost_promote_admin.rc | default(1) | int) != 0
+      ansible.builtin.fail:
+        msg: >-
+          mmctl could not grant system_admin to {{ mattermost_admin_username }}
+          (rc={{ mattermost_promote_admin.rc }};
+          stdout={{ mattermost_promote_admin.stdout | default('') }};
+          stderr={{ mattermost_promote_admin.stderr | default('') }}).
+          Ensure MM_SERVICESETTINGS_ENABLELOCALMODE=true on the container.
+
+    - name: Enable Mattermost bot account creation via mmctl
+      ansible.builtin.command:
+        argv:
+          - podman
+          - exec
+          - mattermost
+          - mmctl
+          - --local
+          - config
+          - set
+          - ServiceSettings.EnableBotAccountCreation
+          - "true"
+      register: mattermost_enable_bots
+      changed_when: true
+      failed_when: (mattermost_enable_bots.rc | default(1) | int) != 0
+
     # Product Demos EE ships ansible-core where uri lacks return_headers;
     # Mattermost returns the session token only in the Token response header.
+    # Login after promote so the session carries system_admin.
     - name: Log in as Mattermost admin and capture Token header
       ansible.builtin.shell: |
         set -euo pipefail
@@ -457,34 +508,6 @@
               | default(mattermost_team_create.json.id | default(''), true)
             )
           }}
-
-    - name: Read Mattermost system config
-      ansible.builtin.uri:
-        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/config"
-        method: GET
-        headers:
-          Authorization: "Bearer {{ mattermost_session_token }}"
-        return_content: true
-        status_code: [200]
-      register: mattermost_config
-
-    - name: Enable Mattermost bot account creation
-      ansible.builtin.uri:
-        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/config"
-        method: PUT
-        headers:
-          Authorization: "Bearer {{ mattermost_session_token }}"
-        body_format: json
-        body: >-
-          {{
-            mattermost_config.json
-            | combine({
-                'ServiceSettings': mattermost_config.json.ServiceSettings
-                  | combine({'EnableBotAccountCreation': true})
-              }, recursive=true)
-          }}
-        status_code: [200]
-      register: mattermost_config_update
 
     - name: Create Mattermost bot account
       ansible.builtin.uri:
