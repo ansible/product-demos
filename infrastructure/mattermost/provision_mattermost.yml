@@ -349,7 +349,7 @@
           password: "{{ mattermost_admin_password }}"
         status_code: [201, 400]
       register: mattermost_admin_create
-      no_log: true
+      no_log: false
 
     - name: Fail when admin create returned an unexpected 400
       when:
@@ -379,10 +379,11 @@
         body:
           login_id: "{{ mattermost_admin_email }}"
           password: "{{ mattermost_admin_password }}"
-        status_code: [200]
+        status_code: [200, 400, 401, 403]
         return_headers: true
       register: mattermost_login
-      no_log: true
+      # Keep result visible — password is only in the request body, not the response.
+      no_log: false
       failed_when: false
 
     - name: Fail when Mattermost admin login fails
@@ -392,8 +393,8 @@
           Mattermost admin login failed
           (status={{ mattermost_login.status | default('n/a') }};
           message={{ mattermost_login.json.message | default(mattermost_login.msg | default('unknown')) }}).
-          Try logging into http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}
-          as {{ mattermost_admin_username }} / (see playbook defaults).
+          Expected user {{ mattermost_admin_username }} ({{ mattermost_admin_email }}).
+          Open http://{{ mattermost_public_ip }}:{{ mattermost_http_port }} to verify.
 
     - name: Store Mattermost session token
       ansible.builtin.set_fact:
