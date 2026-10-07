@@ -31,7 +31,9 @@
           'ask_variables_on_launch': ao_jt.ask_variables_on_launch | default(true),
         }
         | combine(
-            {'inventory': ao_inventory_id} if ao_inventory_id | length > 0 else {}
+            {'inventory': ao_inventory_id}
+            if (ao_inventory_id | default('') | string | length) > 0
+            else {}
           )
         | combine(
             {'limit': ao_jt.limit, 'ask_limit_on_launch': true}
@@ -103,7 +105,7 @@
 - name: Attach machine credential to {{ ao_jt.name }}
   when:
     - "'machine' in (ao_jt.credentials | default([]))"
-    - ao_machine_credential_id | length > 0
+    - (ao_machine_credential_id | default('') | string | length) > 0
   ansible.builtin.uri:
     url: "{{ ao_controller_api }}/job_templates/{{ ao_jt_id }}/credentials/"
     method: POST
@@ -127,7 +129,7 @@
 - name: Attach AWS credential to {{ ao_jt.name }}
   when:
     - "'aws' in (ao_jt.credentials | default([]))"
-    - ao_aws_credential_id | length > 0
+    - (ao_aws_credential_id | default('') | string | length) > 0
   ansible.builtin.uri:
     url: "{{ ao_controller_api }}/job_templates/{{ ao_jt_id }}/credentials/"
     method: POST
