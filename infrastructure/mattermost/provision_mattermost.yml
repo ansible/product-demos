@@ -185,6 +185,7 @@
         - "{{ mattermost_data_dir }}"
         - "{{ mattermost_data_dir }}/config"
         - "{{ mattermost_data_dir }}/data"
+        - "{{ mattermost_data_dir }}/db"
         - "{{ mattermost_data_dir }}/logs"
         - "{{ mattermost_data_dir }}/plugins"
         - "{{ mattermost_data_dir }}/client/plugins"
