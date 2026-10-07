@@ -118,3 +118,8 @@
             {{
               'Mattermost: ' ~ (ao_mattermost_server | default('not provisioned — run Infrastructure | AWS - Provision Mattermost'))
             }}
+
+    - name: Warn about missing demo prerequisites
+      when: (ao_seed_warnings | default([])) | length > 0
+      ansible.builtin.debug:
+        msg: "{{ ['WARNING: demo prerequisites incomplete:'] + ao_seed_warnings }}"

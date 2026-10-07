@@ -7,7 +7,7 @@ Under the hood the playbook runs `aapctl`, stands up CloudNativePG plus the AO o
 ## Prerequisites
 
 - **If using RHDP (demo.redhat.com):** OpenShift, the **OpenShift Credential**, the **AAP Credential**, and the **AO Execution Environment** ship with the catalog item. Run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** → `infrastructure`) if the AO templates are not visible yet.
-- **Deploy Cloud Stack in AWS** so inventory host `aws_rhel9` exists (required for the seeded disk-utilization demo)
+- **Recommended before running the disk demo:** **Deploy Cloud Stack in AWS** so `aws_rhel9` is in inventory (Install warns if it is missing, but still seeds the workflow)
 - **Recommended:** **Infrastructure ǀ AWS - Provision Mattermost** so Notify Chatroom can post (see [Mattermost](./mattermost.md))
 - **If using your own installation:** You need an OpenShift cluster, OpenShift + AAP credentials in AAP, the AO EE (`quay.io/acme_corp/ao-ee:latest`), and **APD ǀ Single demo setup** with category `infrastructure`.
 

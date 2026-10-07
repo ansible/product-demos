@@ -1,5 +1,9 @@
 ---
-# Soft requirements for enabled demos (cloud stack hard-fail, Mattermost warn).
+# Soft requirements for enabled demos — warn only; Install still succeeds.
+- name: Initialize seed warning list
+  ansible.builtin.set_fact:
+    ao_seed_warnings: []
+
 - name: Collect demos that require the cloud stack
   ansible.builtin.set_fact:
     ao_cloud_stack_demos: >-
@@ -10,21 +14,25 @@
         | list
       }}
 
-- name: Require aws_rhel9 when a seeded demo needs the cloud stack
+- name: Check aws_rhel9 when a seeded demo needs the cloud stack
   when: ao_cloud_stack_demos | length > 0
   block:
     - name: Look up aws_rhel9 in inventory
       ansible.builtin.set_fact:
         ao_aws_rhel9_present: "{{ 'aws_rhel9' in hostvars }}"
 
-    - name: Fail when Deploy Cloud Stack has not created aws_rhel9
-      ansible.builtin.assert:
-        that:
-          - ao_aws_rhel9_present
-        fail_msg: >-
-          Seeded demo(s) {{ ao_cloud_stack_demos | map(attribute='slug') | list | join(', ') }}
-          require host aws_rhel9. Run Deploy Cloud Stack in AWS, sync AWS Inventory,
-          then re-run Infrastructure | Automation Orchestrator | Install.
+    - name: Record cloud-stack warning when aws_rhel9 is missing
+      when: not (ao_aws_rhel9_present | bool)
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'Seeded demo(s) '
+              ~ (ao_cloud_stack_demos | map(attribute='slug') | list | join(', '))
+              ~ ' expect host aws_rhel9. Run Deploy Cloud Stack in AWS, sync AWS Inventory, '
+              ~ 'then re-run those job templates (or re-run Install).'
+            ]
+          }}
 
 - name: Collect demos that prefer Mattermost
   ansible.builtin.set_fact:
@@ -61,10 +69,15 @@
             | default('', true)
           }}
 
-    - name: Warn when Mattermost is not provisioned
+    - name: Record Mattermost warning when not provisioned
       when: not (ao_mattermost_present | default(false) | bool)
-      ansible.builtin.debug:
-        msg: >-
-          Demo(s) {{ ao_mattermost_demos | map(attribute='slug') | list | join(', ') }}
-          post to Mattermost. Run Infrastructure | AWS - Provision Mattermost, then
-          re-run Install (or set Notify Chatroom extra vars) so chat notifications work.
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'Demo(s) '
+              ~ (ao_mattermost_demos | map(attribute='slug') | list | join(', '))
+              ~ ' post to Mattermost. Run Infrastructure | AWS - Provision Mattermost, '
+              ~ 'then set Notify Chatroom extra vars (or re-run Install).'
+            ]
+          }}

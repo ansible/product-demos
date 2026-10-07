@@ -256,8 +256,8 @@ controller_templates:
       Deploys Automation Orchestrator on an existing OpenShift cluster using
       aapctl, configures network access, wires the AAP integration, and seeds
       curated AO demos from infrastructure/ao/demos.yml (disk-utilization by
-      default). Requires aws_rhel9 from Deploy Cloud Stack in AWS for the
-      disk demo; Mattermost is recommended for chat notifications.
+      default). Warns if aws_rhel9 or Mattermost are missing; Deploy Cloud
+      Stack and Provision Mattermost before running the disk demo end-to-end.
     labels:
       - infrastructure
       - orchestrator
