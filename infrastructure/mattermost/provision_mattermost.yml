@@ -775,6 +775,14 @@
   vars:
     mattermost_credential_name: Mattermost
     mattermost_credential_organization: Ansible Product Demos (APD)
+    # Prefer AAP Credential injectors (same as AO Install / seed).
+    _mm_controller_host_raw: >-
+      {{ lookup('env', 'CONTROLLER_HOST') | default(lookup('env', 'AAP_HOSTNAME'), true)
+         | default('', true) }}
+    _mm_controller_host: "{{ _mm_controller_host_raw | regex_replace('/$', '') }}"
+    _mm_controller_oauth_token: "{{ lookup('env', 'CONTROLLER_OAUTH_TOKEN') | default('', true) }}"
+    _mm_controller_username: "{{ lookup('env', 'CONTROLLER_USERNAME') | default('', true) }}"
+    _mm_controller_password: "{{ lookup('env', 'CONTROLLER_PASSWORD') | default('', true) }}"
   tasks:
     - name: Require Mattermost connection facts for credential publish
       ansible.builtin.assert:
@@ -785,43 +793,191 @@
           Missing Mattermost server/token facts from the configure play.
           Cannot update the Controller Mattermost credential.
 
-    - name: Ensure Mattermost credential type exists
-      ansible.controller.credential_type:
-        name: "{{ mattermost_credential_name }}"
-        description: >-
-          Mattermost chat endpoint for AO Notify Chatroom and other demos.
-          Filled by Infrastructure | AWS - Provision Mattermost.
-        kind: cloud
-        inputs:
-          fields:
-            - id: mattermost_server
-              type: string
-              label: Mattermost server (host:port)
-              help_text: Example 1.2.3.4:8065 — no http:// prefix.
-            - id: api_chat_token
-              type: string
-              label: Mattermost bot access token
-              secret: true
-          required:
-            - mattermost_server
-            - api_chat_token
-        injectors:
-          extra_vars:
-            mattermost_server: "{{ '{{' }} mattermost_server {{ '}}' }}"
-            api_chat_token: "{{ '{{' }} api_chat_token {{ '}}' }}"
-        state: present
+    - name: Require Controller API access for credential publish
+      ansible.builtin.assert:
+        that:
+          - (_mm_controller_host | default('') | length) > 0
+          - >-
+            (_mm_controller_oauth_token | default('') | length) > 0
+            or (
+              (_mm_controller_username | default('') | length) > 0
+              and (_mm_controller_password | default('') | length) > 0
+            )
+        fail_msg: >-
+          Attach an AAP Credential to this job template so CONTROLLER_HOST and
+          CONTROLLER_OAUTH_TOKEN (or username/password) are available.
 
-    - name: Upsert Mattermost credential with bot token
-      ansible.controller.credential:
-        name: "{{ mattermost_credential_name }}"
-        description: >-
-          Updated automatically by Infrastructure | AWS - Provision Mattermost.
-        organization: "{{ mattermost_credential_organization }}"
-        credential_type: "{{ mattermost_credential_name }}"
-        inputs:
-          mattermost_server: "{{ mattermost_credential_server }}"
-          api_chat_token: "{{ mattermost_credential_token }}"
-        state: present
+    - name: Build Controller API auth facts
+      ansible.builtin.set_fact:
+        _mm_controller_api: "{{ _mm_controller_host }}/api/controller/v2"
+        _mm_controller_use_token: "{{ (_mm_controller_oauth_token | default('') | length) > 0 }}"
+      no_log: true
+
+    - name: Look up APD organization for Mattermost credential
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/organizations/?name={{ mattermost_credential_organization | urlencode }}"
+        method: GET
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        validate_certs: false
+        return_content: true
+        status_code: [200]
+      register: _mm_org_lookup
+      no_log: true
+
+    - name: Require APD organization
+      ansible.builtin.assert:
+        that:
+          - _mm_org_lookup.json.results | default([]) | length > 0
+        fail_msg: "Organization '{{ mattermost_credential_organization }}' was not found in Controller."
+
+    - name: Look up Mattermost credential type
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/credential_types/?name={{ mattermost_credential_name | urlencode }}"
+        method: GET
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        validate_certs: false
+        return_content: true
+        status_code: [200]
+      register: _mm_cred_type_lookup
+      no_log: true
+
+    - name: Create Mattermost credential type when missing
+      when: _mm_cred_type_lookup.json.results | default([]) | length == 0
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/credential_types/"
+        method: POST
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        body_format: json
+        body:
+          name: "{{ mattermost_credential_name }}"
+          description: >-
+            Mattermost chat endpoint for AO Notify Chatroom and other demos.
+            Filled by Infrastructure | AWS - Provision Mattermost.
+          kind: cloud
+          inputs:
+            fields:
+              - id: mattermost_server
+                type: string
+                label: Mattermost server (host:port)
+                help_text: Example 1.2.3.4:8065 — no http:// prefix.
+              - id: api_chat_token
+                type: string
+                label: Mattermost incoming webhook id
+                secret: true
+            required:
+              - mattermost_server
+              - api_chat_token
+          injectors:
+            extra_vars:
+              mattermost_server: "{{ '{{' }} mattermost_server {{ '}}' }}"
+              api_chat_token: "{{ '{{' }} api_chat_token {{ '}}' }}"
+        validate_certs: false
+        status_code: [200, 201]
+      register: _mm_cred_type_create
+      no_log: true
+
+    - name: Store Mattermost credential type id
+      ansible.builtin.set_fact:
+        _mm_cred_type_id: >-
+          {{
+            (_mm_cred_type_lookup.json.results | default([{}]))[0].id
+            | default(_mm_cred_type_create.json.id, true)
+          }}
+
+    - name: Look up Mattermost credential
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/credentials/?name={{ mattermost_credential_name | urlencode }}"
+        method: GET
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        validate_certs: false
+        return_content: true
+        status_code: [200]
+      register: _mm_cred_lookup
+      no_log: true
+
+    - name: Build Mattermost credential payload
+      ansible.builtin.set_fact:
+        _mm_cred_payload:
+          name: "{{ mattermost_credential_name }}"
+          description: >-
+            Updated automatically by Infrastructure | AWS - Provision Mattermost.
+          organization: "{{ _mm_org_lookup.json.results[0].id | int }}"
+          credential_type: "{{ _mm_cred_type_id | int }}"
+          inputs:
+            mattermost_server: "{{ mattermost_credential_server }}"
+            api_chat_token: "{{ mattermost_credential_token }}"
+      no_log: true
+
+    - name: Create Mattermost credential
+      when: _mm_cred_lookup.json.results | default([]) | length == 0
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/credentials/"
+        method: POST
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        body_format: json
+        body: "{{ _mm_cred_payload }}"
+        validate_certs: false
+        status_code: [200, 201]
+      no_log: true
+
+    - name: Update Mattermost credential
+      when: _mm_cred_lookup.json.results | default([]) | length > 0
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/credentials/{{ _mm_cred_lookup.json.results[0].id }}/"
+        method: PATCH
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        body_format: json
+        body: "{{ _mm_cred_payload }}"
+        validate_certs: false
+        status_code: [200]
       no_log: true
 
     - name: Show Mattermost credential publish result
