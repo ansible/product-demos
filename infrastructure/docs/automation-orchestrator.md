@@ -2,15 +2,14 @@
 
 Start here for Automation Orchestrator (AO) on the [Ansible Product Demos catalog item](https://red.ht/apd-sandbox) from [demo.redhat.com](https://demo.redhat.com). OpenShift, credentials, and the AO execution environment are already wired.
 
-There are **two paths**. Pick one.
+**Both paths:** confirm AO templates exist — if not, run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** → `infrastructure`). Then pick a path.
 
 ## Path 1 — Just install AO
 
 Stupid simple: one job template.
 
-1. Confirm AO templates exist — if not, run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** → `infrastructure`).
-2. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
-3. Open the AO URL from the job output and log in as `admin` with the printed password.
+1. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
+2. Open the AO URL from the job output and log in as `admin` with the printed password.
 
 You now have AO. Seeded demo workflows may appear in AO, but they will not run end-to-end without Path 2 (no `aws_rhel9`, no Mattermost, and so on). Install **warns** on missing deps; it does not fail.
 
@@ -18,7 +17,7 @@ Skip Network Configuration on RHDP — Install already ran it.
 
 ## Path 2 — Pre-seeded demos that actually run
 
-Still simple — same Install — plus a short setup so curated content can hit a real host and post to chat. Run these first (then Install):
+Still simple — same Install as Path 1 — plus a short setup so curated content can hit a real host and post to chat. **Before** Path 1, run:
 
 | Run | Piece | Why |
 |-----|-------|-----|
@@ -28,7 +27,7 @@ Still simple — same Install — plus a short setup so curated content can hit 
 
 Cloud Stack and Mattermost stay opt-in so shared labs are not billed for idle EC2 when you only wanted Path 1.
 
-Then launch **Infrastructure ǀ Automation Orchestrator ǀ Install**, open the AO URL from the job output (`admin` + printed password), and open the seeded workflow you want to show.
+Then complete **Path 1** (Install + login) and open the seeded workflow you want to show.
 
 **You are ready to present.** Curated demos (add rows as more are enabled in [`demos.yml`](../ao/demos.yml)):
 
@@ -40,7 +39,7 @@ Then launch **Infrastructure ǀ Automation Orchestrator ǀ Install**, open the A
 
 | Template | When to use it | Playbook |
 |----------|----------------|----------|
-| **Infrastructure ǀ Automation Orchestrator ǀ Install** | Path 1 / Path 2 — stands up AO, wires AAP, seeds demos from [`demos.yml`](../ao/demos.yml). | [`install.yml`](../ao/install.yml) |
+| **Infrastructure ǀ Automation Orchestrator ǀ Install** | Path 1 — stands up AO, wires AAP, seeds demos from [`demos.yml`](../ao/demos.yml). | [`install.yml`](../ao/install.yml) |
 | **Infrastructure ǀ AO Network Configuration ǀ Install** | Rare re-run of allow-listing. **Skip on RHDP.** | [`network-access.yml`](../ao/network-access.yml) |
 | **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** | Tear down AO when the lab session is done. | [`uninstall.yml`](../ao/uninstall.yml) |
 
