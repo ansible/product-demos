@@ -1786,7 +1786,7 @@
     flowchart LR
       P1["Path 1"] --> I1["AO Install"]
       I1 --> AO["AO ready"]
-      P2["Path 2"] --> REQ["Cloud Stack + Mattermost"]
+      P2["Path 2"] --> REQ["Setup deps"]
       REQ --> I2["AO Install"]
       I2 --> R["Ready to present"]
       style P1 fill:#2d2d2d,stroke:#888,color:#fff

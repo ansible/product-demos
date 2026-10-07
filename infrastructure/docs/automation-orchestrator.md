@@ -14,37 +14,33 @@ Stupid simple: one job template.
 
 You now have AO. Seeded demo workflows may appear in AO, but they will not run end-to-end without Path 2 (no `aws_rhel9`, no Mattermost, and so on). Install **warns** on missing deps; it does not fail.
 
-Skip Network Configuration on RHDP — Install already ran it. Tear down later with **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** if you want.
+Skip Network Configuration on RHDP — Install already ran it.
 
 ## Path 2 — Pre-seeded demos that actually run
 
-Still simple — same Install — plus a short setup so curated content (today: **disk-utilization**) can hit a real host and post to chat.
+Still simple — same Install — plus a short setup so curated content can hit a real host and post to chat. Run these first (then Install):
 
-Before Install, you need:
+| Run | Piece | Why |
+|-----|-------|-----|
+| **Deploy Cloud Stack in AWS**, then sync **AWS Inventory** | `aws_rhel9` in inventory | Disk check / remediate target |
+| **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)), then sync inventory | Mattermost + Controller credential | Notify Chatroom posts |
+| Matching APD template when a seeded demo catalogs it | AI endpoints or other backends | Only for demos that need them |
 
-| Piece | Why | Run |
-|-------|-----|-----|
-| `aws_rhel9` in inventory | Disk check / remediate target | **Deploy Cloud Stack in AWS**, then sync **AWS Inventory** |
-| Mattermost + Controller credential | Notify Chatroom posts | **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)), then sync inventory |
-| (Later demos) AI endpoints or other backends | Only when a seeded demo catalogs them | Matching APD template for that demo |
+Cloud Stack and Mattermost stay opt-in so shared labs are not billed for idle EC2 when you only wanted Path 1.
 
-Cloud Stack and Mattermost stay opt-in on purpose so shared labs are not billed for idle EC2 when you only wanted Path 1.
+Then launch **Infrastructure ǀ Automation Orchestrator ǀ Install**, open the AO URL from the job output (`admin` + printed password), and open the seeded workflow you want to show.
 
-### Presenter walkthrough (Path 2)
+**You are ready to present.** Curated demos (add rows as more are enabled in [`demos.yml`](../ao/demos.yml)):
 
-Assumes the Path 2 requirements above are already in place (`aws_rhel9`, Mattermost credential updated, inventory synced).
-
-1. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
-2. From the job output, open the AO URL, log in as `admin` with the printed password, and open the seeded **disk-utilization** workflow.
-3. **You are ready to present** — run the workflow (disk check → remediate → Mattermost notify on `apd-notify`). Story, switch tiers, and playbooks: [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/).
-
-When the lab session is done → **Infrastructure ǀ Automation Orchestrator ǀ Uninstall**.
+| Demo | Directions |
+|------|------------|
+| Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) |
 
 ## The three AO templates
 
 | Template | When to use it | Playbook |
 |----------|----------------|----------|
-| **Infrastructure ǀ Automation Orchestrator ǀ Install** | Path 1 step 2 / Path 2 walkthrough step 1 — stands up AO, wires AAP, seeds demos from [`demos.yml`](../ao/demos.yml). | [`install.yml`](../ao/install.yml) |
+| **Infrastructure ǀ Automation Orchestrator ǀ Install** | Path 1 / Path 2 — stands up AO, wires AAP, seeds demos from [`demos.yml`](../ao/demos.yml). | [`install.yml`](../ao/install.yml) |
 | **Infrastructure ǀ AO Network Configuration ǀ Install** | Rare re-run of allow-listing. **Skip on RHDP.** | [`network-access.yml`](../ao/network-access.yml) |
 | **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** | Tear down AO when the lab session is done. | [`uninstall.yml`](../ao/uninstall.yml) |
 
@@ -64,7 +60,6 @@ Install seeds demos with `enabled: true` in [`demos.yml`](../ao/demos.yml) (toda
 
 | Demo | Description |
 |------|-------------|
-| [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | Upstream AO demo walkthrough (switch tiers, playbooks, video) |
 | [AWS Mattermost](./mattermost.md) | Path 2 — chat backend + Controller credential |
 | [ROSA Cluster Lifecycle](./rosa-lifecycle.md) | OpenShift on AWS when you are not using RHDP |
 | [OPA — Policy as Code](./opa-policy-as-code.md) | Another OpenShift-backed control-plane component from AAP |
