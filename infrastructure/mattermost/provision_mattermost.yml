@@ -458,6 +458,34 @@
             )
           }}
 
+    - name: Read Mattermost system config
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/config"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        return_content: true
+        status_code: [200]
+      register: mattermost_config
+
+    - name: Enable Mattermost bot account creation
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/config"
+        method: PUT
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body: >-
+          {{
+            mattermost_config.json
+            | combine({
+                'ServiceSettings': mattermost_config.json.ServiceSettings
+                  | combine({'EnableBotAccountCreation': true})
+              }, recursive=true)
+          }}
+        status_code: [200]
+      register: mattermost_config_update
+
     - name: Create Mattermost bot account
       ansible.builtin.uri:
         url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/bots"
@@ -469,9 +497,30 @@
           username: "{{ mattermost_bot_username }}"
           display_name: APD Bot
           description: Ansible Product Demos notification bot
-        status_code: [201, 400]
+        status_code: [201, 400, 403]
       register: mattermost_bot_create
-      no_log: true
+      failed_when: false
+
+    - name: Fail when Mattermost bot create fails unexpectedly
+      when: >-
+        mattermost_bot_create.status | default(0) not in [201, 400]
+        or (
+          mattermost_bot_create.status | default(0) == 400
+          and 'already exists' not in (
+            mattermost_bot_create.json.message | default('')
+            | lower
+          )
+          and 'already exists' not in (
+            mattermost_bot_create.json.id | default('')
+            | lower
+          )
+        )
+      ansible.builtin.fail:
+        msg: >-
+          Mattermost bot create failed
+          (status={{ mattermost_bot_create.status | default('n/a') }};
+          id={{ mattermost_bot_create.json.id | default('') }};
+          message={{ mattermost_bot_create.json.message | default(mattermost_bot_create.msg) }}).
 
     - name: List Mattermost bots
       ansible.builtin.uri:
@@ -481,7 +530,6 @@
           Authorization: "Bearer {{ mattermost_session_token }}"
         return_content: true
       register: mattermost_bots
-      no_log: true
 
     - name: Select Mattermost bot user id
       ansible.builtin.set_fact:
@@ -495,6 +543,12 @@
               | default(mattermost_bot_create.json.user_id | default(''), true)
             )
           }}
+
+    - name: Require Mattermost bot user id
+      ansible.builtin.assert:
+        that:
+          - (mattermost_bot_user_id | default('') | string | length) > 0
+        fail_msg: Could not resolve Mattermost bot user id for {{ mattermost_bot_username }}.
 
     - name: Create Mattermost bot access token
       ansible.builtin.uri:
