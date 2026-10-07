@@ -391,6 +391,15 @@
       no_log: true
       failed_when: false
 
+    - name: Read Mattermost login response body on failure
+      when: >-
+        (mattermost_login.rc | default(1) | int) != 0
+        or (mattermost_login.stdout | default('') | trim | length) == 0
+      ansible.builtin.slurp:
+        src: /tmp/mm_login_body.json
+      register: mattermost_login_body
+      failed_when: false
+
     - name: Fail when Mattermost admin login fails
       when: >-
         (mattermost_login.rc | default(1) | int) != 0
@@ -400,7 +409,10 @@
           Mattermost admin login failed for {{ mattermost_admin_username }}
           ({{ mattermost_admin_email }}).
           curl_rc={{ mattermost_login.rc | default('n/a') }};
-          body={{ lookup('ansible.builtin.file', '/tmp/mm_login_body.json', errors='ignore') | default('') }}.
+          body={{
+            (mattermost_login_body.content | default('') | b64decode)
+            if mattermost_login_body is succeeded else ''
+          }}.
           Open http://{{ mattermost_public_ip }}:{{ mattermost_http_port }} to verify.
 
     - name: Store Mattermost session token
