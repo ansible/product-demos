@@ -285,6 +285,7 @@
           MM_SERVICESETTINGS_LISTENADDRESS: ":8065"
           MM_TEAMSETTINGS_ENABLEOPENSERVER: "true"
           MM_SERVICESETTINGS_ENABLEBOTACCOUNTCREATION: "true"
+          MM_SERVICESETTINGS_ENABLEUSERACCESSTOKENS: "true"
           # mmctl --local needs this to promote apdadmin (API user create is not
           # always system_admin on re-runs against an existing DB).
           MM_SERVICESETTINGS_ENABLELOCALMODE: "true"
@@ -402,33 +403,31 @@
         (mattermost_promote_sql.rc | default(1) | int) != 0
         or 'system_admin' not in (mattermost_promote_sql.stdout | default(''))
 
-    - name: Enable Mattermost bot account creation via mmctl
-      ansible.builtin.command:
-        argv:
-          - podman
-          - exec
-          - mattermost
-          - mmctl
-          - --local
-          - config
-          - set
-          - ServiceSettings.EnableBotAccountCreation
-          - "true"
-      register: mattermost_enable_bots
+    - name: Enable Mattermost bot and user-token settings via mmctl
+      ansible.builtin.shell: |
+        set -euo pipefail
+        podman exec mattermost mmctl --local config set \
+          ServiceSettings.EnableBotAccountCreation true
+        podman exec mattermost mmctl --local config set \
+          ServiceSettings.EnableUserAccessTokens true
+      args:
+        executable: /bin/bash
+      register: mattermost_enable_flags
       changed_when: true
       failed_when: false
       retries: 12
       delay: 5
-      until: mattermost_enable_bots.rc == 0
+      until: mattermost_enable_flags.rc == 0
 
-    - name: Fail when bot-creation config enable fails
-      when: (mattermost_enable_bots.rc | default(1) | int) != 0
+    - name: Fail when Mattermost feature flags could not be enabled
+      when: (mattermost_enable_flags.rc | default(1) | int) != 0
       ansible.builtin.fail:
         msg: >-
-          mmctl could not enable EnableBotAccountCreation
-          (rc={{ mattermost_enable_bots.rc }};
-          stdout={{ mattermost_enable_bots.stdout | default('') }};
-          stderr={{ mattermost_enable_bots.stderr | default('') }}).
+          mmctl could not enable EnableBotAccountCreation /
+          EnableUserAccessTokens
+          (rc={{ mattermost_enable_flags.rc }};
+          stdout={{ mattermost_enable_flags.stdout | default('') }};
+          stderr={{ mattermost_enable_flags.stderr | default('') }}).
     # Product Demos EE ships ansible-core where uri lacks return_headers;
     # Mattermost returns the session token only in the Token response header.
     # Login after promote so the session carries system_admin.
@@ -609,9 +608,20 @@
         body_format: json
         body:
           description: APD demo notify token
-        status_code: [201]
+        status_code: [201, 403, 501]
       register: mattermost_bot_token
+      failed_when: false
       no_log: true
+
+    - name: Fail when Mattermost bot token create fails
+      when: (mattermost_bot_token.status | default(0) | int) != 201
+      ansible.builtin.fail:
+        msg: >-
+          Mattermost bot token create failed
+          (status={{ mattermost_bot_token.status | default('n/a') }};
+          id={{ mattermost_bot_token.json.id | default('') }};
+          message={{ mattermost_bot_token.json.message | default(mattermost_bot_token.msg | default('')) }}).
+          Ensure ServiceSettings.EnableUserAccessTokens=true.
 
     - name: Add bot to Mattermost team
       ansible.builtin.uri:
