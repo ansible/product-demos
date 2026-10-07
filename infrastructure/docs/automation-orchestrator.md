@@ -20,9 +20,9 @@ Skip Network Configuration on RHDP — Install already ran it.
 Still simple — short cloud/chat setup, then Install, so curated content can hit a real host and post to chat.
 
 1. Run **Deploy Cloud Stack in AWS**, then sync **AWS Inventory** (`aws_rhel9` for disk check / remediate).
-2. Launch **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)) — Mattermost, Controller credential, and inventory host for Notify Chatroom.
+2. Launch **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)) — Mattermost, Controller credential, and inventory host for Notify Chatroom. **Save the Mattermost UI login** from that job (`apdadmin` / `Ansible123!` by default) for when you open chat later.
 3. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
-4. Open the AO URL from the job output and log in as `admin` with the printed password.
+4. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost URL + default UI login when provisioned).
 5. Open the seeded workflow you want to show.
 
 <aside class="info-callout" role="note">

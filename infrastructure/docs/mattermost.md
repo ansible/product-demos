@@ -41,8 +41,8 @@ The playbook creates/updates a **Mattermost** custom credential (`mattermost_ser
 
 1. Run **Deploy Cloud Stack in AWS** (or reuse an existing stack)
 2. Launch **Infrastructure ǀ AWS - Provision Mattermost** with the same region and owner tag
-3. Confirm job output shows the **Mattermost** Controller credential was updated and **AWS Inventory** synced
-4. For AO demos: run **Infrastructure ǀ Automation Orchestrator ǀ Install** so **Notify Chatroom** gets the Mattermost credential attached
+3. Confirm job output shows the **Mattermost** Controller credential was updated and **AWS Inventory** synced — **save the UI login** (`apdadmin` / `Ansible123!` by default) for later
+4. For AO demos: run **Infrastructure ǀ Automation Orchestrator ǀ Install** so **Notify Chatroom** gets the Mattermost credential attached; the Install seed summary also reprints the Mattermost URL and default UI login
 
 Default admin login is `apdadmin` / `Ansible123!` (username `admin` is reserved by Mattermost). Change it for long-lived labs.
 

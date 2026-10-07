@@ -110,14 +110,27 @@
 
     - name: Show seed summary
       ansible.builtin.debug:
-        msg:
-          - "AO demos seeded: {{ ao_enabled_demos | map(attribute='slug') | list | join(', ') }}"
-          - "AO URL: https://{{ ao_api_host }}"
-          - "AAP project: {{ ao_demos_project_name }}"
-          - >-
-            {{
-              'Mattermost: ' ~ (ao_mattermost_server | default('not provisioned — run Infrastructure | AWS - Provision Mattermost (updates Mattermost credential)'))
-            }}
+        msg: >-
+          {{
+            [
+              'AO demos seeded: ' ~ (ao_enabled_demos | map(attribute='slug') | list | join(', ')),
+              'AO URL: https://' ~ ao_api_host,
+              'AO username: admin',
+              'AO password: ' ~ ao_admin_password,
+              'AAP project: ' ~ ao_demos_project_name,
+            ]
+            + (
+              [
+                'Mattermost URL: http://' ~ ao_mattermost_server,
+                'Mattermost UI login: apdadmin / Ansible123! (save from Provision Mattermost; change for long-lived labs)',
+                'Mattermost Controller credential: attached to Notify Chatroom when present',
+              ]
+              if (ao_mattermost_server | default('') | length) > 0
+              else [
+                'Mattermost: not provisioned — run Infrastructure | AWS - Provision Mattermost (updates Mattermost credential + syncs inventory)',
+              ]
+            )
+          }}
 
     - name: Warn about missing demo prerequisites
       when: (ao_seed_warnings | default([])) | length > 0
