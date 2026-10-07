@@ -21,22 +21,26 @@ Install alone is enough to get AO up and log in. Extra jobs below are only neede
 
 ## Optional — make seeded AO demos work
 
-Install seeds workflows and job templates from [`infrastructure/ao/demos.yml`](../ao/demos.yml) (today: **disk-utilization** from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos)). Those templates call existing APD inventory and credentials. They are **not required** to open AO — only to run the demo story.
+Install seeds workflows from [`infrastructure/ao/demos.yml`](../ao/demos.yml) (today: **disk-utilization** from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos)). Those JTs use APD inventory and credentials. They are **not required** to open AO — only to run the demo story.
 
-| Goal | Run this | Why |
-|------|----------|-----|
-| Disk check / remediate against a RHEL host | **Deploy Cloud Stack in AWS**, then sync **AWS Inventory** so `aws_rhel9` exists | Seeded JTs limit to `aws_rhel9`. Install **warns** if it is missing but still seeds. |
-| Notify Chatroom posts to Mattermost | **Infrastructure ǀ AWS - Provision Mattermost** (writes the **Mattermost** Controller credential), sync inventory, re-run **AO Install** so Notify Chatroom attaches that credential and **Product Demos EE** | `community.general.mattermost` needs `mattermost_server` + incoming webhook id (`api_chat_token`). See [Mattermost](./mattermost.md). |
-| Expand EBS during disk-expand remediation | Cloud stack host + **AWS** credential on the expand JT (Install attaches AWS when the catalog says so) | Same cloud stack as above. |
-
-Suggested order when you want the full disk demo:
+**Full disk demo (recommended order):**
 
 1. **Deploy Cloud Stack in AWS** → wait for `aws_rhel9`
-2. **Infrastructure ǀ AWS - Provision Mattermost** → confirm credential **Mattermost** was updated
+2. **Infrastructure ǀ AWS - Provision Mattermost** → confirm credential **Mattermost** was updated ([details](./mattermost.md))
 3. Sync **AWS Inventory**
 4. **Infrastructure ǀ Automation Orchestrator ǀ Install**
 5. Open the AO URL from the job output (`admin` + printed password) → run the seeded disk-utilization workflow
 6. When finished → **Uninstall**
+
+Cheat sheet if you only need one piece:
+
+| Need | Run |
+|------|-----|
+| RHEL target for disk check / remediate | **Deploy Cloud Stack in AWS** + sync inventory (`aws_rhel9`) |
+| Mattermost notifications | **Provision Mattermost**, sync inventory, re-run **AO Install** |
+| EBS expand remediation | Same cloud stack + **AWS** credential (Install attaches it when catalogued) |
+
+Install **warns** (does not fail) if `aws_rhel9` or Mattermost is missing.
 
 ## Why don't we just provision everything?
 
@@ -56,33 +60,11 @@ If a dependency is missing later, run the matching APD template and re-run Insta
 | AAP Credential | Red Hat Ansible Automation Platform | Pre-configured |
 | Mattermost | Custom (server + webhook id) | Created/updated by **Provision Mattermost** |
 
-## What Install seeds
+## Under the hood
 
-Install only seeds demos with `enabled: true` in [`infrastructure/ao/demos.yml`](../ao/demos.yml).
+Install only seeds demos with `enabled: true` in [`demos.yml`](../ao/demos.yml). It creates project **AAP Orchestrator Demos** and the demo JTs in org **Ansible Product Demos (APD)** (not permanently in `setup.yml`), rewrites workflow `organization_name` from `Default` → APD, attaches **Mattermost** + **Product Demos EE** to **Notify Chatroom** when present, and imports the workflow into AO.
 
-On seed, Install:
-
-1. Creates AAP project **AAP Orchestrator Demos** and the demo job templates in org **Ansible Product Demos (APD)** — not declared permanently in `setup.yml`
-2. Rewrites workflow JSON `organization_name` from `Default` → **Ansible Product Demos (APD)** and injects AO AAP credential/integration IDs
-3. Attaches **Mattermost** credential + **Product Demos EE** to **Notify Chatroom** when present
-4. Imports the selected workflow into AO (idempotent create/update by `source_file` label)
-
-To add another demo later: append a catalog entry and set `enabled: true`.
-
-## Why it matters
-
-- **Demo-ready on RHDP** — Cluster and credentials are already there; the story is “press Launch,” not “assemble a platform”
-- **AO boots with a real workflow** — disk utilization check → switch → remediate → notify, not an empty canvas
-- **No JT sprawl** — demo job templates appear at Install time from the catalog
-- **Clean exit** — Uninstall is first-class so shared labs do not keep orphaned AO namespaces
-- **Pay for what you use** — cloud/chat backends stay optional
-
-## Talking points
-
-- Supported path: AAP drives `aapctl`, the same CLI an admin would use
-- Seeding reuses normalize/import (aap-demo style), filtered by a YAML allowlist
-- Upstream exports say `organization_name: Default`; APD rewrites that to the APD org at import time
-- Mattermost credential holds an **incoming webhook** id for `community.general.mattermost`, not only a bot PAT
+Why this shape: demo-ready on RHDP (“press Launch”), AO boots with a real disk → remediate → notify path, no permanent JT sprawl, Uninstall keeps shared labs clean, and cloud/chat backends stay pay-for-what-you-use. AAP drives `aapctl`; seeding is allowlisted normalize/import; the Mattermost credential holds an **incoming webhook** id for `community.general.mattermost`.
 
 ## Related demos
 
