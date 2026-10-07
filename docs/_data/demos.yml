@@ -1789,14 +1789,12 @@
       MM --> INV["4 Sync inventory"]
       INV --> I["5 AO Install"]
       I --> R["Ready to present"]
-      R --> U["6 Uninstall"]
       style S fill:#2d2d2d,stroke:#888,color:#fff
       style CS fill:#1a3d2e,stroke:#3dd68c,color:#fff
       style MM fill:#1a3d2e,stroke:#3dd68c,color:#fff
       style INV fill:#2d2d2d,stroke:#888,color:#fff
       style I fill:#1e3a5f,stroke:#4a90d9,color:#fff
       style R fill:#162c46,stroke:#58a6ff,color:#fff
-      style U fill:#3d1a1a,stroke:#f87171,color:#fff
 
 - slug: automation-orchestrator-install
   readme_path: infrastructure/docs/automation-orchestrator.md

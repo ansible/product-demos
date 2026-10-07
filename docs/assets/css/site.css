@@ -853,6 +853,13 @@ html:not([data-theme="dark"]) .demo-card:hover {
   border-top: none;
 }
 
+/* Avoid double rule: table row border + next h2 section divider */
+.detail-body table + h2 {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 32px;
+}
+
 /* 5: Prerequisites callout box */
 .detail-body h2 + ul,
 .detail-body h2 + ol {

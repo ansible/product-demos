@@ -109,18 +109,6 @@
       return;
     }
 
-    /* Info callout: wrap following paragraphs/lists until the next h2 */
-    if (title.indexOf("why don't we just provision") === 0) {
-      var infoBox = document.createElement('div');
-      infoBox.className = 'info-box';
-      next.parentNode.insertBefore(infoBox, next);
-      var node = next;
-      while (node && node.tagName !== 'H2') {
-        var move = node;
-        node = node.nextElementSibling;
-        infoBox.appendChild(move);
-      }
-    }
   });
 
   /* ── Highlight active TOC link on scroll ───────────────────── */

@@ -14,11 +14,7 @@ Do these in order. When you finish step 5, you have **AO + the disk-utilization 
 
 **You are ready to present** — run the workflow in AO (disk check → remediate → Mattermost notify on channel `apd-notify`). For the story, switch tiers, and playbook map, see the upstream walkthrough: [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/).
 
-6. When the session is over → **Infrastructure ǀ Automation Orchestrator ǀ Uninstall**.
-
-Skip Network Configuration on RHDP — Install already ran it.
-
-Only need AO itself (no disk demo / no chat)? Run steps **1** and **5**, then **6** when done. Install **warns** if `aws_rhel9` or Mattermost is missing; it does not fail.
+Skip Network Configuration on RHDP — Install already ran it. Only need AO itself (no disk demo / no chat)? Run steps **1** and **5**. Install **warns** if `aws_rhel9` or Mattermost is missing; it does not fail. Cloud Stack and Mattermost stay opt-in so shared labs are not billed for idle EC2 on every Install.
 
 ## The three AO templates
 
@@ -26,15 +22,7 @@ Only need AO itself (no disk demo / no chat)? Run steps **1** and **5**, then **
 |----------|----------------|----------|
 | **Infrastructure ǀ Automation Orchestrator ǀ Install** | Step 5 — stands up AO, wires AAP, seeds demos from [`demos.yml`](../ao/demos.yml). | [`install.yml`](../ao/install.yml) |
 | **Infrastructure ǀ AO Network Configuration ǀ Install** | Rare re-run of allow-listing. **Skip on RHDP.** | [`network-access.yml`](../ao/network-access.yml) |
-| **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** | Step 6 — tear down when finished. | [`uninstall.yml`](../ao/uninstall.yml) |
-
-## Why don't we just provision everything?
-
-Cloud Stack and Mattermost are **not** part of AO Install on purpose:
-
-- **Cost** — Shared RHDP labs already burn OpenShift + AAP. Auto-creating EC2 on every Install leaves idle hosts and drives AWS spend.
-- **Choice** — Presenters who only want the AO UI skip steps 2–4.
-- **Soft preflight** — Missing deps warn at Install time; AO still comes up.
+| **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** | Tear down AO when the lab session is done. | [`uninstall.yml`](../ao/uninstall.yml) |
 
 ## Configure credentials
 
