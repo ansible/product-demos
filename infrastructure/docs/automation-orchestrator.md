@@ -32,7 +32,7 @@ Still simple — same Install as Path 1 — plus a short setup so curated conten
 
 Then complete **Path 1** (Install + login) and open the seeded workflow you want to show.
 
-**You are ready to present.** Curated demos (add rows as more are enabled in [`demos.yml`](../ao/demos.yml)):
+**You are ready to present.** Curated demos:
 
 | Demo | Directions |
 |------|------------|
