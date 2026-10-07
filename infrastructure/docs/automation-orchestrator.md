@@ -2,7 +2,7 @@
 
 Start here for Automation Orchestrator (AO) on the [Ansible Product Demos catalog item](https://red.ht/apd-sandbox) from [demo.redhat.com](https://demo.redhat.com). OpenShift, credentials, and the AO execution environment are already wired.
 
-**Both paths:** confirm AO templates exist — if not, run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** → `infrastructure`). Then pick a path.
+Before either path: confirm AO templates exist — if not, run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** → `infrastructure`).
 
 ## Path 1 — Just install AO
 
@@ -56,7 +56,14 @@ Then complete **Path 1** (Install + login) and open the seeded workflow you want
 
 ## Under the hood
 
-Install seeds demos with `enabled: true` in [`demos.yml`](../ao/demos.yml) (today: **disk-utilization** from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos)). It creates project **AAP Orchestrator Demos** and demo JTs in org **Ansible Product Demos (APD)**, rewrites workflow `organization_name` from `Default` → APD, attaches **Mattermost** + **Product Demos EE** to **Notify Chatroom** when present, and imports the workflow into AO. AAP drives `aapctl`; the Mattermost credential holds an **incoming webhook** id for `community.general.mattermost`.
+What **Install** does when it seeds curated demos:
+
+- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` (today: **disk-utilization** from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos)).
+- Creates the **AAP Orchestrator Demos** project and those demo job templates in org **Ansible Product Demos (APD)**.
+- Rewrites each workflow’s `organization_name` from `Default` → APD, then imports it into AO.
+- When present, attaches the **Mattermost** credential and **Product Demos EE** to **Notify Chatroom**.
+
+AAP drives this with `aapctl`. The Mattermost credential stores an **incoming webhook** id for `community.general.mattermost` (not a bot personal access token).
 
 ## Related demos
 
