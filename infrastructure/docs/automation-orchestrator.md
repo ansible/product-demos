@@ -6,17 +6,11 @@ This page is the **hub**. The three AO job templates are listed below. Optional 
 
 ## The three AO templates
 
-| Template | When to use it |
-|----------|----------------|
-| **Infrastructure ǀ Automation Orchestrator ǀ Install** | Main path. Runs `aapctl`, network allow-list, AAP integration, and seeds curated demos from [`demos.yml`](../ao/demos.yml). |
-| **Infrastructure ǀ AO Network Configuration ǀ Install** | Optional re-run of allow-listing / private-network OIDC. **Skip on RHDP** — Install already did this. |
-| **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** | Tear down AO when the demo is done so the shared cluster stays clean. |
-
-| Template | Playbook |
-|----------|----------|
-| Install | [`infrastructure/ao/install.yml`](../ao/install.yml) |
-| Network Configuration | [`infrastructure/ao/network-access.yml`](../ao/network-access.yml) |
-| Uninstall | [`infrastructure/ao/uninstall.yml`](../ao/uninstall.yml) |
+| Template | When to use it | Playbook |
+|----------|----------------|----------|
+| **Infrastructure ǀ Automation Orchestrator ǀ Install** | Main path. Runs `aapctl`, network allow-list, AAP integration, and seeds curated demos from [`demos.yml`](../ao/demos.yml). | [`install.yml`](../ao/install.yml) |
+| **Infrastructure ǀ AO Network Configuration ǀ Install** | Optional re-run of allow-listing / private-network OIDC. **Skip on RHDP** — Install already did this. | [`network-access.yml`](../ao/network-access.yml) |
+| **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** | Tear down AO when the demo is done so the shared cluster stays clean. | [`uninstall.yml`](../ao/uninstall.yml) |
 
 ## Prerequisites
 
