@@ -374,36 +374,33 @@
           message={{ mattermost_admin_create.json.message | default(mattermost_admin_create.msg) }}).
           Username 'admin' is reserved — use apdadmin.
 
-    - name: Promote Mattermost admin to system_admin via mmctl local mode
+    # API-created users on a reused DB are often plain system_user; mmctl
+    # --local "user roles" can report ok without the session picking it up.
+    # Update Roles in Postgres, then re-login before bot APIs.
+    - name: Ensure Mattermost admin has system_admin role in Postgres
       ansible.builtin.command:
         argv:
           - podman
           - exec
+          - mattermost-db
+          - psql
+          - -U
+          - mmuser
+          - -d
           - mattermost
-          - mmctl
-          - --local
-          - user
-          - roles
-          - system_admin
-          - "{{ mattermost_admin_username }}"
-      register: mattermost_promote_admin
-      changed_when: >-
-        'added' in (mattermost_promote_admin.stdout | default('') | lower)
-        or 'system_admin' in (mattermost_promote_admin.stdout | default('') | lower)
-      failed_when: false
-      retries: 12
-      delay: 5
-      until: mattermost_promote_admin.rc == 0
-
-    - name: Fail when Mattermost admin promote fails
-      when: (mattermost_promote_admin.rc | default(1) | int) != 0
-      ansible.builtin.fail:
-        msg: >-
-          mmctl could not grant system_admin to {{ mattermost_admin_username }}
-          (rc={{ mattermost_promote_admin.rc }};
-          stdout={{ mattermost_promote_admin.stdout | default('') }};
-          stderr={{ mattermost_promote_admin.stderr | default('') }}).
-          Ensure MM_SERVICESETTINGS_ENABLELOCALMODE=true on the container.
+          - -v
+          - ON_ERROR_STOP=1
+          - -c
+          - >-
+            UPDATE users
+            SET roles = 'system_user system_admin'
+            WHERE username = '{{ mattermost_admin_username }}'
+            RETURNING username, roles;
+      register: mattermost_promote_sql
+      changed_when: "'system_admin' in (mattermost_promote_sql.stdout | default(''))"
+      failed_when: >-
+        (mattermost_promote_sql.rc | default(1) | int) != 0
+        or 'system_admin' not in (mattermost_promote_sql.stdout | default(''))
 
     - name: Enable Mattermost bot account creation via mmctl
       ansible.builtin.command:
@@ -419,8 +416,19 @@
           - "true"
       register: mattermost_enable_bots
       changed_when: true
-      failed_when: (mattermost_enable_bots.rc | default(1) | int) != 0
+      failed_when: false
+      retries: 12
+      delay: 5
+      until: mattermost_enable_bots.rc == 0
 
+    - name: Fail when bot-creation config enable fails
+      when: (mattermost_enable_bots.rc | default(1) | int) != 0
+      ansible.builtin.fail:
+        msg: >-
+          mmctl could not enable EnableBotAccountCreation
+          (rc={{ mattermost_enable_bots.rc }};
+          stdout={{ mattermost_enable_bots.stdout | default('') }};
+          stderr={{ mattermost_enable_bots.stderr | default('') }}).
     # Product Demos EE ships ansible-core where uri lacks return_headers;
     # Mattermost returns the session token only in the Token response header.
     # Login after promote so the session carries system_admin.
@@ -509,96 +517,167 @@
             )
           }}
 
-    - name: Create Mattermost bot account
-      ansible.builtin.uri:
-        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/bots"
-        method: POST
-        headers:
-          Authorization: "Bearer {{ mattermost_session_token }}"
-        body_format: json
-        body:
-          username: "{{ mattermost_bot_username }}"
-          display_name: APD Bot
-          description: Ansible Product Demos notification bot
-        status_code: [201, 400, 403]
+    # mmctl bot create cannot use --local; authenticate over HTTP inside the
+    # container, then create the bot + token.
+    - name: Authenticate mmctl as Mattermost admin
+      ansible.builtin.shell: |
+        set -euo pipefail
+        printf '%s\n' '{{ mattermost_admin_password }}' | podman exec -i mattermost \
+          mmctl auth login "http://127.0.0.1:{{ mattermost_http_port }}" \
+          --name apd-local \
+          --username "{{ mattermost_admin_username }}" \
+          --password-stdin
+      args:
+        executable: /bin/bash
+      register: mattermost_mmctl_auth
+      changed_when: false
+      no_log: true
+
+    - name: Create Mattermost bot via mmctl
+      ansible.builtin.command:
+        argv:
+          - podman
+          - exec
+          - mattermost
+          - mmctl
+          - --json
+          - bot
+          - create
+          - "{{ mattermost_bot_username }}"
+          - --display-name
+          - APD Bot
+          - --description
+          - Ansible Product Demos notification bot
+          - --with-token
       register: mattermost_bot_create
       failed_when: false
+      no_log: true
+
+    - name: Resolve existing Mattermost bot when create reports already exists
+      when: >-
+        (mattermost_bot_create.rc | default(1) | int) != 0
+      ansible.builtin.command:
+        argv:
+          - podman
+          - exec
+          - mattermost
+          - mmctl
+          - --json
+          - bot
+          - list
+          - --all
+      register: mattermost_bot_list
+      changed_when: false
+      failed_when: (mattermost_bot_list.rc | default(1) | int) != 0
+
+    - name: Generate Mattermost bot token when bot already existed
+      when: >-
+        (mattermost_bot_create.rc | default(1) | int) != 0
+      ansible.builtin.command:
+        argv:
+          - podman
+          - exec
+          - mattermost
+          - mmctl
+          - --json
+          - token
+          - generate
+          - "{{ mattermost_bot_username }}"
+          - APD demo notify token
+      register: mattermost_bot_token_gen
+      changed_when: true
+      failed_when: (mattermost_bot_token_gen.rc | default(1) | int) != 0
+      no_log: true
 
     - name: Fail when Mattermost bot create fails unexpectedly
       when: >-
-        mattermost_bot_create.status | default(0) not in [201, 400]
-        or (
-          mattermost_bot_create.status | default(0) == 400
-          and 'already exists' not in (
-            mattermost_bot_create.json.message | default('')
-            | lower
-          )
-          and 'already exists' not in (
-            mattermost_bot_create.json.id | default('')
-            | lower
-          )
+        (mattermost_bot_create.rc | default(1) | int) != 0
+        and (
+          mattermost_bot_token_gen is not defined
+          or (mattermost_bot_token_gen.rc | default(1) | int) != 0
         )
       ansible.builtin.fail:
         msg: >-
-          Mattermost bot create failed
-          (status={{ mattermost_bot_create.status | default('n/a') }};
-          id={{ mattermost_bot_create.json.id | default('') }};
-          message={{ mattermost_bot_create.json.message | default(mattermost_bot_create.msg) }}).
+          Mattermost bot create/token failed
+          (create_rc={{ mattermost_bot_create.rc | default('n/a') }};
+          create_err={{ mattermost_bot_create.stderr | default(mattermost_bot_create.stdout) }};
+          token_rc={{ mattermost_bot_token_gen.rc | default('n/a') if mattermost_bot_token_gen is defined else 'n/a' }}).
 
-    - name: List Mattermost bots
-      ansible.builtin.uri:
-        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/bots"
-        method: GET
-        headers:
-          Authorization: "Bearer {{ mattermost_session_token }}"
-        return_content: true
-      register: mattermost_bots
+    - name: Parse Mattermost bot token from mmctl output
+      ansible.builtin.shell: |
+        set -euo pipefail
+        python3 - <<'PY'
+        import json, os, re, sys
+        blobs = []
+        for key in ("CREATE_OUT", "TOKEN_OUT"):
+            raw = os.environ.get(key, "") or ""
+            if raw.strip():
+                blobs.append(raw)
+        token = ""
+        for raw in blobs:
+            try:
+                data = json.loads(raw)
+            except Exception:
+                m = re.search(r"(?i)token[\"'\\s:=]+([a-z0-9]+)", raw)
+                if m:
+                    token = m.group(1)
+                continue
+            items = data if isinstance(data, list) else [data]
+            for item in items:
+                if isinstance(item, dict):
+                    for k in ("token", "Token", "access_token"):
+                        if item.get(k):
+                            token = item[k]
+                            break
+                if token:
+                    break
+            if token:
+                break
+            m = re.search(r"(?i)token[\"'\\s:=]+([a-z0-9]+)", raw)
+            if m:
+                token = m.group(1)
+        if not token:
+            sys.stderr.write("Unable to parse bot token from mmctl output\\n")
+            sys.exit(1)
+        print(token)
+        PY
+      args:
+        executable: /bin/bash
+      environment:
+        CREATE_OUT: "{{ mattermost_bot_create.stdout | default('') }}"
+        TOKEN_OUT: "{{ mattermost_bot_token_gen.stdout | default('') if mattermost_bot_token_gen is defined else '' }}"
+      register: mattermost_bot_token_parse
+      changed_when: false
+      no_log: true
 
-    - name: Select Mattermost bot user id
+    - name: Store Mattermost bot access token
       ansible.builtin.set_fact:
-        mattermost_bot_user_id: >-
-          {{
-            (
-              mattermost_bots.json
-              | selectattr('username', 'equalto', mattermost_bot_username)
-              | map(attribute='user_id')
-              | first
-              | default(mattermost_bot_create.json.user_id | default(''), true)
-            )
-          }}
+        mattermost_bot_access_token: "{{ mattermost_bot_token_parse.stdout | trim }}"
+      no_log: true
 
-    - name: Require Mattermost bot user id
+    - name: Require Mattermost bot access token
       ansible.builtin.assert:
         that:
-          - (mattermost_bot_user_id | default('') | string | length) > 0
-        fail_msg: Could not resolve Mattermost bot user id for {{ mattermost_bot_username }}.
+          - (mattermost_bot_access_token | default('') | string | length) > 0
+        fail_msg: Could not parse Mattermost bot token from mmctl output.
 
-    - name: Create Mattermost bot access token
-      ansible.builtin.uri:
-        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/users/{{ mattermost_bot_user_id }}/tokens"
-        method: POST
-        headers:
-          Authorization: "Bearer {{ mattermost_session_token }}"
-        body_format: json
-        body:
-          description: APD demo notify token
-        status_code: [201]
-      register: mattermost_bot_token
-      no_log: true
-
-    - name: Add bot to Mattermost team
-      ansible.builtin.uri:
-        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/teams/{{ mattermost_team_id }}/members"
-        method: POST
-        headers:
-          Authorization: "Bearer {{ mattermost_session_token }}"
-        body_format: json
-        body:
-          team_id: "{{ mattermost_team_id }}"
-          user_id: "{{ mattermost_bot_user_id }}"
-        status_code: [201, 400]
+    - name: Add bot to Mattermost team via mmctl
+      ansible.builtin.command:
+        argv:
+          - podman
+          - exec
+          - mattermost
+          - mmctl
+          - team
+          - users
+          - add
+          - "{{ mattermost_team_name }}"
+          - "{{ mattermost_bot_username }}"
+      register: mattermost_bot_team_add
       failed_when: false
-      no_log: true
+      changed_when: >-
+        (mattermost_bot_team_add.rc | default(1) | int) == 0
+        and 'already' not in (mattermost_bot_team_add.stdout | default('') | lower)
 
     - name: Persist Mattermost connection facts on the host
       ansible.builtin.copy:
@@ -607,7 +686,7 @@
         content: |
           MATTERMOST_URL=http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}
           MATTERMOST_SERVER={{ mattermost_public_ip }}:{{ mattermost_http_port }}
-          MATTERMOST_BOT_TOKEN={{ mattermost_bot_token.json.token }}
+          MATTERMOST_BOT_TOKEN={{ mattermost_bot_access_token }}
           MATTERMOST_ADMIN_USER={{ mattermost_admin_username }}
           MATTERMOST_TEAM={{ mattermost_team_name }}
       no_log: true
@@ -618,6 +697,6 @@
           - "Mattermost URL: http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}"
           - "Admin user: {{ mattermost_admin_username }} / {{ mattermost_admin_password }}"
           - "Team: {{ mattermost_team_name }}"
-          - "Bot token (for Notify Chatroom api_chat_token): {{ mattermost_bot_token.json.token }}"
+          - "Bot token (for Notify Chatroom api_chat_token): {{ mattermost_bot_access_token }}"
           - "mattermost_server extra var: {{ mattermost_public_ip }}:{{ mattermost_http_port }}"
           - "Sync AWS Inventory so aws_mattermost appears for AO Install seeding."
