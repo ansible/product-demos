@@ -371,38 +371,41 @@
           message={{ mattermost_admin_create.json.message | default(mattermost_admin_create.msg) }}).
           Username 'admin' is reserved — use apdadmin.
 
-    - name: Log in as Mattermost admin
-      ansible.builtin.uri:
-        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/users/login"
-        method: POST
-        body_format: json
-        body:
-          login_id: "{{ mattermost_admin_email }}"
-          password: "{{ mattermost_admin_password }}"
-        status_code: [200, 400, 401, 403]
-        return_headers: true
+    # Product Demos EE ships ansible-core where uri lacks return_headers;
+    # Mattermost returns the session token only in the Token response header.
+    - name: Log in as Mattermost admin and capture Token header
+      ansible.builtin.shell: |
+        set -euo pipefail
+        curl -sS -D /tmp/mm_login_headers.txt -o /tmp/mm_login_body.json \
+          -H 'Content-Type: application/json' \
+          -d @- \
+          "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/users/login" <<EOF
+        {"login_id":"{{ mattermost_admin_email }}","password":"{{ mattermost_admin_password }}"}
+        EOF
+        awk -F': ' 'BEGIN{IGNORECASE=1} $1=="Token" {gsub(/\r/,"",$2); print $2; exit}' \
+          /tmp/mm_login_headers.txt
+      args:
+        executable: /bin/bash
       register: mattermost_login
-      # Keep result visible — password is only in the request body, not the response.
-      no_log: false
+      changed_when: false
+      no_log: true
       failed_when: false
 
     - name: Fail when Mattermost admin login fails
-      when: mattermost_login.status | default(0) != 200
+      when: >-
+        (mattermost_login.rc | default(1) | int) != 0
+        or (mattermost_login.stdout | default('') | trim | length) == 0
       ansible.builtin.fail:
         msg: >-
-          Mattermost admin login failed
-          (status={{ mattermost_login.status | default('n/a') }};
-          message={{ mattermost_login.json.message | default(mattermost_login.msg | default('unknown')) }}).
-          Expected user {{ mattermost_admin_username }} ({{ mattermost_admin_email }}).
+          Mattermost admin login failed for {{ mattermost_admin_username }}
+          ({{ mattermost_admin_email }}).
+          curl_rc={{ mattermost_login.rc | default('n/a') }};
+          body={{ lookup('ansible.builtin.file', '/tmp/mm_login_body.json', errors='ignore') | default('') }}.
           Open http://{{ mattermost_public_ip }}:{{ mattermost_http_port }} to verify.
 
     - name: Store Mattermost session token
       ansible.builtin.set_fact:
-        mattermost_session_token: >-
-          {{
-            mattermost_login.headers.Token
-            | default(mattermost_login.headers.token, true)
-          }}
+        mattermost_session_token: "{{ mattermost_login.stdout | trim }}"
       no_log: true
 
     - name: Create Mattermost team when missing
