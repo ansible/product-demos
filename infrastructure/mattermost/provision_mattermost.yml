@@ -191,6 +191,24 @@
         - "{{ mattermost_data_dir }}/client/plugins"
         - "{{ mattermost_data_dir }}/bleve-indexes"
 
+    # Official Mattermost image runs as UID 2000; root-owned mounts make the
+    # process exit immediately so localhost:8065 never listens.
+    - name: Set Mattermost app volume ownership for container UID 2000
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "2000"
+        group: "2000"
+        mode: "0755"
+        recurse: true
+      loop:
+        - "{{ mattermost_data_dir }}/config"
+        - "{{ mattermost_data_dir }}/data"
+        - "{{ mattermost_data_dir }}/logs"
+        - "{{ mattermost_data_dir }}/plugins"
+        - "{{ mattermost_data_dir }}/client"
+        - "{{ mattermost_data_dir }}/bleve-indexes"
+
     - name: Ensure Podman network for Mattermost
       ansible.builtin.command:
         argv:
@@ -243,6 +261,12 @@
       delay: 2
       changed_when: false
 
+    - name: Remove exited Mattermost app container before recreate
+      containers.podman.podman_container:
+        name: mattermost
+        state: absent
+      failed_when: false
+
     - name: Run Mattermost application
       containers.podman.podman_container:
         name: mattermost
@@ -277,6 +301,41 @@
       until: mattermost_ping.status | default(0) == 200
       retries: 60
       delay: 5
+      ignore_errors: true
+
+    - name: Collect Mattermost container diagnostics on HTTP failure
+      when: mattermost_ping is failed
+      block:
+        - name: Show Mattermost container status
+          ansible.builtin.command:
+            argv:
+              - podman
+              - ps
+              - -a
+              - --filter
+              - name=mattermost
+          register: mattermost_ps
+          changed_when: false
+
+        - name: Show Mattermost container logs
+          ansible.builtin.command:
+            argv:
+              - podman
+              - logs
+              - --tail
+              - "80"
+              - mattermost
+          register: mattermost_logs
+          changed_when: false
+          failed_when: false
+
+        - name: Fail with Mattermost diagnostics
+          ansible.builtin.fail:
+            msg: >-
+              Mattermost did not answer on 127.0.0.1:{{ mattermost_http_port }}
+              (not a VPC/SG issue — this check is localhost).
+              podman ps: {{ mattermost_ps.stdout }}
+              logs: {{ mattermost_logs.stdout_lines | default(mattermost_logs.stderr_lines) }}
 
     - name: Create Mattermost admin user when missing
       ansible.builtin.uri:
