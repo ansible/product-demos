@@ -56,16 +56,6 @@ If a dependency is missing later, run the matching APD template and re-run Insta
 | AAP Credential | Red Hat Ansible Automation Platform | Pre-configured |
 | Mattermost | Custom (server + webhook id) | Created/updated by **Provision Mattermost** |
 
-## Survey prompts
-
-No surveys on Install for the common path — click Launch.
-
-| Template | Variable | Default | When to change it |
-|----------|----------|---------|-------------------|
-| Install | `ao_operator_channel` | `stable` | Rarely — non-stable operator channel only |
-| Network Configuration | `aap_hostname` / `ao_extra_hosts` | from AAP credential | Only if you re-run network config with overrides |
-| Uninstall | — | — | No prompts |
-
 ## What Install seeds
 
 Install only seeds demos with `enabled: true` in [`infrastructure/ao/demos.yml`](../ao/demos.yml).
