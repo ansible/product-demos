@@ -694,23 +694,33 @@
       register: mattermost_webhooks_existing
       no_log: true
 
+    - name: Build list of prior APD Notify Chatroom webhook ids
+      ansible.builtin.set_fact:
+        mattermost_webhooks_to_delete: >-
+          {{
+            (
+              mattermost_webhooks_existing.json
+              if (mattermost_webhooks_existing.json | type_debug == 'list')
+              else []
+            )
+            | selectattr('display_name', 'defined')
+            | selectattr('display_name', 'equalto', 'APD Notify Chatroom')
+            | map(attribute='id')
+            | reject('equalto', None)
+            | reject('equalto', '')
+            | list
+          }}
+      no_log: true
+
     - name: Delete prior APD Notify Chatroom webhooks
+      when: (mattermost_webhooks_to_delete | default([]) | length) > 0
       ansible.builtin.uri:
-        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/hooks/incoming/{{ item.id }}"
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/hooks/incoming/{{ item }}"
         method: DELETE
         headers:
           Authorization: "Bearer {{ mattermost_session_token }}"
         status_code: [200, 204, 404]
-      loop: >-
-        {{
-          mattermost_webhooks_existing.json
-          | default([])
-          | selectattr('display_name', 'defined')
-          | selectattr('display_name', 'equalto', 'APD Notify Chatroom')
-          | list
-        }}
-      loop_control:
-        label: "{{ item.id | default('unknown') }}"
+      loop: "{{ mattermost_webhooks_to_delete }}"
       failed_when: false
       no_log: true
 
@@ -725,10 +735,12 @@
           channel_id: "{{ mattermost_channel_id }}"
           display_name: APD Notify Chatroom
           description: Incoming webhook for community.general.mattermost / AO demos
-        status_code: [201]
         return_content: true
+        status_code: [201, 400, 403, 401]
       register: mattermost_webhook
-      no_log: true
+      failed_when: (mattermost_webhook.status | default(0) | int) != 201
+      # Do not no_log here — failures must show Mattermost's status/message.
+      # The id is stored with no_log on the next task.
 
     - name: Store new Mattermost incoming webhook id
       ansible.builtin.set_fact:
