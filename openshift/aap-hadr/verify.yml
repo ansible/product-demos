@@ -2,10 +2,23 @@
 - name: Verify AAP HA/DR OpenShift sites
   hosts: localhost
   gather_facts: false
+  vars:
+    aap_hadr_expected_primary_idle: false
+    aap_hadr_expected_standby_idle: true
   tasks:
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - aap_hadr_namespace | default('') | length > 0
+          - aap_hadr_primary_context | default('') | length > 0
+          - aap_hadr_standby_context | default('') | length > 0
+          - (aap_hadr_primary_context | default('')) != (aap_hadr_standby_context | default(''))
+        fail_msg: >-
+          Provide distinct OpenShift contexts and a non-empty AAP namespace.
+
     - name: Read AAP resources
       kubernetes.core.k8s_info:
-        api_version: ansible.com/v1alpha1
+        api_version: aap.ansible.com/v1alpha1
         kind: AnsibleAutomationPlatform
         namespace: "{{ aap_hadr_namespace }}"
         context: "{{ item.context }}"

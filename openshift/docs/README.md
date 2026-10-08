@@ -12,3 +12,4 @@ Each file in this folder documents a corresponding openshift demo playbook or wo
 | GitLab | [openshift-gitlab.md](openshift-gitlab.md) | [`openshift/gitlab.yml`](../gitlab.yml) |
 | CNV — Infra Stack | [openshift-cnv-infra-stack.md](openshift-cnv-infra-stack.md) | [`openshift/setup.yml`](../setup.yml) |
 | CNV — Patch Workflow | [openshift-cnv-patch-workflow.md](openshift-cnv-patch-workflow.md) | [`openshift/setup.yml`](../setup.yml) |
+| AAP HA/DR | [openshift-aap-hadr.md](openshift-aap-hadr.md) | [`openshift/aap-hadr/`](../aap-hadr/) |

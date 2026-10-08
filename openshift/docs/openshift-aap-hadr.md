@@ -5,8 +5,8 @@ OpenShift clusters before introducing controlled switchover or emergency
 failover operations.
 
 The implementation follows the [AAP HA/DR on OpenShift solution guide](https://ansible-tmm.github.io/solution-guides/README-AAP-HA-DR-OpenShift)
-and targets AAP 2.7. Use the AAP 2.7 Product Demos execution environment for
-these jobs:
+and targets AAP 2.7. Run the playbooks with the AAP 2.7 Product Demos
+execution environment:
 
 ```text
 quay.io/ansible-product-demos/apd-ee-27:latest
@@ -15,18 +15,23 @@ quay.io/ansible-product-demos/apd-ee-27:latest
 ## Prerequisites
 
 - Two OpenShift 4.14+ clusters in separate failure domains
-- Active `KUBECONFIG` with contexts for both clusters
+- CLI or `ansible-navigator` access with an active `KUBECONFIG` containing contexts for both clusters
 - An `aap` namespace on both clusters
 - AAP Operator, CloudNativePG, and External Secrets Operator installed
 - AAP and CNPG custom resources deployed on both clusters
 - Cross-cluster database replication and replicated object storage configured
 
-## Job templates
+These playbooks are currently CLI/`ansible-navigator` only. The APD Controller
+setup attaches one `OpenShift Credential`, which injects one cluster endpoint
+and token rather than a multi-context kubeconfig. Do not run these playbooks
+from Controller until a two-cluster credential model is available.
 
-| Job template | Purpose | Mutates the cluster |
+## Playbooks
+
+| Playbook | Purpose | Mutates the cluster |
 | --- | --- | --- |
-| **OpenShift ǀ AAP HA/DR ǀ Preflight** | Checks cluster versions, namespace, operators, AAP resources, and CNPG resources. | No |
-| **OpenShift ǀ AAP HA/DR ǀ Verify** | Confirms the expected active/passive `idle_aap` state and reports platform/database resources. | No |
+| **Preflight** | Checks cluster versions, namespace, operator CRDs, AAP resources, and CNPG resources. | No |
+| **Verify** | Confirms the expected active/passive `idle_aap` state and reports platform/database resources. | No |
 
 ## Current limitation
 

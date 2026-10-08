@@ -6,6 +6,10 @@
     aap_hadr_required_contexts:
       - "{{ aap_hadr_primary_context }}"
       - "{{ aap_hadr_standby_context }}"
+    aap_hadr_required_operator_crds:
+      - ansibleautomationplatforms.aap.ansible.com
+      - clusters.postgresql.cnpg.io
+      - externalsecrets.external-secrets.io
   tasks:
     - name: Validate required variables
       ansible.builtin.assert:
@@ -17,20 +21,25 @@
         fail_msg: >-
           Provide distinct OpenShift contexts and a non-empty AAP namespace.
 
-    - name: Query OpenShift version on both sites
-      kubernetes.core.k8s_cluster_info:
+    - name: Query OpenShift ClusterVersion on both sites
+      kubernetes.core.k8s_info:
+        api_version: config.openshift.io/v1
+        kind: ClusterVersion
+        name: version
         context: "{{ item }}"
       loop: "{{ aap_hadr_required_contexts }}"
-      register: aap_hadr_cluster_info
+      register: aap_hadr_cluster_versions
       changed_when: false
 
     - name: Verify both sites are OpenShift 4.14 or newer
       ansible.builtin.assert:
         that:
-          - item.version.server.major | int >= 4
-          - item.version.server.major | int > 4 or item.version.server.minor | int >= 14
-        fail_msg: "{{ item.item }} does not meet the OpenShift 4.14+ baseline."
-      loop: "{{ aap_hadr_cluster_info.results }}"
+          - item.resources | length == 1
+          - item.resources[0].status.desired.version is version('4.14', '>=')
+        fail_msg: >-
+          {{ item.item }} does not meet the OpenShift 4.14+ baseline
+          (found {{ item.resources[0].status.desired.version | default('unknown') }}).
+      loop: "{{ aap_hadr_cluster_versions.results }}"
 
     - name: Verify AAP namespace exists on both sites
       kubernetes.core.k8s_info:
@@ -49,36 +58,36 @@
         fail_msg: "Namespace {{ aap_hadr_namespace }} is missing on {{ item.item }}."
       loop: "{{ aap_hadr_namespaces.results }}"
 
-    - name: Verify required operators are installed
+    - name: Query required operator CRDs on both sites
       kubernetes.core.k8s_info:
-        api_version: operators.coreos.com/v1alpha1
-        kind: ClusterServiceVersion
-        namespace: "{{ aap_hadr_namespace }}"
-        context: "{{ item }}"
-      loop: "{{ aap_hadr_required_contexts }}"
-      register: aap_hadr_csvs
+        api_version: apiextensions.k8s.io/v1
+        kind: CustomResourceDefinition
+        name: "{{ item.1 }}"
+        context: "{{ item.0 }}"
+      loop: "{{ aap_hadr_required_contexts | product(aap_hadr_required_operator_crds) | list }}"
+      loop_control:
+        label: "{{ item.0 }} / {{ item.1 }}"
+      register: aap_hadr_operator_crds
       changed_when: false
 
-    - name: Report operator readiness
-      ansible.builtin.debug:
-        msg:
-          site: "{{ item.item }}"
-          succeeded_csvs: >-
-            {{ item.resources | selectattr('status.phase', 'defined') |
-            selectattr('status.phase', 'equalto', 'Succeeded') |
-            map(attribute='metadata.name') | list }}
-      loop: "{{ aap_hadr_csvs.results }}"
+    - name: Require AAP, CNPG, and External Secrets CRDs on both sites
+      ansible.builtin.assert:
+        that:
+          - item.resources | length == 1
+        fail_msg: "Required CRD {{ item.item.1 }} is missing on {{ item.item.0 }}."
+      loop: "{{ aap_hadr_operator_crds.results }}"
 
     - name: Check required API resources exist
       kubernetes.core.k8s_info:
         api_version: "{{ item.api_version }}"
         kind: "{{ item.kind }}"
+        namespace: "{{ aap_hadr_namespace }}"
         context: "{{ item.context }}"
       loop:
-        - api_version: ansible.com/v1alpha1
+        - api_version: aap.ansible.com/v1alpha1
           kind: AnsibleAutomationPlatform
           context: "{{ aap_hadr_primary_context }}"
-        - api_version: ansible.com/v1alpha1
+        - api_version: aap.ansible.com/v1alpha1
           kind: AnsibleAutomationPlatform
           context: "{{ aap_hadr_standby_context }}"
         - api_version: postgresql.cnpg.io/v1

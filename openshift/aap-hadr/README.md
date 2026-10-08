@@ -4,9 +4,10 @@ This demo provides a product-demo integration point for the active/passive AAP
 HA/DR architecture described in the [AAP HA/DR on OpenShift implementation
 guide](https://ansible-tmm.github.io/solution-guides/README-AAP-HA-DR-OpenShift).
 
-The initial implementation is intentionally read-only. It validates two
-OpenShift sites, CloudNativePG replication, AAP health, and the expected
-`idle_aap` state before any switchover or failover automation is enabled.
+The initial implementation is intentionally read-only. It validates that both
+OpenShift sites are reachable, the required custom resources exist, and the
+expected active/passive `idle_aap` topology is configured. It does not yet
+validate CloudNativePG replication health or lag, or deeper AAP health.
 
 ## Scope
 
@@ -20,7 +21,10 @@ The platform team must provide the underlying infrastructure:
 - A stable vanity URL and DNS/GSLB cutover capability
 
 The playbooks in this directory use the active `KUBECONFIG` and named
-OpenShift contexts. They do not contain credentials or secret material.
+OpenShift contexts. They do not contain credentials or secret material. They
+are currently CLI/`ansible-navigator` only: the APD Controller's existing
+`OpenShift Credential` injects one cluster endpoint and token, not a
+multi-context kubeconfig for both sites.
 
 ## Variables
 
