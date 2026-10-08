@@ -853,6 +853,13 @@ html:not([data-theme="dark"]) .demo-card:hover {
   border-top: none;
 }
 
+/* Avoid double rule: table row border + next h2 section divider */
+.detail-body table + h2 {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 32px;
+}
+
 /* 5: Prerequisites callout box */
 .detail-body h2 + ul,
 .detail-body h2 + ol {
@@ -874,6 +881,69 @@ html:not([data-theme="dark"]) .demo-card:hover {
   background: var(--bg-surface);
   padding: 16px 20px;
   max-width: 720px;
+}
+
+/* Info callout (legacy full-width box) */
+.detail-body .info-box {
+  border: 1px solid var(--border);
+  border-left: 3px solid #58a6ff;
+  border-radius: 8px;
+  background: var(--bg-surface);
+  padding: 16px 20px;
+  max-width: 720px;
+  margin: 0 0 1.5rem;
+}
+
+.detail-body .info-box > :first-child {
+  margin-top: 0;
+}
+
+.detail-body .info-box > :last-child {
+  margin-bottom: 0;
+}
+
+/* Compact info pill with "i" glyph */
+.detail-body .info-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 720px;
+  margin: 16px 0 20px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-surface);
+}
+
+.detail-body .info-callout__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: #58a6ff;
+  color: #0d1117;
+  font-size: 13px;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.detail-body .info-callout p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+  .detail-body .info-callout {
+    border-radius: 12px;
+  }
 }
 
 /* 9: Related demos section gets card-like rows */

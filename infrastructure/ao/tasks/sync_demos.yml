@@ -1,0 +1,71 @@
+---
+# Download pinned upstream demos and import only catalog-selected workflows.
+- name: Create temporary directory for AO demo archive
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: apd-ao-demos-
+  register: ao_demo_tmpdir
+
+- name: Download curated AO demos archive
+  ansible.builtin.get_url:
+    url: "{{ ao_demos_repository.rstrip('/') }}/archive/{{ ao_demos_ref }}.tar.gz"
+    dest: "{{ ao_demo_tmpdir.path }}/demos.tar.gz"
+    mode: "0600"
+  register: ao_demo_archive
+
+- name: Extract AO demos archive
+  ansible.builtin.unarchive:
+    src: "{{ ao_demo_archive.dest }}"
+    dest: "{{ ao_demo_tmpdir.path }}"
+    remote_src: true
+
+- name: Locate extracted repository root
+  ansible.builtin.find:
+    paths: "{{ ao_demo_tmpdir.path }}"
+    file_type: directory
+    patterns: "aap-orchestrator-demos*"
+    recurse: false
+  register: ao_demo_roots
+
+- name: Require extracted repository root
+  ansible.builtin.assert:
+    that:
+      - ao_demo_roots.files | length > 0
+    fail_msg: Could not find extracted aap-orchestrator-demos directory.
+
+- name: Build absolute workflow source paths from catalog
+  ansible.builtin.set_fact:
+    ao_workflow_sources: >-
+      {{
+        ao_enabled_demos
+        | map(attribute='workflow')
+        | map('regex_replace', '^', ao_demo_roots.files[0].path ~ '/')
+        | list
+      }}
+
+- name: Ensure catalog workflow files exist
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop: "{{ ao_workflow_sources }}"
+  register: ao_workflow_stats
+
+- name: Fail when a catalog workflow file is missing
+  ansible.builtin.assert:
+    that:
+      - item.stat.exists
+    fail_msg: "Catalog workflow missing in archive: {{ item.item }}"
+  loop: "{{ ao_workflow_stats.results }}"
+  loop_control:
+    label: "{{ item.item | basename }}"
+
+- name: Synchronize each curated AO workflow
+  ansible.builtin.include_tasks: sync_workflow.yml
+  loop: "{{ ao_workflow_sources }}"
+  loop_control:
+    loop_var: __ao_source_path
+    label: "{{ __ao_source_path | basename }}"
+
+- name: Remove temporary AO demo archive
+  ansible.builtin.file:
+    path: "{{ ao_demo_tmpdir.path }}"
+    state: absent

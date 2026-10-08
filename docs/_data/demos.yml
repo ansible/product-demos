@@ -1762,8 +1762,8 @@
 
 - slug: automation-orchestrator
   readme_path: infrastructure/docs/automation-orchestrator.md
-  title: "Infrastructure | Automation Orchestrator — Provisioning"
-  subtitle: "One-click AO install — already wired on demo.redhat.com"
+  title: "Infrastructure | Automation Orchestrator — Hub (Start Here)"
+  subtitle: "Path 1: one JT for AO · Path 2: seed demos that actually run"
   category: infrastructure
   status: active
   featured: false
@@ -1773,29 +1773,29 @@
     - Playbook
     - OpenShift
     - Orchestrator
-    - Provisioning
+    - Hub
   thumbnail:
     gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
     icon: "🎼"
-  blurb: "On the RHDP catalog item, credentials and OpenShift are preconfigured — launch Install, grab the admin URL from the job output, and you are in."
+  blurb: "Path 1 is one Install JT for AO. Path 2 adds Cloud Stack + Mattermost so seeded demos (disk-utilization) run end-to-end — then present."
   stats:
     playbooks: 3
   url: /demos/automation-orchestrator/
   github_path: infrastructure/setup.yml
   workflow_mermaid: |
     flowchart LR
-      S["🏠 Start"]
-      S --> A["🎼 Install AO via aapctl"]
-      A --> B["🛣 Wait for Route"]
-      B --> C["🔗 Network allow-list + OIDC"]
-      C --> D["🔑 Admin URL + password"]
-      D --> E["🧹 Uninstall when done"]
-      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
-      style B fill:#162c46,stroke:#58a6ff,color:#fff
-      style C fill:#1a3d2e,stroke:#3dd68c,color:#fff
-      style D fill:#2d2d2d,stroke:#888,color:#fff
-      style E fill:#3d1a1a,stroke:#f87171,color:#fff
-      style S fill:#212427,stroke:#8a8d90,color:#fff
+      P1["Path 1"] --> I1["AO Install"]
+      I1 --> AO["AO ready"]
+      P2["Path 2"] --> REQ["Setup deps"]
+      REQ --> I2["AO Install"]
+      I2 --> R["Ready to present"]
+      style P1 fill:#2d2d2d,stroke:#888,color:#fff
+      style I1 fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style AO fill:#162c46,stroke:#58a6ff,color:#fff
+      style P2 fill:#2d2d2d,stroke:#888,color:#fff
+      style REQ fill:#1a3d2e,stroke:#3dd68c,color:#fff
+      style I2 fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style R fill:#162c46,stroke:#58a6ff,color:#fff
 
 - slug: automation-orchestrator-install
   readme_path: infrastructure/docs/automation-orchestrator.md
@@ -1812,7 +1812,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
     icon: "🎼"
-  blurb: "Launch Install on RHDP — no survey, credentials already attached. Job output has the AO URL and admin password."
+  blurb: "Main AO job — aapctl, network allow-list, AAP wiring, curated demo seed. See the Hub for optional Cloud Stack / Mattermost."
   stats:
     playbooks: 1
   github_path: infrastructure/ao/install.yml
@@ -1832,7 +1832,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
     icon: "🎼"
-  blurb: "Optional re-run of allow-listing — Install already does this for you on demo.redhat.com."
+  blurb: "Optional re-run of allow-listing — Install already does this on RHDP. See the AO Hub (Start Here)."
   stats:
     playbooks: 1
   github_path: infrastructure/ao/network-access.yml
@@ -1852,7 +1852,26 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
     icon: "🎼"
-  blurb: "One-click teardown when the demo is done — keeps the shared RHDP cluster clean."
+  blurb: "Tear down AO when done — keeps the shared RHDP cluster clean. See the AO Hub (Start Here)."
   stats:
     playbooks: 1
   github_path: infrastructure/ao/uninstall.yml
+
+- slug: infrastructure-mattermost
+  readme_path: infrastructure/docs/mattermost.md
+  title: "Infrastructure | AWS — Provision Mattermost"
+  subtitle: "Shared Mattermost chat host for AO and other notification demos"
+  category: infrastructure
+  status: active
+  tags:
+    - AWS
+    - Orchestrator
+    - Chat
+  thumbnail:
+    gradient: "linear-gradient(135deg, #231f20 0%, #005c99 100%)"
+    icon: "💬"
+  blurb: "Provision aws_mattermost with Podman Mattermost, create a bot token, and write it to a Mattermost Controller credential for AO Notify Chatroom and other demos."
+  stats:
+    playbooks: 1
+  url: /demos/infrastructure-mattermost/
+  github_path: infrastructure/setup.yml

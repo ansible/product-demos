@@ -1,0 +1,165 @@
+---
+# Normalize one AO workflow export and create/update it in AO.
+# Rewrites organization_name Default -> APD and injects AAP credential/integration.
+- name: Reset per-workflow normalization facts
+  ansible.builtin.set_fact:
+    __ao_triggers: []
+    __ao_nodes: []
+
+- name: Read workflow export {{ __ao_source_path | basename }}
+  ansible.builtin.set_fact:
+    __ao_workflow: "{{ lookup('file', __ao_source_path) | from_json }}"
+    __ao_source:
+      path: "{{ __ao_source_path }}"
+
+- name: Normalize workflow triggers
+  ansible.builtin.set_fact:
+    __ao_triggers: "{{ __ao_triggers + [__ao_trigger] }}"
+  loop: "{{ __ao_workflow.triggers | default([]) }}"
+  loop_control:
+    loop_var: __ao_trigger_item
+  vars:
+    __ao_trigger: >-
+      {{
+        __ao_trigger_item
+        | dict2items
+        | rejectattr('key', 'equalto', 'config')
+        | list
+        | items2dict
+        | combine({
+            'parameters': __ao_trigger_item.parameters
+              | default(__ao_trigger_item.config | default({}))
+          })
+      }}
+
+- name: Normalize workflow nodes
+  ansible.builtin.set_fact:
+    __ao_nodes: "{{ __ao_nodes + [__ao_node] }}"
+  loop: "{{ __ao_workflow.nodes | default([]) }}"
+  loop_control:
+    loop_var: __ao_node_item
+  vars:
+    __ao_node_parameters: "{{ __ao_node_item.parameters | default(__ao_node_item.config | default({})) }}"
+    __ao_node_drop: >-
+      {{
+        ['config', 'parameters']
+        + (
+          ['credential_id', 'integration_id', 'organization_name']
+          if __ao_node_item.type == 'aap_job_template'
+          else []
+        )
+      }}
+    __ao_node_base: >-
+      {{
+        __ao_node_item
+        | dict2items
+        | rejectattr('key', 'in', ['config', 'parameters'])
+        | list
+        | items2dict
+      }}
+    __ao_node_clean_parameters: >-
+      {{
+        __ao_node_parameters
+        | dict2items
+        | rejectattr('key', 'in', __ao_node_drop)
+        | list
+        | items2dict
+      }}
+    __ao_parameters: >-
+      {{
+        __ao_node_clean_parameters
+        | combine(
+            {
+              'credential_id': ao_aap_credential_id,
+              'integration_id': ao_aap_integration_id,
+              'organization_name': ao_organization
+            }
+            if __ao_node_item.type == 'aap_job_template'
+            else {}
+          )
+      }}
+    __ao_node: "{{ __ao_node_base | combine({'parameters': __ao_parameters}) }}"
+
+- name: Build normalized workflow payload
+  ansible.builtin.set_fact:
+    __ao_payload:
+      name: "{{ __ao_workflow.name | default(__ao_source.path | basename | splitext | first) }}"
+      description: "{{ __ao_workflow.description | default('') }}"
+      labels:
+        apd: "true"
+        source: ansible-tmm/aap-orchestrator-demos
+        source_file: "{{ __ao_source.path | basename }}"
+      workflow_definition: >-
+        {{
+          __ao_workflow
+          | combine({
+              'schema_version': __ao_workflow.schema_version | default('2.0.0'),
+              'name': __ao_workflow.name | default(__ao_source.path | basename | splitext | first),
+              'triggers': __ao_triggers,
+              'nodes': __ao_nodes
+            })
+        }}
+      project_id: "{{ ao_demo_project_id }}"
+
+- name: Find existing AO workflows
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/workflows?limit=100"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ ao_api_token }}"
+    validate_certs: false
+    return_content: true
+  register: __ao_existing_workflows
+  no_log: true
+
+- name: Select existing AO workflow by source_file
+  ansible.builtin.set_fact:
+    __ao_existing: >-
+      {{
+        (
+          __ao_existing_workflows.json.resources
+          | default(__ao_existing_workflows.json.results | default([]))
+          | selectattr('labels', 'defined')
+          | selectattr('labels.source_file', 'defined')
+          | selectattr('labels.source_file', 'equalto', __ao_payload.labels.source_file)
+          | list
+          | first
+          | default({})
+        )
+      }}
+
+- name: Create AO workflow {{ __ao_payload.name }}
+  when: __ao_existing | length == 0
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/workflows"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ ao_api_token }}"
+      Content-Type: application/json
+    body_format: json
+    body: "{{ __ao_payload }}"
+    validate_certs: false
+    status_code: [200, 201]
+  no_log: true
+
+- name: Update AO workflow {{ __ao_payload.name }}
+  when: __ao_existing | length > 0
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/workflows/{{ __ao_existing.id }}"
+    method: PATCH
+    headers:
+      Authorization: "Bearer {{ ao_api_token }}"
+      Content-Type: application/json
+    body_format: json
+    body:
+      description: "{{ __ao_payload.description }}"
+      labels: "{{ __ao_payload.labels }}"
+      workflow_definition: "{{ __ao_payload.workflow_definition }}"
+      change_description: Synchronized from aap-orchestrator-demos by APD
+    validate_certs: false
+    status_code: [200, 202]
+  no_log: true
+
+- name: Report synchronized workflow
+  ansible.builtin.debug:
+    msg: "Synchronized AO workflow {{ __ao_payload.name }}"

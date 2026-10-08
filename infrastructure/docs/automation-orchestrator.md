@@ -1,13 +1,48 @@
-# Automation Orchestrator — Provisioning
+# Automation Orchestrator — Hub (Start Here)
 
-Turn on Automation Orchestrator with one job. On the [Ansible Product Demos catalog item](https://red.ht/apd-sandbox) from [demo.redhat.com](https://demo.redhat.com), OpenShift, credentials, and the AO execution environment are already wired up — launch **Infrastructure ǀ Automation Orchestrator ǀ Install**, wait for it to finish, and use the URL and admin password from the job output.
+Start here for Automation Orchestrator (AO) on the [Ansible Product Demos catalog item](https://red.ht/apd-sandbox) from [demo.redhat.com](https://demo.redhat.com). OpenShift, credentials, and the AO execution environment are already wired.
 
-Under the hood the playbook runs `aapctl`, stands up CloudNativePG plus the AO operator, and allow-lists the AAP gateway so Controller and Orchestrator can talk. You do not need to do any of that by hand on RHDP.
+Before either path: confirm AO templates exist — if not, run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** → `infrastructure`).
 
-## Prerequisites
+## Path 1 — Just install AO
 
-- **If using RHDP (demo.redhat.com):** Nothing extra. OpenShift, the **OpenShift Credential**, the **AAP Credential**, and the **AO Execution Environment** ship with the catalog item. Run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** → `infrastructure`) if the AO templates are not visible yet, then launch Install.
-- **If using your own installation:** You need an OpenShift cluster, OpenShift + AAP credentials in AAP, the AO EE (`quay.io/acme_corp/ao-ee:latest`), and **APD ǀ Single demo setup** with category `infrastructure`.
+Stupid simple: one job template.
+
+1. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
+2. Open the AO URL from the job output and log in as `admin` with the printed password.
+
+You now have AO. Seeded demo workflows may appear in AO, but they will not run end-to-end without Path 2 (no `aws_rhel9`, no Mattermost, and so on). Install **warns** on missing deps; it does not fail.
+
+Skip Network Configuration on RHDP — Install already ran it.
+
+## Path 2 — Pre-seeded demos that actually run
+
+Still simple — short cloud/chat setup, then Install, so curated content can hit a real host and post to chat.
+
+1. Run **Deploy Cloud Stack in AWS**, then sync **AWS Inventory** (`aws_rhel9` for disk check / remediate).
+2. Launch **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)) — Mattermost, Controller credential, and inventory host for Notify Chatroom. **Save the Mattermost UI login** from that job (`apdadmin` / `Ansible123!` by default) for when you open chat later.
+3. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
+4. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost URL + default UI login when provisioned).
+5. Open the seeded workflow you want to show.
+
+<aside class="info-callout" role="note">
+  <span class="info-callout__icon" aria-hidden="true">i</span>
+  <p>Cloud Stack and Mattermost stay opt-in so shared labs are not billed for idle EC2 when you only wanted Path 1.</p>
+</aside>
+
+**You are ready to present.** Curated demos:
+
+| Demo | Directions |
+|------|------------|
+| Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) |
+
+## The three AO templates
+
+| Template | When to use it | Playbook |
+|----------|----------------|----------|
+| **Infrastructure ǀ Automation Orchestrator ǀ Install** | Path 1 — stands up AO, wires AAP, seeds demos from [`demos.yml`](../ao/demos.yml). | [`install.yml`](../ao/install.yml) |
+| **Infrastructure ǀ AO Network Configuration ǀ Install** | Rare re-run of allow-listing. **Skip on RHDP.** | [`network-access.yml`](../ao/network-access.yml) |
+| **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** | Tear down AO when the lab session is done. Waits until the `automation-orchestrator` namespace is gone so Install can be re-run cleanly. | [`uninstall.yml`](../ao/uninstall.yml) |
 
 ## Configure credentials
 
@@ -15,52 +50,23 @@ Under the hood the playbook runs `aapctl`, stands up CloudNativePG plus the AO o
 |------------|------|--------------------|
 | OpenShift Credential | OpenShift or Kubernetes API Bearer Token | Pre-configured |
 | AAP Credential | Red Hat Ansible Automation Platform | Pre-configured |
+| Mattermost | Custom (server + webhook id) | Path 2 — created/updated by **Provision Mattermost** |
 
-Only set these yourself if you are running APD outside RHDP.
+## Under the hood
 
-## Survey prompts
+What **Install** does when it seeds curated demos:
 
-No surveys. Click Launch on Install — defaults are fine.
+- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` (today: **disk-utilization** from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos)).
+- Creates the **AAP Orchestrator Demos** project and those demo job templates in org **Ansible Product Demos (APD)**.
+- Rewrites each workflow’s `organization_name` from `Default` → APD, then imports it into AO.
+- When present, attaches the **Mattermost** credential and **Product Demos EE** to **Notify Chatroom**.
 
-| Template | Variable | Default | When to change it |
-|----------|----------|---------|-------------------|
-| Install | `ao_operator_channel` | `stable` | Rarely — only if you need a non-stable operator channel |
-| Network Configuration | `aap_hostname` / `ao_extra_hosts` | from AAP credential | Only if you re-run network config with overrides |
-| Uninstall | — | — | No prompts |
-
-## Job templates
-
-| Template | Playbook | Description |
-|----------|----------|-------------|
-| Infrastructure ǀ Automation Orchestrator ǀ Install | [`infrastructure/ao/install.yml`](../ao/install.yml) | One-click deploy: `aapctl install ao`, wait for the Route, print admin URL/password, configure network access |
-| Infrastructure ǀ AO Network Configuration ǀ Install | [`infrastructure/ao/network-access.yml`](../ao/network-access.yml) | Re-run allow-listing / private-network OIDC if needed (Install already does this) |
-| Infrastructure ǀ Automation Orchestrator ǀ Uninstall | [`infrastructure/ao/uninstall.yml`](../ao/uninstall.yml) | Tear down AO when the demo is done |
-
-## Why it matters
-
-- **Demo-ready on RHDP** — Catalog item already has the cluster and credentials; the story is “press Launch,” not “assemble a platform”
-- **Day-0 to day-1 in one job** — Operators, database, and AAP allow-listing finish before the job succeeds
-- **Clean exit** — Uninstall is a first-class template so shared lab clusters do not keep orphaned AO namespaces
-
-## Presenter walkthrough
-
-1. Order the Ansible Product Demos item from [demo.redhat.com](https://red.ht/apd-sandbox) (or open your existing lab)
-2. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install** — no survey answers required; it takes several minutes (timeout is 60 minutes)
-3. When the job succeeds, open the AO URL from the job output and log in as `admin` with the printed password (retry for a minute or two if login fails right after deploy)
-4. When finished, launch **Infrastructure ǀ Automation Orchestrator ǀ Uninstall**
-
-Skip the Network Configuration template unless you changed the AAP gateway or need extra allow-listed hosts — Install already ran it.
-
-## Talking points
-
-- This is the supported path: AAP drives `aapctl`, the same CLI an admin would use
-- On RHDP the hard parts (OpenShift access, credentials, EE with `aapctl`) are already done — the demo is the install itself
-- Network allow-listing is included so AAP and AO can integrate immediately after Install succeeds
-- Uninstall keeps the shared demo cluster tidy for the next presenter
+AAP drives this with `aapctl`. The Mattermost credential stores an **incoming webhook** id for `community.general.mattermost` (not a bot personal access token).
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
-| [ROSA Cluster Lifecycle](./rosa-lifecycle.md) | Provision an OpenShift cluster on AWS when you are not using the RHDP catalog item |
-| [OPA — Policy as Code](./opa-policy-as-code.md) | Another OpenShift-backed control-plane component launched from AAP |
+| [AWS Mattermost](./mattermost.md) | Path 2 — chat backend + Controller credential |
+| [ROSA Cluster Lifecycle](./rosa-lifecycle.md) | OpenShift on AWS when you are not using RHDP |
+| [OPA — Policy as Code](./opa-policy-as-code.md) | Another OpenShift-backed control-plane component from AAP |

@@ -1,0 +1,57 @@
+---
+# Curated Automation Orchestrator demos seeded by
+# Infrastructure | Automation Orchestrator | Install.
+# Add a slug and set enabled: true to seed more demos later.
+
+ao_demos_repository: https://github.com/ansible-tmm/aap-orchestrator-demos
+ao_demos_ref: main
+ao_demos_project_name: AAP Orchestrator Demos
+ao_organization: Ansible Product Demos (APD)
+ao_inventory_name: Ansible Product Demos Inventory
+ao_aap_credential_name: APD AAP Token
+ao_aap_integration_name: APD AAP
+ao_machine_credential_name: APD Machine Credential
+ao_aws_credential_name: AWS
+ao_mattermost_credential_name: Mattermost
+# community.general (Mattermost module) ships in the APD EE image.
+ao_execution_environment_name: Product Demos EE
+
+ao_demos:
+  - slug: disk-utilization
+    enabled: true
+    workflow: disk-utilization/ao/disk-demo-101.json
+    inventory_limit: aws_rhel9
+    requires_cloud_stack: true
+    requires_mattermost: true
+    job_templates:
+      - name: Disk Utilization Check
+        playbook: disk-utilization/playbooks/check_disk.yml
+        credentials:
+          - machine
+        limit: aws_rhel9
+      - name: Linux - Remediate - Continue
+        playbook: disk-utilization/playbooks/remediate_disk_continue.yml
+        credentials:
+          - machine
+        limit: aws_rhel9
+      - name: Linux - Remediate - Disk Cleanup
+        playbook: disk-utilization/playbooks/remediate_disk_cleanup.yml
+        credentials:
+          - machine
+        limit: aws_rhel9
+      - name: Linux - Remediate - Disk Expand
+        playbook: disk-utilization/playbooks/remediate_disk_expand.yml
+        credentials:
+          - machine
+          - aws
+        limit: aws_rhel9
+      - name: Disk Utilization - Fallback
+        playbook: disk-utilization/playbooks/remediate_disk_fallback.yml
+        credentials:
+          - machine
+        limit: aws_rhel9
+      - name: Notify Chatroom
+        playbook: disk-utilization/playbooks/notify_chatroom.yml
+        credentials:
+          - mattermost
+        ask_variables_on_launch: true

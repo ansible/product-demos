@@ -33,38 +33,18 @@
       if (workflow) {
         body.insertBefore(workflow, video || firstH2);
 
-        /* Build strips ## Workflow + mermaid fences. Step lists then sit
-           either before Prerequisites (workflow-first docs) or under the
-           Survey table — fold both into the layout Workflow section. */
-        var stop = null;
-        body.querySelectorAll('h2').forEach(function (h2) {
-          if (stop || h2.closest('section#workflow')) return;
-          var t = h2.textContent.trim().toLowerCase();
-          if (t === 'prerequisites' ||
-              t.indexOf('configure credentials') === 0 ||
-              t === 'survey prompts' ||
-              t === 'job templates') {
-            stop = h2;
+        /* Only fold orphan lists that sit in the lead area (before the
+           first markdown h2). Do not pull Path / Presenter step lists out
+           from under their headings into Workflow. */
+        var node = body.firstElementChild;
+        while (node && node !== firstH2) {
+          var next = node.nextElementSibling;
+          if (node !== workflow && node !== video &&
+              (node.tagName === 'OL' || node.tagName === 'UL')) {
+            workflow.appendChild(node);
           }
-        });
-        if (stop) {
-          var node = body.firstElementChild;
-          while (node && node !== stop) {
-            var next = node.nextElementSibling;
-            if (node !== workflow && node !== video &&
-                (node.tagName === 'OL' || node.tagName === 'UL')) {
-              workflow.appendChild(node);
-            }
-            node = next;
-          }
+          node = next;
         }
-        Array.prototype.slice.call(body.children).forEach(function (el) {
-          if ((el.tagName === 'OL' || el.tagName === 'UL') &&
-              el.previousElementSibling &&
-              el.previousElementSibling.tagName === 'TABLE') {
-            workflow.appendChild(el);
-          }
-        });
       }
     }
   }
@@ -95,17 +75,20 @@
     toc.appendChild(link);
   });
 
-  /* ── Wrap prerequisites list in a callout box ──────────────── */
+  /* ── Wrap prerequisites / info callout boxes ───────────────── */
   allH2s.forEach(function (h2) {
-    if (h2.textContent.trim().toLowerCase() === 'prerequisites') {
-      var ul = h2.nextElementSibling;
-      if (ul && (ul.tagName === 'UL' || ul.tagName === 'OL')) {
-        var box = document.createElement('div');
-        box.className = 'prereq-box';
-        ul.parentNode.insertBefore(box, ul);
-        box.appendChild(ul);
-      }
+    var title = h2.textContent.trim().toLowerCase();
+    var next = h2.nextElementSibling;
+    if (!next) return;
+
+    if (title === 'prerequisites' && (next.tagName === 'UL' || next.tagName === 'OL')) {
+      var prereqBox = document.createElement('div');
+      prereqBox.className = 'prereq-box';
+      next.parentNode.insertBefore(prereqBox, next);
+      prereqBox.appendChild(next);
+      return;
     }
+
   });
 
   /* ── Highlight active TOC link on scroll ───────────────────── */

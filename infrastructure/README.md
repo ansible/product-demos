@@ -41,6 +41,14 @@ Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route eve
 |--------------|-------------|
 | **Vault** | Install or remove HashiCorp Vault on an OpenShift cluster via the HashiCorp Helm chart (dev mode). Install seeds the KV v2 secrets engine and userpass auth with sample credentials. |
 
+### Mattermost
+
+#### Jobs
+
+| Job Template | Description |
+|--------------|-------------|
+| [**Infrastructure ǀ AWS - Provision Mattermost**](docs/mattermost.md) | EC2 `aws_mattermost` + Podman Mattermost with bot token for AO and other chat demos |
+
 ### OPA (Open Policy Agent)
 
 #### Jobs

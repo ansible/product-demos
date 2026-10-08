@@ -1,0 +1,169 @@
+---
+- name: Look up job template {{ ao_jt.name }}
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/job_templates/?name={{ ao_jt.name | urlencode }}"
+    method: GET
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    validate_certs: false
+    return_content: true
+  register: ao_jt_lookup
+  no_log: true
+
+- name: Build job template payload for {{ ao_jt.name }}
+  ansible.builtin.set_fact:
+    ao_jt_payload: >-
+      {{
+        {
+          'name': ao_jt.name,
+          'description': 'AO demo playbook (seeded by APD): ' ~ ao_jt.playbook,
+          'job_type': 'run',
+          'organization': ao_apd_organization_id,
+          'project': ao_demos_project_id,
+          'playbook': ao_jt.playbook,
+          'ask_variables_on_launch': ao_jt.ask_variables_on_launch | default(true),
+        }
+        | combine(
+            {'inventory': ao_inventory_id}
+            if (ao_inventory_id | default('') | string | length) > 0
+            else {}
+          )
+        | combine(
+            {'limit': ao_jt.limit, 'ask_limit_on_launch': true}
+            if ao_jt.limit is defined else {}
+          )
+        | combine(
+            {'execution_environment': ao_execution_environment_id | int}
+            if (ao_execution_environment_id | default('') | string | length) > 0
+            else {}
+          )
+      }}
+
+- name: Create job template {{ ao_jt.name }}
+  when: ao_jt_lookup.json.results | default([]) | length == 0
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/job_templates/"
+    method: POST
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    body_format: json
+    body: "{{ ao_jt_payload }}"
+    validate_certs: false
+    status_code: [200, 201]
+  register: ao_jt_create
+  no_log: true
+
+- name: Update job template {{ ao_jt.name }}
+  when: ao_jt_lookup.json.results | default([]) | length > 0
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/job_templates/{{ ao_jt_lookup.json.results[0].id }}/"
+    method: PATCH
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    body_format: json
+    body: "{{ ao_jt_payload }}"
+    validate_certs: false
+    status_code: [200]
+  register: ao_jt_update
+  no_log: true
+
+- name: Store job template id for {{ ao_jt.name }}
+  ansible.builtin.set_fact:
+    ao_jt_id: >-
+      {{
+        (ao_jt_lookup.json.results | default([{}]))[0].id
+        | default(ao_jt_create.json.id, true)
+      }}
+
+- name: Attach machine credential to {{ ao_jt.name }}
+  when:
+    - "'machine' in (ao_jt.credentials | default([]))"
+    - (ao_machine_credential_id | default('') | string | length) > 0
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/job_templates/{{ ao_jt_id }}/credentials/"
+    method: POST
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    body_format: json
+    body:
+      id: "{{ ao_machine_credential_id | int }}"
+    validate_certs: false
+    status_code: [200, 201, 204, 400]
+  failed_when: false
+  no_log: true
+
+- name: Attach AWS credential to {{ ao_jt.name }}
+  when:
+    - "'aws' in (ao_jt.credentials | default([]))"
+    - (ao_aws_credential_id | default('') | string | length) > 0
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/job_templates/{{ ao_jt_id }}/credentials/"
+    method: POST
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    body_format: json
+    body:
+      id: "{{ ao_aws_credential_id | int }}"
+    validate_certs: false
+    status_code: [200, 201, 204, 400]
+  failed_when: false
+  no_log: true
+
+- name: Attach Mattermost credential to {{ ao_jt.name }}
+  when:
+    - "'mattermost' in (ao_jt.credentials | default([]))"
+    - (ao_mattermost_credential_id | default('') | string | length) > 0
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/job_templates/{{ ao_jt_id }}/credentials/"
+    method: POST
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    body_format: json
+    body:
+      id: "{{ ao_mattermost_credential_id | int }}"
+    validate_certs: false
+    status_code: [200, 201, 204, 400]
+  failed_when: false
+  no_log: true

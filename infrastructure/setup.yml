@@ -16,6 +16,31 @@ controller_credential_types:
     injectors:
       extra_vars:
         rosa_token: !unsafe '{{ rosa_token }}'
+  - name: Mattermost
+    description: >-
+      Mattermost chat endpoint for AO Notify Chatroom and other demos.
+      Filled by Infrastructure | AWS - Provision Mattermost.
+    kind: cloud
+    inputs:
+      fields:
+        - id: mattermost_server
+          type: string
+          label: Mattermost server (host:port)
+          help_text: Example 1.2.3.4:8065 — no http:// prefix.
+        - id: api_chat_token
+          type: string
+          label: Mattermost incoming webhook id
+          secret: true
+          help_text: >-
+            Last path segment of /hooks/{id}. Used by community.general.mattermost
+            as api_key (not a bot personal access token).
+      required:
+        - mattermost_server
+        - api_chat_token
+    injectors:
+      extra_vars:
+        mattermost_server: !unsafe '{{ mattermost_server }}'
+        api_chat_token: !unsafe '{{ api_chat_token }}'
 
 controller_credentials:
   - name: ROSA Token
@@ -25,6 +50,16 @@ controller_credentials:
     state: exists
     inputs:
       rosa_token: REPLACEME
+  - name: Mattermost
+    credential_type: Mattermost
+    organization: Ansible Product Demos (APD)
+    description: >-
+      Updated automatically by Infrastructure | AWS - Provision Mattermost.
+    update_secrets: false
+    state: exists
+    inputs:
+      mattermost_server: REPLACEME
+      api_chat_token: REPLACEME
   - name: OpenShift Credential
     organization: Ansible Product Demos (APD)
     credential_type: OpenShift or Kubernetes API Bearer Token
@@ -254,9 +289,10 @@ controller_templates:
   - name: Infrastructure | Automation Orchestrator | Install
     description: >-
       Deploys Automation Orchestrator on an existing OpenShift cluster using
-      aapctl. Installs CloudNativePG operator, PostgreSQL database, and the
-      AO operator, then configures network access so the AAP gateway can
-      reach it.
+      aapctl, configures network access, wires the AAP integration, and seeds
+      curated AO demos from infrastructure/ao/demos.yml (disk-utilization by
+      default). Warns if aws_rhel9 or Mattermost are missing; Deploy Cloud
+      Stack and Provision Mattermost before running the disk demo end-to-end.
     labels:
       - infrastructure
       - orchestrator
@@ -277,8 +313,9 @@ controller_templates:
 
   - name: Infrastructure | Automation Orchestrator | Uninstall
     description: >-
-      Removes Automation Orchestrator, CloudNativePG cluster, operators,
-      and both namespaces.
+      Removes Automation Orchestrator via aapctl, deletes leftover PVCs /
+      CloudNativePG clusters, and waits until the automation-orchestrator
+      namespace is fully gone so Install can be re-run cleanly.
     labels:
       - infrastructure
       - orchestrator
@@ -569,6 +606,65 @@ controller_templates:
       - APD Machine Credential
     project: Ansible Product Demos
     playbook: infrastructure/config-drift/playbooks/provision_kafka.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_aws_keypair_name: aws-test-key
+      create_vm_aws_securitygroup_name: aws-test-sg
+      create_vm_aws_vpc_subnet_name: aws-test-subnet
+      create_vm_vm_deployment: cloud_stack
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Owner
+          question_description: >-
+            Must match the owner tag on your existing cloud stack VMs.
+          type: text
+          variable: create_vm_aws_owner_tag
+          required: true
+          default: your_name
+        - question_name: Environment
+          type: multiplechoice
+          variable: create_vm_vm_environment
+          required: true
+          default: Prod
+          choices:
+            - Dev
+            - QA
+            - Prod
+
+  - name: "Infrastructure | AWS - Provision Mattermost"
+    description: >-
+      Provisions a dedicated aws_mattermost EC2 instance and deploys Mattermost
+      (Postgres + team edition) with Podman. Creates an admin user, team, and
+      bot token, upserts the Mattermost Controller credential for Notify
+      Chatroom, then syncs AWS Inventory so aws_mattermost is available.
+    labels:
+      - aws.ec2
+      - infrastructure
+      - orchestrator
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - APD Machine Credential
+      - AAP Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/mattermost/provision_mattermost.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry

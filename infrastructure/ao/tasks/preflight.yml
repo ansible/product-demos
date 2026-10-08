@@ -1,0 +1,74 @@
+---
+# Soft requirements for enabled demos — warn only; Install still succeeds.
+- name: Initialize seed warning list
+  ansible.builtin.set_fact:
+    ao_seed_warnings: []
+
+- name: Collect demos that require the cloud stack
+  ansible.builtin.set_fact:
+    ao_cloud_stack_demos: >-
+      {{
+        ao_enabled_demos
+        | selectattr('requires_cloud_stack', 'defined')
+        | selectattr('requires_cloud_stack')
+        | list
+      }}
+
+- name: Check aws_rhel9 when a seeded demo needs the cloud stack
+  when: ao_cloud_stack_demos | length > 0
+  block:
+    - name: Look up aws_rhel9 in inventory
+      ansible.builtin.set_fact:
+        ao_aws_rhel9_present: "{{ 'aws_rhel9' in hostvars }}"
+
+    - name: Record cloud-stack warning when aws_rhel9 is missing
+      when: not (ao_aws_rhel9_present | bool)
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'Seeded demo(s) '
+              ~ (ao_cloud_stack_demos | map(attribute='slug') | list | join(', '))
+              ~ ' expect host aws_rhel9. Run Deploy Cloud Stack in AWS, sync AWS Inventory, '
+              ~ 'then re-run those job templates (or re-run Install).'
+            ]
+          }}
+
+- name: Collect demos that prefer Mattermost
+  ansible.builtin.set_fact:
+    ao_mattermost_demos: >-
+      {{
+        ao_enabled_demos
+        | selectattr('requires_mattermost', 'defined')
+        | selectattr('requires_mattermost')
+        | list
+      }}
+
+# Inventory is only a fallback. Provision Mattermost writes the live endpoint
+# into the Controller Mattermost credential; that value is applied later in
+# provision_aap_demos.yml and wins over stale AWS inventory hostvars.
+- name: Resolve Mattermost endpoint from inventory when present
+  when: ao_mattermost_demos | length > 0
+  block:
+    - name: Detect aws_mattermost host
+      ansible.builtin.set_fact:
+        ao_mattermost_present: "{{ 'aws_mattermost' in hostvars }}"
+
+    - name: Set Mattermost server from inventory host
+      when: ao_mattermost_present | bool
+      ansible.builtin.set_fact:
+        ao_mattermost_server: >-
+          {{
+            (
+              hostvars['aws_mattermost']['ansible_host']
+              | default(hostvars['aws_mattermost']['public_ip_address'])
+            )
+            ~ ':8065'
+          }}
+        ao_mattermost_server_source: inventory
+        ao_mattermost_api_token: >-
+          {{
+            hostvars['aws_mattermost']['mattermost_bot_token']
+            | default(lookup('env', 'MATTERMOST_BOT_TOKEN'), true)
+            | default('', true)
+          }}
