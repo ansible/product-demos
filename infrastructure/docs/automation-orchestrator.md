@@ -42,7 +42,7 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 |----------|----------------|----------|
 | **Infrastructure ǀ Automation Orchestrator ǀ Install** | Path 1 — stands up AO, wires AAP, seeds demos from [`demos.yml`](../ao/demos.yml). | [`install.yml`](../ao/install.yml) |
 | **Infrastructure ǀ AO Network Configuration ǀ Install** | Rare re-run of allow-listing. **Skip on RHDP.** | [`network-access.yml`](../ao/network-access.yml) |
-| **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** | Tear down AO when the lab session is done. | [`uninstall.yml`](../ao/uninstall.yml) |
+| **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** | Tear down AO when the lab session is done. Waits until the `automation-orchestrator` namespace is gone so Install can be re-run cleanly. | [`uninstall.yml`](../ao/uninstall.yml) |
 
 ## Configure credentials
 

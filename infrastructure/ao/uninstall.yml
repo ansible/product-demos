@@ -5,6 +5,12 @@
   gather_facts: false
 
   vars:
+    ao_namespace: automation-orchestrator
+    # aapctl returns once removal is requested; wait/delete so Install can
+    # safely re-run without leftover namespace / PVC / missing DB races.
+    ao_uninstall_wait_retries: 36
+    ao_uninstall_wait_delay: 10
+
     _k8s_host: "{{ lookup('env', 'K8S_AUTH_HOST') | default('', true) }}"
     _k8s_token: "{{ lookup('env', 'K8S_AUTH_API_KEY') | default('', true) }}"
     _k8s_verify_ssl: "{{ lookup('env', 'K8S_AUTH_VERIFY_SSL') | default('true', true) | bool }}"
@@ -108,14 +114,197 @@
           ansible.builtin.debug:
             var: aapctl_result.stdout_lines
 
-        - name: Note that resource cleanup continues in the background
+        - name: Show aapctl stderr when present
+          when: (aapctl_result.stderr | default('') | length) > 0
           ansible.builtin.debug:
-            msg: >-
-              aapctl has requested removal of Automation Orchestrator.
-              OpenShift is now tearing down the remaining resources in the
-              background; this typically completes within a few minutes.
-              Automation Orchestrator may remain reachable until the route
-              and its pods are fully removed.
+            var: aapctl_result.stderr_lines
+
+        # --- wait for operator teardown, then remove leftover namespace -----
+        - name: Wait for AutomationOrchestrator CRs to disappear
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
+              get automationorchestrator.aap.ansible.com
+              -n {{ ao_namespace }} -o name
+          register: _ao_cr_list
+          changed_when: false
+          failed_when: false
+          until: >-
+            (_ao_cr_list.stdout | default('') | trim | length) == 0
+            and (
+              _ao_cr_list.rc == 0
+              or ('NotFound' in (_ao_cr_list.stderr | default('')))
+            )
+          retries: "{{ ao_uninstall_wait_retries }}"
+          delay: "{{ ao_uninstall_wait_delay }}"
+
+        - name: Clear stuck AutomationOrchestrator finalizers
+          when: (_ao_cr_list.stdout | default('') | trim | length) > 0
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
+              patch {{ item }}
+              -n {{ ao_namespace }}
+              --type=merge
+              -p '{"metadata":{"finalizers":[]}}'
+          loop: "{{ _ao_cr_list.stdout_lines | default([]) }}"
+          register: _ao_cr_finalizer_patch
+          changed_when: _ao_cr_finalizer_patch.rc == 0
+          failed_when: false
+
+        - name: Wait again after clearing AutomationOrchestrator finalizers
+          when: (_ao_cr_list.stdout | default('') | trim | length) > 0
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
+              get automationorchestrator.aap.ansible.com
+              -n {{ ao_namespace }} -o name
+          register: _ao_cr_list_retry
+          changed_when: false
+          failed_when: false
+          until: >-
+            (_ao_cr_list_retry.stdout | default('') | trim | length) == 0
+            and (
+              _ao_cr_list_retry.rc == 0
+              or ('NotFound' in (_ao_cr_list_retry.stderr | default('')))
+            )
+          retries: 12
+          delay: "{{ ao_uninstall_wait_delay }}"
+
+        - name: List leftover CloudNativePG clusters
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
+              get cluster.postgresql.cnpg.io
+              -n {{ ao_namespace }} -o name
+          register: _ao_cnpg_list
+          changed_when: false
+          failed_when: false
+
+        - name: Delete leftover CloudNativePG clusters
+          when: (_ao_cnpg_list.stdout | default('') | trim | length) > 0
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
+              delete {{ item }} -n {{ ao_namespace }} --wait=false
+          loop: "{{ _ao_cnpg_list.stdout_lines | default([]) }}"
+          register: _ao_cnpg_delete
+          changed_when: _ao_cnpg_delete.rc == 0
+          failed_when: false
+
+        - name: List leftover PVCs
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
+              get pvc -n {{ ao_namespace }} -o name
+          register: _ao_pvc_list
+          changed_when: false
+          failed_when: false
+
+        - name: Delete leftover PVCs
+          when: (_ao_pvc_list.stdout | default('') | trim | length) > 0
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
+              delete {{ item }} -n {{ ao_namespace }} --wait=false
+          loop: "{{ _ao_pvc_list.stdout_lines | default([]) }}"
+          register: _ao_pvc_delete
+          changed_when: _ao_pvc_delete.rc == 0
+          failed_when: false
+
+        - name: Check whether AO namespace still exists
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
+              get namespace {{ ao_namespace }} -o name
+          register: _ao_ns_check
+          changed_when: false
+          failed_when: false
+
+        - name: Delete leftover AO namespace
+          when: _ao_ns_check.rc == 0
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
+              delete namespace {{ ao_namespace }} --wait=false
+          register: _ao_ns_delete
+          changed_when: _ao_ns_delete.rc == 0
+          failed_when: false
+
+        - name: Wait until AO namespace is fully gone
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
+              get namespace {{ ao_namespace }} -o name
+          register: _ao_ns_gone
+          changed_when: false
+          failed_when: false
+          until: >-
+            _ao_ns_gone.rc != 0
+            and ('NotFound' in (_ao_ns_gone.stderr | default('NotFound')))
+          retries: "{{ ao_uninstall_wait_retries }}"
+          delay: "{{ ao_uninstall_wait_delay }}"
+
+        - name: Clear namespace finalizers when delete is stuck
+          when: >-
+            _ao_ns_gone.rc == 0
+            or (
+              _ao_ns_gone.rc != 0
+              and ('NotFound' not in (_ao_ns_gone.stderr | default('')))
+            )
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
+              patch namespace {{ ao_namespace }}
+              --type=merge
+              -p '{"spec":{"finalizers":null}}'
+          register: _ao_ns_finalizer_patch
+          changed_when: _ao_ns_finalizer_patch.rc == 0
+          failed_when: false
+
+        - name: Wait again after clearing namespace finalizers
+          when: >-
+            _ao_ns_finalizer_patch is defined
+            and not (_ao_ns_finalizer_patch.skipped | default(false))
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig {{ _kubeconfig_tmp.path }}
+              get namespace {{ ao_namespace }} -o name
+          register: _ao_ns_gone_retry
+          changed_when: false
+          failed_when: false
+          until: >-
+            _ao_ns_gone_retry.rc != 0
+            and ('NotFound' in (_ao_ns_gone_retry.stderr | default('NotFound')))
+          retries: 12
+          delay: "{{ ao_uninstall_wait_delay }}"
+
+        - name: Require AO namespace removal
+          ansible.builtin.assert:
+            that:
+              - >-
+                (
+                  _ao_ns_gone.rc != 0
+                  and ('NotFound' in (_ao_ns_gone.stderr | default('')))
+                )
+                or (
+                  _ao_ns_gone_retry is defined
+                  and not (_ao_ns_gone_retry.skipped | default(false))
+                  and _ao_ns_gone_retry.rc != 0
+                  and ('NotFound' in (_ao_ns_gone_retry.stderr | default('')))
+                )
+            fail_msg: >-
+              Namespace {{ ao_namespace }} is still present after uninstall.
+              Check stuck finalizers with:
+              oc get automationorchestrator,pvc,cluster.postgresql.cnpg.io -n {{ ao_namespace }}
+              oc get ns {{ ao_namespace }} -o yaml
+
+        - name: Show uninstall complete
+          ansible.builtin.debug:
+            msg:
+              - "Automation Orchestrator uninstall complete."
+              - "Namespace {{ ao_namespace }} has been removed."
+              - "Safe to re-run Infrastructure | Automation Orchestrator | Install."
 
       always:
         - name: Clean up generated credentials

@@ -313,8 +313,9 @@ controller_templates:
 
   - name: Infrastructure | Automation Orchestrator | Uninstall
     description: >-
-      Removes Automation Orchestrator, CloudNativePG cluster, operators,
-      and both namespaces.
+      Removes Automation Orchestrator via aapctl, deletes leftover PVCs /
+      CloudNativePG clusters, and waits until the automation-orchestrator
+      namespace is fully gone so Install can be re-run cleanly.
     labels:
       - infrastructure
       - orchestrator
