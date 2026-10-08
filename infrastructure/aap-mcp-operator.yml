@@ -1,0 +1,41 @@
+---
+- name: Enable AAP operator MCP server
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    aap_custom_resource_name: aap
+    aap_custom_resource_namespace: aap
+    aap_mcp_allow_write_operations: true
+
+  tasks:
+    - name: Patch AAP custom resource with MCP spec
+      kubernetes.core.k8s:
+        state: patched
+        api_version: aap.ansible.com/v1alpha1
+        kind: AnsibleAutomationPlatform
+        name: '{{ aap_custom_resource_name }}'
+        namespace: '{{ aap_custom_resource_namespace }}'
+        definition:
+          spec:
+            mcp:
+              disabled: false
+              allow_write_operations: '{{ aap_mcp_allow_write_operations | bool }}'
+
+    - name: Wait for the AAP MCP server route to be available (may take a while)
+      kubernetes.core.k8s_info:
+        api_version: route.openshift.io/v1
+        kind: Route
+        name: '{{ aap_custom_resource_name }}-mcp'
+        namespace: "{{ aap_custom_resource_namespace }}"
+      register: _mcp_route
+      until: _mcp_route.resources | length > 0
+      retries: 15
+      delay: 30
+
+    - name: Print MCP server URL
+      ansible.builtin.debug:
+        msg: "AAP MCP server URL: https://{{ _mcp_route.resources[0].spec.host }}"
+
+...
