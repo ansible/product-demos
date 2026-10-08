@@ -667,19 +667,26 @@
       register: mattermost_channel
       when: (mattermost_channel_create.status | default(0) | int) != 201
 
+    # Mattermost 400 bodies use json.id for the error code (e.g.
+    # store.sql_channel.save_channel.exists.app_error) — never treat that as
+    # a channel id. Only trust create.json.id on HTTP 201.
     - name: Select Mattermost notify channel id
       ansible.builtin.set_fact:
         mattermost_channel_id: >-
           {{
             mattermost_channel_create.json.id
-            | default(mattermost_channel.json.id | default(''), true)
+            if (mattermost_channel_create.status | default(0) | int) == 201
+            else (mattermost_channel.json.id | default('', true))
           }}
 
     - name: Require Mattermost notify channel id
       ansible.builtin.assert:
         that:
           - (mattermost_channel_id | default('') | string | length) > 0
-        fail_msg: Could not resolve Mattermost channel id for apd-notify.
+          - "'app_error' not in (mattermost_channel_id | default(''))"
+        fail_msg: >-
+          Could not resolve Mattermost channel id for apd-notify
+          (got '{{ mattermost_channel_id | default('') }}').
 
     # Always mint a fresh webhook and overwrite the Controller credential so
     # Notify Chatroom never keeps a stale api_chat_token after re-provision.
