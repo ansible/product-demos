@@ -44,6 +44,9 @@
         | list
       }}
 
+# Inventory is only a fallback. Provision Mattermost writes the live endpoint
+# into the Controller Mattermost credential; that value is applied later in
+# provision_aap_demos.yml and wins over stale AWS inventory hostvars.
 - name: Resolve Mattermost endpoint from inventory when present
   when: ao_mattermost_demos | length > 0
   block:
@@ -57,28 +60,15 @@
         ao_mattermost_server: >-
           {{
             (
-              hostvars['aws_mattermost']['public_ip_address']
-              | default(hostvars['aws_mattermost']['ansible_host'])
+              hostvars['aws_mattermost']['ansible_host']
+              | default(hostvars['aws_mattermost']['public_ip_address'])
             )
             ~ ':8065'
           }}
+        ao_mattermost_server_source: inventory
         ao_mattermost_api_token: >-
           {{
             hostvars['aws_mattermost']['mattermost_bot_token']
             | default(lookup('env', 'MATTERMOST_BOT_TOKEN'), true)
             | default('', true)
-          }}
-
-    - name: Record Mattermost warning when not provisioned
-      when: not (ao_mattermost_present | default(false) | bool)
-      ansible.builtin.set_fact:
-        ao_seed_warnings: >-
-          {{
-            ao_seed_warnings + [
-              'Demo(s) '
-              ~ (ao_mattermost_demos | map(attribute='slug') | list | join(', '))
-              ~ ' post to Mattermost. Run Infrastructure | AWS - Provision Mattermost '
-              ~ '(writes the Mattermost Controller credential and syncs AWS Inventory), '
-              ~ 'then re-run Install so Notify Chatroom attaches that credential.'
-            ]
           }}

@@ -108,6 +108,23 @@
     - name: Synchronize enabled AO workflow exports
       ansible.builtin.include_tasks: tasks/sync_demos.yml
 
+    - name: Record Mattermost warning when credential and inventory are missing
+      when:
+        - (ao_mattermost_demos | default([]) | length) > 0
+        - not (ao_mattermost_present | default(false) | bool)
+        - (ao_mattermost_server | default('') | length) == 0
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'Demo(s) '
+              ~ (ao_mattermost_demos | map(attribute='slug') | list | join(', '))
+              ~ ' post to Mattermost. Run Infrastructure | AWS - Provision Mattermost '
+              ~ '(writes the Mattermost Controller credential and syncs AWS Inventory), '
+              ~ 'then re-run Install so Notify Chatroom attaches that credential.'
+            ]
+          }}
+
     # Decode the admin password here (same pattern as install.yml) so no_log
     # on ao_admin_password does not redact this final presenter-facing summary.
     - name: Show seed summary
@@ -126,6 +143,8 @@
                 'Mattermost URL: http://' ~ ao_mattermost_server,
                 'Mattermost Username: apdadmin',
                 'Mattermost Password: Ansible123!',
+                'Mattermost endpoint source: '
+                ~ (ao_mattermost_server_source | default('unknown')),
                 'Mattermost Controller credential: attached to Notify Chatroom when present',
               ]
               if (ao_mattermost_server | default('') | length) > 0
@@ -136,6 +155,6 @@
           }}
 
     - name: Warn about missing demo prerequisites
-      when: (ao_seed_warnings | default([])) | length > 0
+      when: (ao_seed_warnings | default([]) | length) > 0
       ansible.builtin.debug:
         msg: "{{ ['WARNING: demo prerequisites incomplete:'] + ao_seed_warnings }}"

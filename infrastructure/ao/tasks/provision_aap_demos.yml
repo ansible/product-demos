@@ -116,6 +116,29 @@
     ao_aws_credential_id: "{{ (ao_aws_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
     ao_mattermost_credential_id: "{{ (ao_mattermost_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
 
+# Prefer the Mattermost Controller credential (written by Provision Mattermost)
+# over inventory hostvars — AWS inventory can lag after stop/start or re-create.
+- name: Prefer Mattermost server from Controller credential
+  when:
+    - (ao_mattermost_demos | default([]) | length) > 0
+    - (ao_mattermost_cred_lookup.json.results | default([]) | length) > 0
+    - >-
+      (
+        ao_mattermost_cred_lookup.json.results[0].inputs.mattermost_server
+        | default('')
+        | length
+      ) > 0
+    - >-
+      (
+        ao_mattermost_cred_lookup.json.results[0].inputs.mattermost_server
+        | default('')
+      ) not in ['REPLACEME', 'replace_me']
+  ansible.builtin.set_fact:
+    ao_mattermost_server: >-
+      {{ ao_mattermost_cred_lookup.json.results[0].inputs.mattermost_server }}
+    ao_mattermost_present: true
+    ao_mattermost_server_source: controller_credential
+
 - name: Look up Product Demos execution environment
   ansible.builtin.uri:
     url: "{{ ao_controller_api }}/execution_environments/?name={{ ao_execution_environment_name | urlencode }}"
