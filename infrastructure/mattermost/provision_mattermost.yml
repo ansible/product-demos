@@ -681,6 +681,39 @@
           - (mattermost_channel_id | default('') | string | length) > 0
         fail_msg: Could not resolve Mattermost channel id for apd-notify.
 
+    # Always mint a fresh webhook and overwrite the Controller credential so
+    # Notify Chatroom never keeps a stale api_chat_token after re-provision.
+    - name: List existing Mattermost incoming webhooks
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/hooks/incoming"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        return_content: true
+        status_code: [200]
+      register: mattermost_webhooks_existing
+      no_log: true
+
+    - name: Delete prior APD Notify Chatroom webhooks
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/hooks/incoming/{{ item.id }}"
+        method: DELETE
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        status_code: [200, 204, 404]
+      loop: >-
+        {{
+          mattermost_webhooks_existing.json
+          | default([])
+          | selectattr('display_name', 'defined')
+          | selectattr('display_name', 'equalto', 'APD Notify Chatroom')
+          | list
+        }}
+      loop_control:
+        label: "{{ item.id | default('unknown') }}"
+      failed_when: false
+      no_log: true
+
     - name: Create Mattermost incoming webhook for Notify Chatroom
       ansible.builtin.uri:
         url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/hooks/incoming"
@@ -692,39 +725,14 @@
           channel_id: "{{ mattermost_channel_id }}"
           display_name: APD Notify Chatroom
           description: Incoming webhook for community.general.mattermost / AO demos
-        status_code: [201, 400]
+        status_code: [201]
+        return_content: true
       register: mattermost_webhook
-      failed_when: false
       no_log: true
 
-    - name: List Mattermost incoming webhooks when create did not return 201
-      when: (mattermost_webhook.status | default(0) | int) != 201
-      ansible.builtin.uri:
-        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/hooks/incoming"
-        method: GET
-        headers:
-          Authorization: "Bearer {{ mattermost_session_token }}"
-        return_content: true
-        status_code: [200]
-      register: mattermost_webhooks
-
-    - name: Select Mattermost incoming webhook id
+    - name: Store new Mattermost incoming webhook id
       ansible.builtin.set_fact:
-        mattermost_webhook_id: >-
-          {{
-            mattermost_webhook.json.id
-            | default(
-                (
-                  mattermost_webhooks.json
-                  | default([])
-                  | selectattr('display_name', 'equalto', 'APD Notify Chatroom')
-                  | map(attribute='id')
-                  | first
-                  | default('', true)
-                ),
-                true
-              )
-          }}
+        mattermost_webhook_id: "{{ mattermost_webhook.json.id }}"
       no_log: true
 
     - name: Require Mattermost incoming webhook id
@@ -732,7 +740,7 @@
         that:
           - (mattermost_webhook_id | default('') | string | length) > 0
         fail_msg: >-
-          Could not create or find Mattermost incoming webhook for apd-notify.
+          Create Mattermost incoming webhook did not return an id.
           community.general.mattermost needs url/hooks/{api_key}.
 
     - name: Persist Mattermost connection facts on the host
@@ -979,12 +987,28 @@
         body: "{{ _mm_cred_payload }}"
         validate_certs: false
         status_code: [200]
+        return_content: true
+      register: _mm_cred_update
       no_log: true
+
+    - name: Require Mattermost credential inputs were written
+      ansible.builtin.assert:
+        that:
+          - (mattermost_credential_server | default('') | length) > 0
+          - (mattermost_credential_token | default('') | length) > 0
+          - >-
+            (_mm_cred_lookup.json.results | default([]) | length) == 0
+            or (_mm_cred_update.status | default(0) | int) == 200
+        fail_msg: >-
+          Failed to publish Mattermost server/webhook id to Controller credential
+          '{{ mattermost_credential_name }}'.
 
     - name: Show Mattermost credential publish result
       ansible.builtin.debug:
         msg:
-          - "Controller credential '{{ mattermost_credential_name }}' updated."
+          - "Controller credential '{{ mattermost_credential_name }}' overwritten with this run's webhook."
+          - "mattermost_server={{ mattermost_credential_server }}"
+          - "api_chat_token matches new /hooks/{id} from Mattermost (re-run always resets both)."
           - "Attach it to Notify Chatroom (AO Install does this) or any JT that needs Mattermost."
 
     - name: Look up AWS Inventory source
