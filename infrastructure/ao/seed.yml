@@ -108,6 +108,8 @@
     - name: Synchronize enabled AO workflow exports
       ansible.builtin.include_tasks: tasks/sync_demos.yml
 
+    # Decode the admin password here (same pattern as install.yml) so no_log
+    # on ao_admin_password does not redact this final presenter-facing summary.
     - name: Show seed summary
       ansible.builtin.debug:
         msg: >-
@@ -115,14 +117,15 @@
             [
               'AO demos seeded: ' ~ (ao_enabled_demos | map(attribute='slug') | list | join(', ')),
               'AO URL: https://' ~ ao_api_host,
-              'AO username: admin',
-              'AO password: ' ~ ao_admin_password,
+              'Username: admin',
+              'Password: ' ~ (ao_seed_admin_secret.resources[0].data.password | b64decode),
               'AAP project: ' ~ ao_demos_project_name,
             ]
             + (
               [
                 'Mattermost URL: http://' ~ ao_mattermost_server,
-                'Mattermost UI login: apdadmin / Ansible123! (save from Provision Mattermost; change for long-lived labs)',
+                'Mattermost Username: apdadmin',
+                'Mattermost Password: Ansible123!',
                 'Mattermost Controller credential: attached to Notify Chatroom when present',
               ]
               if (ao_mattermost_server | default('') | length) > 0
