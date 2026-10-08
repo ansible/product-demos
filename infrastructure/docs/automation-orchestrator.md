@@ -20,10 +20,10 @@ Skip Network Configuration on RHDP — Install already ran it.
 Still simple — short cloud/chat setup, then Install, so curated content can hit real hosts (and chat when the demo needs it).
 
 1. Ensure **APD ǀ Multi-demo setup** (or Single → `cloud` + `infrastructure`) created the **Cloud | AWS |*** patch/snapshot JTs.
-2. Run **Deploy Cloud Stack in AWS**, then sync **AWS Inventory** (full stack: `aws_rhel8`/`aws_rhel9`, `aws-dc`/`aws_win1`, `reports` — disk-utilization only needs `aws_rhel9`).
-3. For demos that post to chat (disk-utilization): launch **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)). **Save the Mattermost UI login** (`apdadmin` / `Ansible123!` by default). Skip this for Multi-OS Cloud Patching.
+2. Run **Deploy Cloud Stack in AWS** (full stack for Multi-OS; disk-utilization only needs `aws_rhel9`).
+3. For demos that post to chat (disk-utilization): launch **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)). Skip for Multi-OS Cloud Patching.
 4. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
-5. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost URL + default UI login when provisioned).
+5. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost URL + login when provisioned).
 6. Open the seeded workflow you want to show.
 
 <aside class="info-callout" role="note">

@@ -58,7 +58,7 @@
               ~ (ao_cloud_stack_demos | map(attribute='slug') | list | join(', '))
               ~ ' expect cloud-stack host(s) '
               ~ (ao_missing_cloud_hosts | join(', '))
-              ~ '. Run Deploy Cloud Stack in AWS, sync AWS Inventory, '
+              ~ '. Run Deploy Cloud Stack in AWS, '
               ~ 'ensure APD cloud setup created Cloud | AWS |* patch JTs, '
               ~ 'then re-run Install.'
             ]
