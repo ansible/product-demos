@@ -17,13 +17,14 @@ Skip Network Configuration on RHDP — Install already ran it.
 
 ## Path 2 — Pre-seeded demos that actually run
 
-Still simple — short cloud/chat setup, then Install, so curated content can hit a real host and post to chat.
+Still simple — short cloud/chat setup, then Install, so curated content can hit real hosts (and chat when the demo needs it).
 
-1. Run **Deploy Cloud Stack in AWS**, then sync **AWS Inventory** (`aws_rhel9` for disk check / remediate).
-2. Launch **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)) — Mattermost, Controller credential, and inventory host for Notify Chatroom. **Save the Mattermost UI login** from that job (`apdadmin` / `Ansible123!` by default) for when you open chat later.
-3. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
-4. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost URL + default UI login when provisioned).
-5. Open the seeded workflow you want to show.
+1. Ensure **APD ǀ Multi-demo setup** (or Single → `cloud` + `infrastructure`) created the **Cloud | AWS |*** patch/snapshot JTs.
+2. Run **Deploy Cloud Stack in AWS** (full stack for Multi-OS; disk-utilization only needs `aws_rhel9`).
+3. For demos that post to chat (disk-utilization): launch **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)). Skip for Multi-OS Cloud Patching.
+4. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
+5. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost URL + login when provisioned).
+6. Open the seeded workflow you want to show.
 
 <aside class="info-callout" role="note">
   <span class="info-callout__icon" aria-hidden="true">i</span>
@@ -32,9 +33,10 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 
 **You are ready to present.** Curated demos:
 
-| Demo | Directions |
-|------|------------|
-| Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) |
+| Demo | Directions | Needs |
+|------|------------|-------|
+| Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | `aws_rhel9` + Mattermost |
+| Multi-OS Cloud Patching | [Multi-OS Cloud Patching](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/multi-os-cloud-patching/) | Full cloud stack + existing **Cloud \| AWS \|*** JTs |
 
 ## The three AO templates
 
@@ -56,9 +58,9 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 
 What **Install** does when it seeds curated demos:
 
-- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` (today: **disk-utilization** from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos)).
-- Creates the **AAP Orchestrator Demos** project and those demo job templates in org **Ansible Product Demos (APD)**.
-- Rewrites each workflow’s `organization_name` from `Default` → APD, then imports it into AO.
+- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**).
+- Creates the **AAP Orchestrator Demos** project and any demo-owned job templates (disk-utilization playbooks). Multi-OS reuses existing **Cloud | AWS |*** templates from cloud setup — seed only imports the workflow.
+- Rewrites each workflow’s AAP org/credential placeholders → APD, then imports it into AO.
 - When present, attaches the **Mattermost** credential and **Product Demos EE** to **Notify Chatroom**.
 
 AAP drives this with `aapctl`. The Mattermost credential stores an **incoming webhook** id for `community.general.mattermost` (not a bot personal access token).
