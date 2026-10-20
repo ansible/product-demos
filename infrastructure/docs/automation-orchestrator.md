@@ -20,7 +20,7 @@ Skip Network Configuration on RHDP — Install already ran it.
 Still simple — short cloud/chat setup, then Install, so curated content can hit real hosts (and chat when the demo needs it).
 
 1. Ensure **APD ǀ Multi-demo setup** (or Single → `cloud` + `infrastructure`) created the **Cloud | AWS |*** patch/snapshot JTs.
-2. Run **Deploy Cloud Stack in AWS** (full stack for Multi-OS; disk-utilization only needs `aws_rhel9`).
+2. Run **Deploy Cloud Stack in AWS**.
 3. For demos that post to chat (disk-utilization): launch **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)). Skip for Multi-OS Cloud Patching.
 4. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
 5. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost URL + login when provisioned).
@@ -37,6 +37,19 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 |------|------------|-------|
 | Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | `aws_rhel9` + Mattermost |
 | Multi-OS Cloud Patching | [Multi-OS Cloud Patching](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/multi-os-cloud-patching/) | Full cloud stack + existing **Cloud \| AWS \|*** JTs |
+
+### Multi-OS Cloud Patching — manual trigger
+
+The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_region`** to the region where you deployed the stack, then run:
+
+```json
+{
+  "_hosts": "aws_rhel8:aws_rhel9",
+  "_hosts_windows": "aws-dc:aws_win1",
+  "_report_server": "reports",
+  "aws_region": "<your region>"
+}
+```
 
 ## The three AO templates
 
