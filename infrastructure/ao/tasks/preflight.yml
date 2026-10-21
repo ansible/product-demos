@@ -1,6 +1,9 @@
 ---
 # Soft requirements for enabled demos — warn only; Install still succeeds.
-- name: Initialize seed warning list
+# Do not reset ao_seed_warnings here — LiteMaaS wiring may have already
+# appended re-run / empty-model warnings before preflight runs.
+- name: Ensure seed warning list exists
+  when: ao_seed_warnings is not defined
   ansible.builtin.set_fact:
     ao_seed_warnings: []
 

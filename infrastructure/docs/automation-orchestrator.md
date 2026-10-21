@@ -11,7 +11,7 @@ Stupid simple: one job template.
 1. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
 2. Open the AO URL from the job output and log in as `admin` with the printed password.
 
-You now have AO. Seeded demo workflows may appear in AO, but they will not run end-to-end without Path 2 (no `aws_rhel9`, no Mattermost, and so on). Install **warns** on missing deps; it does not fail.
+You now have AO. On demo.redhat.com, Install also wires the pre-filled Controller **LiteMaaS** credential into AO as an LLM Provider integration so agentic (AI) workflow nodes can run. The Install job template must have **LiteMaaS** attached (APD setup on this branch does that). If the seed summary says LLM was not wired, re-run Install once after setup so the virtual key injects. Seeded demo workflows may still need Path 2 for cloud/chat deps (`aws_rhel9`, Mattermost, and so on). Install **warns** on missing deps; it does not fail.
 
 Skip Network Configuration on RHDP — Install already ran it.
 
@@ -35,8 +35,13 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 
 | Demo | Directions | Needs |
 |------|------------|-------|
+| Task Step Example | Open **Task Step Example** in AO — question is pre-filled; press Run | LiteMaaS wired (RHDP boot + Install) |
 | Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | `aws_rhel9` + Mattermost |
 | Multi-OS Cloud Patching | [Multi-OS Cloud Patching](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/multi-os-cloud-patching/) | Full cloud stack + existing **Cloud \| AWS \|*** JTs |
+
+### Task Step Example — LiteMaaS smoke test
+
+No cloud stack. After Install, open **Task Step Example**, leave the default question (or edit it), and Run. Seed injects both the model (`llm_model_id`) and the **APD LiteMaaS** LLM Provider credential (`credential_id`) on the AI task step — model alone is not enough to call LiteMaaS.
 
 ### Multi-OS Cloud Patching — manual trigger
 
@@ -65,18 +70,20 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
 |------------|------|--------------------|
 | OpenShift Credential | OpenShift or Kubernetes API Bearer Token | Pre-configured |
 | AAP Credential | Red Hat Ansible Automation Platform | Pre-configured |
+| LiteMaaS | Custom (API base URL + virtual key + model) | Pre-configured at catalog boot; Install wires it into AO |
 | Mattermost | Custom (server + webhook id) | Path 2 — created/updated by **Provision Mattermost** |
 
 ## Under the hood
 
 What **Install** does when it seeds curated demos:
 
-- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**).
+- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**) plus local workflows such as **Task Step Example**.
 - Creates the **AAP Orchestrator Demos** project and any demo-owned job templates (disk-utilization playbooks). Multi-OS reuses existing **Cloud | AWS |*** templates from cloud setup — seed only imports the workflow.
-- Rewrites each workflow’s AAP org/credential placeholders → APD, then imports it into AO.
+- Wires AO-native **AAP** and **LiteMaaS** (LLM Provider) integrations; allow-lists the LiteMaaS hostname for AO workers.
+- Rewrites each workflow’s AAP org/credential placeholders → APD, and fills `llm_model_id` on agentic nodes when LiteMaaS is wired, then imports into AO.
 - When present, attaches the **Mattermost** credential and **Product Demos EE** to **Notify Chatroom**.
 
-AAP drives this with `aapctl`. The Mattermost credential stores an **incoming webhook** id for `community.general.mattermost` (not a bot personal access token).
+AAP drives this with `aapctl`. The Mattermost credential stores an **incoming webhook** id for `community.general.mattermost` (not a bot personal access token). Controller **LiteMaaS** is the source of truth for the virtual key; AO gets a copy as **APD LiteMaaS** during Install.
 
 ## Related demos
 

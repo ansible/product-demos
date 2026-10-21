@@ -7,7 +7,23 @@
   vars:
     ao_namespace: automation-orchestrator
     ao_instance: automation-orchestrator
-    ao_extra_hosts: []
+    # LiteMaaS hostname from Install JT env injectors (Controller LiteMaaS cred).
+    # RHDP api_endpoint is typically a full URL (https://…); the allow-list
+    # needs a bare hostname, same as CONTROLLER_HOST / AAP above.
+    ao_litemaas_hostname: >-
+      {{
+        (
+          lookup('env', 'LITELLM_API_ENDPOINT')
+          | default(lookup('env', 'LITELLM_API_BASE'), true)
+          | default(lookup('env', 'OPENAI_API_BASE'), true)
+          | default('', true)
+          | trim
+        )
+        | ansible.builtin.urlsplit('hostname')
+        | default('', true)
+      }}
+    ao_extra_hosts: >-
+      {{ [ao_litemaas_hostname] if (ao_litemaas_hostname | default('') | length) > 0 else [] }}
 
     # AAP gateway hostname, from the AAP credential on the job template.
     # CONTROLLER_HOST is a URL; the allow-list takes a bare hostname.

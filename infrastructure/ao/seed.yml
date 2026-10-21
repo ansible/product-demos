@@ -99,6 +99,9 @@
     - name: Wire AO AAP credential and integration
       ansible.builtin.include_tasks: tasks/wire_aap_integration.yml
 
+    - name: Wire Controller LiteMaaS into AO as LLM Provider
+      ansible.builtin.include_tasks: tasks/wire_litemaas_integration.yml
+
     - name: Run demo preflight checks
       ansible.builtin.include_tasks: tasks/preflight.yml
 
@@ -151,6 +154,27 @@
               else [
                 'Mattermost: not provisioned — run Infrastructure | AWS - Provision Mattermost (updates Mattermost credential + syncs inventory)',
               ]
+            )
+            + (
+              [
+                'AO LLM: ' ~ ao_llm_integration_name
+                ~ ' (model ' ~ (ao_llm_model_name | default(ao_llm_model))
+                ~ ', id ' ~ ao_llm_model_id ~ ')',
+              ]
+              if (
+                (ao_litemaas_present | default(false) | bool)
+                and (ao_llm_model_id | default('') | length) > 0
+                and (ao_llm_credential_id | default('') | length) > 0
+              )
+              else (
+                [
+                  'AO LLM: credential/integration created but no model id yet — see warnings',
+                ]
+                if (ao_litemaas_present | default(false) | bool)
+                else [
+                  'AO LLM: not wired — ensure Controller LiteMaaS is populated and attached to Install',
+                ]
+              )
             )
           }}
 
