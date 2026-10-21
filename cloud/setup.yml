@@ -147,7 +147,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      _hosts: aws_rhel8:aws_rhel9
+      _hosts: aws-rhel9:aws-rhel10
       _hosts_windows: aws-dc:aws_win1
     limit: all
     survey_enabled: true
@@ -169,7 +169,7 @@ controller_templates:
           type: text
           variable: _hosts
           required: false
-          default: aws_rhel8:aws_rhel9
+          default: aws-rhel9:aws-rhel10
         - question_name: Specify Windows hosts
           type: text
           variable: _hosts_windows
@@ -190,7 +190,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      _hosts: aws_rhel8:aws_rhel9
+      _hosts: aws-rhel9:aws-rhel10
       _hosts_windows: aws-dc:aws_win1
     limit: all
     survey_enabled: true
@@ -212,7 +212,7 @@ controller_templates:
           type: text
           variable: _hosts
           required: false
-          default: aws_rhel8:aws_rhel9
+          default: aws-rhel9:aws-rhel10
         - question_name: Specify Windows hosts
           type: text
           variable: _hosts_windows
@@ -487,7 +487,7 @@ controller_templates:
     notification_templates_error: Telemetry
     use_fact_cache: true
     extra_vars:
-      _hosts: aws_rhel8:aws_rhel9
+      _hosts: aws-rhel9:aws-rhel10
       _hosts_windows: aws-dc:aws_win1
       _report_server: reports
     limit: all
@@ -583,8 +583,8 @@ controller_workflows:
         all_parents_must_converge: true
         always_nodes:
           - Deploy Windows GUI Blueprint
-          - Deploy RHEL8 Blueprint
           - Deploy RHEL9 Blueprint
+          - Deploy RHEL10 Blueprint
           - Deploy Windows Core Blueprint
           - Deploy Report Server
       - identifier: Deploy Windows GUI Blueprint
@@ -605,20 +605,20 @@ controller_workflows:
           - Update Inventory
         failure_nodes:
           - Ticket - Instance Failed
-      - identifier: Deploy RHEL8 Blueprint
+      - identifier: Deploy RHEL9 Blueprint
         unified_job_template: Cloud | AWS | Create VM
         extra_data:
-          create_vm_vm_name: aws_rhel8
-          vm_blueprint: rhel8
+          create_vm_vm_name: aws-rhel9
+          vm_blueprint: rhel9
         success_nodes:
           - Update Inventory
         failure_nodes:
           - Ticket - Instance Failed
-      - identifier: Deploy RHEL9 Blueprint
+      - identifier: Deploy RHEL10 Blueprint
         unified_job_template: Cloud | AWS | Create VM
         extra_data:
-          create_vm_vm_name: aws_rhel9
-          vm_blueprint: rhel9
+          create_vm_vm_name: aws-rhel10
+          vm_blueprint: rhel10
         success_nodes:
           - Update Inventory
         failure_nodes:
@@ -681,43 +681,42 @@ controller_workflows:
         extra_data:
           create_vm_vm_name: aws-dc
         success_nodes:
-          - Delete Infrastructure
+          - Update Inventory
       - identifier: Delete Windows Core VM
         unified_job_template: Cloud | AWS | Delete Stack VM
         extra_data:
           create_vm_vm_name: aws_win1
         success_nodes:
-          - Delete Infrastructure
-      - identifier: Delete RHEL8 VM
-        unified_job_template: Cloud | AWS | Delete Stack VM
-        extra_data:
-          create_vm_vm_name: aws_rhel8
-        success_nodes:
-          - Delete Infrastructure
+          - Update Inventory
       - identifier: Delete RHEL9 VM
         unified_job_template: Cloud | AWS | Delete Stack VM
         extra_data:
-          create_vm_vm_name: aws_rhel9
+          create_vm_vm_name: aws-rhel9
         success_nodes:
-          - Delete Infrastructure
+          - Update Inventory
+      - identifier: Delete RHEL10 VM
+        unified_job_template: Cloud | AWS | Delete Stack VM
+        extra_data:
+          create_vm_vm_name: aws-rhel10
+        success_nodes:
+          - Update Inventory
       - identifier: Delete Report Server
         unified_job_template: Cloud | AWS | Delete Stack VM
         extra_data:
           create_vm_vm_name: reports
         success_nodes:
-          - Delete Infrastructure
-      - identifier: Delete Infrastructure
-        unified_job_template: Cloud | AWS | Delete VPC
-        all_parents_must_converge: true
-        success_nodes:
-          - Update Inventory
-      - identifier: Delete Keypair
-        unified_job_template: Cloud | AWS | Delete Keypair
-        all_parents_must_converge: true
-        success_nodes:
           - Update Inventory
       - identifier: Update Inventory
         unified_job_template: AWS Inventory
+        all_parents_must_converge: true
+        success_nodes:
+          - Delete Keypair
+          - Delete VPC
+      - identifier: Delete Keypair
+        unified_job_template: Cloud | AWS | Delete Keypair
+        all_parents_must_converge: true
+      - identifier: Delete VPC
+        unified_job_template: Cloud | AWS | Delete VPC
         all_parents_must_converge: true
 
   - name: Patch Cloud Stack in AWS
@@ -737,7 +736,7 @@ controller_workflows:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     extra_vars:
-      _hosts: aws_rhel8:aws_rhel9
+      _hosts: aws-rhel9:aws-rhel10
       _hosts_windows: aws-dc:aws_win1
       _report_server: reports
     survey_enabled: true
@@ -749,7 +748,7 @@ controller_workflows:
           type: multiplechoice
           variable: aws_region
           required: true
-          default: us-east-1
+          default: us-east-2
           choices:
             - us-east-1
             - us-east-2
@@ -758,11 +757,11 @@ controller_workflows:
         - question_name: RHEL hosts
           question_description: >-
             Workload VMs to snapshot and patch on the RHEL path.
-            Default is aws_rhel8:aws_rhel9. Does not include reports or aws_kafka.
+            Default is aws-rhel9:aws-rhel10. Does not include reports or aws_kafka.
           type: text
           variable: _hosts
           required: true
-          default: aws_rhel8:aws_rhel9
+          default: aws-rhel9:aws-rhel10
         - question_name: Windows hosts
           question_description: >-
             Workload VMs to snapshot and patch on the Windows path.

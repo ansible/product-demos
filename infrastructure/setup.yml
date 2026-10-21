@@ -521,7 +521,7 @@ controller_templates:
 
   - name: "Infrastructure | Configuration management - ACME App - Setup"
     description: >-
-      Installs httpd on aws_rhel9 and renders the approved ACME storefront
+      Installs httpd on aws-rhel9 and renders the approved ACME storefront
       from a Jinja2 template. Click Launch with the default host to deploy
       the baseline page.
     labels:
@@ -553,12 +553,12 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           question_description: >-
-            Default is aws_rhel9 for a single-host demo. The ACME App is
+            Default is aws-rhel9 for a single-host demo. The ACME App is
             installed on this host only.
           type: text
           variable: _hosts
           required: true
-          default: aws_rhel9
+          default: aws-rhel9
 
   - name: "Infrastructure | Configuration management - ACME App - Update Configuration"
     description: >-
@@ -583,11 +583,11 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           question_description: >-
-            Same host as Setup. Default is aws_rhel9.
+            Same host as Setup. Default is aws-rhel9.
           type: text
           variable: _hosts
           required: true
-          default: aws_rhel9
+          default: aws-rhel9
         - question_name: Company name
           type: text
           variable: acme_app_company
@@ -787,13 +787,13 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           question_description: >-
-            Default is aws_rhel* (aws_rhel8 and aws_rhel9). Use aws_rhel9 for
+            Default is aws-rhel* (aws-rhel9 and aws-rhel10). Use aws-rhel9 for
             one host only. Unreachable hosts are skipped. reports is not matched
-            by aws_rhel*.
+            by aws-rhel*.
           type: text
           variable: _hosts
           required: true
-          default: aws_rhel*
+          default: aws-rhel*
         - question_name: Filebeat output
           type: multiplechoice
           variable: config_drift_filebeat_output
@@ -828,12 +828,12 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           question_description: >-
-            Default is aws_rhel* (aws_rhel8 and aws_rhel9). Use aws_rhel9 for
+            Default is aws-rhel* (aws-rhel9 and aws-rhel10). Use aws-rhel9 for
             one host only. Unreachable hosts are skipped.
           type: text
           variable: _hosts
           required: true
-          default: aws_rhel*
+          default: aws-rhel*
 
   - name: "Infrastructure | Setup Rulebook for Kafka Queue - Config Drift & Remediation"
     description: >-
@@ -876,7 +876,7 @@ controller_templates:
 
   - name: "Infrastructure | Config Drift - Check Cloud Stack"
     description: >-
-      Verifies aws_rhel8 and aws_rhel9 exist in inventory before config drift
+      Verifies aws-rhel9 and aws-rhel10 exist in inventory before config drift
       setup. Used by the Full Setup workflow; fails when Deploy Cloud Stack in
       AWS must be run first.
     labels:
@@ -1043,7 +1043,7 @@ controller_workflows:
       One-shot config drift pipeline setup: verify cloud stack RHEL workers are
       in inventory, provision Kafka, sync inventory, deploy auditd and Filebeat
       with Kafka output, and activate the EDA rulebook. Run Deploy Cloud Stack
-      in AWS first if aws_rhel8/aws_rhel9 are missing. Run Introduce SSHD Drift
+      in AWS first if aws-rhel9/aws-rhel10 are missing. Run Introduce SSHD Drift
       separately for the live demo.
     labels:
       - compliance
@@ -1115,7 +1115,7 @@ controller_workflows:
           type: job_template
         extra_data:
           feedback: >-
-            aws_rhel8 and aws_rhel9 were not found in inventory. Run Deploy
+            aws-rhel9 and aws-rhel10 were not found in inventory. Run Deploy
             Cloud Stack in AWS first, then re-launch Infrastructure | Config
             Drift - Full Setup.
       - identifier: Provision Kafka
@@ -1152,7 +1152,7 @@ controller_workflows:
             type: organization
           type: job_template
         extra_data:
-          _hosts: aws_rhel*
+          _hosts: aws-rhel*
           config_drift_filebeat_output: kafka
       - identifier: Setup EDA
         unified_job_template:

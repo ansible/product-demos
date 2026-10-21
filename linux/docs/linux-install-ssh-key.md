@@ -15,7 +15,7 @@ This job is idempotent: re-running with the same key does not create duplicates.
 
 | Prompt | Variable | Type | Required | Default | Description |
 |--------|----------|------|----------|---------|-------------|
-| Server Name or Pattern | `_hosts` | text | Yes | | Limit or pattern, for example `aws_rhel9` or `aws_rhel*` |
+| Server Name or Pattern | `_hosts` | text | Yes | | Limit or pattern, for example `aws-rhel9` or `aws-rhel*` |
 | SSH User | `ssh_user` | text | Yes | `ec2-user` | Linux account that receives the key |
 | SSH Public Key | `ssh_public_key` | textarea | Yes | | Full public key line from `cat ~/.ssh/id_ed25519.pub` |
 
@@ -30,13 +30,13 @@ This job is idempotent: re-running with the same key does not create duplicates.
 - **APD Machine Credential** stores a private key for Ansible automation, but AAP does not let you export it after save
 - Operators often want their **own** key for interactive SSH during demos, troubleshooting, or presenter prep
 - Survey-driven, RBAC-controlled access beats ad-hoc `authorized_keys` edits on every host
-- Works across host patterns (`aws_rhel*`) so one launch updates every matching RHEL worker
+- Works across host patterns (`aws-rhel*`) so one launch updates every matching RHEL worker
 
 ## Presenter walkthrough
 
 1. **Generate a key (if needed):** `ssh-keygen -t ed25519 -f ~/.ssh/apd-demo -N ""`
 2. **Copy the public key:** `cat ~/.ssh/apd-demo.pub`
-3. **Launch the job:** Set `_hosts` to `aws_rhel*` (or a single host), leave **SSH User** as `ec2-user`, paste the public key
+3. **Launch the job:** Set `_hosts` to `aws-rhel*` (or a single host), leave **SSH User** as `ec2-user`, paste the public key
 4. **Verify:** `ssh -i ~/.ssh/apd-demo ec2-user@<instance-ip>`
 5. **Call out:** This adds your key alongside the cloud stack keypair; it does not replace **APD Machine Credential**
 
