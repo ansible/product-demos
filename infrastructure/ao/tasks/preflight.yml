@@ -14,23 +14,53 @@
         | list
       }}
 
-- name: Check aws_rhel9 when a seeded demo needs the cloud stack
+- name: Collect required cloud-stack hosts from seeded demos
+  when: ao_cloud_stack_demos | length > 0
+  ansible.builtin.set_fact:
+    ao_required_cloud_hosts: >-
+      {{
+        ao_cloud_stack_demos
+        | selectattr('cloud_stack_hosts', 'defined')
+        | map(attribute='cloud_stack_hosts')
+        | list
+        | flatten
+        | unique
+        | list
+      }}
+
+- name: Default cloud-stack host check to aws_rhel9
+  when:
+    - ao_cloud_stack_demos | length > 0
+    - (ao_required_cloud_hosts | default([]) | length) == 0
+  ansible.builtin.set_fact:
+    ao_required_cloud_hosts:
+      - aws_rhel9
+
+- name: Check cloud-stack hosts when a seeded demo needs them
   when: ao_cloud_stack_demos | length > 0
   block:
-    - name: Look up aws_rhel9 in inventory
+    - name: Find missing cloud-stack hosts in inventory
       ansible.builtin.set_fact:
-        ao_aws_rhel9_present: "{{ 'aws_rhel9' in hostvars }}"
+        ao_missing_cloud_hosts: >-
+          {{
+            ao_required_cloud_hosts
+            | reject('in', hostvars)
+            | list
+          }}
 
-    - name: Record cloud-stack warning when aws_rhel9 is missing
-      when: not (ao_aws_rhel9_present | bool)
+    - name: Record cloud-stack warning when hosts are missing
+      when: (ao_missing_cloud_hosts | default([]) | length) > 0
       ansible.builtin.set_fact:
         ao_seed_warnings: >-
           {{
             ao_seed_warnings + [
               'Seeded demo(s) '
               ~ (ao_cloud_stack_demos | map(attribute='slug') | list | join(', '))
-              ~ ' expect host aws_rhel9. Run Deploy Cloud Stack in AWS, sync AWS Inventory, '
-              ~ 'then re-run those job templates (or re-run Install).'
+              ~ ' expect cloud-stack host(s) '
+              ~ (ao_missing_cloud_hosts | join(', '))
+              ~ '. Run Deploy Cloud Stack in AWS, '
+              ~ 'ensure APD cloud setup created Cloud | AWS |* patch JTs, '
+              ~ 'then re-run Install.'
             ]
           }}
 

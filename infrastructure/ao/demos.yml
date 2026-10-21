@@ -22,6 +22,8 @@ ao_demos:
     workflow: disk-utilization/ao/disk-demo-101.json
     inventory_limit: aws_rhel9
     requires_cloud_stack: true
+    cloud_stack_hosts:
+      - aws_rhel9
     requires_mattermost: true
     job_templates:
       - name: Disk Utilization Check
@@ -55,3 +57,19 @@ ao_demos:
         credentials:
           - mattermost
         ask_variables_on_launch: true
+
+  # Playbooks/JTs already live in product-demos cloud/setup.yml
+  # (Cloud | AWS | Snapshot/Patch/Restore/Compliance). Seed only imports
+  # the AO workflow and rewrites AAP org/credential placeholders.
+  - slug: multi-os-cloud-patching
+    enabled: true
+    workflow: multi-os-cloud-patching/ao/multi-os-cloud-patching.json
+    requires_cloud_stack: true
+    cloud_stack_hosts:
+      - aws_rhel8
+      - aws_rhel9
+      - aws-dc
+      - aws_win1
+      - reports
+    requires_mattermost: false
+    job_templates: []

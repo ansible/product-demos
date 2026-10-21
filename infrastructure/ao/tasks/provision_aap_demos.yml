@@ -286,9 +286,8 @@
     ao_jt_defs: >-
       {{
         ao_enabled_demos
-        | map(attribute='job_templates')
-        | flatten
-        | list
+        | json_query('[].job_templates[]')
+        | default([])
       }}
 
 - name: Ensure each demo job template
