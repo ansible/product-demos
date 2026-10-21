@@ -102,7 +102,12 @@
       description: "{{ __ao_workflow.description | default('') }}"
       labels:
         apd: "true"
-        source: ansible-tmm/aap-orchestrator-demos
+        source: >-
+          {{
+            'ansible/product-demos'
+            if (__ao_source.path | string is search('/infrastructure/ao/workflows/'))
+            else 'ansible-tmm/aap-orchestrator-demos'
+          }}
         source_file: "{{ __ao_source.path | basename }}"
       workflow_definition: >-
         {{

@@ -79,3 +79,12 @@ ao_demos:
       - reports
     requires_mattermost: false
     job_templates: []
+
+  # Local smoke-test for LiteMaaS → AO LLM wiring (no cloud/chat deps).
+  # workflow_local is relative to infrastructure/ao/.
+  - slug: task-step-example
+    enabled: true
+    workflow_local: workflows/task-step-example.json
+    requires_cloud_stack: false
+    requires_mattermost: false
+    job_templates: []

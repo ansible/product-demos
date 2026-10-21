@@ -1,12 +1,30 @@
 ---
-# Download pinned upstream demos and import only catalog-selected workflows.
+# Import catalog-selected workflows from aap-orchestrator-demos and/or
+# local paths under infrastructure/ao/ (workflow_local).
+- name: Split catalog into upstream vs local workflow demos
+  ansible.builtin.set_fact:
+    ao_upstream_demos: >-
+      {{
+        ao_enabled_demos
+        | selectattr('workflow', 'defined')
+        | list
+      }}
+    ao_local_demos: >-
+      {{
+        ao_enabled_demos
+        | selectattr('workflow_local', 'defined')
+        | list
+      }}
+
 - name: Create temporary directory for AO demo archive
+  when: (ao_upstream_demos | length) > 0
   ansible.builtin.tempfile:
     state: directory
     prefix: apd-ao-demos-
   register: ao_demo_tmpdir
 
 - name: Download curated AO demos archive
+  when: (ao_upstream_demos | length) > 0
   ansible.builtin.get_url:
     url: "{{ ao_demos_repository.rstrip('/') }}/archive/{{ ao_demos_ref }}.tar.gz"
     dest: "{{ ao_demo_tmpdir.path }}/demos.tar.gz"
@@ -14,12 +32,14 @@
   register: ao_demo_archive
 
 - name: Extract AO demos archive
+  when: (ao_upstream_demos | length) > 0
   ansible.builtin.unarchive:
     src: "{{ ao_demo_archive.dest }}"
     dest: "{{ ao_demo_tmpdir.path }}"
     remote_src: true
 
 - name: Locate extracted repository root
+  when: (ao_upstream_demos | length) > 0
   ansible.builtin.find:
     paths: "{{ ao_demo_tmpdir.path }}"
     file_type: directory
@@ -28,6 +48,7 @@
   register: ao_demo_roots
 
 - name: Require extracted repository root
+  when: (ao_upstream_demos | length) > 0
   ansible.builtin.assert:
     that:
       - ao_demo_roots.files | length > 0
@@ -37,11 +58,27 @@
   ansible.builtin.set_fact:
     ao_workflow_sources: >-
       {{
-        ao_enabled_demos
-        | map(attribute='workflow')
-        | map('regex_replace', '^', ao_demo_roots.files[0].path ~ '/')
-        | list
+        (
+          ao_upstream_demos
+          | map(attribute='workflow')
+          | map('regex_replace', '^', ao_demo_roots.files[0].path ~ '/')
+          | list
+          if (ao_upstream_demos | length) > 0
+          else []
+        )
+        + (
+          ao_local_demos
+          | map(attribute='workflow_local')
+          | map('regex_replace', '^', playbook_dir ~ '/')
+          | list
+        )
       }}
+
+- name: Require at least one workflow source
+  ansible.builtin.assert:
+    that:
+      - ao_workflow_sources | length > 0
+    fail_msg: No workflow or workflow_local paths found for enabled AO demos.
 
 - name: Ensure catalog workflow files exist
   ansible.builtin.stat:
@@ -53,7 +90,7 @@
   ansible.builtin.assert:
     that:
       - item.stat.exists
-    fail_msg: "Catalog workflow missing in archive: {{ item.item }}"
+    fail_msg: "Catalog workflow missing: {{ item.item }}"
   loop: "{{ ao_workflow_stats.results }}"
   loop_control:
     label: "{{ item.item | basename }}"
@@ -66,6 +103,9 @@
     label: "{{ __ao_source_path | basename }}"
 
 - name: Remove temporary AO demo archive
+  when:
+    - ao_demo_tmpdir is defined
+    - (ao_demo_tmpdir.path | default('') | length) > 0
   ansible.builtin.file:
     path: "{{ ao_demo_tmpdir.path }}"
     state: absent

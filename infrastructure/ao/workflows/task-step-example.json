@@ -1,0 +1,78 @@
+{
+  "schema_version": "2.0.0",
+  "name": "Task Step Example",
+  "description": "Smoke-test the LiteMaaS LLM integration: manual trigger with a pre-filled question, one AI task step, done.",
+  "triggers": [
+    {
+      "id": "trigger_manual",
+      "type": "manual_trigger",
+      "name": "Trigger",
+      "parameters": {
+        "input_schema": {
+          "type": "object",
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "required": [
+            "question"
+          ],
+          "properties": {
+            "question": {
+              "type": "string",
+              "default": "Tell me what type of model you are and any information I need about you.",
+              "description": "Question sent to the AI task step"
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "position": {
+        "x": 0,
+        "y": 200
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "id": "ask_model",
+      "type": "agentic",
+      "name": "Ask the model",
+      "parameters": {
+        "prompt": "You are answering a short smoke-test question for Ansible Automation Orchestrator.\n\nUser question:\n${trigger.question}\n\nReply clearly. Identify the model family/name you are if you know it, and share any useful facts about your capabilities or limits that a presenter should know.\n\nOutput ONLY valid JSON matching the response schema.",
+        "llm_model_id": null,
+        "response_schema": {
+          "type": "object",
+          "required": [
+            "model_identity",
+            "answer"
+          ],
+          "properties": {
+            "model_identity": {
+              "type": "string",
+              "description": "What model or model family you are"
+            },
+            "answer": {
+              "type": "string",
+              "description": "Full answer to the user question"
+            },
+            "notes": {
+              "type": "string",
+              "description": "Optional extra presenter notes"
+            }
+          }
+        },
+        "tool_selections": [],
+        "integration_connections": [],
+        "tool_selection_strategy": "SELECTED"
+      },
+      "position": {
+        "x": 360,
+        "y": 200
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "trigger_manual",
+      "to": "ask_model"
+    }
+  ]
+}

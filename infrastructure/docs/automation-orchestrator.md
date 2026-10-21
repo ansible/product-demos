@@ -35,8 +35,13 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 
 | Demo | Directions | Needs |
 |------|------------|-------|
+| Task Step Example | Open **Task Step Example** in AO — question is pre-filled; press Run | LiteMaaS wired (RHDP boot + Install) |
 | Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | `aws_rhel9` + Mattermost |
 | Multi-OS Cloud Patching | [Multi-OS Cloud Patching](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/multi-os-cloud-patching/) | Full cloud stack + existing **Cloud \| AWS \|*** JTs |
+
+### Task Step Example — LiteMaaS smoke test
+
+No cloud stack. After Install, open **Task Step Example**, leave the default question (or edit it), and Run. The AI task step uses the AO **APD LiteMaaS** LLM integration.
 
 ### Multi-OS Cloud Patching — manual trigger
 
@@ -72,7 +77,7 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
 
 What **Install** does when it seeds curated demos:
 
-- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**).
+- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**) plus local workflows such as **Task Step Example**.
 - Creates the **AAP Orchestrator Demos** project and any demo-owned job templates (disk-utilization playbooks). Multi-OS reuses existing **Cloud | AWS |*** templates from cloud setup — seed only imports the workflow.
 - Wires AO-native **AAP** and **LiteMaaS** (LLM Provider) integrations; allow-lists the LiteMaaS hostname for AO workers.
 - Rewrites each workflow’s AAP org/credential placeholders → APD, and fills `llm_model_id` on agentic nodes when LiteMaaS is wired, then imports into AO.
