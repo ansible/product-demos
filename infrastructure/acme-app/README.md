@@ -1,6 +1,6 @@
 # ACME App (Simple Config Drift)
 
-Playbooks and a single Jinja template for the **Simple Config Drift** demo: Ansible owns an ACME storefront on `aws_rhel9`.
+Playbooks and a single Jinja template for the **Simple Config Drift** demo: Ansible owns an ACME storefront on `aws-rhel9`.
 
 Documentation: [`../docs/config-drift-simple.md`](../docs/config-drift-simple.md)
 

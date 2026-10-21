@@ -14,22 +14,22 @@
         | list
       }}
 
-- name: Check aws_rhel9 when a seeded demo needs the cloud stack
+- name: Check aws-rhel9 when a seeded demo needs the cloud stack
   when: ao_cloud_stack_demos | length > 0
   block:
-    - name: Look up aws_rhel9 in inventory
+    - name: Look up aws-rhel9 in inventory
       ansible.builtin.set_fact:
-        ao_aws_rhel9_present: "{{ 'aws_rhel9' in hostvars }}"
+        ao_aws-rhel9_present: "{{ 'aws-rhel9' in hostvars }}"
 
-    - name: Record cloud-stack warning when aws_rhel9 is missing
-      when: not (ao_aws_rhel9_present | bool)
+    - name: Record cloud-stack warning when aws-rhel9 is missing
+      when: not (ao_aws-rhel9_present | bool)
       ansible.builtin.set_fact:
         ao_seed_warnings: >-
           {{
             ao_seed_warnings + [
               'Seeded demo(s) '
               ~ (ao_cloud_stack_demos | map(attribute='slug') | list | join(', '))
-              ~ ' expect host aws_rhel9. Run Deploy Cloud Stack in AWS, sync AWS Inventory, '
+              ~ ' expect host aws-rhel9. Run Deploy Cloud Stack in AWS, sync AWS Inventory, '
               ~ 'then re-run those job templates (or re-run Install).'
             ]
           }}

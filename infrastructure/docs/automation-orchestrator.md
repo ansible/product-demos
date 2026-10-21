@@ -11,7 +11,7 @@ Stupid simple: one job template.
 1. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
 2. Open the AO URL from the job output and log in as `admin` with the printed password.
 
-You now have AO. Seeded demo workflows may appear in AO, but they will not run end-to-end without Path 2 (no `aws_rhel9`, no Mattermost, and so on). Install **warns** on missing deps; it does not fail.
+You now have AO. Seeded demo workflows may appear in AO, but they will not run end-to-end without Path 2 (no `aws-rhel9`, no Mattermost, and so on). Install **warns** on missing deps; it does not fail.
 
 Skip Network Configuration on RHDP — Install already ran it.
 
@@ -19,7 +19,7 @@ Skip Network Configuration on RHDP — Install already ran it.
 
 Still simple — short cloud/chat setup, then Install, so curated content can hit a real host and post to chat.
 
-1. Run **Deploy Cloud Stack in AWS**, then sync **AWS Inventory** (`aws_rhel9` for disk check / remediate).
+1. Run **Deploy Cloud Stack in AWS**, then sync **AWS Inventory** (`aws-rhel9` for disk check / remediate).
 2. Launch **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)) — Mattermost, Controller credential, and inventory host for Notify Chatroom. **Save the Mattermost UI login** from that job (`apdadmin` / `Ansible123!` by default) for when you open chat later.
 3. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
 4. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost URL + default UI login when provisioned).

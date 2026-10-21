@@ -6,8 +6,8 @@
 
   vars:
     config_drift_required_rhel_hosts:
-      - aws_rhel8
-      - aws_rhel9
+      - aws-rhel9
+      - aws-rhel10
 
   tasks:
     - name: List missing cloud stack RHEL workers

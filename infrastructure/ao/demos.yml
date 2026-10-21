@@ -20,7 +20,7 @@ ao_demos:
   - slug: disk-utilization
     enabled: true
     workflow: disk-utilization/ao/disk-demo-101.json
-    inventory_limit: aws_rhel9
+    inventory_limit: aws-rhel9
     requires_cloud_stack: true
     requires_mattermost: true
     job_templates:
@@ -28,28 +28,28 @@ ao_demos:
         playbook: disk-utilization/playbooks/check_disk.yml
         credentials:
           - machine
-        limit: aws_rhel9
+        limit: aws-rhel9
       - name: Linux - Remediate - Continue
         playbook: disk-utilization/playbooks/remediate_disk_continue.yml
         credentials:
           - machine
-        limit: aws_rhel9
+        limit: aws-rhel9
       - name: Linux - Remediate - Disk Cleanup
         playbook: disk-utilization/playbooks/remediate_disk_cleanup.yml
         credentials:
           - machine
-        limit: aws_rhel9
+        limit: aws-rhel9
       - name: Linux - Remediate - Disk Expand
         playbook: disk-utilization/playbooks/remediate_disk_expand.yml
         credentials:
           - machine
           - aws
-        limit: aws_rhel9
+        limit: aws-rhel9
       - name: Disk Utilization - Fallback
         playbook: disk-utilization/playbooks/remediate_disk_fallback.yml
         credentials:
           - machine
-        limit: aws_rhel9
+        limit: aws-rhel9
       - name: Notify Chatroom
         playbook: disk-utilization/playbooks/notify_chatroom.yml
         credentials:
