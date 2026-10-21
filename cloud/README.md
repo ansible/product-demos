@@ -84,8 +84,8 @@ The workflow:
    |---------|-----------|
    | `aws-dc` | windows_full |
    | `aws_win1` | windows_core |
-   | `aws_rhel8` | rhel8 |
-   | `aws_rhel9` | rhel9 |
+   | `aws-rhel9` | rhel9 |
+   | `aws-rhel10` | rhel10 |
    | `reports` | rhel9 |
 4. Syncs AWS inventory and publishes the VPC report to S3
 
@@ -99,7 +99,7 @@ Use this workflow to completely tear down a stack created by **Deploy Cloud Stac
 
 The workflow:
 
-1. Terminates all five stack VMs **in parallel** (`aws-dc`, `aws_win1`, `aws_rhel8`, `aws_rhel9`, `reports`)
+1. Terminates all five stack VMs **in parallel** (`aws-dc`, `aws_win1`, `aws-rhel9`, `aws-rhel10`, `reports`)
 2. Deletes VPC `aws-test-vpc` and related resources (subnet, route table, internet gateway, security group)
 3. Deletes keypair `aws-test-key` (runs in parallel with VPC teardown)
 4. Syncs AWS inventory so hosts are removed from AAP
@@ -115,7 +115,7 @@ Launch the workflow and complete the survey:
 | Prompt | Purpose |
 |--------|---------|
 | **AWS Region** | Region where the stack is deployed |
-| **RHEL hosts** | Workload VMs for the RHEL path (default `aws_rhel8:aws_rhel9`) |
+| **RHEL hosts** | Workload VMs for the RHEL path (default `aws-rhel9:aws-rhel10`) |
 | **Windows hosts** | Workload VMs for the Windows path (default `aws-dc:aws_win1`) |
 | **Report server** | Host that publishes the HTML dashboard (default `reports`; not patched) |
 | **RHEL Advisory IDs** | Comma-separated RHSA/CVE IDs to patch (e.g. `RHSA-2024:3138, CVE-2024-33599`) |

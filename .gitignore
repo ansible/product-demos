@@ -2,6 +2,7 @@
 **/navigator-output/
 **/ansible-builder.log
 **/vault*.yml
+**/*.env
 sean_login_info.yml
 .DS_Store
 :memory:.ses

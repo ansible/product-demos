@@ -87,8 +87,8 @@
       B["🌐 Create VPC"] --> C
       C -->|always| D["🪟 aws-dc<br/>windows_full"]
       C -->|always| E["🪟 aws_win1<br/>windows_core"]
-      C -->|always| F["🐧 aws_rhel8<br/>rhel8"]
-      C -->|always| G["🐧 aws_rhel9<br/>rhel9"]
+      C -->|always| F["🐧 aws-rhel9<br/>rhel9"]
+      C -->|always| G["🐧 aws-rhel10<br/>rhel10"]
       C -->|always| H["📋 reports<br/>rhel9"]
       D --> I["🔄 Sync Inventory"]
       E --> I
@@ -159,8 +159,8 @@
       S --> G
       A["💥 Delete aws-dc"] --> F["🌐 Delete VPC"]
       B["💥 Delete aws_win1"] --> F
-      C["💥 Delete aws_rhel8"] --> F
-      D["💥 Delete aws_rhel9"] --> F
+      C["💥 Delete aws-rhel9"] --> F
+      D["💥 Delete aws-rhel10"] --> F
       E["💥 Delete reports"] --> F
       F --> H["🔄 Sync Inventory"]
       G["🔑 Delete Key"] --> H
@@ -1546,7 +1546,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #1a365d 0%, #ee0000 100%)"
     icon: "🛒"
-  blurb: "Install a tiny ACME storefront on aws_rhel9, then change the live page from a survey that re-renders one Jinja template."
+  blurb: "Install a tiny ACME storefront on aws-rhel9, then change the live page from a survey that re-renders one Jinja template."
   stats:
     playbooks: 2
   url: /demos/infrastructure-simple-config-drift/
@@ -1554,7 +1554,7 @@
   workflow_mermaid: |
     flowchart LR
       setup["ACME App Setup"]
-      httpd["httpd on aws_rhel9"]
+      httpd["httpd on aws-rhel9"]
       page["index.html from Jinja"]
       survey["Update Configuration survey"]
       browser["Browser port 80"]

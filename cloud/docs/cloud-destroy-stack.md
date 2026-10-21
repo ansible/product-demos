@@ -27,8 +27,8 @@ graph LR
   S --> G
   A["💥 Delete aws-dc"] --> F["🌐 Delete VPC"]
   B["💥 Delete aws_win1"] --> F
-  C["💥 Delete aws_rhel8"] --> F
-  D["💥 Delete aws_rhel9"] --> F
+  C["💥 Delete aws-rhel9"] --> F
+  D["💥 Delete aws-rhel10"] --> F
   E["💥 Delete reports"] --> F
   F --> H["🔄 Sync Inventory"]
   G["🔑 Delete Key"] --> H
