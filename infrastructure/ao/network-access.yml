@@ -7,7 +7,28 @@
   vars:
     ao_namespace: automation-orchestrator
     ao_instance: automation-orchestrator
-    ao_extra_hosts: []
+    # LiteMaaS hostname from Install JT env injectors (Controller LiteMaaS cred).
+    ao_litemaas_hostname: >-
+      {{
+        (
+          lookup('env', 'LITELLM_API_ENDPOINT') | default('', true) | trim
+        )
+        if (
+          lookup('env', 'LITELLM_API_ENDPOINT') | default('', true) | trim | length
+        ) > 0
+        else (
+          (
+            lookup('env', 'LITELLM_API_BASE')
+            | default(lookup('env', 'OPENAI_API_BASE'), true)
+            | default('', true)
+            | trim
+          )
+          | urlsplit('hostname')
+          | default('', true)
+        )
+      }}
+    ao_extra_hosts: >-
+      {{ [ao_litemaas_hostname] if (ao_litemaas_hostname | default('') | length) > 0 else [] }}
 
     # AAP gateway hostname, from the AAP credential on the job template.
     # CONTROLLER_HOST is a URL; the allow-list takes a bare hostname.

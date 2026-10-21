@@ -11,7 +11,7 @@ Stupid simple: one job template.
 1. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
 2. Open the AO URL from the job output and log in as `admin` with the printed password.
 
-You now have AO. Seeded demo workflows may appear in AO, but they will not run end-to-end without Path 2 (no `aws_rhel9`, no Mattermost, and so on). Install **warns** on missing deps; it does not fail.
+You now have AO. On demo.redhat.com, Install also wires the pre-filled Controller **LiteMaaS** credential into AO as an LLM Provider integration so agentic (AI) workflow nodes can run. Seeded demo workflows may still need Path 2 for cloud/chat deps (`aws_rhel9`, Mattermost, and so on). Install **warns** on missing deps; it does not fail.
 
 Skip Network Configuration on RHDP — Install already ran it.
 
@@ -65,6 +65,7 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
 |------------|------|--------------------|
 | OpenShift Credential | OpenShift or Kubernetes API Bearer Token | Pre-configured |
 | AAP Credential | Red Hat Ansible Automation Platform | Pre-configured |
+| LiteMaaS | Custom (API base URL + virtual key + model) | Pre-configured at catalog boot; Install wires it into AO |
 | Mattermost | Custom (server + webhook id) | Path 2 — created/updated by **Provision Mattermost** |
 
 ## Under the hood
@@ -73,10 +74,11 @@ What **Install** does when it seeds curated demos:
 
 - Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**).
 - Creates the **AAP Orchestrator Demos** project and any demo-owned job templates (disk-utilization playbooks). Multi-OS reuses existing **Cloud | AWS |*** templates from cloud setup — seed only imports the workflow.
-- Rewrites each workflow’s AAP org/credential placeholders → APD, then imports it into AO.
+- Wires AO-native **AAP** and **LiteMaaS** (LLM Provider) integrations; allow-lists the LiteMaaS hostname for AO workers.
+- Rewrites each workflow’s AAP org/credential placeholders → APD, and fills `llm_model_id` on agentic nodes when LiteMaaS is wired, then imports into AO.
 - When present, attaches the **Mattermost** credential and **Product Demos EE** to **Notify Chatroom**.
 
-AAP drives this with `aapctl`. The Mattermost credential stores an **incoming webhook** id for `community.general.mattermost` (not a bot personal access token).
+AAP drives this with `aapctl`. The Mattermost credential stores an **incoming webhook** id for `community.general.mattermost` (not a bot personal access token). Controller **LiteMaaS** is the source of truth for the virtual key; AO gets a copy as **APD LiteMaaS** during Install.
 
 ## Related demos
 

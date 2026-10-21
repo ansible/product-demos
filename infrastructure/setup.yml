@@ -41,6 +41,47 @@ controller_credential_types:
       extra_vars:
         mattermost_server: !unsafe '{{ mattermost_server }}'
         api_chat_token: !unsafe '{{ api_chat_token }}'
+  # RHDP boot already populates this via agnosticv; stub exists for BYO / JT attach.
+  - name: LiteMaaS
+    description: >-
+      Models-as-a-Service (LiteMaaS / LiteLLM) OpenAI-compatible endpoint and
+      virtual key. On demo.redhat.com this is pre-filled at catalog boot.
+    kind: cloud
+    inputs:
+      fields:
+        - type: string
+          id: api_endpoint
+          label: API Endpoint
+          help_text: LiteMaaS / LiteLLM API endpoint host
+        - type: string
+          id: api_base_url
+          label: API Base URL
+          help_text: OpenAI-compatible API base URL (typically includes /v1)
+        - type: string
+          id: virtual_key
+          label: Virtual Key
+          secret: true
+          help_text: LiteMaaS virtual key / access token
+        - type: string
+          id: model
+          label: Model
+          help_text: Default model id available with this key
+      required:
+        - api_base_url
+        - virtual_key
+    injectors:
+      env:
+        LITELLM_API_ENDPOINT: !unsafe '{{ api_endpoint }}'
+        LITELLM_API_BASE: !unsafe '{{ api_base_url }}'
+        OPENAI_API_BASE: !unsafe '{{ api_base_url }}'
+        LITELLM_API_KEY: !unsafe '{{ virtual_key }}'
+        OPENAI_API_KEY: !unsafe '{{ virtual_key }}'
+        LITELLM_MODEL: !unsafe '{{ model }}'
+      extra_vars:
+        litellm_api_endpoint: !unsafe '{{ api_endpoint }}'
+        litellm_api_base_url: !unsafe '{{ api_base_url }}'
+        litellm_virtual_key: !unsafe '{{ virtual_key }}'
+        litellm_available_models_list: !unsafe '{{ model }}'
 
 controller_credentials:
   - name: ROSA Token
@@ -60,6 +101,19 @@ controller_credentials:
     inputs:
       mattermost_server: REPLACEME
       api_chat_token: REPLACEME
+  - name: LiteMaaS
+    credential_type: LiteMaaS
+    organization: Ansible Product Demos (APD)
+    description: >-
+      Pre-filled on demo.redhat.com. AO Install wires this into Automation
+      Orchestrator as an LLM Provider integration for agentic workflow nodes.
+    update_secrets: false
+    state: exists
+    inputs:
+      api_endpoint: REPLACEME
+      api_base_url: REPLACEME
+      virtual_key: REPLACEME
+      model: qwen3-235b
   - name: OpenShift Credential
     organization: Ansible Product Demos (APD)
     credential_type: OpenShift or Kubernetes API Bearer Token
@@ -289,10 +343,9 @@ controller_templates:
   - name: Infrastructure | Automation Orchestrator | Install
     description: >-
       Deploys Automation Orchestrator on an existing OpenShift cluster using
-      aapctl, configures network access, wires the AAP integration, and seeds
-      curated AO demos from infrastructure/ao/demos.yml (disk-utilization by
-      default). Warns if aws_rhel9 or Mattermost are missing; Deploy Cloud
-      Stack and Provision Mattermost before running the disk demo end-to-end.
+      aapctl, configures network access, wires the AAP and LiteMaaS (LLM)
+      integrations, and seeds curated AO demos from infrastructure/ao/demos.yml.
+      Warns if aws_rhel9, Mattermost, or LiteMaaS are missing.
     labels:
       - infrastructure
       - orchestrator
@@ -310,6 +363,7 @@ controller_templates:
     credentials:
       - OpenShift Credential
       - AAP Credential
+      - LiteMaaS
 
   - name: Infrastructure | Automation Orchestrator | Uninstall
     description: >-

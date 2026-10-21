@@ -48,6 +48,11 @@
           if __ao_node_item.type == 'aap_job_template'
           else []
         )
+        + (
+          ['llm_model_id']
+          if __ao_node_item.type == 'agentic'
+          else []
+        )
       }}
     __ao_node_base: >-
       {{
@@ -75,6 +80,16 @@
               'organization_name': ao_organization
             }
             if __ao_node_item.type == 'aap_job_template'
+            else {}
+          )
+        | combine(
+            {
+              'llm_model_id': ao_llm_model_id
+            }
+            if (
+              __ao_node_item.type == 'agentic'
+              and (ao_llm_model_id | default('') | length) > 0
+            )
             else {}
           )
       }}
