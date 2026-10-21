@@ -1,6 +1,19 @@
 ---
 # Bridge Controller LiteMaaS into AO as LLM Provider credential + llm_provider
 # integration (same pattern as intro-ao-workshop). Soft-skip when missing.
+#
+# Secret source: Install JT must attach the Controller LiteMaaS credential so
+# LITELLM_* / OPENAI_* env injectors are present in this job. Non-secret fields
+# can also be read from the Controllers API as a fallback.
+- name: Build Controller API facts for LiteMaaS lookup
+  ansible.builtin.set_fact:
+    ao_llm_controller_api: "{{ _controller_host }}/api/controller/v2"
+    ao_llm_controller_use_token: >-
+      {{ (_controller_oauth_token | default(ao_aap_oauth_token, true) | default('', true) | length) > 0 }}
+    ao_llm_controller_token: >-
+      {{ _controller_oauth_token | default(ao_aap_oauth_token, true) | default('', true) }}
+  no_log: true
+
 - name: Resolve LiteMaaS inputs from Install JT env injectors
   ansible.builtin.set_fact:
     ao_llm_base_url: >-
@@ -33,6 +46,76 @@
       }}
   no_log: true
 
+- name: Look up Controller LiteMaaS credential
+  ansible.builtin.uri:
+    url: "{{ ao_llm_controller_api }}/credentials/?name={{ ao_litemaas_credential_name | urlencode }}"
+    method: GET
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ ao_llm_controller_token, 'Content-Type': 'application/json'}
+        if ao_llm_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_llm_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_llm_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_llm_controller_use_token | bool) }}"
+    validate_certs: false
+    return_content: true
+  register: ao_litemaas_cred_lookup
+  failed_when: false
+  no_log: true
+
+- name: Merge non-secret LiteMaaS fields from Controller credential
+  when: (ao_litemaas_cred_lookup.json.results | default([]) | length) > 0
+  vars:
+    _lm_inputs: "{{ ao_litemaas_cred_lookup.json.results[0].inputs | default({}) }}"
+    _lm_base: "{{ _lm_inputs.api_base_url | default('', true) | trim }}"
+    _lm_endpoint: "{{ _lm_inputs.api_endpoint | default('', true) | trim }}"
+    _lm_model: "{{ _lm_inputs.model | default('', true) | trim }}"
+    _lm_key: "{{ _lm_inputs.virtual_key | default('', true) | trim }}"
+  ansible.builtin.set_fact:
+    ao_llm_base_url: >-
+      {{
+        ao_llm_base_url
+        if (ao_llm_base_url | length) > 0
+        else (_lm_base | regex_replace('/$', ''))
+      }}
+    ao_llm_endpoint_host: >-
+      {{
+        ao_llm_endpoint_host
+        if (ao_llm_endpoint_host | length) > 0
+        else _lm_endpoint
+      }}
+    ao_llm_model_name: >-
+      {{
+        ao_llm_model_name
+        if (
+          (ao_llm_model_name | length) > 0
+          and (ao_llm_model_name | lower) not in ['replaceme', 'replace_me']
+        )
+        else (
+          _lm_model
+          if (_lm_model | length) > 0
+          else (ao_llm_model | default('qwen3-235b'))
+        )
+      }}
+    ao_llm_api_key: >-
+      {{
+        ao_llm_api_key
+        if (ao_llm_api_key | length) > 0
+        else (
+          _lm_key
+          if (
+            (_lm_key | length) > 0
+            and not (_lm_key is match('^\\$encrypted\\$'))
+            and (_lm_key | lower) not in ['replaceme', 'replace_me', 'changeme']
+          )
+          else ''
+        )
+      }}
+    ao_litemaas_controller_credential_id: "{{ ao_litemaas_cred_lookup.json.results[0].id }}"
+  no_log: true
+
 - name: Normalize LiteMaaS base URL hostname when endpoint host empty
   when:
     - (ao_llm_endpoint_host | default('') | length) == 0
@@ -41,28 +124,118 @@
     ao_llm_endpoint_host: >-
       {{ ao_llm_base_url | urlsplit('hostname') | default('', true) }}
 
-- name: Detect placeholder or missing LiteMaaS values
+- name: Detect usable LiteMaaS values for AO wiring
   ansible.builtin.set_fact:
     ao_litemaas_present: >-
       {{
-        (ao_llm_base_url | length) > 0
-        and (ao_llm_api_key | length) > 0
+        (ao_llm_base_url | default('') | length) > 0
+        and (ao_llm_api_key | default('') | length) > 0
         and (ao_llm_base_url | lower) not in ['replaceme', 'replace_me', 'changeme']
         and (ao_llm_api_key | lower) not in ['replaceme', 'replace_me', 'changeme']
+        and not (ao_llm_api_key is match('^\\$encrypted\\$'))
       }}
+    ao_litemaas_on_controller: >-
+      {{ (ao_litemaas_cred_lookup.json.results | default([]) | length) > 0 }}
   no_log: true
 
-- name: Skip LiteMaaS AO wiring when credential is not usable
+- name: Ensure LiteMaaS is attached to the AO Install job template for the next run
+  when:
+    - ao_litemaas_on_controller | bool
+    - not (ao_litemaas_present | bool)
+    - (ao_litemaas_controller_credential_id | default('') | length) > 0
+  block:
+    - name: Look up AO Install job template
+      ansible.builtin.uri:
+        url: >-
+          {{ ao_llm_controller_api }}/job_templates/?name={{
+            'Infrastructure | Automation Orchestrator | Install' | urlencode
+          }}
+        method: GET
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ ao_llm_controller_token, 'Content-Type': 'application/json'}
+            if ao_llm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _controller_username if not (ao_llm_controller_use_token | bool) else omit }}"
+        password: "{{ _controller_password if not (ao_llm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (ao_llm_controller_use_token | bool) }}"
+        validate_certs: false
+        return_content: true
+      register: ao_install_jt_lookup
+      failed_when: false
+      no_log: true
+
+    - name: List credentials on AO Install job template
+      when: (ao_install_jt_lookup.json.results | default([]) | length) > 0
+      ansible.builtin.uri:
+        url: "{{ ao_llm_controller_api }}/job_templates/{{ ao_install_jt_lookup.json.results[0].id }}/credentials/"
+        method: GET
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ ao_llm_controller_token, 'Content-Type': 'application/json'}
+            if ao_llm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _controller_username if not (ao_llm_controller_use_token | bool) else omit }}"
+        password: "{{ _controller_password if not (ao_llm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (ao_llm_controller_use_token | bool) }}"
+        validate_certs: false
+        return_content: true
+      register: ao_install_jt_creds
+      failed_when: false
+      no_log: true
+
+    - name: Attach LiteMaaS credential to AO Install job template
+      when:
+        - (ao_install_jt_lookup.json.results | default([]) | length) > 0
+        - >-
+          ao_litemaas_controller_credential_id | int
+          not in (
+            ao_install_jt_creds.json.results | default([])
+            | map(attribute='id') | list
+          )
+      ansible.builtin.uri:
+        url: "{{ ao_llm_controller_api }}/job_templates/{{ ao_install_jt_lookup.json.results[0].id }}/credentials/"
+        method: POST
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ ao_llm_controller_token, 'Content-Type': 'application/json'}
+            if ao_llm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _controller_username if not (ao_llm_controller_use_token | bool) else omit }}"
+        password: "{{ _controller_password if not (ao_llm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (ao_llm_controller_use_token | bool) }}"
+        body_format: json
+        body:
+          id: "{{ ao_litemaas_controller_credential_id | int }}"
+        validate_certs: false
+        status_code: [204, 200, 201, 400]
+      register: ao_install_jt_attach
+      failed_when: false
+      no_log: true
+
+- name: Skip LiteMaaS AO wiring when virtual key was not injected into this job
   when: not (ao_litemaas_present | bool)
   ansible.builtin.set_fact:
     ao_seed_warnings: >-
       {{
         (ao_seed_warnings | default([]))
         + [
-          'LiteMaaS Controller credential missing or still REPLACEME. '
-          ~ 'On demo.redhat.com it is pre-filled at boot; attach it to '
-          ~ 'Infrastructure | Automation Orchestrator | Install and re-run. '
-          ~ 'Without it, AO agentic AI nodes have no LLM integration.'
+          (
+            'LiteMaaS exists on Controller but its virtual key was not injected '
+            ~ 'into this Install job (Controller API redacts secrets). '
+            ~ 'LiteMaaS has been attached to the Install job template if missing — '
+            ~ 'RE-RUN Infrastructure | Automation Orchestrator | Install once so '
+            ~ 'LITELLM_* env injectors populate and AO gets the LLM integration.'
+            if (ao_litemaas_on_controller | bool)
+            else (
+              'LiteMaaS Controller credential missing or still REPLACEME. '
+              ~ 'On demo.redhat.com it is pre-filled at boot. Run APD | Multi-demo '
+              ~ 'setup (or Single → infrastructure), then re-run Install.'
+            )
+          )
         ]
       }}
     ao_llm_model_id: ""

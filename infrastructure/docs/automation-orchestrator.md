@@ -11,7 +11,7 @@ Stupid simple: one job template.
 1. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
 2. Open the AO URL from the job output and log in as `admin` with the printed password.
 
-You now have AO. On demo.redhat.com, Install also wires the pre-filled Controller **LiteMaaS** credential into AO as an LLM Provider integration so agentic (AI) workflow nodes can run. Seeded demo workflows may still need Path 2 for cloud/chat deps (`aws_rhel9`, Mattermost, and so on). Install **warns** on missing deps; it does not fail.
+You now have AO. On demo.redhat.com, Install also wires the pre-filled Controller **LiteMaaS** credential into AO as an LLM Provider integration so agentic (AI) workflow nodes can run. The Install job template must have **LiteMaaS** attached (APD setup on this branch does that). If the seed summary says LLM was not wired, re-run Install once after setup so the virtual key injects. Seeded demo workflows may still need Path 2 for cloud/chat deps (`aws_rhel9`, Mattermost, and so on). Install **warns** on missing deps; it does not fail.
 
 Skip Network Configuration on RHDP — Install already ran it.
 

@@ -61,7 +61,7 @@
         },
         "tool_selections": [],
         "integration_connections": [],
-        "tool_selection_strategy": "SELECTED"
+        "tool_selection_strategy": "NONE"
       },
       "position": {
         "x": 360,
