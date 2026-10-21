@@ -105,7 +105,7 @@
         source: >-
           {{
             'ansible/product-demos'
-            if (__ao_source.path | string is search('/infrastructure/ao/workflows/'))
+            if ('/infrastructure/ao/workflows/' in (__ao_source.path | string))
             else 'ansible-tmm/aap-orchestrator-demos'
           }}
         source_file: "{{ __ao_source.path | basename }}"
