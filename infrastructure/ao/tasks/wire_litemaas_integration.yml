@@ -239,6 +239,7 @@
         ]
       }}
     ao_llm_model_id: ""
+    ao_llm_credential_id: ""
 
 - name: Ensure LiteMaaS base URL includes /v1 for OpenAI-compatible clients
   when:

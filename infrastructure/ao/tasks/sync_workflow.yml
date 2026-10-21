@@ -1,6 +1,7 @@
 ---
 # Normalize one AO workflow export and create/update it in AO.
-# Rewrites organization_name Default -> APD and injects AAP credential/integration.
+# Rewrites organization_name Default -> APD, injects AAP credential/integration,
+# and on agentic nodes injects llm_model_id + LLM Provider credential_id.
 - name: Reset per-workflow normalization facts
   ansible.builtin.set_fact:
     __ao_triggers: []
@@ -49,7 +50,7 @@
           else []
         )
         + (
-          ['llm_model_id']
+          ['llm_model_id', 'credential_id']
           if __ao_node_item.type == 'agentic'
           else []
         )
@@ -84,11 +85,13 @@
           )
         | combine(
             {
-              'llm_model_id': ao_llm_model_id
+              'llm_model_id': ao_llm_model_id,
+              'credential_id': ao_llm_credential_id
             }
             if (
               __ao_node_item.type == 'agentic'
               and (ao_llm_model_id | default('') | length) > 0
+              and (ao_llm_credential_id | default('') | length) > 0
             )
             else {}
           )

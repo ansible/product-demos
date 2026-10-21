@@ -38,6 +38,7 @@
       "parameters": {
         "prompt": "You are answering a short smoke-test question for Ansible Automation Orchestrator.\n\nUser question:\n${trigger.question}\n\nReply clearly. Identify the model family/name you are if you know it, and share any useful facts about your capabilities or limits that a presenter should know.\n\nOutput ONLY valid JSON matching the response schema.",
         "llm_model_id": null,
+        "credential_id": null,
         "response_schema": {
           "type": "object",
           "required": [

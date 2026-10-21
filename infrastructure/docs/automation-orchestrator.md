@@ -41,7 +41,7 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 
 ### Task Step Example — LiteMaaS smoke test
 
-No cloud stack. After Install, open **Task Step Example**, leave the default question (or edit it), and Run. The AI task step uses the AO **APD LiteMaaS** LLM integration.
+No cloud stack. After Install, open **Task Step Example**, leave the default question (or edit it), and Run. Seed injects both the model (`llm_model_id`) and the **APD LiteMaaS** LLM Provider credential (`credential_id`) on the AI task step — model alone is not enough to call LiteMaaS.
 
 ### Multi-OS Cloud Patching — manual trigger
 
