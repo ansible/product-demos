@@ -159,12 +159,22 @@
               [
                 'AO LLM: ' ~ ao_llm_integration_name
                 ~ ' (model ' ~ (ao_llm_model_name | default(ao_llm_model))
-                ~ ', id ' ~ (ao_llm_model_id | default('pending')) ~ ')',
+                ~ ', id ' ~ ao_llm_model_id ~ ')',
               ]
-              if (ao_litemaas_present | default(false) | bool)
-              else [
-                'AO LLM: not wired — ensure Controller LiteMaaS is populated and attached to Install',
-              ]
+              if (
+                (ao_litemaas_present | default(false) | bool)
+                and (ao_llm_model_id | default('') | length) > 0
+                and (ao_llm_credential_id | default('') | length) > 0
+              )
+              else (
+                [
+                  'AO LLM: credential/integration created but no model id yet — see warnings',
+                ]
+                if (ao_litemaas_present | default(false) | bool)
+                else [
+                  'AO LLM: not wired — ensure Controller LiteMaaS is populated and attached to Install',
+                ]
+              )
             )
           }}
 

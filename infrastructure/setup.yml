@@ -386,9 +386,10 @@ controller_templates:
 
   - name: Infrastructure | AO Network Configuration | Install
     description: >-
-      Allow-lists the AAP gateway and AO route hostnames on Automation
-      Orchestrator's integration URL allow-list and enables private-network
-      OIDC, then restarts the instance so the change takes effect.
+      Allow-lists the AAP gateway, AO route, and LiteMaaS hostnames on
+      Automation Orchestrator's integration URL allow-list and enables
+      private-network OIDC, then restarts the instance so the change takes
+      effect.
     labels:
       - infrastructure
       - orchestrator
@@ -404,6 +405,7 @@ controller_templates:
     credentials:
       - OpenShift Credential
       - AAP Credential
+      - LiteMaaS
 
   - name: Infrastructure | HashiCorp Vault
     labels:

@@ -125,6 +125,14 @@
       {{ ao_llm_base_url | urlsplit('hostname') | default('', true) }}
 
 - name: Detect usable LiteMaaS values for AO wiring
+  vars:
+    _lm_ctrl_inputs: >-
+      {{
+        (ao_litemaas_cred_lookup.json.results | default([{}]))[0].inputs
+        | default({})
+      }}
+    _lm_ctrl_base: "{{ _lm_ctrl_inputs.api_base_url | default('', true) | trim | lower }}"
+    _lm_ctrl_key: "{{ _lm_ctrl_inputs.virtual_key | default('', true) | trim | lower }}"
   ansible.builtin.set_fact:
     ao_litemaas_present: >-
       {{
@@ -136,12 +144,22 @@
       }}
     ao_litemaas_on_controller: >-
       {{ (ao_litemaas_cred_lookup.json.results | default([]) | length) > 0 }}
+    # Credential exists but still holds setup placeholders — re-run Install will not help.
+    ao_litemaas_placeholder: >-
+      {{
+        (ao_litemaas_cred_lookup.json.results | default([]) | length) > 0
+        and (
+          _lm_ctrl_base in ['replaceme', 'replace_me', 'changeme', '']
+          or _lm_ctrl_key in ['replaceme', 'replace_me', 'changeme', '']
+        )
+      }}
   no_log: true
 
 - name: Ensure LiteMaaS is attached to the AO Install job template for the next run
   when:
     - ao_litemaas_on_controller | bool
     - not (ao_litemaas_present | bool)
+    - not (ao_litemaas_placeholder | default(false) | bool)
     - (ao_litemaas_controller_credential_id | default('') | length) > 0
   block:
     - name: Look up AO Install job template
@@ -224,16 +242,23 @@
         (ao_seed_warnings | default([]))
         + [
           (
-            'LiteMaaS exists on Controller but its virtual key was not injected '
-            ~ 'into this Install job (Controller API redacts secrets). '
-            ~ 'LiteMaaS has been attached to the Install job template if missing — '
-            ~ 'RE-RUN Infrastructure | Automation Orchestrator | Install once so '
-            ~ 'LITELLM_* env injectors populate and AO gets the LLM integration.'
-            if (ao_litemaas_on_controller | bool)
+            'LiteMaaS Controller credential is still REPLACEME (not populated). '
+            ~ 'On demo.redhat.com it is pre-filled at catalog boot. Re-running '
+            ~ 'Install will not fill the key — use a lab with LiteMaaS injected, '
+            ~ 'or set the Controller LiteMaaS credential, then re-run Install.'
+            if (ao_litemaas_placeholder | default(false) | bool)
             else (
-              'LiteMaaS Controller credential missing or still REPLACEME. '
-              ~ 'On demo.redhat.com it is pre-filled at boot. Run APD | Multi-demo '
-              ~ 'setup (or Single → infrastructure), then re-run Install.'
+              'LiteMaaS exists on Controller but its virtual key was not injected '
+              ~ 'into this Install job (Controller API redacts secrets). '
+              ~ 'LiteMaaS has been attached to the Install job template if missing — '
+              ~ 'RE-RUN Infrastructure | Automation Orchestrator | Install once so '
+              ~ 'LITELLM_* env injectors populate and AO gets the LLM integration.'
+              if (ao_litemaas_on_controller | bool)
+              else (
+                'LiteMaaS Controller credential missing. On demo.redhat.com it is '
+                ~ 'pre-filled at boot. Run APD | Multi-demo setup (or Single → '
+                ~ 'infrastructure), then re-run Install.'
+              )
             )
           )
         ]
@@ -498,35 +523,54 @@
       no_log: true
 
     - name: Resolve AO llm_model_id for {{ ao_llm_model_name }}
-      ansible.builtin.set_fact:
-        ao_llm_models: >-
+      vars:
+        _ao_llm_models: >-
           {{
             ao_llm_models_resp.json.resources
             | default(ao_llm_models_resp.json.results | default([]))
           }}
-        ao_llm_model_id: >-
+        _ao_llm_preferred: >-
           {{
-            (
-              ao_llm_models_resp.json.resources
-              | default(ao_llm_models_resp.json.results | default([]))
-              | selectattr('name', 'equalto', ao_llm_model_name)
-              | map(attribute='id')
-              | list
-              | first
-              | default(
-                  (
-                    ao_llm_models_resp.json.resources
-                    | default(ao_llm_models_resp.json.results | default([]))
-                    | map(attribute='id')
-                    | list
-                    | first
-                    | default('')
-                  ),
-                  true
-                )
-            )
+            _ao_llm_models
+            | selectattr('name', 'equalto', ao_llm_model_name)
+            | list
+          }}
+        _ao_llm_selected: >-
+          {{
+            _ao_llm_preferred | first
+            | default(_ao_llm_models | first | default({}), true)
+          }}
+      ansible.builtin.set_fact:
+        ao_llm_models: "{{ _ao_llm_models }}"
+        ao_llm_model_id: "{{ _ao_llm_selected.id | default('', true) }}"
+        ao_llm_model_name: >-
+          {{
+            _ao_llm_selected.name
+            | default(ao_llm_model_name, true)
+          }}
+        ao_llm_model_fallback: >-
+          {{
+            (_ao_llm_preferred | length) == 0
+            and (_ao_llm_selected.id | default('') | length) > 0
           }}
       no_log: true
+
+    - name: Warn when preferred LiteMaaS model was not found
+      when: ao_llm_model_fallback | default(false) | bool
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            (ao_seed_warnings | default([]))
+            + [
+              'Preferred LiteMaaS model '
+              ~ (ao_llm_model | default('qwen3-235b'))
+              ~ ' was not in the discovered list; using '
+              ~ ao_llm_model_name
+              ~ ' (id '
+              ~ ao_llm_model_id
+              ~ ') instead.'
+            ]
+          }}
 
     - name: Warn when LiteMaaS model list is empty
       when: (ao_llm_model_id | default('') | length) == 0
@@ -536,7 +580,7 @@
             (ao_seed_warnings | default([]))
             + [
               'LiteMaaS was wired into AO but no models were returned yet '
-              ~ '(model wanted: ' ~ ao_llm_model_name ~ '). '
+              ~ '(model wanted: ' ~ (ao_llm_model | default(ao_llm_model_name)) ~ '). '
               ~ 'Check the APD LiteMaaS integration in AO; agentic nodes may '
               ~ 'need a re-run of Install after models appear.'
             ]
