@@ -163,8 +163,12 @@ def network_report_device(
             status = "failed"
             errors.append({"section": resource, "message": _error(result, secrets)})
         else:
-            raw = result.get("ansible_facts", {}).get("ansible_network_resources", {})
-            if resource not in raw:
+            raw = result.get("ansible_facts", {}).get("ansible_network_resources")
+            # Several vendor collectors omit empty resource keys. An explicit
+            # empty resource mapping is a successful, unconfigured section.
+            if raw == {}:
+                status = "not configured"
+            elif not isinstance(raw, dict) or resource not in raw:
                 status = "not collected"
             else:
                 data = _clean(raw[resource], secrets)

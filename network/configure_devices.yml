@@ -2,6 +2,8 @@
 - name: Configure the multi-vendor lab using network resource modules
   hosts: "{{ _hosts | default('containerlab') }}"
   gather_facts: false
+  # Each vendor has a different dependency order for its resource modules.
+  strategy: free
   pre_tasks:
     - name: Wait for the selected device management service
       ansible.builtin.wait_for:

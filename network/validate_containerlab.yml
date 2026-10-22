@@ -17,7 +17,7 @@
         fail_msg: The APD EC2 hypervisor must expose /dev/kvm before device validation.
 
     - name: Inspect deployed topology
-      ansible.builtin.command: containerlab inspect --all --format json
+      ansible.builtin.command: containerlab --runtime podman inspect --all --format json
       register: clab_validation_topology
       changed_when: false
 

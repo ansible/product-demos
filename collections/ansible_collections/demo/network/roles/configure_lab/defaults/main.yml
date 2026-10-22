@@ -78,6 +78,8 @@ network_lab_resources:
       config:
         - {name: irb, unit: 110, ipv4: [{address: 10.110.0.2/24}]}
         - {name: lo0, unit: 0, ipv4: [{address: 10.255.10.12/32}]}
+    - resource: lldp_interfaces
+      config: [{name: all, enabled: true}]
     - resource: lldp_global
       config: {enabled: true}
   veos:

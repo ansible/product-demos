@@ -138,6 +138,20 @@ def device_fixture(
 
 
 class NetworkReportTests(unittest.TestCase):
+    def test_successful_empty_resource_mapping_is_unconfigured(self):
+        fixture = device_fixture()
+        fixture["resource_results"]["results"][2]["ansible_facts"] = {
+            "ansible_network_resources": {}
+        }
+        device = REPORT.network_report_device(**fixture)
+        self.assertEqual(device["sections"][2]["status"], "not configured")
+
+    def test_missing_resource_mapping_is_a_collection_issue(self):
+        fixture = device_fixture()
+        fixture["resource_results"]["results"][2]["ansible_facts"] = {}
+        device = REPORT.network_report_device(**fixture)
+        self.assertEqual(device["sections"][2]["status"], "not collected")
+
     def test_junos_units_and_operational_state(self):
         device = REPORT.network_report_device(**device_fixture())
         self.assertEqual(device["interfaces"][0]["operational"], "up")
