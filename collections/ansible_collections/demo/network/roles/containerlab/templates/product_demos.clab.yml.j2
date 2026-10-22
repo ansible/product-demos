@@ -6,6 +6,9 @@ topology:
     {{ name }}:
       kind: {{ device.kind }}
       image: {{ device.image }}
+{% if device.env is defined %}
+      env: {{ device.env | to_json }}
+{% endif %}
       startup-config: configs/{{ name }}/startup-config.cfg
       ports:
         - "{{ device.ssh_port }}:22"

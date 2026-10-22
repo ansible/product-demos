@@ -84,6 +84,9 @@ clab_devices:
   veos:
     kind: arista_veos
     image: registry.gitlab.com/redhatautomation/veos-ee:4.32.0F
+    # EC2 nested KVM rejects the performance-capabilities MSR exposed by host.
+    env:
+      QEMU_CPU: host,level=9,pdcm=off
     group: clab_eos
     network_os: arista.eos.eos
     connection: ansible.netcommon.network_cli

@@ -20,6 +20,7 @@
           - clab_test_topology.topology.links | length == 3
           - "'2830:830' in clab_test_topology.topology.nodes.vjunos.ports"
           - clab_test_topology.topology.nodes.veos.kind == 'arista_veos'
+          - clab_test_topology.topology.nodes.veos.env.QEMU_CPU == 'host,level=9,pdcm=off'
 
     - name: Render each credential bootstrap without writing device files
       ansible.builtin.set_fact:
