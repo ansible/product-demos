@@ -1,5 +1,6 @@
 ---
 collections:
+  # Keep collection requirements compatible with the AAP 2.7 base (core 2.16).
   # AAP config as code, see https://access.redhat.com/articles/7143507 for version pinning
   - name: ansible.controller
     version: ">=4.8"
@@ -15,7 +16,7 @@ collections:
   - name: ansible.posix
     version: ">=1.5.4"
   - name: community.general
-    version: ">=8.0.0"
+    version: "11.4.9"
   - name: containers.podman
     version: ">=1.12.1"
   - name: redhat.insights
@@ -28,26 +29,30 @@ collections:
   - name: ansible.windows
     version: ">=2.3.0"
   - name: chocolatey.chocolatey
-    version: ">=1.5.1"
+    version: "1.5.3"
   - name: community.windows
     version: ">=2.2.0"
   # cloud demos
   - name: amazon.aws
-    version: ">=7.5.0"
+    version: "9.5.2"
   - name: community.aws
-    version: ">=7.0.0"
+    version: "9.3.0"
   # satellite demos
   - name: redhat.satellite
     version: ">=4.0.0"
   # network demos
   - name: ansible.netcommon
-    version: ">=6.0.0"
+    version: "8.7.1"
   - name: cisco.ios
-    version: ">=7.0.0"
+    version: "11.6.0"
   - name: cisco.iosxr
     version: ">=8.0.0"
   - name: cisco.nxos
-    version: ">=7.0.0"
+    version: "13.0.0"
+  - name: arista.eos
+    version: "12.3.0"
+  - name: juniper.device
+    version: "2.0.1"
   - name: network.backup
     version: ">=3.0.0"
   - name: paloaltonetworks.panos

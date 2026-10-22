@@ -11,30 +11,33 @@
   - [Suggested Usage](#suggested-usage)
 
 ## About These Demos
-This category of demos shows examples of network operations and management with Ansible Automation Platform. The demos run against Cisco NX-OS and IOS-XE devices hosted in a [containerlab](https://containerlab.dev/) topology on AWS, providing a fully self-contained environment with no external dependencies.
+This category of demos shows examples of network operations and management with Ansible Automation Platform. The demos run against Cisco IOS-XE, Cisco NX-OS, Juniper Junos, and Arista EOS devices hosted in a [containerlab](https://containerlab.dev/) topology on AWS, providing a fully self-contained environment with no external dependencies.
 
 ## Infrastructure
 
-The network demos use containerlab to run virtual Cisco devices as containers on an AWS EC2 hypervisor with nested virtualization enabled.
+The network demos use containerlab to run virtual network devices as containers on an AWS EC2 hypervisor with nested virtualization enabled.
 
 | Component | Details |
 |-----------|---------|
-| **Hypervisor** | RHEL 9 on AWS EC2 (c8i.2xlarge) with nested virtualization |
+| **Hypervisor** | RHEL 9 on AWS EC2 (c8i.4xlarge by default) with nested virtualization |
 | **Container Runtime** | Podman |
 | **NX-OS Device** | Cisco Nexus 9000v (`n9kv`) — SSH on port 2122 |
 | **IOS-XE Device** | Cisco Catalyst 8000v (`cat8kv`) — SSH on port 2123 |
+| **Junos Device** | Juniper vJunos-switch (`vjunos`) — SSH 2124, NETCONF 2830 |
+| **EOS Device** | Arista vEOS (`veos`) — SSH 2125 |
+| **Report** | Persistent HTML and sanitized JSON at `http://<hypervisor>:8088/network/` |
 | **Regions** | us-east-2, us-west-2 |
 
-Device connectivity is handled via an **SSH Proxy** credential type that routes connections through the hypervisor to the containerlab devices. A dedicated **ContainerLab Inventory** holds the device hosts and group variables.
+Devices use port-mapped management services on the hypervisor. The **Containerlab Device Access** credential supplies device authentication; Junos uses NETCONF and the other platforms use `network_cli`. A dedicated **ContainerLab Inventory** holds the device hosts and group variables.
 
 ## Getting Started
 
 1. Deploy the demos using the "Product Demos | Multi-demo setup" or "Product Demos | Single demo setup" and select **Network**.
 2. Run the **NETWORK ǀ Deploy Containerlab Stack** workflow to provision the infrastructure. This will:
    - Provision an EC2 hypervisor with nested virtualization
-   - Deploy the containerlab topology (n9kv + cat8kv)
+   - Deploy the containerlab topology (n9kv + cat8kv + vjunos + veos)
    - Sync the ContainerLab Inventory with the hypervisor IP
-3. Once the stack is up, run the demo job templates (Report, Backup, DISA STIG, Configure Devices).
+3. Run **Configure Devices**, then **Validate Devices**, then **Report**. The report job publishes a browser URL in its output and AAP artifacts. Cisco Backup, DISA STIG, Staging, and Upgrade remain available.
 4. When finished, run **NETWORK ǀ Destroy Containerlab Stack** to tear down all AWS resources.
 
 ## Workflows
@@ -52,8 +55,9 @@ Device connectivity is handled via an **SSH Proxy** credential type that routes 
 | Job Template | Description |
 |--------------|-------------|
 | **Provision Hypervisor** | Create AWS VPC, subnet, security group, keypair, and launch a RHEL 9 EC2 instance with nested virtualization enabled. |
-| **Deploy Topology** | Install podman and containerlab on the hypervisor, pull device images, and start the n9kv + cat8kv topology. |
-| **Configure Devices** | Apply baseline configuration (banner, NTP, SNMP) to the containerlab NX-OS and IOS-XE devices. |
+| **Deploy Topology** | Install podman and containerlab on the hypervisor, pull device images, and start the four-device topology. |
+| **Configure Devices** | Merge interface, VLAN, trunk, addressing, LLDP, and NTP configuration across all four platforms; retain Cisco banner and SNMP baselines. |
+| **Validate Devices** | Check KVM, capacity, device facts, and configured data-path reachability. Starts with Junos to validate the new image on EC2. |
 | **Teardown Topology** | Destroy the running containerlab topology on the hypervisor. |
 | **Troubleshoot** | Collect hypervisor, containerlab, and podman diagnostics through AAP when manual SSH is unavailable. |
 | **Teardown Hypervisor** | Terminate the EC2 instance and remove all associated AWS resources. |
@@ -62,7 +66,7 @@ Device connectivity is handled via an **SSH Proxy** credential type that routes 
 
 | Job Template | Description |
 |--------------|-------------|
-| **Report** | Gather facts from containerlab Cisco devices and display device information including hostname, OS version, model, serial number, and interfaces. |
+| **Report** | Publish a detailed multi-vendor web report with identity, operational interfaces, neighbors, structured configuration, and independent collection status. |
 | **DISA STIG** | Run the DISA STIG role against the IOS-XE device to assess configuration compliance. Runs in check mode by default. |
 | **Backup** | Back up running configurations from containerlab NX-OS and IOS-XE devices using native Cisco collection modules. |
 | **Staging** | Stage a new IOS-XE image to the IOS-XE device bootflash via SCP, then verify the file integrity with a SHA-512 hash check. Must be run before **Upgrade**. |
@@ -80,11 +84,13 @@ Device connectivity is handled via an **SSH Proxy** credential type that routes 
 
 ## Suggested Usage
 
-**Deploy the stack first** — Run the **NETWORK ǀ Deploy Containerlab Stack** workflow before any other network demo. The workflow provisions infrastructure and populates the ContainerLab Inventory. Provisioning takes approximately 10-15 minutes while device images are pulled and virtual devices boot.
+**Deploy the stack first** — Run the **NETWORK ǀ Deploy Containerlab Stack** workflow before any other network demo. The workflow provisions infrastructure and populates the ContainerLab Inventory. Allow at least 15 minutes for vJunos boot plus image pulls. Per-device readiness timeouts include 30 minutes for Junos; EC2 boot timing is still to be measured.
 
-**NETWORK ǀ Configure Devices** — Run this after deploying the stack to apply baseline device configuration (NTP, SNMP, banners) using Cisco Network Resource Modules. This demonstrates how Ansible standardizes configuration across different network operating systems.
+**NETWORK ǀ Configure Devices** — Configure the connected topology with vendor network resource modules and `state: merged`. The same logical network intent is expressed in each platform's structured schema.
 
-**NETWORK ǀ Report** — Gather facts from the containerlab devices and display a summary of each device. Shows how Ansible can collect and present network device information for reporting and auditing.
+**NETWORK ǀ Containerlab ǀ Validate Devices** — Validate the exact vJunos image on the APD EC2 hypervisor after configuration. Containerlab documents a nested-VM restriction, so successful Azure testing must be verified on EC2. The job records hypervisor and container resource usage and checks collection and a cross-device ping. The default four-device size is `c8i.4xlarge`; capacity and reboot stability still need live verification.
+
+**NETWORK ǀ Report** — Open the detailed HTML report linked in the job output and artifacts. Search or filter by vendor, expand resource configuration, and compare live interface and neighbor observations. See the [report guide](docs/network-report.md) for collection coverage and failure behavior. Rebuild the Product Demos EE before using the new modules.
 
 **NETWORK ǀ DISA STIG** — Run in check mode (default) to show how Ansible assesses compliance against DISA STIG rules on IOS-XE devices. Click into tasks to see what would change for each compliance rule.
 

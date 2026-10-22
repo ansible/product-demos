@@ -1,7 +1,7 @@
 ---
 # AWS infrastructure
 clab_aws_region: us-east-2
-clab_aws_instance_type: c8i.2xlarge
+clab_aws_instance_type: c8i.4xlarge
 clab_aws_image_filter: 'RHEL-9*HVM-*Hourly*'
 clab_aws_image_owners: "309956199498"
 clab_aws_image_architecture: x86_64
@@ -36,9 +36,61 @@ clab_podman_user_storage_content: |
   [storage]
   driver = "overlay"
   graphroot = "/mnt/images/storage"
-clab_images:
-  - "registry.gitlab.com/redhatautomation/cat8:17.13.01a"
-  - "registry.gitlab.com/redhatautomation/nexus10-ee:10.5.3.F"
+clab_images: "{{ clab_devices.values() | map(attribute='image') | unique | list }}"
 
 # Containerlab topology
 clab_topology: product_demos
+clab_device_username: admin
+# Match the Containerlab Device Access credential. Override both together.
+clab_device_password: "{{ lookup('ansible.builtin.env', 'CLAB_DEVICE_PASSWORD') | default('admin@123', true) }}"
+clab_report_port: 8088
+clab_access_cidr: 0.0.0.0/0
+clab_security_group_rules:
+  - proto: tcp
+    ports: "{{ ([22, clab_report_port | int] + (clab_devices.values() | map(attribute='port') | list) + (clab_devices.values() | map(attribute='ssh_port') | list)) | unique | list }}"
+    cidr_ip: "{{ clab_access_cidr }}"
+  - proto: icmp
+    from_port: -1
+    to_port: -1
+    cidr_ip: "{{ clab_access_cidr }}"
+clab_devices:
+  n9kv:
+    kind: cisco_n9kv
+    image: registry.gitlab.com/redhatautomation/nexus10-ee:10.5.3.F
+    group: clab_nxos
+    network_os: cisco.nxos.nxos
+    connection: ansible.netcommon.network_cli
+    ssh_port: 2122
+    port: 2122
+    timeout: 900
+  cat8kv:
+    kind: cisco_c8000v
+    image: registry.gitlab.com/redhatautomation/cat8:17.13.01a
+    group: clab_ios
+    network_os: cisco.ios.ios
+    connection: ansible.netcommon.network_cli
+    ssh_port: 2123
+    port: 2123
+    timeout: 900
+  vjunos:
+    kind: juniper_vjunosswitch
+    image: registry.gitlab.com/redhatautomation/vjunos_switch_clab:25.2R1.9
+    group: clab_junos
+    network_os: juniper.device.junos
+    connection: ansible.netcommon.netconf
+    ssh_port: 2124
+    port: 2830
+    timeout: 1800
+  veos:
+    kind: arista_veos
+    image: registry.gitlab.com/redhatautomation/veos-ee:4.32.0F
+    group: clab_eos
+    network_os: arista.eos.eos
+    connection: ansible.netcommon.network_cli
+    ssh_port: 2125
+    port: 2125
+    timeout: 900
+clab_links:
+  - endpoints: [cat8kv:Gi2, n9kv:eth1]
+  - endpoints: [n9kv:eth2, vjunos:ge-0/0/0]
+  - endpoints: [vjunos:ge-0/0/1, veos:eth1]

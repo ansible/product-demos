@@ -1108,7 +1108,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)"
     icon: "🌐"
-  blurb: "Gather facts from containerlab Cisco NX-OS and IOS-XE devices and display hostname, version, model, and interfaces."
+  blurb: "Publish a detailed Cisco, Juniper, and Arista web report with operational observations and structured configuration."
   stats:
     playbooks: 1
   github_path: network/report.yml

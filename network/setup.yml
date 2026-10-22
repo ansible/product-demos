@@ -2,7 +2,14 @@
 _deployment_id: '{{ lookup("ansible.builtin.password", playbook_dir + "/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
 apd_managed_by: aap-product-demos
 
-user_message:
+user_message: >-
+  The multi-vendor lab requires the rebuilt Product Demos EE with the pinned network
+  collections. vJunos-switch 25.2R1.9 must be validated on the APD EC2 hypervisor;
+  run NETWORK | Containerlab | Validate Devices after deploying and configuring.
+  The four-device default is c8i.4xlarge for memory headroom; live capacity is not yet measured.
+
+# Reuse the role's device catalog when creating Controller inventory.
+clab_device_catalog: "{{ (lookup('ansible.builtin.file', playbook_dir + '/collections/ansible_collections/demo/network/roles/containerlab/defaults/main.yml') | from_yaml).clab_devices }}"
 
 controller_credential_types:
   - name: SSH Proxy
@@ -118,7 +125,7 @@ controller_credentials:
       ssh_proxy_host: REPLACEME
       ssh_proxy_username: ec2-user
   - name: Containerlab Device Access
-    description: Admin credentials for containerlab network devices (n9kv, cat8kv)
+    description: Admin credentials shared by Cisco, Juniper, and Arista lab devices
     organization: Ansible Product Demos (APD)
     credential_type: SSH Proxy
     inputs:
@@ -153,6 +160,12 @@ controller_hosts:
   - name: cat8kv
     inventory: ContainerLab Inventory
     enabled: true
+  - name: vjunos
+    inventory: ContainerLab Inventory
+    enabled: true
+  - name: veos
+    inventory: ContainerLab Inventory
+    enabled: true
 
 controller_groups:
   - name: clab_nxos
@@ -160,32 +173,53 @@ controller_groups:
     hosts:
       - n9kv
     variables:
-      ansible_port: 2122
-      ansible_network_os: cisco.nxos.nxos
+      ansible_port: "{{ clab_device_catalog.n9kv.port }}"
+      ansible_network_os: "{{ clab_device_catalog.n9kv.network_os }}"
+      ansible_connection: "{{ clab_device_catalog.n9kv.connection }}"
+      ansible_connect_timeout: "{{ clab_device_catalog.n9kv.timeout }}"
+      ansible_command_timeout: 120
   - name: clab_ios
     inventory: ContainerLab Inventory
     hosts:
       - cat8kv
     variables:
-      ansible_port: 2123
-      ansible_network_os: cisco.ios.ios
+      ansible_port: "{{ clab_device_catalog.cat8kv.port }}"
+      ansible_network_os: "{{ clab_device_catalog.cat8kv.network_os }}"
+      ansible_connection: "{{ clab_device_catalog.cat8kv.connection }}"
+      ansible_connect_timeout: "{{ clab_device_catalog.cat8kv.timeout }}"
+      ansible_command_timeout: 120
+  - name: clab_junos
+    inventory: ContainerLab Inventory
+    hosts:
+      - vjunos
+    variables:
+      ansible_port: "{{ clab_device_catalog.vjunos.port }}"
+      ansible_network_os: "{{ clab_device_catalog.vjunos.network_os }}"
+      ansible_connection: "{{ clab_device_catalog.vjunos.connection }}"
+      ansible_connect_timeout: "{{ clab_device_catalog.vjunos.timeout }}"
+      ansible_command_timeout: 120
+  - name: clab_eos
+    inventory: ContainerLab Inventory
+    hosts:
+      - veos
+    variables:
+      ansible_port: "{{ clab_device_catalog.veos.port }}"
+      ansible_network_os: "{{ clab_device_catalog.veos.network_os }}"
+      ansible_connection: "{{ clab_device_catalog.veos.connection }}"
+      ansible_connect_timeout: "{{ clab_device_catalog.veos.timeout }}"
+      ansible_command_timeout: 120
   - name: clab_switches
     inventory: ContainerLab Inventory
-    hosts:
-      - n9kv
+    hosts: [n9kv, vjunos, veos]
   - name: clab_routers
     inventory: ContainerLab Inventory
-    hosts:
-      - cat8kv
+    hosts: [cat8kv]
   - name: containerlab
     inventory: ContainerLab Inventory
-    children:
-      - clab_nxos
-      - clab_ios
+    children: [clab_nxos, clab_ios, clab_junos, clab_eos]
     variables:
       ansible_user: !unsafe '{{ ssh_proxy_username }}'
       ansible_password: !unsafe '{{ ssh_proxy_password }}'
-      ansible_connection: ansible.netcommon.network_cli
       ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
 
 controller_inventory_sources:
@@ -273,7 +307,7 @@ controller_templates:
           type: multiplechoice
           variable: clab_aws_instance_type
           required: true
-          default: c8i.2xlarge
+          default: c8i.4xlarge
           choices:
             - c8i.2xlarge
             - c8i.4xlarge
@@ -429,6 +463,29 @@ controller_templates:
             - us-east-2
             - us-west-2
 
+  - name: "NETWORK | Containerlab | Validate Devices"
+    description: Validate EC2 KVM, resource usage, device facts, and configured lab connectivity
+    labels: [network, containerlab]
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: ContainerLab Inventory
+    project: Ansible Product Demos
+    playbook: network/validate_containerlab.yml
+    credentials:
+      - Containerlab Device Access
+      - Containerlab SSH
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Which devices should be validated?
+          type: multiplechoice
+          variable: _hosts
+          default: clab_junos
+          required: true
+          choices: [clab_junos, containerlab, clab_ios, clab_nxos, clab_eos]
+
   - name: "NETWORK | Report"
     labels:
       - network
@@ -442,6 +499,7 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - Containerlab Device Access
+      - Containerlab SSH
     survey_enabled: true
     survey:
       name: ''
@@ -456,6 +514,8 @@ controller_templates:
             - containerlab
             - clab_nxos
             - clab_ios
+            - clab_junos
+            - clab_eos
 
   - name: "NETWORK | DISA STIG"
     labels:
@@ -740,7 +800,7 @@ controller_workflows:
           type: multiplechoice
           variable: clab_aws_instance_type
           required: true
-          default: c8i.2xlarge
+          default: c8i.4xlarge
           choices:
             - c8i.2xlarge
             - c8i.4xlarge

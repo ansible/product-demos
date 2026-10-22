@@ -83,6 +83,11 @@
       changed_when: clab_destroy.rc == 0
       failed_when: false
 
+    - name: Remove the generated report for the destroyed topology
+      ansible.builtin.file:
+        path: /var/www/html/network
+        state: absent
+
     - name: Display result
       ansible.builtin.debug:
         msg: "Containerlab topology '{{ clab_topology }}' destroyed"

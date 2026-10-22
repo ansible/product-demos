@@ -1,0 +1,69 @@
+---
+- name: Initialize this run's collection results
+  ansible.builtin.set_fact:
+    network_report_base: {}
+    network_report_legacy: {results: []}
+    network_report_resource_results: {results: []}
+    network_report_neighbors: {}
+    network_report_platform: "{{ network_report_platforms.get(ansible_network_os | default(''), {}) }}"
+
+- name: Collect supported device facts
+  when: network_report_platform | length > 0
+  block:
+    - name: Collect identity and discover supported resource subsets
+      action: "{{ network_report_platform.facts_module | default('ansible.builtin.debug') }}"
+      args:
+        gather_subset: [min]
+        available_network_resources: true
+      register: network_report_base
+      ignore_errors: true  # noqa: ignore-errors - failed devices must remain in the report
+      ignore_unreachable: true
+      no_log: true
+
+    - name: Collect hardware and live interface facts independently
+      action: "{{ network_report_platform.facts_module | default('ansible.builtin.debug') }}"
+      args:
+        gather_subset: "{{ [item] }}"
+      loop: [hardware, interfaces]
+      register: network_report_legacy
+      when: not (network_report_base.failed | default(false) or network_report_base.unreachable | default(false))
+      ignore_errors: true  # noqa: ignore-errors - preserve successful identity and resource facts
+      ignore_unreachable: true
+      no_log: true
+
+    - name: Gather supported structured configuration one resource at a time
+      action: "{{ network_report_platform.facts_module | default('ansible.builtin.debug') }}"
+      args:
+        gather_subset: ['!all', '!min']
+        gather_network_resources: "{{ [item] }}"
+      loop: "{{ network_report_resources }}"
+      when:
+        - not (network_report_base.failed | default(false) or network_report_base.unreachable | default(false))
+        - item in (network_report_base.ansible_facts.available_network_resources | default([]))
+      register: network_report_resource_results
+      ignore_errors: true  # noqa: ignore-errors - distinguish failed resources from unsupported ones
+      ignore_unreachable: true
+      no_log: true
+
+    - name: Collect discovered Junos LLDP neighbors over NETCONF
+      juniper.device.junos_command:
+        commands: show lldp neighbors
+        display: json
+      when:
+        - ansible_network_os == 'juniper.device.junos'
+        - not (network_report_base.failed | default(false) or network_report_base.unreachable | default(false))
+      register: network_report_neighbors
+      ignore_errors: true  # noqa: ignore-errors - LLDP discovery is an independent report section
+      ignore_unreachable: true
+      no_log: true
+
+- name: Normalize collected facts and redact sensitive values
+  ansible.builtin.set_fact:
+    network_report_device: >-
+      {{ inventory_hostname | demo.network.network_report_device(
+         ansible_host | default(inventory_hostname), ansible_port | default(22),
+         ansible_network_os | default('unknown'), ansible_connection | default('unknown'),
+         network_report_platform, network_report_base, network_report_legacy,
+         network_report_resource_results, network_report_neighbors, network_report_resources,
+         [ansible_password | default(''), ansible_become_password | default('')]) }}
+  no_log: true

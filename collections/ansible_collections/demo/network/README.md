@@ -1,13 +1,13 @@
 # demo.network
 
-Local collection containing roles used by the [Network demos](../../../../network/README.md) in ansible-product-demos.
-
-This collection is not published to Ansible Galaxy or Automation Hub; it exists solely to organize roles used by playbooks in this repository under the `demo.network` namespace.
-
-## Contents
-
-### Roles
+Local collection supporting the [Network demos](../../../../network/README.md). It is shipped inside this repository rather than published to Galaxy or Automation Hub.
 
 | Role | Description |
-|------|-------------|
-| containerlab | Defaults and topology files for provisioning a containerlab hypervisor on AWS and deploying Cisco NX-OS / IOS-XE lab devices. |
+|---|---|
+| `containerlab` | Shared device catalog, infrastructure defaults, topology, and bootstrap rendering for Cisco, Juniper, and Arista. |
+| `configure_lab` | Connected demo configuration using vendor network resource modules. |
+| `gather_report` | Independent identity, operational, and structured-resource collection with partial-failure handling. |
+| `report_server` | Persistent Apache hosting, SELinux port policy, and active firewalld configuration. |
+| `build_report` | Static HTML and sanitized JSON publication with an AAP report URL artifact. |
+
+The `network_report` filter plugin normalizes vendor facts, redacts sensitive values, and aggregates only hosts selected by the current job. The HTML uses native expandable sections and local assets. See [report documentation](../../../../network/docs/network-report.md) and [tests](tests/README.md).

@@ -8,8 +8,6 @@
     - role: demo.network.containerlab
 
   vars:
-    clab_aws_region: "{{ clab_aws_region | default('us-east-2') }}"
-    clab_aws_instance_type: "{{ clab_aws_instance_type | default('c8i.2xlarge') }}"
     aws_owner_tag: "{{ clab_aws_owner_tag | default('apd-demo') }}"
 
   tasks:
@@ -77,16 +75,7 @@
         description: Containerlab hypervisor - SSH and port-mapped device access
         region: "{{ clab_aws_region }}"
         vpc_id: "{{ clab_vpc.vpc.id }}"
-        rules:
-          - proto: tcp
-            ports:
-              - 22
-              - 2122-2123
-            cidr_ip: 0.0.0.0/0
-          - proto: icmp
-            from_port: -1
-            to_port: -1
-            cidr_ip: 0.0.0.0/0
+        rules: "{{ clab_security_group_rules }}"
         rules_egress:
           - proto: -1
             cidr_ip: 0.0.0.0/0

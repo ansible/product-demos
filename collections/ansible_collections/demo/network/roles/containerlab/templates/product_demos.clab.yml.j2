@@ -1,0 +1,29 @@
+# Generated from the device catalog in demo.network.containerlab.
+name: {{ clab_topology }}
+topology:
+  nodes:
+{% for name, device in clab_devices.items() %}
+    {{ name }}:
+      kind: {{ device.kind }}
+      image: {{ device.image }}
+      startup-config: configs/{{ name }}/startup-config.cfg
+      ports:
+        - "{{ device.ssh_port }}:22"
+{% if device.connection == 'ansible.netcommon.netconf' %}
+        - "{{ device.port }}:830"
+{% endif %}
+{% endfor %}
+    scp-server:
+      kind: linux
+      image: registry.gitlab.com/redhatautomation/linux-file:latest
+      mgmt-ipv4: 172.20.20.11
+      exec:
+        - apt-get update
+        - apt-get install -y openssh-server
+        - mkdir -p /var/run/sshd
+        - useradd -m -s /bin/bash scpuser
+        - echo 'scpuser:scpuser' | chpasswd
+        - sed -i 's/.*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+        - /usr/sbin/sshd
+  links:
+{{ clab_links | to_nice_yaml(indent=2) | indent(4, true) }}

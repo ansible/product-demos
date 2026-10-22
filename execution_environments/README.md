@@ -14,3 +14,13 @@ Currently the execution environment image is created manually using the `build.s
 The `build.sh` script creates a multi-architecture EE image for the amd64 (x86_64) and arm64 (aarch64) platforms.  It does so by creating the build context using `ansible-builder create`, then creating a podman manifest definition and building an EE image for each supported platform.
 
 NOTE: Podman will use qemu to emulate the non-native architecture at build time, so the build must be performed on a system which includes the qemu-user-static package.  Builds have only been tested on MacOS using podman-desktop with the native Fedora-based podman machine.
+
+## AAP 2.7 compatibility
+
+The pinned AAP 2.7 base image ships Ansible core 2.16. The 2.7 requirements pin
+compatible releases: `amazon.aws` 9.5.2, `community.aws` 9.3.0,
+`community.general` 11.4.9, and `chocolatey.chocolatey` 1.5.3. In addition to the
+core requirement, `community.aws` 9.3.0 requires `amazon.aws` below version 10.
+The network collections remain pinned to the versions selected for the
+multi-vendor report. Check collection `meta/runtime.yml` requirements and
+collection dependencies against the base runtime when refreshing these pins.

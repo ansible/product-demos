@@ -1,0 +1,34 @@
+---
+- name: Validate device credentials for startup configuration
+  ansible.builtin.assert:
+    that:
+      - clab_device_username is match('^[a-zA-Z][a-zA-Z0-9_-]*$')
+      - clab_device_password is match('^[A-Za-z0-9!@#%^*()_+=.,:-]+$')
+    fail_msg: Device credentials must use a simple username and a nonempty password without whitespace or quotes.
+  no_log: true
+
+- name: Generate password hash for EOS and Junos bootstrap
+  ansible.builtin.set_fact:
+    clab_device_password_hash: "{{ clab_device_password | password_hash('sha512') }}"
+  no_log: true
+
+- name: Create startup configuration directories
+  ansible.builtin.file:
+    path: "/root/clab/{{ clab_topology }}/configs/{{ item }}"
+    state: directory
+    mode: '0700'
+  loop: "{{ clab_devices.keys() | list }}"
+
+- name: Render device bootstrap configuration
+  ansible.builtin.template:
+    src: "{{ clab_files_path }}/{{ clab_topology }}/configs/{{ item }}/startup-config.cfg"
+    dest: "/root/clab/{{ clab_topology }}/configs/{{ item }}/startup-config.cfg"
+    mode: '0600'
+  loop: "{{ clab_devices.keys() | list }}"
+  no_log: true
+
+- name: Render topology from device catalog
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/product_demos.clab.yml.j2"
+    dest: "/root/clab/{{ clab_topology }}/{{ clab_topology }}.clab.yml"
+    mode: '0644'

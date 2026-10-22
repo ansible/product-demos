@@ -1,0 +1,28 @@
+---
+- name: Validate generated topology and bootstrap templates without a hypervisor
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    clab_device_password: offline-test-password
+    clab_device_password_hash: '$6$offline$fixture'
+  roles:
+    - role: demo.network.containerlab
+  tasks:
+    - name: Parse generated topology
+      ansible.builtin.set_fact:
+        clab_test_topology: "{{ lookup('ansible.builtin.template', playbook_dir + '/../roles/containerlab/templates/product_demos.clab.yml.j2') | from_yaml }}"
+
+    - name: Require connected topology and correct NETCONF mapping
+      ansible.builtin.assert:
+        that:
+          - clab_test_topology.topology.nodes | length == 5
+          - clab_test_topology.topology.links | length == 3
+          - "'2830:830' in clab_test_topology.topology.nodes.vjunos.ports"
+          - clab_test_topology.topology.nodes.veos.kind == 'arista_veos'
+
+    - name: Render each credential bootstrap without writing device files
+      ansible.builtin.set_fact:
+        clab_test_bootstrap: "{{ lookup('ansible.builtin.template', clab_files_path + '/product_demos/configs/' + item + '/startup-config.cfg') }}"
+      loop: "{{ clab_devices.keys() | list }}"
+      no_log: true

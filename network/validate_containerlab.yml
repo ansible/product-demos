@@ -1,0 +1,83 @@
+---
+- name: Inspect APD hypervisor virtualization and capacity
+  hosts: "{{ _report_server | default('clab_containerlab') }}"
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Check KVM device
+      ansible.builtin.stat:
+        path: /dev/kvm
+      register: clab_validation_kvm
+
+    - name: Require hardware virtualization
+      ansible.builtin.assert:
+        that:
+          - clab_validation_kvm.stat.exists
+          - clab_validation_kvm.stat.ischr
+        fail_msg: The APD EC2 hypervisor must expose /dev/kvm before device validation.
+
+    - name: Inspect deployed topology
+      ansible.builtin.command: containerlab inspect --all --format json
+      register: clab_validation_topology
+      changed_when: false
+
+    - name: Measure container resource usage
+      ansible.builtin.command: podman stats --no-stream --format json
+      register: clab_validation_usage
+      changed_when: false
+
+    - name: Export hypervisor validation evidence
+      ansible.builtin.set_stats:
+        data:
+          clab_validation:
+            collected_at: "{{ ansible_facts.date_time.iso8601 }}"
+            hypervisor: "{{ ansible_host }}"
+            cpu_count: "{{ ansible_facts.processor_vcpus }}"
+            memory_total_mb: "{{ ansible_facts.memtotal_mb }}"
+            memory_available_mb: "{{ ansible_facts.memory_mb.real.free }}"
+            topology: "{{ clab_validation_topology.stdout | from_json }}"
+            usage: "{{ clab_validation_usage.stdout | from_json }}"
+        per_host: false
+
+- name: Validate device services and structured resource collection
+  hosts: "{{ _hosts | default('clab_junos') }}"
+  gather_facts: false
+  vars:
+    clab_validation_commands:
+      cisco.ios.ios: ping 10.255.0.1 repeat 3 timeout 2
+      cisco.nxos.nxos: ping 10.110.0.2 count 3 timeout 2
+      juniper.device.junos: ping 10.110.0.3 count 3 wait 1
+      arista.eos.eos: ping 10.110.0.2 repeat 3
+  pre_tasks:
+    - name: Wait for selected management endpoint
+      ansible.builtin.wait_for:
+        host: "{{ ansible_host }}"
+        port: "{{ ansible_port }}"
+        timeout: "{{ ansible_connect_timeout | default(1800) }}"
+        search_regex: SSH
+      delegate_to: localhost
+  roles:
+    - role: demo.network.gather_report
+  tasks:
+    - name: Require identity, operational interfaces, and structured addressing
+      ansible.builtin.assert:
+        that:
+          - network_report_device.status in ['collected', 'partial']
+          - network_report_device.interface_status == 'collected'
+          - network_report_device.sections | selectattr('name', 'equalto', 'interfaces') | selectattr('status', 'equalto', 'collected') | list | length == 1
+          - network_report_device.sections | selectattr('name', 'equalto', 'l3_interfaces') | selectattr('status', 'equalto', 'collected') | list | length == 1
+        fail_msg: Device collection failed. Run NETWORK | Report to inspect collection errors.
+
+    - name: Exercise the configured cross-device data path
+      action: "{{ ansible_network_os }}_command"
+      args:
+        commands: "{{ [clab_validation_commands[ansible_network_os]] }}"
+      register: clab_validation_ping
+      changed_when: false
+      retries: 6
+      delay: 10
+      until: clab_validation_ping.stdout | join('\n') is search('Success rate is 100 percent|(?<![0-9])0% packet loss')
+
+    - name: Record successful device validation
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }}: authenticated, gathered structured configuration and live interfaces, and passed a data-path ping."
