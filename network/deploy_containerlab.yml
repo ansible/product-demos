@@ -3,6 +3,7 @@
   hosts: localhost
   connection: local
   gather_facts: false
+  tags: [always]
 
   roles:
     - role: demo.network.containerlab
@@ -58,6 +59,16 @@
           - clab_target_metadata.instances | length == 1
         fail_msg: Could not resolve the selected EC2 hypervisor in this region.
 
+    - name: Refresh APD inventory discovery tags
+      amazon.aws.ec2_tag:
+        region: "{{ clab_aws_region }}"
+        resource: "{{ clab_target_metadata.instances[0].instance_id }}"
+        state: present
+        tags:
+          managed-by: "{{ apd_managed_by | default('aap-product-demos') }}"
+          apd_id: "{{ apd_id }}"
+      when: apd_id is defined
+
     - name: Refresh management port rules for existing lab deployments
       amazon.aws.ec2_security_group:
         name: "{{ clab_aws_sg_name }}"
@@ -106,6 +117,7 @@
   hosts: clab-hypervisor
   become: true
   gather_facts: true
+  tags: [deploy]
 
   roles:
     - role: demo.network.containerlab
@@ -280,6 +292,7 @@
   hosts: localhost
   connection: local
   gather_facts: false
+  tags: [inventory]
 
   roles:
     - role: demo.network.containerlab

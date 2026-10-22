@@ -287,6 +287,9 @@ controller_templates:
     project: Ansible Product Demos
     playbook: network/provision_hypervisor.yml
     inventory: Ansible Product Demos Inventory
+    extra_vars:
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -333,6 +336,9 @@ controller_templates:
     project: Ansible Product Demos
     playbook: network/deploy_containerlab.yml
     inventory: Ansible Product Demos Inventory
+    extra_vars:
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
