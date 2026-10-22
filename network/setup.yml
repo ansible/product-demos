@@ -208,6 +208,8 @@ controller_groups:
       ansible_connection: "{{ clab_device_catalog.veos.connection }}"
       ansible_connect_timeout: "{{ clab_device_catalog.veos.timeout }}"
       ansible_command_timeout: 120
+      ansible_become: true
+      ansible_become_method: enable
   - name: clab_switches
     inventory: ContainerLab Inventory
     hosts: [n9kv, vjunos, veos]
