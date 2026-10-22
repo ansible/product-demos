@@ -47,7 +47,7 @@
 
     - name: Collect discovered Junos LLDP neighbors over NETCONF
       juniper.device.junos_command:
-        commands: show lldp neighbors
+        commands: show lldp neighbors detail
         display: json
       when:
         - ansible_network_os == 'juniper.device.junos'

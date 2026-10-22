@@ -95,7 +95,11 @@ def _junos_neighbors(value):
 
                     found.append(
                         {
-                            "local_interface": text("lldp-local-interface"),
+                            "local_interface": (
+                                text("lldp-local-interface")
+                                if "lldp-local-interface" in entry
+                                else text("lldp-local-port-id")
+                            ),
                             "neighbor": text("lldp-remote-system-name"),
                             "remote_port": text("lldp-remote-port-id"),
                             "source": "LLDP",

@@ -158,6 +158,15 @@ class NetworkReportTests(unittest.TestCase):
         self.assertEqual(device["sections"][1]["rows"][0]["unit"], 110)
         self.assertEqual(device["neighbors"][0]["neighbor"], "n9kv")
 
+    def test_junos_25_local_port_identifier(self):
+        fixture = device_fixture()
+        entry = fixture["neighbor_result"]["output"][0]["lldp-neighbors-information"][0][
+            "lldp-neighbor-information"
+        ][0]
+        entry["lldp-local-port-id"] = entry.pop("lldp-local-interface")
+        device = REPORT.network_report_device(**fixture)
+        self.assertEqual(device["neighbors"][0]["local_interface"], "ge-0/0/0")
+
     def test_partial_failure_preserves_device_and_other_sections(self):
         device = REPORT.network_report_device(**device_fixture())
         self.assertEqual(device["status"], "partial")

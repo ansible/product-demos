@@ -88,7 +88,11 @@ Devices use port-mapped management services on the hypervisor. The **Containerla
 
 **NETWORK ǀ Configure Devices** — Configure the connected topology with vendor network resource modules and `state: merged`. The same logical network intent is expressed in each platform's structured schema.
 
-**NETWORK ǀ Containerlab ǀ Validate Devices** — Validate the exact vJunos image on the APD EC2 hypervisor after configuration. Containerlab documents a nested-VM restriction, so successful Azure testing must be verified on EC2. The job records hypervisor and container resource usage and checks collection and a cross-device ping. The default four-device size is `c8i.4xlarge`; capacity and reboot stability still need live verification.
+**NETWORK ǀ Containerlab ǀ Validate Devices** — Validate device collection and cross-device pings after configuration. The job also records hypervisor KVM support and container resource usage. On October 22, 2026, all four devices were deployed and configured through APD on AAP 2.7 using `c8i.4xlarge` in `us-east-2`. The exact vJunos-switch `25.2R1.9` image passed its forwarding test on EC2. This is a functional validation; prolonged load and reboot stability remain unmeasured.
+
+The tested deployment needs three compatibility settings included in this branch: vEOS masks the unsupported nested-KVM performance-capabilities feature with `QEMU_CPU=host,level=9,pdcm=off`; EOS password hashes use the standard SHA-512 format without a `rounds=` prefix; and the Junos interface intent omits the `enabled` field because `juniper.device` 2.0.1 emits invalid logical-interface statements. Configuration resources run independently per device to preserve each vendor's dependency order.
+
+Repeated configuration succeeds, but current Cisco and EOS modules can reissue default settings and report changes despite identical before/after data. IOS-XE configuration saving also reports a change on repeated runs. Do not interpret the changed-task count alone as configuration drift.
 
 **NETWORK ǀ Report** — Open the detailed HTML report linked in the job output and artifacts. Search or filter by vendor, expand resource configuration, and compare live interface and neighbor observations. See the [report guide](docs/network-report.md) for collection coverage and failure behavior. Rebuild the Product Demos EE before using the new modules.
 

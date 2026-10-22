@@ -76,7 +76,7 @@
       changed_when: false
       retries: 6
       delay: 10
-      until: clab_validation_ping.stdout | join('\n') is search('Success rate is 100 percent|(?<![0-9])0% packet loss')
+      until: clab_validation_ping.stdout | join('\n') is search('Success rate is 100 percent|(?<![0-9.])0([.]0+)?% packet loss')
 
     - name: Record successful device validation
       ansible.builtin.debug:
