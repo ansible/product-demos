@@ -9,7 +9,8 @@
 
 - name: Generate password hash for EOS and Junos bootstrap
   ansible.builtin.set_fact:
-    clab_device_password_hash: "{{ clab_device_password | password_hash('sha512') }}"
+    # EOS requires the standard $6$salt$hash form, without a rounds= prefix.
+    clab_device_password_hash: "{{ clab_device_password | password_hash('sha512', rounds=5000) }}"
   no_log: true
 
 - name: Create startup configuration directories
