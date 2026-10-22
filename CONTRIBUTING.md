@@ -7,7 +7,17 @@ This document aims to outline the requirements for the various forms of contribu
 
 ## Pull Requests
 
-**ALL** contributions are subject to review via pull request
+All contributions must go through a pull request into `ansible/product-demos`. Most PRs still need a human approving review before merge.
+
+### Docs-only exception (markdown)
+
+Pull requests that change **only** Markdown files (`*.md`) do not require a second-person approving review. After CI is green, a collaborator with write access may merge.
+
+This is intentional: README and docs updates are low risk to demo job templates compared with playbooks, `setup.yml`, roles, and collections.
+
+If the PR changes any non-markdown file (even one `.yml` / `.yaml` / `.j2` / workflow / image / script), the normal review requirement still applies.
+
+Background and the GitHub settings needed to enforce this are in [.github/proposals/docs-only-pr-fast-path.md](.github/proposals/docs-only-pr-fast-path.md).
 
 ### Pull Requests
 1) Ensure the "base repository" is set to "ansible/product-demos".
