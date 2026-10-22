@@ -55,11 +55,13 @@ network_lab_resources:
       config: {timer: 30}
   vjunos:
     - resource: interfaces
+      # juniper.device 2.0.1 emits an invalid `enable;` leaf on logical
+      # interfaces. Junos interfaces are enabled by default; omit that field.
       config:
-        - {name: ge-0/0/0, description: 'To n9kv Ethernet1/2', enabled: true}
-        - {name: ge-0/0/1, description: 'To veos Ethernet1', enabled: true}
-        - {name: irb, description: DEMO SVI, enabled: true}
-        - {name: lo0, description: APD report demo, enabled: true}
+        - {name: ge-0/0/0, description: 'To n9kv Ethernet1/2'}
+        - {name: ge-0/0/1, description: 'To veos Ethernet1'}
+        - {name: irb, description: DEMO SVI}
+        - {name: lo0, description: APD report demo}
     - resource: vlans
       config:
         - {vlan_id: 110, name: DEMO, l3_interface: irb.110}
