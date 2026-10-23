@@ -6,6 +6,13 @@ apd_ee_image: quay.io/ansible-product-demos/apd-ee-{{ apd_ee_image_version }}:{{
 apd_git_repo: https://github.com/ansible/product-demos
 apd_git_repo_branch: main
 
+apd_eda_ee_image_name: "de-supported-rhel9"
+apd_eda_ee_image_tag: "{{ apd_ee_image_tag }}"
+apd_eda_ee_image_version: "{{ apd_ee_image_version }}"
+apd_eda_ee_image: "registry.redhat.io/ansible-automation-platform-{{ apd_eda_ee_image_version }}/{{ apd_eda_ee_image_name }}:{{ apd_eda_ee_image_tag }}"
+apd_eda_git_repo: "{{ apd_git_repo }}"
+apd_eda_git_branch: "{{ apd_git_repo_branch }}"
+
 ## Disable async for gateway roles to work around ansible.platform 2.7 action plugin
 ## incompatibility (redhat-cop/infra.aap_configuration#1368).
 ## Remove once the EE ships ansible.platform >= 2.7.20260615.
@@ -158,5 +165,29 @@ controller_templates:
             - openshift
             - satellite
             - windows
+
+eda_projects:
+  - name: Ansible Product Demos
+    description: Event-Driven Automation Demo
+    organization: Ansible Product Demos (APD)
+    url: "{{ apd_eda_git_repo }}"
+    scm_branch: "{{ eda_project_scm_branch | default(apd_git_repo_branch) }}"
+
+eda_decision_environments:
+  - name: Default Decision Environment
+    description: Default decision environment for rulebooks
+    organization: Ansible Product Demos (APD)
+    image_url: "{{ apd_eda_ee_image }}"
+
+eda_credentials:
+  - name: AAP Credential
+    credential_type: Red Hat Ansible Automation Platform
+    organization: Ansible Product Demos (APD)
+    update_secrets: false
+    inputs:
+      host: '{{ aap_hostname }}/api/controller/'
+      username: '{{ aap_username | default(omit) }}'
+      password: '{{ aap_password | default(omit) }}'
+      verify_ssl: '{{ aap_validate_certs }}'
 
 ...
