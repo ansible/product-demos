@@ -50,12 +50,6 @@
         name: infra.aap_configuration.dispatch
       vars:
         controller_dependency_check: false  # noqa: var-naming[no-role-prefix]
-        # Config-as-code apply should only declare inventory sources, not
-        # launch a sync job for them (e.g. AD LDAP Inventory failing before
-        # dc01 exists / its credential is filled in). Syncs are triggered
-        # explicitly by workflow nodes or Controller's own scheduling instead.
-        aap_configuration_dispatcher_exclude_roles:
-          - controller_inventory_source_update
 
     - name: Log Demo
       ansible.builtin.uri:
