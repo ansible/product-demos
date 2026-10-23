@@ -1,29 +1,57 @@
 ---
-- name: Validate generated topology and bootstrap templates without a hypervisor
+- name: Validate both topologies and active topology discovery without a hypervisor
   hosts: localhost
   connection: local
   gather_facts: false
   vars:
     clab_device_password: offline-test-password
-    clab_device_password_hash: '$6$offline$fixture'
   roles:
     - role: demo.network.containerlab
   tasks:
-    - name: Parse generated topology
-      ansible.builtin.set_fact:
-        clab_test_topology: "{{ lookup('ansible.builtin.template', playbook_dir + '/../roles/containerlab/templates/product_demos.clab.yml.j2') | from_yaml }}"
+    - name: Create temporary lab workspace
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: clab-topology-test-
+      register: clab_test_workspace
 
-    - name: Require connected topology and correct NETCONF mapping
-      ansible.builtin.assert:
-        that:
-          - clab_test_topology.topology.nodes | length == 5
-          - clab_test_topology.topology.links | length == 3
-          - "'2830:830' in clab_test_topology.topology.nodes.vjunos.ports"
-          - clab_test_topology.topology.nodes.veos.kind == 'arista_veos'
-          - clab_test_topology.topology.nodes.veos.env.QEMU_CPU == 'host,level=9,pdcm=off'
+    - name: Exercise topology rendering and discovery
+      vars:
+        clab_root_dir: "{{ clab_test_workspace.path }}"
+      block:
+        - name: Discover an empty workspace
+          ansible.builtin.include_role:
+            name: demo.network.containerlab
+            tasks_from: discover_active
 
-    - name: Render each credential bootstrap without writing device files
-      ansible.builtin.set_fact:
-        clab_test_bootstrap: "{{ lookup('ansible.builtin.template', clab_files_path + '/product_demos/configs/' + item + '/startup-config.cfg') }}"
-      loop: "{{ clab_devices.keys() | list }}"
-      no_log: true
+        - name: Require no active topology before deployment
+          ansible.builtin.assert:
+            that: clab_active_topology == ''
+
+        - name: Render and validate each supported topology
+          ansible.builtin.include_tasks: tasks/render_topology.yml
+          loop: [product_demos, multi-vendor, product_demos]
+          loop_control:
+            loop_var: clab_test_topology_name
+            index_var: clab_test_topology_index
+          vars:
+            clab_topology: "{{ clab_test_topology_name }}"
+
+        - name: Mark the lab as torn down while retaining old topology files
+          ansible.builtin.copy:
+            dest: "{{ clab_root_dir }}/active_topology"
+            content: ""
+            mode: '0644'
+
+        - name: Discover a torn down lab
+          ansible.builtin.include_role:
+            name: demo.network.containerlab
+            tasks_from: discover_active
+
+        - name: Require teardown record to take precedence over legacy files
+          ansible.builtin.assert:
+            that: clab_active_topology == ''
+      always:
+        - name: Remove temporary lab workspace
+          ansible.builtin.file:
+            path: "{{ clab_test_workspace.path }}"
+            state: absent

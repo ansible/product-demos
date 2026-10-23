@@ -1,0 +1,29 @@
+---
+- name: Check active topology record
+  ansible.builtin.stat:
+    path: "{{ clab_root_dir }}/active_topology"
+  register: clab_active_record
+
+- name: Read active topology record
+  ansible.builtin.slurp:
+    src: "{{ clab_root_dir }}/active_topology"
+  register: clab_active_content
+  when: clab_active_record.stat.exists
+
+- name: Check topology deployed before topology selection was introduced
+  ansible.builtin.stat:
+    path: "{{ clab_root_dir }}/product_demos/product_demos.clab.yml"
+  register: clab_legacy_topology
+  when: not clab_active_record.stat.exists
+
+- name: Resolve active topology
+  ansible.builtin.set_fact:
+    clab_active_topology: >-
+      {{ (clab_active_content.content | b64decode | trim) if clab_active_record.stat.exists
+         else ('product_demos' if clab_legacy_topology.stat.exists else '') }}
+
+- name: Validate active topology record
+  ansible.builtin.assert:
+    that:
+      - clab_active_topology == '' or clab_active_topology in clab_topologies
+    fail_msg: "Unknown active topology in {{ clab_root_dir }}/active_topology: {{ clab_active_topology }}"

@@ -1,4 +1,10 @@
 ---
+- name: Validate topology selection
+  ansible.builtin.assert:
+    that:
+      - clab_topology in clab_topologies
+    fail_msg: "Choose one of the supported topologies: {{ clab_topologies.keys() | join(', ') }}"
+
 - name: Set containerlab files path
   ansible.builtin.set_fact:
     clab_files_path: "{{ role_path }}/files/clab/"

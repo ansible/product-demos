@@ -252,6 +252,32 @@
       args:
         creates: /usr/bin/containerlab
 
+    - name: Discover previously deployed topology
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: discover_active
+
+    - name: Stop previous deployment before rendering the selected lab
+      ansible.builtin.command:
+        cmd: containerlab destroy --cleanup --runtime podman
+        chdir: "{{ clab_root_dir }}/{{ clab_active_topology }}/"
+      environment:
+        DOCKER_HOST: "unix:///run/user/1000/podman/podman.sock"
+      changed_when: true
+      when: clab_active_topology | length > 0
+
+    - name: Clear previous deployment record
+      ansible.builtin.copy:
+        dest: "{{ clab_root_dir }}/active_topology"
+        content: ""
+        mode: '0644'
+      when: clab_active_topology | length > 0
+
+    - name: Remove report from the previous deployment
+      ansible.builtin.file:
+        path: /var/www/html/network
+        state: absent
+
     - name: Render topology and device bootstrap configurations
       ansible.builtin.include_role:
         name: demo.network.containerlab
@@ -261,10 +287,16 @@
       ansible.builtin.include_role:
         name: demo.network.report_server
 
+    - name: Record selected topology for teardown and diagnostics
+      ansible.builtin.copy:
+        dest: "{{ clab_root_dir }}/active_topology"
+        content: "{{ clab_topology }}\n"
+        mode: '0644'
+
     - name: Deploy containerlab topology
       ansible.builtin.command:
         cmd: containerlab deploy --reconfigure --runtime podman
-        chdir: "/root/clab/{{ clab_topology }}/"
+        chdir: "{{ clab_root_dir }}/{{ clab_topology }}/"
       environment:
         DOCKER_HOST: "unix:///run/user/1000/podman/podman.sock"
       retries: 2
@@ -302,6 +334,7 @@
       ansible.controller.host:
         name: "{{ item.key }}"
         inventory: ContainerLab Inventory
+        enabled: "{{ item.key in clab_devices }}"
         variables:
           ansible_host: "{{ clab_host_ip }}"
           ansible_port: "{{ item.value.port }}"
@@ -310,7 +343,7 @@
           ansible_connect_timeout: "{{ item.value.timeout }}"
           ansible_command_timeout: 120
         state: present
-      loop: "{{ clab_devices | dict2items }}"
+      loop: "{{ clab_device_catalog | dict2items }}"
       loop_control:
         label: "{{ item.key }}"
       when: lookup('ansible.builtin.env', 'AWX_HOST') | length > 0

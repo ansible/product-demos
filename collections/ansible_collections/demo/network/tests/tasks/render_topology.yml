@@ -1,0 +1,67 @@
+---
+- name: Render selected topology and startup files
+  ansible.builtin.include_role:
+    name: demo.network.containerlab
+    tasks_from: render_configs
+
+- name: Read rendered topology
+  ansible.builtin.slurp:
+    src: "{{ clab_root_dir }}/{{ clab_topology }}/{{ clab_topology }}.clab.yml"
+  register: clab_test_rendered
+
+- name: Parse rendered topology
+  ansible.builtin.set_fact:
+    clab_test_topology: "{{ clab_test_rendered.content | b64decode | from_yaml }}"
+
+- name: Require topology and device selection to agree
+  ansible.builtin.assert:
+    that:
+      - clab_test_topology.name == clab_topology
+      - clab_test_topology.topology.nodes.keys() | list | sort == (clab_devices.keys() | list + ['scp-server']) | sort
+      - clab_devices.keys() | list | sort == clab_topologies[clab_topology].devices | sort
+      - clab_images | length == clab_devices | length
+      - (2830 in clab_security_group_rules[0].ports) == (clab_topology == 'multi-vendor')
+
+- name: Require the original two-device topology without data links
+  ansible.builtin.assert:
+    that:
+      - clab_test_topology.topology.nodes | length == 3
+      - clab_test_topology.topology.links is not defined
+      - clab_test_rendered.content | b64decode == lookup('ansible.builtin.file', clab_files_path + '/product_demos/product_demos.clab.yml', rstrip=false)
+  when: clab_topology == 'product_demos'
+
+- name: Discover a legacy deployment without an active topology record
+  ansible.builtin.include_role:
+    name: demo.network.containerlab
+    tasks_from: discover_active
+  when: clab_test_topology_index == 0
+
+- name: Require legacy deployment compatibility
+  ansible.builtin.assert:
+    that: clab_active_topology == 'product_demos'
+  when: clab_test_topology_index == 0
+
+- name: Require connected multi-vendor topology and correct NETCONF mapping
+  ansible.builtin.assert:
+    that:
+      - clab_test_topology.topology.nodes | length == 5
+      - clab_test_topology.topology.links | length == 3
+      - "'2830:830' in clab_test_topology.topology.nodes.vjunos.ports"
+      - clab_test_topology.topology.nodes.veos.kind == 'arista_veos'
+      - clab_test_topology.topology.nodes.veos.env.QEMU_CPU == 'host,level=9,pdcm=off'
+  when: clab_topology == 'multi-vendor'
+
+- name: Record selected topology
+  ansible.builtin.copy:
+    dest: "{{ clab_root_dir }}/active_topology"
+    content: "{{ clab_topology }}\n"
+    mode: '0644'
+
+- name: Discover recorded topology
+  ansible.builtin.include_role:
+    name: demo.network.containerlab
+    tasks_from: discover_active
+
+- name: Require recorded topology to take precedence over previous topology files
+  ansible.builtin.assert:
+    that: clab_active_topology == clab_topology

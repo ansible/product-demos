@@ -40,8 +40,10 @@ clab_images: "{{ clab_devices.values() | map(attribute='image') | unique | list 
 
 # Containerlab topology
 clab_topology: product_demos
+clab_root_dir: /root/clab
 clab_device_username: admin
-# Match the Containerlab Device Access credential. Override both together.
+# Multi-vendor bootstrap credentials must match Containerlab Device Access.
+# The restored product_demos startup files retain admin / admin@123 from main.
 clab_device_password: "{{ lookup('ansible.builtin.env', 'CLAB_DEVICE_PASSWORD') | default('admin@123', true) }}"
 clab_report_port: 8088
 clab_access_cidr: 0.0.0.0/0
@@ -53,7 +55,20 @@ clab_security_group_rules:
     from_port: -1
     to_port: -1
     cidr_ip: "{{ clab_access_cidr }}"
-clab_devices:
+# Catalog shared by topology selection and Controller inventory setup.
+clab_devices: "{{ clab_device_catalog | dict2items | selectattr('key', 'in', clab_topologies[clab_topology].devices) | items2dict }}"
+clab_links: "{{ clab_topologies[clab_topology].links }}"
+clab_topologies:
+  product_demos:
+    devices: [n9kv, cat8kv]
+    links: []
+  multi-vendor:
+    devices: [n9kv, cat8kv, vjunos, veos]
+    links:
+      - endpoints: [cat8kv:Gi2, n9kv:eth1]
+      - endpoints: [n9kv:eth2, vjunos:ge-0/0/0]
+      - endpoints: [vjunos:ge-0/0/1, veos:eth1]
+clab_device_catalog:
   n9kv:
     kind: cisco_n9kv
     image: registry.gitlab.com/redhatautomation/nexus10-ee:10.5.3.F
@@ -93,7 +108,3 @@ clab_devices:
     ssh_port: 2125
     port: 2125
     timeout: 900
-clab_links:
-  - endpoints: [cat8kv:Gi2, n9kv:eth1]
-  - endpoints: [n9kv:eth2, vjunos:ge-0/0/0]
-  - endpoints: [vjunos:ge-0/0/1, veos:eth1]

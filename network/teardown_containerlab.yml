@@ -73,15 +73,29 @@
     - role: demo.network.containerlab
 
   tasks:
+    - name: Discover deployed topology
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: discover_active
+
     - name: Destroy containerlab topology
       ansible.builtin.command:
-        cmd: containerlab destroy --cleanup
-        chdir: "/root/clab/{{ clab_topology }}/"
+        cmd: containerlab destroy --cleanup --runtime podman
+        chdir: "{{ clab_root_dir }}/{{ clab_active_topology }}/"
       environment:
         DOCKER_HOST: "unix:///run/user/1000/podman/podman.sock"
       register: clab_destroy
       changed_when: clab_destroy.rc == 0
+      # Stack teardown must still be able to remove AWS resources if destroy fails.
       failed_when: false
+      when: clab_active_topology | length > 0
+
+    - name: Clear active topology record
+      ansible.builtin.copy:
+        dest: "{{ clab_root_dir }}/active_topology"
+        content: ""
+        mode: '0644'
+      when: clab_destroy.rc | default(1) == 0
 
     - name: Remove the generated report for the destroyed topology
       ansible.builtin.file:
@@ -90,4 +104,12 @@
 
     - name: Display result
       ansible.builtin.debug:
-        msg: "Containerlab topology '{{ clab_topology }}' destroyed"
+        msg: >-
+          {% if clab_active_topology | length == 0 %}
+          No deployed topology found
+          {% elif clab_destroy.rc == 0 %}
+          Containerlab topology '{{ clab_active_topology }}' destroyed
+          {% else %}
+          Containerlab could not destroy '{{ clab_active_topology }}': {{ clab_destroy.stderr | default(clab_destroy.msg | default('unknown error'), true) }}.
+          The active topology record was retained. Run Troubleshoot, or Destroy Containerlab Stack to remove AWS resources.
+          {% endif %}

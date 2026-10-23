@@ -3,13 +3,14 @@ _deployment_id: '{{ lookup("ansible.builtin.password", playbook_dir + "/.deploym
 apd_managed_by: aap-product-demos
 
 user_message: >-
+  Choose product_demos for the original Cisco lab or multi-vendor for the connected four-platform lab.
   The multi-vendor lab requires the rebuilt Product Demos EE with the pinned network
   collections. vJunos-switch 25.2R1.9 was functionally validated on APD EC2 c8i.4xlarge;
   run NETWORK | Containerlab | Validate Devices after deploying and configuring.
   The four-device default is c8i.4xlarge for memory headroom; prolonged load and reboot stability remain unmeasured.
 
 # Reuse the role's device catalog when creating Controller inventory.
-clab_device_catalog: "{{ (lookup('ansible.builtin.file', playbook_dir + '/collections/ansible_collections/demo/network/roles/containerlab/defaults/main.yml') | from_yaml).clab_devices }}"
+clab_device_catalog: "{{ (lookup('ansible.builtin.file', playbook_dir + '/collections/ansible_collections/demo/network/roles/containerlab/defaults/main.yml') | from_yaml).clab_device_catalog }}"
 
 controller_credential_types:
   - name: SSH Proxy
@@ -162,10 +163,10 @@ controller_hosts:
     enabled: true
   - name: vjunos
     inventory: ContainerLab Inventory
-    enabled: true
+    enabled: "{{ clab_topology | default('product_demos') == 'multi-vendor' }}"
   - name: veos
     inventory: ContainerLab Inventory
-    enabled: true
+    enabled: "{{ clab_topology | default('product_demos') == 'multi-vendor' }}"
 
 controller_groups:
   - name: clab_nxos
@@ -349,6 +350,14 @@ controller_templates:
       name: ''
       description: ''
       spec:
+        - question_name: Topology
+          type: multiplechoice
+          variable: clab_topology
+          required: true
+          default: product_demos
+          choices:
+            - product_demos
+            - multi-vendor
         - question_name: AWS Region
           type: multiplechoice
           variable: clab_aws_region
@@ -796,6 +805,14 @@ controller_workflows:
       name: ''
       description: ''
       spec:
+        - question_name: Topology
+          type: multiplechoice
+          variable: clab_topology
+          required: true
+          default: product_demos
+          choices:
+            - product_demos
+            - multi-vendor
         - question_name: AWS Region
           type: multiplechoice
           variable: clab_aws_region
