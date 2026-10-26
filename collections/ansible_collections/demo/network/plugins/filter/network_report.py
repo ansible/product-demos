@@ -270,7 +270,9 @@ def network_report_device(
         else (
             "failed"
             if _failed(base) or not base
-            else "partial" if errors else "collected"
+            else "partial"
+            if errors
+            else "collected"
         )
     )
     return _clean(

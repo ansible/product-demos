@@ -160,9 +160,9 @@ class NetworkReportTests(unittest.TestCase):
 
     def test_junos_25_local_port_identifier(self):
         fixture = device_fixture()
-        entry = fixture["neighbor_result"]["output"][0]["lldp-neighbors-information"][0][
-            "lldp-neighbor-information"
-        ][0]
+        entry = fixture["neighbor_result"]["output"][0]["lldp-neighbors-information"][
+            0
+        ]["lldp-neighbor-information"][0]
         entry["lldp-local-port-id"] = entry.pop("lldp-local-interface")
         device = REPORT.network_report_device(**fixture)
         self.assertEqual(device["neighbors"][0]["local_interface"], "ge-0/0/0")

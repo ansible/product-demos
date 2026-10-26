@@ -15,6 +15,20 @@ The `build.sh` script creates a multi-architecture EE image for the amd64 (x86_6
 
 NOTE: Podman will use qemu to emulate the non-native architecture at build time, so the build must be performed on a system which includes the qemu-user-static package.  Builds have only been tested on MacOS using podman-desktop with the native Fedora-based podman machine.
 
+## Network demo testing prerequisite
+
+The official Product Demos EE must be rebuilt and published with the updated
+EE definitions and requirements in this PR before testing the multi-vendor
+configuration and report jobs. Updating or syncing the APD project does not
+update an already published EE image.
+
+The jobs require the pinned `ansible.netcommon`, `cisco.ios`, `cisco.nxos`,
+`arista.eos`, and `juniper.device` collections, plus `ncclient` and `passlib`.
+Build the EE for the target AAP version, publish it to an accessible registry,
+and select that image for Product Demos EE before running Network setup and
+the demo jobs. Attach a Container Registry credential when using a private
+registry. Live acceptance was performed with a rebuilt AAP 2.7 EE on x86_64.
+
 ## AAP 2.7 compatibility
 
 The pinned AAP 2.7 base image ships Ansible core 2.16. The 2.7 requirements pin

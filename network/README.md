@@ -34,6 +34,11 @@ Devices use port-mapped management services on the hypervisor. The **Containerla
 
 ## Getting Started
 
+**Testing prerequisite:** The official Product Demos EE needs to be rebuilt
+and published with this branch's updated collections and Python dependencies.
+A project sync alone is insufficient. Select the rebuilt EE for the network
+jobs; see the [EE testing prerequisite](../execution_environments/README.md#network-demo-testing-prerequisite).
+
 1. Deploy the demos using the "Product Demos | Multi-demo setup" or "Product Demos | Single demo setup" and select **Network**.
 2. Run the **NETWORK ǀ Deploy Containerlab Stack** workflow to provision the infrastructure. This will:
    - Provision an EC2 hypervisor with nested virtualization
