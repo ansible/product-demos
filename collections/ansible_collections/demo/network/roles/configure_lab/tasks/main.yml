@@ -17,6 +17,16 @@
     loop_var: network_lab_item
     label: "{{ network_lab_item.resource }}"
 
+- name: Permit diagnostic pings from the vSRX data interface to its loopback
+  juniper.device.junos_config:
+    lines:
+      - set security policies from-zone trust to-zone trust policy apd-loopback-ping match source-address any
+      - set security policies from-zone trust to-zone trust policy apd-loopback-ping match destination-address any
+      - set security policies from-zone trust to-zone trust policy apd-loopback-ping match application junos-icmp-ping
+      - set security policies from-zone trust to-zone trust policy apd-loopback-ping then permit
+    update: merge
+  when: ansible_network_os == 'juniper.device.junos'
+
 - name: Configure Cisco login banner
   action: "{{ network_lab_prefixes[ansible_network_os] }}_banner"
   args:
