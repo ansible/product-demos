@@ -83,6 +83,8 @@
               - "'management-instance' not in (clab_test_junos_bootstrap.content | b64decode)"
               - "'route 0.0.0.0/0 next-hop 10.0.0.2' in (clab_test_junos_bootstrap.content | b64decode)"
               - "'security-zone trust' in (clab_test_junos_bootstrap.content | b64decode)"
+              - "'client-alive-interval 10;' in (clab_test_junos_bootstrap.content | b64decode)"
+              - "'client-alive-count-max 3;' in (clab_test_junos_bootstrap.content | b64decode)"
 
         - name: Create an existing split-lab record for migration
           ansible.builtin.copy:

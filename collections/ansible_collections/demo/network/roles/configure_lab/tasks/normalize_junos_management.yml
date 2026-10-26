@@ -2,6 +2,16 @@
 # The image merges startup snippets into a retained management VRF. The pinned
 # route resource parser cannot gather an IPv4-only VRF. Normalize this lab's
 # management context and verify it when the transition closes NETCONF.
+- name: Ensure unresponsive NETCONF clients release their server sessions
+  juniper.device.junos_config:
+    lines:
+      - set system services netconf ssh client-alive-interval 10
+      - set system services netconf ssh client-alive-count-max 3
+    update: merge
+
+- name: Reconnect so NETCONF uses the configured client keepalives
+  ansible.builtin.meta: reset_connection
+
 - name: Inspect the current Junos management context
   juniper.device.junos_command:
     display: text
