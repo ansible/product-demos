@@ -14,41 +14,26 @@ network_lab_vlans:
   - vlan_id: 120
     name: OPERATIONS
 network_lab_resources:
+  # The original Cisco topology has no data links. Configure virtual
+  # interfaces and baselines without assuming extra physical NICs exist.
   cat8kv:
     - resource: interfaces
       config:
-        - {name: GigabitEthernet2, description: 'Demo routed port', enabled: true}
         - {name: Loopback10, description: APD report demo, enabled: true}
     - resource: l3_interfaces
       config:
-        - {name: GigabitEthernet2, ipv4: [{address: 10.255.0.0/31}]}
         - {name: Loopback10, ipv4: [{address: 10.255.10.10/32}]}
     - resource: lldp_global
       config: {enabled: true}
-    - resource: static_routes
-      config:
-        - address_families:
-            - afi: ipv4
-              routes:
-                - dest: 10.110.0.0/24
-                  next_hops: [{forward_router_address: 10.255.0.1}]
   n9kv:
     - resource: vlans
       config: "{{ network_lab_vlans }}"
     - resource: interfaces
       config:
-        - {name: Ethernet1/1, description: 'Demo routed port', enabled: true, mode: layer3}
-        - {name: Ethernet1/2, description: 'Spare trunk port', enabled: true, mode: layer2}
         - {name: Vlan110, description: DEMO gateway, enabled: true}
         - {name: Loopback10, description: APD report demo, enabled: true}
-    - resource: l2_interfaces
-      config:
-        - name: Ethernet1/2
-          mode: trunk
-          trunk: {allowed_vlans: '110,120'}
     - resource: l3_interfaces
       config:
-        - {name: Ethernet1/1, ipv4: [{address: 10.255.0.1/31}]}
         - {name: Vlan110, ipv4: [{address: 10.110.0.1/24}]}
         - {name: Loopback10, ipv4: [{address: 10.255.10.11/32}]}
     - resource: lldp_global
