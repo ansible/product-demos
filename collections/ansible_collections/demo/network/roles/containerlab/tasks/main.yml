@@ -1,9 +1,8 @@
 ---
-- name: Validate topology selection
+- name: Require the connected Product Demos topology
   ansible.builtin.assert:
-    that:
-      - clab_topology in clab_topologies
-    fail_msg: "Choose one of the supported topologies: {{ clab_topologies.keys() | join(', ') }}"
+    that: clab_topology == 'product_demos'
+    fail_msg: The network demos now use one connected product_demos topology. Rerun Network setup to refresh the surveys.
 
 - name: Set containerlab files path
   ansible.builtin.set_fact:

@@ -190,7 +190,7 @@
       ansible.builtin.shell:
         cmd: |
           set -o pipefail
-          for name in $(podman ps -a --format '{{ '{{' }}.Names{{ '}}' }}' | grep -E '^clab-({{ clab_topologies.keys() | join('|') }})-' || true); do
+          for name in $(podman ps -a --format '{{ '{{' }}.Names{{ '}}' }}' | grep -E '^clab-({{ ([clab_topology] + clab_legacy_topology_names) | join('|') }})-' || true); do
             echo "=== ${name} (last 20 lines) ==="
             podman logs --tail 20 "${name}" || echo "No logs available for ${name}"
             echo

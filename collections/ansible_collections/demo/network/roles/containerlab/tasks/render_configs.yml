@@ -12,34 +12,24 @@
     # EOS requires the standard $6$salt$hash form, without a rounds= prefix.
     clab_device_password_hash: "{{ clab_device_password | password_hash('sha512', rounds=5000) }}"
   no_log: true
-  when: clab_topology == 'multi-vendor'
 
 - name: Create startup configuration directories
   ansible.builtin.file:
-    path: "{{ clab_root_dir }}/{{ clab_topology }}/configs/{{ item }}"
+    path: "{{ clab_root_dir }}/{{ clab_topology }}/{{ item.value.startup_config | dirname }}"
     state: directory
     mode: '0700'
-  loop: "{{ clab_devices.keys() | list }}"
+  loop: "{{ clab_devices | dict2items }}"
 
 - name: Render device bootstrap configuration
   ansible.builtin.template:
-    src: "{{ clab_files_path }}/{{ clab_topology }}/configs/{{ item }}/startup-config.cfg"
-    dest: "{{ clab_root_dir }}/{{ clab_topology }}/configs/{{ item }}/startup-config.cfg"
+    src: "{{ clab_files_path }}/{{ clab_topology }}/{{ item.value.startup_config }}"
+    dest: "{{ clab_root_dir }}/{{ clab_topology }}/{{ item.value.startup_config }}"
     mode: '0600'
-  loop: "{{ clab_devices.keys() | list }}"
+  loop: "{{ clab_devices | dict2items }}"
   no_log: true
-  when: clab_topology == 'multi-vendor'
-
-- name: Restore original Product Demos topology
-  ansible.builtin.copy:
-    src: "{{ clab_files_path }}/product_demos/"
-    dest: "{{ clab_root_dir }}/product_demos/"
-    mode: preserve
-  when: clab_topology == 'product_demos'
 
 - name: Render topology from device catalog
   ansible.builtin.template:
-    src: "{{ role_path }}/templates/multi-vendor.clab.yml.j2"
+    src: "{{ role_path }}/templates/product_demos.clab.yml.j2"
     dest: "{{ clab_root_dir }}/{{ clab_topology }}/{{ clab_topology }}.clab.yml"
     mode: '0644'
-  when: clab_topology == 'multi-vendor'

@@ -6,13 +6,6 @@
       - ansible_network_os in network_lab_prefixes
     fail_msg: Select a supported ContainerLab Inventory device.
 
-- name: Enable required NX-OS capabilities
-  cisco.nxos.nxos_feature:
-    feature: "{{ item }}"
-    state: enabled
-  loop: [interface-vlan, lldp]
-  when: ansible_network_os == 'cisco.nxos.nxos'
-
 - name: Merge structured lab configuration
   ansible.builtin.include_tasks: resource.yml
   loop: "{{ network_lab_resources[inventory_hostname] + [{'resource': 'ntp_global', 'config': network_lab_ntp}] }}"
@@ -26,7 +19,7 @@
     banner: motd
     text: "MANAGED BY ANSIBLE AUTOMATION PLATFORM. Unauthorized access is prohibited."
     state: present
-  when: ansible_network_os in ['cisco.ios.ios', 'cisco.nxos.nxos']
+  when: ansible_network_os == 'cisco.ios.ios'
 
 - name: Merge Cisco SNMP baseline
   action: "{{ network_lab_prefixes[ansible_network_os] }}_snmp_server"
@@ -38,17 +31,12 @@
       contact: Ansible Product Demos
       location: Containerlab on AWS
     state: merged
-  when: ansible_network_os in ['cisco.ios.ios', 'cisco.nxos.nxos']
+  when: ansible_network_os == 'cisco.ios.ios'
 
 - name: Preserve IOS-XE configuration across upgrades
   cisco.ios.ios_config:
     save_when: modified
   when: ansible_network_os == 'cisco.ios.ios'
-
-- name: Save NX-OS configuration
-  cisco.nxos.nxos_config:
-    save_when: modified
-  when: ansible_network_os == 'cisco.nxos.nxos'
 
 - name: Save EOS configuration
   arista.eos.eos_config:

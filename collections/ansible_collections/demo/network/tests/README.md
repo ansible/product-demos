@@ -1,6 +1,6 @@
 # Network demo checks
 
-Run from the repository root. Install the pinned network collections from an EE requirements file and use Python with `ncclient`, `passlib`, Jinja2, and Ansible available. Offline resource rendering does not connect to devices.
+Run from the repository root with the rebuilt network EE. Offline rendering does not connect to devices.
 
 ```bash
 python -m unittest discover -s collections/ansible_collections/demo/network/tests -v
@@ -9,19 +9,17 @@ ansible-playbook -i localhost, collections/ansible_collections/demo/network/test
 ansible-playbook -i localhost, collections/ansible_collections/demo/network/tests/collect_unsupported.yml
 ```
 
-`render_topology.yml` renders both `product_demos` and `multi-vendor` into a temporary directory and verifies device selection, management port rules, the unchanged original topology, the independent Junos/EOS link, and active topology discovery for legacy, simultaneous, redeployed, and torn down labs.
+`render_topology.yml` renders the connected topology and all bootstrap files in a temporary directory. It checks the exact requested node names, vSRX image/kind, management IP uniqueness, ports, EOS CPU settings, and all three cross-vendor links. It also verifies discovery of legacy split-lab records for migration and of completed teardown records.
 
-`render_resources.yml` invokes each planned vendor resource module with `state: rendered`, checks that commands were generated, and requires zero device changes. Unit tests cover Junos logical units and LLDP JSON, Cisco/EOS neighbors, independent resource failures, unreachable devices, inventory selection, redaction, and HTML escaping.
+`render_resources.yml` invokes each planned vendor resource module with `state: rendered`, requires commands to be generated, and checks zero device changes. Unit tests cover vendor facts and neighbors, report host selection, unreachable devices, independent collection errors, redaction, and HTML escaping.
 
-In an APD environment, also verify:
+For live APD acceptance:
 
-1. Deploy `product_demos`, then add `multi-vendor` on the same hypervisor through Deploy Topology and deploy the exact vJunos-switch image on the chosen EC2 size; record boot time and stability alongside all four devices. The default four-device deployment uses `c8i.4xlarge` for additional memory headroom; resource usage has not yet been measured live. `c8i.2xlarge` remains selectable for comparison.
-2. Run Configure Devices twice and confirm second-run idempotence.
-3. Run `network/validate_containerlab.yml` (the Controller job initially targets Junos) to capture KVM, container resource usage, facts, and a data-path ping. For a full standalone run, use `_hosts=containerlab`.
-4. Generate all-device and each platform-only report. Make one device unreachable and verify the report retains it with an error.
-5. Verify HTTP access from the execution node and presenter browser, then reboot the hypervisor and verify device and report persistence.
-6. Redeploy either topology and confirm the other lab retains its container IDs and start times. Tear down one lab and confirm only its inventory hosts are disabled and the other stays accessible. Exercise Cisco Backup, Staging, Upgrade, and IOS-XE compliance. Destroy the topology and confirm its report is removed; destroy the stack and confirm AWS resources are gone.
+1. Deploy the connected topology on a KVM-capable EC2 hypervisor using the rebuilt EE. Confirm old split labs and retired inventory hosts are removed.
+2. Run Configure Devices; check all four nodes and rerun when inspecting configuration drift.
+3. Run Validate Devices for `containerlab`. It captures KVM/capacity evidence, collects structured resources, and tests multi-hop pings sourced from each node's loopback.
+4. Run Report and verify four collected devices with no issues; inspect interface/neighbor observations and routes.
+5. Run the IOS-XE backup demo. Exercise STIG, Staging, and Upgrade separately as required.
+6. Test topology and stack teardown, including report removal and AWS cleanup.
 
-Offline checks validate rendering and discovery. Run the APD checks above to verify deployment, topology switching, inventory updates, and teardown on an actual hypervisor.
-
-`inspect_coexistence.yml` is a live validation playbook for the ContainerLab Inventory hypervisor. It verifies deployment records, exact device membership, management reachability, and running containers. Its AAP artifacts include container IDs and start times. Pass a prior `clab_containers` artifact as `clab_preserved_containers` to prove that adding or redeploying the other lab did not restart existing containers. `clab_expected_topologies` defaults to both labs and can select one for an initial snapshot.
+`inspect_topology.yml` is a read-only live hypervisor check for the single topology record, exact five-container membership, running states, and all device management ports. Its AAP artifacts include container IDs and start times. Previous split-lab or vJunos-switch acceptance is not evidence for vSRX 23.2R2.21 or the new connected layout; validate this image and routed paths live.

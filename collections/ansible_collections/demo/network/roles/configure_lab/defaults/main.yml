@@ -1,95 +1,177 @@
 ---
+# Routed links follow the connected product_demos topology. Junos logical
+# interfaces omit enabled because juniper.device 2.0.1 emits an invalid leaf.
 network_lab_prefixes:
   cisco.ios.ios: cisco.ios.ios
-  cisco.nxos.nxos: cisco.nxos.nxos
   arista.eos.eos: arista.eos.eos
   juniper.device.junos: juniper.device.junos
 network_lab_ntp:
   servers:
     - server: 216.239.35.0
     - server: 216.239.35.4
-network_lab_vlans:
-  - vlan_id: 110
-    name: DEMO
-  - vlan_id: 120
-    name: OPERATIONS
 network_lab_resources:
-  # The original Cisco topology has no data links. Configure virtual
-  # interfaces and baselines without assuming extra physical NICs exist.
-  cat8kv:
+  cat8kv1:
     - resource: interfaces
       config:
-        - {name: Loopback10, description: APD report demo, enabled: true}
+        - name: GigabitEthernet2
+          description: To veos2 Ethernet1
+          enabled: true
+        - name: GigabitEthernet3
+          description: To vjunos3 ge-0/0/0
+          enabled: true
+        - name: Loopback10
+          description: APD connected demo
+          enabled: true
     - resource: l3_interfaces
       config:
-        - {name: Loopback10, ipv4: [{address: 10.255.10.10/32}]}
+        - name: GigabitEthernet2
+          ipv4:
+            - address: 10.10.12.1/30
+        - name: GigabitEthernet3
+          ipv4:
+            - address: 10.10.13.1/30
+        - name: Loopback10
+          ipv4:
+            - address: 10.255.0.1/32
     - resource: lldp_global
-      config: {enabled: true}
-  n9kv:
-    - resource: vlans
-      config: "{{ network_lab_vlans }}"
+      config:
+        enabled: true
+    - resource: static_routes
+      config:
+        - address_families:
+            - afi: ipv4
+              routes:
+                - dest: 10.255.0.2/32
+                  next_hops:
+                    - forward_router_address: 10.10.12.2
+                - dest: 10.255.0.3/32
+                  next_hops:
+                    - forward_router_address: 10.10.13.2
+                - dest: 10.255.0.4/32
+                  next_hops:
+                    - forward_router_address: 10.10.12.2
+  veos2:
     - resource: interfaces
-      config:
-        - {name: Vlan110, description: DEMO gateway, enabled: true}
-        - {name: Loopback10, description: APD report demo, enabled: true}
-    - resource: l3_interfaces
-      config:
-        - {name: Vlan110, ipv4: [{address: 10.110.0.1/24}]}
-        - {name: Loopback10, ipv4: [{address: 10.255.10.11/32}]}
-    - resource: lldp_global
-      config: {timer: 30}
-  vjunos:
-    - resource: interfaces
-      # juniper.device 2.0.1 emits an invalid `enable;` leaf on logical
-      # interfaces. Junos interfaces are enabled by default; omit that field.
-      config:
-        - {name: ge-0/0/0, description: 'Spare trunk port'}
-        - {name: ge-0/0/1, description: 'To veos Ethernet1'}
-        - {name: irb, description: DEMO SVI}
-        - {name: lo0, description: APD report demo}
-    - resource: vlans
-      config:
-        - {vlan_id: 110, name: DEMO, l3_interface: irb.110}
-        - {vlan_id: 120, name: OPERATIONS}
-    - resource: l2_interfaces
-      config:
-        - name: ge-0/0/0
-          enhanced_layer: true
-          unit: 0
-          trunk: {allowed_vlans: [DEMO, OPERATIONS]}
-        - name: ge-0/0/1
-          enhanced_layer: true
-          unit: 0
-          trunk: {allowed_vlans: [DEMO, OPERATIONS]}
-    - resource: l3_interfaces
-      config:
-        - {name: irb, unit: 110, ipv4: [{address: 10.110.0.2/24}]}
-        - {name: lo0, unit: 0, ipv4: [{address: 10.255.10.12/32}]}
-    - resource: lldp_interfaces
-      config: [{name: all, enabled: true}]
-    - resource: lldp_global
-      config: {enabled: true}
-  veos:
-    - resource: vlans
-      config: "{{ network_lab_vlans }}"
-    - resource: interfaces
-      config:
-        - {name: Ethernet1, description: 'To vjunos ge-0/0/1', enabled: true, mode: layer2}
-        - {name: Vlan110, description: DEMO SVI, enabled: true}
-        - {name: Loopback10, description: APD report demo, enabled: true}
-    - resource: l2_interfaces
       config:
         - name: Ethernet1
-          mode: trunk
-          trunk: {trunk_allowed_vlans: ['110', '120']}
+          description: To cat8kv1 GigabitEthernet2
+          enabled: true
+          mode: layer3
+        - name: Ethernet2
+          description: To veos4 Ethernet1
+          enabled: true
+          mode: layer3
+        - name: Loopback10
+          description: APD connected demo
+          enabled: true
     - resource: l3_interfaces
       config:
-        - {name: Vlan110, ipv4: [{address: 10.110.0.3/24}]}
-        - {name: Loopback10, ipv4: [{address: 10.255.10.13/32}]}
+        - name: Ethernet1
+          ipv4:
+            - address: 10.10.12.2/30
+        - name: Ethernet2
+          ipv4:
+            - address: 10.10.24.1/30
+        - name: Loopback10
+          ipv4:
+            - address: 10.255.0.2/32
     - resource: lldp_global
-      # EOS 12.3.0 renders absent scalar fields as "None"; specify all globals.
       config:
         timer: 30
         holdtime: 120
         reinit: 2
-        tlv_select: {system_name: true, port_description: true}
+        tlv_select:
+          system_name: true
+          port_description: true
+    - resource: static_routes
+      config:
+        - address_families:
+            - afi: ipv4
+              routes:
+                - dest: 10.255.0.1/32
+                  next_hops:
+                    - forward_router_address: 10.10.12.1
+                - dest: 10.255.0.3/32
+                  next_hops:
+                    - forward_router_address: 10.10.12.1
+                - dest: 10.255.0.4/32
+                  next_hops:
+                    - forward_router_address: 10.10.24.2
+  vjunos3:
+    - resource: interfaces
+      config:
+        - name: ge-0/0/0
+          description: To cat8kv1 GigabitEthernet3
+        - name: lo0
+          description: APD connected demo
+    - resource: l3_interfaces
+      config:
+        - name: ge-0/0/0
+          unit: 0
+          ipv4:
+            - address: 10.10.13.2/30
+        - name: lo0
+          unit: 0
+          ipv4:
+            - address: 10.255.0.3/32
+    - resource: lldp_interfaces
+      config:
+        - name: ge-0/0/0
+          enabled: true
+    - resource: lldp_global
+      config:
+        enabled: true
+    - resource: static_routes
+      config:
+        - address_families:
+            - afi: ipv4
+              routes:
+                - dest: 10.255.0.1/32
+                  next_hop:
+                    - forward_router_address: 10.10.13.1
+                - dest: 10.255.0.2/32
+                  next_hop:
+                    - forward_router_address: 10.10.13.1
+                - dest: 10.255.0.4/32
+                  next_hop:
+                    - forward_router_address: 10.10.13.1
+  veos4:
+    - resource: interfaces
+      config:
+        - name: Ethernet1
+          description: To veos2 Ethernet2
+          enabled: true
+          mode: layer3
+        - name: Loopback10
+          description: APD connected demo
+          enabled: true
+    - resource: l3_interfaces
+      config:
+        - name: Ethernet1
+          ipv4:
+            - address: 10.10.24.2/30
+        - name: Loopback10
+          ipv4:
+            - address: 10.255.0.4/32
+    - resource: lldp_global
+      config:
+        timer: 30
+        holdtime: 120
+        reinit: 2
+        tlv_select:
+          system_name: true
+          port_description: true
+    - resource: static_routes
+      config:
+        - address_families:
+            - afi: ipv4
+              routes:
+                - dest: 10.255.0.1/32
+                  next_hops:
+                    - forward_router_address: 10.10.24.1
+                - dest: 10.255.0.2/32
+                  next_hops:
+                    - forward_router_address: 10.10.24.1
+                - dest: 10.255.0.3/32
+                  next_hops:
+                    - forward_router_address: 10.10.24.1

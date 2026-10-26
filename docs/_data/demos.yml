@@ -1016,7 +1016,7 @@
 - slug: network-deploy-containerlab-stack
   readme_path: network/docs/network-deploy-containerlab-stack.md
   title: "Deploy Containerlab Stack"
-  subtitle: "Nested-virt hypervisor, n9kv + cat8kv, inventory sync"
+  subtitle: "Connected IOS-XE, EOS, and vSRX lab with inventory sync"
   category: network
   status: active
   author: "Matthew Fernandez <matferna@redhat.com>"
@@ -1030,7 +1030,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #0d9488 0%, #065f54 100%)"
     icon: "🚀"
-  blurb: "Provision an AWS nested-virt hypervisor, deploy a containerlab Cisco lab (n9kv + cat8kv), and sync ContainerLab Inventory."
+  blurb: "Provision an AWS nested-virt hypervisor, deploy a connected Containerlab lab with IOS-XE, two EOS nodes, and vSRX, and sync ContainerLab Inventory."
   stats:
     workflows: 1
     playbooks: 2

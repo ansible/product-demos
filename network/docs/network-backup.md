@@ -1,7 +1,7 @@
 # Backup
 
 
-Backs up running configurations from containerlab NX-OS and IOS-XE devices using the native `cisco.ios.ios_config` and `cisco.nxos.nxos_config` modules. Backup files are saved to the execution node.
+Backs up running configurations from containerlab IOS-XE devices using the native `cisco.ios.ios_config` module. Backup files are saved to the execution node.
 
 ## Prerequisites
 

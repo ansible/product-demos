@@ -38,75 +38,81 @@ clab_podman_user_storage_content: |
   graphroot = "/mnt/images/storage"
 clab_images: "{{ clab_devices.values() | map(attribute='image') | unique | list }}"
 
-# Containerlab topology
+# Connected Product Demos topology
 clab_topology: product_demos
 clab_root_dir: /root/clab
 clab_device_username: admin
-# Multi-vendor bootstrap credentials must match Containerlab Device Access.
-# The restored product_demos startup files retain admin / admin@123 from main.
+# Match the Containerlab Device Access credential.
 clab_device_password: "{{ lookup('ansible.builtin.env', 'CLAB_DEVICE_PASSWORD') | default('admin@123', true) }}"
 clab_report_port: 8088
 clab_access_cidr: 0.0.0.0/0
 clab_security_group_rules:
   - proto: tcp
-    ports: "{{ ([22, clab_report_port | int] + (clab_device_catalog.values() | map(attribute='port') | list) + (clab_device_catalog.values() | map(attribute='ssh_port') | list)) | unique | list }}"
+    ports: "{{ ([22, clab_report_port | int] + (clab_devices.values() | map(attribute='port') | list) + (clab_devices.values() | map(attribute='ssh_port') | list)) | unique | list }}"
     cidr_ip: "{{ clab_access_cidr }}"
   - proto: icmp
     from_port: -1
     to_port: -1
     cidr_ip: "{{ clab_access_cidr }}"
-# Catalog shared by topology selection and Controller inventory setup.
-clab_devices: "{{ clab_device_catalog | dict2items | selectattr('key', 'in', clab_topologies[clab_topology].devices) | items2dict }}"
-clab_links: "{{ clab_topologies[clab_topology].links }}"
-clab_teardown_topology: all
+clab_devices: "{{ clab_device_catalog }}"
+# Previous split deployments are accepted only for migration and cleanup.
+clab_legacy_topology_names: [multi-vendor]
+clab_retired_devices: [n9kv, cat8kv, vjunos, veos]
 clab_active_topologies: []
-clab_active_device_names: "{{ clab_active_topologies | map('extract', clab_topologies) | map(attribute='devices') | flatten | unique | list }}"
-clab_active_devices: "{{ clab_device_catalog | dict2items | selectattr('key', 'in', clab_active_device_names) | items2dict }}"
-clab_topologies:
-  product_demos:
-    devices: [n9kv, cat8kv]
-    links: []
-  multi-vendor:
-    devices: [vjunos, veos]
-    links:
-      - endpoints: [vjunos:ge-0/0/1, veos:eth1]
+clab_active_devices: "{{ clab_devices if clab_topology in clab_active_topologies else {} }}"
+clab_destroy_required: false
+clab_links:
+  - endpoints: [cat8kv1:Gi2, veos2:eth1]
+  - endpoints: [cat8kv1:Gi3, vjunos3:ge-0/0/0]
+  - endpoints: [veos4:eth1, veos2:eth2]
 clab_device_catalog:
-  n9kv:
-    kind: cisco_n9kv
-    image: registry.gitlab.com/redhatautomation/nexus10-ee:10.5.3.F
-    group: clab_nxos
-    network_os: cisco.nxos.nxos
-    connection: ansible.netcommon.network_cli
-    ssh_port: 2122
-    port: 2122
-    timeout: 900
-  cat8kv:
+  cat8kv1:
     kind: cisco_c8000v
     image: registry.gitlab.com/redhatautomation/cat8:17.13.01a
+    startup_config: configs/cat8kv/startup-config.cfg
+    mgmt_ipv4: 172.20.20.12
     group: clab_ios
     network_os: cisco.ios.ios
     connection: ansible.netcommon.network_cli
     ssh_port: 2123
     port: 2123
     timeout: 900
-  vjunos:
-    kind: juniper_vjunosswitch
-    image: registry.gitlab.com/redhatautomation/vjunos_switch_clab:25.2R1.9
-    group: clab_junos
-    network_os: juniper.device.junos
-    connection: ansible.netcommon.netconf
-    ssh_port: 2124
-    port: 2830
-    timeout: 1800
-  veos:
+  veos2:
     kind: arista_veos
     image: registry.gitlab.com/redhatautomation/veos-ee:4.32.0F
-    # EC2 nested KVM rejects the performance-capabilities MSR exposed by host.
+    startup_config: configs/veos2/startup-config.cfg
+    mgmt_ipv4: 172.20.20.13
     env:
-      QEMU_CPU: host,level=9,pdcm=off
+      QEMU_CPU: IvyBridge
+      QEMU_ADDITIONAL_ARGS: '-cpu IvyBridge,check=off'
     group: clab_eos
     network_os: arista.eos.eos
     connection: ansible.netcommon.network_cli
+    ssh_port: 2124
+    port: 2124
+    timeout: 900
+  vjunos3:
+    kind: juniper_vsrx
+    image: registry.gitlab.com/redhatautomation/juniper-ee:23.2R2.21
+    startup_config: configs/vjunos3/startup-config.cfg
+    mgmt_ipv4: 172.20.20.14
+    group: clab_junos
+    network_os: juniper.device.junos
+    connection: ansible.netcommon.netconf
     ssh_port: 2125
-    port: 2125
+    port: 2225
+    timeout: 1800
+  veos4:
+    kind: arista_veos
+    image: registry.gitlab.com/redhatautomation/veos-ee:4.32.0F
+    startup_config: configs/veos4/startup-config.cfg
+    mgmt_ipv4: 172.20.20.15
+    env:
+      QEMU_CPU: IvyBridge
+      QEMU_ADDITIONAL_ARGS: '-cpu IvyBridge,check=off'
+    group: clab_eos
+    network_os: arista.eos.eos
+    connection: ansible.netcommon.network_cli
+    ssh_port: 2126
+    port: 2126
     timeout: 900

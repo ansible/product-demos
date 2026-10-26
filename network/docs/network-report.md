@@ -5,9 +5,9 @@
 ## Run the demo
 
 1. Build and select the updated **Product Demos EE** using the definitions in `execution_environments/`. Sync the project and rerun Network setup to update inventory groups and job credentials.
-2. Run **NETWORK | Deploy Containerlab Stack** and choose `product_demos` for the original two Cisco devices or `multi-vendor` for Junos and EOS. Deploy both topologies on the same hypervisor to report on all four platforms. Existing hypervisors can use **NETWORK | Containerlab | Deploy Topology**, which also refreshes security group ports. Redeploying reconfigures the lab and resets device configuration to its bootstrap.
-3. Run **NETWORK | Containerlab | Configure Devices** to populate the deployed devices with interfaces, VLANs, trunks, loopbacks, NTP, and addressing through network resource modules.
-4. For `multi-vendor`, run **NETWORK | Containerlab | Validate Devices** to validate Juniper on EC2. Its default target is `clab_junos`; the data-path check requires the neighboring Arista device to be configured too. This validation is still required: image availability and offline checks do not establish EC2 compatibility.
+2. Run **NETWORK | Deploy Containerlab Stack** to deploy the connected `product_demos` lab. Existing hypervisors can use **NETWORK | Containerlab | Deploy Topology**. Redeployment resets device configuration to bootstrap.
+3. Run **NETWORK | Containerlab | Configure Devices** to apply routed links, loopbacks, static routes, LLDP, and NTP.
+4. Run **NETWORK | Containerlab | Validate Devices** to collect all four nodes and verify multi-hop forwarding between their loopbacks.
 5. Run **NETWORK | Report**, select all devices or one platform, and open the `network_report_url` from the job output or AAP artifacts.
 
 The default report URL is `http://<hypervisor>:8088/network/`. `report.json` provides the same sanitized data for download. The stable URL shows the most recently published report; concurrent runs may replace it.
@@ -30,9 +30,8 @@ The report exports an explicit set of fields rather than hostvars or running con
 
 | Selection | Platform | Connection |
 |---|---|---|
-| `containerlab` | All enabled devices in the selected topology | Per-platform settings |
+| `containerlab` | All four connected devices | Per-platform settings |
 | `clab_ios` | Cisco IOS-XE | `ansible.netcommon.network_cli` |
-| `clab_nxos` | Cisco NX-OS | `ansible.netcommon.network_cli` |
 | `clab_junos` | Juniper Junos | `ansible.netcommon.netconf` |
 | `clab_eos` | Arista EOS | `ansible.netcommon.network_cli` |
 

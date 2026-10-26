@@ -1,31 +1,27 @@
 # Configure Devices
 
-`network/configure_devices.yml` applies structured configuration across Cisco IOS-XE, Cisco NX-OS, Juniper Junos, and Arista EOS with vendor network resource modules and `state: merged`.
+`network/configure_devices.yml` configures the connected `product_demos` lab through vendor network resource modules with `state: merged`. It uses **Containerlab Device Access** and **ContainerLab Inventory**. `_hosts` defaults to `containerlab` and can select a platform or device.
 
-Run **NETWORK | Deploy Containerlab Stack** first, then **NETWORK | Containerlab | Configure Devices**. The job uses **Containerlab Device Access** and **ContainerLab Inventory**. `_hosts` defaults to `containerlab`; an extra variable can select a single platform or device.
-
-## Independent labs
+## Routed topology
 
 ```mermaid
 flowchart LR
-  subgraph product_demos
-    C[cat8kv / IOS-XE]
-    N[n9kv / NX-OS]
-  end
-  subgraph multi-vendor
-    J[vjunos / Junos] ---|VLANs 110,120| E[veos / EOS]
-  end
+  J[vjunos3] ---|10.10.13.0/30| C[cat8kv1]
+  C ---|10.10.12.0/30| E[veos2]
+  E ---|10.10.24.0/30| F[veos4]
 ```
 
-| Device | Data interfaces | Demo address | Loopback |
-|---|---|---|---|
-| `cat8kv` | No data links | Loopback only | 10.255.10.10/32 |
-| `n9kv` | No data links | Vlan110 10.110.0.1/24 | 10.255.10.11/32 |
-| `vjunos` | ge-0/0/1 trunk to EOS; ge-0/0/0 spare | irb.110 10.110.0.2/24 | 10.255.10.12/32 |
-| `veos` | Ethernet1 trunk | Vlan110 10.110.0.3/24 | 10.255.10.13/32 |
+| Node | Data interfaces and addresses | Loopback |
+|---|---|---|
+| `cat8kv1` | Gi2: 10.10.12.1/30; Gi3: 10.10.13.1/30 | Loopback10: 10.255.0.1/32 |
+| `veos2` | Ethernet1: 10.10.12.2/30; Ethernet2: 10.10.24.1/30 | Loopback10: 10.255.0.2/32 |
+| `vjunos3` | ge-0/0/0.0: 10.10.13.2/30 | lo0.0: 10.255.0.3/32 |
+| `veos4` | Ethernet1: 10.10.24.2/30 | Loopback10: 10.255.0.4/32 |
 
-Resource modules configure interface descriptions and state, IP addresses, switch VLANs and trunks, LLDP settings, and NTP. The original Cisco topology has no data links. Its configuration uses virtual interfaces and baselines, without assuming extra physical NICs or routing between the labs. Cisco banners and SNMP retain their existing baseline. NX-OS capabilities use `nxos_feature`; EOS enables global routing and LLDP in its bootstrap because the selected resource modules do not expose those switches.
+Each device receives static routes to the other three loopbacks. This supports cross-vendor paths including vSRX → IOS-XE → EOS → EOS. Validation sources pings from loopback addresses so return traffic follows the configured routes. Management uses a separate interface and is preserved.
 
-Configuration data lives in `demo.network.configure_lab` defaults, separate from module invocation. Junos units and VLAN names and EOS trunk VLAN lists retain their vendor schemas. IOS-XE and NX-OS management configuration and existing upgrade interfaces remain in place. Cisco and EOS configuration is saved; Junos resource modules commit their changes.
+Resource modules configure descriptions, routed interfaces, addressing, LLDP, NTP, and static routes. IOS-XE also receives the existing banner and SNMP baseline. EOS routing and vSRX NETCONF/security-zone ICMP access are enabled in bootstrap. Junos logical interfaces omit the `enabled` field because the pinned resource module emits an invalid logical-interface statement for that field.
 
-Run configuration a second time during live acceptance and inspect for configuration drift. Some Cisco and EOS modules report changes for defaults even when before/after configuration matches. Then run **NETWORK | Containerlab | Validate Devices** and [**NETWORK | Report**](network-report.md). Lab redeployment resets configuration, so rerun Configure Devices afterward.
+Configuration data lives in `demo.network.configure_lab` defaults. Junos static routes use their vendor-specific `next_hop` schema; IOS-XE and EOS use `next_hops`. Cisco/EOS changes are saved and Junos changes are committed by the resource modules.
+
+Run **Configure Devices**, **Validate Devices**, then [**Report**](network-report.md). The validation job tests all four nodes and multi-hop forwarding. Rerun configuration after redeployment. When checking idempotence, compare actual before/after configuration as some modules reissue defaults and report changes.

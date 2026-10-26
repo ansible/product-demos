@@ -1,11 +1,9 @@
 ---
-- name: Verify independent Containerlab deployments on the live hypervisor
+- name: Verify the connected Product Demos deployment on the live hypervisor
   hosts: "{{ _report_server | default('clab_containerlab') }}"
   become: true
   gather_facts: false
   vars:
-    clab_expected_topologies: [product_demos, multi-vendor]
-    clab_preserved_containers: {}
     clab_inspect_format: !unsafe '{{.Name}}|{{.Id}}|{{.State.StartedAt}}|{{.State.Status}}'
   roles:
     - role: demo.network.containerlab
@@ -18,7 +16,7 @@
     - name: Require the expected labs to remain deployed
       ansible.builtin.assert:
         that:
-          - clab_active_topologies | sort == clab_expected_topologies | sort
+          - clab_active_topologies == ['product_demos']
 
     - name: List lab containers
       ansible.builtin.command:
@@ -46,27 +44,11 @@
         clab_runtime_snapshot: "{{ clab_runtime_snapshot | combine({item.split('|')[0]: {'id': item.split('|')[1], 'started_at': item.split('|')[2], 'status': item.split('|')[3]}}) }}"
       loop: "{{ clab_runtime_inspect.stdout_lines }}"
 
-    - name: Require each selected device container to be running
+    - name: Require exactly the connected topology containers
       ansible.builtin.assert:
         that:
-          - clab_runtime_snapshot['clab-' + item.0.key + '-' + item.1].status == 'running'
-      loop: "{{ (clab_topologies | dict2items | selectattr('key', 'in', clab_expected_topologies) | list) | subelements('value.devices') }}"
-      loop_control:
-        label: "{{ item.0.key }} / {{ item.1 }}"
-
-    - name: Require no duplicate or unexpected device containers
-      ansible.builtin.assert:
-        that:
-          - clab_runtime_snapshot | length == (clab_expected_topologies | map('extract', clab_topologies) | map(attribute='devices') | flatten | length) + (1 if 'product_demos' in clab_expected_topologies else 0)
-
-    - name: Require containers from the other lab to retain identity and start time
-      ansible.builtin.assert:
-        that:
-          - clab_runtime_snapshot[item.key].id == item.value.id
-          - clab_runtime_snapshot[item.key].started_at == item.value.started_at
-      loop: "{{ clab_preserved_containers | dict2items }}"
-      loop_control:
-        label: "{{ item.key }}"
+          - clab_runtime_snapshot.keys() | list | sort == ['clab-product_demos-cat8kv1', 'clab-product_demos-scp-server', 'clab-product_demos-veos2', 'clab-product_demos-veos4', 'clab-product_demos-vjunos3']
+          - clab_runtime_snapshot.values() | map(attribute='status') | unique | list == ['running']
 
     - name: Verify all deployed device management services
       ansible.builtin.wait_for:
@@ -78,7 +60,7 @@
       loop_control:
         label: "{{ item.key }}:{{ item.value.port }}"
 
-    - name: Export coexistence validation evidence
+    - name: Export connected topology evidence
       ansible.builtin.set_stats:
         data:
           clab_topologies: "{{ clab_active_topologies }}"

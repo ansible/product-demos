@@ -1,87 +1,33 @@
 # Deploy Containerlab Stack
 
-
-Provisions a self-contained network lab on AWS: nested-virt EC2 hypervisor, a selectable containerlab topology, and ContainerLab Inventory sync. This is the starting point for the network Configure, Report, Backup, and DISA STIG demos.
+Provision a nested-virtualization AWS hypervisor, deploy one connected `product_demos` topology, and sync ContainerLab Inventory. The topology contains `cat8kv1`, `veos2`, `vjunos3`, `veos4`, and an SCP server.
 
 ## Prerequisites
 
-- **If using RHDP (demo.redhat.com):** Run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** and choose `network`). AWS and AAP credentials are pre-configured for you.
-- **If using your own installation:** Run **APD ǀ Single demo setup** and choose `network`. Configure the **AWS** credential with your Access Key and Secret Key.
+Run APD setup with **Network**, configure AWS/AAP credentials, and select a rebuilt Product Demos EE with the network requirements in this branch. The official EE needs rebuilding/publishing; a project sync alone does not install new modules.
 
-## Survey prompts
+## Survey
 
-| Prompt | Variable | Type | Required |
-|--------|----------|------|----------|
-| Topology | `clab_topology` | multiplechoice | Yes |
-| AWS Region | `clab_aws_region` | multiplechoice | Yes |
-| Instance Type | `clab_aws_instance_type` | multiplechoice | Yes |
-| Owner | `clab_aws_owner_tag` | text | Yes |
+| Prompt | Variable | Choices |
+|---|---|---|
+| AWS Region | `clab_aws_region` | us-east-2 (default), us-west-2 |
+| Instance Type | `clab_aws_instance_type` | c8i.4xlarge (default), c8i.2xlarge |
+| Owner | `clab_aws_owner_tag` | Text |
 
-Topologies: `product_demos` (default) restores the original Cisco n9kv + cat8kv lab and SCP server from `main`. `multi-vendor` runs a connected vjunos + veos lab. The two topologies have separate device names and management ports and can coexist on the same hypervisor. The SCP server belongs only to `product_demos`.
-
-Options: region `us-east-2` / `us-west-2`; instance type `c8i.4xlarge` (default) / `c8i.2xlarge`.
+The standalone Deploy Topology job asks only for region. Both entry points deploy `product_demos`; there is no topology choice.
 
 ## Workflow
 
-```mermaid
-graph LR
-  S["🏠 Start"]
-  S --> A
-  A["🖥️ Provision Hypervisor"] --> B["📦 Deploy Topology"]
-  B --> C["🔄 Sync ContainerLab Inventory"]
-  A -. "on failure" .-> D["📋 Submit Feedback"]
-  style S fill:#212427,stroke:#8a8d90,color:#fff
-```
+1. **Provision Hypervisor** creates AWS networking, keypair, storage, and EC2 host.
+2. **Deploy Topology** enables KVM, installs Podman/Containerlab, pulls images, renders bootstrap credentials, starts all devices, waits for management services, configures persistent report hosting, and updates inventory.
+3. **Sync ContainerLab Inventory** discovers the hypervisor for report and device jobs.
 
-1. **Provision Hypervisor** — Creates VPC, subnet, security group, keypair, and launches a RHEL 9 EC2 instance with nested virtualization
-2. **Deploy Topology** — Installs podman and containerlab, pulls network images, renders bootstrap credentials, starts the selected devices, and configures persistent report hosting
-3. **Sync ContainerLab Inventory** — Imports the hypervisor and sets device connection details for demo job templates
-4. **Submit Feedback** — Opens only if hypervisor provisioning fails
+Run **Configure Devices**, **Validate Devices**, and **Report** afterward. Image pulls and virtual-device startup take time; readiness timeouts are 15 minutes for IOS-XE/EOS and 30 minutes for vSRX.
 
-For `multi-vendor`, allow at least 15 minutes for vJunos boot plus image pulls. The Junos readiness timeout is 30 minutes. The exact vJunos-switch image passed functional validation on APD EC2; prolonged load and reboot stability remain unmeasured. The larger default instance supplies additional memory headroom.
+## Existing hypervisors and migration
 
-## Job templates
+Deploy Topology discovers the hypervisor by EC2 tags, or accepts `clab_host_ip`. It refreshes management rules for SSH, device ports 2123–2126, NETCONF 2225, and report HTTP 8088. `clab_access_cidr` controls the allowed source network.
 
-| Template | Playbook | Description |
-|----------|----------|-------------|
-| NETWORK ǀ Deploy Containerlab Stack | [`network/setup.yml`](../setup.yml) | Workflow that provisions hypervisor, deploys topology, and syncs inventory |
-| NETWORK ǀ Containerlab ǀ Provision Hypervisor | [`network/provision_hypervisor.yml`](../provision_hypervisor.yml) | Creates AWS networking and the nested-virt EC2 hypervisor |
-| NETWORK ǀ Containerlab ǀ Deploy Topology | [`network/deploy_containerlab.yml`](../deploy_containerlab.yml) | Installs containerlab and adds or redeploys the selected topology while retaining the other lab. Can also run standalone to redeploy the lab on an existing hypervisor; it discovers the running EC2 instance by tag. |
+The existing deployment record recognizes old `product_demos` and `multi-vendor` labs. Deployment destroys those labs using their existing topology files before rendering the connected replacement, freeing their ports and management IPs. A cleanup failure stops redeployment. The new inventory contains the four current node names; retired `n9kv`, `cat8kv`, `vjunos`, and `veos` hosts are removed after deployment succeeds.
 
-## Why it matters
-
-- Replaces external Cisco DevNet sandbox dependencies with a fully self-contained lab
-- Network resource modules demonstrate structured configuration across multiple network vendors
-- Dynamic inventory + SSH Proxy credentials give AAP a clean path to the lab devices
-- One workflow brings up everything the day-2 network demos need
-
-## Presenter walkthrough
-
-1. **Show the survey:** Topology, region, instance size, and owner tag — explain how surveys keep self-service provisioning safe.
-2. **Launch:** Start **NETWORK ǀ Deploy Containerlab Stack**. Call out the three success path nodes: hypervisor → topology → inventory sync.
-3. **While it runs:** Explain nested virt, containerlab, and the selected platforms; both topologies together provide all four (NX-OS SSH 2122, IOS-XE SSH 2123, Junos SSH 2124 / NETCONF 2830, EOS SSH 2125).
-4. **Inventory sync:** After success, open **ContainerLab Inventory** and show the hypervisor/device hosts.
-5. **Add the other lab:** Run **NETWORK | Containerlab | Deploy Topology**, select the other topology, and retain the same region. Provision the hypervisor once; use the standalone deploy job to add another topology.
-6. **Transition:** Run **NETWORK ǀ Containerlab ǀ Configure Devices**, then Report, Backup, or DISA STIG. For `multi-vendor`, also run **NETWORK | Containerlab | Validate Devices** after configuration. Open the report URL from the Report job artifacts.
-
-If a device misbehaves later, rerun **NETWORK ǀ Containerlab ǀ Deploy Topology** by itself with the AWS Region and Topology survey. It discovers the existing hypervisor automatically and redeploys the topology without reprovisioning AWS infrastructure.
-
-## Related demos
-
-| Demo | Description |
-|------|-------------|
-| 💥 [Destroy Containerlab Stack](./network-destroy-containerlab-stack.md) | Tear down the lab when finished |
-| 🌐 [Configure Devices](./network-configuration.md) | Apply baseline banner, NTP, and SNMP |
-| 🌐 [Report](./network-report.md) | Gather facts from the lab devices |
-| 🌐 [Backup](./network-backup.md) | Back up running configs |
-| 🌐 [DISA STIG](./network-disa-stig.md) | Audit IOS-XE against DISA STIG |
-
-## Existing hypervisors and access
-
-Deploy Topology refreshes the managed security group for the additional management ports and report HTTP port 8088. `clab_access_cidr` defaults to the existing public demo access behavior; restrict it to the execution nodes and presenter network when appropriate. Devices connect directly to port mappings; no SSH jump host is required.
-
-Redeployment stops and resets only the selected lab before deploying it with `--reconfigure`. The other topology stays running. Management rules retain ports for both topologies, and inventory enables all deployed devices. Teardown accepts `product_demos`, `multi-vendor`, or `all` (the default used by Destroy Containerlab Stack). Troubleshoot inspects both labs. Deployment discovery accepts previous single-topology records as well. Run Configure Devices again afterward. Topology teardown removes the generated report; stack teardown removes its EC2 host and networking.
-
-If a device times out before inventory sync, use **NETWORK | Containerlab | Troubleshoot** with the AWS region to collect hypervisor and container diagnostics. A TCP/SSH readiness check does not establish NETCONF authentication or a working forwarding plane; for `multi-vendor`, run Validate Devices after configuration.
-
-When upgrading an older four-device `multi-vendor` deployment, tear it down once before deploying the new independent labs. Its Cisco devices and SCP server must release their ports and management IP before `product_demos` can run.
+Redeployment resets the whole lab to bootstrap. Teardown Topology removes the lab and report; Destroy Containerlab Stack also removes its AWS resources. Use [Troubleshoot](network-troubleshoot-containerlab.md) to collect boot, port, and container diagnostics when readiness fails.

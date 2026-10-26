@@ -3,11 +3,10 @@ _deployment_id: '{{ lookup("ansible.builtin.password", playbook_dir + "/.deploym
 apd_managed_by: aap-product-demos
 
 user_message: >-
-  Choose product_demos for the original Cisco lab or multi-vendor for the Juniper/Arista lab that can run alongside it.
-  The multi-vendor lab requires the rebuilt Product Demos EE with the pinned network
-  collections. vJunos-switch 25.2R1.9 was functionally validated on APD EC2 c8i.4xlarge;
-  run NETWORK | Containerlab | Validate Devices after deploying and configuring.
-  The combined four-device default is c8i.4xlarge for memory headroom; prolonged load and reboot stability remain unmeasured.
+  Product Demos deploys one connected IOS-XE, Arista EOS, and Juniper vSRX lab.
+  Rebuild the Product Demos EE with the pinned network collections and Python dependencies.
+  Run Configure Devices, Validate Devices, and Report after deployment.
+  Redeployment replaces older product_demos and multi-vendor labs and resets device configuration.
 
 # Reuse the role's device catalog when creating Controller inventory.
 clab_device_catalog: "{{ (lookup('ansible.builtin.file', playbook_dir + '/collections/ansible_collections/demo/network/roles/containerlab/defaults/main.yml') | from_yaml).clab_device_catalog }}"
@@ -155,67 +154,54 @@ controller_inventories:
     description: Containerlab network devices discovered via AWS EC2
 
 controller_hosts:
-  - name: n9kv
+  - name: cat8kv1
     inventory: ContainerLab Inventory
-  - name: cat8kv
+  - name: veos2
     inventory: ContainerLab Inventory
-  - name: vjunos
+  - name: vjunos3
     inventory: ContainerLab Inventory
-  - name: veos
+  - name: veos4
     inventory: ContainerLab Inventory
 
 controller_groups:
   - name: clab_nxos
     inventory: ContainerLab Inventory
-    hosts:
-      - n9kv
-    variables:
-      ansible_port: "{{ clab_device_catalog.n9kv.port }}"
-      ansible_network_os: "{{ clab_device_catalog.n9kv.network_os }}"
-      ansible_connection: "{{ clab_device_catalog.n9kv.connection }}"
-      ansible_connect_timeout: "{{ clab_device_catalog.n9kv.timeout }}"
-      ansible_command_timeout: 120
+    state: absent
   - name: clab_ios
     inventory: ContainerLab Inventory
-    hosts:
-      - cat8kv
+    hosts: [cat8kv1]
     variables:
-      ansible_port: "{{ clab_device_catalog.cat8kv.port }}"
-      ansible_network_os: "{{ clab_device_catalog.cat8kv.network_os }}"
-      ansible_connection: "{{ clab_device_catalog.cat8kv.connection }}"
-      ansible_connect_timeout: "{{ clab_device_catalog.cat8kv.timeout }}"
+      ansible_network_os: cisco.ios.ios
+      ansible_connection: ansible.netcommon.network_cli
+      ansible_connect_timeout: 900
       ansible_command_timeout: 120
   - name: clab_junos
     inventory: ContainerLab Inventory
-    hosts:
-      - vjunos
+    hosts: [vjunos3]
     variables:
-      ansible_port: "{{ clab_device_catalog.vjunos.port }}"
-      ansible_network_os: "{{ clab_device_catalog.vjunos.network_os }}"
-      ansible_connection: "{{ clab_device_catalog.vjunos.connection }}"
-      ansible_connect_timeout: "{{ clab_device_catalog.vjunos.timeout }}"
+      ansible_network_os: juniper.device.junos
+      ansible_connection: ansible.netcommon.netconf
+      ansible_connect_timeout: 1800
       ansible_command_timeout: 120
   - name: clab_eos
     inventory: ContainerLab Inventory
-    hosts:
-      - veos
+    hosts: [veos2, veos4]
     variables:
-      ansible_port: "{{ clab_device_catalog.veos.port }}"
-      ansible_network_os: "{{ clab_device_catalog.veos.network_os }}"
-      ansible_connection: "{{ clab_device_catalog.veos.connection }}"
-      ansible_connect_timeout: "{{ clab_device_catalog.veos.timeout }}"
+      ansible_network_os: arista.eos.eos
+      ansible_connection: ansible.netcommon.network_cli
+      ansible_connect_timeout: 900
       ansible_command_timeout: 120
       ansible_become: true
       ansible_become_method: enable
   - name: clab_switches
     inventory: ContainerLab Inventory
-    hosts: [n9kv, vjunos, veos]
+    hosts: [veos2, veos4]
   - name: clab_routers
     inventory: ContainerLab Inventory
-    hosts: [cat8kv]
+    hosts: [cat8kv1, vjunos3]
   - name: containerlab
     inventory: ContainerLab Inventory
-    children: [clab_nxos, clab_ios, clab_junos, clab_eos]
+    children: [clab_ios, clab_junos, clab_eos]
     variables:
       ansible_user: !unsafe '{{ ssh_proxy_username }}'
       ansible_password: !unsafe '{{ ssh_proxy_password }}'
@@ -346,14 +332,6 @@ controller_templates:
       name: ''
       description: ''
       spec:
-        - question_name: Topology
-          type: multiplechoice
-          variable: clab_topology
-          required: true
-          default: product_demos
-          choices:
-            - product_demos
-            - multi-vendor
         - question_name: AWS Region
           type: multiplechoice
           variable: clab_aws_region
@@ -387,15 +365,6 @@ controller_templates:
       name: ''
       description: ''
       spec:
-        - question_name: Topology
-          type: multiplechoice
-          variable: clab_teardown_topology
-          required: true
-          default: all
-          choices:
-            - all
-            - product_demos
-            - multi-vendor
         - question_name: AWS Region
           type: multiplechoice
           variable: clab_aws_region
@@ -505,7 +474,7 @@ controller_templates:
         - question_name: Which devices should be validated?
           type: multiplechoice
           variable: _hosts
-          default: clab_junos
+          default: containerlab
           required: true
           choices: [clab_junos, containerlab, clab_ios, clab_nxos, clab_eos]
 
@@ -535,7 +504,6 @@ controller_templates:
           required: true
           choices:
             - containerlab
-            - clab_nxos
             - clab_ios
             - clab_junos
             - clab_eos
@@ -568,7 +536,7 @@ controller_templates:
           required: true
           choices:
             - clab_ios
-            - cat8kv
+            - cat8kv1
 
   - name: "NETWORK | Backup"
     labels:
@@ -811,14 +779,6 @@ controller_workflows:
       name: ''
       description: ''
       spec:
-        - question_name: Topology
-          type: multiplechoice
-          variable: clab_topology
-          required: true
-          default: product_demos
-          choices:
-            - product_demos
-            - multi-vendor
         - question_name: AWS Region
           type: multiplechoice
           variable: clab_aws_region

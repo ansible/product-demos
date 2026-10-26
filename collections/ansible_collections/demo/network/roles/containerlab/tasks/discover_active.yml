@@ -26,5 +26,5 @@
 - name: Validate active topology record
   ansible.builtin.assert:
     that:
-      - clab_active_topologies | difference(clab_topologies.keys() | list) | length == 0
+      - clab_active_topologies | difference([clab_topology] + clab_legacy_topology_names) | length == 0
     fail_msg: "Unknown topology in {{ clab_root_dir }}/active_topology: {{ clab_active_topologies }}"

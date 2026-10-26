@@ -4,8 +4,8 @@ Local collection supporting the [Network demos](../../../../network/README.md). 
 
 | Role | Description |
 |---|---|
-| `containerlab` | Shared device catalog, infrastructure defaults, independent `product_demos` (Cisco) and `multi-vendor` (Juniper/Arista) topologies, bootstrap rendering, and active topology discovery. |
-| `configure_lab` | Connected demo configuration using vendor network resource modules. |
+| `containerlab` | Shared device catalog, infrastructure defaults, one connected `product_demos` topology (IOS-XE, two EOS nodes, and vSRX), bootstrap rendering, and active topology discovery. |
+| `configure_lab` | Routed interfaces, loopbacks, LLDP, NTP, and cross-vendor static routes using native network resource modules. |
 | `gather_report` | Independent identity, operational, and structured-resource collection with partial-failure handling. |
 | `report_server` | Persistent Apache hosting, SELinux port policy, and active firewalld configuration. |
 | `build_report` | Static HTML and sanitized JSON publication with an AAP report URL artifact. |

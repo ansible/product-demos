@@ -8,7 +8,7 @@
   register: clab_destroy
   changed_when: clab_destroy.rc == 0
   # Stack teardown must still be able to remove AWS resources if destroy fails.
-  failed_when: false
+  failed_when: clab_destroy_required and clab_destroy.rc != 0
 
 - name: Remove successfully destroyed topology from the deployment record
   ansible.builtin.set_fact:

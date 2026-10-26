@@ -257,25 +257,15 @@
         name: demo.network.containerlab
         tasks_from: discover_active
 
-    - name: Stop the selected topology before rendering its replacement
-      ansible.builtin.command:
-        cmd: containerlab destroy --cleanup --runtime podman
-        chdir: "{{ clab_root_dir }}/{{ clab_topology }}/"
-      environment:
-        DOCKER_HOST: "unix:///run/user/1000/podman/podman.sock"
-      changed_when: true
-      when: clab_topology in clab_active_topologies
-
-    - name: Retain the other deployed topologies
-      ansible.builtin.set_fact:
-        clab_active_topologies: "{{ clab_active_topologies | difference([clab_topology]) }}"
-
-    - name: Update deployment record after stopping the selected topology
-      ansible.builtin.copy:
-        dest: "{{ clab_root_dir }}/active_topology"
-        content: "{{ clab_active_topologies | join('\n') }}"
-        mode: '0644'
-      when: clab_active_record.stat.exists
+    - name: Stop existing Product Demos and legacy split deployments
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: destroy_topology
+      vars:
+        clab_destroy_required: true
+      loop: "{{ clab_active_topologies | list }}"
+      loop_control:
+        loop_var: clab_destroy_topology
 
     - name: Remove report from the previous deployment
       ansible.builtin.file:
@@ -293,7 +283,7 @@
 
     - name: Include the selected topology in the deployment record
       ansible.builtin.set_fact:
-        clab_active_topologies: "{{ (clab_active_topologies + [clab_topology]) | unique | list }}"
+        clab_active_topologies: "{{ [clab_topology] }}"
 
     - name: Record deployed topologies for teardown and diagnostics
       ansible.builtin.copy:
@@ -342,7 +332,7 @@
       ansible.controller.host:
         name: "{{ item.key }}"
         inventory: ContainerLab Inventory
-        enabled: "{{ item.key in (hostvars['clab-hypervisor'].clab_active_topologies | map('extract', clab_topologies) | map(attribute='devices') | flatten | list) }}"
+        enabled: true
         variables:
           ansible_host: "{{ clab_host_ip }}"
           ansible_port: "{{ item.value.port }}"
@@ -354,4 +344,12 @@
       loop: "{{ clab_device_catalog | dict2items }}"
       loop_control:
         label: "{{ item.key }}"
+      when: lookup('ansible.builtin.env', 'AWX_HOST') | length > 0
+
+    - name: Remove retired device hosts from the previous topology
+      ansible.controller.host:
+        name: "{{ item }}"
+        inventory: ContainerLab Inventory
+        state: absent
+      loop: "{{ clab_retired_devices }}"
       when: lookup('ansible.builtin.env', 'AWX_HOST') | length > 0

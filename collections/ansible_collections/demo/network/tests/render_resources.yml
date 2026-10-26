@@ -9,9 +9,9 @@
     - name: Render vendor resources
       ansible.builtin.include_tasks: tasks/render_platform.yml
       loop:
-        - {host: cat8kv, os: cisco.ios.ios}
-        - {host: n9kv, os: cisco.nxos.nxos}
-        - {host: vjunos, os: juniper.device.junos}
-        - {host: veos, os: arista.eos.eos}
+        - {host: cat8kv1, os: cisco.ios.ios}
+        - {host: veos2, os: arista.eos.eos}
+        - {host: vjunos3, os: juniper.device.junos}
+        - {host: veos4, os: arista.eos.eos}
       loop_control:
         loop_var: platform

@@ -78,21 +78,11 @@
         name: demo.network.containerlab
         tasks_from: discover_active
 
-    - name: Validate topology teardown selection
-      ansible.builtin.assert:
-        that:
-          - clab_teardown_topology == 'all' or clab_teardown_topology in clab_topologies
-        fail_msg: Choose all, product_demos, or multi-vendor.
-
-    - name: Select deployed topologies to destroy
-      ansible.builtin.set_fact:
-        clab_topologies_to_destroy: "{{ clab_active_topologies if clab_teardown_topology == 'all' else clab_active_topologies | intersect([clab_teardown_topology]) }}"
-
-    - name: Destroy selected topologies while retaining other labs
+    - name: Destroy Product Demos and legacy split deployments
       ansible.builtin.include_role:
         name: demo.network.containerlab
         tasks_from: destroy_topology
-      loop: "{{ clab_topologies_to_destroy }}"
+      loop: "{{ clab_active_topologies | list }}"
       loop_control:
         loop_var: clab_destroy_topology
 
@@ -116,7 +106,7 @@
       ansible.controller.host:
         name: "{{ item.key }}"
         inventory: ContainerLab Inventory
-        enabled: "{{ item.key in (hostvars['clab-hypervisor'].clab_active_topologies | map('extract', clab_topologies) | map(attribute='devices') | flatten | list) }}"
+        enabled: "{{ clab_topology in hostvars['clab-hypervisor'].clab_active_topologies }}"
         state: present
       loop: "{{ clab_device_catalog | dict2items }}"
       loop_control:
