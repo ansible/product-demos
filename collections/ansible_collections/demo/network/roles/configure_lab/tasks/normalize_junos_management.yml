@@ -1,0 +1,59 @@
+---
+# The image merges startup snippets into a retained management VRF. The pinned
+# route resource parser cannot gather an IPv4-only VRF. Normalize this lab's
+# management context and verify it when the transition closes NETCONF.
+- name: Inspect the current Junos management context
+  juniper.device.junos_command:
+    commands:
+      - show configuration system management-instance | display set
+      - show configuration routing-instances mgmt_junos | display set
+  register: network_lab_junos_context
+
+- name: Move retained management routing into the default table
+  when: >-
+    'set system management-instance' in (network_lab_junos_context.stdout | join(' '))
+    or 'set routing-instances mgmt_junos' in (network_lab_junos_context.stdout | join(' '))
+  block:
+    - name: Preserve the management gateway while removing the retained VRF
+      juniper.device.junos_config:
+        lines:
+          - delete system management-instance
+          - delete routing-instances mgmt_junos
+          - set routing-options static route 0.0.0.0/0 next-hop 10.0.0.2
+        update: merge
+  rescue:
+    - name: Require a transport interruption from the management-context change
+      ansible.builtin.assert:
+        that:
+          - (ansible_failed_result.module_stdout | default('') + ansible_failed_result.msg | default('')) is search('command timeout triggered|Unexpected session close|Connection closed|SessionCloseError')
+        fail_msg: The Junos management change failed for a reason other than its expected NETCONF session interruption.
+
+    - name: Reset the interrupted NETCONF session
+      ansible.builtin.meta: reset_connection
+
+    - name: Wait for the management endpoint to recover
+      ansible.builtin.wait_for:
+        host: "{{ ansible_host }}"
+        port: "{{ ansible_port }}"
+        search_regex: SSH
+        timeout: 120
+      delegate_to: localhost
+
+    - name: Read the committed management routing context
+      juniper.device.junos_command:
+        commands:
+          - show configuration system management-instance | display set
+          - show configuration routing-instances mgmt_junos | display set
+          - show configuration routing-options static route 0.0.0.0/0 | display set
+      register: network_lab_junos_context_after
+
+    - name: Require the intended management change to have committed
+      ansible.builtin.assert:
+        that:
+          - "'set system management-instance' not in (network_lab_junos_context_after.stdout | join(' '))"
+          - "'set routing-instances mgmt_junos' not in (network_lab_junos_context_after.stdout | join(' '))"
+          - "'next-hop 10.0.0.2' in (network_lab_junos_context_after.stdout | join(' '))"
+        fail_msg: NETCONF recovered but the required management routing context was not committed.
+
+- name: Reopen NETCONF before configuring device resources
+  ansible.builtin.meta: reset_connection
