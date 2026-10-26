@@ -54,4 +54,4 @@ Deployment uses a single topology; no topology selection survey is needed. Redep
 
 Read [configuration](docs/network-configuration.md), [deployment](docs/network-deploy-containerlab-stack.md), [reporting](docs/network-report.md), and [troubleshooting](docs/network-troubleshoot-containerlab.md) for details. The [Palo Alto firewall demo](docs/network-panos-workflow.md) remains separate.
 
-Configuration resources execute in each vendor's dependency order with `state: merged`. Some Cisco and EOS modules can report changes for defaults even when before/after values match; inspect configuration data when checking idempotence. The vSRX topology requires its own live validation; prior vJunos-switch or split-lab results do not establish compatibility for this image and layout.
+Configuration resources execute in each vendor's dependency order with `state: merged`. Some Cisco and EOS modules can report changes for defaults even when before/after values match; inspect configuration data when checking idempotence. Run Validate Devices after configuration to verify collection and routed paths in the current deployment.

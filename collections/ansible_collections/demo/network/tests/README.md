@@ -22,4 +22,4 @@ For live APD acceptance:
 5. Run the IOS-XE backup demo. Exercise STIG, Staging, and Upgrade separately as required.
 6. Test topology and stack teardown, including report removal and AWS cleanup.
 
-`inspect_topology.yml` is a read-only live hypervisor check for the single topology record, exact five-container membership, running states, and all device management ports. Its AAP artifacts include container IDs and start times. Previous split-lab or vJunos-switch acceptance is not evidence for vSRX 23.2R2.21 or the new connected layout; validate this image and routed paths live.
+`inspect_topology.yml` is a read-only live hypervisor check for the single topology record, exact five-container membership, running states, and all device management ports. Its AAP artifacts include container IDs and start times. Validate the actual vSRX image and routed paths on the target AAP and hypervisor runtime.

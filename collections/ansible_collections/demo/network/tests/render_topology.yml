@@ -77,7 +77,7 @@
           register: clab_test_junos_bootstrap
           no_log: true
 
-        - name: Preserve the management gateway without triggering the VRF parser bug
+        - name: Require the bootstrap management gateway and ICMP zone
           ansible.builtin.assert:
             that:
               - "'management-instance' not in (clab_test_junos_bootstrap.content | b64decode)"

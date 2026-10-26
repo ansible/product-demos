@@ -1090,7 +1090,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #38b000 0%, #006400 100%)"
     icon: "🌐"
-  blurb: "Apply baseline banner, NTP, and SNMP configuration to containerlab Cisco NX-OS and IOS-XE devices."
+  blurb: "Configure connected IOS-XE, EOS, and Junos devices with native modules for interfaces, addressing, LLDP, NTP, and static routes."
   stats:
     playbooks: 1
   github_path: network/configure_devices.yml
@@ -1143,7 +1143,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #38b000 0%, #006400 100%)"
     icon: "🌐"
-  blurb: "Back up running configurations from containerlab NX-OS and IOS-XE devices to the execution node."
+  blurb: "Back up the connected Containerlab IOS-XE configuration to the execution node."
   stats:
     playbooks: 1
   github_path: network/backup.yml

@@ -4,15 +4,16 @@
 # management context and verify it when the transition closes NETCONF.
 - name: Inspect the current Junos management context
   juniper.device.junos_command:
+    display: text
     commands:
-      - show configuration system management-instance | display set
-      - show configuration routing-instances mgmt_junos | display set
+      - show configuration system management-instance
+      - show configuration routing-instances
   register: network_lab_junos_context
 
 - name: Move retained management routing into the default table
   when: >-
-    'set system management-instance' in (network_lab_junos_context.stdout | join(' '))
-    or 'set routing-instances mgmt_junos' in (network_lab_junos_context.stdout | join(' '))
+    'management-instance;' in (network_lab_junos_context.stdout | join(' '))
+    or 'mgmt_junos' in (network_lab_junos_context.stdout | join(' '))
   block:
     - name: Preserve the management gateway while removing the retained VRF
       juniper.device.junos_config:
@@ -41,17 +42,18 @@
 
     - name: Read the committed management routing context
       juniper.device.junos_command:
+        display: text
         commands:
-          - show configuration system management-instance | display set
-          - show configuration routing-instances mgmt_junos | display set
-          - show configuration routing-options static route 0.0.0.0/0 | display set
+          - show configuration system management-instance
+          - show configuration routing-instances
+          - show configuration routing-options static route 0.0.0.0/0
       register: network_lab_junos_context_after
 
     - name: Require the intended management change to have committed
       ansible.builtin.assert:
         that:
-          - "'set system management-instance' not in (network_lab_junos_context_after.stdout | join(' '))"
-          - "'set routing-instances mgmt_junos' not in (network_lab_junos_context_after.stdout | join(' '))"
+          - "'management-instance;' not in (network_lab_junos_context_after.stdout | join(' '))"
+          - "'mgmt_junos' not in (network_lab_junos_context_after.stdout | join(' '))"
           - "'next-hop 10.0.0.2' in (network_lab_junos_context_after.stdout | join(' '))"
         fail_msg: NETCONF recovered but the required management routing context was not committed.
 

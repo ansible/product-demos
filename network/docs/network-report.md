@@ -1,6 +1,6 @@
 # Detailed multi-vendor network report
 
-`network/report.yml` collects Cisco IOS-XE, Cisco NX-OS, Juniper Junos, and Arista EOS devices and publishes a standalone HTML report on the containerlab hypervisor. The report remains available after the AAP job finishes.
+`network/report.yml` collects the connected Cisco IOS-XE, Juniper vSRX, and Arista EOS devices and publishes a standalone HTML report on the containerlab hypervisor. The report remains available after the AAP job finishes.
 
 ## Run the demo
 
