@@ -88,6 +88,7 @@ mock_modules:
   - community.aws.s3_website
   - arista.eos.eos_config
   - juniper.device.junos_command
+  - juniper.device.junos_config
   - community.general.seport
   - community.general.filesystem
   - community.general.modprobe

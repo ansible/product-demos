@@ -6,6 +6,24 @@
       - ansible_network_os in network_lab_prefixes
     fail_msg: Select a supported ContainerLab Inventory device.
 
+# The vSRX image retains a management VRF when startup snippets are merged.
+# juniper.device 2.0.1 cannot gather static routes from an IPv4-only VRF.
+- name: Keep vSRX management reachable in the default routing table
+  juniper.device.junos_config:
+    lines:
+      - delete system management-instance
+      - delete routing-instances mgmt_junos
+      - set routing-options static route 0.0.0.0/0 next-hop 10.0.0.2
+    update: merge
+  register: network_lab_junos_management
+  when: ansible_network_os == 'juniper.device.junos'
+
+- name: Reopen NETCONF after changing the management routing context
+  ansible.builtin.meta: reset_connection
+  when:
+    - ansible_network_os == 'juniper.device.junos'
+    - network_lab_junos_management.changed
+
 - name: Merge structured lab configuration
   ansible.builtin.include_tasks: resource.yml
   loop: "{{ network_lab_resources[inventory_hostname] + [{'resource': 'ntp_global', 'config': network_lab_ntp}] }}"
