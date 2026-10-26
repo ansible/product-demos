@@ -21,7 +21,7 @@ flowchart LR
 
 Management IPs belong to the Containerlab network. AAP connects to device ports mapped on the hypervisor's public address. The **Containerlab Device Access** credential supplies authentication; Junos uses NETCONF and IOS-XE/EOS use `network_cli`. ContainerLab Inventory groups select all devices or a platform.
 
-The topology uses the supplied IvyBridge CPU settings for both EOS nodes. The vSRX bootstrap enables NETCONF and allows ICMP to its demo interfaces. Device configuration adds routed links, loopbacks, LLDP, NTP, and static routes so demos can exercise paths across all three vendors.
+The topology uses the supplied IvyBridge CPU settings for both EOS nodes. The vSRX bootstrap enables NETCONF and allows ICMP to its demo interfaces. Its management gateway remains in the default routing table: the pinned Juniper static-route parser fails on IPv4-only management routing instances. Device configuration adds routed links, loopbacks, LLDP, NTP, and static routes so demos can exercise paths across all three vendors.
 
 ## Getting started
 

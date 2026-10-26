@@ -71,6 +71,19 @@
               - clab_test_topology.topology.links[2].endpoints == ['veos4:eth1', 'veos2:eth2']
               - "'rounds=' not in clab_device_password_hash"
 
+        - name: Read the vSRX bootstrap without exposing credentials
+          ansible.builtin.slurp:
+            src: "{{ clab_root_dir }}/product_demos/configs/vjunos3/startup-config.cfg"
+          register: clab_test_junos_bootstrap
+          no_log: true
+
+        - name: Preserve the management gateway without triggering the VRF parser bug
+          ansible.builtin.assert:
+            that:
+              - "'management-instance' not in (clab_test_junos_bootstrap.content | b64decode)"
+              - "'route 0.0.0.0/0 next-hop 10.0.0.2' in (clab_test_junos_bootstrap.content | b64decode)"
+              - "'security-zone trust' in (clab_test_junos_bootstrap.content | b64decode)"
+
         - name: Create an existing split-lab record for migration
           ansible.builtin.copy:
             dest: "{{ clab_root_dir }}/active_topology"
