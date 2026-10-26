@@ -1,0 +1,29 @@
+---
+- name: Destroy selected containerlab topology
+  ansible.builtin.command:
+    cmd: containerlab destroy --cleanup --runtime podman
+    chdir: "{{ clab_root_dir }}/{{ clab_destroy_topology }}/"
+  environment:
+    DOCKER_HOST: "unix:///run/user/1000/podman/podman.sock"
+  register: clab_destroy
+  changed_when: clab_destroy.rc == 0
+  # Stack teardown must still be able to remove AWS resources if destroy fails.
+  failed_when: false
+
+- name: Remove successfully destroyed topology from the deployment record
+  ansible.builtin.set_fact:
+    clab_active_topologies: "{{ clab_active_topologies | difference([clab_destroy_topology]) }}"
+  when: clab_destroy.rc == 0
+
+- name: Record remaining topologies
+  ansible.builtin.copy:
+    dest: "{{ clab_root_dir }}/active_topology"
+    content: "{{ clab_active_topologies | join('\n') }}"
+    mode: '0644'
+  when: clab_destroy.rc == 0
+
+- name: Display topology teardown result
+  ansible.builtin.debug:
+    msg: >-
+      {{ 'Destroyed ' + clab_destroy_topology if clab_destroy.rc == 0
+         else 'Could not destroy ' + clab_destroy_topology + ': ' + (clab_destroy.stderr | default(clab_destroy.msg | default('unknown error'), true)) }}

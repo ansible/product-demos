@@ -49,7 +49,7 @@ clab_report_port: 8088
 clab_access_cidr: 0.0.0.0/0
 clab_security_group_rules:
   - proto: tcp
-    ports: "{{ ([22, clab_report_port | int] + (clab_devices.values() | map(attribute='port') | list) + (clab_devices.values() | map(attribute='ssh_port') | list)) | unique | list }}"
+    ports: "{{ ([22, clab_report_port | int] + (clab_device_catalog.values() | map(attribute='port') | list) + (clab_device_catalog.values() | map(attribute='ssh_port') | list)) | unique | list }}"
     cidr_ip: "{{ clab_access_cidr }}"
   - proto: icmp
     from_port: -1
@@ -58,15 +58,17 @@ clab_security_group_rules:
 # Catalog shared by topology selection and Controller inventory setup.
 clab_devices: "{{ clab_device_catalog | dict2items | selectattr('key', 'in', clab_topologies[clab_topology].devices) | items2dict }}"
 clab_links: "{{ clab_topologies[clab_topology].links }}"
+clab_teardown_topology: all
+clab_active_topologies: []
+clab_active_device_names: "{{ clab_active_topologies | map('extract', clab_topologies) | map(attribute='devices') | flatten | unique | list }}"
+clab_active_devices: "{{ clab_device_catalog | dict2items | selectattr('key', 'in', clab_active_device_names) | items2dict }}"
 clab_topologies:
   product_demos:
     devices: [n9kv, cat8kv]
     links: []
   multi-vendor:
-    devices: [n9kv, cat8kv, vjunos, veos]
+    devices: [vjunos, veos]
     links:
-      - endpoints: [cat8kv:Gi2, n9kv:eth1]
-      - endpoints: [n9kv:eth2, vjunos:ge-0/0/0]
       - endpoints: [vjunos:ge-0/0/1, veos:eth1]
 clab_device_catalog:
   n9kv:

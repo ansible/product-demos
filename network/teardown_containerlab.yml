@@ -78,38 +78,50 @@
         name: demo.network.containerlab
         tasks_from: discover_active
 
-    - name: Destroy containerlab topology
-      ansible.builtin.command:
-        cmd: containerlab destroy --cleanup --runtime podman
-        chdir: "{{ clab_root_dir }}/{{ clab_active_topology }}/"
-      environment:
-        DOCKER_HOST: "unix:///run/user/1000/podman/podman.sock"
-      register: clab_destroy
-      changed_when: clab_destroy.rc == 0
-      # Stack teardown must still be able to remove AWS resources if destroy fails.
-      failed_when: false
-      when: clab_active_topology | length > 0
+    - name: Validate topology teardown selection
+      ansible.builtin.assert:
+        that:
+          - clab_teardown_topology == 'all' or clab_teardown_topology in clab_topologies
+        fail_msg: Choose all, product_demos, or multi-vendor.
 
-    - name: Clear active topology record
-      ansible.builtin.copy:
-        dest: "{{ clab_root_dir }}/active_topology"
-        content: ""
-        mode: '0644'
-      when: clab_destroy.rc | default(1) == 0
+    - name: Select deployed topologies to destroy
+      ansible.builtin.set_fact:
+        clab_topologies_to_destroy: "{{ clab_active_topologies if clab_teardown_topology == 'all' else clab_active_topologies | intersect([clab_teardown_topology]) }}"
 
-    - name: Remove the generated report for the destroyed topology
+    - name: Destroy selected topologies while retaining other labs
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: destroy_topology
+      loop: "{{ clab_topologies_to_destroy }}"
+      loop_control:
+        loop_var: clab_destroy_topology
+
+    - name: Remove the generated report after changing device membership
       ansible.builtin.file:
         path: /var/www/html/network
         state: absent
 
-    - name: Display result
+    - name: Display remaining topologies
       ansible.builtin.debug:
-        msg: >-
-          {% if clab_active_topology | length == 0 %}
-          No deployed topology found
-          {% elif clab_destroy.rc == 0 %}
-          Containerlab topology '{{ clab_active_topology }}' destroyed
-          {% else %}
-          Containerlab could not destroy '{{ clab_active_topology }}': {{ clab_destroy.stderr | default(clab_destroy.msg | default('unknown error'), true) }}.
-          The active topology record was retained. Run Troubleshoot, or Destroy Containerlab Stack to remove AWS resources.
-          {% endif %}
+        msg: "Remaining topologies: {{ clab_active_topologies | join(', ') }}"
+
+- name: Update remaining ContainerLab device inventory
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - role: demo.network.containerlab
+  tasks:
+    - name: Enable only devices from remaining deployed topologies
+      ansible.controller.host:
+        name: "{{ item.key }}"
+        inventory: ContainerLab Inventory
+        enabled: "{{ item.key in (hostvars['clab-hypervisor'].clab_active_topologies | map('extract', clab_topologies) | map(attribute='devices') | flatten | list) }}"
+        state: present
+      loop: "{{ clab_device_catalog | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+      when:
+        - lookup('ansible.builtin.env', 'AWX_HOST') | length > 0
+        - "'clab-hypervisor' in hostvars"
+        - hostvars['clab-hypervisor'].clab_active_topologies is defined

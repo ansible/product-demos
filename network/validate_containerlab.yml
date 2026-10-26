@@ -44,8 +44,6 @@
   gather_facts: false
   vars:
     clab_validation_commands:
-      cisco.ios.ios: ping 10.255.0.1 repeat 3 timeout 2
-      cisco.nxos.nxos: ping 10.110.0.2 count 3 timeout 2
       juniper.device.junos: ping 10.110.0.3 count 3 wait 1
       arista.eos.eos: ping 10.110.0.2 repeat 3
   pre_tasks:
@@ -76,8 +74,9 @@
       changed_when: false
       retries: 6
       delay: 10
+      when: ansible_network_os in clab_validation_commands
       until: clab_validation_ping.stdout | join('\n') is search('Success rate is 100 percent|(?<![0-9.])0([.]0+)?% packet loss')
 
     - name: Record successful device validation
       ansible.builtin.debug:
-        msg: "{{ inventory_hostname }}: authenticated, gathered structured configuration and live interfaces, and passed a data-path ping."
+        msg: "{{ inventory_hostname }}: authenticated and gathered structured configuration and live interfaces{{ '; passed a data-path ping' if ansible_network_os in clab_validation_commands else '' }}."

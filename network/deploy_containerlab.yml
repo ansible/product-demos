@@ -257,21 +257,25 @@
         name: demo.network.containerlab
         tasks_from: discover_active
 
-    - name: Stop previous deployment before rendering the selected lab
+    - name: Stop the selected topology before rendering its replacement
       ansible.builtin.command:
         cmd: containerlab destroy --cleanup --runtime podman
-        chdir: "{{ clab_root_dir }}/{{ clab_active_topology }}/"
+        chdir: "{{ clab_root_dir }}/{{ clab_topology }}/"
       environment:
         DOCKER_HOST: "unix:///run/user/1000/podman/podman.sock"
       changed_when: true
-      when: clab_active_topology | length > 0
+      when: clab_topology in clab_active_topologies
 
-    - name: Clear previous deployment record
+    - name: Retain the other deployed topologies
+      ansible.builtin.set_fact:
+        clab_active_topologies: "{{ clab_active_topologies | difference([clab_topology]) }}"
+
+    - name: Update deployment record after stopping the selected topology
       ansible.builtin.copy:
         dest: "{{ clab_root_dir }}/active_topology"
-        content: ""
+        content: "{{ clab_active_topologies | join('\n') }}"
         mode: '0644'
-      when: clab_active_topology | length > 0
+      when: clab_active_record.stat.exists
 
     - name: Remove report from the previous deployment
       ansible.builtin.file:
@@ -287,10 +291,14 @@
       ansible.builtin.include_role:
         name: demo.network.report_server
 
-    - name: Record selected topology for teardown and diagnostics
+    - name: Include the selected topology in the deployment record
+      ansible.builtin.set_fact:
+        clab_active_topologies: "{{ (clab_active_topologies + [clab_topology]) | unique | list }}"
+
+    - name: Record deployed topologies for teardown and diagnostics
       ansible.builtin.copy:
         dest: "{{ clab_root_dir }}/active_topology"
-        content: "{{ clab_topology }}\n"
+        content: "{{ clab_active_topologies | join('\n') }}\n"
         mode: '0644'
 
     - name: Deploy containerlab topology
@@ -334,7 +342,7 @@
       ansible.controller.host:
         name: "{{ item.key }}"
         inventory: ContainerLab Inventory
-        enabled: "{{ item.key in clab_devices }}"
+        enabled: "{{ item.key in (hostvars['clab-hypervisor'].clab_active_topologies | map('extract', clab_topologies) | map(attribute='devices') | flatten | list) }}"
         variables:
           ansible_host: "{{ clab_host_ip }}"
           ansible_port: "{{ item.value.port }}"

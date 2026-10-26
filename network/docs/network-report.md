@@ -5,8 +5,8 @@
 ## Run the demo
 
 1. Build and select the updated **Product Demos EE** using the definitions in `execution_environments/`. Sync the project and rerun Network setup to update inventory groups and job credentials.
-2. Run **NETWORK | Deploy Containerlab Stack** and choose `multi-vendor` for all four platforms, or `product_demos` for the original two Cisco devices. Existing hypervisors can use **NETWORK | Containerlab | Deploy Topology**, which also refreshes security group ports. Redeploying reconfigures the lab and resets device configuration to its bootstrap.
-3. Run **NETWORK | Containerlab | Configure Devices** to populate the connected topology with interfaces, VLANs, trunks, loopbacks, NTP, and addressing through network resource modules.
+2. Run **NETWORK | Deploy Containerlab Stack** and choose `product_demos` for the original two Cisco devices or `multi-vendor` for Junos and EOS. Deploy both topologies on the same hypervisor to report on all four platforms. Existing hypervisors can use **NETWORK | Containerlab | Deploy Topology**, which also refreshes security group ports. Redeploying reconfigures the lab and resets device configuration to its bootstrap.
+3. Run **NETWORK | Containerlab | Configure Devices** to populate the deployed devices with interfaces, VLANs, trunks, loopbacks, NTP, and addressing through network resource modules.
 4. For `multi-vendor`, run **NETWORK | Containerlab | Validate Devices** to validate Juniper on EC2. Its default target is `clab_junos`; the data-path check requires the neighboring Arista device to be configured too. This validation is still required: image availability and offline checks do not establish EC2 compatibility.
 5. Run **NETWORK | Report**, select all devices or one platform, and open the `network_report_url` from the job output or AAP artifacts.
 

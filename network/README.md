@@ -11,7 +11,7 @@
   - [Suggested Usage](#suggested-usage)
 
 ## About These Demos
-This category of demos shows examples of network operations and management with Ansible Automation Platform. Choose the original `product_demos` lab with Cisco IOS-XE and NX-OS, or the `multi-vendor` lab that adds Juniper Junos and Arista EOS. Both run in a [containerlab](https://containerlab.dev/) topology on AWS, providing a fully self-contained environment with no external dependencies.
+This category of demos shows examples of network operations and management with Ansible Automation Platform. Choose the original `product_demos` lab with Cisco IOS-XE and NX-OS, or the `multi-vendor` lab with Juniper Junos and Arista EOS. Both run in a [containerlab](https://containerlab.dev/) topology on AWS, providing a fully self-contained environment with no external dependencies.
 
 ## Infrastructure
 
@@ -28,7 +28,7 @@ The network demos use containerlab to run virtual network devices as containers 
 | **Report** | Persistent HTML and sanitized JSON at `http://<hypervisor>:8088/network/` |
 | **Regions** | us-east-2, us-west-2 |
 
-Deploy Topology can switch labs on the same hypervisor. It stops the previous deployment, resets device configuration to bootstrap, and enables only the selected devices in ContainerLab Inventory. Teardown and Troubleshoot discover the deployed topology automatically. The original `product_demos` topology and startup files are restored from `main`, including their `admin` / `admin@123` device credentials.
+Deploy Topology adds the selected lab on the existing hypervisor. `product_demos` owns the Cisco devices and SCP server; `multi-vendor` owns Junos and EOS with a link between them. Both labs can run together. Redeploying resets only the selected lab to bootstrap. Inventory enables devices from all deployed labs. Teardown can remove one lab or all labs, and Troubleshoot discovers all deployed topologies. The original `product_demos` topology and startup files are restored from `main`, including their `admin` / `admin@123` device credentials.
 
 Devices use port-mapped management services on the hypervisor. The **Containerlab Device Access** credential supplies device authentication; Junos uses NETCONF and the other platforms use `network_cli`. A dedicated **ContainerLab Inventory** holds the device hosts and group variables.
 
@@ -37,10 +37,11 @@ Devices use port-mapped management services on the hypervisor. The **Containerla
 1. Deploy the demos using the "Product Demos | Multi-demo setup" or "Product Demos | Single demo setup" and select **Network**.
 2. Run the **NETWORK ǀ Deploy Containerlab Stack** workflow to provision the infrastructure. This will:
    - Provision an EC2 hypervisor with nested virtualization
-   - Deploy the topology selected in the survey: `product_demos` (default: n9kv + cat8kv) or `multi-vendor` (n9kv + cat8kv + vjunos + veos)
+   - Deploy the topology selected in the survey: `product_demos` (default: n9kv + cat8kv) or `multi-vendor` (vjunos + veos)
    - Sync the ContainerLab Inventory with the hypervisor IP
-3. Run **Configure Devices**, then **Report**. For `multi-vendor`, run **Validate Devices** after configuration to check forwarding across the connected lab. The report job publishes a browser URL in its output and AAP artifacts. Cisco Backup, DISA STIG, Staging, and Upgrade remain available.
-4. When finished, run **NETWORK ǀ Destroy Containerlab Stack** to tear down all AWS resources.
+3. To run both labs, launch **NETWORK ǀ Containerlab ǀ Deploy Topology** on the same hypervisor and select the other topology.
+4. Run **Configure Devices**, then **Report**. For `multi-vendor`, run **Validate Devices** after configuration to check forwarding across the connected lab. The report job publishes a browser URL in its output and AAP artifacts. Cisco Backup, DISA STIG, Staging, and Upgrade remain available.
+5. When finished, run **NETWORK ǀ Destroy Containerlab Stack** to tear down all AWS resources.
 
 ## Workflows
 
@@ -58,9 +59,9 @@ Devices use port-mapped management services on the hypervisor. The **Containerla
 |--------------|-------------|
 | **Provision Hypervisor** | Create AWS VPC, subnet, security group, keypair, and launch a RHEL 9 EC2 instance with nested virtualization enabled. |
 | **Deploy Topology** | Install podman and containerlab on the hypervisor, pull device images, and start the topology selected in the survey. |
-| **Configure Devices** | Merge interface, VLAN, trunk, addressing, LLDP, and NTP configuration across all four platforms; retain Cisco banner and SNMP baselines. |
+| **Configure Devices** | Merge interface, VLAN, trunk, addressing, LLDP, and NTP configuration for deployed platforms; retain Cisco banner and SNMP baselines. |
 | **Validate Devices** | For `multi-vendor`, check KVM, capacity, device facts, and configured data-path reachability. Starts with Junos to validate the new image on EC2. |
-| **Teardown Topology** | Destroy the running containerlab topology on the hypervisor. |
+| **Teardown Topology** | Choose `product_demos`, `multi-vendor`, or `all`; other deployed labs remain running. |
 | **Troubleshoot** | Collect hypervisor, containerlab, and podman diagnostics through AAP when manual SSH is unavailable. |
 | **Teardown Hypervisor** | Terminate the EC2 instance and remove all associated AWS resources. |
 
@@ -86,9 +87,9 @@ Devices use port-mapped management services on the hypervisor. The **Containerla
 
 ## Suggested Usage
 
-**Deploy the stack first** — Choose `product_demos` for the original Cisco demos or `multi-vendor` for the connected four-platform lab. Run the **NETWORK ǀ Deploy Containerlab Stack** workflow before any other network demo. The workflow provisions infrastructure and populates the ContainerLab Inventory. For `multi-vendor`, allow at least 15 minutes for vJunos boot plus image pulls. Per-device readiness timeouts include 30 minutes for Junos; EC2 boot timing is still to be measured.
+**Deploy the stack first** — Choose `product_demos` for the original Cisco demos or `multi-vendor` for the connected Juniper/Arista lab. Run the **NETWORK ǀ Deploy Containerlab Stack** workflow before any other network demo. The workflow provisions infrastructure and populates the ContainerLab Inventory. For `multi-vendor`, allow at least 15 minutes for vJunos boot plus image pulls. Per-device readiness timeouts include 30 minutes for Junos; EC2 boot timing is still to be measured.
 
-**NETWORK ǀ Configure Devices** — Configure the connected topology with vendor network resource modules and `state: merged`. The same logical network intent is expressed in each platform's structured schema.
+**NETWORK ǀ Configure Devices** — Configure the deployed devices with vendor network resource modules and `state: merged`. The same logical network intent is expressed in each platform's structured schema.
 
 **NETWORK ǀ Containerlab ǀ Validate Devices** — With `multi-vendor` deployed, validate device collection and cross-device pings after configuration. The job also records hypervisor KVM support and container resource usage. On October 22, 2026, all four devices were deployed and configured through APD on AAP 2.7 using `c8i.4xlarge` in `us-east-2`. The exact vJunos-switch `25.2R1.9` image passed its forwarding test on EC2. This is a functional validation; prolonged load and reboot stability remain unmeasured.
 

@@ -17,10 +17,10 @@
   ansible.builtin.assert:
     that:
       - clab_test_topology.name == clab_topology
-      - clab_test_topology.topology.nodes.keys() | list | sort == (clab_devices.keys() | list + ['scp-server']) | sort
+      - clab_test_topology.topology.nodes.keys() | list | sort == (clab_devices.keys() | list + (['scp-server'] if clab_topology == 'product_demos' else [])) | sort
       - clab_devices.keys() | list | sort == clab_topologies[clab_topology].devices | sort
       - clab_images | length == clab_devices | length
-      - (2830 in clab_security_group_rules[0].ports) == (clab_topology == 'multi-vendor')
+      - "[2122, 2123, 2124, 2125, 2830] | difference(clab_security_group_rules[0].ports) | length == 0"
 
 - name: Require the original two-device topology without data links
   ansible.builtin.assert:
@@ -38,23 +38,29 @@
 
 - name: Require legacy deployment compatibility
   ansible.builtin.assert:
-    that: clab_active_topology == 'product_demos'
+    that: clab_active_topologies == ['product_demos']
   when: clab_test_topology_index == 0
 
 - name: Require connected multi-vendor topology and correct NETCONF mapping
   ansible.builtin.assert:
     that:
-      - clab_test_topology.topology.nodes | length == 5
-      - clab_test_topology.topology.links | length == 3
+      - clab_test_topology.topology.nodes | length == 2
+      - clab_test_topology.topology.links | length == 1
       - "'2830:830' in clab_test_topology.topology.nodes.vjunos.ports"
       - clab_test_topology.topology.nodes.veos.kind == 'arista_veos'
       - clab_test_topology.topology.nodes.veos.env.QEMU_CPU == 'host,level=9,pdcm=off'
+      - clab_test_topology.topology.nodes.keys() | list | sort == ['veos', 'vjunos']
+      - clab_test_topology.topology.links[0].endpoints == ['vjunos:ge-0/0/1', 'veos:eth1']
   when: clab_topology == 'multi-vendor'
+
+- name: Add selected topology while preserving the other deployed lab
+  ansible.builtin.set_fact:
+    clab_active_topologies: "{{ (clab_active_topologies + [clab_topology]) | unique | list }}"
 
 - name: Record selected topology
   ansible.builtin.copy:
     dest: "{{ clab_root_dir }}/active_topology"
-    content: "{{ clab_topology }}\n"
+    content: "{{ clab_active_topologies | join('\n') }}\n"
     mode: '0644'
 
 - name: Discover recorded topology
@@ -64,4 +70,7 @@
 
 - name: Require recorded topology to take precedence over previous topology files
   ansible.builtin.assert:
-    that: clab_active_topology == clab_topology
+    that:
+      - clab_topology in clab_active_topologies
+      - clab_test_topology_index == 0 or clab_active_topologies | sort == ['multi-vendor', 'product_demos']
+      - clab_test_topology_index == 0 or clab_active_device_names | sort == ['cat8kv', 'n9kv', 'veos', 'vjunos']

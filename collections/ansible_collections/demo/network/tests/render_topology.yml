@@ -1,5 +1,5 @@
 ---
-- name: Validate both topologies and active topology discovery without a hypervisor
+- name: Validate independent topologies and deployment discovery without a hypervisor
   hosts: localhost
   connection: local
   gather_facts: false
@@ -25,7 +25,7 @@
 
         - name: Require no active topology before deployment
           ansible.builtin.assert:
-            that: clab_active_topology == ''
+            that: clab_active_topologies == []
 
         - name: Render and validate each supported topology
           ansible.builtin.include_tasks: tasks/render_topology.yml
@@ -49,7 +49,7 @@
 
         - name: Require teardown record to take precedence over legacy files
           ansible.builtin.assert:
-            that: clab_active_topology == ''
+            that: clab_active_topologies == []
       always:
         - name: Remove temporary lab workspace
           ansible.builtin.file:

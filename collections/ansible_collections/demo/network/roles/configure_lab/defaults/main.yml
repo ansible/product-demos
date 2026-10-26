@@ -17,7 +17,7 @@ network_lab_resources:
   cat8kv:
     - resource: interfaces
       config:
-        - {name: GigabitEthernet2, description: 'To n9kv Ethernet1/1', enabled: true}
+        - {name: GigabitEthernet2, description: 'Demo routed port', enabled: true}
         - {name: Loopback10, description: APD report demo, enabled: true}
     - resource: l3_interfaces
       config:
@@ -37,8 +37,8 @@ network_lab_resources:
       config: "{{ network_lab_vlans }}"
     - resource: interfaces
       config:
-        - {name: Ethernet1/1, description: 'To cat8kv GigabitEthernet2', enabled: true, mode: layer3}
-        - {name: Ethernet1/2, description: 'To vjunos ge-0/0/0', enabled: true, mode: layer2}
+        - {name: Ethernet1/1, description: 'Demo routed port', enabled: true, mode: layer3}
+        - {name: Ethernet1/2, description: 'Spare trunk port', enabled: true, mode: layer2}
         - {name: Vlan110, description: DEMO gateway, enabled: true}
         - {name: Loopback10, description: APD report demo, enabled: true}
     - resource: l2_interfaces
@@ -58,7 +58,7 @@ network_lab_resources:
       # juniper.device 2.0.1 emits an invalid `enable;` leaf on logical
       # interfaces. Junos interfaces are enabled by default; omit that field.
       config:
-        - {name: ge-0/0/0, description: 'To n9kv Ethernet1/2'}
+        - {name: ge-0/0/0, description: 'Spare trunk port'}
         - {name: ge-0/0/1, description: 'To veos Ethernet1'}
         - {name: irb, description: DEMO SVI}
         - {name: lo0, description: APD report demo}

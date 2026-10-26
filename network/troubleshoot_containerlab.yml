@@ -59,7 +59,6 @@
     - role: demo.network.containerlab
 
   vars:
-    clab_topology_dir: "{{ clab_root_dir }}/{{ clab_topology }}"
     clab_podman_socket: "unix:///run/user/1000/podman/podman.sock"
 
   tasks:
@@ -68,10 +67,9 @@
         name: demo.network.containerlab
         tasks_from: discover_active
 
-    - name: Use deployed topology for diagnostic device selection
-      ansible.builtin.set_fact:
-        clab_topology: "{{ clab_active_topology }}"
-      when: clab_active_topology | length > 0
+    - name: Display deployed topologies
+      ansible.builtin.debug:
+        msg: "Deployed topologies: {{ clab_active_topologies | join(', ') }}"
 
     - name: Check external reachability of management ports
       ansible.builtin.wait_for:
@@ -82,7 +80,7 @@
       become: false
       register: clab_external_port_check
       failed_when: false
-      loop: "{{ [{'port': 22, 'label': 'hypervisor SSH'}] + (clab_devices.values() | list) }}"
+      loop: "{{ [{'port': 22, 'label': 'hypervisor SSH'}] + (clab_active_devices.values() | list) }}"
 
     - name: Display external port probe results
       ansible.builtin.debug:
@@ -133,8 +131,7 @@
 
     - name: Inspect containerlab topology
       ansible.builtin.command:
-        cmd: containerlab --runtime podman inspect -t {{ clab_topology }}.clab.yml
-        chdir: "{{ clab_topology_dir }}"
+        cmd: containerlab --runtime podman inspect --all
       environment:
         DOCKER_HOST: "{{ clab_podman_socket }}"
       register: clab_inspect
@@ -178,7 +175,7 @@
         timeout: 5
       register: clab_local_port_check
       failed_when: false
-      loop: "{{ clab_devices.values() | list }}"
+      loop: "{{ clab_active_devices.values() | list }}"
 
     - name: Display local device SSH probe results
       ansible.builtin.debug:
@@ -193,7 +190,7 @@
       ansible.builtin.shell:
         cmd: |
           set -o pipefail
-          for name in $(podman ps -a --filter name=clab-{{ clab_topology }}- --format '{{ '{{' }}.Names{{ '}}' }}'); do
+          for name in $(podman ps -a --format '{{ '{{' }}.Names{{ '}}' }}' | grep -E '^clab-({{ clab_topologies.keys() | join('|') }})-' || true); do
             echo "=== ${name} (last 20 lines) ==="
             podman logs --tail 20 "${name}" || echo "No logs available for ${name}"
             echo

@@ -23,7 +23,7 @@ Options: `us-east-2` (default), `us-west-2`.
 |----------|----------|-------------|
 | NETWORK ǀ Containerlab ǀ Troubleshoot | [`network/troubleshoot_containerlab.yml`](../troubleshoot_containerlab.yml) | Discovers the hypervisor, probes device ports, and collects containerlab and podman status |
 
-The job discovers the deployed topology automatically from the hypervisor, including existing labs deployed under `product_demos`.
+The job discovers all deployed topologies automatically from the hypervisor, including existing labs deployed under `product_demos`.
 
 ## What it checks
 
@@ -32,8 +32,8 @@ The job discovers the deployed topology automatically from the hypervisor, inclu
 3. **Hypervisor health** — Uptime, memory, and disk usage on the image volume
 4. **containerlab status** — `containerlab version` and `containerlab inspect`
 5. **Podman containers** — Lists containers for both `ec2-user` and root runtimes
-6. **Local device SSH probes** — Checks whether the selected topology’s device management services respond on the hypervisor
-7. **Recent container logs** — Last 20 log lines for containers in the selected topology
+6. **Local device SSH probes** — Checks whether all deployed device management services respond on the hypervisor
+7. **Recent container logs** — Last 20 log lines for containers in both deployed topologies
 
 ## Related demos
 
