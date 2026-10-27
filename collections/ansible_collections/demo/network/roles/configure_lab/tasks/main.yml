@@ -35,15 +35,24 @@
     state: present
   when: ansible_network_os == 'cisco.ios.ios'
 
-- name: Remove the previous generic Cisco SNMP community
+- name: Inspect Cisco SNMP configuration before migrating the community
   cisco.ios.ios_snmp_server:
-    config:
-      communities:
-        - name: public
-    state: deleted
+    state: gathered
+  register: network_lab_snmp_before
+  no_log: true
   when:
     - ansible_network_os == 'cisco.ios.ios'
     - network_lab_snmp_community != 'public'
+
+# ios_snmp_server state=deleted removes the entire SNMP configuration. Limit
+# this migration to the named community and leave all other settings intact.
+- name: Remove the previous generic Cisco SNMP community
+  cisco.ios.ios_config:
+    lines: no snmp-server community public
+  when:
+    - ansible_network_os == 'cisco.ios.ios'
+    - network_lab_snmp_community != 'public'
+    - network_lab_snmp_before.gathered.communities | default([]) | selectattr('name', 'equalto', 'public') | list | length > 0
 
 - name: Merge Cisco SNMP baseline
   action: "{{ network_lab_prefixes[ansible_network_os] }}_snmp_server"
