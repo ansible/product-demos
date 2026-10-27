@@ -40,3 +40,11 @@
     msg:
       - "Detailed report: {{ network_report_url }}"
       - "{{ network_report.complete_count }}/{{ network_report.devices | length }} devices collected without errors; {{ network_report.issue_count }} with issues."
+
+- name: Fail the job when any selected device has collection errors
+  ansible.builtin.assert:
+    that: network_report.issue_count | int == 0
+    fail_msg: >-
+      Report published at {{ network_report_url }}. Collection failed for:
+      {{ network_report.devices | rejectattr('status', 'equalto', 'collected') | map(attribute='name') | join(', ') }}.
+      Review the device errors in the published report and network_report_devices_with_issues in job artifacts.

@@ -40,9 +40,33 @@
       when:
         - not (network_report_base.failed | default(false) or network_report_base.unreachable | default(false))
         - item in (network_report_base.ansible_facts.available_network_resources | default([]))
+        - not (ansible_network_os == 'juniper.device.junos' and item == 'static_routes')
       register: network_report_resource_results
       ignore_errors: true  # noqa: ignore-errors - distinguish failed resources from unsupported ones
       ignore_unreachable: true
+      no_log: true
+
+    # The pinned Junos facts parser fails on IPv4-only routing instances such as
+    # the factory mgmt_junos VRF. Read these sections without changing the device.
+    - name: Collect Junos static-route configuration over NETCONF
+      demo.network.junos_route_configuration:
+      when:
+        - ansible_network_os == 'juniper.device.junos'
+        - not (network_report_base.failed | default(false) or network_report_base.unreachable | default(false))
+        - "'static_routes' in network_report_resources"
+        - "'static_routes' in (network_report_base.ansible_facts.available_network_resources | default([]))"
+      register: network_report_junos_routes
+      ignore_errors: true  # noqa: ignore-errors - publish diagnostic results before failing the report job
+      ignore_unreachable: true
+      no_log: true
+
+    - name: Include the independently collected Junos routes
+      ansible.builtin.set_fact:
+        network_report_resource_results: >-
+          {{ network_report_resource_results | combine({'results':
+             network_report_resource_results.results +
+             [network_report_junos_routes | demo.network.network_report_junos_static_routes]}) }}
+      when: not (network_report_junos_routes.skipped | default(false))
       no_log: true
 
     - name: Collect discovered Junos LLDP neighbors over NETCONF

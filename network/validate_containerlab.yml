@@ -59,10 +59,10 @@
   roles:
     - role: demo.network.gather_report
   tasks:
-    - name: Require identity, operational interfaces, and structured addressing
+    - name: Require complete collection, operational interfaces, and structured addressing
       ansible.builtin.assert:
         that:
-          - network_report_device.status in ['collected', 'partial']
+          - network_report_device.status == 'collected'
           - network_report_device.interface_status == 'collected'
           - network_report_device.sections | selectattr('name', 'equalto', 'interfaces') | selectattr('status', 'equalto', 'collected') | list | length == 1
           - network_report_device.sections | selectattr('name', 'equalto', 'l3_interfaces') | selectattr('status', 'equalto', 'collected') | list | length == 1

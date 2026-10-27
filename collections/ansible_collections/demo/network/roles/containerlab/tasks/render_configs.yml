@@ -9,9 +9,15 @@
 
 - name: Generate password hash for EOS and Junos bootstrap
   ansible.builtin.set_fact:
-    # EOS requires the standard $6$salt$hash form, without a rounds= prefix.
-    clab_device_password_hash: "{{ clab_device_password | password_hash('sha512', rounds=5000) }}"
+    # crypt includes the default rounds explicitly; passlib omits them. EOS needs
+    # the latter spelling. Removing this prefix preserves the same 5000 rounds.
+    clab_device_password_hash: "{{ clab_device_password | password_hash('sha512', rounds=5000) | replace('$6$rounds=5000$', '$6$') }}"
   no_log: true
+
+- name: Require an EOS-compatible SHA512 bootstrap hash before rendering
+  ansible.builtin.assert:
+    that: clab_device_password_hash is match('^\$6\$[./0-9A-Za-z]{1,16}\$[./0-9A-Za-z]{86}$')
+    fail_msg: Unable to generate a compatible device password hash. Use the rebuilt Product Demos EE with passlib installed.
 
 - name: Create startup configuration directories
   ansible.builtin.file:

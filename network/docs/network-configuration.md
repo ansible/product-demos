@@ -24,6 +24,8 @@ Each device receives static routes to the other three loopbacks. This supports c
 
 Resource modules configure descriptions, routed interfaces, addressing, LLDP, NTP, and static routes. IOS-XE also receives the existing banner and SNMP baseline. EOS routing and vSRX NETCONF/security-zone ICMP access are enabled in bootstrap. A Junos security policy permits only `junos-icmp-ping` within the trust zone so packets can reach the loopback from the data interface. Junos logical interfaces omit the `enabled` field because the pinned resource module emits an invalid logical-interface statement for that field.
 
+Bootstrap password hashes use the EOS-compatible SHA512 spelling with both Ansible hashing backends. Deployment validates the hash format before rendering credentials.
+
 Configuration data lives in `demo.network.configure_lab` defaults. Junos static routes use their vendor-specific `next_hop` schema; IOS-XE and EOS use `next_hops`. Cisco/EOS changes are saved and Junos changes are committed by the resource modules.
 
 Run **Configure Devices**, **Validate Devices**, then [**Report**](network-report.md). The validation job tests all four nodes and multi-hop forwarding. Rerun configuration after redeployment. When checking idempotence, compare actual before/after configuration as some modules reissue defaults and report changes.

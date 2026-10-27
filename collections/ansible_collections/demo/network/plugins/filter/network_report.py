@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import re
+from xml.etree import ElementTree
 from collections.abc import Mapping
 
 SENSITIVE = re.compile(
@@ -330,10 +331,95 @@ def network_report_cell(value):
     return str(value) if value is not None else "Unknown"
 
 
+def network_report_junos_static_routes(result):
+    """Read filtered Junos XML, including VRFs without an IPv6 RIB, without writes."""
+    resource = {"item": "static_routes", "changed": False}
+    if _failed(result):
+        return dict(resource, failed=True, msg=result.get("msg", "Route RPC failed"))
+    try:
+        responses = [result["xml"]] if "xml" in result else result.get("stdout", [])
+        if not isinstance(responses, list) or not responses:
+            raise ValueError("Expected filtered route configuration XML")
+        configs = []
+        for response in responses:
+            root = ElementTree.fromstring(response)
+            for node in root.iter():
+                node.tag = node.tag.rsplit("}", 1)[-1]
+            if any(node.tag == "rpc-error" for node in root.iter()):
+                raise ValueError("Junos route RPC returned an error")
+            configuration = next(
+                (node for node in root.iter() if node.tag == "configuration"), None
+            )
+            if configuration is None:
+                raise ValueError("Junos route RPC did not return configuration XML")
+            scopes = [(None, configuration.find("routing-options"))]
+            for instance in configuration.findall("routing-instances/instance"):
+                name = instance.findtext("name")
+                if not name:
+                    raise ValueError("Routing instance omitted its name")
+                scopes.append((name, instance.find("routing-options")))
+            for vrf, options in scopes:
+                if options is None:
+                    continue
+                tables = [("ipv4", options.find("static"))]
+                for rib in options.findall("rib"):
+                    name = rib.findtext("name", "")
+                    if name == "inet6.0" or name.endswith(".inet6.0"):
+                        tables.append(("ipv6", rib.find("static")))
+                families = []
+                for afi, static in tables:
+                    routes = []
+                    for route in static.findall("route") if static is not None else []:
+                        dest = route.findtext("name")
+                        if not dest:
+                            raise ValueError("Static route omitted its destination")
+                        entry = {"dest": dest}
+                        hops = [
+                            {"forward_router_address": hop.text}
+                            for hop in route.findall("next-hop")
+                            if hop.text
+                        ]
+                        for hop in route.findall("qualified-next-hop"):
+                            address = hop.findtext("name")
+                            if address:
+                                hops.append({"forward_router_address": address})
+                        if hops:
+                            entry["next_hop"] = hops
+                        for flag in ("discard", "reject"):
+                            if route.find(flag) is not None:
+                                entry[flag] = True
+                        for field in ("preference", "tag"):
+                            value = route.findtext(field)
+                            if value is not None:
+                                entry[field] = value
+                        metric = route.findtext("metric/metric-value")
+                        if metric is not None:
+                            entry["metric"] = metric
+                        routes.append(entry)
+                    if routes:
+                        families.append({"afi": afi, "routes": routes})
+                if families:
+                    config = {"address_families": families}
+                    if vrf:
+                        config["vrf"] = vrf
+                    configs.append(config)
+        resource["ansible_facts"] = {
+            "ansible_network_resources": {"static_routes": configs}
+        }
+        return resource
+    except (ElementTree.ParseError, TypeError, ValueError) as exc:
+        return dict(
+            resource,
+            failed=True,
+            msg="Unable to collect Junos static routes: " + str(exc),
+        )
+
+
 class FilterModule:
     def filters(self):
         return {
             "network_report_device": network_report_device,
             "network_report_document": network_report_document,
             "network_report_cell": network_report_cell,
+            "network_report_junos_static_routes": network_report_junos_static_routes,
         }

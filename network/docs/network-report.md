@@ -22,7 +22,9 @@ The default report URL is `http://<hypervisor>:8088/network/`. `report.json` pro
 
 **Configuration and operational observations are separate.** BGP and OSPF configuration does not demonstrate adjacency health. This version does not collect routing protocol operational state.
 
-Failed devices remain visible, successful sections survive individual parser failures, and only hosts selected in the current job are published. A successful publishing job can contain collection failures; check `network_report_devices_with_issues` in artifacts and the errors on each device card.
+Failed devices remain visible, successful sections survive individual parser failures, and only hosts selected in the current job are published. After publishing HTML, JSON, and the report URL artifacts, the job fails if any selected device has collection errors. Authentication, connection, missing collection, and section failures all fail the job. Unsupported or unconfigured resource sections do not. Inspect `network_report_devices_with_issues` and each device card for details.
+
+Reporting also works immediately after deployment, before Configure Devices. Junos static routes are read over NETCONF without changing the device, including the factory IPv4-only `mgmt_junos` instance that the pinned facts parser cannot handle. Configure Devices is still needed to create the routed demo paths.
 
 The report exports an explicit set of fields rather than hostvars or running configuration. Sensitive resource keys and credential values in errors are redacted. Device strings are HTML escaped. The site contains detailed lab information and is served over HTTP; use `clab_access_cidr` to restrict reachability to the execution nodes and presenters.
 

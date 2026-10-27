@@ -138,6 +138,113 @@ def device_fixture(
 
 
 class NetworkReportTests(unittest.TestCase):
+    def test_junos_ipv4_management_vrf_without_ipv6_rib(self):
+        result = REPORT.network_report_junos_static_routes(
+            {
+                "xml": (
+                    '<rpc-reply xmlns="urn:test"><configuration><routing-options><static>'
+                    "<route><name>0.0.0.0/0</name><next-hop>10.0.0.2</next-hop></route>"
+                    "</static></routing-options>"
+                    "<routing-instances><instance><name>mgmt_junos</name>"
+                    "<routing-options><static><route><name>0.0.0.0/0</name>"
+                    "<next-hop>10.0.0.2</next-hop></route></static></routing-options>"
+                    "</instance></routing-instances></configuration></rpc-reply>"
+                )
+            }
+        )
+        routes = result["ansible_facts"]["ansible_network_resources"]["static_routes"]
+        self.assertNotIn("failed", result)
+        self.assertEqual(len(routes), 2)
+        self.assertEqual(routes[1]["vrf"], "mgmt_junos")
+        self.assertEqual(
+            routes[1]["address_families"][0]["routes"][0],
+            {"dest": "0.0.0.0/0", "next_hop": [{"forward_router_address": "10.0.0.2"}]},
+        )
+
+    def test_junos_multiple_instances_and_ipv6_routes(self):
+        result = REPORT.network_report_junos_static_routes(
+            {
+                "stdout": [
+                    "<configuration><routing-options><rib><name>inet6.0</name><static>"
+                    "<route><name>::/0</name><next-hop>2001:db8::1</next-hop></route>"
+                    "</static></rib></routing-options></configuration>",
+                    "<configuration><routing-instances>"
+                    "<instance><name>empty</name></instance>"
+                    "<instance><name>blue</name><routing-options><rib><name>blue.inet6.0</name>"
+                    "<static><route><name>2001:db8:2::/64</name><discard/></route></static>"
+                    "</rib></routing-options></instance></routing-instances></configuration>",
+                ]
+            }
+        )
+        routes = result["ansible_facts"]["ansible_network_resources"]["static_routes"]
+        self.assertEqual(len(routes), 2)
+        self.assertEqual(routes[0]["address_families"][0]["afi"], "ipv6")
+        self.assertEqual(routes[1]["vrf"], "blue")
+        self.assertTrue(routes[1]["address_families"][0]["routes"][0]["discard"])
+
+    def test_junos_empty_static_routes_are_unconfigured(self):
+        result = REPORT.network_report_junos_static_routes(
+            {"stdout": ["<configuration/>", "<configuration/>"]}
+        )
+        fixture = device_fixture()
+        fixture["base"]["ansible_facts"]["available_network_resources"].append(
+            "static_routes"
+        )
+        fixture["requested_resources"] = ["static_routes"]
+        fixture["resource_results"] = {"results": [result]}
+        device = REPORT.network_report_device(**fixture)
+        self.assertEqual(device["status"], "collected")
+        self.assertEqual(device["sections"][0]["status"], "not configured")
+
+    def test_junos_route_transport_errors_remain_failures(self):
+        for failure in ({"failed": True}, {"unreachable": True}):
+            result = REPORT.network_report_junos_static_routes(
+                {**failure, "msg": "Connection closed"}
+            )
+            self.assertTrue(result["failed"])
+            self.assertEqual(result["msg"], "Connection closed")
+
+    def test_junos_invalid_rpc_responses_remain_failures(self):
+        for responses in (
+            [],
+            ["not xml", "<configuration/>"],
+            ["<rpc-reply><rpc-error/></rpc-reply>", "<configuration/>"],
+            ["<rpc-reply/>", "<configuration/>"],
+            [
+                "<configuration><routing-options><static><route/></static></routing-options></configuration>",
+                "<configuration/>",
+            ],
+        ):
+            with self.subTest(responses=responses):
+                result = REPORT.network_report_junos_static_routes(
+                    {"stdout": responses}
+                )
+                self.assertTrue(result["failed"])
+                self.assertNotIn("ansible_facts", result)
+
+    def test_document_counts_partial_failed_and_missing_devices(self):
+        partial = REPORT.network_report_device(**device_fixture())
+        failed = REPORT.network_report_device(
+            **{
+                **device_fixture(name="offline"),
+                "base": {"failed": True, "msg": "Authentication failed"},
+                "legacy": {},
+                "resource_results": {},
+                "neighbor_result": {},
+            }
+        )
+        report = REPORT.network_report_document(
+            {
+                "partial": {"network_report_device": partial},
+                "failed": {"network_report_device": failed},
+                "missing": {},
+            },
+            ["partial", "failed", "missing"],
+            "now",
+        )
+        self.assertEqual(report["issue_count"], 3)
+        self.assertEqual(report["complete_count"], 0)
+
     def test_successful_empty_resource_mapping_is_unconfigured(self):
         fixture = device_fixture()
         fixture["resource_results"]["results"][2]["ansible_facts"] = {
