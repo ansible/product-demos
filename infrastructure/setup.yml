@@ -345,7 +345,6 @@ controller_templates:
       Deploys Automation Orchestrator on an existing OpenShift cluster using
       aapctl, configures network access, wires the AAP and LiteMaaS (LLM)
       integrations, and seeds curated AO demos from infrastructure/ao/demos.yml.
-      Warns if aws_rhel9, Mattermost, or LiteMaaS are missing.
     labels:
       - infrastructure
       - orchestrator

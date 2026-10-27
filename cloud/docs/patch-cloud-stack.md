@@ -20,7 +20,7 @@ Enterprise-grade patching workflow with snapshot safety, parallel RHEL and Windo
 
 | Prompt | Variable | Type | Required | Default |
 |--------|----------|------|----------|---------|
-| AWS Region | `aws_region` | multiplechoice | Yes | `us-east-1` |
+| AWS Region | `aws_region` | multiplechoice | Yes | `us-east-2` |
 | RHEL hosts | `_hosts` | text | Yes | `aws-rhel9:aws-rhel10` |
 | Windows hosts | `_hosts_windows` | text | Yes | `aws-dc:aws_win1` |
 | Report server | `_report_server` | text | Yes | `reports` |

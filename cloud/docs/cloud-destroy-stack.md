@@ -24,21 +24,19 @@ graph LR
   S --> C
   S --> D
   S --> E
-  S --> G
-  A["💥 Delete aws-dc"] --> F["🌐 Delete VPC"]
+  A["💥 Delete aws-dc"] --> F["🔄 Sync Inventory"]
   B["💥 Delete aws_win1"] --> F
   C["💥 Delete aws-rhel9"] --> F
   D["💥 Delete aws-rhel10"] --> F
   E["💥 Delete reports"] --> F
-  F --> H["🔄 Sync Inventory"]
-  G["🔑 Delete Key"] --> H
+  F --> G["🔑 Delete Keypair"]
+  F --> H["🌐 Delete VPC"]
   style S fill:#212427,stroke:#8a8d90,color:#fff
 ```
 
 1. Terminates all five stack VMs **in parallel**
-2. Deletes VPC `aws-test-vpc` and related resources (subnet, route table, internet gateway, security group)
-3. Deletes keypair `aws-test-key`
-4. Syncs AWS inventory so hosts are removed from AAP
+2. Syncs AWS inventory so hosts are removed from AAP
+3. Deletes keypair `aws-test-key` and VPC `aws-test-vpc` (and related resources: subnet, route table, internet gateway, security group) **in parallel**
 
 > **Note:** S3 report buckets created during deploy are not deleted by this workflow.
 

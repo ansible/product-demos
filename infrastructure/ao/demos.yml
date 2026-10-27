@@ -29,7 +29,7 @@ ao_demos:
     inventory_limit: aws-rhel9
     requires_cloud_stack: true
     cloud_stack_hosts:
-      - aws_rhel9
+      - aws-rhel9
     requires_mattermost: true
     job_templates:
       - name: Disk Utilization Check
@@ -72,8 +72,8 @@ ao_demos:
     workflow: multi-os-cloud-patching/ao/multi-os-cloud-patching.json
     requires_cloud_stack: true
     cloud_stack_hosts:
-      - aws_rhel8
-      - aws_rhel9
+      - aws-rhel9
+      - aws-rhel10
       - aws-dc
       - aws_win1
       - reports
