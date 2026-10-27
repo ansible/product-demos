@@ -181,6 +181,7 @@ controller_groups:
     variables:
       ansible_network_os: juniper.device.junos
       ansible_connection: ansible.netcommon.netconf
+      ansible_netconf_port: !unsafe '{{ ansible_port }}'
       ansible_connect_timeout: 1800
       ansible_command_timeout: 120
   - name: clab_eos

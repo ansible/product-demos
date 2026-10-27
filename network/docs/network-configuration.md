@@ -2,6 +2,8 @@
 
 `network/configure_devices.yml` configures the connected `product_demos` lab through vendor network resource modules with `state: merged`. It uses **Containerlab Device Access** and **ContainerLab Inventory**. `_hosts` defaults to `containerlab` and can select a platform or device.
 
+The `clab_junos` inventory group sets `ansible_netconf_port` to `ansible_port` so Junos modules that require either variable use the same mapped NETCONF port. Rerun Network setup to refresh this group on existing AAP instances.
+
 ## Routed topology
 
 ```mermaid

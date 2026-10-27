@@ -8,6 +8,13 @@
   roles:
     - role: demo.network.containerlab
   tasks:
+    - name: Require both NETCONF port variables to match for Junos devices
+      ansible.builtin.assert:
+        that:
+          - hostvars[item].ansible_netconf_port | int == hostvars[item].ansible_port | int
+          - hostvars[item].ansible_netconf_port | int == clab_device_catalog[item].port | int
+      loop: "{{ groups['clab_junos'] }}"
+
     - name: Read the deployed topology record
       ansible.builtin.include_role:
         name: demo.network.containerlab
