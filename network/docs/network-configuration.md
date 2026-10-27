@@ -24,6 +24,8 @@ Each device receives static routes to the other three loopbacks. This supports c
 
 Resource modules configure descriptions, routed interfaces, addressing, LLDP, NTP, and static routes. IOS-XE also receives the existing banner and SNMP baseline. EOS routing and vSRX NETCONF/security-zone ICMP access are enabled in bootstrap. A Junos security policy permits only `junos-icmp-ping` within the trust zone so packets can reach the loopback from the data interface. Junos logical interfaces omit the `enabled` field because the pinned resource module emits an invalid logical-interface statement for that field.
 
+The IOS-XE SNMP community defaults to `apd-demo`, configurable through `network_lab_snmp_community`. Configuration removes the previous `public` community when migrating an existing lab. This is a demo baseline; SNMPv2c communities are not a substitute for authenticated production monitoring.
+
 Bootstrap password hashes use the EOS-compatible SHA512 spelling with both Ansible hashing backends. Deployment validates the hash format before rendering credentials.
 
 Configuration data lives in `demo.network.configure_lab` defaults. Junos static routes use their vendor-specific `next_hop` schema; IOS-XE and EOS use `next_hops`. Cisco/EOS changes are saved and Junos changes are committed by the resource modules.

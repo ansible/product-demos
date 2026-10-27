@@ -11,6 +11,11 @@
     aws_owner_tag: "{{ clab_aws_owner_tag | default('apd-demo') }}"
 
   tasks:
+    - name: Check the selected management access scope
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: check_access
+
     - name: Set deployment metadata defaults
       ansible.builtin.set_fact:
         apd_managed_by: "{{ apd_managed_by | default('aap-product-demos') }}"

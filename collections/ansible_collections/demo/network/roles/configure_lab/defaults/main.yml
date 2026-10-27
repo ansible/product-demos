@@ -9,6 +9,7 @@ network_lab_ntp:
   servers:
     - server: 216.239.35.0
     - server: 216.239.35.4
+network_lab_snmp_community: apd-demo
 network_lab_resources:
   cat8kv1:
     - resource: interfaces

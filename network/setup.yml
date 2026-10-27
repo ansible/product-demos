@@ -8,9 +8,6 @@ user_message: >-
   Run Configure Devices, Validate Devices, and Report after deployment.
   Redeployment replaces older product_demos and multi-vendor labs and resets device configuration.
 
-# Reuse the role's device catalog when creating Controller inventory.
-clab_device_catalog: "{{ (lookup('ansible.builtin.file', playbook_dir + '/collections/ansible_collections/demo/network/roles/containerlab/defaults/main.yml') | from_yaml).clab_device_catalog }}"
-
 controller_credential_types:
   - name: SSH Proxy
     description: Designed for connecting to a managed node through a bastion host
@@ -293,6 +290,7 @@ controller_templates:
             - us-east-2
             - us-west-2
         - question_name: Instance Type
+          question_description: c8i.4xlarge is the validated four-device lab size (16 vCPU, 32 GiB); it costs more than the previous c8i.2xlarge default.
           type: multiplechoice
           variable: clab_aws_instance_type
           required: true
@@ -300,6 +298,12 @@ controller_templates:
           choices:
             - c8i.2xlarge
             - c8i.4xlarge
+        - question_name: Allowed management source CIDR
+          question_description: Include AAP execution-node egress and presenter addresses. The default 0.0.0.0/0 exposes SSH, NETCONF, and the HTTP report publicly.
+          type: text
+          variable: clab_access_cidr
+          required: true
+          default: 0.0.0.0/0
         - question_name: Owner
           type: text
           variable: clab_aws_owner_tag
@@ -341,6 +345,12 @@ controller_templates:
           choices:
             - us-east-2
             - us-west-2
+        - question_name: Allowed management source CIDR
+          question_description: Include AAP execution-node egress and presenter addresses. The default 0.0.0.0/0 exposes SSH, NETCONF, and the HTTP report publicly.
+          type: text
+          variable: clab_access_cidr
+          required: true
+          default: 0.0.0.0/0
 
   - name: "NETWORK | Containerlab | Teardown Topology"
     labels:
@@ -477,7 +487,7 @@ controller_templates:
           variable: _hosts
           default: containerlab
           required: true
-          choices: [clab_junos, containerlab, clab_ios, clab_nxos, clab_eos]
+          choices: [clab_junos, containerlab, clab_ios, clab_eos]
 
   - name: "NETWORK | Report"
     labels:
@@ -789,6 +799,7 @@ controller_workflows:
             - us-east-2
             - us-west-2
         - question_name: Instance Type
+          question_description: c8i.4xlarge is the validated four-device lab size (16 vCPU, 32 GiB); it costs more than the previous c8i.2xlarge default.
           type: multiplechoice
           variable: clab_aws_instance_type
           required: true
@@ -796,6 +807,12 @@ controller_workflows:
           choices:
             - c8i.2xlarge
             - c8i.4xlarge
+        - question_name: Allowed management source CIDR
+          question_description: Include AAP execution-node egress and presenter addresses. The default 0.0.0.0/0 exposes SSH, NETCONF, and the HTTP report publicly.
+          type: text
+          variable: clab_access_cidr
+          required: true
+          default: 0.0.0.0/0
         - question_name: Owner
           type: text
           variable: clab_aws_owner_tag

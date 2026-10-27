@@ -8,6 +8,13 @@
   roles:
     - role: demo.network.containerlab
   tasks:
+    - name: Require every management rule to use the selected source CIDR
+      ansible.builtin.assert:
+        that:
+          - clab_security_group_rules | map(attribute='cidr_ip') | unique | list == ['192.0.2.0/24']
+      vars:
+        clab_access_cidr: 192.0.2.0/24
+
     - name: Create temporary lab workspace
       ansible.builtin.tempfile:
         state: directory

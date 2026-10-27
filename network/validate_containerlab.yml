@@ -43,12 +43,21 @@
   hosts: "{{ _hosts | default('containerlab') }}"
   gather_facts: false
   vars:
+    clab_validation_command_modules:
+      cisco.ios.ios: cisco.ios.ios_command
+      arista.eos.eos: arista.eos.eos_command
+      juniper.device.junos: juniper.device.junos_command
     clab_validation_commands:
       cat8kv1: ping 10.255.0.4 source Loopback10 repeat 3 timeout 2
       veos2: ping 10.255.0.3 source 10.255.0.2 repeat 3
       vjunos3: ping 10.255.0.4 source 10.255.0.3 count 3 wait 1
       veos4: ping 10.255.0.3 source 10.255.0.4 repeat 3
   pre_tasks:
+    - name: Require a validation command module for the selected platform
+      ansible.builtin.assert:
+        that: ansible_network_os | default('') in clab_validation_command_modules
+        fail_msg: "No validation command module is configured for {{ ansible_network_os | default('an unspecified OS') }}."
+
     - name: Wait for selected management endpoint
       ansible.builtin.wait_for:
         host: "{{ ansible_host }}"
@@ -69,7 +78,7 @@
         fail_msg: Device collection failed. Run NETWORK | Report to inspect collection errors.
 
     - name: Exercise the configured cross-device data path
-      action: "{{ ansible_network_os }}_command"
+      action: "{{ clab_validation_command_modules[ansible_network_os] }}"
       args:
         commands: "{{ [clab_validation_commands[inventory_hostname]] }}"
       register: clab_validation_ping

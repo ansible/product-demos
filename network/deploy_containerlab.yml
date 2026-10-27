@@ -9,6 +9,11 @@
     - role: demo.network.containerlab
 
   tasks:
+    - name: Check the selected management access scope
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: check_access
+
     - name: Discover hypervisor IP from EC2 tags
       amazon.aws.ec2_instance_info:
         region: "{{ clab_aws_region | default('us-east-2') }}"

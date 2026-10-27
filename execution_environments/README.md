@@ -31,10 +31,30 @@ registry. Live acceptance was performed with a rebuilt AAP 2.7 EE on x86_64.
 
 ## AAP 2.7 compatibility
 
-The pinned AAP 2.7 base image ships Ansible core 2.16. The 2.7 requirements pin
-compatible releases: `amazon.aws` 9.5.2, `community.aws` 9.3.0,
-`community.general` 11.4.9, and `chocolatey.chocolatey` 1.5.3. In addition to the
-core requirement, `community.aws` 9.3.0 requires `amazon.aws` below version 10.
-The network collections remain pinned to the versions selected for the
-multi-vendor report. Check collection `meta/runtime.yml` requirements and
-collection dependencies against the base runtime when refreshing these pins.
+The pinned AAP 2.7 base image ships Ansible core 2.16. The non-network
+requirements retain their original minimums and add compatibility ceilings,
+rather than pinning cloud, Linux, and Windows content to individual releases:
+
+| Collection | Allowed versions | Version in the tested rebuilt EE |
+|---|---|---|
+| `amazon.aws` | `>=7.5.0,<10.0.0` | 9.5.2 |
+| `community.aws` | `>=7.0.0,<10.0.0` | 9.3.0 |
+| `community.general` | `>=8.0.0,<12.0.0` | 11.4.9 |
+| `chocolatey.chocolatey` | `>=1.5.1,<1.6.0` | 1.5.3 |
+
+These bounds affect the entire AAP 2.7 EE. They are required by the base runtime:
+[`amazon.aws` 10](https://github.com/ansible-collections/amazon.aws/blob/10.0.0/meta/runtime.yml),
+[`community.aws` 10](https://github.com/ansible-collections/community.aws/blob/10.0.0/meta/runtime.yml),
+and [`community.general` 12](https://github.com/ansible-collections/community.general/blob/12.0.0/meta/runtime.yml)
+require core 2.17 or newer. [Chocolatey 1.6](https://github.com/chocolatey-community/chocolatey-ansible/blob/1.6.0/chocolatey/meta/runtime.yml)
+requires core 2.18 or newer.
+`community.aws` 9.3.0 additionally depends on `amazon.aws` below 10.
+
+Network acceptance exercised AWS provisioning and the Linux filesystem,
+SELinux, and report-hosting tasks using the versions listed above. This is not
+a full regression run of the cloud, Windows, or Linux demo catalogs; Windows
+package management and the other demo workflows need their own live validation
+before claiming EE-wide demo coverage. The network collections remain pinned
+to the versions selected for the multi-vendor report. Check collection
+`meta/runtime.yml` requirements and dependencies against the base runtime when
+refreshing these bounds or pins.

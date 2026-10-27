@@ -35,12 +35,22 @@
     state: present
   when: ansible_network_os == 'cisco.ios.ios'
 
+- name: Remove the previous generic Cisco SNMP community
+  cisco.ios.ios_snmp_server:
+    config:
+      communities:
+        - name: public
+    state: deleted
+  when:
+    - ansible_network_os == 'cisco.ios.ios'
+    - network_lab_snmp_community != 'public'
+
 - name: Merge Cisco SNMP baseline
   action: "{{ network_lab_prefixes[ansible_network_os] }}_snmp_server"
   args:
     config:
       communities:
-        - name: public
+        - name: "{{ network_lab_snmp_community }}"
           ro: true
       contact: Ansible Product Demos
       location: Containerlab on AWS
