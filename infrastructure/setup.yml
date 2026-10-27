@@ -895,7 +895,7 @@ controller_templates:
   - name: "Infrastructure | Enable AAP MCP server on operator deployment"
     description: >-
       Enables the AAP MCP server on an operator deployment by patching the
-      AnsibleAutomationPlatform custom resource definition to add the mcp spec.
+      AnsibleAutomationPlatform custom resource to add the mcp spec.
     labels:
       - infrastructure
       - openshift
