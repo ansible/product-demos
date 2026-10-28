@@ -46,13 +46,16 @@ This is **not** part of the automatic `infrastructure` demo setup. The job templ
 
 Leave the admin password unset (the default) and the chart generates one on first install, then reuses it on every subsequent run via a cluster lookup — re-running the template will not roll the password out from under a running demo.
 
-The job output prints the URL, username and namespace, but **not** the password — AAP retains job output indefinitely and shows it to anyone with read access on the job. Read it from the Secret instead:
+The job output prints the URL, username and password at the end of a successful install, so they can be copied straight out of the job.
+
+> [!NOTE]
+> That is a deliberate choice for a demo workload: AAP retains job output and shows it to anyone with read access on the job. Fine for an ephemeral demo cluster, not something to carry into anything long-lived. Only the admin password is exposed — the same Secret also holds `SECRET_KEY` and `POSTGRESQL_PASSWORD`, and those stay out of the log.
+
+The password is also readable from the Secret at any time:
 
 ```bash
 oc -n openflake get secret openflake -o jsonpath="{.data.ADMIN_PASSWORD}" | base64 -d
 ```
-
-The job output prints this exact command with your namespace and Secret name filled in.
 
 Override with `openflake_admin_username` / `openflake_admin_password` in extra_vars if you need a fixed login.
 
