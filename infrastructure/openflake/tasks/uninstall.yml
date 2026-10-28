@@ -12,10 +12,11 @@
       - 'app.kubernetes.io/instance={{ _openflake_release_name }}'
       - 'app.kubernetes.io/part-of=openflake'
   register: _openflake_ownership_probe
+  # Workloads only. The chart's Secret carries the same labels, but k8s_info
+  # would pull its .data along with it for no benefit here.
   loop:
     - Deployment
     - StatefulSet
-    - Secret
 
 - name: Refuse to continue when the namespace holds no OpenFlake release
   ansible.builtin.assert:

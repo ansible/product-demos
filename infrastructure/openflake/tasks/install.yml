@@ -129,6 +129,9 @@
       - 'app.kubernetes.io/instance={{ _openflake_release_name }}'
       - 'app.kubernetes.io/part-of=openflake'
   register: _openflake_secret_info
+  # Only metadata.name is wanted, but k8s_info returns the whole object --
+  # .data carries ADMIN_PASSWORD, SECRET_KEY and POSTGRESQL_PASSWORD.
+  no_log: true
 
 - name: Record the Secret name
   ansible.builtin.set_fact:
