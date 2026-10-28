@@ -1,0 +1,39 @@
+---
+
+# - name: cluster {{ auth_action }}
+#   kubernetes.core.k8s_auth:
+#     state: '{{ state }}'
+#     host: "{{ lookup('env','K8S_AUTH_HOST') }}"
+#     api_key: "{{ api_key }}"
+#     validate_certs: "{{ lookup('env','K8S_AUTH_VERIFY_SSL') | bool }}"
+#   register: k8s_auth_results
+#   until: k8s_auth_results is success
+#   delay: 3
+#   retries: 15
+#
+# - name: set api_key
+#   set_fact:
+#     api_key: ""
+#   no_log: true
+
+- name: cluster {{ auth_action }}
+  community.okd.openshift_auth:
+    state: '{{ state }}'
+    host: "{{ lookup('env','K8S_AUTH_HOST') }}"
+    api_key: "{{ api_key }}"
+    validate_certs: "{{ lookup('env','K8S_AUTH_VERIFY_SSL') | bool }}"
+  register: openshift_auth_results
+  when: cluster == 'openshift'
+  until: >-
+    openshift_auth_results is success or
+    (auth_action == 'logout' and
+    openshift_auth_results.status_code is defined and
+    openshift_auth_results.status_code == 404)
+  delay: 3
+  retries: 15
+  ignore_errors: true
+
+- name: set api_key
+  set_fact:
+    api_key: ""
+  no_log: true

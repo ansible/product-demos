@@ -1,0 +1,5 @@
+---
+
+- include_tasks: "{{ oc_auth_type }}-{{ auth_action }}.yml"
+
+- include_tasks: check_cluster_type.yml

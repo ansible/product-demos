@@ -5,7 +5,7 @@
   connection: local
   become: false
   vars:
-    provider: vmware
+    provider: kubevirt
     scenario: winpe
     create_winpe_name: winpe_bsod_recovery_fix
   vars_files:

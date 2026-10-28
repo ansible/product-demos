@@ -1,0 +1,25 @@
+---
+
+- name: create unattend configmap
+  kubernetes.core.k8s:
+    state: present
+    validate_certs: no
+    api_key: "{{ api_key }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: '{{ template.name }}-configmap'
+        namespace: '{{ target_namespace }}'
+        labels:
+          app: '{{ template.name }}'
+        ownerReferences:
+          - apiVersion: "{{ api_version_virtual_machine }}"
+            kind: VirtualMachine
+            name: '{{ template.name }}'
+            uid: '{{ owner_uid }}'
+            controller: true
+            blockOwnerDeletion: true
+      data:
+        unattend.xml: |-
+          {{ lookup('template', 'unattended.xml.j2') }}

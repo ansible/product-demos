@@ -1,0 +1,34 @@
+---
+
+# this seems to be needed as ansible_password is not passed into the loop
+- name: set ansible user and password
+  set_fact:
+    ansible_password: "{{ ansible_password | default('') }}"
+  no_log: true
+
+- name: Reset provisioning state
+  ansible.builtin.set_fact:
+    vm_failed: false
+
+- block:
+    - name: authenticate with cluster
+      include_role:
+        name: oatakan.openshift-add-auth-config
+      vars:
+        oc_auth_type: api
+
+    - include_tasks: provision.yml
+      when: role_action == 'provision'
+
+    - include_tasks: deprovision.yml
+      run_once: yes
+      when: role_action == 'deprovision'
+  always:
+    - name: clear authentication
+      include_role:
+        name: oatakan.openshift-add-auth-config
+      vars:
+        oc_auth_type: api
+        auth_action: logout
+      when: kubevirt_clear_auth_key
+  no_log: true

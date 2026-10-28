@@ -1,0 +1,21 @@
+---
+
+- name: remove vm
+  kubernetes.core.k8s:
+    state: absent
+    definition: "{{ lookup('template', '{{ vm_os_type }}-vm.yml') | from_yaml }}"
+    validate_certs: no
+    api_key: "{{ api_key }}"
+
+- name: wait for vm deletion to complete
+  k8s_info:
+    api_version: "{{ api_version_virtual_machine }}"
+    kind: VirtualMachine
+    name: '{{ template.name }}'
+    namespace: '{{ target_namespace }}'
+    validate_certs: no
+    api_key: "{{ api_key }}"
+  register: vm_info
+  until: (vm_info.resources | default([])) | length == 0
+  retries: "{{ instance_wait_retry_limit }}"
+  delay: 3

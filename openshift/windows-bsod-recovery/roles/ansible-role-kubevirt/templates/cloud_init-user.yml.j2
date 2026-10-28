@@ -1,0 +1,29 @@
+#cloud-config
+{% set user_password = template.user_password | default(ansible_password | default('')) %}
+{% if template.root_password is defined or (template.user_name is defined and user_password | length > 0) %}
+chpasswd:
+  list: |
+{% if template.root_password is defined %}
+    root:{{ template.root_password }}
+{% endif %}
+{% if template.user_name is defined and template.user_name != 'root' and user_password | length > 0 %}
+    {{ template.user_name }}:{{ user_password }}
+{% elif template.user_name | default('') == 'root' and template.root_password is undefined and user_password | length > 0 %}
+    root:{{ user_password }}
+{% endif %}
+  expire: false
+{% endif %}
+{% if template.dns_servers is defined %}
+resolv_conf:
+  nameservers: {{ template.dns_servers }}
+{% endif %}
+{% if template.user_name is defined %}
+users:
+  - name: {{ template.user_name }}
+    lock_passwd: false
+    sudo: 'ALL=(ALL) NOPASSWD:ALL'
+{% endif %}
+ssh_pwauth: true
+hostname: {{ template.name }}
+fqdn: {{ template.name }}.{{ template.domain | default('') }}
+disable_root: false

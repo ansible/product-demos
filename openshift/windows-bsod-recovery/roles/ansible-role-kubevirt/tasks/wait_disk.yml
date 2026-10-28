@@ -1,0 +1,15 @@
+---
+- name: Require completed VM root DataVolume
+  kubernetes.core.k8s_info:
+    api_version: '{{ api_version_dv }}'
+    kind: DataVolume
+    name: '{{ template.name }}-disk0'
+    namespace: '{{ target_namespace }}'
+    verify_ssl: false
+    api_key: '{{ api_key }}'
+  register: vm_disk_info
+  until: >-
+    vm_disk_info.resources | length > 0 and
+    vm_disk_info.resources[0].status.phase | default('') == 'Succeeded'
+  retries: '{{ instance_wait_retry_limit }}'
+  delay: 3

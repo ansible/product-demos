@@ -535,7 +535,7 @@ controller_workflows:
         success_nodes:
           - Inventory Sync
       - identifier: Inventory Sync
-        unified_job_template: OpenShift CNV Inventory
+        unified_job_template: OpenShift Windows CNV Inventory
         success_nodes:
           - Produce BSOD
       - identifier: Produce BSOD
@@ -559,7 +559,7 @@ controller_workflows:
         success_nodes:
           - Inventory Sync 2
       - identifier: Inventory Sync 2
-        unified_job_template: OpenShift CNV Inventory
+        unified_job_template: OpenShift Windows CNV Inventory
         success_nodes:
           - Check System
       - identifier: Check System
@@ -592,7 +592,7 @@ controller_workflows:
         success_nodes:
           - Inventory Sync
       - identifier: Inventory Sync
-        unified_job_template: OpenShift CNV Inventory
+        unified_job_template: OpenShift Windows CNV Inventory
         success_nodes:
           - Generate WinPE
       - identifier: Generate WinPE

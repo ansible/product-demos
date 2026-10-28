@@ -5,7 +5,7 @@
   connection: local
   become: false
   vars:
-    provider: vmware
+    provider: kubevirt
     scenario: winpe
   vars_files:
     - node-config/{{ scenario }}/node-{{ provider }}.yml

@@ -1,0 +1,29 @@
+---
+# The same explicit node YAML drives provision and deprovision, including
+# localhost/AAP runs without a dynamically discovered guest inventory.
+- ansible.builtin.include_tasks: select_deprovision_nodes.yml
+
+- name: Normalize and validate expected VM deletion preconditions
+  ansible.builtin.include_tasks: validate_deprovision_preconditions.yml
+
+- name: Delete the VMs named in the node definition
+  kubernetes.core.k8s:
+    state: absent
+    api_version: '{{ api_version_virtual_machine }}'
+    kind: VirtualMachine
+    name: '{{ template.name }}'
+    namespace: '{{ target_namespace }}'
+    verify_ssl: false
+    api_key: '{{ api_key }}'
+    delete_options: >-
+      {{ {'preconditions': {'uid': kubevirt_expected_vm_preconditions[template.name].uid, 'resourceVersion': kubevirt_expected_vm_preconditions[template.name].resourceVersion}} if kubevirt_expected_vm_preconditions | length > 0 else omit }}
+  loop: '{{ kubevirt_deprovision_nodes }}'
+  loop_control:
+    loop_var: template
+
+- name: Wait for VM and owned resources to be removed
+  ansible.builtin.include_tasks: wait_deleted.yml
+  loop: '{{ kubevirt_deprovision_nodes }}'
+  loop_control:
+    loop_var: template
+  when: kubevirt_deprov_wait_vm | bool

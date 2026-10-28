@@ -1,0 +1,34 @@
+---
+
+- block:
+
+    - name: check kubevirt upload proxy url
+      uri:
+        url: "{{ kubevirt_upload_proxy_url }}"
+        status_code:
+          - 404
+        validate_certs: no
+      no_log: true
+
+  rescue:
+    - name: get cdi route
+      k8s_info:
+        api_version: route.openshift.io/v1
+        kind: Route
+        name: '{{ kubevirt_upload_proxy_name }}'
+        namespace: '{{ kubevirt_operator_namespace }}'
+        validate_certs: no
+        api_key: "{{ api_key }}"
+      register: cdi_upload_proxy_route
+
+    - name: fail if no ingress route is found
+      fail:
+        msg: "cdi upload proxy url could not be determined, please provide with kubevirt_upload_proxy_url"
+      when: (cdi_upload_proxy_route.resources[0].status.ingress[0].host | default(None)) == None
+
+    - name: set kubevirt upload proxy url
+      set_fact:
+        kubevirt_upload_proxy_url: "https://{{ cdi_upload_proxy_route.resources[0].status.ingress[0].host }}"
+
+    - debug:
+        msg: "{{ kubevirt_upload_proxy_url }}"

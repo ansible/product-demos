@@ -1,0 +1,63 @@
+---
+
+role_action: provision
+
+target_namespace: openshift-cnv
+template_namespace: openshift-cnv
+pvc_storage_class: hostpath-provisioner
+kubevirt_operator_namespace: openshift-cnv
+kubevirt_upload_proxy_name: cdi-uploadproxy
+kubevirt_upload_proxy_url: https://localhost:443
+
+kubevirt_clone_cluster_role_name: datavolume-cloner
+kubevirt_clone_cluster_role_enable: true
+
+kubevirt_virt_launcher_tags:
+  cnv: v2.5.2
+  kubevirt: v0.40.0
+
+kubevirt_virt_launcher_images:
+  cnv: registry.redhat.io/container-native-virtualization/virt-launcher:{{ kubevirt_virt_launcher_tags['cnv'] }}
+  kubevirt: quay.io/kubevirt/virt-launcher:{{ kubevirt_virt_launcher_tags['kubevirt'] }}
+
+os_template_namespace: openshift
+
+kubevirt_use_configmap: yes
+kubevirt_deprov_wait_vm: yes
+kubevirt_expected_vm_preconditions: {}
+
+kubevirt_memory_overcommit_ratio: 0.75
+
+kubevirt_api_version: v1beta1
+
+ansible_port: 22
+instance_wait_retry_limit: 600
+instance_wait_connection_timeout: 600
+instance_wait_for_ip_retry_limit: 50
+resize_job_timeout: 3600
+
+vm_failed: no
+
+api_version_virtual_machine: kubevirt.io/v1
+api_version_dv: cdi.kubevirt.io/v1beta1
+api_version_pvc: v1
+
+default_ports:
+  windows: 5986
+  redhat: 22
+  debian: 22
+
+winrm_enable_script_url: https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1
+
+kubevirt_controller_in_cluster: false # if the Ansible controller is running inside the cluster or from outside. This should be set to false in most instances.
+
+kubevirt_clear_auth_key: false # clear authentication token or not
+
+# Empty inherits the cluster eviction policy.
+kubevirt_eviction_strategy: ''
+kubevirt_shutdown_grace_period: 120
+
+# Create source-namespace permission rather than assuming an external
+# ClusterRole already exists. Disable to use kubevirt_clone_cluster_role_name.
+kubevirt_clone_manage_role: true
+kubevirt_clone_role_name: kubevirt-template-cloner

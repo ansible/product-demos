@@ -29,10 +29,10 @@ Provision Infrastructure ──→ Inventory Sync ──→ Produce BSOD
 ```
 
 1. **Provision Infrastructure** — Deploys Windows Server VMs on OpenShift Virtualization
-2. **Inventory Sync** — Refreshes the CNV dynamic inventory to discover the new VMs
+2. **Inventory Sync** — Refreshes **OpenShift Windows CNV Inventory** to discover the new VMs
 3. **Produce BSOD** — Triggers a simulated Blue Screen of Death on the Windows VMs
 4. **Recover from BSOD** — Boots the affected VM into a custom WinPE environment and applies the recovery fix
-5. **Inventory Sync 2** — Re-syncs inventory after the VM reboots with the fix applied
+5. **Inventory Sync 2** — Re-syncs **OpenShift Windows CNV Inventory** after the VM reboots with the fix applied
 6. **Check System** — Verifies the Windows system is healthy and operational
 
 ### Generate WinPE Image (prerequisite)
@@ -44,7 +44,7 @@ Provision Infrastructure ──→ Inventory Sync ──→ Generate WinPE ─�
 ```
 
 1. **Provision Infrastructure** — Deploys a Windows Server VM to use as a WinPE build host
-2. **Inventory Sync** — Discovers the new VM in inventory
+2. **Inventory Sync** — Discovers the new VM in **OpenShift Windows CNV Inventory**
 3. **Generate WinPE** — Creates a custom WinPE ISO with embedded recovery scripts
 4. **Upload WinPE ISO** — Uploads the ISO to OpenShift Virtualization as a PVC
 5. **Remove Infrastructure** — Cleans up the build VM (no longer needed)
