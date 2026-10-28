@@ -1016,7 +1016,7 @@
 - slug: network-deploy-containerlab-stack
   readme_path: network/docs/network-deploy-containerlab-stack.md
   title: "Deploy Containerlab Stack"
-  subtitle: "Nested-virt hypervisor, n9kv + cat8kv, inventory sync"
+  subtitle: "Connected IOS-XE, EOS, and vSRX lab with inventory sync"
   category: network
   status: active
   author: "Matthew Fernandez <matferna@redhat.com>"
@@ -1030,7 +1030,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #0d9488 0%, #065f54 100%)"
     icon: "🚀"
-  blurb: "Provision an AWS nested-virt hypervisor, deploy a containerlab Cisco lab (n9kv + cat8kv), and sync ContainerLab Inventory."
+  blurb: "Provision an AWS nested-virt hypervisor, deploy a connected Containerlab lab with IOS-XE, two EOS nodes, and vSRX, and sync ContainerLab Inventory."
   stats:
     workflows: 1
     playbooks: 2
@@ -1090,7 +1090,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #38b000 0%, #006400 100%)"
     icon: "🌐"
-  blurb: "Apply baseline banner, NTP, and SNMP configuration to containerlab Cisco NX-OS and IOS-XE devices."
+  blurb: "Configure connected IOS-XE, EOS, and Junos devices with native modules for interfaces, addressing, LLDP, NTP, and static routes."
   stats:
     playbooks: 1
   github_path: network/configure_devices.yml
@@ -1108,7 +1108,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)"
     icon: "🌐"
-  blurb: "Gather facts from containerlab Cisco NX-OS and IOS-XE devices and display hostname, version, model, and interfaces."
+  blurb: "Publish a detailed Cisco, Juniper, and Arista web report with operational observations and structured configuration."
   stats:
     playbooks: 1
   github_path: network/report.yml
@@ -1143,7 +1143,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #38b000 0%, #006400 100%)"
     icon: "🌐"
-  blurb: "Back up running configurations from containerlab NX-OS and IOS-XE devices to the execution node."
+  blurb: "Back up the connected Containerlab IOS-XE configuration to the execution node."
   stats:
     playbooks: 1
   github_path: network/backup.yml

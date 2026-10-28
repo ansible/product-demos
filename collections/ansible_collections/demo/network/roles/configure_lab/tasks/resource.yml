@@ -1,0 +1,6 @@
+---
+- name: "Merge vendor resource configuration for {{ network_lab_item.resource }}"
+  action: "{{ network_lab_prefixes[ansible_network_os] }}_{{ network_lab_item.resource }}"
+  args:
+    config: "{{ network_lab_item.config }}"
+    state: merged

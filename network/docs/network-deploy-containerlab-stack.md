@@ -1,73 +1,44 @@
 # Deploy Containerlab Stack
 
-
-Provisions a self-contained Cisco lab on AWS: nested-virt EC2 hypervisor, containerlab topology (n9kv + cat8kv), and ContainerLab Inventory sync. This is the starting point for the network Configure, Report, Backup, and DISA STIG demos.
+Provision a nested-virtualization AWS hypervisor, deploy one connected `product_demos` topology, and sync ContainerLab Inventory. The topology contains `cat8kv1`, `veos2`, `vjunos3`, `veos4`, and an SCP server.
 
 ## Prerequisites
 
-- **If using RHDP (demo.redhat.com):** Run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** and choose `network`). AWS and AAP credentials are pre-configured for you.
-- **If using your own installation:** Run **APD ǀ Single demo setup** and choose `network`. Configure the **AWS** credential with your Access Key and Secret Key.
+Run APD setup with **Network**, configure AWS/AAP credentials, and select a rebuilt Product Demos EE with the network requirements in this branch. The official EE needs rebuilding/publishing; a project sync alone does not install new modules.
 
-## Survey prompts
+## Survey
 
-| Prompt | Variable | Type | Required |
-|--------|----------|------|----------|
-| AWS Region | `clab_aws_region` | multiplechoice | Yes |
-| Instance Type | `clab_aws_instance_type` | multiplechoice | Yes |
-| Owner | `clab_aws_owner_tag` | text | Yes |
+| Prompt | Variable | Choices |
+|---|---|---|
+| AWS Region | `clab_aws_region` | us-east-2 (default), us-west-2 |
+| Instance Type | `clab_aws_instance_type` | c8i.4xlarge (default), c8i.2xlarge |
+| Allowed management source CIDR | `clab_access_cidr` | IPv4 CIDR; defaults to `0.0.0.0/0` |
+| Owner | `clab_aws_owner_tag` | Text |
 
-Options: region `us-east-2` / `us-west-2`; instance type `c8i.2xlarge` (default) / `c8i.4xlarge`.
+Provision Hypervisor, Deploy Containerlab Stack, and standalone Deploy Topology ask for the allowed management source CIDR. Deploy Topology also asks for region. Both deployment entry points use `product_demos`; there is no topology choice.
+
+## Capacity and cost
+
+The default increases from `c8i.2xlarge` (8 vCPU, 16 GiB) to `c8i.4xlarge` (16 vCPU, 32 GiB). The connected lab runs four nested QEMU network VMs concurrently, plus the SCP container, host services, and report server. The larger size provides CPU and memory headroom during concurrent boot and collection; live acceptance used this size. It is the validated baseline, rather than a measured minimum requirement. The smaller survey choice remains available for capacity experiments and has not been validated for the complete four-device lab.
+
+**This increases the default EC2 compute cost.** Check the current regional RHEL rate before launching; storage and public IPv4 charges are separate. See [AWS C8i specifications](https://aws.amazon.com/ec2/instance-types/compute-optimized/) and [EC2 pricing](https://aws.amazon.com/ec2/pricing/on-demand/). Destroy Containerlab Stack removes the EC2 instance and associated lab resources when the demo is finished.
+
+## Management access
+
+Choose a source CIDR that includes the AAP execution-node egress and presenter addresses. The survey retains `0.0.0.0/0` for existing workshop environments whose egress range is not known in advance, and provisioning/deployment prints a warning when this open scope is selected. That scope exposes hypervisor SSH, mapped device SSH/NETCONF, and the HTTP report publicly while the devices use demo credentials. Select a restricted CIDR for your environment; restricting it only to a presenter's address can prevent AAP from reaching the lab.
 
 ## Workflow
 
-```mermaid
-graph LR
-  S["🏠 Start"]
-  S --> A
-  A["🖥️ Provision Hypervisor"] --> B["📦 Deploy Topology"]
-  B --> C["🔄 Sync ContainerLab Inventory"]
-  A -. "on failure" .-> D["📋 Submit Feedback"]
-  style S fill:#212427,stroke:#8a8d90,color:#fff
-```
+1. **Provision Hypervisor** creates AWS networking, keypair, storage, and EC2 host.
+2. **Deploy Topology** enables KVM, installs Podman/Containerlab, pulls images, renders bootstrap credentials, starts all devices, waits for management services, configures persistent report hosting, and updates inventory.
+3. **Sync ContainerLab Inventory** discovers the hypervisor for report and device jobs.
 
-1. **Provision Hypervisor** — Creates VPC, subnet, security group, keypair, and launches a RHEL 9 EC2 instance with nested virtualization
-2. **Deploy Topology** — Installs podman and containerlab, pulls Cisco images, and starts n9kv (NX-OS) + cat8kv (IOS-XE)
-3. **Sync ContainerLab Inventory** — Imports the hypervisor and sets device connection details for demo job templates
-4. **Submit Feedback** — Opens only if hypervisor provisioning fails
+Run **Configure Devices**, **Validate Devices**, and **Report** afterward. Image pulls and virtual-device startup take time; readiness timeouts are 15 minutes for IOS-XE/EOS and 30 minutes for vSRX.
 
-Provisioning takes approximately 10–15 minutes while device images pull and virtual devices boot.
+## Existing hypervisors and migration
 
-## Job templates
+Deploy Topology discovers the hypervisor by EC2 tags, or accepts `clab_host_ip`. It refreshes management rules for SSH, device ports 2123–2126, NETCONF 2225, and report HTTP 8088. `clab_access_cidr` controls the allowed source network.
 
-| Template | Playbook | Description |
-|----------|----------|-------------|
-| NETWORK ǀ Deploy Containerlab Stack | [`network/setup.yml`](../setup.yml) | Workflow that provisions hypervisor, deploys topology, and syncs inventory |
-| NETWORK ǀ Containerlab ǀ Provision Hypervisor | [`network/provision_hypervisor.yml`](../provision_hypervisor.yml) | Creates AWS networking and the nested-virt EC2 hypervisor |
-| NETWORK ǀ Containerlab ǀ Deploy Topology | [`network/deploy_containerlab.yml`](../deploy_containerlab.yml) | Installs containerlab and starts the n9kv + cat8kv topology. Can also run standalone to redeploy the lab on an existing hypervisor; it discovers the running EC2 instance by tag. |
+The existing deployment record recognizes old `product_demos` and `multi-vendor` labs. Deployment destroys those labs using their existing topology files before rendering the connected replacement, freeing their ports and management IPs. A cleanup failure stops redeployment. The new inventory contains the four current node names; retired `n9kv`, `cat8kv`, `vjunos`, and `veos` hosts are removed after deployment succeeds.
 
-## Why it matters
-
-- Replaces external Cisco DevNet sandbox dependencies with a fully self-contained lab
-- Nested virtualization on AWS lets you run real NX-OS and IOS-XE images under containerlab
-- Dynamic inventory + SSH Proxy credentials give AAP a clean path to the lab devices
-- One workflow brings up everything the day-2 network demos need
-
-## Presenter walkthrough
-
-1. **Show the survey:** Region, instance size, and owner tag — explain how surveys keep self-service provisioning safe.
-2. **Launch:** Start **NETWORK ǀ Deploy Containerlab Stack**. Call out the three success path nodes: hypervisor → topology → inventory sync.
-3. **While it runs:** Explain nested virt, containerlab, and the two platforms (NX-OS n9kv on port 2122, IOS-XE cat8kv on port 2123).
-4. **Inventory sync:** After success, open **ContainerLab Inventory** and show the hypervisor/device hosts.
-5. **Transition:** Run **NETWORK ǀ Containerlab ǀ Configure Devices**, then Report, Backup, or DISA STIG.
-
-If a device misbehaves later, rerun **NETWORK ǀ Containerlab ǀ Deploy Topology** by itself with the AWS Region survey. It discovers the existing hypervisor automatically and redeploys the topology without reprovisioning AWS infrastructure.
-
-## Related demos
-
-| Demo | Description |
-|------|-------------|
-| 💥 [Destroy Containerlab Stack](./network-destroy-containerlab-stack.md) | Tear down the lab when finished |
-| 🌐 [Configure Devices](./network-configuration.md) | Apply baseline banner, NTP, and SNMP |
-| 🌐 [Report](./network-report.md) | Gather facts from the lab devices |
-| 🌐 [Backup](./network-backup.md) | Back up running configs |
-| 🌐 [DISA STIG](./network-disa-stig.md) | Audit IOS-XE against DISA STIG |
+Redeployment resets the whole lab to bootstrap. Teardown Topology removes the lab and report; Destroy Containerlab Stack also removes its AWS resources. Use [Troubleshoot](network-troubleshoot-containerlab.md) to collect boot, port, and container diagnostics when readiness fails.

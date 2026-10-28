@@ -80,11 +80,16 @@ mock_modules:
   - cisco.iosxr.iosxr_facts
   - cisco.nxos.nxos_banner
   - cisco.nxos.nxos_config
+  - cisco.nxos.nxos_feature
   - cisco.nxos.nxos_facts
   - cisco.nxos.nxos_ntp_global
   - cisco.nxos.nxos_snmp_server
   - community.aws.s3_sync
   - community.aws.s3_website
+  - arista.eos.eos_config
+  - juniper.device.junos_command
+  - juniper.device.junos_config
+  - community.general.seport
   - community.general.filesystem
   - community.general.modprobe
   - community.general.redhat_subscription

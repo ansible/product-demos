@@ -1,0 +1,15 @@
+---
+- name: Preserve unsupported devices without resolving a missing vendor module
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    ansible_network_os: unsupported.platform
+  roles:
+    - role: demo.network.gather_report
+  tasks:
+    - name: Require a report row for the unsupported device
+      ansible.builtin.assert:
+        that:
+          - network_report_device.status == 'unsupported'
+          - network_report_device.sections | length == network_report_resources | length

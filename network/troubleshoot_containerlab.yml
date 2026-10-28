@@ -50,36 +50,6 @@
         clab_host_ip: "{{ clab_host_ip }}"
         groups: clab_hosts
 
-- name: Probe Device Ports from Execution Node
-  hosts: localhost
-  connection: local
-  gather_facts: false
-
-  tasks:
-    - name: Check external reachability of device SSH ports
-      ansible.builtin.wait_for:
-        host: "{{ clab_host_ip }}"
-        port: "{{ item.port }}"
-        timeout: 5
-      register: clab_external_port_check
-      failed_when: false
-      loop:
-        - port: 22
-          label: hypervisor SSH
-        - port: 2122
-          label: n9kv SSH
-        - port: 2123
-          label: cat8kv SSH
-
-    - name: Display external port probe results
-      ansible.builtin.debug:
-        msg: >-
-          {{ item.item.label }} ({{ clab_host_ip }}:{{ item.item.port }}):
-          {{ 'open' if item.failed is false else 'closed or filtered' }}
-      loop: "{{ clab_external_port_check.results }}"
-      loop_control:
-        label: "{{ item.item.label }}"
-
 - name: Collect Containerlab Diagnostics on Hypervisor
   hosts: clab-hypervisor
   become: true
@@ -89,10 +59,38 @@
     - role: demo.network.containerlab
 
   vars:
-    clab_topology_dir: "/root/clab/{{ clab_topology }}"
     clab_podman_socket: "unix:///run/user/1000/podman/podman.sock"
 
   tasks:
+    - name: Discover deployed topology
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: discover_active
+
+    - name: Display deployed topologies
+      ansible.builtin.debug:
+        msg: "Deployed topologies: {{ clab_active_topologies | join(', ') }}"
+
+    - name: Check external reachability of management ports
+      ansible.builtin.wait_for:
+        host: "{{ clab_host_ip }}"
+        port: "{{ item.port }}"
+        timeout: 5
+      delegate_to: localhost
+      become: false
+      register: clab_external_port_check
+      failed_when: false
+      loop: "{{ [{'port': 22, 'label': 'hypervisor SSH'}] + (clab_active_devices.values() | list) }}"
+
+    - name: Display external port probe results
+      ansible.builtin.debug:
+        msg: >-
+          {{ item.item.label | default(item.item.network_os | default('device')) }} ({{ clab_host_ip }}:{{ item.item.port }}):
+          {{ 'open' if item.msg is not defined else 'closed or filtered' }}
+      loop: "{{ clab_external_port_check.results }}"
+      loop_control:
+        label: "{{ item.item.port }}"
+
     - name: Collect hypervisor health facts
       ansible.builtin.shell:
         cmd: |
@@ -110,11 +108,9 @@
       ansible.builtin.debug:
         msg: "{{ clab_hypervisor_health.stdout_lines }}"
 
-    - name: Check listening ports for SSH services
-      ansible.builtin.shell:
-        cmd: |
-          set -o pipefail
-          ss -tlnp | grep -E ':22 |:2122 |:2123 ' || true
+    - name: Check listening ports for management services
+      ansible.builtin.command:
+        cmd: ss -tlnp
       register: clab_listening_ports
       changed_when: false
 
@@ -135,8 +131,7 @@
 
     - name: Inspect containerlab topology
       ansible.builtin.command:
-        cmd: containerlab inspect -t {{ clab_topology }} --all
-        chdir: "{{ clab_topology_dir }}"
+        cmd: containerlab --runtime podman inspect --all
       environment:
         DOCKER_HOST: "{{ clab_podman_socket }}"
       register: clab_inspect
@@ -180,26 +175,22 @@
         timeout: 5
       register: clab_local_port_check
       failed_when: false
-      loop:
-        - port: 2122
-          label: n9kv
-        - port: 2123
-          label: cat8kv
+      loop: "{{ clab_active_devices.values() | list }}"
 
     - name: Display local device SSH probe results
       ansible.builtin.debug:
         msg: >-
-          {{ item.item.label }} (127.0.0.1:{{ item.item.port }}):
-          {{ 'SSH responding' if item.failed is false else 'not responding' }}
+          {{ item.item.network_os }} (127.0.0.1:{{ item.item.port }}):
+          {{ 'SSH responding' if item.msg is not defined else 'not responding' }}
       loop: "{{ clab_local_port_check.results }}"
       loop_control:
-        label: "{{ item.item.label }}"
+        label: "{{ item.item.port }}"
 
     - name: Collect recent logs for topology containers
       ansible.builtin.shell:
         cmd: |
           set -o pipefail
-          for name in $(podman ps -a --format '{{ '{{' }}.Names{{ '}}' }}' | grep -E 'n9kv|cat8kv' || true); do
+          for name in $(podman ps -a --format '{{ '{{' }}.Names{{ '}}' }}' | grep -E '^clab-({{ ([clab_topology] + clab_legacy_topology_names) | join('|') }})-' || true); do
             echo "=== ${name} (last 20 lines) ==="
             podman logs --tail 20 "${name}" || echo "No logs available for ${name}"
             echo
@@ -216,7 +207,7 @@
       ansible.builtin.debug:
         msg:
           - "Hypervisor: {{ clab_host_ip }} ({{ ansible_host }})"
-          - "If external port 2122 or 2123 is closed but local probes succeed, check the AWS security group."
+          - "If an external device port is closed but its local probe succeeds, check the AWS security group."
           - "If local probes fail, rerun NETWORK | Containerlab | Deploy Topology."
           - "If a container shows unhealthy but SSH responds, retry the day-2 job or redeploy the topology."
           - "If podman containers are exited, inspect logs above and redeploy the topology."

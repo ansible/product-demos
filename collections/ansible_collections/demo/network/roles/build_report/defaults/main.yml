@@ -1,0 +1,4 @@
+---
+network_report_port: "{{ clab_report_port | default(8088) }}"
+network_report_path: /var/www/html/network
+network_report_url: "http://{{ ansible_host }}:{{ network_report_port }}/network/"

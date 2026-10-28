@@ -15,7 +15,7 @@ Applies DISA STIG compliance checks and hardening to Cisco IOS-XE network device
 |--------|----------|------|----------|
 | What IOS-XE devices do you want to check? | `_hosts` | multiplechoice | Yes |
 
-Options: `clab_ios` (default), `cat8kv`
+Options: `clab_ios` (default), `cat8kv1`
 
 ## Job templates
 
