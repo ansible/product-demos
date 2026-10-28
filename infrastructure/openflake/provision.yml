@@ -1,8 +1,7 @@
 ---
-# Ported from the intro-ao-workshop role ocp4_workload_openflake. The
-# AgnosticD-only pieces (ACTION, output_dir, agnosticd_user_info) are gone:
-# here the operation comes from a survey and the generated admin password is
-# read back out of the Secret the chart creates.
+# The operation comes from a survey rather than a provision/destroy flag, and
+# the generated admin password is read back out of the Secret the chart
+# creates rather than cached on the execution node.
 - name: OpenFlake | Provision on OpenShift
   hosts: localhost
   connection: local

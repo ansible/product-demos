@@ -111,6 +111,6 @@ Everything the survey does not expose is settable in extra_vars.
 
 ## Known issues
 
-- The chart is vendored at [`infrastructure/openflake/chart`](../openflake/chart) and ported from the `ocp4_workload_openflake` role in the `intro-ao-workshop` repo. Chart changes made there do not flow here automatically.
+- The chart is vendored at [`infrastructure/openflake/chart`](../openflake/chart) rather than pulled from a chart repository, so it does not pick up upstream chart changes automatically. Update it in place when OpenFlake ships a new chart version.
 - First boot can take several minutes: Alembic migrations run behind a Postgres advisory lock before the backend passes its startup probe.
 - The deployment is not hardened for production — it is a demo backend.
