@@ -1,6 +1,6 @@
 ---
 - name: Install ACME App and render baseline storefront
-  hosts: "{{ _hosts | default('aws_rhel9') }}"
+  hosts: "{{ _hosts | default('aws-rhel9') }}"
   become: true
 
   vars:

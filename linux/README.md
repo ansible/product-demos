@@ -69,7 +69,7 @@ Edit the `Linux / System Roles` job to include the list of roles that you wish t
 
 **Linux / Run Shell Script** - Use this job to demonstrate running shell commands or an existing shell script across a group of systems as root. This can be preferred over using Ad-Hoc commands due to the ability to control usage with RBAC. This is helpful in showing the scalable of execution of an existing shell script. It is always recommended to convert shell scripts to playbooks over time. Example usage would be getting the public key used in the environment with the command `cat .ssh/authorized_keys`.
 
-**Linux / Add SSH Public Key** - Use this job to add your SSH public key (Ed25519, RSA, or ECDSA) to demo Linux hosts through the survey. Run it against `aws_rhel*` or another host pattern to enable manual SSH access without editing each system's `authorized_keys` by hand. See [Add SSH Public Key](docs/linux-install-ssh-key.md) for the full walkthrough. This is separate from **APD Machine Credential**, which Ansible uses for automation and cannot be exported from AAP after save.
+**Linux / Add SSH Public Key** - Use this job to add your SSH public key (Ed25519, RSA, or ECDSA) to demo Linux hosts through the survey. Run it against `aws-rhel*` or another host pattern to enable manual SSH access without editing each system's `authorized_keys` by hand. See [Add SSH Public Key](docs/linux-install-ssh-key.md) for the full walkthrough. This is separate from **APD Machine Credential**, which Ansible uses for automation and cannot be exported from AAP after save.
 
 **Linux / Fact Scan** - Use this job to demonstrate the use of the Ansible Fact Cache, Ansible facts, and the ability to query installed packages and running services on a system.
 

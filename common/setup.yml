@@ -52,10 +52,6 @@ controller_inventory_sources:
       compose:
         ansible_host: public_ip_address
         ansible_user: "'ec2-user'"
-        # ansible-core 2.16 requires Python 3.8+ on targets; RHEL 8 needs python3.9.
-        ansible_python_interpreter: >-
-          '/usr/bin/python3.9' if tags.get('blueprint', '') == 'rhel8'
-          else omit
         ansible_winrm_kerberos_hostname_override: tags.Name + '.ansible.local' if platform_details == 'Windows' else omit
       groups:
         aws_rhel: "'Red Hat Enterprise Linux' in platform_details"
@@ -321,9 +317,9 @@ controller_templates:
           choices:
             - windows_core
             - windows_full
-            - rhel9
             - rhel8
-            - rhel7
+            - rhel9
+            - rhel10
             - al2023
             - kafka
         - question_name: Subnet

@@ -56,7 +56,7 @@ The setup job reads `aws_kafka` from inventory and creates (or updates) EDA acti
 
 ## Step 4 — End-to-end test
 
-**From AAP (recommended):** run **LINUX | Config Drift - Introduce SSHD Drift** with default limit `aws_rhel*`.
+**From AAP (recommended):** run **LINUX | Config Drift - Introduce SSHD Drift** with default limit `aws-rhel*`.
 
 **Or manually** on a worker, drift `sshd_config`:
 

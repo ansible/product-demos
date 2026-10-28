@@ -13,7 +13,7 @@ Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route eve
 | [**Config Drift Demo**](docs/config-drift.md) | Stage-by-stage setup, validation commands, and live demo script |
 | **LINUX ǀ Config Drift - Deploy Audit and Filebeat** | Deploy persistent auditd watch (Stage 1; Filebeat in Stage 2) |
 
-**Prerequisite:** [Deploy Cloud Stack in AWS](../cloud/docs/deploy-cloud-stack.md) for RHEL targets (`aws_rhel9`, etc.).
+**Prerequisite:** [Deploy Cloud Stack in AWS](../cloud/docs/deploy-cloud-stack.md) for RHEL targets (`aws-rhel9`, etc.).
 
 ### ROSA (Red Hat OpenShift Service on AWS)
 

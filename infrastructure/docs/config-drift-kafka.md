@@ -15,8 +15,8 @@ Wire Filebeat audit events from your RHEL workers into a dedicated `aws_kafka` b
 
 | Step | Job template | Notes |
 |------|--------------|-------|
-| Cloud stack | **Deploy Cloud Stack in AWS** | `aws_rhel8`, `aws_rhel9`, VPC `10.0.0.0/16` |
-| Stage 1–2 | **LINUX \| Config Drift - Deploy Audit and Filebeat** | `_hosts`: `aws_rhel*`, Filebeat output: `console` |
+| Cloud stack | **Deploy Cloud Stack in AWS** | `aws-rhel9`, `aws-rhel10`, VPC `10.0.0.0/16` |
+| Stage 1–2 | **LINUX \| Config Drift - Deploy Audit and Filebeat** | `_hosts`: `aws-rhel*`, Filebeat output: `console` |
 | AAP setup | **APD \| Single demo setup** | category `infrastructure` |
 
 ## Architecture
@@ -54,7 +54,7 @@ Re-run **LINUX \| Config Drift - Deploy Audit and Filebeat**:
 
 | Survey field | Value |
 |--------------|-------|
-| `_hosts` | `aws_rhel*` |
+| `_hosts` | `aws-rhel*` |
 | **Filebeat output** | `kafka` |
 
 This rewrites `/etc/filebeat/filebeat.yml` on each worker to publish to `aws_kafka:9092`. Auditd rules are unchanged.
@@ -103,7 +103,7 @@ sudo podman run --rm --network container:kafka docker.io/apache/kafka:3.9.0 \
 
 ## Step 5 — Trigger a config drift event
 
-On a RHEL worker (`aws_rhel8` or `aws_rhel9`), edit the protected file:
+On a RHEL worker (`aws-rhel9` or `aws-rhel10`), edit the protected file:
 
 ```bash
 sudo vi /etc/ssh/sshd_config
@@ -141,7 +141,7 @@ Example fields from a real drift event:
 | `comm="vi"` / `SYSCALL=rename` | Typical atomic save (temp file → `sshd_config`) |
 | `AUID="ec2-user"` | Login user who made the change |
 | `host.ip[0]` | Worker private IP — used in Stage 4 to pick the remediation target |
-| `host.hostname` | EC2 internal DNS name (not the inventory name `aws_rhel9`) |
+| `host.hostname` | EC2 internal DNS name (not the inventory name `aws-rhel9`) |
 
 ## How this connects to sshd_config
 

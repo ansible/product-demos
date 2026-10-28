@@ -11,7 +11,7 @@ Stupid simple: one job template.
 1. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
 2. Open the AO URL from the job output and log in as `admin` with the printed password.
 
-You now have AO. On demo.redhat.com, Install also wires the pre-filled Controller **LiteMaaS** credential into AO as an LLM Provider integration so agentic (AI) workflow nodes can run. The Install job template must have **LiteMaaS** attached (APD setup on this branch does that). If the seed summary says LLM was not wired, re-run Install once after setup so the virtual key injects. Seeded demo workflows may still need Path 2 for cloud/chat deps (`aws_rhel9`, Mattermost, and so on). Install **warns** on missing deps; it does not fail.
+You now have AO. On demo.redhat.com, Install also wires the pre-filled Controller **LiteMaaS** credential into AO as an LLM Provider integration so agentic (AI) workflow nodes can run. The Install job template must have **LiteMaaS** attached (APD setup on this branch does that). If the seed summary says LLM was not wired, re-run Install once after setup so the virtual key injects. Seeded demo workflows may still need Path 2 for cloud/chat deps (`aws-rhel9`, Mattermost, and so on). Install **warns** on missing deps; it does not fail.
 
 Skip Network Configuration on RHDP — Install already ran it.
 
@@ -36,7 +36,7 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 | Demo | Directions | Needs |
 |------|------------|-------|
 | Task Step Example | Open **Task Step Example** in AO — question is pre-filled; press Run | LiteMaaS wired (RHDP boot + Install) |
-| Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | `aws_rhel9` + Mattermost |
+| Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | `aws-rhel9` + Mattermost |
 | Multi-OS Cloud Patching | [Multi-OS Cloud Patching](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/multi-os-cloud-patching/) | Full cloud stack + existing **Cloud \| AWS \|*** JTs |
 
 ### Task Step Example — LiteMaaS smoke test
@@ -49,7 +49,7 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
 
 ```json
 {
-  "_hosts": "aws_rhel8:aws_rhel9",
+  "_hosts": "aws-rhel9:aws-rhel10",
   "_hosts_windows": "aws-dc:aws_win1",
   "_report_server": "reports",
   "aws_region": "<your region>"

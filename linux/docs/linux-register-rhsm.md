@@ -5,7 +5,7 @@ Registers RHEL hosts with Red Hat Subscription Manager using an activation key a
 
 ## Prerequisites
 
-- RHEL hosts in the **Ansible Product Demos Inventory** (for example `aws_rhel9` from Deploy Cloud Stack in AWS)
+- RHEL hosts in the **Ansible Product Demos Inventory** (for example `aws-rhel9` from Deploy Cloud Stack in AWS)
 - SSH connectivity via **APD Machine Credential**
 - **RHSM Registration** credential with your Red Hat org ID and activation key — created by **APD ǀ Single demo setup** (`cloud` or `linux`). Replace `REPLACEME` values in AAP under Resources → Credentials → `RHSM Registration`. Create an activation key at [console.redhat.com](https://console.redhat.com/insights/connector/activation-key).
 
@@ -13,7 +13,7 @@ Registers RHEL hosts with Red Hat Subscription Manager using an activation key a
 
 | Prompt | Variable | Type | Default | Description |
 |--------|----------|------|---------|-------------|
-| Server Name or Pattern | `_hosts` | text | `aws_rhel*` | Every RHEL worker VM (`aws_rhel8` and `aws_rhel9`) |
+| Server Name or Pattern | `_hosts` | text | `aws-rhel*` | Every RHEL worker VM (`aws-rhel9` and `aws-rhel10`) |
 
 ## Job templates
 
