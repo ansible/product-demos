@@ -1,5 +1,5 @@
 ---
-- name: generate winpe
+- name: Generate WinPE
   hosts: all
   become_method: ansible.builtin.runas
   become: false

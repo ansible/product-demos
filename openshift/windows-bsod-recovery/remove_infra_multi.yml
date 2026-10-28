@@ -1,5 +1,5 @@
 ---
-- name: remove node(s)
+- name: Remove node(s)
   hosts: all
   gather_facts: false
   connection: local

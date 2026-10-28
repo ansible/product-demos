@@ -1,5 +1,5 @@
 ---
-- name: setup demo on Ansible Automation Platform
+- name: Setup demo on Ansible Automation Platform
   hosts: localhost
   gather_facts: false
   vars:

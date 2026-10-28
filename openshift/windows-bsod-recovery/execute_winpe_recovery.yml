@@ -1,5 +1,5 @@
 ---
-- name: execute winpe recovery
+- name: Execute WinPE recovery
   hosts: all
   gather_facts: false
   connection: local
@@ -12,7 +12,7 @@
     - node-config/{{ scenario }}/node-{{ provider }}.yml
 
   tasks:
-    - name: boot vm to winpe
+    - name: Boot VM to WinPE
       ansible.builtin.include_role:
         name: "{{ provider }}_boot_winpe"
         apply:

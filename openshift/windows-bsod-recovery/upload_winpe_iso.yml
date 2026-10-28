@@ -1,5 +1,5 @@
 ---
-- name: upload winpe iso
+- name: Upload WinPE ISO
   hosts: all
   become_method: ansible.builtin.runas
   become: false
@@ -9,7 +9,7 @@
     create_winpe_name: winpe_bsod_recovery_fix
 
   tasks:
-    - name: upload winpe iso to {{ provider }}
+    - name: Upload WinPE ISO to {{ provider }}
       ansible.builtin.include_role:
         name: "{{ provider }}_upload"
       vars:

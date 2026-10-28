@@ -1,5 +1,5 @@
 ---
-- name: ensure system is working properly after fix
+- name: Ensure system is working properly after fix
   hosts: all
   gather_facts: false
   tasks:

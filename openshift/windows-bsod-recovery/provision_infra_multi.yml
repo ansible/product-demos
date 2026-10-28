@@ -1,5 +1,5 @@
 ---
-- name: provision node(s)
+- name: Provision node(s)
   hosts: localhost
   become: false
   vars:
