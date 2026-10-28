@@ -1,0 +1,1115 @@
+---
+- name: Provision Mattermost EC2 instance in AWS
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    create_vm_vm_name: aws_mattermost
+    vm_blueprint: mattermost
+    create_vm_vm_blueprint: mattermost
+    create_vm_vm_purpose: mattermost
+    create_vm_apd_managed_by: aap-product-demos
+    create_vm_apd_demo_tag: "true"
+    create_vm_aws_keypair_name: aws-test-key
+    create_vm_aws_securitygroup_name: aws-test-sg
+    create_vm_aws_vpc_subnet_name: aws-test-subnet
+    create_vm_vm_deployment: cloud_stack
+    # Username "admin" is reserved by Mattermost and returns HTTP 400 on create.
+    mattermost_admin_email: apd-admin@example.com
+    mattermost_admin_username: apdadmin
+    mattermost_admin_password: Ansible123!
+    mattermost_team_name: apd
+    mattermost_team_display_name: Ansible Product Demos
+    mattermost_bot_username: apd-bot
+    mattermost_http_port: 8065
+
+  tasks:
+    - name: Fail if cloud networking variables are not defined
+      ansible.builtin.assert:
+        that:
+          - create_vm_aws_vpc_subnet_name is defined
+          - create_vm_aws_keypair_name is defined
+          - create_vm_aws_securitygroup_name is defined
+          - create_vm_aws_region is defined
+        fail_msg: >-
+          Set create_vm_aws_region, create_vm_aws_vpc_subnet_name,
+          create_vm_aws_securitygroup_name, and create_vm_aws_keypair_name
+          (defaults match Deploy Cloud Stack in AWS).
+
+    - name: Map owner tag for EC2 provisioning
+      ansible.builtin.set_fact:
+        create_vm_vm_owner: "{{ create_vm_aws_owner_tag }}"
+      when: create_vm_aws_owner_tag is defined
+
+    - name: Default deployment tag for Mattermost VM
+      ansible.builtin.set_fact:
+        create_vm_vm_deployment: cloud_stack
+      when: create_vm_vm_deployment is not defined
+
+    - name: Default cloud networking for Mattermost VM
+      ansible.builtin.set_fact:
+        create_vm_aws_keypair_name: aws-test-key
+        create_vm_aws_securitygroup_name: aws-test-sg
+        create_vm_aws_vpc_subnet_name: aws-test-subnet
+      when: create_vm_aws_keypair_name is not defined
+
+    - name: Default environment tag for Mattermost VM
+      ansible.builtin.set_fact:
+        create_vm_vm_environment: Prod
+      when: create_vm_vm_environment is not defined
+
+    - name: Default owner tag for Mattermost VM
+      ansible.builtin.set_fact:
+        create_vm_vm_owner: apd-demo
+      when: create_vm_vm_owner is not defined
+
+    - name: Ensure AWS keypair exists in EC2
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/../../cloud/tasks/ensure_aws_keypair.yml"
+      vars:
+        aws_key_name: "{{ create_vm_aws_keypair_name }}"
+        aws_keypair_owner: "{{ create_vm_vm_owner }}"
+
+    - name: Create or reuse Mattermost EC2 instance
+      ansible.builtin.include_role:
+        name: demo.cloud.aws
+        tasks_from: create_vm
+      vars:
+        create_vm_aws_image_owners: 309956199498
+        create_vm_aws_instance_size: t3.medium
+        create_vm_aws_image_architecture: x86_64
+        create_vm_aws_image_filter: 'RHEL-9*HVM-*Hourly*'
+
+    - name: Look up Mattermost EC2 instance details
+      amazon.aws.ec2_instance_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          "tag:Name": "{{ create_vm_vm_name }}"
+          instance-state-name:
+            - pending
+            - running
+      register: mattermost_instance
+      until: mattermost_instance.instances | length > 0
+      retries: 12
+      delay: 5
+
+    - name: Assert Mattermost instance is running
+      ansible.builtin.assert:
+        that: mattermost_instance.instances | length > 0
+        fail_msg: Mattermost EC2 instance aws_mattermost was not found after provisioning.
+
+    - name: Save Mattermost connection details
+      ansible.builtin.set_fact:
+        mattermost_public_ip: "{{ mattermost_instance.instances[0].public_ip_address }}"
+        mattermost_private_ip: "{{ mattermost_instance.instances[0].private_ip_address }}"
+
+    - name: Register Mattermost host for configuration play
+      ansible.builtin.add_host:
+        name: aws_mattermost
+        ansible_host: "{{ mattermost_public_ip }}"
+        ansible_user: ec2-user
+        groups: mattermost_server
+        mattermost_public_ip: "{{ mattermost_public_ip }}"
+        mattermost_private_ip: "{{ mattermost_private_ip }}"
+        mattermost_admin_email: "{{ mattermost_admin_email }}"
+        mattermost_admin_username: "{{ mattermost_admin_username }}"
+        mattermost_admin_password: "{{ mattermost_admin_password }}"
+        mattermost_team_name: "{{ mattermost_team_name }}"
+        mattermost_team_display_name: "{{ mattermost_team_display_name }}"
+        mattermost_bot_username: "{{ mattermost_bot_username }}"
+        mattermost_http_port: "{{ mattermost_http_port }}"
+
+    - name: Look up demo security group for Mattermost HTTP
+      amazon.aws.ec2_security_group_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          group-name: "{{ create_vm_aws_securitygroup_name }}"
+      register: mattermost_security_group
+
+    - name: Allow Mattermost HTTP port
+      when: mattermost_security_group.security_groups | length > 0
+      amazon.aws.ec2_security_group:
+        name: "{{ create_vm_aws_securitygroup_name }}"
+        description: "{{ mattermost_security_group.security_groups[0].description }}"
+        region: "{{ create_vm_aws_region }}"
+        vpc_id: "{{ mattermost_security_group.security_groups[0].vpc_id }}"
+        purge_rules: false
+        rules:
+          - proto: tcp
+            ports:
+              - "{{ mattermost_http_port }}"
+            cidr_ip: 0.0.0.0/0
+
+- name: Deploy Mattermost with Podman
+  hosts: mattermost_server
+  become: true
+  gather_facts: false
+  vars:
+    mattermost_postgres_image: docker.io/library/postgres:15-alpine
+    mattermost_image: docker.io/mattermost/mattermost-team-edition:9.11
+    mattermost_network: mattermost
+    mattermost_postgres_password: mm_pg_pass
+    mattermost_data_dir: /var/lib/mattermost
+
+  tasks:
+    - name: Wait for SSH on new Mattermost instance
+      ansible.builtin.wait_for_connection:
+        delay: 15
+        timeout: 600
+
+    - name: Gather facts after SSH is ready
+      ansible.builtin.setup:
+
+    - name: Install Podman
+      ansible.builtin.package:
+        name: podman
+        state: present
+
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Allow Mattermost port through firewalld
+      ansible.posix.firewalld:
+        port: "{{ mattermost_http_port }}/tcp"
+        permanent: true
+        state: enabled
+        immediate: true
+      when:
+        - "'firewalld.service' in ansible_facts.services"
+        - ansible_facts.services['firewalld.service'].state == 'running'
+
+    - name: Create Mattermost data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - "{{ mattermost_data_dir }}"
+        - "{{ mattermost_data_dir }}/config"
+        - "{{ mattermost_data_dir }}/data"
+        - "{{ mattermost_data_dir }}/db"
+        - "{{ mattermost_data_dir }}/logs"
+        - "{{ mattermost_data_dir }}/plugins"
+        - "{{ mattermost_data_dir }}/client/plugins"
+        - "{{ mattermost_data_dir }}/bleve-indexes"
+
+    # Official Mattermost image runs as UID 2000; root-owned mounts make the
+    # process exit immediately so localhost:8065 never listens.
+    - name: Set Mattermost app volume ownership for container UID 2000
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "2000"
+        group: "2000"
+        mode: "0755"
+        recurse: true
+      loop:
+        - "{{ mattermost_data_dir }}/config"
+        - "{{ mattermost_data_dir }}/data"
+        - "{{ mattermost_data_dir }}/logs"
+        - "{{ mattermost_data_dir }}/plugins"
+        - "{{ mattermost_data_dir }}/client"
+        - "{{ mattermost_data_dir }}/bleve-indexes"
+
+    - name: Ensure Podman network for Mattermost
+      ansible.builtin.command:
+        argv:
+          - podman
+          - network
+          - exists
+          - "{{ mattermost_network }}"
+      register: mattermost_network_exists
+      changed_when: false
+      failed_when: false
+
+    - name: Create Podman network for Mattermost
+      ansible.builtin.command:
+        argv:
+          - podman
+          - network
+          - create
+          - "{{ mattermost_network }}"
+      when: mattermost_network_exists.rc != 0
+      changed_when: true
+
+    - name: Run Mattermost Postgres
+      containers.podman.podman_container:
+        name: mattermost-db
+        image: "{{ mattermost_postgres_image }}"
+        state: started
+        restart_policy: always
+        network: "{{ mattermost_network }}"
+        env:
+          POSTGRES_USER: mmuser
+          POSTGRES_PASSWORD: "{{ mattermost_postgres_password }}"
+          POSTGRES_DB: mattermost
+        volumes:
+          - "{{ mattermost_data_dir }}/db:/var/lib/postgresql/data:Z"
+
+    - name: Wait for Postgres to accept connections
+      ansible.builtin.command:
+        argv:
+          - podman
+          - exec
+          - mattermost-db
+          - pg_isready
+          - -U
+          - mmuser
+          - -d
+          - mattermost
+      register: mattermost_pg_ready
+      until: mattermost_pg_ready.rc == 0
+      retries: 30
+      delay: 2
+      changed_when: false
+
+    - name: Remove exited Mattermost app container before recreate
+      containers.podman.podman_container:
+        name: mattermost
+        state: absent
+      failed_when: false
+
+    - name: Run Mattermost application
+      containers.podman.podman_container:
+        name: mattermost
+        image: "{{ mattermost_image }}"
+        state: started
+        restart_policy: always
+        network: "{{ mattermost_network }}"
+        publish:
+          - "{{ mattermost_http_port }}:8065"
+        env:
+          MM_SQLSETTINGS_DRIVERNAME: postgres
+          MM_SQLSETTINGS_DATASOURCE: >-
+            postgres://mmuser:{{ mattermost_postgres_password }}@mattermost-db:5432/mattermost?sslmode=disable&connect_timeout=10
+          MM_SERVICESETTINGS_SITEURL: "http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}"
+          MM_SERVICESETTINGS_LISTENADDRESS: ":8065"
+          MM_TEAMSETTINGS_ENABLEOPENSERVER: "true"
+          MM_SERVICESETTINGS_ENABLEBOTACCOUNTCREATION: "true"
+          MM_SERVICESETTINGS_ENABLEUSERACCESSTOKENS: "true"
+          # mmctl --local needs this to promote apdadmin (API user create is not
+          # always system_admin on re-runs against an existing DB).
+          MM_SERVICESETTINGS_ENABLELOCALMODE: "true"
+        volumes:
+          - "{{ mattermost_data_dir }}/config:/mattermost/config:Z"
+          - "{{ mattermost_data_dir }}/data:/mattermost/data:Z"
+          - "{{ mattermost_data_dir }}/logs:/mattermost/logs:Z"
+          - "{{ mattermost_data_dir }}/plugins:/mattermost/plugins:Z"
+          - "{{ mattermost_data_dir }}/client/plugins:/mattermost/client/plugins:Z"
+          - "{{ mattermost_data_dir }}/bleve-indexes:/mattermost/bleve-indexes:Z"
+
+    - name: Wait for Mattermost HTTP
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/system/ping"
+        method: GET
+        status_code: [200]
+      register: mattermost_ping
+      until: mattermost_ping.status | default(0) == 200
+      retries: 60
+      delay: 5
+      ignore_errors: true
+
+    - name: Collect Mattermost container diagnostics on HTTP failure
+      when: mattermost_ping is failed
+      block:
+        - name: Show Mattermost container status
+          ansible.builtin.command:
+            argv:
+              - podman
+              - ps
+              - -a
+              - --filter
+              - name=mattermost
+          register: mattermost_ps
+          changed_when: false
+
+        - name: Show Mattermost container logs
+          ansible.builtin.command:
+            argv:
+              - podman
+              - logs
+              - --tail
+              - "80"
+              - mattermost
+          register: mattermost_logs
+          changed_when: false
+          failed_when: false
+
+        - name: Fail with Mattermost diagnostics
+          ansible.builtin.fail:
+            msg: >-
+              Mattermost did not answer on 127.0.0.1:{{ mattermost_http_port }}
+              (not a VPC/SG issue — this check is localhost).
+              podman ps: {{ mattermost_ps.stdout }}
+              logs: {{ mattermost_logs.stdout_lines | default(mattermost_logs.stderr_lines) }}
+
+    - name: Create Mattermost admin user when missing
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/users"
+        method: POST
+        body_format: json
+        body:
+          email: "{{ mattermost_admin_email }}"
+          username: "{{ mattermost_admin_username }}"
+          password: "{{ mattermost_admin_password }}"
+        status_code: [201, 400]
+      register: mattermost_admin_create
+      no_log: false
+
+    - name: Fail when admin create returned an unexpected 400
+      when:
+        - mattermost_admin_create.status | default(0) == 400
+        - >-
+          'already exists' not in (
+            mattermost_admin_create.json.message | default('')
+            | lower
+          )
+          and 'already exists' not in (
+            mattermost_admin_create.json.id | default('')
+            | lower
+          )
+      ansible.builtin.fail:
+        msg: >-
+          Mattermost admin create failed
+          (status={{ mattermost_admin_create.status }};
+          id={{ mattermost_admin_create.json.id | default('') }};
+          message={{ mattermost_admin_create.json.message | default(mattermost_admin_create.msg) }}).
+          Username 'admin' is reserved — use apdadmin.
+
+    # API-created users on a reused DB are often plain system_user; mmctl
+    # --local "user roles" can report ok without the session picking it up.
+    # Update Roles in Postgres, then re-login before bot APIs.
+    - name: Ensure Mattermost admin has system_admin role in Postgres
+      ansible.builtin.command:
+        argv:
+          - podman
+          - exec
+          - mattermost-db
+          - psql
+          - -U
+          - mmuser
+          - -d
+          - mattermost
+          - -v
+          - ON_ERROR_STOP=1
+          - -c
+          - >-
+            UPDATE users
+            SET roles = 'system_user system_admin'
+            WHERE username = '{{ mattermost_admin_username }}'
+            RETURNING username, roles;
+      register: mattermost_promote_sql
+      changed_when: "'system_admin' in (mattermost_promote_sql.stdout | default(''))"
+      failed_when: >-
+        (mattermost_promote_sql.rc | default(1) | int) != 0
+        or 'system_admin' not in (mattermost_promote_sql.stdout | default(''))
+
+    - name: Enable Mattermost bot, token, and webhook settings via mmctl
+      ansible.builtin.shell: |
+        set -euo pipefail
+        podman exec mattermost mmctl --local config set \
+          ServiceSettings.EnableBotAccountCreation true
+        podman exec mattermost mmctl --local config set \
+          ServiceSettings.EnableUserAccessTokens true
+        podman exec mattermost mmctl --local config set \
+          ServiceSettings.EnableIncomingWebhooks true
+      args:
+        executable: /bin/bash
+      register: mattermost_enable_flags
+      changed_when: true
+      failed_when: false
+      retries: 12
+      delay: 5
+      until: mattermost_enable_flags.rc == 0
+
+    - name: Fail when Mattermost feature flags could not be enabled
+      when: (mattermost_enable_flags.rc | default(1) | int) != 0
+      ansible.builtin.fail:
+        msg: >-
+          mmctl could not enable EnableBotAccountCreation /
+          EnableUserAccessTokens / EnableIncomingWebhooks
+          (rc={{ mattermost_enable_flags.rc }};
+          stdout={{ mattermost_enable_flags.stdout | default('') }};
+          stderr={{ mattermost_enable_flags.stderr | default('') }}).
+    # Product Demos EE ships ansible-core where uri lacks return_headers;
+    # Mattermost returns the session token only in the Token response header.
+    # Login after promote so the session carries system_admin.
+    - name: Log in as Mattermost admin and capture Token header
+      ansible.builtin.shell: |
+        set -euo pipefail
+        curl -sS -D /tmp/mm_login_headers.txt -o /tmp/mm_login_body.json \
+          -H 'Content-Type: application/json' \
+          -d @- \
+          "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/users/login" <<EOF
+        {"login_id":"{{ mattermost_admin_email }}","password":"{{ mattermost_admin_password }}"}
+        EOF
+        awk -F': ' 'BEGIN{IGNORECASE=1} $1=="Token" {gsub(/\r/,"",$2); print $2; exit}' \
+          /tmp/mm_login_headers.txt
+      args:
+        executable: /bin/bash
+      register: mattermost_login
+      changed_when: false
+      no_log: true
+      failed_when: false
+
+    - name: Read Mattermost login response body on failure
+      when: >-
+        (mattermost_login.rc | default(1) | int) != 0
+        or (mattermost_login.stdout | default('') | trim | length) == 0
+      ansible.builtin.slurp:
+        src: /tmp/mm_login_body.json
+      register: mattermost_login_body
+      failed_when: false
+
+    - name: Fail when Mattermost admin login fails
+      when: >-
+        (mattermost_login.rc | default(1) | int) != 0
+        or (mattermost_login.stdout | default('') | trim | length) == 0
+      ansible.builtin.fail:
+        msg: >-
+          Mattermost admin login failed for {{ mattermost_admin_username }}
+          ({{ mattermost_admin_email }}).
+          curl_rc={{ mattermost_login.rc | default('n/a') }};
+          body={{
+            (mattermost_login_body.content | default('') | b64decode)
+            if mattermost_login_body is succeeded else ''
+          }}.
+          Open http://{{ mattermost_public_ip }}:{{ mattermost_http_port }} to verify.
+
+    - name: Store Mattermost session token
+      ansible.builtin.set_fact:
+        mattermost_session_token: "{{ mattermost_login.stdout | trim }}"
+      no_log: true
+
+    - name: Create Mattermost team when missing
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/teams"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body:
+          name: "{{ mattermost_team_name }}"
+          display_name: "{{ mattermost_team_display_name }}"
+          type: O
+        status_code: [201, 400]
+      register: mattermost_team_create
+      no_log: true
+
+    - name: List Mattermost teams
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/teams"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        return_content: true
+      register: mattermost_teams
+      no_log: true
+
+    - name: Select Mattermost team id
+      ansible.builtin.set_fact:
+        mattermost_team_id: >-
+          {{
+            (
+              mattermost_teams.json
+              | selectattr('name', 'equalto', mattermost_team_name)
+              | map(attribute='id')
+              | first
+              | default(mattermost_team_create.json.id | default(''), true)
+            )
+          }}
+
+    - name: Verify Mattermost session has system_admin
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/users/me"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        return_content: true
+        status_code: [200]
+      register: mattermost_me
+
+    - name: Fail when session lacks system_admin
+      when: "'system_admin' not in (mattermost_me.json.roles | default(''))"
+      ansible.builtin.fail:
+        msg: >-
+          Logged-in user {{ mattermost_me.json.username | default('?') }}
+          roles={{ mattermost_me.json.roles | default('') }} — expected system_admin
+          after Postgres role update.
+
+    - name: Create Mattermost bot account
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/bots"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body:
+          username: "{{ mattermost_bot_username }}"
+          display_name: APD Bot
+          description: Ansible Product Demos notification bot
+        status_code: [201, 400]
+      register: mattermost_bot_create
+      failed_when: false
+
+    - name: Fail when Mattermost bot create fails unexpectedly
+      when: >-
+        mattermost_bot_create.status | default(0) not in [201, 400]
+        or (
+          mattermost_bot_create.status | default(0) == 400
+          and 'already exists' not in (
+            mattermost_bot_create.json.message | default('')
+            | lower
+          )
+          and 'already exists' not in (
+            mattermost_bot_create.json.id | default('')
+            | lower
+          )
+        )
+      ansible.builtin.fail:
+        msg: >-
+          Mattermost bot create failed
+          (status={{ mattermost_bot_create.status | default('n/a') }};
+          id={{ mattermost_bot_create.json.id | default('') }};
+          message={{ mattermost_bot_create.json.message | default(mattermost_bot_create.msg) }};
+          roles={{ mattermost_me.json.roles | default('') }}).
+
+    - name: List Mattermost bots
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/bots"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        return_content: true
+      register: mattermost_bots
+
+    - name: Select Mattermost bot user id
+      ansible.builtin.set_fact:
+        mattermost_bot_user_id: >-
+          {{
+            (
+              mattermost_bots.json
+              | selectattr('username', 'equalto', mattermost_bot_username)
+              | map(attribute='user_id')
+              | first
+              | default(mattermost_bot_create.json.user_id | default(''), true)
+            )
+          }}
+
+    - name: Require Mattermost bot user id
+      ansible.builtin.assert:
+        that:
+          - (mattermost_bot_user_id | default('') | string | length) > 0
+        fail_msg: Could not resolve Mattermost bot user id for {{ mattermost_bot_username }}.
+
+    - name: Create Mattermost bot access token
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/users/{{ mattermost_bot_user_id }}/tokens"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body:
+          description: APD demo notify token
+        # Mattermost returns 200 (not 201) for user access token create.
+        status_code: [200, 201]
+      register: mattermost_bot_token
+      no_log: true
+
+    - name: Require Mattermost bot token value
+      ansible.builtin.assert:
+        that:
+          - (mattermost_bot_token.json.token | default('') | string | length) > 0
+        fail_msg: >-
+          Mattermost bot token response missing token field
+          (status={{ mattermost_bot_token.status | default('n/a') }};
+          keys={{ mattermost_bot_token.json.keys() | list if mattermost_bot_token.json is mapping else [] }}).
+
+    - name: Add bot to Mattermost team
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/teams/{{ mattermost_team_id }}/members"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body:
+          team_id: "{{ mattermost_team_id }}"
+          user_id: "{{ mattermost_bot_user_id }}"
+        status_code: [201, 400]
+      failed_when: false
+      no_log: true
+
+    # community.general.mattermost posts to {url}/hooks/{api_key} (Incoming
+    # Webhook), not a bot personal access token.
+    - name: Create Mattermost notify channel when missing
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/channels"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body:
+          team_id: "{{ mattermost_team_id }}"
+          name: apd-notify
+          display_name: APD Notify
+          type: O
+        status_code: [201, 400]
+      register: mattermost_channel_create
+
+    - name: Resolve Mattermost notify channel id
+      ansible.builtin.uri:
+        url: >-
+          http://127.0.0.1:{{ mattermost_http_port }}/api/v4/teams/{{ mattermost_team_id }}/channels/name/apd-notify
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        return_content: true
+        status_code: [200]
+      register: mattermost_channel
+      when: (mattermost_channel_create.status | default(0) | int) != 201
+
+    # Mattermost 400 bodies use json.id for the error code (e.g.
+    # store.sql_channel.save_channel.exists.app_error) — never treat that as
+    # a channel id. Only trust create.json.id on HTTP 201.
+    - name: Select Mattermost notify channel id
+      ansible.builtin.set_fact:
+        mattermost_channel_id: >-
+          {{
+            mattermost_channel_create.json.id
+            if (mattermost_channel_create.status | default(0) | int) == 201
+            else (mattermost_channel.json.id | default('', true))
+          }}
+
+    - name: Require Mattermost notify channel id
+      ansible.builtin.assert:
+        that:
+          - (mattermost_channel_id | default('') | string | length) > 0
+          - "'app_error' not in (mattermost_channel_id | default(''))"
+        fail_msg: >-
+          Could not resolve Mattermost channel id for apd-notify
+          (got '{{ mattermost_channel_id | default('') }}').
+
+    # Always mint a fresh webhook and overwrite the Controller credential so
+    # Notify Chatroom never keeps a stale api_chat_token after re-provision.
+    - name: List existing Mattermost incoming webhooks
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/hooks/incoming"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        return_content: true
+        status_code: [200]
+      register: mattermost_webhooks_existing
+      no_log: true
+
+    - name: Build list of prior APD Notify Chatroom webhook ids
+      ansible.builtin.set_fact:
+        mattermost_webhooks_to_delete: >-
+          {{
+            (
+              mattermost_webhooks_existing.json
+              if (mattermost_webhooks_existing.json | type_debug == 'list')
+              else []
+            )
+            | selectattr('display_name', 'defined')
+            | selectattr('display_name', 'equalto', 'APD Notify Chatroom')
+            | map(attribute='id')
+            | reject('equalto', None)
+            | reject('equalto', '')
+            | list
+          }}
+      no_log: true
+
+    - name: Delete prior APD Notify Chatroom webhooks
+      when: (mattermost_webhooks_to_delete | default([]) | length) > 0
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/hooks/incoming/{{ item }}"
+        method: DELETE
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        status_code: [200, 204, 404]
+      loop: "{{ mattermost_webhooks_to_delete }}"
+      failed_when: false
+      no_log: true
+
+    - name: Create Mattermost incoming webhook for Notify Chatroom
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ mattermost_http_port }}/api/v4/hooks/incoming"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mattermost_session_token }}"
+        body_format: json
+        body:
+          channel_id: "{{ mattermost_channel_id }}"
+          display_name: APD Notify Chatroom
+          description: Incoming webhook for community.general.mattermost / AO demos
+        return_content: true
+        status_code: [201, 400, 403, 401]
+      register: mattermost_webhook
+      failed_when: (mattermost_webhook.status | default(0) | int) != 201
+      # Do not no_log here — failures must show Mattermost's status/message.
+      # The id is stored with no_log on the next task.
+
+    - name: Store new Mattermost incoming webhook id
+      ansible.builtin.set_fact:
+        mattermost_webhook_id: "{{ mattermost_webhook.json.id }}"
+      no_log: true
+
+    - name: Require Mattermost incoming webhook id
+      ansible.builtin.assert:
+        that:
+          - (mattermost_webhook_id | default('') | string | length) > 0
+        fail_msg: >-
+          Create Mattermost incoming webhook did not return an id.
+          community.general.mattermost needs url/hooks/{api_key}.
+
+    - name: Persist Mattermost connection facts on the host
+      ansible.builtin.copy:
+        dest: /etc/apd-mattermost.env
+        mode: "0600"
+        content: |
+          MATTERMOST_URL=http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}
+          MATTERMOST_SERVER={{ mattermost_public_ip }}:{{ mattermost_http_port }}
+          MATTERMOST_BOT_TOKEN={{ mattermost_bot_token.json.token }}
+          MATTERMOST_WEBHOOK_ID={{ mattermost_webhook_id }}
+          MATTERMOST_ADMIN_USER={{ mattermost_admin_username }}
+          MATTERMOST_TEAM={{ mattermost_team_name }}
+          MATTERMOST_CHANNEL=apd-notify
+      no_log: true
+
+    - name: Export Mattermost connection facts to localhost
+      ansible.builtin.set_fact:
+        mattermost_credential_server: "{{ mattermost_public_ip }}:{{ mattermost_http_port }}"
+        mattermost_credential_token: "{{ mattermost_webhook_id }}"
+      delegate_to: localhost
+      delegate_facts: true
+      no_log: true
+
+    - name: Show Mattermost access information
+      ansible.builtin.debug:
+        msg:
+          - "Mattermost URL: http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}"
+          - "Admin user: {{ mattermost_admin_username }} / {{ mattermost_admin_password }}"
+          - "Team: {{ mattermost_team_name }} / channel: apd-notify"
+          - "Incoming webhook id stored as api_chat_token in Controller credential 'Mattermost'"
+          - "Webhook URL: http://{{ mattermost_public_ip }}:{{ mattermost_http_port }}/hooks/{{ mattermost_webhook_id }}"
+          - "mattermost_server: {{ mattermost_public_ip }}:{{ mattermost_http_port }}"
+          - "AWS Inventory sync runs after credential publish so aws_mattermost is in inventory."
+          - "Re-run AO Install so Notify Chatroom uses Product Demos EE + Mattermost credential."
+
+- name: Publish Mattermost credential to Controller
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    mattermost_credential_name: Mattermost
+    mattermost_credential_organization: Ansible Product Demos (APD)
+    # Prefer AAP Credential injectors (same as AO Install / seed).
+    _mm_controller_host_raw: >-
+      {{ lookup('env', 'CONTROLLER_HOST') | default(lookup('env', 'AAP_HOSTNAME'), true)
+         | default('', true) }}
+    _mm_controller_host: "{{ _mm_controller_host_raw | regex_replace('/$', '') }}"
+    _mm_controller_oauth_token: "{{ lookup('env', 'CONTROLLER_OAUTH_TOKEN') | default('', true) }}"
+    _mm_controller_username: "{{ lookup('env', 'CONTROLLER_USERNAME') | default('', true) }}"
+    _mm_controller_password: "{{ lookup('env', 'CONTROLLER_PASSWORD') | default('', true) }}"
+  tasks:
+    - name: Require Mattermost connection facts for credential publish
+      ansible.builtin.assert:
+        that:
+          - (mattermost_credential_server | default('') | length) > 0
+          - (mattermost_credential_token | default('') | length) > 0
+        fail_msg: >-
+          Missing Mattermost server/token facts from the configure play.
+          Cannot update the Controller Mattermost credential.
+
+    - name: Require Controller API access for credential publish
+      ansible.builtin.assert:
+        that:
+          - (_mm_controller_host | default('') | length) > 0
+          - >-
+            (_mm_controller_oauth_token | default('') | length) > 0
+            or (
+              (_mm_controller_username | default('') | length) > 0
+              and (_mm_controller_password | default('') | length) > 0
+            )
+        fail_msg: >-
+          Attach an AAP Credential to this job template so CONTROLLER_HOST and
+          CONTROLLER_OAUTH_TOKEN (or username/password) are available.
+
+    - name: Build Controller API auth facts
+      ansible.builtin.set_fact:
+        _mm_controller_api: "{{ _mm_controller_host }}/api/controller/v2"
+        _mm_controller_use_token: "{{ (_mm_controller_oauth_token | default('') | length) > 0 }}"
+      no_log: true
+
+    - name: Look up APD organization for Mattermost credential
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/organizations/?name={{ mattermost_credential_organization | urlencode }}"
+        method: GET
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        validate_certs: false
+        return_content: true
+        status_code: [200]
+      register: _mm_org_lookup
+      no_log: true
+
+    - name: Require APD organization
+      ansible.builtin.assert:
+        that:
+          - _mm_org_lookup.json.results | default([]) | length > 0
+        fail_msg: "Organization '{{ mattermost_credential_organization }}' was not found in Controller."
+
+    - name: Look up Mattermost credential type
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/credential_types/?name={{ mattermost_credential_name | urlencode }}"
+        method: GET
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        validate_certs: false
+        return_content: true
+        status_code: [200]
+      register: _mm_cred_type_lookup
+      no_log: true
+
+    - name: Create Mattermost credential type when missing
+      when: _mm_cred_type_lookup.json.results | default([]) | length == 0
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/credential_types/"
+        method: POST
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        body_format: json
+        body:
+          name: "{{ mattermost_credential_name }}"
+          description: >-
+            Mattermost chat endpoint for AO Notify Chatroom and other demos.
+            Filled by Infrastructure | AWS - Provision Mattermost.
+          kind: cloud
+          inputs:
+            fields:
+              - id: mattermost_server
+                type: string
+                label: Mattermost server (host:port)
+                help_text: Example 1.2.3.4:8065 — no http:// prefix.
+              - id: api_chat_token
+                type: string
+                label: Mattermost incoming webhook id
+                secret: true
+            required:
+              - mattermost_server
+              - api_chat_token
+          injectors:
+            extra_vars:
+              mattermost_server: "{{ '{{' }} mattermost_server {{ '}}' }}"
+              api_chat_token: "{{ '{{' }} api_chat_token {{ '}}' }}"
+        validate_certs: false
+        status_code: [200, 201]
+      register: _mm_cred_type_create
+      no_log: true
+
+    - name: Store Mattermost credential type id
+      ansible.builtin.set_fact:
+        _mm_cred_type_id: >-
+          {{
+            (_mm_cred_type_lookup.json.results | default([{}]))[0].id
+            | default(_mm_cred_type_create.json.id, true)
+          }}
+
+    - name: Look up Mattermost credential
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/credentials/?name={{ mattermost_credential_name | urlencode }}"
+        method: GET
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        validate_certs: false
+        return_content: true
+        status_code: [200]
+      register: _mm_cred_lookup
+      no_log: true
+
+    - name: Build Mattermost credential payload
+      ansible.builtin.set_fact:
+        _mm_cred_payload:
+          name: "{{ mattermost_credential_name }}"
+          description: >-
+            Updated automatically by Infrastructure | AWS - Provision Mattermost.
+          organization: "{{ _mm_org_lookup.json.results[0].id | int }}"
+          credential_type: "{{ _mm_cred_type_id | int }}"
+          inputs:
+            mattermost_server: "{{ mattermost_credential_server }}"
+            api_chat_token: "{{ mattermost_credential_token }}"
+      no_log: true
+
+    - name: Create Mattermost credential
+      when: _mm_cred_lookup.json.results | default([]) | length == 0
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/credentials/"
+        method: POST
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        body_format: json
+        body: "{{ _mm_cred_payload }}"
+        validate_certs: false
+        status_code: [200, 201]
+      no_log: true
+
+    - name: Update Mattermost credential
+      when: _mm_cred_lookup.json.results | default([]) | length > 0
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/credentials/{{ _mm_cred_lookup.json.results[0].id }}/"
+        method: PATCH
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        body_format: json
+        body: "{{ _mm_cred_payload }}"
+        validate_certs: false
+        status_code: [200]
+        return_content: true
+      register: _mm_cred_update
+      no_log: true
+
+    - name: Require Mattermost credential inputs were written
+      ansible.builtin.assert:
+        that:
+          - (mattermost_credential_server | default('') | length) > 0
+          - (mattermost_credential_token | default('') | length) > 0
+          - >-
+            (_mm_cred_lookup.json.results | default([]) | length) == 0
+            or (_mm_cred_update.status | default(0) | int) == 200
+        fail_msg: >-
+          Failed to publish Mattermost server/webhook id to Controller credential
+          '{{ mattermost_credential_name }}'.
+
+    - name: Show Mattermost credential publish result
+      ansible.builtin.debug:
+        msg:
+          - "Controller credential '{{ mattermost_credential_name }}' overwritten with this run's webhook."
+          - "mattermost_server={{ mattermost_credential_server }}"
+          - "api_chat_token matches new /hooks/{id} from Mattermost (re-run always resets both)."
+          - "Attach it to Notify Chatroom (AO Install does this) or any JT that needs Mattermost."
+
+    - name: Look up AWS Inventory source
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/inventory_sources/?name={{ 'AWS Inventory' | urlencode }}"
+        method: GET
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        validate_certs: false
+        return_content: true
+        status_code: [200]
+      register: _mm_inv_src_lookup
+
+    - name: Require AWS Inventory source
+      ansible.builtin.assert:
+        that:
+          - _mm_inv_src_lookup.json.results | default([]) | length > 0
+        fail_msg: >-
+          Inventory source 'AWS Inventory' was not found. Re-run common/APD setup
+          so aws_mattermost can sync into Ansible Product Demos Inventory.
+
+    - name: Sync AWS Inventory so aws_mattermost appears
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/inventory_sources/{{ _mm_inv_src_lookup.json.results[0].id }}/update/"
+        method: POST
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        body_format: json
+        body: {}
+        validate_certs: false
+        return_content: true
+        status_code: [202]
+      register: _mm_inv_update
+
+    - name: Wait for AWS Inventory sync to finish
+      ansible.builtin.uri:
+        url: "{{ _mm_controller_api }}/inventory_updates/{{ _mm_inv_update.json.id }}/"
+        method: GET
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ _mm_controller_oauth_token, 'Content-Type': 'application/json'}
+            if _mm_controller_use_token | bool
+            else {'Content-Type': 'application/json'}
+          }}
+        user: "{{ _mm_controller_username if not (_mm_controller_use_token | bool) else omit }}"
+        password: "{{ _mm_controller_password if not (_mm_controller_use_token | bool) else omit }}"
+        force_basic_auth: "{{ not (_mm_controller_use_token | bool) }}"
+        validate_certs: false
+        return_content: true
+        status_code: [200]
+      register: _mm_inv_update_status
+      until: >-
+        _mm_inv_update_status.json.status is defined
+        and _mm_inv_update_status.json.status not in ['new', 'pending', 'waiting', 'running']
+      retries: 36
+      delay: 5
+
+    - name: Require AWS Inventory sync succeeded
+      ansible.builtin.assert:
+        that:
+          - _mm_inv_update_status.json.status == 'successful'
+        fail_msg: >-
+          AWS Inventory sync finished with status
+          '{{ _mm_inv_update_status.json.status | default('unknown') }}'.
+          Check the inventory update job in Controller.
+
+    - name: Show AWS Inventory sync result
+      ansible.builtin.debug:
+        msg:
+          - "AWS Inventory synced; aws_mattermost should now be in Ansible Product Demos Inventory."
+          - "No manual inventory sync step is required after Provision Mattermost."

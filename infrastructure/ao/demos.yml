@@ -1,0 +1,90 @@
+---
+# Curated Automation Orchestrator demos seeded by
+# Infrastructure | Automation Orchestrator | Install.
+# Add a slug and set enabled: true to seed more demos later.
+
+ao_demos_repository: https://github.com/ansible-tmm/aap-orchestrator-demos
+ao_demos_ref: main
+ao_demos_project_name: AAP Orchestrator Demos
+ao_organization: Ansible Product Demos (APD)
+ao_inventory_name: Ansible Product Demos Inventory
+ao_aap_credential_name: APD AAP Token
+ao_aap_integration_name: APD AAP
+ao_machine_credential_name: APD Machine Credential
+ao_aws_credential_name: AWS
+ao_mattermost_credential_name: Mattermost
+# Controller credential (RHDP boot / setup.yml); Install JT attaches it for env injectors.
+ao_litemaas_credential_name: LiteMaaS
+# AO-native LLM assets created by seed from the Controller LiteMaaS credential.
+ao_llm_credential_name: APD LiteMaaS
+ao_llm_integration_name: APD LiteMaaS
+ao_llm_model: qwen3-235b
+# community.general (Mattermost module) ships in the APD EE image.
+ao_execution_environment_name: Product Demos EE
+
+ao_demos:
+  - slug: disk-utilization
+    enabled: true
+    workflow: disk-utilization/ao/disk-demo-101.json
+    inventory_limit: aws_rhel9
+    requires_cloud_stack: true
+    cloud_stack_hosts:
+      - aws_rhel9
+    requires_mattermost: true
+    job_templates:
+      - name: Disk Utilization Check
+        playbook: disk-utilization/playbooks/check_disk.yml
+        credentials:
+          - machine
+        limit: aws_rhel9
+      - name: Linux - Remediate - Continue
+        playbook: disk-utilization/playbooks/remediate_disk_continue.yml
+        credentials:
+          - machine
+        limit: aws_rhel9
+      - name: Linux - Remediate - Disk Cleanup
+        playbook: disk-utilization/playbooks/remediate_disk_cleanup.yml
+        credentials:
+          - machine
+        limit: aws_rhel9
+      - name: Linux - Remediate - Disk Expand
+        playbook: disk-utilization/playbooks/remediate_disk_expand.yml
+        credentials:
+          - machine
+          - aws
+        limit: aws_rhel9
+      - name: Disk Utilization - Fallback
+        playbook: disk-utilization/playbooks/remediate_disk_fallback.yml
+        credentials:
+          - machine
+        limit: aws_rhel9
+      - name: Notify Chatroom
+        playbook: disk-utilization/playbooks/notify_chatroom.yml
+        credentials:
+          - mattermost
+        ask_variables_on_launch: true
+
+  # Playbooks/JTs already live in product-demos cloud/setup.yml
+  # (Cloud | AWS | Snapshot/Patch/Restore/Compliance). Seed only imports
+  # the AO workflow and rewrites AAP org/credential placeholders.
+  - slug: multi-os-cloud-patching
+    enabled: true
+    workflow: multi-os-cloud-patching/ao/multi-os-cloud-patching.json
+    requires_cloud_stack: true
+    cloud_stack_hosts:
+      - aws_rhel8
+      - aws_rhel9
+      - aws-dc
+      - aws_win1
+      - reports
+    requires_mattermost: false
+    job_templates: []
+
+  # Local smoke-test for LiteMaaS → AO LLM wiring (no cloud/chat deps).
+  # workflow_local is relative to infrastructure/ao/.
+  - slug: task-step-example
+    enabled: true
+    workflow_local: workflows/task-step-example.json
+    requires_cloud_stack: false
+    requires_mattermost: false
+    job_templates: []

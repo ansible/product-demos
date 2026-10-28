@@ -1,0 +1,71 @@
+---
+- name: OPA | Add Policy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    _opa_namespace: '{{ opa_namespace | default("opa") }}'
+    _opa_policy_name: '{{ opa_policy_name }}'
+    _opa_policy_text: '{{ opa_policy_text }}'
+
+  tasks:
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - opa_policy_name is defined
+          - opa_policy_name | length > 0
+          - opa_policy_text is defined
+          - opa_policy_text | length > 0
+        fail_msg: "Both opa_policy_name and opa_policy_text are required."
+
+    - name: Look up OPA route
+      kubernetes.core.k8s_info:
+        api_version: route.openshift.io/v1
+        kind: Route
+        name: opa
+        namespace: '{{ _opa_namespace }}'
+      register: _opa_route
+
+    - name: Verify OPA route exists
+      ansible.builtin.assert:
+        that:
+          - _opa_route.resources | length > 0
+        fail_msg: "No OPA route found in namespace {{ _opa_namespace }}. Deploy OPA first."
+
+    - name: Set OPA URL
+      ansible.builtin.set_fact:
+        _opa_url: 'https://{{ _opa_route.resources[0].spec.host }}'
+
+    - name: Display policy to upload
+      ansible.builtin.debug:
+        msg:
+          - "OPA server: {{ _opa_url }}"
+          - "Policy name: {{ _opa_policy_name }}"
+          - "Policy text:"
+          - "{{ _opa_policy_text }}"
+
+    - name: Upload policy to OPA
+      ansible.builtin.uri:
+        url: '{{ _opa_url }}/v1/policies/{{ _opa_policy_name }}'
+        method: PUT
+        body: '{{ _opa_policy_text }}'
+        body_format: raw
+        status_code: 200
+        validate_certs: false
+      register: _upload_result
+
+    - name: Display upload result
+      ansible.builtin.debug:
+        msg:
+          - "========================================="
+          - "Policy '{{ _opa_policy_name }}' uploaded successfully"
+          - "========================================="
+          - "OPA server: {{ _opa_url }}"
+          - "Policy endpoint: {{ _opa_url }}/v1/policies/{{ _opa_policy_name }}"
+          - "---"
+          - "NOTE: This policy is in memory only and will not survive an OPA server reboot"
+          - "========================================="
+
+...
+# vim: ft=yaml.ansible

@@ -1,0 +1,37 @@
+---
+- name: Manage HashiCorp Vault on OpenShift
+  hosts: localhost
+  gather_facts: false
+  vars:
+    vault_operation: install
+  tasks:
+    - name: Validate vault_operation
+      ansible.builtin.assert:
+        that: vault_operation in ['install', 'uninstall']
+        fail_msg: "vault_operation must be 'install' or 'uninstall' (got '{{ vault_operation }}')"
+
+    - name: Determine vault tasks
+      vars:
+        _vault_install_tasks: ['install_k8s', 'configure_kv_engine', 'configure_userpass_auth']
+        _vault_uninstall_tasks: ['uninstall']
+      ansible.builtin.set_fact:
+        _vault_tasks: "{{ (vault_operation == 'install') | ternary(_vault_install_tasks, _vault_uninstall_tasks) }}"
+
+    - name: Run demo.infrastructure.vault
+      loop: "{{ _vault_tasks }}"
+      loop_control:
+        loop_var: function
+        label: "{{ function }}"
+      ansible.builtin.include_role:
+        name: demo.infrastructure.vault
+        tasks_from: "{{ function }}"
+
+    - name: Display Vault connection details for demo purposes
+      when: vault_operation == 'install'
+      vars:
+        vault_connection_details:
+          vault_addr: "{{ vault_addr }}"
+          vault_token: "{{ vault_token }}"
+          vault_userpass_credentials: "{{ vault_userpass_credentials | default(omit) }}"
+      ansible.builtin.debug:
+        var: vault_connection_details

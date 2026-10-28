@@ -1,5 +1,12 @@
 ---
-user_message:
+_deployment_id: '{{ lookup("ansible.builtin.password", playbook_dir + "/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
+apd_managed_by: aap-product-demos
+
+user_message: >-
+  Product Demos deploys one connected IOS-XE, Arista EOS, and Juniper vSRX lab.
+  Rebuild the Product Demos EE with the pinned network collections and Python dependencies.
+  Run Configure Devices, Validate Devices, and Report after deployment.
+  Redeployment replaces older product_demos and multi-vendor labs and resets device configuration.
 
 controller_credential_types:
   - name: SSH Proxy
@@ -78,6 +85,26 @@ controller_credential_types:
           password: !unsafe '{{ panos_password | default(omit) }}'
           username: !unsafe '{{ panos_username | default(omit) }}'
 
+  - name: SCP
+    description: SCP credentials for transferring files to network devices
+    kind: cloud
+    inputs:
+      fields:
+        - id: scp_user
+          label: SCP Username
+          type: string
+        - id: scp_password
+          label: SCP Password
+          secret: true
+          type: string
+      required:
+        - scp_user
+        - scp_password
+    injectors:
+      extra_vars:
+        scp_user: !unsafe '{{ scp_user }}'
+        scp_password: !unsafe '{{ scp_password }}'
+
 controller_credentials:
   - name: Palo Alto Firewall Admin
     description: Palo Alto administrator credentials used by the paloaltonetworks.panos collection
@@ -95,13 +122,20 @@ controller_credentials:
       ssh_proxy_host: REPLACEME
       ssh_proxy_username: ec2-user
   - name: Containerlab Device Access
-    description: Admin credentials for containerlab network devices (n9kv, cat8kv)
+    description: Admin credentials shared by Cisco, Juniper, and Arista lab devices
     organization: Ansible Product Demos (APD)
     credential_type: SSH Proxy
     inputs:
       ssh_proxy_host: REPLACEME
       ssh_proxy_username: admin
       ssh_proxy_password: "admin@123"
+  - name: SCP Credential
+    description: SCP credentials for staging IOS images to network devices
+    organization: Ansible Product Demos (APD)
+    credential_type: SCP
+    inputs:
+      scp_user: scpuser  # gitleaks:allow
+      scp_password: scpuser  # gitleaks:allow
   - name: Containerlab SSH
     description: SSH key for the containerlab hypervisor, updated by the provision playbook
     organization: Ansible Product Demos (APD)
@@ -117,45 +151,58 @@ controller_inventories:
     description: Containerlab network devices discovered via AWS EC2
 
 controller_hosts:
-  - name: n9kv
+  - name: cat8kv1
     inventory: ContainerLab Inventory
-    enabled: true
-  - name: cat8kv
+  - name: veos2
     inventory: ContainerLab Inventory
-    enabled: true
+  - name: vjunos3
+    inventory: ContainerLab Inventory
+  - name: veos4
+    inventory: ContainerLab Inventory
 
 controller_groups:
   - name: clab_nxos
     inventory: ContainerLab Inventory
-    hosts:
-      - n9kv
-    variables:
-      ansible_port: 2122
-      ansible_network_os: cisco.nxos.nxos
+    state: absent
   - name: clab_ios
     inventory: ContainerLab Inventory
-    hosts:
-      - cat8kv
+    hosts: [cat8kv1]
     variables:
-      ansible_port: 2123
       ansible_network_os: cisco.ios.ios
+      ansible_connection: ansible.netcommon.network_cli
+      ansible_connect_timeout: 900
+      ansible_command_timeout: 120
+  - name: clab_junos
+    inventory: ContainerLab Inventory
+    hosts: [vjunos3]
+    variables:
+      ansible_network_os: juniper.device.junos
+      ansible_connection: ansible.netcommon.netconf
+      ansible_netconf_port: !unsafe '{{ ansible_port }}'
+      ansible_connect_timeout: 1800
+      ansible_command_timeout: 120
+  - name: clab_eos
+    inventory: ContainerLab Inventory
+    hosts: [veos2, veos4]
+    variables:
+      ansible_network_os: arista.eos.eos
+      ansible_connection: ansible.netcommon.network_cli
+      ansible_connect_timeout: 900
+      ansible_command_timeout: 120
+      ansible_become: true
+      ansible_become_method: enable
   - name: clab_switches
     inventory: ContainerLab Inventory
-    hosts:
-      - n9kv
+    hosts: [veos2, veos4]
   - name: clab_routers
     inventory: ContainerLab Inventory
-    hosts:
-      - cat8kv
+    hosts: [cat8kv1, vjunos3]
   - name: containerlab
     inventory: ContainerLab Inventory
-    children:
-      - clab_nxos
-      - clab_ios
+    children: [clab_ios, clab_junos, clab_eos]
     variables:
       ansible_user: !unsafe '{{ ssh_proxy_username }}'
       ansible_password: !unsafe '{{ ssh_proxy_password }}'
-      ansible_connection: ansible.netcommon.network_cli
       ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
 
 controller_inventory_sources:
@@ -173,6 +220,8 @@ controller_inventory_sources:
         - us-west-2
       filters:
         tag:deployment: containerlab
+        tag:managed-by: "{{ apd_managed_by }}"
+        tag:apd_id: "{{ _deployment_id }}"
         instance-state-name: running
       compose:
         ansible_host: public_ip_address
@@ -192,6 +241,10 @@ controller_inventory_sources:
     source_vars:
       regions:
         - us-east-2
+      filters:
+        tag:managed-by: "{{ apd_managed_by }}"
+        tag:apd_id: "{{ _deployment_id }}"
+        instance-state-name: running
       compose:
         ansible_host: public_ip_address | default(private_ip_address)
         ansible_user: "'ec2-user'"
@@ -203,6 +256,12 @@ controller_inventory_sources:
 
 controller_templates:
   - name: "NETWORK | Containerlab | Provision Hypervisor"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - containerlab
+      - infrastructure
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -211,6 +270,9 @@ controller_templates:
     project: Ansible Product Demos
     playbook: network/provision_hypervisor.yml
     inventory: Ansible Product Demos Inventory
+    extra_vars:
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -228,13 +290,20 @@ controller_templates:
             - us-east-2
             - us-west-2
         - question_name: Instance Type
+          question_description: c8i.4xlarge is the validated four-device lab size (16 vCPU, 32 GiB); it costs more than the previous c8i.2xlarge default.
           type: multiplechoice
           variable: clab_aws_instance_type
           required: true
-          default: c8i.2xlarge
+          default: c8i.4xlarge
           choices:
             - c8i.2xlarge
             - c8i.4xlarge
+        - question_name: Allowed management source CIDR
+          question_description: Include AAP execution-node egress and presenter addresses. The default 0.0.0.0/0 exposes SSH, NETCONF, and the HTTP report publicly.
+          type: text
+          variable: clab_access_cidr
+          required: true
+          default: 0.0.0.0/0
         - question_name: Owner
           type: text
           variable: clab_aws_owner_tag
@@ -242,6 +311,12 @@ controller_templates:
           default: apd-demo
 
   - name: "NETWORK | Containerlab | Deploy Topology"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - containerlab
+      - infrastructure
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
@@ -251,42 +326,47 @@ controller_templates:
     project: Ansible Product Demos
     playbook: network/deploy_containerlab.yml
     inventory: Ansible Product Demos Inventory
+    extra_vars:
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: clab_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-2
+            - us-west-2
+        - question_name: Allowed management source CIDR
+          question_description: Include AAP execution-node egress and presenter addresses. The default 0.0.0.0/0 exposes SSH, NETCONF, and the HTTP report publicly.
+          type: text
+          variable: clab_access_cidr
+          required: true
+          default: 0.0.0.0/0
 
   - name: "NETWORK | Containerlab | Teardown Topology"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - containerlab
+      - infrastructure
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
       - AWS
       - Containerlab SSH
+      - AAP Credential
     project: Ansible Product Demos
     playbook: network/teardown_containerlab.yml
-    inventory: Ansible Product Demos Inventory
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-
-  - name: "NETWORK | Containerlab | Configure Devices"
-    job_type: run
-    organization: Ansible Product Demos (APD)
-    credentials:
-      - Containerlab Device Access
-    project: Ansible Product Demos
-    playbook: network/configure_devices.yml
-    inventory: ContainerLab Inventory
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-
-  - name: "NETWORK | Containerlab | Teardown Hypervisor"
-    job_type: run
-    organization: Ansible Product Demos (APD)
-    credentials:
-      - AWS
-    project: Ansible Product Demos
-    playbook: network/teardown_hypervisor.yml
     inventory: Ansible Product Demos Inventory
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -305,7 +385,113 @@ controller_templates:
             - us-east-2
             - us-west-2
 
+  - name: "NETWORK | Containerlab | Troubleshoot"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - containerlab
+      - infrastructure
+      - network
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - Containerlab SSH
+    project: Ansible Product Demos
+    playbook: network/troubleshoot_containerlab.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: clab_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-2
+            - us-west-2
+
+  - name: "NETWORK | Containerlab | Configure Devices"
+    labels:
+      - containerlab
+      - network
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - Containerlab Device Access
+    project: Ansible Product Demos
+    playbook: network/configure_devices.yml
+    inventory: ContainerLab Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+
+  - name: "NETWORK | Containerlab | Teardown Hypervisor"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - containerlab
+      - infrastructure
+      - network
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+    project: Ansible Product Demos
+    playbook: network/teardown_hypervisor.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: clab_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-2
+            - us-west-2
+
+  - name: "NETWORK | Containerlab | Validate Devices"
+    description: Validate EC2 KVM, resource usage, device facts, and configured lab connectivity
+    labels: [network, containerlab]
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: ContainerLab Inventory
+    project: Ansible Product Demos
+    playbook: network/validate_containerlab.yml
+    credentials:
+      - Containerlab Device Access
+      - Containerlab SSH
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Which devices should be validated?
+          type: multiplechoice
+          variable: _hosts
+          default: containerlab
+          required: true
+          choices: [clab_junos, containerlab, clab_ios, clab_eos]
+
   - name: "NETWORK | Report"
+    labels:
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: ContainerLab Inventory
@@ -316,6 +502,7 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - Containerlab Device Access
+      - Containerlab SSH
     survey_enabled: true
     survey:
       name: ''
@@ -328,10 +515,14 @@ controller_templates:
           required: true
           choices:
             - containerlab
-            - clab_nxos
             - clab_ios
+            - clab_junos
+            - clab_eos
 
   - name: "NETWORK | DISA STIG"
+    labels:
+      - compliance
+      - network
     job_type: check
     organization: Ansible Product Demos (APD)
     inventory: ContainerLab Inventory
@@ -356,9 +547,11 @@ controller_templates:
           required: true
           choices:
             - clab_ios
-            - cat8kv
+            - cat8kv1
 
   - name: "NETWORK | Backup"
+    labels:
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: ContainerLab Inventory
@@ -370,7 +563,65 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
 
+  - name: "NETWORK | Staging"
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: ContainerLab Inventory
+    project: "Ansible Product Demos"
+    playbook: "network/staging.yml"
+    credentials:
+      - Containerlab Device Access
+      - SCP Credential
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      scp_server: 172.20.20.11
+      sha_hash: >-
+        1627b090a42872b9b92d5fdd31f69356bf0f766cd24bcd2ccdc3c1b1bf642d965057288e49ecba96d8d683ecfc116c9a2f7381c739d60c23380ada498cea9f76
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Which IOS version to stage?
+          type: multiplechoice
+          variable: image_staging
+          required: true
+          default: 17.15.01a
+          choices:
+            - 17.15.01a
+
+  - name: "NETWORK | Upgrade"
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: ContainerLab Inventory
+    project: "Ansible Product Demos"
+    playbook: "network/upgrade.yml"
+    credentials:
+      - Containerlab Device Access
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Which IOS version for to upgrade?
+          type: multiplechoice
+          variable: image_upgrade
+          required: true
+          default: 17.15.01a
+          choices:
+            - 17.15.01a
+
   - name: "NETWORK | Panos | Deploy"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - infrastructure
+      - network
     playbook: network/panos/deploy.yml
     project: Ansible Product Demos
     credentials:
@@ -384,8 +635,12 @@ controller_templates:
     job_type: run
     extra_vars:
       aws_region: us-east-2
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
 
   - name: "NETWORK | Panos | Configure Firewall"
+    labels:
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
@@ -396,6 +651,8 @@ controller_templates:
       - Palo Alto Firewall Admin
 
   - name: "NETWORK | Panos | Configure Security Rule"
+    labels:
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
@@ -432,6 +689,8 @@ controller_templates:
             - "false"
 
   - name: "NETWORK | Panos | Configure Webserver"
+    labels:
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
@@ -443,6 +702,11 @@ controller_templates:
       - Palo Alto Bastion
 
   - name: "NETWORK | Panos | Cleanup"
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - infrastructure
+      - network
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
@@ -457,6 +721,11 @@ controller_templates:
 controller_workflows:
   - name: "NETWORK | Panos | Demo Firewall Workflow"
     description: A workflow to provision a firewall, web server, and security rule
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - infrastructure
+      - network
     inventory: Ansible Product Demos Inventory
     organization: Ansible Product Demos (APD)
     workflow_nodes:
@@ -505,6 +774,12 @@ controller_workflows:
 
   - name: "NETWORK | Deploy Containerlab Stack"
     description: Provision hypervisor then deploy containerlab topology
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - containerlab
+      - infrastructure
+      - network
     inventory: Ansible Product Demos Inventory
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
@@ -524,13 +799,20 @@ controller_workflows:
             - us-east-2
             - us-west-2
         - question_name: Instance Type
+          question_description: c8i.4xlarge is the validated four-device lab size (16 vCPU, 32 GiB); it costs more than the previous c8i.2xlarge default.
           type: multiplechoice
           variable: clab_aws_instance_type
           required: true
-          default: c8i.2xlarge
+          default: c8i.4xlarge
           choices:
             - c8i.2xlarge
             - c8i.4xlarge
+        - question_name: Allowed management source CIDR
+          question_description: Include AAP execution-node egress and presenter addresses. The default 0.0.0.0/0 exposes SSH, NETCONF, and the HTTP report publicly.
+          type: text
+          variable: clab_access_cidr
+          required: true
+          default: 0.0.0.0/0
         - question_name: Owner
           type: text
           variable: clab_aws_owner_tag
@@ -581,6 +863,11 @@ controller_workflows:
 
   - name: "NETWORK | Destroy Containerlab Stack"
     description: Tear down containerlab topology and all AWS resources
+    labels:
+      - aws.vpc
+      - aws.ec2
+      - infrastructure
+      - network
     inventory: Ansible Product Demos Inventory
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry

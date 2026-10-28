@@ -70,6 +70,6 @@ graph LR
 
 | Demo | Description |
 |------|-------------|
-| 🌐 [Configure Devices](./network-configuration.md) | Apply baseline configurations to containerlab NX-OS and IOS-XE devices |
+| 🌐 [Configure Devices](./network-configuration.md) | Apply vendor-native configurations to the connected Containerlab devices |
 | 🌐 [DISA STIG](./network-disa-stig.md) | Run network DISA STIG compliance checks on IOS-XE devices |
 | 🌐 [Report](./network-report.md) | Gather facts and display device summaries from containerlab devices |

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ acme_app_company }}</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-{{ acme_app_theme }} env-{{ acme_app_environment | lower }}">
+  <header class="hero">
+    <p class="env-badge">{{ acme_app_environment }}</p>
+    <h1>{{ acme_app_company }}</h1>
+    <p class="tagline">{{ acme_app_tagline }}</p>
+  </header>
+  <p class="banner">{{ acme_app_banner }}</p>
+  <main>
+    <article class="product">
+      <p class="sku">{{ acme_app_sku }}</p>
+      <h2>{{ acme_app_product }}</h2>
+      <p class="price">{{ acme_app_price }}</p>
+      <p class="blurb">{{ acme_app_product_blurb }}</p>
+    </article>
+  </main>
+  <footer>{{ acme_app_footer }}</footer>
+</body>
+</html>

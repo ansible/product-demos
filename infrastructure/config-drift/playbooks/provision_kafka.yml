@@ -1,0 +1,151 @@
+---
+- name: Provision Kafka EC2 instance in AWS
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    create_vm_vm_name: aws_kafka
+    vm_blueprint: kafka
+    create_vm_vm_blueprint: kafka
+    create_vm_vm_purpose: kafka
+    create_vm_apd_managed_by: aap-product-demos
+    create_vm_apd_demo_tag: "true"
+    create_vm_aws_keypair_name: aws-test-key
+    create_vm_aws_securitygroup_name: aws-test-sg
+    create_vm_aws_vpc_subnet_name: aws-test-subnet
+    create_vm_vm_deployment: cloud_stack
+
+  tasks:
+    - name: Fail if cloud networking variables are not defined
+      ansible.builtin.assert:
+        that:
+          - create_vm_aws_vpc_subnet_name is defined
+          - create_vm_aws_keypair_name is defined
+          - create_vm_aws_securitygroup_name is defined
+          - create_vm_aws_region is defined
+        fail_msg: >-
+          Set create_vm_aws_region, create_vm_aws_vpc_subnet_name,
+          create_vm_aws_securitygroup_name, and create_vm_aws_keypair_name
+          (defaults match Deploy Cloud Stack in AWS).
+
+    - name: Map owner tag for EC2 provisioning
+      ansible.builtin.set_fact:
+        create_vm_vm_owner: "{{ create_vm_aws_owner_tag }}"
+      when: create_vm_aws_owner_tag is defined
+
+    - name: Default deployment tag for Kafka VM
+      ansible.builtin.set_fact:
+        create_vm_vm_deployment: cloud_stack
+      when: create_vm_vm_deployment is not defined
+
+    - name: Default cloud networking for Kafka VM
+      ansible.builtin.set_fact:
+        create_vm_aws_keypair_name: aws-test-key
+        create_vm_aws_securitygroup_name: aws-test-sg
+        create_vm_aws_vpc_subnet_name: aws-test-subnet
+      when: create_vm_aws_keypair_name is not defined
+
+    - name: Default environment tag for Kafka VM
+      ansible.builtin.set_fact:
+        create_vm_vm_environment: Prod
+      when: create_vm_vm_environment is not defined
+
+    - name: Default owner tag for Kafka VM
+      ansible.builtin.set_fact:
+        create_vm_vm_owner: apd-demo
+      when: create_vm_vm_owner is not defined
+
+    - name: Ensure AWS keypair exists in EC2
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/../../../cloud/tasks/ensure_aws_keypair.yml"
+      vars:
+        aws_key_name: "{{ create_vm_aws_keypair_name }}"
+        aws_keypair_owner: "{{ create_vm_vm_owner }}"
+
+    - name: Create or reuse Kafka EC2 instance
+      ansible.builtin.include_role:
+        name: demo.cloud.aws
+        tasks_from: create_vm
+      vars:
+        create_vm_aws_image_owners: 309956199498
+        create_vm_aws_instance_size: t3.medium
+        create_vm_aws_image_architecture: x86_64
+        create_vm_aws_image_filter: 'RHEL-9*HVM-*Hourly*'
+
+    - name: Look up Kafka EC2 instance details
+      amazon.aws.ec2_instance_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          "tag:Name": "{{ create_vm_vm_name }}"
+          instance-state-name:
+            - pending
+            - running
+      register: config_drift_kafka_instance
+      until: config_drift_kafka_instance.instances | length > 0
+      retries: 12
+      delay: 5
+
+    - name: Assert Kafka instance is running
+      ansible.builtin.assert:
+        that: config_drift_kafka_instance.instances | length > 0
+        fail_msg: Kafka EC2 instance aws_kafka was not found after provisioning.
+
+    - name: Save Kafka broker connection details
+      ansible.builtin.set_fact:
+        config_drift_kafka_public_ip: "{{ config_drift_kafka_instance.instances[0].public_ip_address }}"
+        config_drift_kafka_private_ip: "{{ config_drift_kafka_instance.instances[0].private_ip_address }}"
+
+    - name: Register Kafka broker for configuration play
+      ansible.builtin.add_host:
+        name: aws_kafka
+        ansible_host: "{{ config_drift_kafka_public_ip }}"
+        ansible_user: ec2-user
+        groups: kafka_broker
+        kafka_private_ip: "{{ config_drift_kafka_private_ip }}"
+        kafka_public_ip: "{{ config_drift_kafka_public_ip }}"
+
+    - name: Show Kafka broker endpoints
+      ansible.builtin.debug:
+        msg:
+          - "Public IP: {{ config_drift_kafka_public_ip }}"
+          - "Private IP (use for Filebeat): {{ config_drift_kafka_private_ip }}:9092"
+          - "Public IP (use for EDA): {{ config_drift_kafka_public_ip }}:9095"
+          - "Presenter dashboard: http://{{ config_drift_kafka_public_ip }}/"
+          - "Sync AWS inventory, then run LINUX | Config Drift with Filebeat output set to kafka."
+
+    - name: Look up demo security group for Kafka external listener
+      amazon.aws.ec2_security_group_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          group-name: "{{ create_vm_aws_securitygroup_name }}"
+      register: config_drift_kafka_security_group
+
+    - name: Allow external Kafka listener port for EDA consumers
+      when: config_drift_kafka_security_group.security_groups | length > 0
+      amazon.aws.ec2_security_group:
+        name: "{{ create_vm_aws_securitygroup_name }}"
+        description: "{{ config_drift_kafka_security_group.security_groups[0].description }}"
+        region: "{{ create_vm_aws_region }}"
+        vpc_id: "{{ config_drift_kafka_security_group.security_groups[0].vpc_id }}"
+        purge_rules: false
+        rules:
+          - proto: tcp
+            ports:
+              - 9095
+            cidr_ip: 0.0.0.0/0
+
+- name: Deploy Podman KRaft Kafka on broker host
+  hosts: kafka_broker
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Wait for SSH on new Kafka instance
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+
+    - name: Deploy Kafka queue
+      ansible.builtin.include_role:
+        name: demo.config_drift.kafka_queue
+      vars:
+        kafka_private_ip: "{{ hostvars[inventory_hostname]['kafka_private_ip'] }}"
+        kafka_public_ip: "{{ hostvars[inventory_hostname]['kafka_public_ip'] }}"

@@ -1,0 +1,253 @@
+---
+# Create or update the AO AAP credential + integration used by workflow JT nodes.
+- name: Find the AO default project
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/projects?limit=100"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ ao_api_token }}"
+    validate_certs: false
+    return_content: true
+  register: ao_projects
+  no_log: true
+
+- name: Select AO project id
+  ansible.builtin.set_fact:
+    ao_demo_project_id: >-
+      {{
+        (
+          ao_projects.json.resources
+          | default(ao_projects.json.results | default([]))
+          | selectattr('is_default', 'equalto', true)
+          | map(attribute='id')
+          | first
+          | default(
+              (
+                ao_projects.json.resources
+                | default(ao_projects.json.results | default([]))
+                | map(attribute='id')
+                | first
+                | default('')
+              ),
+              true
+            )
+        )
+      }}
+
+- name: Require an AO project
+  ansible.builtin.assert:
+    that:
+      - ao_demo_project_id | length > 0
+    fail_msg: Automation Orchestrator has no project to attach credentials to.
+
+- name: List AO credential types
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/credential_types?limit=100"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ ao_api_token }}"
+    validate_certs: false
+    return_content: true
+  register: ao_credential_types
+  no_log: true
+
+- name: Resolve Ansible Automation Platform credential type id
+  ansible.builtin.set_fact:
+    ao_aap_credential_type_id: >-
+      {{
+        (
+          ao_credential_types.json.resources
+          | default(ao_credential_types.json.results | default([]))
+          | selectattr('name', 'equalto', 'Ansible Automation Platform')
+          | map(attribute='id')
+          | first
+          | default('')
+        )
+      }}
+
+- name: Require AAP credential type
+  ansible.builtin.assert:
+    that:
+      - ao_aap_credential_type_id | length > 0
+    fail_msg: AO credential type 'Ansible Automation Platform' was not found.
+
+- name: Find existing AO AAP credential
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/credentials?limit=100"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ ao_api_token }}"
+    validate_certs: false
+    return_content: true
+  register: ao_credentials
+  no_log: true
+
+- name: Select existing AO AAP credential
+  ansible.builtin.set_fact:
+    ao_existing_aap_credential: >-
+      {{
+        (
+          ao_credentials.json.resources
+          | default(ao_credentials.json.results | default([]))
+          | selectattr('name', 'equalto', ao_aap_credential_name)
+          | list
+          | first
+          | default({})
+        )
+      }}
+
+- name: Create AO AAP credential
+  when: ao_existing_aap_credential | length == 0
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/projects/{{ ao_demo_project_id }}/credentials"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ ao_api_token }}"
+      Content-Type: application/json
+    body_format: json
+    body:
+      name: "{{ ao_aap_credential_name }}"
+      description: Auto-wired by Ansible Product Demos
+      credential_type_id: "{{ ao_aap_credential_type_id }}"
+      inputs:
+        oauth_token: "{{ ao_aap_oauth_token }}"
+    validate_certs: false
+    status_code: [200, 201]
+  register: ao_aap_credential_create
+  no_log: true
+
+- name: Update AO AAP credential
+  when: ao_existing_aap_credential | length > 0
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/projects/{{ ao_demo_project_id }}/credentials/{{ ao_existing_aap_credential.id }}"
+    method: PATCH
+    headers:
+      Authorization: "Bearer {{ ao_api_token }}"
+      Content-Type: application/json
+    body_format: json
+    body:
+      name: "{{ ao_aap_credential_name }}"
+      description: Auto-wired by Ansible Product Demos
+      inputs:
+        oauth_token: "{{ ao_aap_oauth_token }}"
+    validate_certs: false
+    status_code: [200, 202]
+  register: ao_aap_credential_update
+  no_log: true
+
+- name: Store AO AAP credential id
+  ansible.builtin.set_fact:
+    ao_aap_credential_id: >-
+      {{
+        ao_existing_aap_credential.id
+        | default(ao_aap_credential_create.json.id, true)
+      }}
+  no_log: true
+
+- name: Find existing AO AAP integration
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/integrations?limit=100"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ ao_api_token }}"
+    validate_certs: false
+    return_content: true
+  register: ao_integrations
+  no_log: true
+
+- name: Select existing AO AAP integration
+  ansible.builtin.set_fact:
+    ao_existing_aap_integration: >-
+      {{
+        (
+          ao_integrations.json.resources
+          | default(ao_integrations.json.results | default([]))
+          | selectattr('name', 'equalto', ao_aap_integration_name)
+          | list
+          | first
+          | default({})
+        )
+      }}
+
+- name: Build AO AAP integration configuration
+  ansible.builtin.set_fact:
+    ao_aap_integration_config:
+      integration_type: ansible_automation_platform
+      base_url: "{{ ao_aap_base_url }}"
+      allow_http: true
+      insecure_skip_tls_verify: true
+
+- name: Create AO AAP integration
+  when: ao_existing_aap_integration | length == 0
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/integrations"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ ao_api_token }}"
+      Content-Type: application/json
+    body_format: json
+    body:
+      name: "{{ ao_aap_integration_name }}"
+      description: Auto-wired by Ansible Product Demos
+      integration_type: ansible_automation_platform
+      configuration: "{{ ao_aap_integration_config }}"
+      management_credential_id: "{{ ao_aap_credential_id }}"
+      enabled: true
+      scope: global
+    validate_certs: false
+    status_code: [200, 201]
+  register: ao_aap_integration_create
+  no_log: true
+
+- name: Update AO AAP integration
+  when: ao_existing_aap_integration | length > 0
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/integrations/{{ ao_existing_aap_integration.id }}"
+    method: PATCH
+    headers:
+      Authorization: "Bearer {{ ao_api_token }}"
+      Content-Type: application/json
+    body_format: json
+    body:
+      name: "{{ ao_aap_integration_name }}"
+      description: Auto-wired by Ansible Product Demos
+      configuration: "{{ ao_aap_integration_config }}"
+      management_credential_id: "{{ ao_aap_credential_id }}"
+      enabled: true
+      scope: global
+    validate_certs: false
+    status_code: [200, 202]
+  register: ao_aap_integration_update
+  no_log: true
+
+- name: Store AO AAP integration id
+  ansible.builtin.set_fact:
+    ao_aap_integration_id: >-
+      {{
+        ao_existing_aap_integration.id
+        | default(ao_aap_integration_create.json.id, true)
+      }}
+  no_log: true
+
+- name: Validate AO AAP integration
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/integrations/{{ ao_aap_integration_id }}/validate"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ ao_api_token }}"
+      Content-Type: application/json
+    body_format: json
+    body:
+      integration_type: ansible_automation_platform
+      configuration: "{{ ao_aap_integration_config }}"
+      credential_id: "{{ ao_aap_credential_id }}"
+    validate_certs: false
+    status_code: [200, 201, 202, 400, 422]
+  failed_when: false
+  no_log: true
+
+- name: Show AO AAP wiring result
+  ansible.builtin.debug:
+    msg: >-
+      AO AAP integration '{{ ao_aap_integration_name }}' is ready
+      (credential={{ ao_aap_credential_id }}, integration={{ ao_aap_integration_id }}).

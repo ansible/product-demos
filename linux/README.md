@@ -32,6 +32,7 @@ This category of demos shows examples of linux operations and management with An
 | [**Start Service**](docs/linux-start-service.md) | Start a named service on a target system. |
 | [**Stop Service**](docs/linux-stop-service.md) | Stop a named service on a target system. |
 | [**Run Shell Script**](docs/linux-run-shell-script.md) | Execute a shell script or command across a group of systems as root, with RBAC-controlled access. |
+| [**Add SSH Public Key**](docs/linux-install-ssh-key.md) | Add an SSH public key to a Linux user's authorized_keys file on one or more hosts. |
 | [**Fact Scan**](docs/linux-fact-scan.md) | Run a fact, package, and service scan against a system and store results in the AAP fact cache. |
 | [**Podman Webserver**](docs/linux-podman-webserver.md) | Install and run an Apache webserver in a Podman container with a configurable home page message. |
 | [**System Roles**](docs/linux-system-roles.md) | Apply RHEL System Roles (e.g. SELinux, timesync) to servers using the redhat.rhel_system_roles collection. |
@@ -67,6 +68,8 @@ Edit the `Linux / System Roles` job to include the list of roles that you wish t
 **Linux / Patching** - Use this job to apply updates or audit for missing updates and produce an html report of systems with missing updates. For a more comprehensive patching workflow that includes EC2 snapshots, pre/post verification, automatic rollback, and a compliance report across both RHEL and Windows, see [Patch Cloud Stack in AWS](../cloud/docs/patch-cloud-stack.md) in the Cloud demos. See the end of the job for the URL to view the report. In other environments this report could be uploaded to a wiki, email, other system. This demo also shows installing a webserver on a linux server. The report is places on the system defined by the `report_server` variable. By default, `report_server` is configured as `reports`. This may be overridden with `extra_vars` on the Job Template.
 
 **Linux / Run Shell Script** - Use this job to demonstrate running shell commands or an existing shell script across a group of systems as root. This can be preferred over using Ad-Hoc commands due to the ability to control usage with RBAC. This is helpful in showing the scalable of execution of an existing shell script. It is always recommended to convert shell scripts to playbooks over time. Example usage would be getting the public key used in the environment with the command `cat .ssh/authorized_keys`.
+
+**Linux / Add SSH Public Key** - Use this job to add your SSH public key (Ed25519, RSA, or ECDSA) to demo Linux hosts through the survey. Run it against `aws_rhel*` or another host pattern to enable manual SSH access without editing each system's `authorized_keys` by hand. See [Add SSH Public Key](docs/linux-install-ssh-key.md) for the full walkthrough. This is separate from **APD Machine Credential**, which Ansible uses for automation and cannot be exported from AAP after save.
 
 **Linux / Fact Scan** - Use this job to demonstrate the use of the Ansible Fact Cache, Ansible facts, and the ability to query installed packages and running services on a system.
 

@@ -1,0 +1,35 @@
+---
+- name: Verify cloud stack RHEL workers exist for config drift demo
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    config_drift_required_rhel_hosts:
+      - aws_rhel8
+      - aws_rhel9
+
+  tasks:
+    - name: List missing cloud stack RHEL workers
+      ansible.builtin.set_fact:
+        config_drift_missing_rhel_hosts: >-
+          {{
+            config_drift_required_rhel_hosts
+            | reject('in', groups['all'])
+            | list
+          }}
+
+    - name: Assert cloud stack RHEL workers are in inventory
+      ansible.builtin.assert:
+        that: config_drift_missing_rhel_hosts | length == 0
+        fail_msg: >-
+          Cloud stack RHEL workers not found in inventory:
+          {{ config_drift_missing_rhel_hosts | join(', ') }}.
+          The workflow will deploy the cloud stack next.
+
+    - name: Show cloud stack readiness
+      ansible.builtin.debug:
+        msg:
+          - Cloud stack RHEL workers found in inventory.
+          - "Hosts: {{ config_drift_required_rhel_hosts | join(', ') }}"
+          - Continuing with Kafka, Filebeat, and EDA setup.

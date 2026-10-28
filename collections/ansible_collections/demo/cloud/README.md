@@ -11,6 +11,7 @@ This collection is not published to Ansible Galaxy or Automation Hub; it exists 
 | Role | Description |
 |------|-------------|
 | [aws](roles/aws/README.md) | Create, resize, snapshot, restore, and destroy AWS EC2 instances and supporting VPC infrastructure. |
+| [ensure_rhel8_python](roles/ensure_rhel8_python/tasks/main.yml) | Pin Python 3.9 on RHEL 8 before Ansible module execution (ansible-core 2.16+ requires Python 3.8+ on targets). |
 | [build_report_s3](roles/build_report_s3/README.md) | Build and publish an HTML report to an S3-hosted static website. |
 | [build_report_linux](roles/build_report_linux/README.md) | Install Apache and build an HTML report from Linux services and packages facts. |
 | [manage_direct_peered_networks](roles/manage_direct_peered_networks/README.md) | Create or delete a direct VPC peering model (DMZ + private network) in AWS. |

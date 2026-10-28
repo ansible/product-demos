@@ -51,6 +51,8 @@ controller_templates:
       - AAP Credential
 
   - name: OpenShift | CNV | Install Operator
+    labels:
+      - openshift
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -63,6 +65,9 @@ controller_templates:
       - OpenShift Credential
 
   - name: OpenShift | CNV | Create RHEL VM
+    labels:
+      - openshift
+      - rhel
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -107,6 +112,8 @@ controller_templates:
       - OpenShift Credential
 
   - name: OpenShift | CNV | Create VM Snapshots
+    labels:
+      - openshift
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -135,6 +142,8 @@ controller_templates:
       - OpenShift Credential
 
   - name: OpenShift | CNV | Restore Latest VM Snapshots
+    labels:
+      - openshift
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -163,6 +172,8 @@ controller_templates:
       - OpenShift Credential
 
   - name: OpenShift | CNV | Delete VM
+    labels:
+      - openshift
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -191,6 +202,9 @@ controller_templates:
       - OpenShift Credential
 
   - name: OpenShift | CNV | Patch
+    labels:
+      - openshift
+      - patching
     job_type: check
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -214,6 +228,9 @@ controller_templates:
           required: true
 
   - name: OpenShift | CNV | Wait Hosts
+    labels:
+      - openshift
+      - patching
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
     playbook: "openshift/cnv/wait.yml"
@@ -232,6 +249,8 @@ controller_templates:
           required: true
 
   - name: OpenShift | Dev Spaces
+    labels:
+      - openshift
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -243,6 +262,8 @@ controller_templates:
       - OpenShift Credential
 
   - name: OpenShift | GitLab
+    labels:
+      - openshift
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
@@ -252,31 +273,6 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - OpenShift Credential
-
-  - name: OpenShift | Vault
-    job_type: run
-    inventory: Ansible Product Demos Inventory
-    project: "Ansible Product Demos"
-    playbook: "openshift/hashi_vault.yml"
-    notification_templates_started: Telemetry
-    notification_templates_success: Telemetry
-    notification_templates_error: Telemetry
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: Operation
-          type: multiplechoice
-          variable: vault_operation
-          required: true
-          default: install
-          choices:
-            - install
-            - uninstall
-    credentials:
-      - OpenShift Credential
-      - AAP Credential
 
   - name: OpenShift | Windows | Provision Infrastructure
     description: Provisions Windows Server VMs on OpenShift Virtualization for the BSOD recovery demo.
@@ -415,6 +411,9 @@ controller_templates:
 controller_workflows:
   - name: OpenShift | CNV | Infra Stack
     description: A workflow to deploy Virtualized infra in OCP Virtalization
+    labels:
+      - openshift
+      - rhel
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -468,6 +467,10 @@ controller_workflows:
 
   - name: OpenShift | CNV | Patch CNV Workflow
     description: A workflow to patch CNV instances with snapshot and restore on failure.
+    labels:
+      - openshift
+      - patching
+      - rhel
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry

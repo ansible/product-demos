@@ -1,0 +1,11 @@
+---
+acme_app_company: ACME Corp
+acme_app_tagline: Widgets you can trust
+acme_app_environment: Production
+acme_app_theme: redhat
+acme_app_banner: Welcome to the ACME storefront
+acme_app_product: Super Widget
+acme_app_price: "$19.99"
+acme_app_product_blurb: Our flagship widget. Built to last.
+acme_app_sku: ACME-1001
+acme_app_footer: Managed by Ansible Automation Platform

@@ -1,6 +1,6 @@
 ---
 - name: Targeted Windows security patching
-  hosts: "{{ _hosts_windows | default('os_windows') }}"
+  hosts: "{{ _hosts_windows | default('aws-dc:aws_win1') }}"
   gather_facts: false
 
   vars:

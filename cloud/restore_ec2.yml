@@ -1,6 +1,6 @@
 ---
 - name: Restore ec2 instance from snapshot
-  hosts: "{{ _hosts | default(omit) }}"
+  hosts: "{{ _hosts | default('aws_rhel8:aws_rhel9') }}:{{ _hosts_windows | default('aws-dc:aws_win1') }}"
   gather_facts: false
 
   tasks:

@@ -1,0 +1,17 @@
+---
+namespace: demo
+name: config_drift
+version: 1.0.0
+readme: README.md
+authors:
+  - Ansible Product Demos (https://github.com/ansible/product-demos)
+description: Roles for event-driven configuration drift detection and remediation demos.
+license:
+  - GPL-3.0-or-later
+tags:
+  - apd
+  - linux
+  - eda
+repository: https://github.com/ansible/product-demos
+issues: https://github.com/ansible/product-demos/issues
+...

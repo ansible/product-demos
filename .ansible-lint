@@ -44,6 +44,12 @@ mock_modules:
   - amazon.aws.s3_object_info
   - ansible.controller.credential
   - ansible.controller.host
+  - ansible.controller.settings
+  - ansible.eda.project_info
+  - ansible.eda.rulebook_info
+  - ansible.eda.rulebook_activation
+  - ansible.eda.rulebook_activation_info
+  - ansible.netcommon.cli_command
   - ansible.posix.at
   - ansible.posix.mount
   - ansible.posix.authorized_key
@@ -66,6 +72,7 @@ mock_modules:
   - ansible.windows.win_user
   - chocolatey.chocolatey.win_chocolatey
   - cisco.ios.ios_banner
+  - cisco.ios.ios_command
   - cisco.ios.ios_config
   - cisco.ios.ios_facts
   - cisco.ios.ios_ntp_global
@@ -73,11 +80,16 @@ mock_modules:
   - cisco.iosxr.iosxr_facts
   - cisco.nxos.nxos_banner
   - cisco.nxos.nxos_config
+  - cisco.nxos.nxos_feature
   - cisco.nxos.nxos_facts
   - cisco.nxos.nxos_ntp_global
   - cisco.nxos.nxos_snmp_server
   - community.aws.s3_sync
   - community.aws.s3_website
+  - arista.eos.eos_config
+  - juniper.device.junos_command
+  - juniper.device.junos_config
+  - community.general.seport
   - community.general.filesystem
   - community.general.modprobe
   - community.general.redhat_subscription
@@ -86,6 +98,7 @@ mock_modules:
   - containers.podman.podman_container
   - containers.podman.podman_image
   - kubernetes.core.k8s
+  - kubernetes.core.k8s_cluster_info
   - kubernetes.core.k8s_info
   - microsoft.ad.domain
   - microsoft.ad.group
@@ -99,6 +112,7 @@ mock_modules:
   - paloaltonetworks.panos.panos_security_rule
   - paloaltonetworks.panos.panos_zone
   - redhat.openshift.k8s
+  - redhat.openshift.openshift_route
   - redhat.openshift_virtualization.kubevirt_vm_info
   - redhat.satellite.content_view_version
   - redhat.satellite.scap_tailoring_file

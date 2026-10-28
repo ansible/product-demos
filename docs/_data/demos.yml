@@ -1,6 +1,6 @@
 ---
 # Ansible Product Demos – Demo Catalog
-# 62 demos across 6 categories
+# 67 demos across 7 categories
 
 # ─── Featured ───────────────────────────────────────────────────────
 
@@ -477,6 +477,23 @@
   stats:
     playbooks: 1
   github_path: linux/run_script.yml
+
+- slug: linux-install-ssh-key
+  readme_path: linux/docs/linux-install-ssh-key.md
+  url: /demos/linux-install-ssh-key/
+  title: "Add SSH Public Key"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Survey
+  thumbnail:
+    gradient: "linear-gradient(135deg, #d13438 0%, #7a0000 100%)"
+    icon: "🐧"
+  blurb: "Add an SSH public key to a Linux user's authorized_keys file on one or more hosts."
+  stats:
+    playbooks: 1
+  github_path: linux/install_ssh_key.yml
 
 - slug: linux-fact-scan
   readme_path: linux/docs/linux-fact-scan.md
@@ -996,6 +1013,72 @@
 
 # ─── Network ────────────────────────────────────────────────────────
 
+- slug: network-deploy-containerlab-stack
+  readme_path: network/docs/network-deploy-containerlab-stack.md
+  title: "Deploy Containerlab Stack"
+  subtitle: "Connected IOS-XE, EOS, and vSRX lab with inventory sync"
+  category: network
+  status: active
+  author: "Matthew Fernandez <matferna@redhat.com>"
+  featured: false
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+    - Containerlab
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0d9488 0%, #065f54 100%)"
+    icon: "🚀"
+  blurb: "Provision an AWS nested-virt hypervisor, deploy a connected Containerlab lab with IOS-XE, two EOS nodes, and vSRX, and sync ContainerLab Inventory."
+  stats:
+    workflows: 1
+    playbooks: 2
+  url: /demos/network-deploy-containerlab-stack/
+  github_path: network/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["🖥️ Provision Hypervisor"] --> B["📦 Deploy Topology"]
+      B --> C["🔄 Sync ContainerLab Inventory"]
+      A -. "on failure" .-> D["📋 Submit Feedback"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style C fill:#162c46,stroke:#58a6ff,color:#fff
+      style D fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: network-destroy-containerlab-stack
+  readme_path: network/docs/network-destroy-containerlab-stack.md
+  title: "Destroy Containerlab Stack"
+  category: network
+  status: active
+  author: "Matthew Fernandez <matferna@redhat.com>"
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+    - Containerlab
+  thumbnail:
+    gradient: "linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)"
+    icon: "💥"
+  blurb: "Tear down the containerlab topology and delete the AWS hypervisor, VPC, subnet, security group, and keypair."
+  stats:
+    workflows: 1
+    playbooks: 2
+  url: /demos/network-destroy-containerlab-stack/
+  github_path: network/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["📦 Teardown Topology"] -->|always| B["💥 Teardown Hypervisor"]
+      style A fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style B fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
 - slug: network-configuration
   readme_path: network/docs/network-configuration.md
   url: /demos/network-configuration/
@@ -1007,7 +1090,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #38b000 0%, #006400 100%)"
     icon: "🌐"
-  blurb: "Apply baseline banner, NTP, and SNMP configuration to containerlab Cisco NX-OS and IOS-XE devices."
+  blurb: "Configure connected IOS-XE, EOS, and Junos devices with native modules for interfaces, addressing, LLDP, NTP, and static routes."
   stats:
     playbooks: 1
   github_path: network/configure_devices.yml
@@ -1025,7 +1108,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)"
     icon: "🌐"
-  blurb: "Gather facts from containerlab Cisco NX-OS and IOS-XE devices and display hostname, version, model, and interfaces."
+  blurb: "Publish a detailed Cisco, Juniper, and Arista web report with operational observations and structured configuration."
   stats:
     playbooks: 1
   github_path: network/report.yml
@@ -1060,10 +1143,28 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #38b000 0%, #006400 100%)"
     icon: "🌐"
-  blurb: "Back up running configurations from containerlab NX-OS and IOS-XE devices to the execution node."
+  blurb: "Back up the connected Containerlab IOS-XE configuration to the execution node."
   stats:
     playbooks: 1
   github_path: network/backup.yml
+
+- slug: network-troubleshoot-containerlab
+  readme_path: network/docs/network-troubleshoot-containerlab.md
+  url: /demos/network-troubleshoot-containerlab/
+  title: "Troubleshoot Containerlab"
+  category: network
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - Troubleshooting
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)"
+    icon: "🌐"
+  blurb: "Collect hypervisor, containerlab, and podman diagnostics through AAP when manual SSH is unavailable."
+  stats:
+    playbooks: 1
+  github_path: network/troubleshoot_containerlab.yml
 
 - slug: network-panos-workflow
   readme_path: network/docs/network-panos-workflow.md
@@ -1387,3 +1488,390 @@
       style C fill:#3d1a1a,stroke:#cc0000,color:#fff
       style D fill:#162c46,stroke:#58a6ff,color:#fff
       style S fill:#212427,stroke:#8a8d90,color:#fff
+
+# ─── Infrastructure ──────────────────────────────────────────────────
+
+- slug: rosa-lifecycle
+  readme_path: infrastructure/docs/rosa-lifecycle.md
+  title: "Infrastructure | ROSA — Cluster Lifecycle"
+  subtitle: "Provision and destroy ROSA clusters with full preflight safety"
+  category: infrastructure
+  status: active
+  featured: false
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+    - OpenShift
+    - ROSA
+    - Lifecycle
+  thumbnail:
+    gradient: "linear-gradient(135deg, #ee0000 0%, #820000 100%)"
+    icon: "🌹"
+  blurb: "Automated ROSA cluster lifecycle: preflight checks, STS creation, readiness verification, and safe destruction with destroy-on-failure guardrails."
+  stats:
+    workflows: 2
+    playbooks: 4
+  url: /demos/rosa-lifecycle/
+  github_path: infrastructure/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      A["✅ Preflight Checks"] --> B["🚀 Create Cluster"]
+      B --> C["⏳ Wait for Ready"]
+      B -->|failure| D["💣 Destroy on Failure"]
+      C -->|failure| D
+      A -->|failure| E["📧 Preflight Failed"]
+      D -->|always| F["📧 Creation Failed"]
+      style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style B fill:#3d1a1a,stroke:#f87171,color:#fff
+      style C fill:#162c46,stroke:#58a6ff,color:#fff
+      style D fill:#4a1a1a,stroke:#cc0000,color:#fff
+      style E fill:#2d2d2d,stroke:#888,color:#fff
+      style F fill:#2d2d2d,stroke:#888,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: infrastructure-simple-config-drift
+  readme_path: infrastructure/docs/config-drift-simple.md
+  title: "Infrastructure | Simple Config Drift"
+  subtitle: "ACME App desired-state with Jinja2"
+  category: infrastructure
+  status: active
+  tags:
+    - Linux
+    - Survey
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1a365d 0%, #ee0000 100%)"
+    icon: "🛒"
+  blurb: "Install a tiny ACME storefront on aws_rhel9, then change the live page from a survey that re-renders one Jinja template."
+  stats:
+    playbooks: 2
+  url: /demos/infrastructure-simple-config-drift/
+  github_path: infrastructure/setup.yml
+  workflow_mermaid: |
+    flowchart LR
+      setup["ACME App Setup"]
+      httpd["httpd on aws_rhel9"]
+      page["index.html from Jinja"]
+      survey["Update Configuration survey"]
+      browser["Browser port 80"]
+
+      setup --> httpd
+      setup --> page
+      survey -->|"same template, overloaded vars"| page
+      page --> browser
+
+- slug: infrastructure-config-drift
+  readme_path: infrastructure/docs/config-drift.md
+  title: "Infrastructure | Config Drift Remediation"
+  subtitle: "auditd → Filebeat → Kafka → EDA → AAP self-healing"
+  category: infrastructure
+  status: active
+  tags:
+    - EDA
+    - Linux
+    - Kafka
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #ee0000 0%, #7a0000 100%)"
+    icon: "🔄"
+  blurb: "One-shot setup workflow plus live demo: detect sshd_config drift via auditd and Kafka, then let EDA trigger AAP remediation automatically."
+  stats:
+    playbooks: 6
+  url: /demos/infrastructure-config-drift/
+  github_path: infrastructure/setup.yml
+
+- slug: infrastructure-config-drift-kafka
+  readme_path: infrastructure/docs/config-drift-kafka.md
+  title: "Infrastructure | Config Drift — Kafka Queue"
+  subtitle: "Ship sshd_config audit events to a dedicated aws_kafka broker"
+  category: infrastructure
+  status: active
+  tags:
+    - Linux
+    - Kafka
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #231f20 0%, #ee0000 100%)"
+    icon: "📨"
+  blurb: "Provision Podman KRaft Kafka, wire Filebeat to topic linux-audit-events, and validate sshd_config_change events end-to-end."
+  stats:
+    playbooks: 2
+  url: /demos/infrastructure-config-drift-kafka/
+  github_path: infrastructure/setup.yml
+
+- slug: infrastructure-config-drift-eda
+  readme_path: infrastructure/docs/config-drift-eda.md
+  title: "Infrastructure | Config Drift — EDA Rulebook"
+  subtitle: "React to Kafka audit events and auto-remediate sshd_config"
+  category: infrastructure
+  status: active
+  tags:
+    - EDA
+    - Kafka
+    - Linux
+    - Compliance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #7a0000 0%, #231f20 100%)"
+    icon: "⚡"
+  blurb: "Activate the config_drift_kafka rulebook to listen on linux-audit-events and launch SSHD remediation when drift is detected."
+  stats:
+    playbooks: 2
+  url: /demos/infrastructure-config-drift-eda/
+  github_path: infrastructure/setup.yml
+
+- slug: rosa-preflight
+  readme_path: infrastructure/docs/rosa-lifecycle.md
+  url: /demos/rosa-preflight/
+  title: "Infrastructure | ROSA — Preflight Checks"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+    - ROSA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0969da 0%, #033d8b 100%)"
+    icon: "🌹"
+  blurb: "Validate AWS identity, ROSA token, EIP and VPC quota, and account roles before attempting cluster creation."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/rosa/preflight.yml
+
+- slug: rosa-create
+  readme_path: infrastructure/docs/rosa-lifecycle.md
+  url: /demos/rosa-create/
+  title: "Infrastructure | ROSA — Create Cluster"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+    - ROSA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #d13438 0%, #7a0000 100%)"
+    icon: "🌹"
+  blurb: "Create a ROSA cluster in STS mode with auto-provisioned account roles, EIP management, and configurable compute options."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/rosa/create.yml
+
+- slug: rosa-wait
+  readme_path: infrastructure/docs/rosa-lifecycle.md
+  url: /demos/rosa-wait/
+  title: "Infrastructure | ROSA — Wait for Ready"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+    - ROSA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #0097a7 0%, #00606f 100%)"
+    icon: "🌹"
+  blurb: "Poll ROSA cluster status until ready, then create a cluster-admin user and display login credentials."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/rosa/wait.yml
+
+- slug: rosa-destroy
+  readme_path: infrastructure/docs/rosa-lifecycle.md
+  url: /demos/rosa-destroy/
+  title: "Infrastructure | ROSA — Destroy Cluster"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - AWS
+    - ROSA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)"
+    icon: "🌹"
+  blurb: "Tear down a ROSA cluster by name and wait for full resource cleanup including AWS infrastructure."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/rosa/destroy.yml
+
+- slug: opa-policy-as-code
+  readme_path: infrastructure/docs/opa-policy-as-code.md
+  title: "Infrastructure | OPA — Policy as Code"
+  subtitle: "Enforce governance policies on AAP job execution with Open Policy Agent"
+  category: infrastructure
+  status: active
+  featured: false
+  tags:
+    - Playbook
+    - Survey
+    - OpenShift
+    - OPA
+    - Policy
+    - Governance
+  thumbnail:
+    gradient: "linear-gradient(135deg, #566b78 0%, #2c3e50 100%)"
+    icon: "🛡️"
+  blurb: "Deploy Open Policy Agent on OpenShift and configure AAP Policy as Code to enforce maintenance windows, superuser restrictions, and custom Rego policies."
+  stats:
+    playbooks: 2
+  url: /demos/opa-policy-as-code/
+  github_path: infrastructure/setup.yml
+
+- slug: opa-deploy
+  readme_path: infrastructure/docs/opa-policy-as-code.md
+  url: /demos/opa-deploy/
+  title: "Infrastructure | OPA — Deploy Open Policy Agent"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - OpenShift
+    - OPA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #566b78 0%, #2c3e50 100%)"
+    icon: "🛡️"
+  blurb: "Deploy OPA on OpenShift with bundled Rego policies and configure AAP's Policy as Code settings."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/opa/deploy-opa.yml
+
+- slug: opa-add-policy
+  readme_path: infrastructure/docs/opa-policy-as-code.md
+  url: /demos/opa-add-policy/
+  title: "Infrastructure | OPA — Add Policy"
+  category: infrastructure
+  status: active
+  tags:
+    - Playbook
+    - Survey
+    - OpenShift
+    - OPA
+  thumbnail:
+    gradient: "linear-gradient(135deg, #566b78 0%, #2c3e50 100%)"
+    icon: "🛡️"
+  blurb: "Upload a custom Rego policy to a running OPA server via the REST API at runtime."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/opa/add-policy.yml
+
+- slug: automation-orchestrator
+  readme_path: infrastructure/docs/automation-orchestrator.md
+  title: "Infrastructure | Automation Orchestrator — Hub (Start Here)"
+  subtitle: "Path 1: one JT for AO · Path 2: seed demos that actually run"
+  category: infrastructure
+  status: active
+  featured: false
+  author: "Roger Lopez"
+  author_url: "https://github.com/rlopez133"
+  tags:
+    - Playbook
+    - OpenShift
+    - Orchestrator
+    - Hub
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
+    icon: "🎼"
+  blurb: "Path 1 is one Install JT for AO. Path 2 adds Cloud Stack + Mattermost so seeded demos (disk-utilization) run end-to-end — then present."
+  stats:
+    playbooks: 3
+  url: /demos/automation-orchestrator/
+  github_path: infrastructure/setup.yml
+  workflow_mermaid: |
+    flowchart LR
+      P1["Path 1"] --> I1["AO Install"]
+      I1 --> AO["AO ready"]
+      P2["Path 2"] --> REQ["Setup deps"]
+      REQ --> I2["AO Install"]
+      I2 --> R["Ready to present"]
+      style P1 fill:#2d2d2d,stroke:#888,color:#fff
+      style I1 fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style AO fill:#162c46,stroke:#58a6ff,color:#fff
+      style P2 fill:#2d2d2d,stroke:#888,color:#fff
+      style REQ fill:#1a3d2e,stroke:#3dd68c,color:#fff
+      style I2 fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style R fill:#162c46,stroke:#58a6ff,color:#fff
+
+- slug: automation-orchestrator-install
+  readme_path: infrastructure/docs/automation-orchestrator.md
+  url: /demos/automation-orchestrator-install/
+  title: "Infrastructure | Automation Orchestrator — Install"
+  category: infrastructure
+  status: active
+  author: "Roger Lopez"
+  author_url: "https://github.com/rlopez133"
+  tags:
+    - Playbook
+    - OpenShift
+    - Orchestrator
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
+    icon: "🎼"
+  blurb: "Main AO job — aapctl, network allow-list, AAP wiring, curated demo seed. See the Hub for optional Cloud Stack / Mattermost."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/ao/install.yml
+
+- slug: automation-orchestrator-network
+  readme_path: infrastructure/docs/automation-orchestrator.md
+  url: /demos/automation-orchestrator-network/
+  title: "Infrastructure | Automation Orchestrator — Network Configuration"
+  category: infrastructure
+  status: active
+  author: "Roger Lopez"
+  author_url: "https://github.com/rlopez133"
+  tags:
+    - Playbook
+    - OpenShift
+    - Orchestrator
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
+    icon: "🎼"
+  blurb: "Optional re-run of allow-listing — Install already does this on RHDP. See the AO Hub (Start Here)."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/ao/network-access.yml
+
+- slug: automation-orchestrator-uninstall
+  readme_path: infrastructure/docs/automation-orchestrator.md
+  url: /demos/automation-orchestrator-uninstall/
+  title: "Infrastructure | Automation Orchestrator — Uninstall"
+  category: infrastructure
+  status: active
+  author: "Roger Lopez"
+  author_url: "https://github.com/rlopez133"
+  tags:
+    - Playbook
+    - OpenShift
+    - Orchestrator
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1e3a5f 0%, #0b1f33 100%)"
+    icon: "🎼"
+  blurb: "Tear down AO when done — keeps the shared RHDP cluster clean. See the AO Hub (Start Here)."
+  stats:
+    playbooks: 1
+  github_path: infrastructure/ao/uninstall.yml
+
+- slug: infrastructure-mattermost
+  readme_path: infrastructure/docs/mattermost.md
+  title: "Infrastructure | AWS — Provision Mattermost"
+  subtitle: "Shared Mattermost chat host for AO and other notification demos"
+  category: infrastructure
+  status: active
+  tags:
+    - AWS
+    - Orchestrator
+    - Chat
+  thumbnail:
+    gradient: "linear-gradient(135deg, #231f20 0%, #005c99 100%)"
+    icon: "💬"
+  blurb: "Provision aws_mattermost with Podman Mattermost, create a bot token, and write it to a Mattermost Controller credential for AO Notify Chatroom and other demos."
+  stats:
+    playbooks: 1
+  url: /demos/infrastructure-mattermost/
+  github_path: infrastructure/setup.yml

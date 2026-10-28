@@ -1,0 +1,4 @@
+---
+reports_aws_region: us-east-1
+# When empty, the role derives reports-pd-<AWS account ID> at runtime.
+reports_aws_bucket_name: ""

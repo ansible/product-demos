@@ -5,6 +5,7 @@
 sean_login_info.yml
 .DS_Store
 .idea/
+:memory:.ses
 choose_demo.yml
 choose_demo_example_azure.yml
 choose_demo_example_aws.yml
@@ -17,6 +18,8 @@ roles/*
 .cache/
 .ansible/
 **/tmp/
+__pycache__/
+*.pyc
 execution_environments/context/
 
 # Build artifact — source of truth is <section>/docs/<slug>.md

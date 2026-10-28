@@ -1,0 +1,66 @@
+---
+- name: Introduce sshd_config drift for demo
+  hosts: "{{ _hosts | default('aws_rhel*') }}"
+  become: true
+  gather_facts: false
+  ignore_unreachable: true
+
+  vars:
+    ansible_python_interpreter: auto_silent
+
+  tasks:
+    - name: Ensure RHEL 8 uses a supported Python for Ansible modules
+      ansible.builtin.include_role:
+        name: demo.cloud.ensure_rhel8_python
+
+    - name: Gather facts after interpreter is pinned
+      ansible.builtin.setup:
+
+    - name: Check OS family
+      ansible.builtin.assert:
+        that: ansible_os_family == 'RedHat'
+        fail_msg: This demo supports RHEL hosts only.
+
+    - name: Show current PermitRootLogin setting
+      ansible.builtin.command:
+        cmd: grep -i Root /etc/ssh/sshd_config
+      register: config_drift_sshd_before
+      changed_when: false
+      failed_when: false
+
+    - name: Display sshd_config before drift
+      ansible.builtin.debug:
+        msg:
+          - "Before drift on {{ inventory_hostname }}:"
+          - "$ sudo cat /etc/ssh/sshd_config | grep Root"
+          - "{{ config_drift_sshd_before.stdout_lines | default(['(no PermitRootLogin line found)']) }}"
+
+    - name: Set PermitRootLogin to yes (configuration drift)
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: PermitRootLogin yes
+        backup: true
+
+    - name: Validate sshd configuration after drift
+      ansible.builtin.command:
+        cmd: sshd -t
+      changed_when: false
+
+    - name: Show PermitRootLogin setting after drift
+      ansible.builtin.command:
+        cmd: grep -i Root /etc/ssh/sshd_config
+      register: config_drift_sshd_after
+      changed_when: false
+      failed_when: false
+
+    - name: Display sshd_config after drift
+      ansible.builtin.debug:
+        msg:
+          - "After drift on {{ inventory_hostname }} (private IP {{ private_ip_address | default('unknown') }}):"
+          - "$ sudo cat /etc/ssh/sshd_config | grep Root"
+          - "{{ config_drift_sshd_after.stdout_lines }}"
+          - >-
+            auditd should emit sshd_config_change events to Kafka. Watch for
+            LINUX | SSHD Configuration Remediation to launch from EDA within
+            about 20 seconds.

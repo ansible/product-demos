@@ -1,0 +1,47 @@
+---
+# Mint or reuse an AAP gateway token for the AO AAP credential.
+- name: Prefer CONTROLLER_OAUTH_TOKEN from the AAP Credential
+  ansible.builtin.set_fact:
+    ao_aap_oauth_token: "{{ _controller_oauth_token }}"
+  when: _controller_oauth_token | length > 0
+  no_log: true
+
+- name: Mint an AAP gateway token when OAuth token is not injected
+  when: ao_aap_oauth_token | default('') | length == 0
+  block:
+    - name: Require Controller username and password to mint a token
+      ansible.builtin.assert:
+        that:
+          - _controller_username | length > 0
+          - _controller_password | length > 0
+        fail_msg: >-
+          Attach an AAP Credential that provides CONTROLLER_OAUTH_TOKEN, or
+          CONTROLLER_USERNAME and CONTROLLER_PASSWORD.
+
+    - name: Create AAP gateway token for AO
+      ansible.builtin.uri:
+        url: "{{ _controller_host }}/api/gateway/v1/tokens/"
+        method: POST
+        user: "{{ _controller_username }}"
+        password: "{{ _controller_password }}"
+        force_basic_auth: true
+        body_format: json
+        body:
+          description: APD Automation Orchestrator integration
+          scope: write
+        validate_certs: false
+        status_code: [200, 201]
+      register: ao_gateway_token
+      no_log: true
+
+    - name: Store minted AAP gateway token
+      ansible.builtin.set_fact:
+        ao_aap_oauth_token: "{{ ao_gateway_token.json.token }}"
+      no_log: true
+
+- name: Require an AAP token for AO wiring
+  ansible.builtin.assert:
+    that:
+      - ao_aap_oauth_token | length > 0
+    fail_msg: Could not resolve an AAP OAuth token for the AO AAP integration.
+  no_log: true

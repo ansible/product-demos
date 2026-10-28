@@ -16,6 +16,8 @@ priv_network_instance_name: priv-network-vm
 priv_network_instance_ami_owner: "{{ omit }}"
 priv_network_instance_ami_architecture: x86_64
 priv_network_instance_ami_filter: RHEL-8*HVM-*Hourly*
+apd_managed_by: aap-product-demos
+apd_id: ""
 transit_gateway_asn: 64514
 transit_gateway_auto_associate: true
 transit_gateway_auto_propagate: true

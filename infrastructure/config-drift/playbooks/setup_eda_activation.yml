@@ -1,0 +1,296 @@
+---
+- name: Activate config drift Kafka rulebook in EDA
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    config_drift_eda_project: Ansible Product Demos
+    config_drift_eda_decision_environment: Product Demos DE
+    config_drift_eda_decision_environment_image: >-
+      registry.redhat.io/ansible-automation-platform-27/de-minimal-rhel9:latest
+    config_drift_eda_rulebook: config_drift_kafka.yml
+    config_drift_eda_activation_name: config_drift_kafka
+    config_drift_kafka_topic: linux-audit-events
+    config_drift_kafka_external_port: 9095
+    config_drift_apd_organization: Ansible Product Demos (APD)
+    config_drift_eda_aap_credential_host: >-
+      {{
+        lookup('ansible.builtin.env', 'CONTROLLER_HOST')
+        | regex_replace('/$', '')
+      }}/api/controller
+
+  tasks:
+    - name: Resolve Kafka broker from inventory
+      ansible.builtin.set_fact:
+        config_drift_kafka_broker_host: >-
+          {{
+            hostvars['aws_kafka']['public_ip_address']
+            | default(hostvars['aws_kafka']['ansible_host'])
+          }}
+
+    - name: Assert Kafka broker is in inventory
+      ansible.builtin.assert:
+        that:
+          - "'aws_kafka' in hostvars"
+          - config_drift_kafka_broker_host | length > 0
+        fail_msg: >-
+          Host aws_kafka was not found in inventory. Run Infrastructure |
+          AWS - Provision Kafka Queue, sync AWS inventory, then re-run this job.
+
+    - name: Look up Ansible Product Demos Controller project via API
+      ansible.builtin.set_fact:
+        config_drift_controller_project: >-
+          {{
+            query(
+              'ansible.controller.controller_api',
+              'projects',
+              query_params={'name': config_drift_eda_project},
+              expect_one=true,
+              return_objects=true
+            ) | first
+          }}
+
+    - name: Assert Controller project exists for EDA SCM mirror
+      ansible.builtin.assert:
+        that: config_drift_controller_project.scm_url | default('') | length > 0
+        fail_msg: >-
+          Controller project {{ config_drift_eda_project }} was not found.
+          Sync the Ansible Product Demos Controller project before running
+          this job.
+
+    - name: Set EDA SCM facts from Controller project
+      ansible.builtin.set_fact:
+        config_drift_eda_scm_url: "{{ config_drift_controller_project.scm_url }}"
+        config_drift_eda_scm_branch: "{{ config_drift_controller_project.scm_branch }}"
+        config_drift_eda_scm_credential: >-
+          {{
+            config_drift_controller_project.summary_fields.credential.name
+            | default('', true)
+          }}
+
+    - name: Show EDA activation parameters
+      ansible.builtin.debug:
+        msg:
+          - "Broker: {{ config_drift_kafka_broker_host }}:9092"
+          - "Topic: {{ config_drift_kafka_topic }}"
+          - "Rulebook: {{ config_drift_eda_rulebook }}"
+          - "Activation: {{ config_drift_eda_activation_name }}"
+          - "Decision environment: {{ config_drift_eda_decision_environment }}"
+          - "Decision environment image: {{ config_drift_eda_decision_environment_image }}"
+          - "EDA project SCM: {{ config_drift_eda_scm_url }} @ {{ config_drift_eda_scm_branch }}"
+
+    - name: Ensure EDA project mirrors Controller SCM
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.eda_projects
+      vars:
+        eda_projects:
+          - name: "{{ config_drift_eda_project }}"
+            description: Ansible Product Demos rulebooks and extensions
+            organization: "{{ config_drift_apd_organization }}"
+            url: "{{ config_drift_eda_scm_url }}"
+            scm_branch: "{{ config_drift_eda_scm_branch }}"
+            credential: "{{ config_drift_eda_scm_credential if config_drift_eda_scm_credential | length > 0 else omit }}"
+            sync: false
+
+    - name: Look up EDA project details
+      ansible.eda.project_info:
+        name: "{{ config_drift_eda_project }}"
+      register: config_drift_eda_project_info
+
+    - name: Set EDA project record fact
+      ansible.builtin.set_fact:
+        config_drift_eda_project_record: "{{ config_drift_eda_project_info.projects | first }}"
+
+    - name: Update EDA project SCM branch and URL from Controller
+      ansible.builtin.uri:
+        url: >-
+          {{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') | regex_replace('/$', '') }}/api/eda/v1/projects/{{
+          config_drift_eda_project_record.id }}/
+        method: PATCH
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN')}
+            if lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN') | default('', true) | length > 0
+            else omit
+          }}
+        url_username: >-
+          {{
+            lookup('ansible.builtin.env', 'CONTROLLER_USERNAME')
+            if lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN') | default('', true) | length == 0
+            else omit
+          }}
+        url_password: >-
+          {{
+            lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD')
+            if lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN') | default('', true) | length == 0
+            else omit
+          }}
+        force_basic_auth: "{{ lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN') | default('', true) | length == 0 }}"
+        body_format: json
+        body:
+          url: "{{ config_drift_eda_scm_url }}"
+          scm_branch: "{{ config_drift_eda_scm_branch }}"
+        status_code: 200
+        validate_certs: "{{ lookup('ansible.builtin.env', 'CONTROLLER_VERIFY_SSL') | default(false) | bool }}"
+
+    - name: Refresh EDA project record after SCM update
+      ansible.eda.project_info:
+        name: "{{ config_drift_eda_project }}"
+      register: config_drift_eda_project_info
+
+    - name: Set EDA project record fact
+      ansible.builtin.set_fact:
+        config_drift_eda_project_record: "{{ config_drift_eda_project_info.projects | first }}"
+
+    - name: Trigger EDA project sync
+      ansible.builtin.uri:
+        url: >-
+          {{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') | regex_replace('/$', '') }}/api/eda/v1/projects/{{
+          config_drift_eda_project_record.id }}/sync/
+        method: POST
+        headers: >-
+          {{
+            {'Authorization': 'Bearer ' ~ lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN')}
+            if lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN') | default('', true) | length > 0
+            else omit
+          }}
+        url_username: >-
+          {{
+            lookup('ansible.builtin.env', 'CONTROLLER_USERNAME')
+            if lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN') | default('', true) | length == 0
+            else omit
+          }}
+        url_password: >-
+          {{
+            lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD')
+            if lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN') | default('', true) | length == 0
+            else omit
+          }}
+        force_basic_auth: "{{ lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN') | default('', true) | length == 0 }}"
+        body_format: json
+        body: {}
+        status_code: [200, 201, 202]
+        validate_certs: "{{ lookup('ansible.builtin.env', 'CONTROLLER_VERIFY_SSL') | default(false) | bool }}"
+
+    - name: Wait for EDA project sync to complete
+      ansible.eda.project_info:
+        name: "{{ config_drift_eda_project }}"
+      register: config_drift_eda_project_sync_status
+      until: >-
+        config_drift_eda_project_sync_status.projects[0].import_state == 'completed'
+      retries: 30
+      delay: 10
+
+    - name: Assert EDA project sync succeeded
+      ansible.builtin.assert:
+        that:
+          - config_drift_eda_project_sync_status.projects[0].import_state == 'completed'
+          - config_drift_eda_project_sync_status.projects[0].import_error | default('', true) | length == 0
+        fail_msg: >-
+          EDA project sync failed (branch={{
+          config_drift_eda_project_sync_status.projects[0].scm_branch | default('unknown')
+          }}): {{
+          config_drift_eda_project_sync_status.projects[0].import_error | default('unknown error', true)
+          }}
+
+    - name: Verify config drift rulebook is available in EDA project
+      ansible.eda.rulebook_info:
+        name: config_drift_kafka.yml
+        project_name: "{{ config_drift_eda_project }}"
+      register: config_drift_eda_rulebook_info
+
+    - name: Assert config drift rulebook is indexed by EDA
+      ansible.builtin.assert:
+        that: config_drift_eda_rulebook_info.rulebooks | length > 0
+        fail_msg: >-
+          Rulebook {{ config_drift_eda_rulebook }} was not found after syncing
+          {{ config_drift_eda_project }} @ {{ config_drift_eda_scm_branch }}.
+          Confirm the file exists on that branch and re-run this job.
+
+    - name: Ensure EDA decision environment exists
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.eda_decision_environments
+      vars:
+        eda_decision_environments:
+          - name: "{{ config_drift_eda_decision_environment }}"
+            description: Product Demos decision environment for config drift rulebooks
+            organization: "{{ config_drift_apd_organization }}"
+            image_url: "{{ config_drift_eda_decision_environment_image }}"
+
+    - name: Ensure EDA AAP credential exists for run_job_template actions
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.eda_credentials
+      vars:
+        eda_credentials:
+          - name: AAP Credential
+            description: RH AAP credential for config drift rulebook job launches
+            organization: "{{ config_drift_apd_organization }}"
+            credential_type: Red Hat Ansible Automation Platform
+            inputs:
+              host: "{{ config_drift_eda_aap_credential_host }}"
+              oauth_token: >-
+                {{
+                  lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN')
+                  | default(lookup('ansible.builtin.env', 'AAP_TOKEN'), true)
+                  | default(omit, true)
+                }}
+              username: >-
+                {{
+                  lookup('ansible.builtin.env', 'CONTROLLER_USERNAME')
+                  | default(lookup('ansible.builtin.env', 'AAP_USERNAME'), true)
+                  | default(omit, true)
+                }}
+              password: >-
+                {{
+                  lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD')
+                  | default(lookup('ansible.builtin.env', 'AAP_PASSWORD'), true)
+                  | default(omit, true)
+                }}
+              verify_ssl: "{{ lookup('ansible.builtin.env', 'CONTROLLER_VERIFY_SSL') | default(false) | bool }}"
+
+    - name: Look up existing config drift rulebook activation
+      ansible.eda.rulebook_activation_info:
+        name: "{{ config_drift_eda_activation_name }}"
+      register: config_drift_existing_activation
+
+    - name: Disable existing config drift rulebook activation before update
+      ansible.eda.rulebook_activation:
+        name: "{{ config_drift_eda_activation_name }}"
+        organization: "{{ config_drift_apd_organization }}"
+        state: disabled
+      when: config_drift_existing_activation.activations | length > 0
+
+    - name: Wait for config drift rulebook activation to stop
+      ansible.eda.rulebook_activation_info:
+        name: "{{ config_drift_eda_activation_name }}"
+      register: config_drift_activation_stop_wait
+      until: >-
+        not config_drift_activation_stop_wait.activations[0].is_enabled
+        and config_drift_activation_stop_wait.activations[0].status
+        not in ['running', 'starting', 'pending']
+      retries: 30
+      delay: 10
+      when: config_drift_existing_activation.activations | length > 0
+
+    - name: Configure EDA rulebook activation
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.eda_rulebook_activations
+      vars:
+        eda_rulebook_activations:
+          - name: "{{ config_drift_eda_activation_name }}"
+            description: >-
+              Listen for sshd_config_change audit events on Kafka topic
+              linux-audit-events and launch SSHD remediation.
+            organization: "{{ config_drift_apd_organization }}"
+            project: "{{ config_drift_eda_project }}"
+            rulebook: "{{ config_drift_eda_rulebook }}"
+            decision_environment: "{{ config_drift_eda_decision_environment }}"
+            eda_credentials:
+              - AAP Credential
+            enabled: true
+            restart_policy: always
+            extra_vars:
+              config_drift_kafka_broker_host: "{{ config_drift_kafka_broker_host }}"
+              config_drift_kafka_broker_port: "{{ config_drift_kafka_external_port }}"
+              config_drift_kafka_topic: "{{ config_drift_kafka_topic }}"

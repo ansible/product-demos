@@ -1,4 +1,4 @@
 ---
-create_vm_aws_instance_size: t3.micro
+create_vm_aws_instance_size: t3.medium
 create_vm_aws_image_architecture: x86_64
 create_vm_aws_image_filter: 'al2023-ami-2023*'

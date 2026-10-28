@@ -3,19 +3,110 @@
   hosts: localhost
   connection: local
   gather_facts: false
+  tags: [always]
 
   roles:
     - role: demo.network.containerlab
 
   tasks:
+    - name: Check the selected management access scope
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: check_access
+
+    - name: Discover hypervisor IP from EC2 tags
+      amazon.aws.ec2_instance_info:
+        region: "{{ clab_aws_region | default('us-east-2') }}"
+        filters:
+          "tag:deployment": containerlab
+          "tag:purpose": "{{ clab_aws_purpose_tag }}"
+          instance-state-name: running
+      register: clab_discovered
+      when: clab_host_ip is not defined
+
+    - name: Set host IP from discovery
+      ansible.builtin.set_fact:
+        clab_host_ip: "{{ clab_discovered.instances[0].public_ip_address }}"
+        clab_instance_id: "{{ clab_discovered.instances[0].instance_id }}"
+      when:
+        - clab_host_ip is not defined
+        - clab_discovered.instances | length > 0
+
+    - name: Warn when multiple containerlab hypervisors are running
+      ansible.builtin.debug:
+        msg: >-
+          Found {{ clab_discovered.instances | length }} running containerlab hypervisors in
+          {{ clab_aws_region | default('us-east-2') }}. Using
+          {{ clab_instance_id | default('unknown') }} at {{ clab_host_ip }}.
+      when:
+        - clab_discovered.instances is defined
+        - clab_discovered.instances | length > 1
+
     - name: Validate required variables
       ansible.builtin.assert:
         that:
           - clab_host_ip is defined
           - clab_aws_keypair_name is defined
         fail_msg: >-
-          clab_host_ip and clab_aws_keypair_name must be set.
-          Run provision_hypervisor.yml first or pass them as extra vars.
+          No running containerlab hypervisor found in {{ clab_aws_region | default('us-east-2') }}.
+          Run NETWORK | Deploy Containerlab Stack first or pass clab_host_ip as an extra variable.
+
+    - name: Resolve target VPC for management port rules
+      amazon.aws.ec2_instance_info:
+        region: "{{ clab_aws_region }}"
+        instance_ids: "{{ [clab_instance_id] if clab_instance_id is defined else omit }}"
+        filters: "{{ {'ip-address': clab_host_ip} if clab_instance_id is not defined else omit }}"
+      register: clab_target_metadata
+
+    - name: Require an unambiguous EC2 target
+      ansible.builtin.assert:
+        that:
+          - clab_target_metadata.instances | length == 1
+        fail_msg: Could not resolve the selected EC2 hypervisor in this region.
+
+    - name: Refresh APD inventory discovery tags
+      amazon.aws.ec2_tag:
+        region: "{{ clab_aws_region }}"
+        resource: "{{ clab_target_metadata.instances[0].instance_id }}"
+        state: present
+        tags:
+          managed-by: "{{ apd_managed_by | default('aap-product-demos') }}"
+          apd_id: "{{ apd_id }}"
+      when: apd_id is defined
+
+    - name: Refresh management port rules for existing lab deployments
+      amazon.aws.ec2_security_group:
+        name: "{{ clab_aws_sg_name }}"
+        description: Containerlab hypervisor - SSH and port-mapped device access
+        region: "{{ clab_aws_region }}"
+        vpc_id: "{{ clab_target_metadata.instances[0].vpc_id }}"
+        rules: "{{ clab_security_group_rules }}"
+        purge_rules: true
+        state: present
+
+    - name: Display hypervisor target
+      ansible.builtin.debug:
+        msg:
+          - "Deploying topology on hypervisor {{ clab_host_ip }}"
+          - "Instance ID: {{ clab_instance_id | default('not discovered') }}"
+          - "Region: {{ clab_aws_region | default('us-east-2') }}"
+
+    - name: Verify hypervisor SSH is reachable from execution node
+      ansible.builtin.wait_for:
+        host: "{{ clab_host_ip }}"
+        port: 22
+        timeout: 30
+      register: clab_hypervisor_ssh_check
+      failed_when: false
+
+    - name: Stop when hypervisor SSH is unreachable
+      ansible.builtin.fail:
+        msg: >-
+          Hypervisor {{ clab_instance_id | default('unknown') }} at {{ clab_host_ip }} is tagged
+          running in AWS but SSH port 22 is unreachable from the execution node. Reboot the
+          instance in the EC2 console, verify its security group allows TCP 22, or run
+          NETWORK | Destroy Containerlab Stack and redeploy the full stack.
+      when: clab_hypervisor_ssh_check.failed
 
     - name: Add hypervisor to inventory
       ansible.builtin.add_host:
@@ -24,12 +115,14 @@
         ansible_user: "{{ clab_aws_admin_user }}"
         ansible_ssh_private_key_file: "{{ (lookup('ansible.builtin.env', 'AWX_HOST') | length > 0) | ternary(omit, playbook_dir + '/' + clab_aws_keypair_name + '.pem') }}"
         ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        clab_host_ip: "{{ clab_host_ip }}"
         groups: clab_hosts
 
 - name: Configure Hypervisor and Deploy Topology
   hosts: clab-hypervisor
   become: true
   gather_facts: true
+  tags: [deploy]
 
   roles:
     - role: demo.network.containerlab
@@ -94,6 +187,18 @@
         params: nested=1
         state: present
 
+    - name: Check hardware virtualization before starting devices
+      ansible.builtin.stat:
+        path: /dev/kvm
+      register: clab_kvm_device
+
+    - name: Require an accessible KVM device
+      ansible.builtin.assert:
+        that:
+          - clab_kvm_device.stat.exists
+          - clab_kvm_device.stat.ischr
+        fail_msg: This hypervisor does not expose /dev/kvm. Validate EC2 nested virtualization before deploying the lab.
+
     - name: Install podman
       ansible.builtin.package:
         name: podman
@@ -152,61 +257,104 @@
       args:
         creates: /usr/bin/containerlab
 
-    - name: Copy topology files
+    - name: Discover previously deployed topology
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: discover_active
+
+    - name: Stop existing Product Demos and legacy split deployments
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: destroy_topology
+      vars:
+        clab_destroy_required: true
+      loop: "{{ clab_active_topologies | list }}"
+      loop_control:
+        loop_var: clab_destroy_topology
+
+    - name: Remove report from the previous deployment
+      ansible.builtin.file:
+        path: /var/www/html/network
+        state: absent
+
+    - name: Render topology and device bootstrap configurations
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: render_configs
+
+    - name: Configure persistent report web server
+      ansible.builtin.include_role:
+        name: demo.network.report_server
+
+    - name: Include the selected topology in the deployment record
+      ansible.builtin.set_fact:
+        clab_active_topologies: "{{ [clab_topology] }}"
+
+    - name: Record deployed topologies for teardown and diagnostics
       ansible.builtin.copy:
-        src: "{{ clab_files_path }}"
-        dest: ~/clab/
+        dest: "{{ clab_root_dir }}/active_topology"
+        content: "{{ clab_active_topologies | join('\n') }}\n"
         mode: '0644'
 
     - name: Deploy containerlab topology
       ansible.builtin.command:
         cmd: containerlab deploy --reconfigure --runtime podman
-        chdir: "/root/clab/{{ clab_topology }}/"
+        chdir: "{{ clab_root_dir }}/{{ clab_topology }}/"
       environment:
         DOCKER_HOST: "unix:///run/user/1000/podman/podman.sock"
       retries: 2
       changed_when: true
       register: clab_deploy
 
-    - name: Wait for n9kv SSH to become available
+    - name: Wait for device management services
       ansible.builtin.wait_for:
-        port: 2122
-        host: 0.0.0.0
-        delay: 30
-        timeout: 600
-
-    - name: Wait for cat8kv SSH to become available
-      ansible.builtin.wait_for:
-        port: 2123
-        host: 0.0.0.0
-        delay: 30
-        timeout: 600
+        port: "{{ item.value.port }}"
+        host: 127.0.0.1
+        search_regex: SSH
+        timeout: "{{ item.value.timeout }}"
+      loop: "{{ clab_devices | dict2items }}"
+      loop_control:
+        label: "{{ item.key }} ({{ item.value.connection }})"
 
     - name: Display device connection information
       ansible.builtin.debug:
-        msg:
-          - "Containerlab topology '{{ clab_topology }}' deployed successfully"
-          - ""
-          - "Device connections (from outside AWS):"
-          - "  n9kv:   ssh -p 2122 admin@{{ clab_host_ip }}  (password: admin@123)"
-          - "  cat8kv: ssh -p 2123 admin@{{ clab_host_ip }}  (password: admin@123)"
-      vars:
-        clab_host_ip: "{{ ansible_host }}"
+        msg: "{{ item.key }}: ssh -p {{ item.value.ssh_port }} {{ clab_device_username }}@{{ ansible_host }}"
+      loop: "{{ clab_devices | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
 
 - name: Update ContainerLab Inventory in AAP
   hosts: localhost
   connection: local
   gather_facts: false
+  tags: [inventory]
+
+  roles:
+    - role: demo.network.containerlab
 
   tasks:
     - name: Update device hosts in AAP inventory
       ansible.controller.host:
-        name: "{{ item }}"
+        name: "{{ item.key }}"
         inventory: ContainerLab Inventory
+        enabled: true
         variables:
           ansible_host: "{{ clab_host_ip }}"
+          ansible_port: "{{ item.value.port }}"
+          ansible_network_os: "{{ item.value.network_os }}"
+          ansible_connection: "{{ item.value.connection }}"
+          ansible_connect_timeout: "{{ item.value.timeout }}"
+          ansible_command_timeout: 120
         state: present
-      loop:
-        - n9kv
-        - cat8kv
+      loop: "{{ clab_device_catalog | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+      when: lookup('ansible.builtin.env', 'AWX_HOST') | length > 0
+
+    - name: Remove retired device hosts from the previous topology
+      ansible.controller.host:
+        name: "{{ item }}"
+        inventory: ContainerLab Inventory
+        state: absent
+      loop: "{{ clab_retired_devices }}"
       when: lookup('ansible.builtin.env', 'AWX_HOST') | length > 0

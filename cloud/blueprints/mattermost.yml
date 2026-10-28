@@ -1,0 +1,7 @@
+---
+# Mattermost host blueprint — same AMI class as RHEL9 workers; kept separate
+# so sizing can diverge without coupling to aws_rhel9.
+create_vm_aws_image_owners: 309956199498
+create_vm_aws_instance_size: t3.medium
+create_vm_aws_image_architecture: x86_64
+create_vm_aws_image_filter: 'RHEL-9*HVM-*Hourly*'

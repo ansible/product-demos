@@ -1,0 +1,136 @@
+---
+- name: ROSA | Create Cluster
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  environment:
+    AWS_DEFAULT_REGION: "{{ rosa_aws_region | default('us-east-1') }}"
+
+  tasks:
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - rosa_cluster_name | length > 0
+          - rosa_aws_region | length > 0
+          - rosa_token is defined and rosa_token | length > 0
+        fail_msg: "Missing required variables for cluster creation."
+
+    - name: Log in to ROSA
+      ansible.builtin.command:
+        cmd: rosa login --token={{ rosa_token }}
+      changed_when: false
+      no_log: true
+
+    - name: Ensure ROSA account roles exist
+      ansible.builtin.command:
+        cmd: >-
+          rosa create account-roles
+          --mode=auto
+          --yes
+      register: _account_roles
+      changed_when: "'Created' in _account_roles.stdout"
+
+    - name: Display account roles output
+      ansible.builtin.debug:
+        msg: "{{ _account_roles.stderr_lines + _account_roles.stdout_lines }}"
+
+    - name: Count total allocated EIPs
+      ansible.builtin.command:
+        cmd: >-
+          aws ec2 describe-addresses
+          --query "length(Addresses)"
+          --output text
+      changed_when: false
+      register: _total_eips
+
+    - name: Check EIP quota
+      ansible.builtin.command:
+        cmd: >-
+          aws service-quotas get-service-quota
+          --service-code ec2
+          --quota-code L-0263D0A3
+          --query "Quota.Value"
+          --output text
+      changed_when: false
+      register: _eip_quota
+
+    - name: Calculate available EIP quota slots
+      ansible.builtin.set_fact:
+        _eip_slots_free: "{{ (_eip_quota.stdout | trim | int) - (_total_eips.stdout | trim | int) }}"
+
+    - name: Display EIP status
+      ansible.builtin.debug:
+        msg: >-
+          EIP quota: {{ _eip_quota.stdout | trim }},
+          allocated: {{ _total_eips.stdout | trim }},
+          free slots: {{ _eip_slots_free }}.
+          ROSA needs at least 1 free slot to allocate its own EIPs.
+
+    - name: Free up EIP quota by releasing an unassociated address
+      when: _eip_slots_free | int < 1
+      block:
+        - name: Find unassociated EIPs
+          ansible.builtin.command:
+            cmd: >-
+              aws ec2 describe-addresses
+              --query "Addresses[?AssociationId==null].AllocationId"
+              --output json
+          changed_when: false
+          register: _unassociated_eips
+
+        - name: Fail if no EIPs can be released
+          ansible.builtin.fail:
+            msg: >-
+              EIP quota is full ({{ _eip_quota.stdout | trim }}) and all EIPs are
+              in use (none unassociated). Release an EIP manually or request a quota
+              increase in AWS console before creating a ROSA cluster.
+          when: (_unassociated_eips.stdout | from_json) | length < 1
+
+        - name: Release one unassociated EIP to free quota for ROSA
+          ansible.builtin.command:
+            cmd: >-
+              aws ec2 release-address
+              --allocation-id {{ (_unassociated_eips.stdout | from_json)[0] }}
+          changed_when: true
+
+        - name: Confirm EIP released
+          ansible.builtin.debug:
+            msg: "Released EIP {{ (_unassociated_eips.stdout | from_json)[0] }} to free quota for ROSA."
+
+    - name: Build cluster creation command
+      ansible.builtin.set_fact:
+        _rosa_create_cmd: >-
+          rosa create cluster
+          --cluster-name={{ rosa_cluster_name }}
+          --region={{ rosa_aws_region | default('us-east-1') }}
+          --replicas={{ rosa_compute_nodes | default(2) }}
+          --compute-machine-type={{ rosa_compute_machine_type | default('m5.xlarge') }}
+          {{ '--multi-az' if (rosa_multi_az | default(false)) | bool else '' }}
+          {{ ('--version=' + rosa_version) if (rosa_version | default('')) | length > 0 else '' }}
+          --tags=owner:{{ rosa_owner_tag | default('apd-demo') }},managed-by:aap-product-demos,ttl:{{ rosa_ttl | default('4h') }}
+          --watch=false
+          --sts
+          --mode=auto
+          --yes
+
+    - name: Display create command (sanitized)
+      ansible.builtin.debug:
+        msg: "{{ _rosa_create_cmd }}"
+
+    - name: Create ROSA cluster
+      ansible.builtin.command:
+        cmd: "{{ _rosa_create_cmd }}"
+      register: _rosa_create
+      changed_when: "'Cluster' in _rosa_create.stdout"
+
+    - name: Display create output
+      ansible.builtin.debug:
+        msg: "{{ _rosa_create.stdout_lines }}"
+
+    - name: Record cluster creation timestamp
+      ansible.builtin.debug:
+        msg: >-
+          Cluster '{{ rosa_cluster_name }}' creation initiated at {{ now(utc=true) }}.
+          Expected ready in 30-45 minutes. TTL tag: {{ rosa_ttl | default('4h') }}.
+          COST WARNING: Cluster incurs charges from creation until destruction.
