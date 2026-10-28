@@ -989,9 +989,10 @@
       F --> G["🔌 Test Connectivity"]
       G --> H["🏰 Create Domain"]
       H --> I["🤝 Join Domain"]
-      I --> J["🔄 Domain Inventory Sync"]
+      I --> J["🔄 AWS Inventory Sync"]
+      I --> N["🔄 AD LDAP Inventory Sync"]
       J --> K["⚡ PowerShell Validation"]
-      J --> L["🔐 Kerberos Validation"]
+      N --> L["🔐 Kerberos Validation"]
       G -. "any failure" .-> M["🧹 Cleanup Resources"]
       H -. "any failure" .-> M
       I -. "any failure" .-> M
@@ -1005,6 +1006,7 @@
       style H fill:#2d1f4e,stroke:#a78bfa,color:#fff
       style I fill:#2d1f4e,stroke:#a78bfa,color:#fff
       style J fill:#2d2d2d,stroke:#888,color:#fff
+      style N fill:#2d2d2d,stroke:#888,color:#fff
       style K fill:#162c46,stroke:#58a6ff,color:#fff
       style L fill:#162c46,stroke:#58a6ff,color:#fff
       style M fill:#4a1a1a,stroke:#ef4444,color:#fff

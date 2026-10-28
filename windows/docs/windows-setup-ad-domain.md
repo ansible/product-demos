@@ -19,9 +19,10 @@ graph LR
   F --> G["🔌 Test Connectivity"]
   G --> H["🏰 Create Domain"]
   H --> I["🤝 Join Domain"]
-  I --> J["🔄 Domain Inventory Sync"]
+  I --> J["🔄 AWS Inventory Sync"]
+  I --> N["🔄 AD LDAP Inventory Sync"]
   J --> K["⚡ PowerShell Validation"]
-  J --> L["🔐 Kerberos Validation"]
+  N --> L["🔐 Kerberos Validation"]
   G -. "any failure" .-> M["🧹 Cleanup Resources"]
   H -. "any failure" .-> M
   I -. "any failure" .-> M
@@ -33,7 +34,8 @@ graph LR
 3. **Inventory Sync + Test Connectivity** — Verifies all three VMs are reachable
 4. **Create Domain** — Promotes the DC to a domain controller
 5. **Join Domain** — Joins the two computers to the new domain
-6. **Validation** (parallel) — Tests PowerShell and Kerberos authentication
+6. **Inventory Sync** (parallel) — Refreshes the AWS dynamic inventory and the AD LDAP inventory to pick up domain membership
+7. **Validation** (parallel) — Tests PowerShell and Kerberos authentication
 
 On any failure, the **Cleanup Resources** rollback node runs automatically.
 
@@ -68,6 +70,8 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 | WINDOWS ǀ Test Connectivity | [`windows/connect.yml`](../connect.yml) | Validates WinRM connectivity to all three Windows hosts |
 | WINDOWS ǀ AD ǀ Create Domain | [`windows/create_ad_domain.yml`](../create_ad_domain.yml) | Promotes dc01 to domain controller and creates the ANSIBLE.LOCAL domain |
 | WINDOWS ǀ AD ǀ Join Domain | [`windows/join_ad_domain.yml`](../join_ad_domain.yml) | Joins winston and winthrop to the Active Directory domain |
+| AWS Inventory (Post-Join) | `(inventory sync)` | Re-syncs the AWS dynamic inventory after domain join |
+| AD LDAP Inventory | `(inventory sync)` | Syncs the AD LDAP inventory via `microsoft.ad.ldap` to discover domain-joined hosts |
 | WINDOWS ǀ Run PowerShell (Validation) | [`windows/powershell.yml`](../powershell.yml) | Runs Get-ADComputer on the domain controller to list joined computers |
 | WINDOWS ǀ Run PowerShell ǀ Kerberos (Validation) | [`windows/powershell.yml`](../powershell.yml) | Validates Kerberos authentication by querying Security event logs |
 | WINDOWS ǀ Rollback (Cleanup) | [`windows/rollback.yml`](../rollback.yml) | Cleans up resources if any workflow step fails |
@@ -94,6 +98,9 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 - This is a complete infrastructure-to-validation workflow. It provisions VMs, configures Active Directory, and proves it works — all in one click.
 - Parallel VM creation with dependency management is a key AAP workflow feature. Three VMs deploy simultaneously, but domain join waits for all three to be ready.
 - The automatic cleanup on failure means you never leave orphaned resources in AWS. If domain creation fails, everything rolls back.
+- Two inventory sync paths included:
+  - amazon.aws.ec2 - dynamic group creation using tags for domain specific roles
+  - microsoft.ad.ldap - demonstrate leveraging the ldap plugin to generate an inventory from Active Directory
 - Kerberos validation is the real proof — it shows the domain is functional, not just provisioned.
 - After this workflow completes, you can pivot to the Helpdesk New User demo to show AD user management.
 
