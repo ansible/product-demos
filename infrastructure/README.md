@@ -58,6 +58,14 @@ Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route eve
 | **Infrastructure | OPA - Deploy Open Policy Agent on OpenShift** | Deploys a demo (non-production) OPA on OpenShift, loads bundled Rego policies into a ConfigMap, and configures AAP's Policy as Code settings |
 | **Infrastructure | OPA - Add Policy** | Uploads a Rego policy to OPA via the REST API (in-memory only, does not persist across pod restarts) |
 
+### OpenFlake (ITSM)
+
+#### Jobs
+
+| Job Template | Description |
+|--------------|-------------|
+| [**Infrastructure ǀ OpenShift - Provision OpenFlake**](docs/openflake.md) | Installs or removes OpenFlake — a lightweight ITSM platform with a ServiceNow-compatible REST API — on OpenShift via its bundled Helm chart |
+
 ## Post Setup
 
 After running `APD | Single demo setup` with `demo: infrastructure`:

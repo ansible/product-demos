@@ -1,0 +1,78 @@
+---
+- name: Uninstall the OpenFlake release
+  kubernetes.core.helm:
+    release_name: '{{ _openflake_release_name }}'
+    release_namespace: '{{ _openflake_namespace }}'
+    binary_path: '{{ _openflake_helm_binary | default(omit, true) }}'
+    host: '{{ _openflake_api_url }}'
+    api_key: '{{ _openflake_api_key }}'
+    validate_certs: '{{ _openflake_validate_certs | bool }}'
+    wait: '{{ _openflake_wait | bool }}'
+    wait_timeout: '{{ _openflake_wait_timeout }}'
+    release_state: absent
+
+# `helm uninstall --wait` returns once the API objects are deleted, but pods
+# can linger through their termination grace period. Confirm they are gone
+# before touching the namespace, so a delete does not race the teardown.
+- name: Wait for the release's workloads to disappear
+  kubernetes.core.k8s_info:
+    kind: '{{ item }}'
+    namespace: '{{ _openflake_namespace }}'
+    label_selectors:
+      - 'app.kubernetes.io/instance={{ _openflake_release_name }}'
+      - 'app.kubernetes.io/part-of=openflake'
+  register: _openflake_leftovers
+  retries: '{{ _openflake_verify_retries }}'
+  delay: '{{ _openflake_verify_delay }}'
+  until: (_openflake_leftovers.resources | default([]) | length) == 0
+  loop:
+    - Deployment
+    - StatefulSet
+    - Pod
+
+# `helm uninstall` leaves both PVCs behind: the attachments claim carries
+# helm.sh/resource-policy=keep, and the Postgres claim belongs to the
+# StatefulSet's volumeClaimTemplate.
+- name: Delete the persistent volume claims
+  when:
+    - _openflake_remove_pvcs | bool
+    # Skipped when the namespace is going away anyway: deleting the claims and
+    # then the namespace means waiting out the same teardown twice.
+    - not (_openflake_remove_namespace | bool)
+  block:
+    - name: Find the claims belonging to this release
+      kubernetes.core.k8s_info:
+        kind: PersistentVolumeClaim
+        namespace: '{{ _openflake_namespace }}'
+        label_selectors:
+          - 'app.kubernetes.io/instance={{ _openflake_release_name }}'
+          - 'app.kubernetes.io/part-of=openflake'
+      register: _openflake_pvcs
+
+    - name: Delete each claim
+      kubernetes.core.k8s:
+        state: absent
+        api_version: v1
+        kind: PersistentVolumeClaim
+        namespace: '{{ _openflake_namespace }}'
+        name: '{{ item.metadata.name }}'
+        wait: true
+      loop: '{{ _openflake_pvcs.resources | default([]) }}'
+      loop_control:
+        label: '{{ item.metadata.name }}'
+
+- name: Remove the namespace
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: Namespace
+    name: '{{ _openflake_namespace }}'
+    wait: true
+    wait_timeout: '{{ _openflake_namespace_delete_timeout | int }}'
+  when: _openflake_remove_namespace | bool
+
+- name: Report the teardown
+  ansible.builtin.debug:
+    msg: >-
+      OpenFlake release '{{ _openflake_release_name }}' removed from
+      namespace '{{ _openflake_namespace }}'.

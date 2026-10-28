@@ -1,0 +1,179 @@
+# Default values for the OpenFlake OpenShift chart.
+#
+# Minimal install:
+#   helm install openflake deploy/helm/openflake \
+#     -n openflake --create-namespace \
+#     --set route.host=openflake.apps.example.com
+#
+# Leaving route.host empty is supported: OpenShift generates a hostname, and
+# the chart's NOTES output tells you how to feed it back in so that baseUrl
+# and CORS match the real URL.
+
+# -- Override the chart name used in resource names.
+nameOverride: ""
+# -- Override the full release-qualified name used in resource names.
+fullnameOverride: ""
+
+image:
+  # -- Registry and organization holding the OpenFlake images.
+  registry: quay.io/zleblanc
+  # -- Tag applied to both images unless overridden per component.
+  tag: latest
+  pullPolicy: IfNotPresent
+  # -- Names of image pull secrets, e.g. [{name: my-quay-secret}].
+  pullSecrets: []
+
+serviceAccount:
+  # -- Create a ServiceAccount for the workloads.
+  create: true
+  # -- Use an existing ServiceAccount instead of creating one.
+  name: ""
+  annotations: {}
+
+# Application settings rendered into the backend's environment.
+config:
+  # -- Public base URL used in reference links. Derived from route.host when empty.
+  baseUrl: ""
+  # -- Comma-separated CORS origins. Derived from route.host when empty.
+  corsOrigins: ""
+  # -- Trusted reverse proxies for X-Forwarded-* headers. "*" trusts the OpenShift router.
+  trustedProxies: "*"
+  # -- Backend log level.
+  logLevel: INFO
+
+auth:
+  # -- Seed admin username.
+  adminUsername: admin
+  # -- Seed admin password. Generated and persisted across upgrades when empty.
+  adminPassword: ""
+  # -- JWT signing key. Generated and persisted across upgrades when empty.
+  secretKey: ""
+  # -- Use a pre-created Secret instead of the chart-managed one. It must
+  # supply DATABASE_URL, SECRET_KEY, ADMIN_USERNAME, ADMIN_PASSWORD and
+  # POSTGRESQL_PASSWORD.
+  existingSecret: ""
+
+backend:
+  replicas: 1
+  image:
+    repository: openflake-backend
+    # -- Overrides image.tag for the backend only.
+    tag: ""
+  service:
+    port: 8000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
+  # Alembic migrations run on startup behind a Postgres advisory lock, so the
+  # first boot can take a while. The startup probe covers that window before
+  # the liveness probe starts counting.
+  startupProbe:
+    failureThreshold: 60
+    periodSeconds: 5
+  livenessProbe:
+    initialDelaySeconds: 0
+    periodSeconds: 20
+    timeoutSeconds: 5
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  # -- Extra environment variables, e.g. [{name: FOO, value: bar}].
+  extraEnv: []
+
+  attachments:
+    persistence:
+      # -- Persist uploaded attachments on a PVC. Strongly recommended.
+      enabled: true
+      size: 5Gi
+      # -- StorageClass name. Empty uses the cluster default.
+      storageClass: ""
+      # -- ReadWriteOnce pins the backend to one replica. Use ReadWriteMany to scale out.
+      accessMode: ReadWriteOnce
+      # -- Mount an existing PVC instead of creating one.
+      existingClaim: ""
+
+frontend:
+  replicas: 1
+  image:
+    repository: openflake-frontend
+    # -- Overrides image.tag for the frontend only.
+    tag: ""
+  service:
+    port: 8080
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnv: []
+
+postgresql:
+  # -- Postgres 16 built for OpenShift: runs under an arbitrary UID with GID 0.
+  image: quay.io/sclorg/postgresql-16-c9s:latest
+  imagePullPolicy: IfNotPresent
+  database: openflake
+  username: openflake
+  # -- Database password. Generated and persisted across upgrades when empty.
+  # Keep it alphanumeric: it is embedded verbatim in the DATABASE_URL.
+  password: ""
+  service:
+    port: 5432
+  persistence:
+    enabled: true
+    size: 10Gi
+    # -- StorageClass name. Empty uses the cluster default.
+    storageClass: ""
+    accessMode: ReadWriteOnce
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+route:
+  # -- Expose the UI and API through an OpenShift Route.
+  enabled: true
+  # -- Hostname for the Route. Empty lets OpenShift generate one.
+  host: ""
+  annotations: {}
+  tls:
+    # -- Terminate TLS at the router. The pods themselves stay on plain HTTP.
+    enabled: true
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+# Pod- and container-level security settings.
+#
+# The defaults deliberately omit runAsUser so that OpenShift's restricted-v2
+# SCC can inject a per-namespace UID. On vanilla Kubernetes, which has no SCC
+# to do that, set podSecurityContext.runAsUser to any non-zero value.
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+# -- Labels added to every resource the chart creates.
+commonLabels: {}
+# -- Annotations added to every resource the chart creates.
+commonAnnotations: {}

@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "openflake.fullname" . }}-test-api-ready
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "openflake.labels" . | nindent 4 }}
+    app.kubernetes.io/component: test
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  {{- with .Values.image.pullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  securityContext:
+    {{- toYaml .Values.podSecurityContext | nindent 4 }}
+  containers:
+    - name: test
+      image: {{ include "openflake.backend.image" . | quote }}
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      command:
+        - python
+        - -c
+        - |
+          import json
+          import sys
+          import urllib.request
+
+          # Through nginx, which also proves the frontend's proxy to the
+          # backend Service resolves.
+          url = "http://{{ include "openflake.frontend.fullname" . }}:{{ .Values.frontend.service.port }}/health/ready"
+          with urllib.request.urlopen(url, timeout=15) as response:
+              body = json.load(response)
+          print(f"{url} -> {response.status} {body}")
+          if body.get("status") != "ready":
+              sys.exit(1)

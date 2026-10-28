@@ -18,6 +18,8 @@ exclude_paths:
   - .patch_demo_export/
   # Vendored BSOD recovery playbooks/roles (legacy naming; linted CaC is in openshift/setup.yml)
   - openshift/windows-bsod-recovery/
+  # Vendored Helm chart -- Go templates and chart metadata, not Ansible YAML.
+  - infrastructure/openflake/chart/
 
 mock_modules:
   - amazon.aws.aws_caller_info
@@ -99,6 +101,7 @@ mock_modules:
   - community.windows.win_psmodule
   - containers.podman.podman_container
   - containers.podman.podman_image
+  - kubernetes.core.helm
   - kubernetes.core.k8s
   - kubernetes.core.k8s_cluster_info
   - kubernetes.core.k8s_info

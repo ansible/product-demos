@@ -1,0 +1,137 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openflake.postgresql.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "openflake.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgresql
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: postgresql
+      port: {{ .Values.postgresql.service.port }}
+      targetPort: postgresql
+      protocol: TCP
+  selector:
+    {{- include "openflake.selectorLabels" (dict "context" . "component" "postgresql") | nindent 4 }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "openflake.postgresql.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "openflake.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgresql
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  serviceName: {{ include "openflake.postgresql.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "openflake.selectorLabels" (dict "context" . "component" "postgresql") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "openflake.labels" . | nindent 8 }}
+        app.kubernetes.io/component: postgresql
+    spec:
+      serviceAccountName: {{ include "openflake.serviceAccountName" . }}
+      {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: postgresql
+          image: {{ .Values.postgresql.image | quote }}
+          imagePullPolicy: {{ .Values.postgresql.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: postgresql
+              containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRESQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "openflake.secretName" . }}
+                  key: POSTGRESQL_USER
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "openflake.secretName" . }}
+                  key: POSTGRESQL_PASSWORD
+            - name: POSTGRESQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "openflake.secretName" . }}
+                  key: POSTGRESQL_DATABASE
+          # Probes shipped inside the sclorg image: they run pg_isready against
+          # the local socket, so they work regardless of the generated password.
+          readinessProbe:
+            exec:
+              command:
+                - /usr/libexec/check-container
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            exec:
+              command:
+                - /usr/libexec/check-container
+                - --live
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.postgresql.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/pgsql/data
+      {{- with .Values.postgresql.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.postgresql.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.postgresql.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if not .Values.postgresql.persistence.enabled }}
+      volumes:
+        - name: data
+          emptyDir: {}
+      {{- end }}
+  {{- if .Values.postgresql.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "openflake.labels" . | nindent 10 }}
+          app.kubernetes.io/component: postgresql
+      spec:
+        accessModes:
+          - {{ .Values.postgresql.persistence.accessMode }}
+        resources:
+          requests:
+            storage: {{ .Values.postgresql.persistence.size | quote }}
+        {{- if .Values.postgresql.persistence.storageClass }}
+        storageClassName: {{ .Values.postgresql.persistence.storageClass | quote }}
+        {{- end }}
+  {{- end }}
