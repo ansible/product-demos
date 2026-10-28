@@ -52,6 +52,6 @@ Deployment uses a single topology; no topology selection survey is needed. Redep
 | **Teardown Topology** | Destroy the topology and remove its report while retaining the hypervisor. |
 | **Teardown Hypervisor** | Remove the EC2 instance and associated AWS resources. |
 
-Read [configuration](docs/network-configuration.md), [deployment](docs/network-deploy-containerlab-stack.md), [reporting](docs/network-report.md), and [troubleshooting](docs/network-troubleshoot-containerlab.md) for details. The [Palo Alto firewall demo](docs/network-panos-workflow.md) remains separate.
+Read [configuration](docs/network-configuration.md), [deployment](docs/network-deploy-containerlab-stack.md), [reporting](docs/network-report.md), [staging and upgrade](docs/network-staging-upgrade.md), and [troubleshooting](docs/network-troubleshoot-containerlab.md) for details. The [Palo Alto firewall demo](docs/network-panos-workflow.md) remains separate.
 
 Configuration resources execute in each vendor's dependency order with `state: merged`. Some Cisco and EOS modules can report changes for defaults even when before/after values match; inspect configuration data when checking idempotence. Run Validate Devices after configuration to verify collection and routed paths in the current deployment.
