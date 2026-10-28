@@ -64,7 +64,7 @@ Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route eve
 
 | Job Template | Description |
 |--------------|-------------|
-| [**Infrastructure ǀ OpenShift - Provision OpenFlake**](docs/openflake.md) | Installs or removes OpenFlake — a lightweight ITSM platform with a ServiceNow-compatible REST API — on OpenShift via its bundled Helm chart |
+| [**Infrastructure ǀ OpenFlake**](docs/openflake.md) | Installs or removes OpenFlake — a lightweight ITSM platform with a ServiceNow-compatible REST API — on OpenShift via its bundled Helm chart |
 
 ## Post Setup
 

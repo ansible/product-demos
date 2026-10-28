@@ -965,7 +965,7 @@ controller_templates:
           required: true
           default: aap
 
-  - name: "Infrastructure | OpenShift - Provision OpenFlake"
+  - name: "Infrastructure | OpenFlake"
     description: >-
       Deploys OpenFlake -- a lightweight ITSM platform with a
       ServiceNow-compatible REST API -- on OpenShift via its Helm chart.

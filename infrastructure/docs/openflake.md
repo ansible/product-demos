@@ -30,7 +30,7 @@ This is **not** part of the automatic `infrastructure` demo setup. The job templ
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Infrastructure ǀ OpenShift - Provision OpenFlake | [`infrastructure/openflake/provision.yml`](../openflake/provision.yml) | Installs or removes OpenFlake via the bundled Helm chart |
+| Infrastructure ǀ OpenFlake | [`infrastructure/openflake/provision.yml`](../openflake/provision.yml) | Installs or removes OpenFlake via the bundled Helm chart |
 
 ## What gets deployed
 
