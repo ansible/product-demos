@@ -1,0 +1,129 @@
+---
+- name: Validate the connected Product Demos topology without a hypervisor
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    clab_device_password: offline-test-password
+  roles:
+    - role: demo.network.containerlab
+  tasks:
+    - name: Require every management rule to use the selected source CIDR
+      ansible.builtin.assert:
+        that:
+          - clab_security_group_rules | map(attribute='cidr_ip') | unique | list == ['192.0.2.0/24']
+      vars:
+        clab_access_cidr: 192.0.2.0/24
+
+    - name: Create temporary lab workspace
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: clab-topology-test-
+      register: clab_test_workspace
+
+    - name: Exercise topology rendering and legacy deployment discovery
+      vars:
+        clab_root_dir: "{{ clab_test_workspace.path }}"
+      block:
+        - name: Discover an empty workspace
+          ansible.builtin.include_role:
+            name: demo.network.containerlab
+            tasks_from: discover_active
+
+        - name: Require no active topology before deployment
+          ansible.builtin.assert:
+            that: clab_active_topologies == []
+
+        - name: Render topology and bootstrap configurations
+          ansible.builtin.include_role:
+            name: demo.network.containerlab
+            tasks_from: render_configs
+
+        - name: Read rendered topology
+          ansible.builtin.slurp:
+            src: "{{ clab_root_dir }}/product_demos/product_demos.clab.yml"
+          register: clab_test_rendered
+
+        - name: Parse rendered topology
+          ansible.builtin.set_fact:
+            clab_test_topology: "{{ clab_test_rendered.content | b64decode | from_yaml }}"
+
+        - name: Require the requested nodes, image kinds, and management endpoints
+          ansible.builtin.assert:
+            that:
+              - clab_test_topology.name == 'product_demos'
+              - clab_test_topology.topology.nodes.keys() | list | sort == ['cat8kv1', 'scp-server', 'veos2', 'veos4', 'vjunos3']
+              - clab_test_topology.topology.nodes.cat8kv1.kind == 'cisco_c8000v'
+              - clab_test_topology.topology.nodes.cat8kv1['startup-config'] == 'configs/cat8kv/startup-config.cfg'
+              - clab_test_topology.topology.nodes.vjunos3.kind == 'juniper_vsrx'
+              - clab_test_topology.topology.nodes.vjunos3.image == 'registry.gitlab.com/redhatautomation/juniper-ee:23.2R2.21'
+              - "clab_test_topology.topology.nodes.vjunos3.ports | sort == ['2125:22', '2225:830']"
+              - clab_test_topology.topology.nodes.veos2.env.QEMU_CPU == 'IvyBridge'
+              - clab_test_topology.topology.nodes.veos4.env.QEMU_ADDITIONAL_ARGS == '-cpu IvyBridge,check=off'
+              - clab_test_topology.topology.nodes.values() | map(attribute='mgmt-ipv4') | unique | list | length == 5
+              - clab_test_topology.topology.nodes.values() | map(attribute='mgmt-ipv4') | sort == ['172.20.20.11', '172.20.20.12', '172.20.20.13', '172.20.20.14', '172.20.20.15']
+              - "clab_test_topology.topology.nodes.cat8kv1.ports == ['2123:22']"
+              - "clab_test_topology.topology.nodes.veos2.ports == ['2124:22']"
+              - "clab_test_topology.topology.nodes.veos4.ports == ['2126:22']"
+              - clab_images | length == 3
+              - "[2123, 2124, 2125, 2126, 2225] | difference(clab_security_group_rules[0].ports) | length == 0"
+              - "[2122, 2830] | intersect(clab_security_group_rules[0].ports) | length == 0"
+
+        - name: Require all requested cross-vendor data links
+          ansible.builtin.assert:
+            that:
+              - clab_test_topology.topology.links | length == 3
+              - clab_test_topology.topology.links[0].endpoints == ['cat8kv1:Gi2', 'veos2:eth1']
+              - clab_test_topology.topology.links[1].endpoints == ['cat8kv1:Gi3', 'vjunos3:ge-0/0/0']
+              - clab_test_topology.topology.links[2].endpoints == ['veos4:eth1', 'veos2:eth2']
+              - "'rounds=' not in clab_device_password_hash"
+
+        - name: Read the vSRX bootstrap without exposing credentials
+          ansible.builtin.slurp:
+            src: "{{ clab_root_dir }}/product_demos/configs/vjunos3/startup-config.cfg"
+          register: clab_test_junos_bootstrap
+          no_log: true
+
+        - name: Require the bootstrap management gateway and ICMP zone
+          ansible.builtin.assert:
+            that:
+              - "'management-instance' not in (clab_test_junos_bootstrap.content | b64decode)"
+              - "'route 0.0.0.0/0 next-hop 10.0.0.2' in (clab_test_junos_bootstrap.content | b64decode)"
+              - "'security-zone trust' in (clab_test_junos_bootstrap.content | b64decode)"
+              - "'client-alive-interval 10;' in (clab_test_junos_bootstrap.content | b64decode)"
+              - "'client-alive-count-max 3;' in (clab_test_junos_bootstrap.content | b64decode)"
+
+        - name: Create an existing split-lab record for migration
+          ansible.builtin.copy:
+            dest: "{{ clab_root_dir }}/active_topology"
+            content: "product_demos\nmulti-vendor\n"
+            mode: '0644'
+
+        - name: Discover legacy split labs before migration
+          ansible.builtin.include_role:
+            name: demo.network.containerlab
+            tasks_from: discover_active
+
+        - name: Require both legacy labs to be recognized for cleanup
+          ansible.builtin.assert:
+            that: clab_active_topologies == ['product_demos', 'multi-vendor']
+
+        - name: Mark all labs as torn down while retaining old topology files
+          ansible.builtin.copy:
+            dest: "{{ clab_root_dir }}/active_topology"
+            content: ""
+            mode: '0644'
+
+        - name: Discover a torn down lab
+          ansible.builtin.include_role:
+            name: demo.network.containerlab
+            tasks_from: discover_active
+
+        - name: Require teardown record to take precedence over legacy files
+          ansible.builtin.assert:
+            that: clab_active_topologies == []
+      always:
+        - name: Remove temporary lab workspace
+          ansible.builtin.file:
+            path: "{{ clab_test_workspace.path }}"
+            state: absent

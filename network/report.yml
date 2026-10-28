@@ -1,49 +1,28 @@
 ---
-- name: Wait for Containerlab Devices
-  hosts: localhost
-  connection: local
-  gather_facts: false
-
-  tasks:
-    - name: Wait for n9kv SSH to be ready
-      ansible.builtin.wait_for:
-        host: "{{ hostvars['n9kv']['ansible_host'] }}"
-        port: 2122
-        search_regex: SSH
-        delay: 10
-        timeout: 600
-
-    - name: Wait for cat8kv SSH to be ready
-      ansible.builtin.wait_for:
-        host: "{{ hostvars['cat8kv']['ansible_host'] }}"
-        port: 2123
-        search_regex: SSH
-        delay: 10
-        timeout: 600
-
-- name: Network Device Report
+- name: Collect the selected network devices
   hosts: "{{ _hosts | default('containerlab') }}"
   gather_facts: false
+  pre_tasks:
+    - name: Record the exact device selection for this report
+      ansible.builtin.set_fact:
+        network_report_selected_hosts: "{{ ansible_play_hosts_all }}"
+      run_once: true
+      delegate_to: localhost
+      delegate_facts: true
+  roles:
+    - role: demo.network.gather_report
 
-  tasks:
-    - name: Gather facts [Cisco IOS]
-      cisco.ios.ios_facts:
-        gather_subset: min
-        gather_network_resources: all
-      when: ansible_network_os == 'cisco.ios.ios'
-
-    - name: Gather facts [Cisco NX-OS]
-      cisco.nxos.nxos_facts:
-        gather_subset: min
-        gather_network_resources: all
-      when: ansible_network_os == 'cisco.nxos.nxos'
-
-    - name: Display device report
-      ansible.builtin.debug:
-        msg:
-          - "Hostname: {{ ansible_net_hostname }}"
-          - "OS: {{ ansible_network_os }}"
-          - "Version: {{ ansible_net_version }}"
-          - "Model: {{ ansible_net_model }}"
-          - "Serial: {{ ansible_net_serialnum | default('N/A') }}"
-          - "Interfaces: {{ ansible_net_all_ipv4_addresses | default([]) | join(', ') }}"
+- name: Publish the detailed network report on the hypervisor
+  hosts: "{{ _report_server | default('clab_containerlab') }}"
+  become: true
+  gather_facts: true
+  pre_tasks:
+    - name: Require devices selected in this job
+      ansible.builtin.assert:
+        that:
+          - hostvars['localhost'].network_report_selected_hosts | default([]) | length > 0
+        fail_msg: No devices matched the requested inventory selection.
+  roles:
+    - role: demo.network.containerlab
+    - role: demo.network.report_server
+    - role: demo.network.build_report
