@@ -9,7 +9,7 @@ This is **not** part of the automatic `infrastructure` demo setup. The job templ
 - OpenShift cluster with privileges to create projects, deployments, statefulsets, services, routes and PVCs
 - A default StorageClass, or a StorageClass name to pass in (two PVCs are created: 10Gi for Postgres, 5Gi for attachments)
 - OpenShift Credential configured in AAP (bearer token for cluster authentication)
-- Egress from the execution node to `get.helm.sh` — see [Helm binary](#helm-binary)
+- Product Demos EE, or another EE with `helm` on PATH — see [Helm binary](#helm-binary)
 
 ## Configure credentials
 
@@ -44,7 +44,15 @@ This is **not** part of the automatic `infrastructure` demo setup. The job templ
 
 ## Credentials
 
-Leave the admin password unset (the default) and the chart generates one on first install, then reuses it on every subsequent run via a cluster lookup — re-running the template will not roll the password out from under a running demo. The job output prints the URL, username and password at the end of a successful install; they are also readable from the `openflake` Secret in the namespace.
+Leave the admin password unset (the default) and the chart generates one on first install, then reuses it on every subsequent run via a cluster lookup — re-running the template will not roll the password out from under a running demo.
+
+The job output prints the URL, username and namespace, but **not** the password — AAP retains job output indefinitely and shows it to anyone with read access on the job. Read it from the Secret instead:
+
+```bash
+oc -n openflake get secret openflake -o jsonpath="{.data.ADMIN_PASSWORD}" | base64 -d
+```
+
+The job output prints this exact command with your namespace and Secret name filled in.
 
 Override with `openflake_admin_username` / `openflake_admin_password` in extra_vars if you need a fixed login.
 
@@ -56,17 +64,21 @@ Supplying a hostname skips the second pass.
 
 ## Helm binary
 
-`kubernetes.core.helm` shells out to the `helm` CLI, which the Product Demos EE does not ship. The playbook downloads helm (checksum-verified) to `/tmp/openflake-helm` on every run, so the execution node needs egress to `get.helm.sh`.
+`kubernetes.core.helm` shells out to the `helm` CLI. Product Demos EE already bakes it into `/usr/local/bin/helm` — see the `append_final` step in [`execution_environments/apd-ee-27.yml`](../../execution_environments/apd-ee-27.yml) (same in the `apd-ee-25` and `apd-ee-26` definitions). The template does not set an execution environment, so it runs on Product Demos EE as the organization default and helm is on PATH.
 
-If that egress is not available, build helm into your EE and point the playbook at it:
+Preflight fails with a clear message if it is not. To run on an EE that ships helm somewhere else:
 
 ```yaml
 openflake_helm_binary: /usr/bin/helm
 ```
 
+Note the EE installs the `linux-amd64` build, so the job needs an amd64 execution node.
+
 ## Uninstall
 
 Set **Operation** to `uninstall`. The playbook removes the Helm release, waits for the pods to finish terminating, then deletes the namespace — which takes the PVCs with it. **This destroys all OpenFlake data.**
+
+Before deleting anything it checks that the namespace actually holds resources labelled `app.kubernetes.io/part-of=openflake` for this release, and aborts if it does not. A mistyped namespace fails the job rather than deleting an unrelated project. The same check means uninstalling an already-removed release fails too — that is deliberate.
 
 To keep the namespace and only drop the release and its claims:
 
@@ -93,8 +105,9 @@ Everything the survey does not expose is settable in extra_vars.
 | `openflake_attachments_storage_size` | `5Gi` | Attachments volume |
 | `openflake_wait_timeout` | `10m` | Helm wait timeout |
 | `openflake_verify` | `true` | Wait for Postgres, backend and frontend to report ready |
-| `openflake_validate_certs` | `false` | Verify the cluster API certificate |
-| `openflake_helm_install_if_missing` | `true` | Download helm when it is not on PATH |
+| `openflake_validate_certs` | *(from the credential's `K8S_AUTH_VERIFY_SSL`)* | Verify the cluster API certificate when helm connects |
+| `openflake_ca_cert` | *(from the credential's `K8S_AUTH_SSL_CA_CERT`)* | Cluster CA for helm — a file path, or an inline PEM the playbook spills to a temp file |
+| `openflake_helm_binary` | *(PATH lookup)* | Absolute path to helm on EEs that do not put it on PATH |
 
 ## Known issues
 

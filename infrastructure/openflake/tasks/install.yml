@@ -57,6 +57,7 @@
     host: '{{ _openflake_api_url }}'
     api_key: '{{ _openflake_api_key }}'
     validate_certs: '{{ _openflake_validate_certs | bool }}'
+    ca_cert: '{{ _openflake_ca_cert | default(omit, true) }}'
     wait: '{{ _openflake_wait | bool }}'
     wait_timeout: '{{ _openflake_wait_timeout }}'
     release_state: present
@@ -98,6 +99,7 @@
     host: '{{ _openflake_api_url }}'
     api_key: '{{ _openflake_api_key }}'
     validate_certs: '{{ _openflake_validate_certs | bool }}'
+    ca_cert: '{{ _openflake_ca_cert | default(omit, true) }}'
     wait: '{{ _openflake_wait | bool }}'
     wait_timeout: '{{ _openflake_wait_timeout }}'
     release_state: present
@@ -115,8 +117,11 @@
   when: _openflake_verify | bool
 
 # The chart owns the admin password unless one was supplied, so the only
-# authoritative copy lives in the Secret it rendered.
-- name: Read the credentials back out of the chart-managed Secret
+# authoritative copy lives in the Secret it rendered. Resolve its name here
+# rather than printing the password: AAP keeps job output indefinitely and
+# shows it to anyone with read access on the job, while the Secret is already
+# gated by the same cluster permissions this job template needs anyway.
+- name: Find the chart-managed Secret
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: '{{ _openflake_namespace }}'
@@ -124,14 +129,12 @@
       - 'app.kubernetes.io/instance={{ _openflake_release_name }}'
       - 'app.kubernetes.io/part-of=openflake'
   register: _openflake_secret_info
-  no_log: true
 
-- name: Decode the admin password
+- name: Record the Secret name
   ansible.builtin.set_fact:
-    _openflake_resolved_admin_password: >-
-      {{ ((_openflake_secret_info.resources | default([]) | first | default({})).data | default({})).ADMIN_PASSWORD
-         | default('') | b64decode }}
-  no_log: true
+    _openflake_secret_name: >-
+      {{ (_openflake_secret_info.resources | default([]) | first | default({})).metadata.name
+         | default(_openflake_release_name) }}
 
 - name: Report how to reach OpenFlake
   ansible.builtin.debug:
@@ -140,5 +143,6 @@
       # not just an undefined variable.
       - 'OpenFlake URL:      {{ openflake_public_url | default("no Route - use the in-cluster Service", true) }}'
       - 'OpenFlake username: {{ _openflake_admin_username }}'
-      - 'OpenFlake password: {{ _openflake_resolved_admin_password | default("see the openflake Secret in the namespace", true) }}'
       - 'OpenFlake namespace: {{ _openflake_namespace }}'
+      - 'Admin password:     oc -n {{ _openflake_namespace }} get secret {{ _openflake_secret_name }}
+         -o jsonpath="{.data.ADMIN_PASSWORD}" | base64 -d'

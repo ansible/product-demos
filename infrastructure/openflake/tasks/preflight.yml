@@ -1,7 +1,7 @@
 ---
 # default(..., true) treats an empty string as unset, so an unset
 # openflake_helm_binary falls back to a PATH lookup.
-- name: Resolve the helm binary to try first
+- name: Resolve the helm binary
   ansible.builtin.set_fact:
     _openflake_helm_bin: '{{ _openflake_helm_binary | default("helm", true) }}'
 
@@ -13,112 +13,27 @@
   failed_when: false
 
 # command only returns rc when it actually execs. A missing binary fails
-# before that and returns a dict with no rc at all, so every check below
-# defaults to 1 rather than reading an attribute that may not exist.
+# before that and returns a dict with no rc at all, so this defaults to 1
+# rather than reading an attribute that may not exist.
 - name: Normalise the result of the helm check
   ansible.builtin.set_fact:
     _openflake_helm_rc: '{{ _openflake_helm_check.rc | default(1) | int }}'
 
-# kubernetes.core.helm shells out to the helm CLI, which the Product Demos EE
-# does not ship -- so this runs on every deploy, not just as a fallback. It
-# needs egress to get.helm.sh from the execution node.
-- name: Install helm on the fly
-  when:
-    - _openflake_helm_rc | int != 0
-    - _openflake_helm_install_if_missing | bool
-  block:
-    - name: Read the execution node architecture
-      ansible.builtin.command:
-        cmd: uname -m
-      register: _openflake_uname
-      changed_when: false
-
-    - name: Map the architecture to a helm release
-      ansible.builtin.set_fact:
-        _openflake_helm_arch: >-
-          {{ {'x86_64': 'amd64', 'amd64': 'amd64',
-              'aarch64': 'arm64', 'arm64': 'arm64'}.get(_openflake_uname.stdout | trim, '') }}
-
-    - name: Fail on an architecture helm does not publish
-      ansible.builtin.fail:
-        msg: >-
-          No helm release for architecture
-          '{{ _openflake_uname.stdout | trim }}'. Set openflake_helm_binary
-          to a helm you provide yourself.
-      when: not _openflake_helm_arch
-
-    - name: Build the helm download URL
-      ansible.builtin.set_fact:
-        _openflake_helm_tarball: 'helm-{{ _openflake_helm_version }}-linux-{{ _openflake_helm_arch }}.tar.gz'
-        _openflake_helm_url: 'https://get.helm.sh/helm-{{ _openflake_helm_version }}-linux-{{ _openflake_helm_arch }}.tar.gz'
-
-    - name: Create the scratch directory for helm
-      ansible.builtin.file:
-        path: '{{ _openflake_helm_install_dir }}'
-        state: directory
-        mode: '0755'
-
-    # The filename has to match the one inside the .sha256sum file, because
-    # get_url looks the checksum up by the destination's basename.
-    - name: Download the helm release archive
-      ansible.builtin.get_url:
-        url: '{{ _openflake_helm_url }}'
-        dest: '{{ _openflake_helm_install_dir }}/{{ _openflake_helm_tarball }}'
-        checksum: 'sha256:{{ _openflake_helm_url }}.sha256sum'
-        mode: '0644'
-
-    # Extracted with Python rather than the unarchive module, which shells out
-    # to tar -- another binary a minimal execution environment may not have.
-    - name: Unpack the helm binary
-      ansible.builtin.command:
-        argv:
-          - '{{ ansible_playbook_python }}'
-          - '-c'
-          - |
-            import sys, tarfile
-            archive, member, dest = sys.argv[1:4]
-            with tarfile.open(archive) as tar:
-                info = tar.getmember(member)
-                info.name = "helm"
-                tar.extract(info, dest)
-          - '{{ _openflake_helm_install_dir }}/{{ _openflake_helm_tarball }}'
-          - 'linux-{{ _openflake_helm_arch }}/helm'
-          - '{{ _openflake_helm_install_dir }}'
-        creates: '{{ _openflake_helm_install_dir }}/helm'
-
-    - name: Make the helm binary executable
-      ansible.builtin.file:
-        path: '{{ _openflake_helm_install_dir }}/helm'
-        mode: '0755'
-
-    # set_fact outranks the play vars, so this steers both the checks below
-    # and the binary_path every helm task passes to the module.
-    - name: Use the downloaded helm from here on
-      ansible.builtin.set_fact:
-        _openflake_helm_bin: '{{ _openflake_helm_install_dir }}/helm'
-        _openflake_helm_binary: '{{ _openflake_helm_install_dir }}/helm'
-
-    - name: Re-check helm now that it is installed
-      ansible.builtin.command:
-        cmd: '{{ _openflake_helm_bin }} version --short'
-      register: _openflake_helm_check
-      changed_when: false
-      failed_when: false
-
-    - name: Normalise the result of the re-check
-      ansible.builtin.set_fact:
-        _openflake_helm_rc: '{{ _openflake_helm_check.rc | default(1) | int }}'
-
+# kubernetes.core.helm shells out to the helm CLI. Product Demos EE bakes it
+# into /usr/local/bin (see execution_environments/apd-ee-27.yml), so this only
+# trips when the job runs on some other EE.
 - name: Fail when helm is unavailable
   ansible.builtin.fail:
     msg: |
       Could not run '{{ _openflake_helm_bin }} version --short'
       (rc={{ _openflake_helm_rc }}).
 
-      kubernetes.core.helm shells out to the helm CLI. Either:
-        - leave openflake_helm_install_if_missing true (the default) and give
-          the execution environment egress to get.helm.sh; or
-        - set openflake_helm_binary to an absolute path to helm.
+      kubernetes.core.helm shells out to the helm CLI. Product Demos EE
+      installs it into /usr/local/bin, so either:
+        - run this job template on Product Demos EE (the organization
+          default, which is what it uses when no EE is set); or
+        - set openflake_helm_binary to an absolute path to helm on the EE
+          you are using.
 
       Error: {{ _openflake_helm_check.stderr | default('', true)
                 or _openflake_helm_check.msg | default('no error reported') }}
@@ -141,6 +56,44 @@
       No chart found at '{{ _openflake_chart_path }}'
       (expected Chart.yaml there).
   when: not _openflake_chart_stat.stat.exists
+
+# The k8s modules read K8S_AUTH_SSL_CA_CERT themselves, but helm does not --
+# and it needs a path on disk, so an inline PEM has to be spilled to a file.
+- name: Resolve the cluster CA for helm
+  when: _openflake_ca_raw | length > 0
+  block:
+    - name: Create a temp file for an inline CA certificate
+      ansible.builtin.tempfile:
+        state: file
+        suffix: .crt
+      register: _openflake_ca_tmp
+      when: _openflake_ca_is_inline | bool
+
+    - name: Write the inline CA certificate
+      ansible.builtin.copy:
+        dest: '{{ _openflake_ca_tmp.path }}'
+        mode: '0600'
+        content: '{{ _openflake_ca_raw }}'
+      when: _openflake_ca_is_inline | bool
+
+    - name: Record the CA path helm should use
+      ansible.builtin.set_fact:
+        _openflake_ca_cert: >-
+          {{ _openflake_ca_tmp.path if (_openflake_ca_is_inline | bool) else _openflake_ca_raw }}
+
+    - name: Confirm the CA file exists
+      ansible.builtin.stat:
+        path: '{{ _openflake_ca_cert }}'
+      register: _openflake_ca_stat
+
+    - name: Fail when a CA was supplied but is not readable
+      ansible.builtin.assert:
+        that:
+          - _openflake_ca_stat.stat.exists
+        fail_msg: >-
+          K8S_AUTH_SSL_CA_CERT resolved to '{{ _openflake_ca_cert }}'
+          but no such file exists.
+        quiet: true
 
 # Doubles as an authentication check: fails fast with a clear error if the
 # credentials are missing or expired, rather than letting helm fail later

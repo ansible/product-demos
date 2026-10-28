@@ -53,15 +53,24 @@
     # explicitly so helm talks to the same cluster the k8s modules do.
     _openflake_api_url: '{{ lookup("env", "K8S_AUTH_HOST") | default("", true) }}'
     _openflake_api_key: '{{ lookup("env", "K8S_AUTH_API_KEY") | default("", true) }}'
-    # Demo clusters routinely serve a self-signed API certificate and the
-    # execution node has no copy of its CA.
-    _openflake_validate_certs: '{{ openflake_validate_certs | default(false) | bool }}'
 
+    # Take the TLS posture from the credential rather than hardcoding it, so
+    # helm agrees with the k8s modules in this same play -- they read these
+    # env vars themselves, helm does not.
+    _openflake_validate_certs: >-
+      {{ openflake_validate_certs
+         | default(lookup("env", "K8S_AUTH_VERIFY_SSL") | default("true", true), true) | bool }}
+    _openflake_ca_raw: >-
+      {{ openflake_ca_cert
+         | default(lookup("env", "K8S_AUTH_SSL_CA_CERT") | default("", true), true) }}
+    _openflake_ca_is_inline: '{{ _openflake_ca_raw is search("BEGIN CERTIFICATE") }}'
+    # preflight.yml overrides this with a path once it has resolved the CA.
+    _openflake_ca_cert: ''
+
+    # Product Demos EE bakes helm into /usr/local/bin
+    # (execution_environments/apd-ee-27.yml), so this only needs setting when
+    # the job runs on an EE that does not ship it.
     _openflake_helm_binary: '{{ openflake_helm_binary | default("") }}'
-    # Download helm when it is not on PATH. Needs egress to get.helm.sh.
-    _openflake_helm_install_if_missing: '{{ openflake_helm_install_if_missing | default(true) | bool }}'
-    _openflake_helm_version: '{{ openflake_helm_version | default("v3.16.3") }}'
-    _openflake_helm_install_dir: '{{ openflake_helm_install_dir | default("/tmp/openflake-helm") }}'
 
   tasks:
     - name: Reject an unknown operation
@@ -71,6 +80,20 @@
         fail_msg: >-
           openflake_operation must be 'install' or 'uninstall',
           got '{{ _openflake_operation }}'.
+        quiet: true
+
+    # Both come from free-text survey fields and the uninstall path deletes
+    # the namespace, so reject anything that is not a well-formed name before
+    # it reaches a destructive task.
+    - name: Validate the namespace and release name
+      ansible.builtin.assert:
+        that:
+          - _openflake_namespace is match('^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$')
+          - _openflake_release_name is match('^[a-z0-9]([-a-z0-9]{0,51}[a-z0-9])?$')
+        fail_msg: >-
+          openflake_namespace ('{{ _openflake_namespace }}') and
+          openflake_release_name ('{{ _openflake_release_name }}') must be
+          lowercase RFC 1123 labels.
         quiet: true
 
     - name: Verify the OpenShift credential env vars are set
