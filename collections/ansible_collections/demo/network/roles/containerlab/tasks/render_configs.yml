@@ -1,0 +1,41 @@
+---
+- name: Validate device credentials for startup configuration
+  ansible.builtin.assert:
+    that:
+      - clab_device_username is match('^[a-zA-Z][a-zA-Z0-9_-]*$')
+      - clab_device_password is match('^[A-Za-z0-9!@#%^*()_+=.,:-]+$')
+    fail_msg: Device credentials must use a simple username and a nonempty password without whitespace or quotes.
+  no_log: true
+
+- name: Generate password hash for EOS and Junos bootstrap
+  ansible.builtin.set_fact:
+    # crypt includes the default rounds explicitly; passlib omits them. EOS needs
+    # the latter spelling. Removing this prefix preserves the same 5000 rounds.
+    clab_device_password_hash: "{{ clab_device_password | password_hash('sha512', rounds=5000) | replace('$6$rounds=5000$', '$6$') }}"
+  no_log: true
+
+- name: Require an EOS-compatible SHA512 bootstrap hash before rendering
+  ansible.builtin.assert:
+    that: clab_device_password_hash is match('^\$6\$[./0-9A-Za-z]{1,16}\$[./0-9A-Za-z]{86}$')
+    fail_msg: Unable to generate a compatible device password hash. Use the rebuilt Product Demos EE with passlib installed.
+
+- name: Create startup configuration directories
+  ansible.builtin.file:
+    path: "{{ clab_root_dir }}/{{ clab_topology }}/{{ item.value.startup_config | dirname }}"
+    state: directory
+    mode: '0700'
+  loop: "{{ clab_devices | dict2items }}"
+
+- name: Render device bootstrap configuration
+  ansible.builtin.template:
+    src: "{{ clab_files_path }}/{{ clab_topology }}/{{ item.value.startup_config }}"
+    dest: "{{ clab_root_dir }}/{{ clab_topology }}/{{ item.value.startup_config }}"
+    mode: '0600'
+  loop: "{{ clab_devices | dict2items }}"
+  no_log: true
+
+- name: Render topology from device catalog
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/product_demos.clab.yml.j2"
+    dest: "{{ clab_root_dir }}/{{ clab_topology }}/{{ clab_topology }}.clab.yml"
+    mode: '0644'
