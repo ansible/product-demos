@@ -972,10 +972,11 @@ controller_templates:
       The chart generates the admin password on first install and keeps it
       across upgrades; the job output reports the URL and credentials.
       Set Operation to uninstall to remove the release and its namespace.
+    # Labels must already exist in controller_labels (common/setup.yml);
+    # the job template module does not create them.
     labels:
       - infrastructure
       - openshift
-      - itsm
     job_type: run
     organization: Ansible Product Demos (APD)
     inventory: Ansible Product Demos Inventory
