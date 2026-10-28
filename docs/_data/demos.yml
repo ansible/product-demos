@@ -156,22 +156,21 @@
       S --> C
       S --> D
       S --> E
-      S --> G
-      A["💥 Delete aws-dc"] --> F["🌐 Delete VPC"]
+      A["💥 Delete aws-dc"] --> F["🔄 Sync Inventory"]
       B["💥 Delete aws_win1"] --> F
       C["💥 Delete aws-rhel9"] --> F
       D["💥 Delete aws-rhel10"] --> F
       E["💥 Delete reports"] --> F
-      F --> H["🔄 Sync Inventory"]
-      G["🔑 Delete Key"] --> H
+      F --> G["🔑 Delete Keypair"]
+      F --> H["🌐 Delete VPC"]
       style A fill:#4a1a1a,stroke:#ef4444,color:#fff
       style B fill:#4a1a1a,stroke:#ef4444,color:#fff
       style C fill:#4a1a1a,stroke:#ef4444,color:#fff
       style D fill:#4a1a1a,stroke:#ef4444,color:#fff
       style E fill:#4a1a1a,stroke:#ef4444,color:#fff
-      style F fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style F fill:#2d1f4e,stroke:#a78bfa,color:#fff
       style G fill:#1e3a5f,stroke:#4a90d9,color:#fff
-      style H fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style H fill:#1e3a5f,stroke:#4a90d9,color:#fff
       style S fill:#212427,stroke:#8a8d90,color:#fff
 
 - slug: cloud-create-vpc
