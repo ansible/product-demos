@@ -1,113 +1,57 @@
 # Network Demos
 
-## Table of Contents
-- [Network Demos](#network-demos)
-  - [Table of Contents](#table-of-contents)
-  - [About These Demos](#about-these-demos)
-  - [Infrastructure](#infrastructure)
-  - [Getting Started](#getting-started)
-  - [Workflows](#workflows)
-  - [Job Templates](#job-templates)
-  - [Suggested Usage](#suggested-usage)
+The network demos show Ansible Automation Platform configuring and reporting on Cisco IOS-XE, Arista EOS, and Juniper Junos through their native Ansible collections. One connected Containerlab topology, `product_demos`, runs on an AWS EC2 hypervisor with nested virtualization.
 
-## About These Demos
-This category of demos shows examples of network operations and management with Ansible Automation Platform. The demos run against Cisco NX-OS and IOS-XE devices hosted in a [containerlab](https://containerlab.dev/) topology on AWS, providing a fully self-contained environment with no external dependencies.
+## Connected lab
 
-## Infrastructure
-
-The network demos use containerlab to run virtual Cisco devices as containers on an AWS EC2 hypervisor with nested virtualization enabled.
-
-| Component | Details |
-|-----------|---------|
-| **Hypervisor** | RHEL 9 on AWS EC2 (c8i.2xlarge) with nested virtualization |
-| **Container Runtime** | Podman |
-| **NX-OS Device** | Cisco Nexus 9000v (`n9kv`) — SSH on port 2122 |
-| **IOS-XE Device** | Cisco Catalyst 8000v (`cat8kv`) — SSH on port 2123 |
-| **Regions** | us-east-2, us-west-2 |
-
-Device connectivity is handled via an **SSH Proxy** credential type that routes connections through the hypervisor to the containerlab devices. A dedicated **ContainerLab Inventory** holds the device hosts and group variables.
-
-## Getting Started
-
-1. Deploy the demos using the "Product Demos | Multi-demo setup" or "Product Demos | Single demo setup" and select **Network**.
-2. Run the **NETWORK ǀ Deploy Containerlab Stack** workflow to provision the infrastructure. This will:
-   - Provision an EC2 hypervisor with nested virtualization
-   - Deploy the containerlab topology (n9kv + cat8kv)
-   - Sync the ContainerLab Inventory with the hypervisor IP
-3. Once the stack is up, run the demo job templates (Report, Backup, DISA STIG, Configure Devices).
-4. When finished, run **NETWORK ǀ Destroy Containerlab Stack** to tear down all AWS resources.
-
-## Workflows
-
-| Workflow | Description |
-|----------|-------------|
-| [**Deploy Containerlab Stack**](docs/network-deploy-containerlab-stack.md) | Provision an AWS hypervisor, deploy the containerlab topology, and sync the inventory. |
-| [**Destroy Containerlab Stack**](docs/network-destroy-containerlab-stack.md) | Tear down the containerlab topology and delete all AWS resources (VPC, subnet, security group, EC2 instance, keypair). |
-| [**Palo Alto Firewall Demo**](docs/network-panos-workflow.md) | End-to-end Palo Alto firewall workflow: deploy, configure, validate, and clean up a PAN-OS instance. |
-
-## Job Templates
-
-### Containerlab Lifecycle
-
-| Job Template | Description |
-|--------------|-------------|
-| **Provision Hypervisor** | Create AWS VPC, subnet, security group, keypair, and launch a RHEL 9 EC2 instance with nested virtualization enabled. |
-| **Deploy Topology** | Install podman and containerlab on the hypervisor, pull device images, and start the n9kv + cat8kv topology. |
-| **Configure Devices** | Apply baseline configuration (banner, NTP, SNMP) to the containerlab NX-OS and IOS-XE devices. |
-| **Teardown Topology** | Destroy the running containerlab topology on the hypervisor. |
-| **Troubleshoot** | Collect hypervisor, containerlab, and podman diagnostics through AAP when manual SSH is unavailable. |
-| **Teardown Hypervisor** | Terminate the EC2 instance and remove all associated AWS resources. |
-
-### Demo Jobs
-
-| Job Template | Description |
-|--------------|-------------|
-| **Report** | Gather facts from containerlab Cisco devices and display device information including hostname, OS version, model, serial number, and interfaces. |
-| **DISA STIG** | Run the DISA STIG role against the IOS-XE device to assess configuration compliance. Runs in check mode by default. |
-| **Backup** | Back up running configurations from containerlab NX-OS and IOS-XE devices using native Cisco collection modules. |
-| **Staging** | Stage a new IOS-XE image to the IOS-XE device bootflash via SCP, then verify the file integrity with a SHA-512 hash check. Must be run before **Upgrade**. |
-| **Upgrade** | Install and activate the staged IOS-XE image, reload the device, and verify the new version is running. Requires **Staging** to have completed successfully first. |
-
-### Palo Alto
-
-| Job Template | Description |
-|--------------|-------------|
-| **Panos \| Deploy** | Deploy a PAN-OS firewall instance and web server on AWS. |
-| **Panos \| Configure Firewall** | Configure the PAN-OS firewall with network and security settings. |
-| **Panos \| Configure Security Rule** | Create or modify a security rule on the PAN-OS firewall. |
-| **Panos \| Configure Webserver** | Configure the web server behind the firewall. |
-| **Panos \| Cleanup** | Remove all Palo Alto demo AWS resources. |
-
-## Suggested Usage
-
-**Deploy the stack first** — Run the **NETWORK ǀ Deploy Containerlab Stack** workflow before any other network demo. The workflow provisions infrastructure and populates the ContainerLab Inventory. Provisioning takes approximately 10-15 minutes while device images are pulled and virtual devices boot.
-
-**NETWORK ǀ Configure Devices** — Run this after deploying the stack to apply baseline device configuration (NTP, SNMP, banners) using Cisco Network Resource Modules. This demonstrates how Ansible standardizes configuration across different network operating systems.
-
-**NETWORK ǀ Report** — Gather facts from the containerlab devices and display a summary of each device. Shows how Ansible can collect and present network device information for reporting and auditing.
-
-**NETWORK ǀ DISA STIG** — Run in check mode (default) to show how Ansible assesses compliance against DISA STIG rules on IOS-XE devices. Click into tasks to see what would change for each compliance rule.
-
-**NETWORK ǀ Backup** — Back up device configurations using the native `cisco.ios.ios_config` and `cisco.nxos.nxos_config` modules. Backups are saved on the execution node. This demonstrates how Ansible can automate configuration backup across heterogeneous network environments.
-
-**NETWORK ǀ Staging** — Stage a new IOS-XE image onto the cat8kv device. Enables SCP on the IOS-XE device, transfers the image to bootflash, and verifies the file integrity with a SHA-512 hash check. This job must be run **before** the Upgrade job — the upgrade will fail if no image has been staged. The IOS version is selected via a survey (`image_staging`), and several variables are pre-configured in the job template extra variables (`scp_server`, `sha_hash`) and the SCP credential (`scp_user`, `scp_password`). The playbook derives `new_version` and `new_image_ios` automatically from the survey selection.
-
-**NETWORK ǀ Upgrade** — Install and activate the previously staged IOS-XE image on the cat8kv device. The playbook sets the boot system to the new image, runs `install add activate commit`, waits for the device to reload, and then verifies the new version is running. **You must run Staging first** — the upgrade checks that the image exists in bootflash and will fail if it is missing. The IOS version is selected via a survey (`image_upgrade`), and the playbook derives `new_version` and `new_image_ios` automatically from the survey selection. Note: the upgrade and reboot process may take approximately 10 minutes to complete. Also in rare instances the reboot will show the original version if the router container fails and respawns during the reboot. Just run the upgrade again and it should be fine.
-
-**NETWORK ǀ Panos** — See the [Palo Alto README](./panos/README.md) for usage instructions.
-
-**Clean up when done** — Run the **NETWORK ǀ Destroy Containerlab Stack** workflow to remove all AWS resources and avoid unnecessary costs.
-
-## Troubleshooting
-
-### Receptor Pod Connection Refused
-
-If a job fails with an error like:
-
-```
-Error with pod's stdout: Error getting pod aap/automation-job-XX-xxxxx.
-Error: Get "https://172.231.0.1:443/api/v1/namespaces/aap/pods/automation-job-XX-xxxxx":
-dial tcp 172.231.0.1:443: connect: connection refused
+```mermaid
+flowchart LR
+  J[vjunos3 / vSRX] ---|ge-0/0/0 — Gi3| C[cat8kv1 / IOS-XE]
+  C ---|Gi2 — Ethernet1| E[veos2 / EOS]
+  E ---|Ethernet2 — Ethernet1| F[veos4 / EOS]
 ```
 
-This means the execution environment pod lost connectivity to the Kubernetes API server. Common causes include API server pressure, node resource exhaustion, or network policies blocking egress from the `aap` namespace. Try relaunching the job template — if the error is intermittent it is usually transient and a relaunch will succeed. If it persists, check `oc get co`, `oc get nodes`, and `oc get networkpolicy -n aap` to verify the cluster and network are healthy.
+| Device | Kind / image | Management |
+|---|---|---|
+| `cat8kv1` | Catalyst 8000v / 17.13.01a | 172.20.20.12; SSH 2123 |
+| `veos2` | Arista vEOS / 4.32.0F | 172.20.20.13; SSH 2124 |
+| `vjunos3` | Juniper vSRX / 23.2R2.21 | 172.20.20.14; SSH 2125, NETCONF 2225 |
+| `veos4` | Arista vEOS / 4.32.0F | 172.20.20.15; SSH 2126 |
+| `scp-server` | Linux file server | 172.20.20.11 inside the lab |
+
+Management IPs belong to the Containerlab network. AAP connects to device ports mapped on the hypervisor's public address. The **Containerlab Device Access** credential supplies authentication; Junos uses NETCONF and IOS-XE/EOS use `network_cli`. ContainerLab Inventory groups select all devices or a platform.
+
+The topology uses the supplied IvyBridge CPU settings for both EOS nodes. The vSRX bootstrap enables NETCONF and allows ICMP to its demo interfaces. Configure Devices removes the image’s retained management VRF and preserves its gateway in the default routing table, because the pinned Juniper static-route parser fails on IPv4-only routing instances. NETCONF reconnects after that routing-context change. Device configuration adds routed links, loopbacks, LLDP, NTP, and static routes so demos can exercise paths across all three vendors.
+
+## Getting started
+
+**EE prerequisite:** Rebuild and publish Product Demos EE with this branch's collection and Python requirements, or use an accessible rebuilt EE until the official image is updated. A project sync does not update installed modules. See [EE prerequisites](../execution_environments/README.md#network-demo-testing-prerequisite).
+
+1. Run APD setup and select **Network**.
+2. Run **NETWORK | Deploy Containerlab Stack** to provision a hypervisor, deploy `product_demos`, and sync inventory. An existing hypervisor can use **NETWORK | Containerlab | Deploy Topology** directly.
+3. Run **NETWORK | Containerlab | Configure Devices**.
+4. Run **NETWORK | Containerlab | Validate Devices** to check structured collection and multi-hop pings sourced from each device's loopback.
+5. Run **NETWORK | Report** and open its published HTML URL. Sanitized JSON is available beside it at `/network/report.json`.
+6. When finished, run **NETWORK | Destroy Containerlab Stack** to remove the lab and AWS resources.
+
+Deployment uses a single topology; no topology selection survey is needed. Redeploying resets all four devices to bootstrap. Older `product_demos` and `multi-vendor` deployments are stopped before the connected replacement is rendered, and retired inventory hosts are removed after successful deployment. Regenerate the report after deployment or teardown changes device membership.
+
+## Job templates
+
+| Template | Purpose |
+|---|---|
+| **Provision Hypervisor** | Create AWS networking, keys, and a RHEL 9 EC2 host with KVM; defaults to c8i.4xlarge. |
+| **Deploy Topology** | Install Containerlab/Podman, pull images, render credentials, deploy the connected lab, refresh management ports, and update inventory. |
+| **Configure Devices** | Merge vendor-native interface, address, LLDP, NTP, and route configuration; retain Cisco banner/SNMP baselines. |
+| **Validate Devices** | Capture hypervisor/KVM/resource evidence, collect structured data, and test routed paths between vendors. |
+| **Report** | Publish searchable HTML and sanitized JSON with identity, live interfaces, neighbors, configuration, and independent collection status. |
+| **Backup** | Back up the IOS-XE configuration using the Cisco collection. |
+| **DISA STIG** | Assess IOS-XE configuration in check mode by default. |
+| **Staging / Upgrade** | Stage an IOS-XE image over SCP, then install and activate it; run Staging first. |
+| **Troubleshoot** | Inspect management ports, the topology, host resources, and container logs. |
+| **Teardown Topology** | Destroy the topology and remove its report while retaining the hypervisor. |
+| **Teardown Hypervisor** | Remove the EC2 instance and associated AWS resources. |
+
+Read [configuration](docs/network-configuration.md), [deployment](docs/network-deploy-containerlab-stack.md), [reporting](docs/network-report.md), and [troubleshooting](docs/network-troubleshoot-containerlab.md) for details. The [Palo Alto firewall demo](docs/network-panos-workflow.md) remains separate.
+
+Configuration resources execute in each vendor's dependency order with `state: merged`. Some Cisco and EOS modules can report changes for defaults even when before/after values match; inspect configuration data when checking idempotence. Run Validate Devices after configuration to verify collection and routed paths in the current deployment.

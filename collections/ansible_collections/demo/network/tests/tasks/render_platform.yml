@@ -1,0 +1,7 @@
+---
+- name: Render vendor resource
+  ansible.builtin.include_tasks: render_resource.yml
+  loop: "{{ network_lab_resources[platform.host] + [{'resource': 'ntp_global', 'config': network_lab_ntp}] }}"
+  loop_control:
+    loop_var: resource
+    label: "{{ platform.host }} {{ resource.resource }}"

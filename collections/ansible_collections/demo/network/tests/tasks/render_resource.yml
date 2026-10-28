@@ -1,0 +1,16 @@
+---
+- name: Render configuration for {{ platform.host ~ ' ' ~ resource.resource }}
+  action: "{{ network_lab_prefixes[platform.os] }}_{{ resource.resource }}"
+  args:
+    config: "{{ resource.config }}"
+    state: rendered
+  connection: "{{ 'ansible.netcommon.netconf' if platform.os == 'juniper.device.junos' else 'ansible.netcommon.network_cli' }}"
+  vars:
+    ansible_network_os: "{{ platform.os }}"
+  register: rendered_resource
+- name: Require render-only task to leave devices unchanged
+  ansible.builtin.assert:
+    that:
+      - not rendered_resource.changed
+      - rendered_resource.rendered | length > 0
+      - "'None' not in (rendered_resource.rendered | string)"
