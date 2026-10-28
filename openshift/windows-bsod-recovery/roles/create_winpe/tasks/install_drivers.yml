@@ -1,0 +1,24 @@
+---
+- name: download and install drivers
+  block:
+    - name: download drivers
+      ansible.windows.win_get_url:
+        url: "{{ item }}"
+        dest: '{{ create_winpe_temp_directory }}\{{ item | urlsplit("path") | basename }}'
+        force: false
+      loop: '{{ create_winpe_drivers | map(attribute="url") | list | unique }}'
+
+    - name: install drivers
+      ansible.builtin.include_tasks: drivers_{{ item.type | default('zip') }}.yml
+      loop: "{{ create_winpe_drivers }}"
+      when: (item.enabled | bool) | default(false)
+
+  always:
+    - name: clean up driver files
+      ansible.windows.win_file:
+        path: "{{ create_winpe_temp_directory }}\\{{ _file_name }}"
+        state: absent
+      loop: "{{ create_winpe_drivers }}"
+      when: create_winpe_delete_downloaded_files
+  vars:
+    _file_name: '{{ item.url | urlsplit("path") | basename }}'

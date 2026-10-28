@@ -1,0 +1,9 @@
+---
+
+collections:
+  - name: infra.ah_configuration
+    version: ">=2.0.6"
+  - name: infra.controller_configuration
+    version: ">=2.7.1"
+  - name: redhat_cop.controller_configuration
+    version: ">=2.3.1"

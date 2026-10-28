@@ -1,0 +1,25 @@
+---
+- name: authenticate with cluster
+  ansible.builtin.include_role:
+    name: oatakan.openshift-add-auth-config
+    apply:
+      delegate_to: localhost
+  vars:
+    oc_auth_type: api
+
+- name: perform pre-check and upload iso
+  block:
+    - name: preflight check
+      ansible.builtin.include_tasks: preflight_check.yml
+    - name: upload iso
+      ansible.builtin.include_tasks: iso_upload.yml
+  always:
+    - name: clear authentication
+      ansible.builtin.include_role:
+        name: oatakan.openshift-add-auth-config
+        apply:
+          delegate_to: localhost
+      vars:
+        oc_auth_type: api
+        auth_action: logout
+      when: kubevirt_upload_kubevirt_clear_auth_key

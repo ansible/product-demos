@@ -1,0 +1,47 @@
+---
+
+- name: set oc cluster
+  set_fact:
+    cluster: "{{ lookup('env','K8S_AUTH_HOST') | regex_replace('^(.+)(/)$','\\1') | replace('https://', '') | replace('.', '-') | replace('.', '-') }}"
+
+- name: set oc context
+  set_fact:
+    context: "{{ namespace }}/{{ cluster }}/{{ lookup('env','K8S_AUTH_USERNAME') }}"
+
+- name: set config directory
+  set_fact:
+    oc_config_file_location: "{{ playbook_dir }}/config"
+
+- debug:
+    var: cluster
+
+- debug:
+    var: context
+
+- name: create oc config credentials configuration
+  shell: rm -f '{{ oc_config_file_location }}'; oc login --config='{{ oc_config_file_location }}' {{ lookup('env','K8S_AUTH_HOST') }} --username={{ lookup('env','K8S_AUTH_USERNAME') }} --password={{ lookup('env','K8S_AUTH_PASSWORD') }} --insecure-skip-tls-verify=true
+  no_log: True
+  become: no
+
+- name: create oc config set cluster
+  command: oc config --config='{{ oc_config_file_location }}' set-cluster {{ cluster }} --insecure-skip-tls-verify=true --server={{ lookup('env','K8S_AUTH_HOST') }}
+  become: no
+
+- name: create oc config set context
+  command: oc config --config='{{ oc_config_file_location }}' set-context {{ context }} --user={{ lookup('env','K8S_AUTH_USERNAME') }}/{{ cluster }} --namespace={{ namespace }} --cluster={{ cluster }}
+  become: no
+
+- name: create oc config use context
+  command: oc config --config='{{ oc_config_file_location }}' use-context {{ context }}
+  become: no
+
+- name: create oc config use context
+  command: oc whoami --config='{{ oc_config_file_location }}' -t
+  register: get_api_key
+  no_log: true
+  become: no
+
+- name: set api_key
+  set_fact:
+    api_key: "{{ get_api_key.stdout }}"
+  no_log: true

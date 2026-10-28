@@ -1,0 +1,63 @@
+---
+
+create_winpe_virtio_win_iso_url: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.248-1/virtio-win-0.1.248.iso
+
+create_winpe_virtio_directory_mapping:
+  win_10: w10
+  win_11: w11
+  win_2022: 2k22
+
+create_winpe_delete_downloaded_files: true
+
+create_winpe_win_adk:
+  win_10:
+    download_url: https://go.microsoft.com/fwlink/?linkid=2271337
+    product_id: "{B30B4A08-0946-44E6-C5AC-6C2563D08195}"
+    features: OptionId.DeploymentTools
+  win_11:
+    download_url: https://go.microsoft.com/fwlink/?linkid=2271337
+    product_id: "{B30B4A08-0946-44E6-C5AC-6C2563D08195}"
+    features: OptionId.DeploymentTools
+  win_2022:
+    download_url: https://go.microsoft.com/fwlink/?linkid=2271337
+    product_id: "{B30B4A08-0946-44E6-C5AC-6C2563D08195}"
+    features: OptionId.DeploymentTools
+create_winpe_win_adk_winpe_addon:
+  win_10:
+    download_url: https://go.microsoft.com/fwlink/?linkid=2271338
+    product_id: "{C6CB0DF0-B1BD-3CF0-4056-3D63832B3AD6}"
+    features: OptionId.WindowsPreinstallationEnvironment
+  win_11:
+    download_url: https://go.microsoft.com/fwlink/?linkid=2271338
+    product_id: "{C6CB0DF0-B1BD-3CF0-4056-3D63832B3AD6}"
+    features: OptionId.WindowsPreinstallationEnvironment
+  win_2022:
+    download_url: https://go.microsoft.com/fwlink/?linkid=2271338
+    product_id: "{C6CB0DF0-B1BD-3CF0-4056-3D63832B3AD6}"
+    features: OptionId.WindowsPreinstallationEnvironment
+
+create_winpe_temp_directory: "{{ ansible_env.TEMP }}"
+create_winpe_destination_file_location: ""
+
+create_winpe_architectures:
+  x86_64: amd64
+  aarch64: arm64
+  arm64: arm64
+
+create_winpe_drivers:
+  - name: vioscsi
+    url: "{{ create_winpe_virtio_win_iso_url }}"
+    type: iso
+    directory: "{{ create_winpe_arch }}\\{{ create_winpe_virtio_directory }}"
+    enabled: true
+
+create_winpe_name: winpe_bsod_recovery_fix
+
+create_winpe_enable_script_debug: false
+create_winpe_enable_powershell_modules: false
+create_winpe_enable_autostart: true
+create_winpe_load_drivers: false
+
+create_winpe_replace_wallpaper: false
+
+create_winpe_init_file: crowdstrike_fix.cmd # set this to script inside files directory to fix a potential critical issue

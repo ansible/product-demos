@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template.name }}-remote
+  namespace: {{ target_namespace }}
+{% if owner_uid is defined and owner_uid is not none %}
+  ownerReferences:
+    - apiVersion: "{{ api_version_virtual_machine }}"
+      kind: VirtualMachine
+      name: {{ template.name }}
+      uid: {{ owner_uid }}
+      controller: true
+      blockOwnerDeletion: true
+{% endif %}
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+{% if vm_os_type == 'windows' %}
+    - name: winrm
+      port: {{ ('5' + vm_ansible_port | default('5986')) | int }}
+      protocol: TCP
+      targetPort: {{ vm_ansible_port | default('5986') | int }}
+    - name: rdp
+      port: {{ ('3' + vm_ansible_port | default('3389')) | int }}
+      protocol: TCP
+      targetPort: 3389
+{% else %}
+    - name: ssh
+      port: {{ ('20' + vm_ansible_port | default('22')) | int }}
+      protocol: TCP
+      targetPort: {{ vm_ansible_port | default('22') | int }}
+{% endif %}
+{% if template.ports is defined and template.ports | length > 0 %}
+{% for port in template.ports %}
+{% if port.port is defined and (port.port|int != 0) %}
+    - name: {{ port.name | default('svc-' + port.port|string) }}
+      port: {{ port.port|int }}
+      protocol: {{ port.protocol | default('TCP') }}
+      targetPort: {{ port.port|int }}
+{% endif %}
+{% endfor %}
+{% endif %}
+  selector:
+    kubevirt.io/domain: {{ template.name }}
+  sessionAffinity: None
+  type: NodePort

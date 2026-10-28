@@ -5,6 +5,7 @@
 **/*.env
 sean_login_info.yml
 .DS_Store
+.idea/
 :memory:.ses
 choose_demo.yml
 choose_demo_example_azure.yml
@@ -27,4 +28,3 @@ docs/demos/*/index.md
 
 # Leftover export from jopaik/patch_demo clone
 .patch_demo_export/
-

@@ -1,0 +1,7 @@
+apiVersion: upload.cdi.kubevirt.io/{{ kubevirt_api_version }}
+kind: UploadTokenRequest
+metadata:
+  name: {{ iso_pvc_name }}
+  namespace: {{ target_namespace }}
+spec:
+  pvcName: {{ iso_pvc_name }}

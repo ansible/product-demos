@@ -1,0 +1,23 @@
+---
+- name: Wait for garbage collection without removing finalizers
+  kubernetes.core.k8s_info:
+    api_version: '{{ resource.api }}'
+    kind: '{{ resource.kind }}'
+    name: '{{ template.name }}{{ resource.suffix }}'
+    namespace: '{{ target_namespace }}'
+    verify_ssl: false
+    api_key: '{{ api_key }}'
+  register: deleted_resource
+  until: deleted_resource.resources | length == 0
+  retries: '{{ instance_wait_retry_limit }}'
+  delay: 3
+  loop:
+    - {api: kubevirt.io/v1, kind: VirtualMachine, suffix: ''}
+    - {api: kubevirt.io/v1, kind: VirtualMachineInstance, suffix: ''}
+    - {api: cdi.kubevirt.io/v1beta1, kind: DataVolume, suffix: '-disk0'}
+    - {api: v1, kind: PersistentVolumeClaim, suffix: '-disk0'}
+    - {api: v1, kind: Service, suffix: '-remote'}
+    - {api: v1, kind: ConfigMap, suffix: '-configmap'}
+  loop_control:
+    loop_var: resource
+    label: '{{ resource.kind }} {{ template.name }}{{ resource.suffix }}'

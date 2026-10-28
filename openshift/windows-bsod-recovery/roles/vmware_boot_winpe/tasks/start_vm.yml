@@ -1,0 +1,34 @@
+---
+- name: ensure systems powered-on
+  community.vmware.vmware_guest:
+    hostname: "{{ lookup('env', 'VMWARE_HOST') }}"
+    username: "{{ lookup('env', 'VMWARE_USER') }}"
+    password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
+    validate_certs: false
+    name: "{{ item }}"
+    uuid: "{{ hostvars[item].config.uuid }}"
+    state: poweredon
+  async: 7200
+  poll: 0
+  register: vms_poweredon
+  loop: "{{ ansible_play_hosts }}"
+  when:
+    - nodes is defined
+    - hostvars[item].config.uuid is defined
+    - hostvars[item].config.name is defined
+    - (nodes | json_query(query)) | length > 0
+  vars:
+    query: "@[?name==`{{ hostvars[item].config.name }}`]"
+
+- name: wait for vms to be started
+  ansible.builtin.async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: vm_poweredon
+  until: vm_poweredon.finished
+  retries: "{{ vmware_boot_winpe_instance_wait_retry_limit }}"
+  delay: 10
+  loop: "{{ vms_poweredon.results }}"
+  when:
+    - nodes is defined
+    - vms_poweredon.results is defined
+    - item.ansible_job_id is defined

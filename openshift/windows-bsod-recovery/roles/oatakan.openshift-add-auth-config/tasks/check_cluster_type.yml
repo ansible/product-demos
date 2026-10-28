@@ -1,0 +1,22 @@
+---
+
+- name: get list of projects
+  k8s_info:
+    api_version: project.openshift.io/v1
+    kind: Project
+    validate_certs: "{{ lookup('env','K8S_AUTH_VERIFY_SSL') | bool }}"
+    api_key: "{{ api_key }}"
+  register: project_list
+  failed_when: false
+
+- name: set cluster to kubernetes
+  set_fact:
+    cluster: kubernetes
+  when: project_list.resources is undefined or project_list.resources|length == 0
+
+- name: set cluster to openshift
+  set_fact:
+    cluster: openshift
+  when:
+    - project_list.resources is defined
+    - project_list.resources|length > 0

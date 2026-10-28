@@ -1,0 +1,36 @@
+---
+temp_directory: tmp{{ awx_job_id | default('') }}
+
+iso_file: "windows_{{ template.name }}_autounattend{{ awx_job_id | default('') }}.iso"
+iso_pvc_name: "iso-auto-{{ (iso_file + template.name) | to_uuid }}"
+
+vm_os_type: "{{ nodes_os_type[template.name] | lower | default('redhat') }}"
+
+set_network_to_private: "([Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid]'{DCB00C01-570F-4A9B-8D69-199FDBA5723B}'))).GetNetworkConnections() | % {$_.GetNetwork().SetCategory(1)}"
+
+_remote_host: "{{ template_svc.result.spec.clusterIP if kubevirt_controller_in_cluster else template_vmi.resources[0].status.nodeName }}"
+_remote_port: "{{ template_svc.result.spec.ports[0].port if kubevirt_controller_in_cluster else template_svc.result.spec.ports[0].nodePort }}"
+
+# if using named network we'll assume direct connection and won't use service
+remote_host: "{{ template.networks[0].ip if (template.networks[0].ip is defined) else  _remote_host }}"
+remote_port: "{{ default_ports[vm_os_type] if (template.networks[0].ip is defined) else _remote_port }}"
+
+template_iso_pvc_name: "iso-{{ awx_job_id | default('') }}-{{ (template.name + '_' + (template.pvc_iso_template | default(''))) | to_uuid }}"
+
+template_dv_storage_size: "{{ dv_template_disk_info.resources[0].spec.storage.resources.requests.storage }}"
+template_pvc_storage_size: '{{ pvc_template_disk_info.resources[0].spec.resources.requests.storage }}'
+template_storage_size: "{{ (template.disks[0].size | default(template_dv_storage_size) | default(template_pvc_storage_size)) | replace('GiB', 'Gi') }}"
+
+os_version_reg_pattern: '.*v((\d+).(\d+).(\d+))$'
+
+rhel_os_template_name: rhel8-server-medium
+rhel_os_template_jmesquery: "[?starts_with(name, '{{ rhel_os_template_name }}')].labels"
+rhel_os_template_version: "{{ (os_templates.resources | map(attribute='metadata') | list | to_json | from_json | json_query(rhel_os_template_jmesquery))[0]['template.kubevirt.io/version'] | regex_replace(os_version_reg_pattern, '\\1') }}"
+
+win_os_template_name: windows2k19-server-medium
+win_os_template_jmesquery: "[?starts_with(name, '{{ win_os_template_name }}')].labels"
+win_os_template_version: "{{ (os_templates.resources | map(attribute='metadata') | list | to_json | from_json | json_query(win_os_template_jmesquery))[0]['template.kubevirt.io/version'] | regex_replace(os_version_reg_pattern, '\\1') }}"
+
+win_os_c_drive_partition: "{{ '4' if (template.efi | default(bootloader_efi is mapping) | bool) else '2' }}"
+
+kubevirt_launcher_image: "{{ kubevirt_virt_launcher_images['cnv'] if ((kubevirt_operator_namespace | default('')) == 'openshift-cnv') else kubevirt_virt_launcher_images['kubevirt'] }}"

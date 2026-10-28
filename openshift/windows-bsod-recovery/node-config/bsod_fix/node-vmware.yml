@@ -1,0 +1,57 @@
+---
+
+providers:
+  vcenter:
+    datacenter: cloud
+    cluster: mylab
+    resource_pool: manageto
+
+nodes:
+  - name: winfix1
+    role: windows
+    app_name: bsodfix
+    environment: dev
+    networks:
+      - name: mgmt
+    domain: home.ad
+    memory: 4096
+    cpu: 2
+    template: "{{ infra_template_name | default('windows-2022-standard') }}"
+    customization:
+      autologon: true
+      autologoncount: 2
+      orgname: Ansible
+      fullname: Ansible
+      timezone: 20
+      password: "{{ ansible_password }}"
+      runonce:
+        - powershell.exe -command "Get-NetConnectionProfile | Set-NetConnectionProfile -NetworkCategory Private"
+        - >
+          powershell.exe -command "Invoke-WebRequest -Uri
+          https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1
+          -OutFile C:\ConfigureRemotingForAnsible.ps1"
+        - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
+  - name: winfix2
+    role: windows
+    app_name: bsodfix
+    environment: dev
+    networks:
+      - name: mgmt
+    domain: home.ad
+    memory: 4096
+    cpu: 2
+    template: "{{ infra_template_name | default('windows-2022-standard') }}"
+    customization:
+      autologon: true
+      autologoncount: 2
+      orgname: Ansible
+      fullname: Ansible
+      timezone: 20
+      password: "{{ ansible_password }}"
+      runonce:
+        - powershell.exe -command "Get-NetConnectionProfile | Set-NetConnectionProfile -NetworkCategory Private"
+        - >
+          powershell.exe -command "Invoke-WebRequest -Uri
+          https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1
+          -OutFile C:\ConfigureRemotingForAnsible.ps1"
+        - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP

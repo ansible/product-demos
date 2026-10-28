@@ -1,0 +1,6 @@
+---
+
+state_map:
+  login: present
+  logout: absent
+state: "{{ state_map[auth_action] }}"

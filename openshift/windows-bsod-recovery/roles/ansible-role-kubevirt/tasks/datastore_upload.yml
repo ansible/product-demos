@@ -1,0 +1,58 @@
+---
+
+- name: create data volume for the iso file
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'iso-dv.yml') | from_yaml }}"
+    validate_certs: no
+    api_key: "{{ api_key }}"
+
+- name: wait for dv to be ready
+  k8s_info:
+    api_version: "{{ api_version_dv }}"
+    kind: DataVolume
+    name: '{{ iso_pvc_name }}'
+    namespace: '{{ target_namespace }}'
+    validate_certs: no
+    api_key: "{{ api_key }}"
+  register: dv_iso_auto_info
+  until: (dv_iso_auto_info.resources[0].status.phase | default('')) == 'UploadReady' or (dv_iso_auto_info.resources[0].status.phase | default('')) == 'Succeeded'
+  retries: 100
+  delay: 5
+  ignore_errors: yes
+
+- name: upload token request
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'cdi-upload-token-request.yml') | from_yaml }}"
+    validate_certs: no
+    api_key: "{{ api_key }}"
+  register: cdi_upload_token_request
+
+- name: upload iso file to data volume
+  ansible.builtin.uri:
+    url: '{{ kubevirt_upload_proxy_url }}/{{ kubevirt_api_version }}/upload'
+    method: POST
+    src: '{{ playbook_dir }}/{{ temp_directory }}/{{ iso_file }}'
+    force_basic_auth: yes
+    headers:
+      Authorization: 'Bearer {{ cdi_upload_token_request.result.status.token }}'
+    validate_certs: false
+  register: disk_iso_file
+  until: disk_iso_file is success
+  delay: 3
+  retries: 5
+
+#- name: upload iso file to data volume
+#  kubevirt_cdi_upload:
+#    pvc_namespace: '{{ target_namespace }}'
+#    pvc_name: '{{ iso_pvc_name }}'
+#    upload_host: '{{ kubevirt_upload_proxy_url }}'
+#    upload_host_validate_certs: false
+#    path: "{{ playbook_dir }}/{{ temp_directory }}/{{ iso_file }}"
+#    validate_certs: no
+#    api_key: "{{ api_key }}"
+#  register: disk_iso_file
+#  until: disk_iso_file is success
+#  delay: 3
+#  retries: 5

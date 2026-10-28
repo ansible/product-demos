@@ -1,0 +1,23 @@
+---
+- name: mount and copy files
+  block:
+    - name: mount {{ _file_name }}
+      community.windows.win_disk_image:
+        image_path: "{{ ansible_env.TEMP }}\\{{ _file_name }}"
+      register: win_disk_image
+      until: win_disk_image is success
+      delay: 3
+      retries: 5
+
+    - name: copy drivers
+      ansible.windows.win_copy:
+        src: "{{ win_disk_image.mount_paths[0] }}\\{{ item.directory }}\\"
+        dest: "{{ create_winpe_temp_directory }}\\{{ item.name }}"
+        remote_src: true
+
+  always:
+    - name: unmount {{ _file_name }}
+      community.windows.win_disk_image:
+        image_path: "{{ ansible_env.TEMP }}\\{{ _file_name }}"
+        state: absent
+      when: win_disk_image.mount_paths is defined

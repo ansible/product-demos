@@ -16,6 +16,8 @@ exclude_paths:
   - .github/
   - execution_environments/ee_contexts/
   - .patch_demo_export/
+  # Vendored BSOD recovery playbooks/roles (legacy naming; linted CaC is in openshift/setup.yml)
+  - openshift/windows-bsod-recovery/
 
 mock_modules:
   - amazon.aws.aws_caller_info

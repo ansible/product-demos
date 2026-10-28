@@ -1,0 +1,5 @@
+---
+- name: extract drivers
+  community.windows.win_unzip:
+    src: "{{ create_winpe_temp_directory }}\\{{ _file_name }}"
+    dest: "{{ create_winpe_temp_directory }}\\{{ item.name }}"

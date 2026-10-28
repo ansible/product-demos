@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+    <settings pass="oobeSystem">
+        <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <UserAccounts>
+                <AdministratorPassword>
+                    <Value>{{ ansible_password }}</Value>
+                    <PlainText>true</PlainText>
+                </AdministratorPassword>
+                <LocalAccounts>
+                    <LocalAccount wcm:action="add">
+                        <Password>
+                            <Value>{{ ansible_password }}</Value>
+                            <PlainText>true</PlainText>
+                        </Password>
+                        <Description>{{ template.user_name | default(ansible_user) | default('vagrant') }} User</Description>
+                        <DisplayName>{{ template.user_name | default(ansible_user) | default('vagrant') }}</DisplayName>
+                        <Group>Administrators</Group>
+                        <Name>{{ template.user_name | default(ansible_user) | default('vagrant') }}</Name>
+                    </LocalAccount>
+                </LocalAccounts>
+            </UserAccounts>
+            <OOBE>
+                <HideEULAPage>true</HideEULAPage>
+                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+                <NetworkLocation>Home</NetworkLocation>
+                <ProtectYourPC>1</ProtectYourPC>
+{% if not '2008' in (distro_name | default(template.template)) %}
+                <HideLocalAccountScreen>true</HideLocalAccountScreen>
+                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+{% endif %}
+                <SkipMachineOOBE>true</SkipMachineOOBE>
+                <SkipUserOOBE>true</SkipUserOOBE>
+            </OOBE>
+            <AutoLogon>
+                <Password>
+                    <Value>{{ ansible_password }}</Value>
+                    <PlainText>true</PlainText>
+                </Password>
+                <Username>{{ template.user_name | default(ansible_user) | default('vagrant') }}</Username>
+                <Enabled>true</Enabled>
+            </AutoLogon>
+            <FirstLogonCommands>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force"</CommandLine>
+                    <Description>Set Execution Policy 64 Bit</Description>
+                    <Order>1</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+{% if not '2008' in (distro_name | default(template.template)) %}
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Set-NetConnectionProfile -NetworkCategory Private"</CommandLine>
+                    <Description>Set network connection profile to private</Description>
+                    <Order>3</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c winrm quickconfig -q</CommandLine>
+                    <Description>winrm quickconfig -q</Description>
+                    <Order>4</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c winrm quickconfig -transport:http</CommandLine>
+                    <Description>winrm quickconfig -transport:http</Description>
+                    <Order>5</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c winrm set winrm/config @{MaxTimeoutms="1800000"}</CommandLine>
+                    <Description>Win RM MaxTimoutms</Description>
+                    <Order>6</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c winrm set winrm/config/winrs @{MaxMemoryPerShellMB="800"}</CommandLine>
+                    <Description>Win RM MaxMemoryPerShellMB</Description>
+                    <Order>7</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c winrm set winrm/config/service @{AllowUnencrypted="true"}</CommandLine>
+                    <Description>Win RM AllowUnencrypted</Description>
+                    <Order>8</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c winrm set winrm/config/service/auth @{Basic="true"}</CommandLine>
+                    <Description>Win RM auth Basic</Description>
+                    <Order>9</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c winrm set winrm/config/client/auth @{Basic="true"}</CommandLine>
+                    <Description>Win RM client auth Basic</Description>
+                    <Order>10</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c winrm set winrm/config/listener?Address=*+Transport=HTTP @{Port="5985"} </CommandLine>
+                    <Description>Win RM listener Address/Port</Description>
+                    <Order>11</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c netsh firewall add portopening TCP 5985 "Port 5985"</CommandLine>
+                    <Description>Win RM port open</Description>
+                    <Order>12</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c net stop winrm</CommandLine>
+                    <Description>Stop Win RM Service </Description>
+                    <Order>13</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c sc config winrm start= auto</CommandLine>
+                    <Description>Win RM Autostart</Description>
+                    <Order>14</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c net start winrm</CommandLine>
+                    <Description>Start Win RM Service</Description>
+                    <Order>15</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+{% else %}
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c reg add "HKLM\System\CurrentControlSet\Control\Network\NewNetworkWindowOff" /f</CommandLine>
+                    <Description>Network prompt</Description>
+                    <Order>3</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "{{ set_network_to_private }}"</CommandLine>
+                    <Description>Set network connection profile to private</Description>
+                    <Order>4</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+{% endif %}
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "& $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('{{ winrm_enable_script_url }}'))) -ForceNewSSLCert -EnableCredSSP"</CommandLine>
+                    <Description>Enable winrm</Description>
+                    <Order>20</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Enable-WSManCredSSP -Role Server -Force"</CommandLine>
+                    <Description>Enable winrm server role</Description>
+                    <Order>21</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Set-Item -Path 'WSMan:\localhost\Service\Auth\CredSSP' -Value $true"</CommandLine>
+                    <Description>Enable credssp authentication</Description>
+                    <Order>22</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+{% if not '2008' in (distro_name | default(template.template)) %}
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Resize-Partition -DriveLetter C -Size (Get-PartitionSupportedSize -DriveLetter C).Sizemax -ErrorAction SilentlyContinue"</CommandLine>
+                    <Description>Extend OS disk</Description>
+                    <Order>23</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+{% else %}
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "'select disk 0','select partition {{ win_os_c_drive_partition }}','extend' | diskpart | Out-Null"</CommandLine>
+                    <Description>Extend OS disk</Description>
+                    <Order>23</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+{% endif %}
+{% if template.networks is defined and template.networks[0].ip is defined and template.networks[0].gateway is defined and template.networks[0].netmask is defined %}
+{% if not '2008' in (distro_name | default(template.template)) %}
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "New-NetIPAddress –IPAddress {{ template.networks[0].ip }} -DefaultGateway {{ template.networks[0].gateway }} -PrefixLength {{ (template.networks[0].ip + '/' + template.networks[0].netmask) | ansible.utils.ipaddr('prefix') }} -InterfaceIndex (Get-NetAdapter | Where-Object { ($_.Name -like '*Ethernet*') -and ($_.Status -like 'Up') })[0].InterfaceIndex"</CommandLine>
+                    <Description>Set static ip</Description>
+                    <Order>50</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+{% else %}
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c netsh int ipv4 set address "Local Area connection" static {{ template.networks[0].ip }} {{ template.networks[0].netmask }} {{ template.networks[0].gateway }}</CommandLine>
+                    <Description>Set static ip</Description>
+                    <Order>50</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+{% endif %}
+{% if template.networks[0].dns_servers is defined %}
+{% if not '2008' in (distro_name | default(template.template)) %}
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Set-DNSClientServerAddress –InterfaceIndex (Get-NetAdapter | Where-Object { ($_.Name -like '*Ethernet*') -and ($_.Status -like 'Up') })[0].InterfaceIndex –ServerAddresses {{ template.networks[0].dns_servers|join(',') }}"</CommandLine>
+                    <Description>Set static ip</Description>
+                    <Order>51</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+{% else %}
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c netsh int ipv4 set dns "Local Area connection" static {{ template.networks[0].dns_servers[0] }}</CommandLine>
+                    <Description>Set static ip</Description>
+                    <Order>51</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+{% endif %}
+{% endif %}
+{% endif %}
+            </FirstLogonCommands>
+            <ShowWindowsLive>false</ShowWindowsLive>
+        </component>
+    </settings>
+    <settings pass="specialize">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <OEMInformation>
+                <HelpCustomized>false</HelpCustomized>
+            </OEMInformation>
+            <!-- Rename computer here. -->
+            <ComputerName>{{ template.name }}</ComputerName>
+            <TimeZone>Central Standard Time</TimeZone>
+            <RegisteredOwner/>
+        </component>
+        <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Security-SPP-UX" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <SkipAutoActivation>true</SkipAutoActivation>
+        </component>
+        <component name="Microsoft-Windows-Deployment" processorArchitecture="x86" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <ExtendOSPartition>
+                <Extend>true</Extend>
+            </ExtendOSPartition>
+        </component>
+    </settings>
+    <cpi:offlineImage xmlns:cpi="urn:schemas-microsoft-com:cpi" cpi:source="catalog:d:/sources/install_windows 7 ENTERPRISE.clg"/>
+</unattend>
