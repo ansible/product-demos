@@ -1,0 +1,27 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ template.name }}-{{ port.name | default(port.port|string) }}
+  namespace: {{ target_namespace }}
+{% if owner_uid is defined and owner_uid is not none %}
+  ownerReferences:
+    - apiVersion: "{{ api_version_virtual_machine }}"
+      kind: VirtualMachine
+      name: {{ template.name }}
+      uid: {{ owner_uid }}
+      controller: true
+      blockOwnerDeletion: true
+{% endif %}
+spec:
+  wildcardPolicy: None
+  to:
+    kind: Service
+    name: {{ template.name }}-remote
+    weight: 100
+  port:
+    targetPort: {{ port.name | default('svc-' + port.port|string) }}
+{% if port.secure is defined and port.secure %}
+  tls:
+    termination: {{ port.tls.termination | default('passthrough') }}
+    insecureEdgeTerminationPolicy: {{ port.tls.insecure_edge_termination_policy | default('Redirect') }}
+{% endif %}

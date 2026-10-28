@@ -1,0 +1,47 @@
+---
+- name: attach iso
+  kubernetes.core.k8s:
+    state: present
+    merge_type: merge
+    validate_certs: false
+    api_key: "{{ api_key }}"
+    definition:
+      apiVersion: "{{ kubevirt_boot_winpe_api_version_virtual_machine }}"
+      kind: VirtualMachine
+      metadata:
+        name: "{{ hostvars[vm].labels['vm.kubevirt.io/name'] }}"
+        namespace: "{{ kubevirt_boot_winpe_target_namespace }}"
+      spec:
+        runStrategy: Manual
+        running:
+        template:
+          spec:
+            domain:
+              devices:
+                disks:
+                  - bootOrder: 1
+                    cdrom:
+                      bus: sata
+                    name: cd-drive-1
+                    shareable: true
+                    readonly: true
+                  - bootOrder: 2
+                    disk:
+                      bus: virtio
+                    name: disk0
+            volumes:
+              - dataVolume:
+                  name: "{{ hostvars[vm].labels['vm.kubevirt.io/name'] }}-disk0"
+                name: disk0
+              - name: cd-drive-1
+                persistentVolumeClaim:
+                  claimName: "{{ kubevirt_boot_winpe_iso_pvc_name }}"
+  loop: "{{ ansible_play_hosts }}"
+  loop_control:
+    loop_var: vm
+  when:
+    - nodes is defined
+    - hostvars[vm].labels['vm.kubevirt.io/name'] is defined
+    - (nodes | json_query(query)) | length > 0
+  vars:
+    query: "@[?name==`{{ hostvars[vm].labels['vm.kubevirt.io/name'] }}`]"

@@ -1,0 +1,24 @@
+---
+- name: wait for vm to be stopped
+  community.vmware.vmware_vm_info:
+    hostname: "{{ lookup('env', 'VMWARE_HOST') }}"
+    username: "{{ lookup('env', 'VMWARE_USER') }}"
+    password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
+    validate_certs: false
+    vm_name: "{{ item }}"
+    vm_type: vm
+  register: vm_info
+  loop: "{{ ansible_play_hosts }}"
+  until:
+    - vm_info.virtual_machines is defined
+    - vm_info.virtual_machines | length
+    - vm_info.virtual_machines[0].power_state == 'poweredOff'
+  retries: "{{ vmware_boot_winpe_instance_wait_retry_limit }}"
+  delay: 10
+  when:
+    - nodes is defined
+    - hostvars[item].config.uuid is defined
+    - hostvars[item].config.name is defined
+    - (nodes | json_query(query)) | length > 0
+  vars:
+    query: "@[?name==`{{ hostvars[item].config.name }}`]"

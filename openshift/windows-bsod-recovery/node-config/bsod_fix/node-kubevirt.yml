@@ -1,0 +1,25 @@
+---
+
+nodes:
+  - name: winfix1
+    role: windows
+    app_name: bsodfix
+    environment: dev
+    domain: home.ad
+    disks:
+      - name: winfix1-disk0
+        size: 40GiB
+    memory: 6144
+    cpu: 2
+    template: "{{ infra_template_name | default('windows-2022-standard') }}"
+  - name: winfix2
+    role: windows
+    app_name: bsodfix
+    environment: dev
+    domain: home.ad
+    disks:
+      - name: winfix2-disk0
+        size: 40GiB
+    memory: 6144
+    cpu: 2
+    template: "{{ infra_template_name | default('windows-2022-standard') }}"

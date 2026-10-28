@@ -1,0 +1,18 @@
+---
+- name: shutdown vm
+  ansible.builtin.include_tasks: stop_vm.yml
+
+- name: attach winpe iso and boot from it
+  ansible.builtin.include_tasks: attach_iso.yml
+
+- name: start vm
+  ansible.builtin.include_tasks: start_vm.yml
+
+- name: wait for vm to shutdown gracefully
+  ansible.builtin.include_tasks: wait_for_vm_stop.yml
+
+- name: detach winpe iso
+  ansible.builtin.include_tasks: detach_iso.yml
+
+- name: start vm
+  ansible.builtin.include_tasks: start_vm.yml

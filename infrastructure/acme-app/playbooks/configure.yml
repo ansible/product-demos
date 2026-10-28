@@ -1,6 +1,6 @@
 ---
 - name: Update ACME App configuration from survey
-  hosts: "{{ _hosts | default('aws_rhel9') }}"
+  hosts: "{{ _hosts | default('aws-rhel9') }}"
   become: true
 
   vars:

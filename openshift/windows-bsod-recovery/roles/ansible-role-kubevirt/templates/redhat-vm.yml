@@ -1,0 +1,168 @@
+apiVersion: "{{ api_version_virtual_machine }}"
+kind: VirtualMachine
+metadata:
+  annotations:
+{% if template.networks is defined and template.networks|length > 0 %}
+    k8s.v1.cni.cncf.io/networks: "{{ template.networks | map(attribute='name') | join(', ') }}"
+{% endif %}
+    name.os.template.kubevirt.io/{{ kubevirt_guest_os_id }}: {{ template.name }}
+  name: {{ template.name }}
+  namespace: '{{ target_namespace }}'
+  labels:
+    app: {{ template.name }}
+    app_name: {{ template.app_name }}
+    role: {{ template.role }}
+{% if kubevirt_action_id is defined and kubevirt_action_id | string | length > 0 %}
+    automation.ansible.com/action-id: {{ kubevirt_action_id }}
+{% endif %}
+{% if template.template is defined %}
+    vm.kubevirt.io/template: {{ template.template }}
+    vm.kubevirt.io/template-namespace: {{ template_namespace }}
+{% endif %}
+    workload.template.kubevirt.io/server: 'true'
+    os.family: redhat
+    os.distribution: {{ distro_name | default(vm_os_type, true) }}
+spec:
+  dataVolumeTemplates:
+    - apiVersion: {{ api_version_dv }}
+      kind: DataVolume
+      metadata:
+        name: {{ template.name }}-disk0
+{% if kubevirt_action_id is defined and kubevirt_action_id | string | length > 0 %}
+        labels:
+          automation.ansible.com/action-id: {{ kubevirt_action_id }}
+{% endif %}
+      spec:
+        source:
+{% if template.template is defined %}
+          pvc:
+            namespace: {{ template_image_namespace }}
+            name: {{ template_image_pvc_name }}
+{% else %}
+          blank: {}
+{% endif %}
+        storage:
+          resources:
+            requests:
+              storage: {{ template_storage_size }}
+          storageClassName: {{ pvc_storage_class }}
+  runStrategy: Halted
+  template:
+    metadata:
+      annotations:
+        vm.kubevirt.io/flavor: medium
+        vm.kubevirt.io/os: {{ kubevirt_guest_os_id }}
+        vm.kubevirt.io/workload: server
+      labels:
+        kubevirt.io/domain: {{ template.name }}
+        kubevirt.io/size: medium
+        vm.kubevirt.io/name: {{ template.name }}
+        app: {{ template.name }}
+        app_name: {{ template.app_name }}
+        role: {{ template.role }}
+{% if kubevirt_action_id is defined and kubevirt_action_id | string | length > 0 %}
+        automation.ansible.com/action-id: {{ kubevirt_action_id }}
+{% endif %}
+    spec:
+      domain:
+        cpu:
+          sockets: {{ template.cpu }}
+{% if template.cores is defined %}
+          cores: {{ template.cores }}
+{% endif %}
+{% if template.threads is defined %}
+          threads: {{ template.threads }}
+{% endif %}
+{% if template.cpu_model is defined and template.cpu_model == 'host-passthrough' %}
+          model: {{ template.cpu_model }}
+{% endif %}
+        devices:
+          disks:
+            - bootOrder: 1
+              disk:
+                bus: {{ template.boot_disk_bus | default('virtio') }}
+              name: disk0
+{% if boot_iso_pvc_name is defined and boot_iso_pvc_name|length > 0 %}
+            - bootOrder: 2
+              cdrom:
+                bus: sata
+              name: boot-iso
+{% else %}
+            - name: cloudinitdisk
+              bootOrder: 3
+              cdrom:
+                bus: sata
+                readonly: true
+{% endif %}
+          interfaces:
+{% if template.networks is defined and template.networks|length > 0 %}
+{% for network in template.networks %}
+            - bridge: {}
+              model: {{ network.model | default('virtio') }}
+              name: nic{{ (loop.index-1)|string }}
+{% endfor %}
+{% else %}
+            - bootOrder: 2
+              masquerade: {}
+              model: virtio
+              name: nic0
+{% endif %}
+{% if template.efi | default(bootloader_efi is mapping) | bool %}
+        firmware:
+          bootloader:
+{% if bootloader_efi is mapping %}
+            efi: {{ bootloader_efi }}
+{% else %}
+            efi: {}
+{% endif %}
+        features:
+          smm:
+            enabled: true
+{% endif %}
+        machine:
+          type: ''
+        resources:
+          requests:
+            memory: {{ ((template.memory|int) * kubevirt_memory_overcommit_ratio) | int | string }}Mi
+        memory:
+          guest: {{ template.memory }}Mi
+{% if template.eviction_strategy | default(kubevirt_eviction_strategy) | length > 0 %}
+      evictionStrategy: {{ template.eviction_strategy | default(kubevirt_eviction_strategy) }}
+{% endif %}
+      hostname: {{ template.name }}
+      networks:
+{% if template.networks is defined and template.networks|length > 0 %}
+{% for network in template.networks %}
+        - multus:
+            networkName: {{ network.name }}
+          name: nic{{ (loop.index-1)|string }}
+{% endfor %}
+{% else %}
+        - name: nic0
+          pod: {}
+{% endif %}
+      terminationGracePeriodSeconds: {{ template.shutdown_grace_period | default(kubevirt_shutdown_grace_period) }}
+      volumes:
+        - dataVolume:
+            name: {{ template.name }}-disk0
+          name: disk0
+{% if boot_iso_pvc_name is defined and boot_iso_pvc_name|length > 0 %}
+        - name: boot-iso
+          persistentVolumeClaim:
+            claimName: {{ boot_iso_pvc_name }}
+{% else %}
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+{% if template.networks is defined and template.networks|length > 0 %}
+{% set network_data_content %}
+{% include 'templates/cloud_init-network.yml.j2' %}
+{% endset %}
+            networkData: |
+{{ network_data_content | indent(14, True) }}
+{% endif %}
+{% set user_data_content %}
+{% include 'templates/cloud_init-user.yml.j2' %}
+{% endset %}
+            userData: |
+{{ user_data_content | indent(14, True) }}
+{% endif %}

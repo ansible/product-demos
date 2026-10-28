@@ -1,0 +1,12 @@
+---
+- name: Provision node(s)
+  hosts: localhost
+  become: false
+  vars:
+    provider: kubevirt
+    scenario: winpe
+  vars_files:
+    - node-config/{{ scenario }}/node-{{ provider }}.yml
+
+  roles:
+    - ansible-role-{{ provider }}

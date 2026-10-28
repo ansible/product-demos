@@ -1,0 +1,65 @@
+---
+
+controller_execution_environments:
+  - name: ansible-base-ee-dev
+    image: quay.io/oatakan/ansible-base-ee-dev:latest
+
+controller_organizations:
+  - name: Default
+    default_environment: ansible-base-ee-dev
+
+controller_credentials:
+  - name: Windows Machine Credential
+    credential_type: Machine
+    organization: Default
+    inputs:
+      username: "{{ lookup('env', 'AAP_CRED_MACHINE_USERNAME') | default('') }}"
+      password: "{{ lookup('env', 'AAP_CRED_MACHINE_PASSWORD') | default('') }}"
+
+controller_projects:
+  - name: ansible-windows-0-day-bsod-recovery-fix
+    organization: Default
+    scm_type: git
+    scm_url: https://github.com/oatakan/ansible-windows-0-day-bsod-recovery.git
+    scm_branch: main
+
+controller_inventories:
+  - name: localhost
+    description: local inventory
+    organization: Default
+
+controller_hosts:
+  - name: localhost
+    inventory: localhost
+    variables:
+      ansible_connection: local
+      ansible_python_interpreter: /usr/bin/python3
+
+controller_templates:
+  - name: Provision Infrastructure
+    description: Provisions the required infrastructure
+    organization: Default
+    project: ansible-windows-0-day-bsod-recovery-fix
+    playbook: provision_infra_multi.yml
+    inventory: localhost
+    extra_vars:
+      provider: vmware
+      scenario: winpe
+      infra_template_name: windows-2022-standard
+    execution_environment: ansible-base-ee-dev
+    ask_credential_on_launch: true
+    ask_variables_on_launch: true
+
+  - name: Remove Infrastructure
+    description: Removes the provisioned systems
+    organization: Default
+    project: ansible-windows-0-day-bsod-recovery-fix
+    playbook: remove_infra_multi.yml
+    extra_vars:
+      provider: vmware
+      scenario: winpe
+    execution_environment: ansible-base-ee-dev
+    ask_credential_on_launch: true
+    ask_inventory_on_launch: true
+    ask_limit_on_launch: true
+    ask_variables_on_launch: true

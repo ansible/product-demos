@@ -7,7 +7,7 @@ Enterprise-grade patching workflow with snapshot safety, parallel RHEL and Windo
 
 - **If using RHDP (demo.redhat.com):** Run **APD ǀ Multi-demo setup** to configure all demo categories at once, or run **APD ǀ Single demo setup** and choose `cloud` — either option configures the cloud patching templates and credentials. AWS and APD Machine credentials are pre-configured for you.
 - **If using your own installation:** Run **APD ǀ Single demo setup** and choose `cloud`. You will also need to configure the **AWS** credential (Access Key + Secret Key), add an SSH private key and Windows username/password to **APD Machine Credential**, and ensure you have the target VMs, VPC, and keypair provisioned.
-- Run **Deploy Cloud Stack in AWS** to create the five target VMs (aws_rhel8, aws_rhel9, aws-dc, aws_win1, reports)
+- Run **Deploy Cloud Stack in AWS** to create the five target VMs (aws-rhel9, aws-rhel10, aws-dc, aws_win1, reports)
 - **RHSM Registration credential:** Fill in your Red Hat org ID and activation key (see credential setup below). **Without this, all RHEL patching steps are skipped** — the workflow still succeeds but only Windows hosts actually get patched. RHEL hosts will show as SKIPPED/UNREGISTERED in the output and compliance report.
 
 ## Configure credentials before first run
@@ -20,8 +20,8 @@ Enterprise-grade patching workflow with snapshot safety, parallel RHEL and Windo
 
 | Prompt | Variable | Type | Required | Default |
 |--------|----------|------|----------|---------|
-| AWS Region | `aws_region` | multiplechoice | Yes | `us-east-1` |
-| RHEL hosts | `_hosts` | text | Yes | `aws_rhel8:aws_rhel9` |
+| AWS Region | `aws_region` | multiplechoice | Yes | `us-east-2` |
+| RHEL hosts | `_hosts` | text | Yes | `aws-rhel9:aws-rhel10` |
 | Windows hosts | `_hosts_windows` | text | Yes | `aws-dc:aws_win1` |
 | Report server | `_report_server` | text | Yes | `reports` |
 | RHEL Advisory IDs | `input_cve_ids` | text | Yes | `RHSA-2024:3138, CVE-2024-33599` |
@@ -78,7 +78,7 @@ graph LR
 
 1. **Run setup:** On RHDP (Red Hat Demo Platform), run **APD ǀ Multi-demo setup** to configure everything. On your own install, run **APD ǀ Single demo setup** → choose `cloud`. Then fill in the **RHSM Registration** credential with your org ID and activation key (see credential setup above).
 2. **Deploy the stack:** Launch **Deploy Cloud Stack in AWS** to create the five target VMs. Wait for it to complete and verify the hosts appear in inventory.
-3. **Set the stage:** Show the audience the five VMs in AAP inventory (aws_rhel8, aws_rhel9, aws-dc, aws_win1, reports). Point out it's a mixed Linux/Windows fleet. The workflow patches the four workload VMs and publishes the dashboard on `reports`. `aws_kafka` is out of scope.
+3. **Set the stage:** Show the audience the five VMs in AAP inventory (aws-rhel9, aws-rhel10, aws-dc, aws_win1, reports). Point out it's a mixed Linux/Windows fleet. The workflow patches the four workload VMs and publishes the dashboard on `reports`. `aws_kafka` is out of scope.
 4. **Launch the workflow:** Navigate to Templates → Patch Cloud Stack in AWS. Host lists default to the cloud-stack VMs; fill in a real RHSA/CVE and KB (defaults work). Launch.
 5. **Snapshot step:** While it runs, explain that the first node takes EBS snapshots of the target instances — this is the safety net. 'If anything goes wrong during patching, we restore to this point.'
 6. **Parallel paths:** Point out the RHEL and Windows pre-checks running simultaneously. 'One workflow, two operating systems, zero extra effort.'

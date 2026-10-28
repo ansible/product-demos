@@ -1,0 +1,157 @@
+---
+
+- name: fail if no template and disk specified
+  fail:
+    msg: "At least one disk must be specified when no template is used"
+  when:
+    - template.template is undefined
+    - template.disks[0].size is undefined
+
+- name: fail if both template and pvc_iso_template is specified
+  fail:
+    msg: "template and pvc_iso_template are mutually exclusive, only define one of them"
+  when:
+    - template.template is defined
+    - template.pvc_iso_template is defined
+
+- name: Reset image metadata for this node
+  ansible.builtin.set_fact:
+    bootloader_efi: null
+    distro_name: null
+    boot_iso_pvc_name: ''
+    template_image_pvc_name: ''
+    template_image_namespace: '{{ template_namespace }}'
+
+- block:
+    - name: Resolve the current image DataSource
+      kubernetes.core.k8s_info:
+        api_version: '{{ api_version_dv }}'
+        kind: DataSource
+        name: '{{ template.template }}-template-disk0'
+        namespace: '{{ template_namespace }}'
+        verify_ssl: false
+        api_key: '{{ api_key }}'
+      register: template_datasource
+
+    - name: Require a ready PVC DataSource when present
+      ansible.builtin.assert:
+        that:
+          - template_datasource.resources[0].spec.source.pvc is defined
+          - >-
+            template_datasource.resources[0].status.conditions | default([]) |
+            selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0
+        fail_msg: 'Template {{ template.template }} has no ready PVC image in its DataSource.'
+      when: template_datasource.resources | length > 0
+
+    - name: Select DataSource image or legacy fixed-name disk
+      ansible.builtin.set_fact:
+        template_image_pvc_name: "{{ template_datasource.resources[0].spec.source.pvc.name if template_datasource.resources | length > 0 else template.template + '-template-disk0' }}"
+        template_image_namespace: "{{ template_datasource.resources[0].spec.source.pvc.namespace | default(template_namespace) if template_datasource.resources | length > 0 else template_namespace }}"
+
+    - name: Read source image DataVolume
+      kubernetes.core.k8s_info:
+        api_version: '{{ api_version_dv }}'
+        kind: DataVolume
+        name: '{{ template_image_pvc_name }}'
+        namespace: '{{ template_image_namespace }}'
+        verify_ssl: false
+        api_key: '{{ api_key }}'
+      register: dv_template_disk_info
+
+    - name: Read source image PVC
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: PersistentVolumeClaim
+        name: '{{ template_image_pvc_name }}'
+        namespace: '{{ template_image_namespace }}'
+        verify_ssl: false
+        api_key: '{{ api_key }}'
+      register: pvc_template_disk_info
+
+    - name: Require a completed source image before creating a VM
+      ansible.builtin.assert:
+        that:
+          - pvc_template_disk_info.resources | length > 0
+          - pvc_template_disk_info.resources[0].metadata.deletionTimestamp is undefined
+          - pvc_template_disk_info.resources[0].status.phase | default('') == 'Bound'
+          - >-
+            dv_template_disk_info.resources | length == 0 or
+            dv_template_disk_info.resources[0].status.phase | default('') == 'Succeeded'
+          - >-
+            pvc_template_disk_info.resources[0].metadata.annotations['cdi.kubevirt.io/storage.pod.phase'] | default('Succeeded') == 'Succeeded'
+        fail_msg: 'Template image {{ template_image_namespace }}/{{ template_image_pvc_name }} is missing, terminating, or incomplete.'
+
+    - name: Read template boot metadata
+      kubernetes.core.k8s_info:
+        api_version: template.openshift.io/v1
+        kind: Template
+        name: '{{ template.template }}'
+        namespace: '{{ template_namespace }}'
+        verify_ssl: false
+        api_key: '{{ api_key }}'
+      register: template_info
+
+    - name: Inherit EFI bootloader from the template
+      ansible.builtin.set_fact:
+        bootloader_efi: "{{ (template_info.resources[0].objects | selectattr('kind', 'equalto', 'VirtualMachine') | first).spec.template.spec.domain.firmware.bootloader.efi | default(None) }}"
+      when: template_info.resources | length > 0
+
+  when: template.template is defined
+
+- name: check if template iso pvc exists
+  k8s_info:
+    api_version: v1
+    kind: PersistentVolumeClaim
+    name: '{{ template_iso_pvc_name }}'
+    namespace: '{{ template_namespace }}'
+    validate_certs: no
+    api_key: "{{ api_key }}"
+  register: template_iso_pvc_info
+  when: template.pvc_iso_template is defined
+
+- name: set pvc iso template name
+  set_fact:
+    boot_iso_pvc_name: '{{ template_iso_pvc_info.resources[0].metadata.name | default("") }}'
+
+- name: Set OS metadata for this node
+  ansible.builtin.set_fact:
+    distro_name: "{{ pvc_template_disk_info.resources[0].metadata.labels['os.distribution'] | default(template_iso_pvc_info.resources[0].metadata.labels['os.distribution']) | default('') }}"
+    nodes_os_type: "{{ nodes_os_type | default({}) | combine({template.name: (template.os_type | default(pvc_template_disk_info.resources[0].metadata.labels['os.family']) | default(template_iso_pvc_info.resources[0].metadata.labels['os.family']) | default('redhat') | lower)}) }}"
+
+- name: Derive guest OS metadata from the actual source template
+  ansible.builtin.set_fact:
+    kubevirt_guest_os_id: >-
+      {{ template.os_id | default(
+      (template_info.resources[0].metadata.labels | default({}) | dict2items |
+      selectattr('key', 'match', '^os[.]template[.]kubevirt[.]io/') |
+      map(attribute='key') | map('regex_replace', '^os[.]template[.]kubevirt[.]io/', '') |
+      first) | default(distro_name, true) | default(vm_os_type, true)) }}
+
+- name: Configure narrowly scoped cross-namespace clone permission
+  block:
+    - name: Create a clone-source Role in the image namespace
+      kubernetes.core.k8s:
+        state: present
+        verify_ssl: false
+        api_key: '{{ api_key }}'
+        definition:
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: Role
+          metadata:
+            name: '{{ kubevirt_clone_role_name }}'
+            namespace: '{{ template_image_namespace }}'
+          rules:
+            - apiGroups: [cdi.kubevirt.io]
+              resources: [datavolumes/source]
+              verbs: [create]
+      when: kubevirt_clone_manage_role | bool
+
+    - name: Bind the VM service account for this destination namespace
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', 'clone-role-binding.yml') | from_yaml }}"
+        verify_ssl: false
+        api_key: '{{ api_key }}'
+  when:
+    - kubevirt_clone_cluster_role_enable | bool
+    - template_image_namespace != target_namespace

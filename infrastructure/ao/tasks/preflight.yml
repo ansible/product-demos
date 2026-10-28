@@ -31,13 +31,13 @@
         | list
       }}
 
-- name: Default cloud-stack host check to aws_rhel9
+- name: Default cloud-stack host check to aws-rhel9
   when:
     - ao_cloud_stack_demos | length > 0
     - (ao_required_cloud_hosts | default([]) | length) == 0
   ansible.builtin.set_fact:
     ao_required_cloud_hosts:
-      - aws_rhel9
+      - aws-rhel9
 
 - name: Check cloud-stack hosts when a seeded demo needs them
   when: ao_cloud_stack_demos | length > 0

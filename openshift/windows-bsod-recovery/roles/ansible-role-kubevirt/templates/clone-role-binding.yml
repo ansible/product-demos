@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: allow-clone-to-{{ target_namespace }}
+  namespace: {{ template_image_namespace }}
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: {{ target_namespace }}
+roleRef:
+  kind: {{ 'Role' if kubevirt_clone_manage_role else 'ClusterRole' }}
+  name: {{ kubevirt_clone_role_name if kubevirt_clone_manage_role else kubevirt_clone_cluster_role_name }}
+  apiGroup: rbac.authorization.k8s.io

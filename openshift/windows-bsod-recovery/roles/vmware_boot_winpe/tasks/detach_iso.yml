@@ -1,0 +1,58 @@
+---
+- name: set boot from disk
+  community.vmware.vmware_guest_boot_manager:
+    hostname: "{{ lookup('env', 'VMWARE_HOST') }}"
+    username: "{{ lookup('env', 'VMWARE_USER') }}"
+    password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
+    validate_certs: false
+    uuid: "{{ hostvars[item].config.uuid }}"
+    boot_order:
+      - disk
+      - cdrom
+  loop: "{{ ansible_play_hosts }}"
+  when:
+    - nodes is defined
+    - hostvars[item].config.uuid is defined
+    - hostvars[item].config.name is defined
+    - (nodes | json_query(query)) | length > 0
+  vars:
+    query: "@[?name==`{{ hostvars[item].config.name }}`]"
+
+- name: detach iso
+  community.vmware.vmware_guest:
+    hostname: "{{ lookup('env', 'VMWARE_HOST') }}"
+    username: "{{ lookup('env', 'VMWARE_USER') }}"
+    password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
+    validate_certs: false
+    uuid: "{{ hostvars[item].config.uuid }}"
+    cdrom:
+      - type: iso
+        controller_type: sata
+        controller_number: 0
+        unit_number: 0
+        state: absent
+    state: present
+  async: 7200
+  poll: 0
+  register: vms_detach_iso
+  loop: "{{ ansible_play_hosts }}"
+  when:
+    - nodes is defined
+    - hostvars[item].config.uuid is defined
+    - hostvars[item].config.name is defined
+    - (nodes | json_query(query)) | length > 0
+  vars:
+    query: "@[?name==`{{ hostvars[item].config.name }}`]"
+
+- name: wait for vms to be updated
+  ansible.builtin.async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: vm_detach_iso
+  until: vm_detach_iso.finished
+  retries: "{{ vmware_boot_winpe_instance_wait_retry_limit }}"
+  delay: 10
+  loop: "{{ vms_detach_iso.results }}"
+  when:
+    - nodes is defined
+    - vms_detach_iso.results is defined
+    - item.ansible_job_id is defined

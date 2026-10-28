@@ -16,6 +16,8 @@ This category of demos shows examples of OpenShift operations and management wit
 |----------|-------------|
 | [**CNV — Infra Stack**](docs/openshift-cnv-infra-stack.md) | Workflow to deploy virtualized infrastructure (RHEL 8 + RHEL 9 VMs) in OpenShift Virtualization with inventory sync. |
 | [**CNV — Patch Workflow**](docs/openshift-cnv-patch-workflow.md) | Snapshot CNV virtual machines, apply patches, and automatically restore from snapshot on failure. |
+| [**Windows — BSOD Recovery**](docs/openshift-windows-bsod-recovery.md) | Simulate and recover from a Windows Blue Screen of Death on OpenShift Virtualization. |
+| [**Windows — Generate WinPE Image**](docs/openshift-windows-bsod-recovery.md) | Build and upload a WinPE recovery ISO to OpenShift Virtualization. |
 
 ### Jobs
 

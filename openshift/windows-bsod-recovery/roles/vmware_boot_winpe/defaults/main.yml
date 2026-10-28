@@ -1,0 +1,8 @@
+---
+
+vmware_boot_winpe_iso_file: "{{ iso_file | default('file.iso') }}"
+
+vmware_boot_winpe_vcenter_target_datastore: "{{ vcenter_target_datastore | default('datastore2') }}"
+
+vmware_boot_winpe_vcenter_destination_path: "{{ vcenter_destination_path | default('iso') }}"
+vmware_boot_winpe_instance_wait_retry_limit: "{{ instance_wait_retry_limit | default(300) }}"

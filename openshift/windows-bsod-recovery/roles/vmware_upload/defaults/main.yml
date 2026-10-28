@@ -1,0 +1,7 @@
+---
+
+vmware_upload_iso_file_path: "{{ iso_file_path | default('file.iso') }}"
+
+vmware_upload_vcenter_target_datastore: "{{ vcenter_target_datastore | default('datastore2') }}"
+
+vmware_upload_vcenter_destination_path: "{{ vcenter_destination_path | default('iso') }}"

