@@ -16,10 +16,11 @@ fullnameOverride: ""
 
 image:
   # -- Registry and organization holding the OpenFlake images.
-  registry: quay.io/zleblanc
+  registry: quay.io/acme_corp
   # -- Tag applied to both images unless overridden per component.
-  tag: latest
-  pullPolicy: IfNotPresent
+  tag: stable
+  # stable is a mutable tag, so IfNotPresent would reuse a stale cached layer.
+  pullPolicy: Always
   # -- Names of image pull secrets, e.g. [{name: my-quay-secret}].
   pullSecrets: []
 

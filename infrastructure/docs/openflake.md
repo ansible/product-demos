@@ -97,7 +97,7 @@ Everything the survey does not expose is settable in extra_vars.
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `openflake_release_name` | `openflake` | Helm release name |
-| `openflake_image_registry` | `quay.io/rlopez133/openflake` | Registry and org holding the images |
+| `openflake_image_registry` | `quay.io/acme_corp` | Registry and org holding the images |
 | `openflake_image_pull_policy` | `Always` | `stable` is a mutable tag, so `IfNotPresent` would reuse a stale layer |
 | `openflake_route_enabled` | `true` | Set false for in-cluster-only access |
 | `openflake_route_tls_enabled` | `true` | Edge TLS termination |

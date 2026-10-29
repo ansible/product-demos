@@ -16,7 +16,7 @@
     # ships the chart it installs.
     _openflake_chart_path: '{{ playbook_dir }}/chart'
 
-    _openflake_image_registry: '{{ openflake_image_registry | default("quay.io/rlopez133/openflake") }}'
+    _openflake_image_registry: '{{ openflake_image_registry | default("quay.io/acme_corp") }}'
     _openflake_image_tag: '{{ openflake_image_tag | default("stable") }}'
     # The tag is mutable, so IfNotPresent would reuse a stale cached layer.
     _openflake_image_pull_policy: '{{ openflake_image_pull_policy | default("Always") }}'
