@@ -1876,3 +1876,26 @@
     playbooks: 1
   url: /demos/infrastructure-mattermost/
   github_path: infrastructure/setup.yml
+
+- slug: openflake
+  readme_path: infrastructure/docs/openflake.md
+  title: "Infrastructure | OpenFlake"
+  subtitle: "Run a ServiceNow-compatible ITSM backend on OpenShift for demos"
+  category: infrastructure
+  status: active
+  featured: false
+  tags:
+    - Playbook
+    - Survey
+    - OpenShift
+    - ITSM
+    - ServiceNow
+    - Helm
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1f6feb 0%, #0b3d91 100%)"
+    icon: "🎫"
+  blurb: "Deploy OpenFlake — a lightweight ITSM platform with a ServiceNow-compatible REST API — on OpenShift via its bundled Helm chart, so servicenow.itsm content can run against it with only a URL change."
+  stats:
+    playbooks: 1
+  url: /demos/openflake/
+  github_path: infrastructure/openflake/provision.yml

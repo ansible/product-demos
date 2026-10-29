@@ -61,11 +61,17 @@
     wait: '{{ _openflake_wait | bool }}'
     wait_timeout: '{{ _openflake_wait_timeout }}'
     release_state: present
+  # Only when a password was pinned via extra_vars: it rides inside
+  # release_values, and helm task args would otherwise echo it. Normal
+  # chart-generated runs keep their output for debugging.
+  no_log: '{{ _openflake_admin_password | length > 0 }}'
 
 # When no hostname was supplied, OpenShift picked one. The backend was
 # installed pointing BASE_URL/CORS_ORIGINS at the in-cluster Service, so read
 # the real hostname back and run a second pass. Helm is idempotent, so later
 # runs converge to a no-op rather than churning the deployment.
+# Retried: the Route object can exist for a moment before the router has
+# assigned it a hostname.
 - name: Look up the Route created for this release
   kubernetes.core.k8s_info:
     api_version: route.openshift.io/v1
@@ -75,6 +81,11 @@
       - 'app.kubernetes.io/instance={{ _openflake_release_name }}'
       - 'app.kubernetes.io/part-of=openflake'
   register: _openflake_route_info
+  retries: '{{ _openflake_verify_retries }}'
+  delay: '{{ _openflake_verify_delay }}'
+  until: >-
+    (_openflake_route_info.resources | default([]) | length) > 0
+    and ((_openflake_route_info.resources | first).spec.host | default('')) | length > 0
   when:
     - _openflake_route_enabled | bool
     - not _openflake_route_host
@@ -83,6 +94,24 @@
   ansible.builtin.set_fact:
     _openflake_generated_host: >-
       {{ (_openflake_route_info.resources | default([]) | first | default({})).spec.host | default('') }}
+  when:
+    - _openflake_route_enabled | bool
+    - not _openflake_route_host
+
+# Without this the reconcile below is skipped silently: BASE_URL and
+# CORS_ORIGINS stay pointed at the in-cluster Service, openflake_public_url
+# renders as a bare scheme, and the job still reports success.
+- name: Fail when the Route never produced a hostname
+  ansible.builtin.assert:
+    that:
+      - _openflake_generated_host | default('') | length > 0
+    fail_msg: >-
+      The Route for release '{{ _openflake_release_name }}' in namespace
+      '{{ _openflake_namespace }}' never reported spec.host, so BASE_URL and
+      CORS_ORIGINS cannot be reconciled with the public hostname. Check the
+      Route and the cluster's ingress, or set the Route hostname survey
+      answer explicitly.
+    quiet: true
   when:
     - _openflake_route_enabled | bool
     - not _openflake_route_host
@@ -103,6 +132,10 @@
     wait: '{{ _openflake_wait | bool }}'
     wait_timeout: '{{ _openflake_wait_timeout }}'
     release_state: present
+  # Only when a password was pinned via extra_vars: it rides inside
+  # release_values, and helm task args would otherwise echo it. Normal
+  # chart-generated runs keep their output for debugging.
+  no_log: '{{ _openflake_admin_password | length > 0 }}'
   when: _openflake_generated_host | default('') | length > 0
 
 - name: Record the public URL
