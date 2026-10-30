@@ -48,6 +48,7 @@ mock_modules:
   - amazon.aws.s3_object_info
   - ansible.controller.credential
   - ansible.controller.host
+  - ansible.controller.inventory_source
   - ansible.controller.settings
   - ansible.eda.project_info
   - ansible.eda.rulebook_info

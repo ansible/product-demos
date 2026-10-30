@@ -19,3 +19,4 @@ Each file in this folder documents a corresponding windows demo playbook or work
 | AD — New User | [windows-ad-new-user.md](windows-ad-new-user.md) | [`windows/helpdesk_new_user_portal.yml`](../helpdesk_new_user_portal.yml) |
 | DISA STIG | [windows-disa-stig.md](windows-disa-stig.md) | [`windows/compliance.yml`](../compliance.yml) |
 | Setup Active Directory Domain | [windows-setup-ad-domain.md](windows-setup-ad-domain.md) | [`windows/setup.yml`](../setup.yml) |
+| Destroy Active Directory Domain | [windows-destroy-ad-domain.md](windows-destroy-ad-domain.md) | [`windows/setup.yml`](../setup.yml) |

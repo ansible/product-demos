@@ -72,27 +72,11 @@
           add:
             - Domain Admins
 
-    - name: Update Kerberos Credential
+    - name: Publish domain details for downstream workflow nodes
       run_once: true
       delegate_to: localhost
-      ansible.controller.credential:
-        name: Kerberos Credential
-        credential_type: Kerberos
-        organization: Ansible Product Demos (APD)
-        inputs:
-          username: "{{ ansible_user }}@{{ domain_name | upper }}"
-          password: "{{ ansible_password }}"
-          default_realm: "{{ domain_name | upper }}"
-          kdc: "{{ ansible_host }}"
-
-    - name: Update Microsoft AD LDAP Credential
-      run_once: true
-      delegate_to: localhost
-      ansible.controller.credential:
-        name: Microsoft AD LDAP Credential
-        credential_type: Microsoft AD LDAP
-        organization: Ansible Product Demos (APD)
-        inputs:
-          username: "{{ ansible_user }}@{{ domain_name | upper }}"
-          password: "{{ ansible_password }}"
-          server: "{{ ansible_host }}"
+      ansible.builtin.set_stats:
+        data:
+          ad_domain_name: "{{ domain_name }}"
+          ad_domain_controller_host: "{{ ansible_host }}"
+        per_host: false

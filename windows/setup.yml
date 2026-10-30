@@ -110,20 +110,6 @@ controller_inventories:
     organization: Ansible Product Demos (APD)
     description: Hosts discovered from Active Directory via microsoft.ad.ldap
 
-# Disable AD inventory sync during setup; dependent on Setup Active Directory Domain workflow
-aap_configuration_dispatcher_exclude_roles: [controller_inventory_source_update]
-
-controller_inventory_sources:
-  - name: AD LDAP Inventory
-    inventory: Windows AD Inventory
-    source: scm
-    source_project: Ansible Product Demos
-    source_path: windows/inventory.microsoft.ad.ldap.yml
-    credential: Microsoft AD LDAP Credential
-    overwrite: true
-    update_on_launch: false
-    update_on_project_update: false
-
 controller_templates:
   - name: "WINDOWS | Install IIS"
     labels:
@@ -415,6 +401,28 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - APD Machine Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: false
+
+  - name: "WINDOWS | AD | Manage Resources"
+    labels:
+      - windows
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "windows/manage_ad_resources.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - APD Machine Credential
       - AAP Credential
     survey_enabled: true
     survey:
@@ -425,6 +433,14 @@ controller_templates:
           type: text
           variable: _hosts
           required: false
+        - question_name: AD Resource State
+          type: multiplechoice
+          variable: ad_resource_state
+          required: true
+          default: present
+          choices:
+            - present
+            - absent
 
   - name: "WINDOWS | AD | Join Domain"
     labels:
@@ -646,6 +662,16 @@ controller_workflows:
         failure_nodes:
           - Cleanup Resources
         success_nodes:
+          - Manage AD Resources
+      - identifier: Manage AD Resources
+        unified_job_template: WINDOWS | AD | Manage Resources
+        job_type: run
+        extra_data:
+          _hosts: purpose_domain_controller
+          ad_resource_state: present
+        failure_nodes:
+          - Cleanup Resources
+        success_nodes:
           - Join Domain
       - identifier: Join Domain
         unified_job_template: WINDOWS | AD | Join Domain
@@ -685,3 +711,70 @@ controller_workflows:
         job_type: run
         extra_data:
           ps_script: "Get-WinEvent -LogName Security | Where-Object {$_.Message -like '*Kerberos*'} | Select-Object TimeCreated, Message -First 1"
+
+  - name: Destroy Active Directory Domain
+    description: Tear down the AD domain VMs, VPC, and keypair created by Setup Active Directory Domain
+    labels:
+      - aws.ec2
+      - aws.vpc
+      - windows
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            AWS region where the AD domain stack was deployed.
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+    simplified_workflow_nodes:
+      - identifier: Delete Domain Controller
+        unified_job_template: Cloud | AWS | Delete Stack VM
+        extra_data:
+          create_vm_vm_name: dc01
+        success_nodes:
+          - Update Inventory
+      - identifier: Delete Computer 1
+        unified_job_template: Cloud | AWS | Delete Stack VM
+        extra_data:
+          create_vm_vm_name: winston
+        success_nodes:
+          - Update Inventory
+      - identifier: Delete Computer 2
+        unified_job_template: Cloud | AWS | Delete Stack VM
+        extra_data:
+          create_vm_vm_name: winthrop
+        success_nodes:
+          - Update Inventory
+      - identifier: Manage AD Resources
+        unified_job_template: WINDOWS | AD | Manage Resources
+        job_type: run
+        extra_data:
+          _hosts: localhost
+          ad_resource_state: absent
+        success_nodes:
+          - Update Inventory
+      - identifier: Update Inventory
+        unified_job_template: AWS Inventory
+        all_parents_must_converge: true
+        success_nodes:
+          - Delete Keypair
+          - Delete VPC
+      - identifier: Delete Keypair
+        unified_job_template: Cloud | AWS | Delete Keypair
+        all_parents_must_converge: true
+      - identifier: Delete VPC
+        unified_job_template: Cloud | AWS | Delete VPC
+        all_parents_must_converge: true
