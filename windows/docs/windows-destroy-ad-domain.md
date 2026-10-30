@@ -15,7 +15,7 @@ graph LR
   A["💥 Delete dc01"] --> F["🔄 Sync Inventory"]
   B["💥 Delete winston"] --> F
   C["💥 Delete winthrop"] --> F
-  D["🔧 Manage AD Resources"] --> F
+  D["🔧 Reset AD Configuration"] --> F
   F --> G["🔑 Delete Keypair"]
   F --> H["🌐 Delete VPC"]
   style S fill:#212427,stroke:#8a8d90,color:#fff
@@ -43,7 +43,7 @@ graph LR
 | Template | Playbook | Description |
 |----------|----------|-------------|
 | Cloud ǀ AWS ǀ Delete Stack VM | [`cloud/delete_vm_by_name.yml`](../../cloud/delete_vm_by_name.yml) | Terminates dc01, winston, and winthrop by Name tag |
-| WINDOWS ǀ AD ǀ Manage Resources | [`windows/manage_ad_resources.yml`](../manage_ad_resources.yml) | Resets the Kerberos and AD LDAP credentials to placeholders |
+| WINDOWS ǀ AD ǀ Reset Configuration | [`windows/reset_ad_configuration.yml`](../reset_ad_configuration.yml) | Resets the Kerberos and AD LDAP credentials to placeholders |
 | AWS Inventory | `(inventory sync)` | Re-syncs the AWS dynamic inventory so the deleted hosts are removed from AAP |
 | Cloud ǀ AWS ǀ Delete Keypair | [`cloud/delete_keypair.yml`](../../cloud/delete_keypair.yml) | Deletes the `aws-test-key` keypair |
 | Cloud ǀ AWS ǀ Delete VPC | [`cloud/delete_vpc.yml`](../../cloud/delete_vpc.yml) | Deletes the VPC and related networking resources |

@@ -18,15 +18,13 @@ graph LR
   E --> F
   F --> G["🔌 Test Connectivity"]
   G --> H["🏰 Create Domain"]
-  H --> R["🔧 Manage AD Resources"]
-  R --> I["🤝 Join Domain"]
+  H --> I["🤝 Join Domain"]
   I --> J["🔄 AWS Inventory Sync"]
   I --> N["🔄 AD LDAP Inventory Sync"]
   J --> K["⚡ PowerShell Validation"]
   N --> L["🔐 Kerberos Validation"]
   G -. "any failure" .-> M["🧹 Cleanup Resources"]
   H -. "any failure" .-> M
-  R -. "any failure" .-> M
   I -. "any failure" .-> M
   style S fill:#212427,stroke:#8a8d90,color:#fff
 ```
@@ -34,11 +32,10 @@ graph LR
 1. **Create Keypair + VPC** — Provisions AWS infrastructure
 2. **Create VMs** (parallel) — Deploys one domain controller and two domain computers
 3. **Inventory Sync + Test Connectivity** — Verifies all three VMs are reachable
-4. **Create Domain** — Promotes the DC to a domain controller
-5. **Manage AD Resources** — Updates the Kerberos and AD LDAP credentials with the new domain controller's connection info
-6. **Join Domain** — Joins the two computers to the new domain
-7. **Inventory Sync** (parallel) — Refreshes the AWS dynamic inventory and the AD LDAP inventory to pick up domain membership
-8. **Validation** (parallel) — Tests PowerShell and Kerberos authentication
+4. **Create Domain** — Promotes the DC to a domain controller and updates the Kerberos and AD LDAP credentials with its connection info
+5. **Join Domain** — Joins the two computers to the new domain
+6. **Inventory Sync** (parallel) — Refreshes the AWS dynamic inventory and the AD LDAP inventory to pick up domain membership
+7. **Validation** (parallel) — Tests PowerShell and Kerberos authentication
 
 On any failure, the **Cleanup Resources** rollback node runs automatically.
 
@@ -47,7 +44,7 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 - AWS credential configured with Access and Secret key
 - SSH public key for AWS keypair creation
 - **APD Machine Credential** with Windows administrator credentials
-- **AAP Credential** for Controller API callbacks when creating AD resources
+- **AAP Credential** for Controller API callbacks during domain creation
 
 ## Survey prompts
 
@@ -71,8 +68,7 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 | Cloud ǀ AWS ǀ Create VM (Computer 2 - winthrop) | [`cloud/create_vm.yml`](../../cloud/create_vm.yml) | Deploys the winthrop Windows Server instance as domain computer |
 | AWS Inventory | `(inventory sync)` | Syncs the AWS dynamic inventory to import the new VMs |
 | WINDOWS ǀ Test Connectivity | [`windows/connect.yml`](../connect.yml) | Validates WinRM connectivity to all three Windows hosts |
-| WINDOWS ǀ AD ǀ Create Domain | [`windows/create_ad_domain.yml`](../create_ad_domain.yml) | Promotes dc01 to domain controller and creates the ANSIBLE.LOCAL domain |
-| WINDOWS ǀ AD ǀ Manage Resources | [`windows/manage_ad_resources.yml`](../manage_ad_resources.yml) | Updates the Kerberos and AD LDAP credentials with dc01's connection info |
+| WINDOWS ǀ AD ǀ Create Domain | [`windows/create_ad_domain.yml`](../create_ad_domain.yml) | Promotes dc01 to domain controller, creates the ANSIBLE.LOCAL domain, and updates the Kerberos and AD LDAP credentials with dc01's connection info |
 | WINDOWS ǀ AD ǀ Join Domain | [`windows/join_ad_domain.yml`](../join_ad_domain.yml) | Joins winston and winthrop to the Active Directory domain |
 | AWS Inventory (Post-Join) | `(inventory sync)` | Re-syncs the AWS dynamic inventory after domain join |
 | AD LDAP Inventory | `(inventory sync)` | Syncs the AD LDAP inventory via `microsoft.ad.ldap` to discover domain-joined hosts |

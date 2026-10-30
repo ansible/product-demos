@@ -109,6 +109,8 @@ controller_inventories:
   - name: Windows AD Inventory
     organization: Ansible Product Demos (APD)
     description: Hosts discovered from Active Directory via microsoft.ad.ldap
+    variables:
+      DISCLAIMER: RUN SETUP ACTIVE DIRECTORY DOMAIN BEFORE SYNCING
 
 # Disable AD inventory sync during setup; dependent on Setup Active Directory Domain workflow
 aap_configuration_dispatcher_exclude_roles: [controller_inventory_source_update]
@@ -417,6 +419,7 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - APD Machine Credential
+      - AAP Credential
     survey_enabled: true
     survey:
       name: ''
@@ -427,32 +430,18 @@ controller_templates:
           variable: _hosts
           required: false
 
-  - name: "WINDOWS | AD | Manage Resources"
+  - name: "WINDOWS | AD | Reset Configuration"
     labels:
       - windows
     job_type: run
     inventory: Ansible Product Demos Inventory
     project: "Ansible Product Demos"
-    playbook: "windows/manage_ad_resources.yml"
+    playbook: "windows/reset_ad_configuration.yml"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     credentials:
-      - APD Machine Credential
       - AAP Credential
-    survey_enabled: true
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - question_name: AD Resource State
-          type: multiplechoice
-          variable: ad_resource_state
-          required: true
-          default: present
-          choices:
-            - present
-            - absent
 
   - name: "WINDOWS | AD | Join Domain"
     labels:
@@ -580,14 +569,6 @@ controller_workflows:
             - us-east-2
             - us-west-1
             - us-west-2
-        - question_name: Keypair Public Key
-          type: textarea
-          variable: aws_public_key
-          required: false
-          question_description: >-
-            Optional when APD Machine Credential includes an SSH private key — the
-            public key is derived automatically. Otherwise paste the full public key
-            line (for example, from ~/.ssh/id_rsa.pub).
         # Create VM variables
         - question_name: Owner
           type: text
@@ -671,15 +652,6 @@ controller_workflows:
         job_type: run
         extra_data:
           _hosts: purpose_domain_controller
-        failure_nodes:
-          - Cleanup Resources
-        success_nodes:
-          - Manage AD Resources
-      - identifier: Manage AD Resources
-        unified_job_template: WINDOWS | AD | Manage Resources
-        job_type: run
-        extra_data:
-          ad_resource_state: present
         failure_nodes:
           - Cleanup Resources
         success_nodes:
@@ -769,11 +741,9 @@ controller_workflows:
           create_vm_vm_name: winthrop
         success_nodes:
           - Update Inventory
-      - identifier: Manage AD Resources
-        unified_job_template: WINDOWS | AD | Manage Resources
+      - identifier: Reset AD Configuration
+        unified_job_template: WINDOWS | AD | Reset Configuration
         job_type: run
-        extra_data:
-          ad_resource_state: absent
         success_nodes:
           - Update Inventory
       - identifier: Update Inventory
