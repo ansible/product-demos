@@ -965,6 +965,63 @@ controller_templates:
           required: true
           default: aap
 
+  - name: "Infrastructure | OpenFlake"
+    description: >-
+      Deploys OpenFlake -- a lightweight ITSM platform with a
+      ServiceNow-compatible REST API -- on OpenShift via its Helm chart.
+      The chart generates the admin password on first install and keeps it
+      across upgrades; the job output reports the URL and credentials.
+      Set Operation to uninstall to remove the release and its namespace.
+    # Labels must already exist in controller_labels (common/setup.yml);
+    # the job template module does not create them.
+    labels:
+      - infrastructure
+      - openshift
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    credentials:
+      - OpenShift Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/openflake/provision.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Operation
+          type: multiplechoice
+          variable: openflake_operation
+          required: true
+          default: install
+          choices:
+            - install
+            - uninstall
+        - question_name: OpenFlake namespace
+          question_description: >-
+            OpenShift project/namespace for the OpenFlake deployment.
+            Created if it does not exist.
+          type: text
+          variable: openflake_namespace
+          required: true
+          default: openflake
+        - question_name: Route hostname
+          question_description: >-
+            Leave blank to let OpenShift generate one from the cluster's
+            wildcard apps domain.
+          type: text
+          variable: openflake_route_host
+          required: false
+          default: ''
+        - question_name: OpenFlake image tag
+          type: text
+          variable: openflake_image_tag
+          required: true
+          default: stable
+
 controller_workflows:
   - name: Infrastructure | ROSA - Lifecycle (Create)
     description: >-

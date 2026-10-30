@@ -1,6 +1,6 @@
 ---
 # Bridge Controller LiteMaaS into AO as LLM Provider credential + llm_provider
-# integration (same pattern as intro-ao-workshop). Soft-skip when missing.
+# integration. Soft-skip when missing.
 #
 # Secret source: Install JT must attach the Controller LiteMaaS credential so
 # LITELLM_* / OPENAI_* env injectors are present in this job. Non-secret fields

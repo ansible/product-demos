@@ -1,0 +1,187 @@
+---
+- name: Assemble the base Helm values
+  ansible.builtin.set_fact:
+    _openflake_release_values:
+      image:
+        registry: '{{ _openflake_image_registry }}'
+        tag: '{{ _openflake_image_tag }}'
+        pullPolicy: '{{ _openflake_image_pull_policy }}'
+      auth:
+        adminUsername: '{{ _openflake_admin_username }}'
+      route:
+        enabled: '{{ _openflake_route_enabled | bool }}'
+        tls:
+          enabled: '{{ _openflake_route_tls_enabled | bool }}'
+      postgresql:
+        persistence:
+          size: '{{ _openflake_postgres_storage_size }}'
+      backend:
+        attachments:
+          persistence:
+            size: '{{ _openflake_attachments_storage_size }}'
+
+- name: Layer in the optional settings that were supplied
+  ansible.builtin.set_fact:
+    _openflake_release_values: >-
+      {{
+        _openflake_release_values
+        | combine({'route': {'host': _openflake_route_host}}
+                  if _openflake_route_host else {}, recursive=True)
+        | combine({'postgresql': {'persistence': {'storageClass': _openflake_storage_class}},
+                   'backend': {'attachments': {'persistence': {'storageClass': _openflake_storage_class}}}}
+                  if _openflake_storage_class else {}, recursive=True)
+      }}
+
+# Merged separately so the credentials can be hidden from the job output
+# without also hiding the settings above. Left empty, the chart generates the
+# admin password, JWT key and Postgres password on first install and reuses
+# them on every upgrade via a cluster lookup.
+- name: Merge an explicitly supplied admin password
+  ansible.builtin.set_fact:
+    _openflake_release_values: >-
+      {{
+        _openflake_release_values
+        | combine({'auth': {'adminPassword': _openflake_admin_password}}
+                  if _openflake_admin_password else {}, recursive=True)
+      }}
+  no_log: true
+
+- name: Install or upgrade the OpenFlake release
+  kubernetes.core.helm:
+    release_name: '{{ _openflake_release_name }}'
+    release_namespace: '{{ _openflake_namespace }}'
+    chart_ref: '{{ _openflake_chart_path }}'
+    create_namespace: true
+    release_values: '{{ _openflake_release_values }}'
+    binary_path: '{{ _openflake_helm_binary | default(omit, true) }}'
+    host: '{{ _openflake_api_url }}'
+    api_key: '{{ _openflake_api_key }}'
+    validate_certs: '{{ _openflake_validate_certs | bool }}'
+    ca_cert: '{{ _openflake_ca_cert | default(omit, true) }}'
+    wait: '{{ _openflake_wait | bool }}'
+    wait_timeout: '{{ _openflake_wait_timeout }}'
+    release_state: present
+  # Only when a password was pinned via extra_vars: it rides inside
+  # release_values, and helm task args would otherwise echo it. Normal
+  # chart-generated runs keep their output for debugging.
+  no_log: '{{ _openflake_admin_password | length > 0 }}'
+
+# When no hostname was supplied, OpenShift picked one. The backend was
+# installed pointing BASE_URL/CORS_ORIGINS at the in-cluster Service, so read
+# the real hostname back and run a second pass. Helm is idempotent, so later
+# runs converge to a no-op rather than churning the deployment.
+# Retried: the Route object can exist for a moment before the router has
+# assigned it a hostname.
+- name: Look up the Route created for this release
+  kubernetes.core.k8s_info:
+    api_version: route.openshift.io/v1
+    kind: Route
+    namespace: '{{ _openflake_namespace }}'
+    label_selectors:
+      - 'app.kubernetes.io/instance={{ _openflake_release_name }}'
+      - 'app.kubernetes.io/part-of=openflake'
+  register: _openflake_route_info
+  retries: '{{ _openflake_verify_retries }}'
+  delay: '{{ _openflake_verify_delay }}'
+  until: >-
+    (_openflake_route_info.resources | default([]) | length) > 0
+    and ((_openflake_route_info.resources | first).spec.host | default('')) | length > 0
+  when:
+    - _openflake_route_enabled | bool
+    - not _openflake_route_host
+
+- name: Record the hostname OpenShift generated
+  ansible.builtin.set_fact:
+    _openflake_generated_host: >-
+      {{ (_openflake_route_info.resources | default([]) | first | default({})).spec.host | default('') }}
+  when:
+    - _openflake_route_enabled | bool
+    - not _openflake_route_host
+
+# Without this the reconcile below is skipped silently: BASE_URL and
+# CORS_ORIGINS stay pointed at the in-cluster Service, openflake_public_url
+# renders as a bare scheme, and the job still reports success.
+- name: Fail when the Route never produced a hostname
+  ansible.builtin.assert:
+    that:
+      - _openflake_generated_host | default('') | length > 0
+    fail_msg: >-
+      The Route for release '{{ _openflake_release_name }}' in namespace
+      '{{ _openflake_namespace }}' never reported spec.host, so BASE_URL and
+      CORS_ORIGINS cannot be reconciled with the public hostname. Check the
+      Route and the cluster's ingress, or set the Route hostname survey
+      answer explicitly.
+    quiet: true
+  when:
+    - _openflake_route_enabled | bool
+    - not _openflake_route_host
+
+- name: Reconcile BASE_URL and CORS_ORIGINS with the generated hostname
+  kubernetes.core.helm:
+    release_name: '{{ _openflake_release_name }}'
+    release_namespace: '{{ _openflake_namespace }}'
+    chart_ref: '{{ _openflake_chart_path }}'
+    release_values: >-
+      {{ _openflake_release_values
+         | combine({'route': {'host': _openflake_generated_host}}, recursive=True) }}
+    binary_path: '{{ _openflake_helm_binary | default(omit, true) }}'
+    host: '{{ _openflake_api_url }}'
+    api_key: '{{ _openflake_api_key }}'
+    validate_certs: '{{ _openflake_validate_certs | bool }}'
+    ca_cert: '{{ _openflake_ca_cert | default(omit, true) }}'
+    wait: '{{ _openflake_wait | bool }}'
+    wait_timeout: '{{ _openflake_wait_timeout }}'
+    release_state: present
+  # Only when a password was pinned via extra_vars: it rides inside
+  # release_values, and helm task args would otherwise echo it. Normal
+  # chart-generated runs keep their output for debugging.
+  no_log: '{{ _openflake_admin_password | length > 0 }}'
+  when: _openflake_generated_host | default('') | length > 0
+
+- name: Record the public URL
+  ansible.builtin.set_fact:
+    openflake_public_url: >-
+      {{ (_openflake_route_tls_enabled | bool) | ternary('https://', 'http://')
+         ~ (_openflake_route_host or _openflake_generated_host | default('')) }}
+  when: _openflake_route_enabled | bool
+
+- name: Verify the deployment
+  ansible.builtin.include_tasks: verify.yml
+  when: _openflake_verify | bool
+
+# The chart owns the admin password unless one was supplied, so the only
+# authoritative copy lives in the Secret it rendered.
+#
+# The login is printed below so demo users can copy it straight out of the
+# job output. That is a deliberate trade for a demo workload on an ephemeral
+# cluster -- AAP retains job output and shows it to anyone with read access
+# on the job, so do not reuse this playbook for anything long-lived without
+# revisiting it. The fetch stays no_log so only the admin password is
+# exposed: the same Secret also carries SECRET_KEY and POSTGRESQL_PASSWORD,
+# which nobody needs to read off the screen.
+- name: Read the credentials back out of the chart-managed Secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: '{{ _openflake_namespace }}'
+    label_selectors:
+      - 'app.kubernetes.io/instance={{ _openflake_release_name }}'
+      - 'app.kubernetes.io/part-of=openflake'
+  register: _openflake_secret_info
+  no_log: true
+
+- name: Decode the admin password
+  ansible.builtin.set_fact:
+    _openflake_resolved_admin_password: >-
+      {{ ((_openflake_secret_info.resources | default([]) | first | default({})).data | default({})).ADMIN_PASSWORD
+         | default('') | b64decode }}
+  no_log: true
+
+- name: Report how to reach OpenFlake
+  ansible.builtin.debug:
+    msg:
+      # default(..., true) so an empty string falls through to the hint too,
+      # not just an undefined variable.
+      - 'OpenFlake URL:      {{ openflake_public_url | default("no Route - use the in-cluster Service", true) }}'
+      - 'OpenFlake username: {{ _openflake_admin_username }}'
+      - 'OpenFlake password: {{ _openflake_resolved_admin_password | default("not found - read it from the Secret in the namespace", true) }}'
+      - 'OpenFlake namespace: {{ _openflake_namespace }}'

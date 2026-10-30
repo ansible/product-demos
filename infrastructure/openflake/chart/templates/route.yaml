@@ -1,0 +1,32 @@
+{{- if .Values.route.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "openflake.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "openflake.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+  {{- with (merge (dict) .Values.route.annotations .Values.commonAnnotations) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.route.host }}
+  host: {{ . | quote }}
+  {{- end }}
+  to:
+    kind: Service
+    name: {{ include "openflake.frontend.fullname" . }}
+    weight: 100
+  port:
+    targetPort: http
+  {{- if .Values.route.tls.enabled }}
+  # Edge termination: the router holds the certificate and forwards plain HTTP
+  # to nginx, which is why the pods do not need OPENFLAKE_SSL_* configured.
+  tls:
+    termination: {{ .Values.route.tls.termination }}
+    insecureEdgeTerminationPolicy: {{ .Values.route.tls.insecureEdgeTerminationPolicy }}
+  {{- end }}
+  wildcardPolicy: None
+{{- end }}
