@@ -5,11 +5,11 @@
 
   tasks:
     - name: Assert domain details are available
+      when: ad_resource_state == 'present'
       ansible.builtin.assert:
         that:
           - ad_domain_name is defined
           - ad_domain_controller_host is defined
-          - ad_resource_state is defined
         fail_msg: "Domain details are not available"
         success_msg: "Domain details are available"
 
@@ -58,16 +58,3 @@
           username: ec2-user@ANSIBLE.LOCAL
           password: REPLACEME
           server: REPLACEME
-
-    - name: Manage AD LDAP inventory source
-      ansible.controller.inventory_source:
-        name: AD LDAP Inventory
-        inventory: Windows AD Inventory
-        source: scm
-        source_project: Ansible Product Demos
-        source_path: windows/inventory.microsoft.ad.ldap.yml
-        credential: Microsoft AD LDAP Credential
-        overwrite: true
-        update_on_launch: false
-        update_on_project_update: false
-        state: "{{ ad_resource_state }}"

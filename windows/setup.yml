@@ -110,6 +110,22 @@ controller_inventories:
     organization: Ansible Product Demos (APD)
     description: Hosts discovered from Active Directory via microsoft.ad.ldap
 
+# Disable AD inventory sync during setup; dependent on Setup Active Directory Domain workflow
+aap_configuration_dispatcher_exclude_roles: [controller_inventory_source_update]
+
+controller_inventory_sources:
+  - name: AD LDAP Inventory
+    inventory: Windows AD Inventory
+    source: scm
+    source_project: Ansible Product Demos
+    source_path: windows/inventory.microsoft.ad.ldap.yml
+    credential: Microsoft AD LDAP Credential
+    overwrite: true
+    update_on_launch: false
+    update_on_project_update: false
+    source_vars:
+      DISCLAIMER: RUN SETUP ACTIVE DIRECTORY DOMAIN BEFORE SYNCING
+
 controller_templates:
   - name: "WINDOWS | Install IIS"
     labels:
@@ -429,10 +445,6 @@ controller_templates:
       name: ''
       description: ''
       spec:
-        - question_name: Server Name or Pattern
-          type: text
-          variable: _hosts
-          required: false
         - question_name: AD Resource State
           type: multiplechoice
           variable: ad_resource_state
@@ -667,7 +679,6 @@ controller_workflows:
         unified_job_template: WINDOWS | AD | Manage Resources
         job_type: run
         extra_data:
-          _hosts: purpose_domain_controller
           ad_resource_state: present
         failure_nodes:
           - Cleanup Resources
@@ -762,7 +773,6 @@ controller_workflows:
         unified_job_template: WINDOWS | AD | Manage Resources
         job_type: run
         extra_data:
-          _hosts: localhost
           ad_resource_state: absent
         success_nodes:
           - Update Inventory

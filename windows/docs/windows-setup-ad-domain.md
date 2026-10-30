@@ -35,7 +35,7 @@ graph LR
 2. **Create VMs** (parallel) — Deploys one domain controller and two domain computers
 3. **Inventory Sync + Test Connectivity** — Verifies all three VMs are reachable
 4. **Create Domain** — Promotes the DC to a domain controller
-5. **Manage AD Resources** — Updates the Kerberos and AD LDAP credentials with the new domain controller's connection info and creates the AD LDAP inventory source
+5. **Manage AD Resources** — Updates the Kerberos and AD LDAP credentials with the new domain controller's connection info
 6. **Join Domain** — Joins the two computers to the new domain
 7. **Inventory Sync** (parallel) — Refreshes the AWS dynamic inventory and the AD LDAP inventory to pick up domain membership
 8. **Validation** (parallel) — Tests PowerShell and Kerberos authentication
@@ -72,7 +72,7 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 | AWS Inventory | `(inventory sync)` | Syncs the AWS dynamic inventory to import the new VMs |
 | WINDOWS ǀ Test Connectivity | [`windows/connect.yml`](../connect.yml) | Validates WinRM connectivity to all three Windows hosts |
 | WINDOWS ǀ AD ǀ Create Domain | [`windows/create_ad_domain.yml`](../create_ad_domain.yml) | Promotes dc01 to domain controller and creates the ANSIBLE.LOCAL domain |
-| WINDOWS ǀ AD ǀ Manage Resources | [`windows/manage_ad_resources.yml`](../manage_ad_resources.yml) | Updates the Kerberos and AD LDAP credentials with dc01's connection info and creates the AD LDAP inventory source |
+| WINDOWS ǀ AD ǀ Manage Resources | [`windows/manage_ad_resources.yml`](../manage_ad_resources.yml) | Updates the Kerberos and AD LDAP credentials with dc01's connection info |
 | WINDOWS ǀ AD ǀ Join Domain | [`windows/join_ad_domain.yml`](../join_ad_domain.yml) | Joins winston and winthrop to the Active Directory domain |
 | AWS Inventory (Post-Join) | `(inventory sync)` | Re-syncs the AWS dynamic inventory after domain join |
 | AD LDAP Inventory | `(inventory sync)` | Syncs the AD LDAP inventory via `microsoft.ad.ldap` to discover domain-joined hosts |
