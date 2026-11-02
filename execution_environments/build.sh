@@ -48,7 +48,7 @@ ansible-builder create \
 
 # remove existing manifest if present
 _tag=$(date +%Y%m%d)
-podman manifest rm ${manifest}:${_tag}
+podman manifest exists ${manifest}:${_tag} && podman manifest rm ${manifest}:${_tag}
 
 # create manifest for EE image
 podman manifest create ${manifest}:${_tag}
