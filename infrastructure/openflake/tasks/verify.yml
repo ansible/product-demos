@@ -1,0 +1,31 @@
+---
+- name: Wait for PostgreSQL to report a ready replica
+  kubernetes.core.k8s_info:
+    kind: StatefulSet
+    namespace: '{{ _openflake_namespace }}'
+    label_selectors:
+      - 'app.kubernetes.io/instance={{ _openflake_release_name }}'
+      - 'app.kubernetes.io/component=postgresql'
+  register: _openflake_pg_status
+  retries: '{{ _openflake_verify_retries }}'
+  delay: '{{ _openflake_verify_delay }}'
+  until: >-
+    (_openflake_pg_status.resources | default([]) | length) > 0
+    and ((_openflake_pg_status.resources[0].status.readyReplicas | default(0)) | int) >= 1
+
+- name: Wait for the backend and frontend to report available replicas
+  kubernetes.core.k8s_info:
+    kind: Deployment
+    namespace: '{{ _openflake_namespace }}'
+    label_selectors:
+      - 'app.kubernetes.io/instance={{ _openflake_release_name }}'
+      - 'app.kubernetes.io/component={{ item }}'
+  register: _openflake_deploy_status
+  retries: '{{ _openflake_verify_retries }}'
+  delay: '{{ _openflake_verify_delay }}'
+  until: >-
+    (_openflake_deploy_status.resources | default([]) | length) > 0
+    and ((_openflake_deploy_status.resources[0].status.availableReplicas | default(0)) | int) >= 1
+  loop:
+    - backend
+    - frontend

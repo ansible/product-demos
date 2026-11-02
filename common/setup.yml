@@ -173,7 +173,7 @@ controller_templates:
         - question_name: Name/Email/Contact
           type: text
           variable: email
-          required: true
+          required: false
         - question_name: Issue or Feedback
           type: textarea
           variable: feedback

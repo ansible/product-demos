@@ -1,0 +1,120 @@
+---
+# default(..., true) treats an empty string as unset, so an unset
+# openflake_helm_binary falls back to a PATH lookup.
+- name: Resolve the helm binary
+  ansible.builtin.set_fact:
+    _openflake_helm_bin: '{{ _openflake_helm_binary | default("helm", true) }}'
+
+- name: Check for the helm binary
+  ansible.builtin.command:
+    cmd: '{{ _openflake_helm_bin }} version --short'
+  register: _openflake_helm_check
+  changed_when: false
+  failed_when: false
+
+# command only returns rc when it actually execs. A missing binary fails
+# before that and returns a dict with no rc at all, so this defaults to 1
+# rather than reading an attribute that may not exist.
+- name: Normalise the result of the helm check
+  ansible.builtin.set_fact:
+    _openflake_helm_rc: '{{ _openflake_helm_check.rc | default(1) | int }}'
+
+# kubernetes.core.helm shells out to the helm CLI. Product Demos EE bakes it
+# into /usr/local/bin (see execution_environments/apd-ee-27.yml), so this only
+# trips when the job runs on some other EE.
+- name: Fail when helm is unavailable
+  ansible.builtin.fail:
+    msg: |
+      Could not run '{{ _openflake_helm_bin }} version --short'
+      (rc={{ _openflake_helm_rc }}).
+
+      kubernetes.core.helm shells out to the helm CLI. Product Demos EE
+      installs it into /usr/local/bin, so either:
+        - run this job template on Product Demos EE (the organization
+          default, which is what it uses when no EE is set); or
+        - set openflake_helm_binary to an absolute path to helm on the EE
+          you are using.
+
+      Error: {{ _openflake_helm_check.stderr | default('', true)
+                or _openflake_helm_check.msg | default('no error reported') }}
+  when: _openflake_helm_rc | int != 0
+
+- name: Report the helm version in use
+  ansible.builtin.debug:
+    msg: >-
+      Using helm {{ _openflake_helm_check.stdout | default('') | trim }}
+      at '{{ _openflake_helm_bin }}'
+
+- name: Confirm the chart directory exists
+  ansible.builtin.stat:
+    path: '{{ _openflake_chart_path }}/Chart.yaml'
+  register: _openflake_chart_stat
+
+- name: Fail when the chart is missing
+  ansible.builtin.fail:
+    msg: >-
+      No chart found at '{{ _openflake_chart_path }}'
+      (expected Chart.yaml there).
+  when: not _openflake_chart_stat.stat.exists
+
+# The k8s modules read K8S_AUTH_SSL_CA_CERT themselves, but helm does not --
+# and it needs a path on disk, so an inline PEM has to be spilled to a file.
+- name: Resolve the cluster CA for helm
+  when: _openflake_ca_raw | length > 0
+  block:
+    - name: Create a temp file for an inline CA certificate
+      ansible.builtin.tempfile:
+        state: file
+        suffix: .crt
+      register: _openflake_ca_tmp
+      when: _openflake_ca_is_inline | bool
+
+    - name: Write the inline CA certificate
+      ansible.builtin.copy:
+        dest: '{{ _openflake_ca_tmp.path }}'
+        mode: '0600'
+        content: '{{ _openflake_ca_raw }}'
+      when: _openflake_ca_is_inline | bool
+
+    - name: Record the CA path helm should use
+      ansible.builtin.set_fact:
+        _openflake_ca_cert: >-
+          {{ _openflake_ca_tmp.path if (_openflake_ca_is_inline | bool) else _openflake_ca_raw }}
+
+    - name: Confirm the CA file exists
+      ansible.builtin.stat:
+        path: '{{ _openflake_ca_cert }}'
+      register: _openflake_ca_stat
+
+    - name: Fail when a CA was supplied but is not readable
+      ansible.builtin.assert:
+        that:
+          - _openflake_ca_stat.stat.exists
+        fail_msg: >-
+          K8S_AUTH_SSL_CA_CERT resolved to '{{ _openflake_ca_cert }}'
+          but no such file exists.
+        quiet: true
+
+# Doubles as an authentication check: fails fast with a clear error if the
+# credentials are missing or expired, rather than letting helm fail later
+# with a less obvious message.
+- name: Query the cluster
+  kubernetes.core.k8s_cluster_info:
+  register: _openflake_cluster_info
+
+- name: Report the connected cluster
+  ansible.builtin.debug:
+    msg: >-
+      Connected to Kubernetes
+      {{ _openflake_cluster_info.version.server.kubernetes.gitVersion
+         | default('unknown') }}
+
+- name: Fail when the cluster has no Route API but a Route was requested
+  ansible.builtin.fail:
+    msg: >-
+      openflake_route_enabled is true but the cluster does not serve
+      route.openshift.io/v1, so this is not an OpenShift cluster.
+  when:
+    - _openflake_route_enabled | bool
+    - (_openflake_cluster_info.apis | default({}) | length) > 0
+    - "'route.openshift.io/v1' not in _openflake_cluster_info.apis"
