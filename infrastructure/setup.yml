@@ -1187,12 +1187,14 @@ controller_templates:
 controller_workflows:
   - name: Infrastructure | AWS - Deploy Shared Services
     description: >-
-      One-click shared AWS services without cloud-stack VMs: Create VPC and
-      keypair, then provision Mattermost and Gitea in parallel.
+      One-click shared lab services without cloud-stack VMs: Create VPC and
+      keypair, then provision Mattermost and Gitea in parallel, while OpenFlake
+      installs on OpenShift in parallel from the start (upserts OpenFlake credential).
     labels:
       - aws.ec2
       - aws.vpc
       - infrastructure
+      - openshift
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -1203,6 +1205,7 @@ controller_workflows:
       create_vm_aws_securitygroup_name: aws-test-sg
       create_vm_aws_vpc_subnet_name: aws-test-subnet
       create_vm_vm_deployment: cloud_stack
+      openflake_operation: install
     survey_enabled: true
     survey:
       name: ''
@@ -1238,6 +1241,11 @@ controller_workflows:
             - QA
             - Prod
     simplified_workflow_nodes:
+      # OpenFlake is OpenShift-only — start it immediately alongside AWS networking.
+      - identifier: Provision OpenFlake
+        unified_job_template: Infrastructure | OpenFlake
+        failure_nodes:
+          - Ticket - OpenFlake Failed
       - identifier: Create Keypair
         unified_job_template: Cloud | AWS | Create Keypair
         success_nodes:
@@ -1278,6 +1286,10 @@ controller_workflows:
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to provision Gitea shared service
+      - identifier: Ticket - OpenFlake Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to provision OpenFlake shared ITSM service
 
   - name: Infrastructure | ROSA - Lifecycle (Create)
     description: >-

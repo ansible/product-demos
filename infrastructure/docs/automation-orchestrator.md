@@ -22,7 +22,7 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 1. Ensure **APD ǀ Multi-demo setup** (or Single → `cloud` + `infrastructure`) created the **Cloud | AWS |*** patch/snapshot JTs and OpenFlake / Gitea credential types.
 2. Run **Deploy Cloud Stack in AWS** (needed for disk-utilization / Multi-OS; optional for CI/CD Pipeline alone).
 3. For demos that post to chat (disk-utilization): launch **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)). Skip for Multi-OS Cloud Patching.
-4. For **CI/CD Pipeline**: run **Infrastructure ǀ AWS - Deploy Shared Services** (or Provision Gitea alone) so Gitea seeds `inventory-service` + act_runner and upserts the **Gitea** credential, then run **Infrastructure ǀ OpenFlake** so **OpenFlake** credential is written back. Skip for demos that do not need SCM/ServiceNow.
+4. For **CI/CD Pipeline**: run **Infrastructure ǀ AWS - Deploy Shared Services** so Gitea seeds `inventory-service` + act_runner, OpenFlake installs on OpenShift, and both **Gitea** / **OpenFlake** credentials are upserted (or run Provision Gitea + OpenFlake alone). Skip for demos that do not need SCM/ITSM.
 5. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
 6. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost / OpenFlake / Gitea notes when provisioned). Soft warnings appear for missing optional deps — Install does not fail.
 7. For CI/CD: set the Gitea repo Actions secret `AO_WEBHOOK_URL` to the AO **lightwell-ci-cd** webhook URL from Install output, then open the seeded workflow.

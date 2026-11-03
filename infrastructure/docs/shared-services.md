@@ -1,12 +1,12 @@
 # AWS Deploy Shared Services
 
-One-click workflow that stands up shared AWS networking plus Mattermost and Gitea — without provisioning the five **Deploy Cloud Stack** demo VMs.
+One-click workflow that stands up shared lab services — AWS networking plus Mattermost and Gitea, and OpenFlake on OpenShift — without provisioning the five **Deploy Cloud Stack** demo VMs.
 
 ## Prerequisites
 
-- **AWS**, **APD Machine Credential**, and **AAP Credential** configured
+- **AWS**, **APD Machine Credential**, **AAP Credential**, and **OpenShift Credential** configured
 - Cloud job templates already present from common/APD setup (**Create VPC**, **Create Keypair**)
-- Infrastructure demo setup run so **Provision Mattermost** and **Provision Gitea** exist
+- Infrastructure demo setup run so **Provision Mattermost**, **Provision Gitea**, and **OpenFlake** exist
 
 ## Configure credentials
 
@@ -14,7 +14,8 @@ One-click workflow that stands up shared AWS networking plus Mattermost and Gite
 |------------|------|-------|
 | AWS | Amazon Web Services | VPC, keypair, EC2 for Mattermost/Gitea |
 | APD Machine Credential | Machine | SSH as `ec2-user`; Create Keypair derives the public key from this credential |
-| AAP Credential | Red Hat Ansible Automation Platform | Required by **Provision Mattermost** to upsert the Mattermost Controller credential |
+| AAP Credential | Red Hat Ansible Automation Platform | Required by provision jobs to upsert Mattermost / Gitea / OpenFlake Controller credentials |
+| OpenShift Credential | OpenShift or Kubernetes API Bearer Token | Required by **Infrastructure \| OpenFlake** (OpenShift Helm install) |
 
 ## Survey prompts
 
@@ -24,33 +25,39 @@ One-click workflow that stands up shared AWS networking plus Mattermost and Gite
 | Owner | `create_vm_aws_owner_tag` | `your_name` |
 | Environment | `create_vm_vm_environment` | `Prod` |
 
+OpenFlake runs with `openflake_operation: install` from the workflow extra vars (no separate survey question).
+
 ## Job templates
 
 | Template | Playbook / workflow | Description |
 |----------|---------------------|-------------|
-| Infrastructure ǀ AWS - Deploy Shared Services | Workflow in [`infrastructure/setup.yml`](../setup.yml) | Create VPC + keypair, then Mattermost and Gitea in parallel |
+| Infrastructure ǀ AWS - Deploy Shared Services | Workflow in [`infrastructure/setup.yml`](../setup.yml) | Create VPC + keypair → Mattermost + Gitea in parallel; OpenFlake starts immediately on OpenShift |
 | Infrastructure ǀ AWS - Provision Mattermost | [`infrastructure/mattermost/provision_mattermost.yml`](../mattermost/provision_mattermost.yml) | Leaf JT (also runnable alone) |
 | Infrastructure ǀ AWS - Provision Gitea | [`infrastructure/gitea/provision_gitea.yml`](../gitea/provision_gitea.yml) | Leaf JT (also runnable alone) |
+| Infrastructure ǀ OpenFlake | [`infrastructure/openflake/provision.yml`](../openflake/provision.yml) | Leaf JT (also runnable alone) |
 
 ## Why it matters
 
-- Shared chat + Git for labs without waiting on a full cloud stack
+- Shared chat + Git + ITSM for labs without waiting on a full cloud stack
 - Same `aws-test-*` networking defaults as Mattermost/Gitea standalone jobs
-- Prefer this over manual Create VPC → Create Keypair → two provision jobs
+- OpenFlake credential write-back enables AO **CI/CD Pipeline** without a real ServiceNow
+- Prefer this over manual Create VPC → Create Keypair → three provision jobs
 
 ## Presenter walkthrough
 
 1. Launch **Infrastructure ǀ AWS - Deploy Shared Services** (region + owner + environment)
-2. Wait for Create VPC and Create Keypair to finish, then Mattermost and Gitea in parallel
+2. OpenFlake starts immediately on OpenShift; Create VPC and Create Keypair run in parallel, then Mattermost and Gitea
 3. From the Mattermost job output, save the UI login (`apdadmin` / `Ansible123!`) and confirm the Controller credential was updated
-4. From the Gitea job output, save the URL and login (`apdadmin` / `Ansible123!`)
-5. Optional: run AO Install if you need Notify Chatroom wired to Mattermost
+4. From the Gitea job output, save the URL and login (`apdadmin` / `Ansible123!`); confirm the **Gitea** credential was upserted
+5. From the OpenFlake job output, save the URL / admin password; confirm the **OpenFlake** credential was upserted
+6. Optional: run AO Install if you need Notify Chatroom + CI/CD Pipeline seeded
 
 ## Talking points
 
 - Does **not** create `aws-rhel9`, Windows, or reports hosts — use **Deploy Cloud Stack in AWS** when you need those
 - Mattermost opens TCP **8065**; Gitea opens TCP **3000** (UI) plus **80**/**8080** (CI/CD demo app) on `aws-test-sg`
 - Provision Gitea also seeds `inventory-service`, starts an Actions runner, and upserts the **Gitea** credential for AO CI/CD Pipeline
+- OpenFlake does not use the AWS VPC — it installs via Helm on the lab OpenShift cluster and upserts the **OpenFlake** credential
 - Kafka and other shared hosts can be added as parallel nodes later
 
 ## Related demos
@@ -59,4 +66,6 @@ One-click workflow that stands up shared AWS networking plus Mattermost and Gite
 |------|-------------|
 | [AWS Mattermost](./mattermost.md) | Standalone Mattermost provision |
 | [AWS Gitea](./gitea.md) | Standalone Gitea provision |
+| [OpenFlake](./openflake.md) | Standalone OpenFlake install / uninstall |
 | [Deploy Cloud Stack in AWS](../../cloud/docs/deploy-cloud-stack.md) | Full stack including demo VMs |
+| [Automation Orchestrator](./automation-orchestrator.md) | Seed Path 2 uses Shared Services for CI/CD deps |

@@ -41,13 +41,13 @@ Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route eve
 |--------------|-------------|
 | **Vault** | Install or remove HashiCorp Vault on an OpenShift cluster via the HashiCorp Helm chart (dev mode). Install seeds the KV v2 secrets engine and userpass auth with sample credentials. |
 
-### Shared services (Mattermost + Gitea)
+### Shared services (Mattermost + Gitea + OpenFlake)
 
 #### Workflows
 
 | Workflow | Description |
 |----------|-------------|
-| [**Infrastructure ǀ AWS - Deploy Shared Services**](docs/shared-services.md) | One-click VPC + keypair, then Mattermost and Gitea in parallel (no cloud-stack VMs) |
+| [**Infrastructure ǀ AWS - Deploy Shared Services**](docs/shared-services.md) | One-click VPC + keypair, then Mattermost and Gitea in parallel, with OpenFlake on OpenShift from the start (no cloud-stack VMs) |
 
 #### Jobs
 

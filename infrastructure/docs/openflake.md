@@ -2,7 +2,7 @@
 
 Deploy [OpenFlake](https://github.com/rlopez133/open-flake) — a lightweight ITSM platform with a ServiceNow-compatible REST API — on an OpenShift cluster. It gives demos a real incident/change backend to drive without needing a ServiceNow instance, and the ServiceNow-compatible endpoints mean `servicenow.itsm` content can point at it with only a URL change.
 
-This is **not** part of the automatic `infrastructure` demo setup. The job template is seeded by the demo setup, but the deployment only happens when someone launches it.
+The job template is seeded by the demo setup. Prefer launching it via **[Infrastructure ǀ AWS - Deploy Shared Services](./shared-services.md)** (OpenFlake starts in parallel with AWS networking), or run **Infrastructure ǀ OpenFlake** alone when you only need ITSM.
 
 ## Prerequisites
 
@@ -16,6 +16,7 @@ This is **not** part of the automatic `infrastructure` demo setup. The job templ
 | Credential | Type | Where to get it |
 |------------|------|-----------------|
 | OpenShift Credential | OpenShift or Kubernetes API Bearer Token | OpenShift console — Service Account or user token |
+| AAP Credential | Red Hat Ansible Automation Platform | Required so install can upsert the **OpenFlake** Controller credential for AO CI/CD |
 
 ## Survey prompts
 
