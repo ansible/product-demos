@@ -30,7 +30,9 @@
         fail_msg: >-
           Set create_vm_aws_region, create_vm_aws_vpc_subnet_name,
           create_vm_aws_securitygroup_name, and create_vm_aws_keypair_name
-          (defaults match Deploy Cloud Stack in AWS).
+          (defaults: aws-test-subnet / aws-test-sg / aws-test-key).
+          Run Cloud | AWS | Create VPC and Create Keypair first — the full
+          Deploy Cloud Stack workflow is not required for Gitea.
 
     - name: Map owner tag for EC2 provisioning
       ansible.builtin.set_fact:

@@ -4,7 +4,9 @@ Stand up a lightweight self-hosted Git server on AWS for demos that need a simpl
 
 ## Prerequisites
 
-- **Deploy Cloud Stack in AWS** already run (VPC, subnet, security group, keypair)
+- Shared AWS networking in the target region (defaults: `aws-test-subnet`, `aws-test-sg`, `aws-test-key`). Either:
+  - **Cloud ǀ AWS ǀ Create VPC** + **Cloud ǀ AWS ǀ Create Keypair**, or
+  - reuse an existing **Deploy Cloud Stack in AWS** (full stack is fine, but not required — Gitea does not need the five demo VMs)
 - **AWS** and **APD Machine Credential** configured
 
 ## Configure credentials
@@ -19,7 +21,7 @@ Stand up a lightweight self-hosted Git server on AWS for demos that need a simpl
 | Prompt | Variable | Default |
 |--------|----------|---------|
 | AWS Region | `create_vm_aws_region` | `us-east-2` |
-| Owner | `create_vm_aws_owner_tag` | `your_name` (must match cloud stack owner tag) |
+| Owner | `create_vm_aws_owner_tag` | `your_name` (must match the owner tag on VPC/keypair resources) |
 | Environment | `create_vm_vm_environment` | `Prod` |
 
 ## Job templates
@@ -36,7 +38,7 @@ Stand up a lightweight self-hosted Git server on AWS for demos that need a simpl
 
 ## Presenter walkthrough
 
-1. Run **Deploy Cloud Stack in AWS** (or reuse an existing stack)
+1. Ensure networking exists: run **Create VPC** + **Create Keypair**, or reuse a cloud stack already in that region
 2. Launch **Infrastructure ǀ AWS - Provision Gitea** with the same region and owner tag
 3. At the end of the job, copy the printed **URL / Username / Password** block
 4. Open the URL in a browser and sign in — default login is `admin` / `Ansible123!`
@@ -54,5 +56,7 @@ Default admin login is `admin` / `Ansible123!` (same password pattern as Matterm
 
 | Demo | Description |
 |------|-------------|
+| [AWS — Create VPC](../../cloud/docs/cloud-create-vpc.md) | Minimal networking prerequisite (no full cloud stack) |
+| [AWS — Create Keypair](../../cloud/docs/cloud-create-keypair.md) | SSH key used by APD Machine Credential |
 | [AWS Mattermost](./mattermost.md) | Sibling AWS service host pattern (`aws_mattermost`) |
 | [Config Drift — Kafka Queue](./config-drift-kafka.md) | Sibling AWS service host pattern (`aws_kafka`) |
