@@ -14,7 +14,8 @@
     create_vm_aws_securitygroup_name: aws-test-sg
     create_vm_aws_vpc_subnet_name: aws-test-subnet
     create_vm_vm_deployment: cloud_stack
-    gitea_admin_username: admin
+    # Username "admin" is reserved by Gitea (CreateUser: name is reserved).
+    gitea_admin_username: apdadmin
     gitea_admin_password: Ansible123!
     gitea_admin_email: apd-admin@example.com
     gitea_http_port: 3000

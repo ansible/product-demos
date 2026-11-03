@@ -1910,7 +1910,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #231f20 0%, #609926 100%)"
     icon: "📦"
-  blurb: "Provision aws_gitea with Podman Gitea (SQLite), create an admin user, and print the URL plus login (admin / Ansible123!) in the job output."
+  blurb: "Provision aws_gitea with Podman Gitea (SQLite), create an admin user, and print the URL plus login (apdadmin / Ansible123!) in the job output."
   stats:
     playbooks: 1
   url: /demos/infrastructure-gitea/

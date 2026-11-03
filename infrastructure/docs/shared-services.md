@@ -43,7 +43,7 @@ One-click workflow that stands up shared AWS networking plus Mattermost and Gite
 1. Launch **Infrastructure ǀ AWS - Deploy Shared Services** (region + owner + environment)
 2. Wait for Create VPC and Create Keypair to finish, then Mattermost and Gitea in parallel
 3. From the Mattermost job output, save the UI login (`apdadmin` / `Ansible123!`) and confirm the Controller credential was updated
-4. From the Gitea job output, save the URL and login (`admin` / `Ansible123!`)
+4. From the Gitea job output, save the URL and login (`apdadmin` / `Ansible123!`)
 5. Optional: run AO Install if you need Notify Chatroom wired to Mattermost
 
 ## Talking points

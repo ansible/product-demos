@@ -41,9 +41,9 @@ Stand up a lightweight self-hosted Git server on AWS for demos that need a simpl
 
 1. Prefer **Infrastructure ǀ AWS - Deploy Shared Services** for one-click networking + Gitea (and Mattermost). Or ensure networking exists via **Create VPC** + **Create Keypair** / cloud stack, then launch **Infrastructure ǀ AWS - Provision Gitea** alone
 2. At the end of the job, copy the printed **URL / Username / Password** block
-3. Open the URL in a browser and sign in — default login is `admin` / `Ansible123!`
+3. Open the URL in a browser and sign in — default login is `apdadmin` / `Ansible123!`
 
-Default admin login is `admin` / `Ansible123!` (same password pattern as Mattermost). Change it for long-lived labs.
+Default admin login is `apdadmin` / `Ansible123!` (same as Mattermost; username `admin` is reserved by Gitea). Change it for long-lived labs.
 
 ## Talking points
 
