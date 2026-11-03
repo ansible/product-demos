@@ -724,19 +724,19 @@ controller_workflows:
             - us-west-2
     simplified_workflow_nodes:
       - identifier: Delete Domain Controller
-        unified_job_template: Cloud | AWS | Delete Stack VM
+        unified_job_template: Cloud | AWS | Delete VM
         extra_data:
           create_vm_vm_name: dc01
         success_nodes:
           - Update Inventory
       - identifier: Delete Computer 1
-        unified_job_template: Cloud | AWS | Delete Stack VM
+        unified_job_template: Cloud | AWS | Delete VM
         extra_data:
           create_vm_vm_name: winston
         success_nodes:
           - Update Inventory
       - identifier: Delete Computer 2
-        unified_job_template: Cloud | AWS | Delete Stack VM
+        unified_job_template: Cloud | AWS | Delete VM
         extra_data:
           create_vm_vm_name: winthrop
         success_nodes:
