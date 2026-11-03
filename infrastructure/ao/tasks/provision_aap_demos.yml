@@ -110,11 +110,49 @@
   register: ao_mattermost_cred_lookup
   no_log: true
 
+- name: Look up OpenFlake credential
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/credentials/?name={{ ao_openflake_credential_name | urlencode }}"
+    method: GET
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    validate_certs: false
+    return_content: true
+  register: ao_openflake_cred_lookup
+  no_log: true
+
+- name: Look up Gitea credential
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/credentials/?name={{ ao_gitea_credential_name | urlencode }}"
+    method: GET
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    validate_certs: false
+    return_content: true
+  register: ao_gitea_cred_lookup
+  no_log: true
+
 - name: Store credential ids
   ansible.builtin.set_fact:
     ao_machine_credential_id: "{{ (ao_machine_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
     ao_aws_credential_id: "{{ (ao_aws_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
     ao_mattermost_credential_id: "{{ (ao_mattermost_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
+    ao_openflake_credential_id: "{{ (ao_openflake_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
+    ao_gitea_credential_id: "{{ (ao_gitea_cred_lookup.json.results | default([{}]))[0].id | default('') }}"
 
 # Prefer the Mattermost Controller credential (written by Provision Mattermost)
 # over inventory hostvars — AWS inventory can lag after stop/start or re-create.
@@ -138,6 +176,38 @@
       {{ ao_mattermost_cred_lookup.json.results[0].inputs.mattermost_server }}
     ao_mattermost_present: true
     ao_mattermost_server_source: controller_credential
+
+- name: Mark OpenFlake present from Controller credential
+  when:
+    - (ao_openflake_demos | default([]) | length) > 0
+    - (ao_openflake_cred_lookup.json.results | default([]) | length) > 0
+    - >-
+      (
+        ao_openflake_cred_lookup.json.results[0].inputs.instance_url
+        | default('')
+      ) not in ['', 'REPLACEME', 'replace_me']
+  ansible.builtin.set_fact:
+    ao_openflake_present: true
+    ao_openflake_url: "{{ ao_openflake_cred_lookup.json.results[0].inputs.instance_url }}"
+
+- name: Mark Gitea present from Controller credential
+  when:
+    - (ao_gitea_demos | default([]) | length) > 0
+    - (ao_gitea_cred_lookup.json.results | default([]) | length) > 0
+    - >-
+      (
+        ao_gitea_cred_lookup.json.results[0].inputs.gitea_host
+        | default('')
+      ) not in ['', 'REPLACEME', 'replace_me']
+    - >-
+      (
+        ao_gitea_cred_lookup.json.results[0].inputs.gitea_token
+        | default('')
+      ) not in ['', 'REPLACEME', 'replace_me']
+  ansible.builtin.set_fact:
+    ao_gitea_present: true
+    ao_gitea_host: "{{ ao_gitea_cred_lookup.json.results[0].inputs.gitea_host }}"
+    ao_gitea_port: "{{ ao_gitea_cred_lookup.json.results[0].inputs.gitea_port | default('3000') }}"
 
 - name: Look up Product Demos execution environment
   ansible.builtin.uri:

@@ -1,0 +1,42 @@
+name: inventory-service CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test-and-notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Skip AO webhook when CHANGE_REQUEST empty
+        id: gate
+        run: |
+          if [ ! -s CHANGE_REQUEST ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "CHANGE_REQUEST empty — Reset Demo baseline; no AO webhook"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install pytest
+        if: steps.gate.outputs.skip != 'true'
+        run: pip install pytest aiohttp==3.9.2 || pip install pytest
+      - name: Placeholder unit check
+        if: steps.gate.outputs.skip != 'true'
+        run: python -c "import aiohttp; print('ok', aiohttp.__version__)"
+      - name: Notify AO webhook lightwell-ci-cd
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          AO_WEBHOOK_URL: ${{ secrets.AO_WEBHOOK_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${AO_WEBHOOK_URL:-}" ]; then
+            echo "AO_WEBHOOK_URL secret not set — skip webhook (set after AO Install)"
+            exit 0
+          fi
+          VERSION=$(tr -d '[:space:]' < version.txt)
+          CVE=$(tr -d '[:space:]' < PATCHED_CVE)
+          CHG=$(tr -d '[:space:]' < CHANGE_REQUEST)
+          curl -fsS -X POST "$AO_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d "{\"app_name\":\"inventory-service\",\"artifact_version\":\"${VERSION}-b${GITHUB_RUN_NUMBER}\",\"git_sha\":\"${GITHUB_SHA}\",\"ci_build_url\":\"${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\",\"affected_cve\":\"${CVE}\",\"change_request\":\"${CHG}\",\"ci_build_number\":\"${GITHUB_RUN_NUMBER}\"}"

@@ -121,7 +121,7 @@
           group-name: "{{ create_vm_aws_securitygroup_name }}"
       register: gitea_security_group
 
-    - name: Allow Gitea HTTP port
+    - name: Allow Gitea HTTP and demo app ports
       when: gitea_security_group.security_groups | length > 0
       amazon.aws.ec2_security_group:
         name: "{{ create_vm_aws_securitygroup_name }}"
@@ -133,6 +133,8 @@
           - proto: tcp
             ports:
               - "{{ gitea_http_port }}"
+              - 80
+              - 8080
             cidr_ip: 0.0.0.0/0
 
 - name: Deploy Gitea with Podman
@@ -196,6 +198,8 @@
           GITEA__server__DISABLE_SSH: "true"
           GITEA__security__INSTALL_LOCK: "true"
           GITEA__service__DISABLE_REGISTRATION: "true"
+          GITEA__actions__ENABLED: "true"
+          GITEA__actions__DEFAULT_ACTIONS_URL: github
         volumes:
           - "{{ gitea_data_dir }}:/data:Z"
 
@@ -281,6 +285,9 @@
           GITEA_ADMIN_PASSWORD={{ gitea_admin_password }}
           GITEA_ADMIN_EMAIL={{ gitea_admin_email }}
 
+    - name: Bootstrap CI/CD repo, Actions runner, and API token
+      ansible.builtin.include_tasks: tasks/bootstrap_cicd.yml
+
     - name: Show Gitea access information
       ansible.builtin.debug:
         msg:
@@ -290,6 +297,15 @@
           - "URL:      http://{{ gitea_public_ip }}:{{ gitea_http_port }}"
           - "Username: {{ gitea_admin_username }}"
           - "Password: {{ gitea_admin_password }}"
+          - "Repo:     {{ gitea_admin_username }}/inventory-service"
           - "============================================================"
           - "Host aws_gitea ({{ gitea_public_ip }}) — sync AWS Inventory to see it in Controller."
           - "Connection details also written to /etc/apd-gitea.env on the host."
+          - "After AO Install, set repo Actions secret AO_WEBHOOK_URL to the lightwell-ci-cd webhook."
+
+- name: Publish Gitea Credential to Controller
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Upsert Gitea Credential from provision facts
+      ansible.builtin.include_tasks: tasks/publish_credential.yml

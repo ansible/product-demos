@@ -185,3 +185,6 @@
       - 'OpenFlake username: {{ _openflake_admin_username }}'
       - 'OpenFlake password: {{ _openflake_resolved_admin_password | default("not found - read it from the Secret in the namespace", true) }}'
       - 'OpenFlake namespace: {{ _openflake_namespace }}'
+
+- name: Publish OpenFlake credential for AO demos
+  ansible.builtin.include_tasks: publish_credential.yml

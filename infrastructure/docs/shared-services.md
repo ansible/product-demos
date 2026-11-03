@@ -49,7 +49,8 @@ One-click workflow that stands up shared AWS networking plus Mattermost and Gite
 ## Talking points
 
 - Does **not** create `aws-rhel9`, Windows, or reports hosts — use **Deploy Cloud Stack in AWS** when you need those
-- Mattermost opens TCP **8065**; Gitea opens TCP **3000** on `aws-test-sg`
+- Mattermost opens TCP **8065**; Gitea opens TCP **3000** (UI) plus **80**/**8080** (CI/CD demo app) on `aws-test-sg`
+- Provision Gitea also seeds `inventory-service`, starts an Actions runner, and upserts the **Gitea** credential for AO CI/CD Pipeline
 - Kafka and other shared hosts can be added as parallel nodes later
 
 ## Related demos

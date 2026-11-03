@@ -19,16 +19,18 @@ Skip Network Configuration on RHDP — Install already ran it.
 
 Still simple — short cloud/chat setup, then Install, so curated content can hit real hosts (and chat when the demo needs it).
 
-1. Ensure **APD ǀ Multi-demo setup** (or Single → `cloud` + `infrastructure`) created the **Cloud | AWS |*** patch/snapshot JTs.
-2. Run **Deploy Cloud Stack in AWS**.
+1. Ensure **APD ǀ Multi-demo setup** (or Single → `cloud` + `infrastructure`) created the **Cloud | AWS |*** patch/snapshot JTs and OpenFlake / Gitea credential types.
+2. Run **Deploy Cloud Stack in AWS** (needed for disk-utilization / Multi-OS; optional for CI/CD Pipeline alone).
 3. For demos that post to chat (disk-utilization): launch **Infrastructure ǀ AWS - Provision Mattermost** ([details](./mattermost.md)). Skip for Multi-OS Cloud Patching.
-4. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
-5. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost URL + login when provisioned).
-6. Open the seeded workflow you want to show.
+4. For **CI/CD Pipeline**: run **Infrastructure ǀ AWS - Deploy Shared Services** (or Provision Gitea alone) so Gitea seeds `inventory-service` + act_runner and upserts the **Gitea** credential, then run **Infrastructure ǀ OpenFlake** so **OpenFlake** credential is written back. Skip for demos that do not need SCM/ServiceNow.
+5. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
+6. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost / OpenFlake / Gitea notes when provisioned). Soft warnings appear for missing optional deps — Install does not fail.
+7. For CI/CD: set the Gitea repo Actions secret `AO_WEBHOOK_URL` to the AO **lightwell-ci-cd** webhook URL from Install output, then open the seeded workflow.
+8. Open the seeded workflow you want to show.
 
 <aside class="info-callout" role="note">
   <span class="info-callout__icon" aria-hidden="true">i</span>
-  <p>Cloud Stack and Mattermost stay opt-in so shared labs are not billed for idle EC2 when you only wanted Path 1.</p>
+  <p>Cloud Stack, Mattermost, Gitea, and OpenFlake stay opt-in so shared labs are not billed for idle EC2 when you only wanted Path 1.</p>
 </aside>
 
 **You are ready to present.** Curated demos:
@@ -38,6 +40,7 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 | Task Step Example | Open **Task Step Example** in AO — question is pre-filled; press Run | LiteMaaS wired (RHDP boot + Install) |
 | Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | `aws-rhel9` + Mattermost |
 | Multi-OS Cloud Patching | [Multi-OS Cloud Patching](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/multi-os-cloud-patching/) | Full cloud stack + existing **Cloud \| AWS \|*** JTs |
+| CI/CD Pipeline | [CI/CD Pipeline](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/cicd-pipeline/) | [Gitea](./gitea.md) (`inventory-service`) + OpenFlake + `AO_WEBHOOK_URL` |
 
 ### Task Step Example — LiteMaaS smoke test
 
@@ -72,23 +75,28 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
 | AAP Credential | Red Hat Ansible Automation Platform | Pre-configured |
 | LiteMaaS | Custom (API base URL + virtual key + model) | Pre-configured at catalog boot; Install wires it into AO |
 | Mattermost | Custom (server + webhook id) | Path 2 — created/updated by **Provision Mattermost** |
+| OpenFlake | Custom (instance URL + admin) | Path 2 — created/updated by **Infrastructure ǀ OpenFlake** |
+| Gitea | Custom (host/port/token/owner/repo) | Path 2 — created/updated by **Provision Gitea** |
 
 ## Under the hood
 
 What **Install** does when it seeds curated demos:
 
-- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**) plus local workflows such as **Task Step Example**.
-- Creates the **AAP Orchestrator Demos** project and any demo-owned job templates (disk-utilization playbooks). Multi-OS reuses existing **Cloud | AWS |*** templates from cloud setup — seed only imports the workflow.
+- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**, **cicd-pipeline**) plus local workflows such as **Task Step Example**.
+- Creates the **AAP Orchestrator Demos** project and any demo-owned job templates (disk-utilization / CI/CD playbooks). Multi-OS reuses existing **Cloud | AWS |*** templates from cloud setup — seed only imports the workflow.
 - Wires AO-native **AAP** and **LiteMaaS** (LLM Provider) integrations; allow-lists the LiteMaaS hostname for AO workers.
 - Rewrites each workflow’s AAP org/credential placeholders → APD, and fills `llm_model_id` on agentic nodes when LiteMaaS is wired, then imports into AO.
 - When present, attaches the **Mattermost** credential and **Product Demos EE** to **Notify Chatroom**.
+- When present, attaches **OpenFlake** and **Gitea** credentials to the CI/CD Pipeline job templates; soft-warns when they are still stubs.
 
-AAP drives this with `aapctl`. The Mattermost credential stores an **incoming webhook** id for `community.general.mattermost` (not a bot personal access token). Controller **LiteMaaS** is the source of truth for the virtual key; AO gets a copy as **APD LiteMaaS** during Install.
+AAP drives this with `aapctl`. The Mattermost credential stores an **incoming webhook** id for `community.general.mattermost` (not a bot personal access token). Controller **LiteMaaS** is the source of truth for the virtual key; AO gets a copy as **APD LiteMaaS** during Install. APD does **not** run upstream `cicd_setup_gitea` (that would wipe the shared Gitea host); Provision Gitea owns the forge bootstrap.
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
 | [AWS Mattermost](./mattermost.md) | Path 2 — chat backend + Controller credential |
+| [AWS Gitea](./gitea.md) | Path 2 — SCM + Actions runner + **Gitea** credential for CI/CD |
+| [AWS Deploy Shared Services](./shared-services.md) | One-click VPC + keypair + Mattermost + Gitea |
 | [ROSA Cluster Lifecycle](./rosa-lifecycle.md) | OpenShift on AWS when you are not using RHDP |
 | [OPA — Policy as Code](./opa-policy-as-code.md) | Another OpenShift-backed control-plane component from AAP |

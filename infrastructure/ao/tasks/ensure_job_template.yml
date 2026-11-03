@@ -167,3 +167,51 @@
     status_code: [200, 201, 204, 400]
   failed_when: false
   no_log: true
+
+- name: Attach OpenFlake credential to {{ ao_jt.name }}
+  when:
+    - "'openflake' in (ao_jt.credentials | default([]))"
+    - (ao_openflake_credential_id | default('') | string | length) > 0
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/job_templates/{{ ao_jt_id }}/credentials/"
+    method: POST
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    body_format: json
+    body:
+      id: "{{ ao_openflake_credential_id | int }}"
+    validate_certs: false
+    status_code: [200, 201, 204, 400]
+  failed_when: false
+  no_log: true
+
+- name: Attach Gitea credential to {{ ao_jt.name }}
+  when:
+    - "'gitea' in (ao_jt.credentials | default([]))"
+    - (ao_gitea_credential_id | default('') | string | length) > 0
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/job_templates/{{ ao_jt_id }}/credentials/"
+    method: POST
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    body_format: json
+    body:
+      id: "{{ ao_gitea_credential_id | int }}"
+    validate_certs: false
+    status_code: [200, 201, 204, 400]
+  failed_when: false
+  no_log: true

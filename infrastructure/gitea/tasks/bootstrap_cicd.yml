@@ -1,0 +1,166 @@
+---
+# Non-destructive CI/CD bootstrap on an already-running APD Gitea container:
+# PAT, inventory-service repo seed files, Actions workflow stub, act_runner.
+- name: Enable Podman socket for act_runner
+  ansible.builtin.systemd:
+    name: podman.socket
+    state: started
+    enabled: true
+
+- name: Allow demo app HTTP ports through firewalld
+  ansible.posix.firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - "80"
+    - "8080"
+  when:
+    - "'firewalld.service' in ansible_facts.services"
+    - ansible_facts.services['firewalld.service'].state == 'running'
+
+- name: Create act_runner data directory
+  ansible.builtin.file:
+    path: /var/lib/gitea-runner
+    state: directory
+    mode: "0755"
+
+- name: List existing Gitea API tokens for admin
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/users/{{ gitea_admin_username }}/tokens"
+    method: GET
+    user: "{{ gitea_admin_username }}"
+    password: "{{ gitea_admin_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: gitea_existing_tokens
+  no_log: true
+
+- name: Delete existing apd-cicd-token when present
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/users/{{ gitea_admin_username }}/tokens/{{ item.id }}"
+    method: DELETE
+    user: "{{ gitea_admin_username }}"
+    password: "{{ gitea_admin_password }}"
+    force_basic_auth: true
+    status_code: [204, 404]
+  loop: "{{ gitea_existing_tokens.json | selectattr('name', 'equalto', 'apd-cicd-token') | list }}"
+  when: gitea_existing_tokens.json is sequence
+  failed_when: false
+  no_log: true
+
+- name: Create Gitea API token for CI/CD demos
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/users/{{ gitea_admin_username }}/tokens"
+    method: POST
+    user: "{{ gitea_admin_username }}"
+    password: "{{ gitea_admin_password }}"
+    force_basic_auth: true
+    headers:
+      Content-Type: application/json
+    body_format: json
+    body:
+      name: apd-cicd-token
+      scopes:
+        - write:repository
+        - write:issue
+        - write:user
+        - write:organization
+        - write:package
+    status_code: [201]
+  register: gitea_token_result
+  no_log: true
+
+- name: Store Gitea API token fact
+  ansible.builtin.set_fact:
+    gitea_api_token: "{{ gitea_token_result.json.sha1 }}"
+    gitea_repo_owner: "{{ gitea_admin_username }}"
+    gitea_repo_name: inventory-service
+  no_log: true
+
+- name: Create inventory-service repository when missing
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/user/repos"
+    method: POST
+    headers:
+      Authorization: "token {{ gitea_api_token }}"
+      Content-Type: application/json
+    body_format: json
+    body:
+      name: "{{ gitea_repo_name }}"
+      description: APD CI/CD Pipeline demo application
+      private: false
+      auto_init: true
+      default_branch: main
+    status_code: [201, 409]
+  register: gitea_repo_create
+  no_log: true
+
+- name: Seed inventory-service baseline files via API
+  vars:
+    _seed_files:
+      - path: requirements.txt
+        message: Seed vulnerable baseline requirements
+        content: |
+          # inventory-service dependencies
+          aiohttp==3.9.0
+      - path: version.txt
+        message: Seed baseline version
+        content: |
+          2.3.0
+      - path: PATCHED_CVE
+        message: Seed empty PATCHED_CVE
+        content: ""
+      - path: CHANGE_REQUEST
+        message: Seed empty CHANGE_REQUEST
+        content: ""
+      - path: .gitea/workflows/ci.yml
+        message: Seed Gitea Actions CI workflow
+        content: "{{ lookup('file', playbook_dir ~ '/files/inventory-service-ci.yml') }}"
+  ansible.builtin.include_tasks: seed_repo_file.yml
+  loop: "{{ _seed_files }}"
+  loop_control:
+    loop_var: gitea_seed_file
+
+- name: Get runner registration token from Gitea
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/admin/actions/runners/registration-token"
+    method: GET
+    user: "{{ gitea_admin_username }}"
+    password: "{{ gitea_admin_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: gitea_runner_token
+  no_log: true
+
+- name: Remove existing act_runner container when present
+  containers.podman.podman_container:
+    name: gitea-runner
+    state: absent
+  failed_when: false
+
+- name: Run Gitea act_runner
+  containers.podman.podman_container:
+    name: gitea-runner
+    image: docker.io/gitea/act_runner:latest
+    state: started
+    restart_policy: always
+    env:
+      GITEA_INSTANCE_URL: "http://{{ ansible_default_ipv4.address }}:{{ gitea_http_port }}"
+      GITEA_RUNNER_REGISTRATION_TOKEN: "{{ gitea_runner_token.json.token }}"
+      GITEA_RUNNER_NAME: apd-demo-runner
+    volumes:
+      - /var/lib/gitea-runner:/data:Z
+      - /run/podman/podman.sock:/var/run/docker.sock:Z
+
+- name: Persist CI/CD token facts for Controller publish
+  ansible.builtin.set_fact:
+    gitea_credential_host: "{{ gitea_public_ip }}"
+    gitea_credential_port: "{{ gitea_http_port }}"
+    gitea_credential_token: "{{ gitea_api_token }}"
+    gitea_credential_owner: "{{ gitea_repo_owner }}"
+    gitea_credential_repo: "{{ gitea_repo_name }}"
+  delegate_to: localhost
+  delegate_facts: true
+  no_log: true

@@ -1,6 +1,6 @@
 # AWS Gitea
 
-Stand up a lightweight self-hosted Git server on AWS for demos that need a simple SCM endpoint (AI-generated playbooks, student labs, or any workflow that pushes to Git without depending on GitHub.com).
+Stand up a lightweight self-hosted Git forge on AWS for demos that need SCM without GitHub.com — including the AO **CI/CD Pipeline** demo (`inventory-service` + Gitea Actions).
 
 ## Prerequisites
 
@@ -8,7 +8,7 @@ Stand up a lightweight self-hosted Git server on AWS for demos that need a simpl
   - **[Infrastructure ǀ AWS - Deploy Shared Services](./shared-services.md)** (one-click VPC + keypair + Mattermost + Gitea), or
   - **Cloud ǀ AWS ǀ Create VPC** + **Cloud ǀ AWS ǀ Create Keypair**, or
   - reuse an existing **Deploy Cloud Stack in AWS** (full stack is fine, but not required — Gitea does not need the five demo VMs)
-- **AWS** and **APD Machine Credential** configured
+- **AWS**, **APD Machine Credential**, and **AAP Credential** configured (AAP Credential is required so Provision Gitea can upsert the **Gitea** credential on Controller)
 
 ## Configure credentials
 
@@ -16,6 +16,7 @@ Stand up a lightweight self-hosted Git server on AWS for demos that need a simpl
 |------------|------|-------|
 | AWS | Amazon Web Services | EC2 create + security group |
 | APD Machine Credential | Machine | SSH as `ec2-user` to configure Podman |
+| AAP Credential | Red Hat Ansible Automation Platform | Controller API for **Gitea** credential write-back |
 
 ## Survey prompts
 
@@ -29,33 +30,38 @@ Stand up a lightweight self-hosted Git server on AWS for demos that need a simpl
 
 | Template | Playbook | Description |
 |----------|----------|-------------|
-| Infrastructure ǀ AWS - Provision Gitea | [`infrastructure/gitea/provision_gitea.yml`](../gitea/provision_gitea.yml) | EC2 `aws_gitea` + Podman Gitea (SQLite) + admin user |
+| Infrastructure ǀ AWS - Provision Gitea | [`infrastructure/gitea/provision_gitea.yml`](../gitea/provision_gitea.yml) | EC2 `aws_gitea` + Podman Gitea (SQLite) + admin + CI/CD bootstrap |
 
 ## Why it matters
 
-- One reusable Git forge for demos that need to push/pull playbooks without GitHub.com
+- One reusable Git forge for demos that need to push/pull without GitHub.com
 - Same cloud networking pattern as **Provision Mattermost** / **Provision Kafka Queue**
+- Seeds `apdadmin/inventory-service`, enables Actions, starts `act_runner`, and upserts the **Gitea** credential for AO Install
 - Job output prints the URL and default login so students can open Gitea immediately
 
 ## Presenter walkthrough
 
 1. Prefer **Infrastructure ǀ AWS - Deploy Shared Services** for one-click networking + Gitea (and Mattermost). Or ensure networking exists via **Create VPC** + **Create Keypair** / cloud stack, then launch **Infrastructure ǀ AWS - Provision Gitea** alone
-2. At the end of the job, copy the printed **URL / Username / Password** block
+2. At the end of the job, copy the printed **URL / Username / Password** block — also note `apdadmin/inventory-service`
 3. Open the URL in a browser and sign in — default login is `apdadmin` / `Ansible123!`
+4. After **AO Install**, set the repo Actions secret **`AO_WEBHOOK_URL`** to the **lightwell-ci-cd** webhook URL from the Install seed summary
 
 Default admin login is `apdadmin` / `Ansible123!` (same as Mattermost; username `admin` is reserved by Gitea). Change it for long-lived labs.
 
 ## Talking points
 
-- Gitea runs as a single Podman container with SQLite on a dedicated RHEL 9 EC2 host
-- Port **3000** is opened on `aws-test-sg` and firewalld
+- Gitea runs as a Podman container with SQLite on a dedicated RHEL 9 EC2 host; Actions enabled
+- Companion `gitea-runner` (`act_runner`) uses the host Podman socket
+- Ports **3000**, **80**, and **8080** are opened on `aws-test-sg` (Gitea UI + demo app ports used by CI/CD Setup Demo Host)
 - Connection details are also written to `/etc/apd-gitea.env` on the host
 - Sync **AWS Inventory** afterward if you need `aws_gitea` as a managed host in Controller
+- APD does **not** run upstream `cicd_setup_gitea` — that would wipe this shared host; Provision Gitea owns the forge bootstrap
 
 ## Related demos
 
 | Demo | Description |
 |------|-------------|
+| [Automation Orchestrator](./automation-orchestrator.md) | Path 2 — CI/CD Pipeline seed attaches the **Gitea** credential |
 | [AWS Deploy Shared Services](./shared-services.md) | Preferred one-click path (VPC + keypair + Mattermost + Gitea) |
 | [AWS — Create VPC](../../cloud/docs/cloud-create-vpc.md) | Minimal networking prerequisite (no full cloud stack) |
 | [AWS — Create Keypair](../../cloud/docs/cloud-create-keypair.md) | SSH key used by APD Machine Credential |

@@ -128,6 +128,39 @@
             ]
           }}
 
+    - name: Record OpenFlake warning when credential is missing
+      when:
+        - (ao_openflake_demos | default([]) | length) > 0
+        - not (ao_openflake_present | default(false) | bool)
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'Demo(s) '
+              ~ (ao_openflake_demos | map(attribute='slug') | list | join(', '))
+              ~ ' need OpenFlake. Run Infrastructure | OpenFlake (writes the '
+              ~ 'OpenFlake Controller credential), then re-run Install.'
+            ]
+          }}
+
+    - name: Record Gitea warning when credential or host is missing
+      when:
+        - (ao_gitea_demos | default([]) | length) > 0
+        - >-
+          not (ao_gitea_present | default(false) | bool)
+          or not (ao_gitea_host_present | default(false) | bool)
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'Demo(s) '
+              ~ (ao_gitea_demos | map(attribute='slug') | list | join(', '))
+              ~ ' need aws_gitea + Gitea Controller credential. Run '
+              ~ 'Infrastructure | AWS - Deploy Shared Services (or Provision Gitea), '
+              ~ 'sync AWS Inventory, run CI/CD Demo - Setup Demo Host, then re-run Install.'
+            ]
+          }}
+
     # Decode the admin password here (same pattern as install.yml) so no_log
     # on ao_admin_password does not redact this final presenter-facing summary.
     - name: Show seed summary
@@ -154,6 +187,34 @@
               else [
                 'Mattermost: not provisioned — run Infrastructure | AWS - Provision Mattermost (updates Mattermost credential + syncs inventory)',
               ]
+            )
+            + (
+              [
+                'OpenFlake URL: ' ~ ao_openflake_url,
+                'OpenFlake Controller credential: attached to CI/CD Demo JTs when present',
+              ]
+              if (ao_openflake_present | default(false) | bool)
+              else (
+                [
+                  'OpenFlake: not provisioned — run Infrastructure | OpenFlake for cicd-pipeline',
+                ]
+                if (ao_openflake_demos | default([]) | length) > 0
+                else []
+              )
+            )
+            + (
+              [
+                'Gitea URL: http://' ~ ao_gitea_host ~ ':' ~ ao_gitea_port,
+                'Gitea Controller credential: attached to CI/CD Demo JTs when present',
+              ]
+              if (ao_gitea_present | default(false) | bool)
+              else (
+                [
+                  'Gitea: not provisioned — run Infrastructure | AWS - Deploy Shared Services / Provision Gitea for cicd-pipeline',
+                ]
+                if (ao_gitea_demos | default([]) | length) > 0
+                else []
+              )
             )
             + (
               [
