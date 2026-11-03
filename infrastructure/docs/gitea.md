@@ -4,7 +4,8 @@ Stand up a lightweight self-hosted Git server on AWS for demos that need a simpl
 
 ## Prerequisites
 
-- Shared AWS networking in the target region (defaults: `aws-test-subnet`, `aws-test-sg`, `aws-test-key`). Either:
+- Shared AWS networking in the target region (defaults: `aws-test-subnet`, `aws-test-sg`, `aws-test-key`). Prefer:
+  - **[Infrastructure ǀ AWS - Deploy Shared Services](./shared-services.md)** (one-click VPC + keypair + Mattermost + Gitea), or
   - **Cloud ǀ AWS ǀ Create VPC** + **Cloud ǀ AWS ǀ Create Keypair**, or
   - reuse an existing **Deploy Cloud Stack in AWS** (full stack is fine, but not required — Gitea does not need the five demo VMs)
 - **AWS** and **APD Machine Credential** configured
@@ -38,10 +39,9 @@ Stand up a lightweight self-hosted Git server on AWS for demos that need a simpl
 
 ## Presenter walkthrough
 
-1. Ensure networking exists: run **Create VPC** + **Create Keypair**, or reuse a cloud stack already in that region
-2. Launch **Infrastructure ǀ AWS - Provision Gitea** with the same region and owner tag
-3. At the end of the job, copy the printed **URL / Username / Password** block
-4. Open the URL in a browser and sign in — default login is `admin` / `Ansible123!`
+1. Prefer **Infrastructure ǀ AWS - Deploy Shared Services** for one-click networking + Gitea (and Mattermost). Or ensure networking exists via **Create VPC** + **Create Keypair** / cloud stack, then launch **Infrastructure ǀ AWS - Provision Gitea** alone
+2. At the end of the job, copy the printed **URL / Username / Password** block
+3. Open the URL in a browser and sign in — default login is `admin` / `Ansible123!`
 
 Default admin login is `admin` / `Ansible123!` (same password pattern as Mattermost). Change it for long-lived labs.
 
@@ -56,6 +56,7 @@ Default admin login is `admin` / `Ansible123!` (same password pattern as Matterm
 
 | Demo | Description |
 |------|-------------|
+| [AWS Deploy Shared Services](./shared-services.md) | Preferred one-click path (VPC + keypair + Mattermost + Gitea) |
 | [AWS — Create VPC](../../cloud/docs/cloud-create-vpc.md) | Minimal networking prerequisite (no full cloud stack) |
 | [AWS — Create Keypair](../../cloud/docs/cloud-create-keypair.md) | SSH key used by APD Machine Credential |
 | [AWS Mattermost](./mattermost.md) | Sibling AWS service host pattern (`aws_mattermost`) |

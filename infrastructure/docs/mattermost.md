@@ -4,7 +4,10 @@ Stand up a shared Mattermost chat server on AWS for demos that post remediation 
 
 ## Prerequisites
 
-- **Deploy Cloud Stack in AWS** already run (VPC, subnet, security group, keypair)
+- Shared AWS networking in the target region (defaults: `aws-test-subnet`, `aws-test-sg`, `aws-test-key`). Prefer:
+  - **[Infrastructure ǀ AWS - Deploy Shared Services](./shared-services.md)** (one-click VPC + keypair + Mattermost + Gitea), or
+  - **Cloud ǀ AWS ǀ Create VPC** + **Cloud ǀ AWS ǀ Create Keypair**, or
+  - reuse an existing **Deploy Cloud Stack in AWS** (full stack is fine, but not required — Mattermost does not need the five demo VMs)
 - **AWS**, **APD Machine Credential**, and **AAP Credential** configured
 
 ## Configure credentials
@@ -39,10 +42,9 @@ The playbook creates/updates a **Mattermost** custom credential (`mattermost_ser
 
 ## Presenter walkthrough
 
-1. Run **Deploy Cloud Stack in AWS** (or reuse an existing stack)
-2. Launch **Infrastructure ǀ AWS - Provision Mattermost** with the same region and owner tag
-3. Confirm job output shows the **Mattermost** Controller credential was updated and **AWS Inventory** synced — **save the UI login** (`apdadmin` / `Ansible123!` by default) for later
-4. For AO demos: run **Infrastructure ǀ Automation Orchestrator ǀ Install** so **Notify Chatroom** gets the Mattermost credential attached; the Install seed summary also reprints the Mattermost URL and default UI login
+1. Prefer **Infrastructure ǀ AWS - Deploy Shared Services** for one-click networking + Mattermost (and Gitea). Or ensure networking exists via **Create VPC** + **Create Keypair** / cloud stack, then launch **Infrastructure ǀ AWS - Provision Mattermost** alone
+2. Confirm job output shows the **Mattermost** Controller credential was updated and **AWS Inventory** synced — **save the UI login** (`apdadmin` / `Ansible123!` by default) for later
+3. For AO demos: run **Infrastructure ǀ Automation Orchestrator ǀ Install** so **Notify Chatroom** gets the Mattermost credential attached; the Install seed summary also reprints the Mattermost URL and default UI login
 
 Default admin login is `apdadmin` / `Ansible123!` (username `admin` is reserved by Mattermost). Change it for long-lived labs.
 
@@ -56,5 +58,6 @@ Default admin login is `apdadmin` / `Ansible123!` (username `admin` is reserved 
 
 | Demo | Description |
 |------|-------------|
+| [AWS Deploy Shared Services](./shared-services.md) | Preferred one-click path (VPC + keypair + Mattermost + Gitea) |
 | [Automation Orchestrator — Provisioning](./automation-orchestrator.md) | Install seeds demos that notify via Mattermost |
 | [Config Drift — Kafka Queue](./config-drift-kafka.md) | Sibling AWS service host pattern (`aws_kafka`) |

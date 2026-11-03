@@ -1079,6 +1079,100 @@ controller_templates:
           default: stable
 
 controller_workflows:
+  - name: Infrastructure | AWS - Deploy Shared Services
+    description: >-
+      One-click shared AWS services without cloud-stack VMs: Create VPC and
+      keypair, then provision Mattermost and Gitea in parallel.
+    labels:
+      - aws.ec2
+      - aws.vpc
+      - infrastructure
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      aws_key_name: aws-test-key
+      create_vm_aws_keypair_name: aws-test-key
+      create_vm_aws_securitygroup_name: aws-test-sg
+      create_vm_aws_vpc_subnet_name: aws-test-subnet
+      create_vm_vm_deployment: cloud_stack
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            AWS region for VPC, keypair, Mattermost, and Gitea.
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Owner
+          question_description: >-
+            EC2 owner tag on networking and service hosts. Use your name or
+            team for cost attribution.
+          type: text
+          variable: create_vm_aws_owner_tag
+          required: true
+          default: your_name
+        - question_name: Environment
+          type: multiplechoice
+          variable: create_vm_vm_environment
+          required: true
+          default: Prod
+          choices:
+            - Dev
+            - QA
+            - Prod
+    simplified_workflow_nodes:
+      - identifier: Create Keypair
+        unified_job_template: Cloud | AWS | Create Keypair
+        success_nodes:
+          - Provision Mattermost
+          - Provision Gitea
+        failure_nodes:
+          - Ticket - Keypair Failed
+      - identifier: Create VPC
+        unified_job_template: Cloud | AWS | Create VPC
+        success_nodes:
+          - Provision Mattermost
+          - Provision Gitea
+        failure_nodes:
+          - Ticket - VPC Failed
+      - identifier: Provision Mattermost
+        unified_job_template: Infrastructure | AWS - Provision Mattermost
+        all_parents_must_converge: true
+        failure_nodes:
+          - Ticket - Mattermost Failed
+      - identifier: Provision Gitea
+        unified_job_template: Infrastructure | AWS - Provision Gitea
+        all_parents_must_converge: true
+        failure_nodes:
+          - Ticket - Gitea Failed
+      - identifier: Ticket - Keypair Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to create AWS keypair for shared services
+      - identifier: Ticket - VPC Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to create AWS VPC for shared services
+      - identifier: Ticket - Mattermost Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to provision Mattermost shared service
+      - identifier: Ticket - Gitea Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to provision Gitea shared service
+
   - name: Infrastructure | ROSA - Lifecycle (Create)
     description: >-
       End-to-end ROSA cluster creation: preflight checks, create,
