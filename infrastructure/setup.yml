@@ -769,7 +769,6 @@ controller_templates:
     labels:
       - aws.ec2
       - infrastructure
-      - git
     job_type: run
     organization: Ansible Product Demos (APD)
     credentials:
