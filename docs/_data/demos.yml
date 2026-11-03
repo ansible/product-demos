@@ -1877,6 +1877,25 @@
   url: /demos/infrastructure-mattermost/
   github_path: infrastructure/setup.yml
 
+- slug: infrastructure-gitea
+  readme_path: infrastructure/docs/gitea.md
+  title: "Infrastructure | AWS — Provision Gitea"
+  subtitle: "Lightweight self-hosted Git forge for lab SCM demos"
+  category: infrastructure
+  status: active
+  tags:
+    - AWS
+    - Git
+    - SCM
+  thumbnail:
+    gradient: "linear-gradient(135deg, #231f20 0%, #609926 100%)"
+    icon: "📦"
+  blurb: "Provision aws_gitea with Podman Gitea (SQLite), create an admin user, and print the URL plus login (admin / Ansible123!) in the job output."
+  stats:
+    playbooks: 1
+  url: /demos/infrastructure-gitea/
+  github_path: infrastructure/setup.yml
+
 - slug: openflake
   readme_path: infrastructure/docs/openflake.md
   title: "Infrastructure | OpenFlake"

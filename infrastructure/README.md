@@ -49,6 +49,14 @@ Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route eve
 |--------------|-------------|
 | [**Infrastructure ǀ AWS - Provision Mattermost**](docs/mattermost.md) | EC2 `aws_mattermost` + Podman Mattermost with bot token for AO and other chat demos |
 
+### Gitea
+
+#### Jobs
+
+| Job Template | Description |
+|--------------|-------------|
+| [**Infrastructure ǀ AWS - Provision Gitea**](docs/gitea.md) | EC2 `aws_gitea` + Podman Gitea (SQLite); job output prints `admin` / `Ansible123!` |
+
 ### OPA (Open Policy Agent)
 
 #### Jobs
