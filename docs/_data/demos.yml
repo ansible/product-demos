@@ -1861,20 +1861,21 @@
 - slug: infrastructure-shared-services
   readme_path: infrastructure/docs/shared-services.md
   title: "Infrastructure | AWS — Deploy Shared Services"
-  subtitle: "One-click VPC, keypair, Mattermost, and Gitea without cloud-stack VMs"
+  subtitle: "One-click VPC, keypair, Mattermost, Gitea, and OpenFlake"
   category: infrastructure
   status: active
   tags:
     - AWS
     - Chat
     - Git
+    - OpenShift
     - Workflow
   thumbnail:
     gradient: "linear-gradient(135deg, #231f20 0%, #3d7ea6 100%)"
     icon: "🧩"
-  blurb: "Create VPC and keypair, then provision Mattermost and Gitea in parallel — shared lab services without the five Deploy Cloud Stack VMs."
+  blurb: "Create VPC and keypair, then provision Mattermost and Gitea in parallel while OpenFlake installs on OpenShift — shared lab services without the five Deploy Cloud Stack VMs."
   stats:
-    playbooks: 2
+    playbooks: 3
   url: /demos/infrastructure-shared-services/
   github_path: infrastructure/setup.yml
 
