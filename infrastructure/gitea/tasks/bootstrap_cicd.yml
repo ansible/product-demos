@@ -123,16 +123,29 @@
   loop_control:
     loop_var: gitea_seed_file
 
+# Gitea 1.22 uses /admin/runners/registration-token (not /admin/actions/...).
 - name: Get runner registration token from Gitea
   ansible.builtin.uri:
-    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/admin/actions/runners/registration-token"
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/admin/runners/registration-token"
     method: GET
-    user: "{{ gitea_admin_username }}"
-    password: "{{ gitea_admin_password }}"
-    force_basic_auth: true
-    status_code: [200]
+    headers:
+      Authorization: "token {{ gitea_api_token }}"
+    status_code: [200, 403, 404]
   register: gitea_runner_token
   no_log: true
+  failed_when: false
+
+- name: Require runner registration token
+  when: >-
+    (gitea_runner_token.status | default(0) | int) != 200
+    or (gitea_runner_token.json.token | default('') | length) == 0
+  ansible.builtin.fail:
+    msg: >-
+      Could not get Actions runner registration token
+      (HTTP {{ gitea_runner_token.status | default('n/a') }}).
+      Confirm Gitea Actions is enabled
+      (GITEA__actions__ENABLED=true) and the admin token works.
+      Endpoint: /api/v1/admin/runners/registration-token
 
 - name: Remove existing act_runner container when present
   containers.podman.podman_container:

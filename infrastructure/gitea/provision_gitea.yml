@@ -180,11 +180,14 @@
         group: "1000"
         mode: "0755"
 
+    # recreate so Actions env applies when re-running against an older
+    # aws_gitea host that was provisioned before CI/CD bootstrap.
     - name: Run Gitea application
       containers.podman.podman_container:
         name: gitea
         image: "{{ gitea_image }}"
         state: started
+        recreate: true
         restart_policy: always
         publish:
           - "{{ gitea_http_port }}:3000"
