@@ -180,8 +180,51 @@
         group: "1000"
         mode: "0755"
 
-    # recreate so Actions env applies when re-running against an older
-    # aws_gitea host that was provisioned before CI/CD bootstrap.
+    - name: Create Gitea config directory
+      ansible.builtin.file:
+        path: "{{ gitea_data_dir }}/gitea/conf"
+        state: directory
+        owner: "1000"
+        group: "1000"
+        mode: "0755"
+
+    # Persist a fixed instance-level runner token so we do not depend on the
+    # admin registration-token API (403 when Actions/unit scopes disagree).
+    - name: Ensure Actions runner registration token file
+      ansible.builtin.copy:
+        dest: /etc/apd-gitea-runner.token
+        mode: "0600"
+        content: "{{ lookup('password', '/dev/null length=40 chars=ascii_letters,digits') }}\n"
+        force: false
+
+    - name: Load Actions runner registration token
+      ansible.builtin.slurp:
+        src: /etc/apd-gitea-runner.token
+      register: gitea_runner_token_file
+      no_log: true
+
+    - name: Store Actions runner registration token fact
+      ansible.builtin.set_fact:
+        gitea_runner_registration_token: "{{ gitea_runner_token_file.content | b64decode | trim }}"
+      no_log: true
+
+    # Official image applies GITEA__* into app.ini on start; also pin Actions
+    # in app.ini so re-runs against older hosts enable the runners API/UI.
+    - name: Ensure Actions enabled in Gitea app.ini
+      ansible.builtin.blockinfile:
+        path: "{{ gitea_data_dir }}/gitea/conf/app.ini"
+        create: true
+        owner: "1000"
+        group: "1000"
+        mode: "0644"
+        marker: "# {mark} APD ACTIONS"
+        block: |
+          [actions]
+          ENABLED = true
+          DEFAULT_ACTIONS_URL = github
+
+    # recreate so Actions env + fixed runner token apply when re-running
+    # against an older aws_gitea host provisioned before CI/CD bootstrap.
     - name: Run Gitea application
       containers.podman.podman_container:
         name: gitea
@@ -203,6 +246,7 @@
           GITEA__service__DISABLE_REGISTRATION: "true"
           GITEA__actions__ENABLED: "true"
           GITEA__actions__DEFAULT_ACTIONS_URL: github
+          GITEA_RUNNER_REGISTRATION_TOKEN: "{{ gitea_runner_registration_token }}"
         volumes:
           - "{{ gitea_data_dir }}:/data:Z"
 

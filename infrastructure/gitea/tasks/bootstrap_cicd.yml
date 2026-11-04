@@ -123,35 +123,49 @@
   loop_control:
     loop_var: gitea_seed_file
 
-# Gitea 1.22 uses /admin/runners/registration-token (not /admin/actions/...).
-- name: Get runner registration token from Gitea
+- name: Require Actions runner registration token from provision
+  ansible.builtin.assert:
+    that:
+      - (gitea_runner_registration_token | default('') | length) >= 32
+    fail_msg: >-
+      gitea_runner_registration_token was not set by provision_gitea.yml.
+      Re-run Infrastructure | AWS - Provision Gitea from a synced project.
+
+# Repos disable Actions by default even when the instance has Actions on.
+- name: Enable Actions unit on inventory-service
   ansible.builtin.uri:
-    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/admin/runners/registration-token"
-    method: GET
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/repos/{{ gitea_repo_owner }}/{{ gitea_repo_name }}"
+    method: PATCH
     headers:
       Authorization: "token {{ gitea_api_token }}"
-    status_code: [200, 403, 404]
-  register: gitea_runner_token
+      Content-Type: application/json
+    body_format: json
+    body:
+      has_actions: true
+    status_code: [200, 422]
+  register: gitea_repo_actions_enable
   no_log: true
   failed_when: false
 
-- name: Require runner registration token
-  when: >-
-    (gitea_runner_token.status | default(0) | int) != 200
-    or (gitea_runner_token.json.token | default('') | length) == 0
-  ansible.builtin.fail:
+- name: Warn when inventory-service Actions unit could not be enabled via API
+  when: (gitea_repo_actions_enable.status | default(0) | int) != 200
+  ansible.builtin.debug:
     msg: >-
-      Could not get Actions runner registration token
-      (HTTP {{ gitea_runner_token.status | default('n/a') }}).
-      Confirm Gitea Actions is enabled
-      (GITEA__actions__ENABLED=true) and the admin token works.
-      Endpoint: /api/v1/admin/runners/registration-token
+      Could not set has_actions via API
+      (HTTP {{ gitea_repo_actions_enable.status | default('n/a') }}).
+      Enable Repository Actions in the Gitea UI if workflows do not run.
 
 - name: Remove existing act_runner container when present
   containers.podman.podman_container:
     name: gitea-runner
     state: absent
   failed_when: false
+
+# Drop prior registration so the runner re-registers with the fixed token.
+- name: Clear stale act_runner registration file
+  ansible.builtin.file:
+    path: /var/lib/gitea-runner/.runner
+    state: absent
 
 - name: Run Gitea act_runner
   containers.podman.podman_container:
@@ -161,7 +175,7 @@
     restart_policy: always
     env:
       GITEA_INSTANCE_URL: "http://{{ ansible_default_ipv4.address }}:{{ gitea_http_port }}"
-      GITEA_RUNNER_REGISTRATION_TOKEN: "{{ gitea_runner_token.json.token }}"
+      GITEA_RUNNER_REGISTRATION_TOKEN: "{{ gitea_runner_registration_token }}"
       GITEA_RUNNER_NAME: apd-demo-runner
     volumes:
       - /var/lib/gitea-runner:/data:Z
