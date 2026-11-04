@@ -1,0 +1,295 @@
+---
+- name: Provision Gitea EC2 instance in AWS
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    create_vm_vm_name: aws_gitea
+    vm_blueprint: gitea
+    create_vm_vm_blueprint: gitea
+    create_vm_vm_purpose: gitea
+    create_vm_apd_managed_by: aap-product-demos
+    create_vm_apd_demo_tag: "true"
+    create_vm_aws_keypair_name: aws-test-key
+    create_vm_aws_securitygroup_name: aws-test-sg
+    create_vm_aws_vpc_subnet_name: aws-test-subnet
+    create_vm_vm_deployment: cloud_stack
+    # Username "admin" is reserved by Gitea (CreateUser: name is reserved).
+    gitea_admin_username: apdadmin
+    gitea_admin_password: Ansible123!
+    gitea_admin_email: apd-admin@example.com
+    gitea_http_port: 3000
+
+  tasks:
+    - name: Fail if cloud networking variables are not defined
+      ansible.builtin.assert:
+        that:
+          - create_vm_aws_vpc_subnet_name is defined
+          - create_vm_aws_keypair_name is defined
+          - create_vm_aws_securitygroup_name is defined
+          - create_vm_aws_region is defined
+        fail_msg: >-
+          Set create_vm_aws_region, create_vm_aws_vpc_subnet_name,
+          create_vm_aws_securitygroup_name, and create_vm_aws_keypair_name
+          (defaults: aws-test-subnet / aws-test-sg / aws-test-key).
+          Run Cloud | AWS | Create VPC and Create Keypair first — the full
+          Deploy Cloud Stack workflow is not required for Gitea.
+
+    - name: Map owner tag for EC2 provisioning
+      ansible.builtin.set_fact:
+        create_vm_vm_owner: "{{ create_vm_aws_owner_tag }}"
+      when: create_vm_aws_owner_tag is defined
+
+    - name: Default deployment tag for Gitea VM
+      ansible.builtin.set_fact:
+        create_vm_vm_deployment: cloud_stack
+      when: create_vm_vm_deployment is not defined
+
+    - name: Default cloud networking for Gitea VM
+      ansible.builtin.set_fact:
+        create_vm_aws_keypair_name: aws-test-key
+        create_vm_aws_securitygroup_name: aws-test-sg
+        create_vm_aws_vpc_subnet_name: aws-test-subnet
+      when: create_vm_aws_keypair_name is not defined
+
+    - name: Default environment tag for Gitea VM
+      ansible.builtin.set_fact:
+        create_vm_vm_environment: Prod
+      when: create_vm_vm_environment is not defined
+
+    - name: Default owner tag for Gitea VM
+      ansible.builtin.set_fact:
+        create_vm_vm_owner: apd-demo
+      when: create_vm_vm_owner is not defined
+
+    - name: Ensure AWS keypair exists in EC2
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/../../cloud/tasks/ensure_aws_keypair.yml"
+      vars:
+        aws_key_name: "{{ create_vm_aws_keypair_name }}"
+        aws_keypair_owner: "{{ create_vm_vm_owner }}"
+
+    - name: Create or reuse Gitea EC2 instance
+      ansible.builtin.include_role:
+        name: demo.cloud.aws
+        tasks_from: create_vm
+      vars:
+        create_vm_aws_image_owners: 309956199498
+        create_vm_aws_instance_size: t3.medium
+        create_vm_aws_image_architecture: x86_64
+        create_vm_aws_image_filter: 'RHEL-9*HVM-*Hourly*'
+
+    - name: Look up Gitea EC2 instance details
+      amazon.aws.ec2_instance_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          "tag:Name": "{{ create_vm_vm_name }}"
+          instance-state-name:
+            - pending
+            - running
+      register: gitea_instance
+      until: gitea_instance.instances | length > 0
+      retries: 12
+      delay: 5
+
+    - name: Assert Gitea instance is running
+      ansible.builtin.assert:
+        that: gitea_instance.instances | length > 0
+        fail_msg: Gitea EC2 instance aws_gitea was not found after provisioning.
+
+    - name: Save Gitea connection details
+      ansible.builtin.set_fact:
+        gitea_public_ip: "{{ gitea_instance.instances[0].public_ip_address }}"
+        gitea_private_ip: "{{ gitea_instance.instances[0].private_ip_address }}"
+
+    - name: Register Gitea host for configuration play
+      ansible.builtin.add_host:
+        name: aws_gitea
+        ansible_host: "{{ gitea_public_ip }}"
+        ansible_user: ec2-user
+        groups: gitea_server
+        gitea_public_ip: "{{ gitea_public_ip }}"
+        gitea_private_ip: "{{ gitea_private_ip }}"
+        gitea_admin_username: "{{ gitea_admin_username }}"
+        gitea_admin_password: "{{ gitea_admin_password }}"
+        gitea_admin_email: "{{ gitea_admin_email }}"
+        gitea_http_port: "{{ gitea_http_port }}"
+
+    - name: Look up demo security group for Gitea HTTP
+      amazon.aws.ec2_security_group_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          group-name: "{{ create_vm_aws_securitygroup_name }}"
+      register: gitea_security_group
+
+    - name: Allow Gitea HTTP port
+      when: gitea_security_group.security_groups | length > 0
+      amazon.aws.ec2_security_group:
+        name: "{{ create_vm_aws_securitygroup_name }}"
+        description: "{{ gitea_security_group.security_groups[0].description }}"
+        region: "{{ create_vm_aws_region }}"
+        vpc_id: "{{ gitea_security_group.security_groups[0].vpc_id }}"
+        purge_rules: false
+        rules:
+          - proto: tcp
+            ports:
+              - "{{ gitea_http_port }}"
+            cidr_ip: 0.0.0.0/0
+
+- name: Deploy Gitea with Podman
+  hosts: gitea_server
+  become: true
+  gather_facts: false
+  vars:
+    gitea_image: docker.io/gitea/gitea:1.22
+    gitea_data_dir: /var/lib/gitea
+
+  tasks:
+    - name: Wait for SSH on new Gitea instance
+      ansible.builtin.wait_for_connection:
+        delay: 15
+        timeout: 600
+
+    - name: Gather facts after SSH is ready
+      ansible.builtin.setup:
+
+    - name: Install Podman
+      ansible.builtin.package:
+        name: podman
+        state: present
+
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Allow Gitea port through firewalld
+      ansible.posix.firewalld:
+        port: "{{ gitea_http_port }}/tcp"
+        permanent: true
+        state: enabled
+        immediate: true
+      when:
+        - "'firewalld.service' in ansible_facts.services"
+        - ansible_facts.services['firewalld.service'].state == 'running'
+
+    - name: Create Gitea data directory
+      ansible.builtin.file:
+        path: "{{ gitea_data_dir }}"
+        state: directory
+        owner: "1000"
+        group: "1000"
+        mode: "0755"
+
+    - name: Run Gitea application
+      containers.podman.podman_container:
+        name: gitea
+        image: "{{ gitea_image }}"
+        state: started
+        restart_policy: always
+        publish:
+          - "{{ gitea_http_port }}:3000"
+        env:
+          USER_UID: "1000"
+          USER_GID: "1000"
+          GITEA__database__DB_TYPE: sqlite3
+          GITEA__server__DOMAIN: "{{ gitea_public_ip }}"
+          GITEA__server__HTTP_PORT: "3000"
+          GITEA__server__ROOT_URL: "http://{{ gitea_public_ip }}:{{ gitea_http_port }}/"
+          GITEA__server__DISABLE_SSH: "true"
+          GITEA__security__INSTALL_LOCK: "true"
+          GITEA__service__DISABLE_REGISTRATION: "true"
+        volumes:
+          - "{{ gitea_data_dir }}:/data:Z"
+
+    - name: Wait for Gitea HTTP
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/version"
+        method: GET
+        status_code: [200]
+      register: gitea_ping
+      until: gitea_ping.status | default(0) == 200
+      retries: 60
+      delay: 5
+      ignore_errors: true
+
+    - name: Collect Gitea container diagnostics on HTTP failure
+      when: gitea_ping is failed
+      block:
+        - name: Show Gitea container status
+          ansible.builtin.command:
+            argv:
+              - podman
+              - ps
+              - -a
+              - --filter
+              - name=gitea
+          register: gitea_ps
+          changed_when: false
+
+        - name: Show Gitea container logs
+          ansible.builtin.command:
+            argv:
+              - podman
+              - logs
+              - --tail
+              - "80"
+              - gitea
+          register: gitea_logs
+          changed_when: false
+          failed_when: false
+
+        - name: Fail with Gitea diagnostics
+          ansible.builtin.fail:
+            msg: >-
+              Gitea did not answer on 127.0.0.1:{{ gitea_http_port }}
+              (not a VPC/SG issue — this check is localhost).
+              podman ps: {{ gitea_ps.stdout }}
+              logs: {{ gitea_logs.stdout_lines | default(gitea_logs.stderr_lines) }}
+
+    - name: Create Gitea admin user when missing
+      ansible.builtin.command:
+        argv:
+          - podman
+          - exec
+          - --user
+          - git
+          - gitea
+          - gitea
+          - admin
+          - user
+          - create
+          - --admin
+          - --username
+          - "{{ gitea_admin_username }}"
+          - --password
+          - "{{ gitea_admin_password }}"
+          - --email
+          - "{{ gitea_admin_email }}"
+          - --must-change-password=false
+      register: gitea_admin_create
+      changed_when: gitea_admin_create.rc == 0
+      failed_when: >-
+        gitea_admin_create.rc != 0
+        and ('already exists' not in (gitea_admin_create.stderr | default('') | lower))
+        and ('user already exists' not in (gitea_admin_create.stdout | default('') | lower))
+
+    - name: Persist Gitea connection facts on the host
+      ansible.builtin.copy:
+        dest: /etc/apd-gitea.env
+        mode: "0600"
+        content: |
+          GITEA_URL=http://{{ gitea_public_ip }}:{{ gitea_http_port }}
+          GITEA_ADMIN_USER={{ gitea_admin_username }}
+          GITEA_ADMIN_PASSWORD={{ gitea_admin_password }}
+          GITEA_ADMIN_EMAIL={{ gitea_admin_email }}
+
+    - name: Show Gitea access information
+      ansible.builtin.debug:
+        msg:
+          - "============================================================"
+          - "Gitea is ready — use these credentials in the lab UI"
+          - "============================================================"
+          - "URL:      http://{{ gitea_public_ip }}:{{ gitea_http_port }}"
+          - "Username: {{ gitea_admin_username }}"
+          - "Password: {{ gitea_admin_password }}"
+          - "============================================================"
+          - "Host aws_gitea ({{ gitea_public_ip }}) — sync AWS Inventory to see it in Controller."
+          - "Connection details also written to /etc/apd-gitea.env on the host."
