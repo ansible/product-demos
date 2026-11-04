@@ -1,5 +1,6 @@
+---
 name: inventory-service CI
-on:
+"on":
   push:
     branches: [main]
   pull_request:
