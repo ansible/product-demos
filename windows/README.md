@@ -25,6 +25,7 @@ We are currently investigating an intermittent connectivity issue related to the
 | Workflow | Description |
 |----------|-------------|
 | [**Setup Active Directory Domain**](docs/windows-setup-ad-domain.md) | One-click workflow to provision a domain controller and two domain-joined Windows hosts in AWS, including Kerberos validation. |
+| [**Destroy Active Directory Domain**](docs/windows-destroy-ad-domain.md) | Tear down the domain controller and both domain-joined hosts created by Setup, reset Kerberos and AD LDAP credentials, and delete the keypair and VPC. |
 
 ### Jobs
 

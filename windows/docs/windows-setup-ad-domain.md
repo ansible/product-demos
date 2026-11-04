@@ -42,8 +42,7 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 ## Prerequisites
 
 - AWS credential configured with Access and Secret key
-- SSH public key for AWS keypair creation
-- **APD Machine Credential** with Windows administrator credentials
+- **APD Machine Credential** with Windows administrator credentials and an SSH private key (Create Keypair derives the public key from it)
 - **AAP Credential** for Controller API callbacks during domain creation
 
 ## Survey prompts
@@ -51,7 +50,6 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 | Prompt | Variable | Type | Required |
 |--------|----------|------|----------|
 | AWS Region | `create_vm_aws_region` | multiplechoice | Yes |
-| Keypair Public Key | `aws_public_key` | textarea | Yes |
 | Owner | `create_vm_vm_owner` | text | Yes |
 | Environment | `create_vm_vm_environment` | multiplechoice | Yes |
 | Subnet | `create_vm_aws_vpc_subnet_name` | text | Yes |
