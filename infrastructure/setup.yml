@@ -465,6 +465,7 @@ controller_templates:
       - OpenShift Credential
       - AAP Credential
       - LiteMaaS
+      - Gitea
 
   - name: Infrastructure | Automation Orchestrator | Uninstall
     description: >-

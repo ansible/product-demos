@@ -111,6 +111,9 @@
     - name: Synchronize enabled AO workflow exports
       ansible.builtin.include_tasks: tasks/sync_demos.yml
 
+    - name: Wire AO webhook URL into Gitea Actions secrets
+      ansible.builtin.include_tasks: tasks/wire_gitea_ao_webhook.yml
+
     - name: Record Mattermost warning when credential and inventory are missing
       when:
         - (ao_mattermost_demos | default([]) | length) > 0
@@ -203,10 +206,19 @@
               )
             )
             + (
-              [
-                'Gitea URL: http://' ~ ao_gitea_host ~ ':' ~ ao_gitea_port,
-                'Gitea Controller credential: attached to CI/CD Demo JTs when present',
-              ]
+              (
+                [
+                  'Gitea URL: http://' ~ ao_gitea_host ~ ':' ~ ao_gitea_port,
+                  'Gitea Controller credential: attached to CI/CD Demo JTs when present',
+                ]
+                + (
+                  [
+                    'Gitea Actions AO_WEBHOOK_URL: set to ' ~ ao_cicd_webhook_url,
+                  ]
+                  if (ao_gitea_webhook_secret_set | default(false) | bool)
+                  else []
+                )
+              )
               if (ao_gitea_present | default(false) | bool)
               else (
                 [

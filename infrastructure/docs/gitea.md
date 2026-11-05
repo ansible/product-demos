@@ -46,7 +46,7 @@ Stand up a lightweight self-hosted Git forge on AWS for demos that need SCM with
 1. Prefer **Infrastructure ǀ AWS - Deploy Shared Services** for one-click networking + Gitea (and Mattermost). Or ensure networking exists via **Create VPC** + **Create Keypair** / cloud stack, then launch **Infrastructure ǀ AWS - Provision Gitea** alone
 2. At the end of the job, copy the printed **URL / Username / Password** block — also note `apdadmin/inventory-service`
 3. Open the URL in a browser and sign in — default login is `apdadmin` / `Ansible123!`
-4. After **AO Install**, set the repo Actions secret **`AO_WEBHOOK_URL`** to the **lightwell-ci-cd** webhook URL from the Install seed summary
+4. Run **AO Install** (with the **Gitea** credential attached) — seed writes Actions secret **`AO_WEBHOOK_URL`** for `lightwell-ci-cd` automatically
 
 Default admin login is `apdadmin` / `Ansible123!` (same as Mattermost; username `admin` is reserved by Gitea). Change it for long-lived labs.
 

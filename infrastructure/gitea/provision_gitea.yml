@@ -353,7 +353,7 @@
           - "============================================================"
           - "Host aws_gitea ({{ gitea_public_ip }}) — sync AWS Inventory to see it in Controller."
           - "Connection details also written to /etc/apd-gitea.env on the host."
-          - "After AO Install, set repo Actions secret AO_WEBHOOK_URL to the lightwell-ci-cd webhook."
+          - "After AO Install (Gitea credential attached), seed sets Actions secret AO_WEBHOOK_URL automatically."
 
 - name: Publish Gitea Credential to Controller
   hosts: localhost

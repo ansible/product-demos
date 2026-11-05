@@ -68,7 +68,7 @@ jobs:
           set -euo pipefail
 
           if [ -z "${AO_WEBHOOK_URL:-}" ]; then
-            echo "AO_WEBHOOK_URL secret not set — skip webhook (set after AO Install)"
+            echo "AO_WEBHOOK_URL secret not set — skip webhook (AO Install sets it when Gitea is attached)"
             exit 0
           fi
 
