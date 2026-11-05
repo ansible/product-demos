@@ -138,6 +138,37 @@
             ]
           }}
 
+    # Chart-generated admin password lives only in the OpenShift Secret.
+    # Surface it in the Install seed summary (same pattern as Mattermost) so
+    # students do not have to dig into the nested Shared Services / OpenFlake job.
+    - name: Read OpenFlake admin password from cluster Secret
+      when: ao_openflake_present | default(false) | bool
+      kubernetes.core.k8s_info:
+        kind: Secret
+        name: openflake
+        namespace: "{{ ao_openflake_namespace | default('openflake') }}"
+      register: ao_openflake_secret
+      failed_when: false
+      no_log: true
+
+    - name: Decode OpenFlake admin login for seed summary
+      when:
+        - ao_openflake_present | default(false) | bool
+        - (ao_openflake_secret.resources | default([]) | length) > 0
+      ansible.builtin.set_fact:
+        ao_openflake_username: >-
+          {{
+            ao_openflake_secret.resources[0].data.ADMIN_USERNAME
+            | default('') | b64decode
+            | default('admin', true)
+          }}
+        ao_openflake_password: >-
+          {{
+            ao_openflake_secret.resources[0].data.ADMIN_PASSWORD
+            | default('') | b64decode
+          }}
+      no_log: true
+
     - name: Record Gitea warning when credential or host is missing
       when:
         - (ao_gitea_demos | default([]) | length) > 0
@@ -184,10 +215,27 @@
               ]
             )
             + (
-              [
-                'OpenFlake URL: ' ~ ao_openflake_url,
-                'OpenFlake Controller credential: attached to CI/CD Demo JTs when present',
-              ]
+              (
+                [
+                  'OpenFlake URL: ' ~ ao_openflake_url,
+                  'OpenFlake Username: '
+                  ~ (ao_openflake_username | default('admin')),
+                ]
+                + (
+                  [
+                    'OpenFlake Password: ' ~ ao_openflake_password,
+                  ]
+                  if (ao_openflake_password | default('') | length) > 0
+                  else [
+                    'OpenFlake Password: see Infrastructure | OpenFlake job output '
+                    ~ '(or: oc -n openflake get secret openflake '
+                    ~ '-o jsonpath="{.data.ADMIN_PASSWORD}" | base64 -d)',
+                  ]
+                )
+                + [
+                  'OpenFlake Controller credential: attached to CI/CD Demo JTs when present',
+                ]
+              )
               if (ao_openflake_present | default(false) | bool)
               else (
                 [
