@@ -68,4 +68,4 @@ OpenFlake runs with `openflake_operation: install` from the workflow extra vars 
 | [AWS Gitea](./gitea.md) | Standalone Gitea provision |
 | [OpenFlake](./openflake.md) | Standalone OpenFlake install / uninstall |
 | [Deploy Cloud Stack in AWS](../../cloud/docs/deploy-cloud-stack.md) | Full stack including demo VMs |
-| [Automation Orchestrator](./automation-orchestrator.md) | Seed Path 2 uses Shared Services for CI/CD deps |
+| [Automation Orchestrator](./automation-orchestrator.md) | Path 2 step 2 — Shared Services before AO Install |

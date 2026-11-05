@@ -201,6 +201,32 @@
         | list
         | items2dict
       }}
+    # LiteMaaS/qwen often completes agentic nodes with empty result.content
+    # while status=completed. Upstream close/rollback AAP nodes then fail
+    # expression eval (${…result.content.snow_*}) *before* launching a job —
+    # AO shows Failed with no Controller job to inspect. Prefer trigger-based
+    # notes so the AAP step still runs; AI nodes remain for the demo narrative.
+    __ao_close_loop_extra_vars:
+      app_name: "${trigger.app_name}"
+      change_request: "${trigger.change_request}"
+      artifact_version: "${trigger.artifact_version}"
+      snow_close_note: >-
+        Production deployment of ${trigger.app_name} ${trigger.artifact_version}
+        completed successfully. Smoke tests passed. Change
+        ${trigger.change_request} closed by the AO CI/CD pipeline.
+    __ao_rollback_extra_vars:
+      app_name: "${trigger.app_name}"
+      snapshot_id: "${deploy_to_prod.artifacts.ao_snapshot_id}"
+      change_request: "${trigger.change_request}"
+      artifact_version: "${trigger.artifact_version}"
+      snow_incident_note: >-
+        Production deployment of ${trigger.app_name} ${trigger.artifact_version}
+        failed smoke tests. Automated rollback to pre-deploy snapshot
+        ${deploy_to_prod.artifacts.ao_snapshot_id} is in progress for change
+        ${trigger.change_request}.
+      recommended_next_step: >-
+        Investigate smoke-test failures, verify the restored snapshot, and
+        re-run the pipeline after a fix is merged.
     __ao_parameters: >-
       {{
         __ao_node_clean_parameters
@@ -214,6 +240,22 @@
             else {}
           )
         | combine(
+            {'extra_vars': __ao_close_loop_extra_vars}
+            if (
+              __ao_node_item.type == 'aap_job_template'
+              and (__ao_node_item.id | default('')) == 'close_loop'
+            )
+            else {}
+          )
+        | combine(
+            {'extra_vars': __ao_rollback_extra_vars}
+            if (
+              __ao_node_item.type == 'aap_job_template'
+              and (__ao_node_item.id | default('')) == 'rollback_to_snapshot'
+            )
+            else {}
+          )
+        | combine(
             {
               'llm_model_id': ao_llm_model_id,
               'credential_id': ao_llm_credential_id
@@ -222,6 +264,38 @@
               __ao_node_item.type == 'agentic'
               and (ao_llm_model_id | default('') | length) > 0
               and (ao_llm_credential_id | default('') | length) > 0
+            )
+            else {}
+          )
+        # Task Step Example works with qwen when schema has required[] and
+        # empty tool_selections. Upstream cicd note agents omit those and
+        # often finish with tool_calls + empty result.content.
+        | combine(
+            {
+              'tool_selections': [],
+              'integration_connections': [],
+              'tool_selection_strategy': 'NONE'
+            }
+            if __ao_node_item.type == 'agentic'
+            else {}
+          )
+        | combine(
+            {
+              'response_schema': (
+                (__ao_node_clean_parameters.response_schema | default({}))
+                | combine({
+                    'type': 'object',
+                    'required': (
+                      (__ao_node_clean_parameters.response_schema.properties | default({}))
+                      | list
+                    )
+                  })
+              )
+            }
+            if (
+              __ao_node_item.type == 'agentic'
+              and ((__ao_node_clean_parameters.response_schema.properties | default({})) | length) > 0
+              and ((__ao_node_clean_parameters.response_schema.required | default([])) | length) == 0
             )
             else {}
           )
