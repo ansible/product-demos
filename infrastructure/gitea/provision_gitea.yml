@@ -338,26 +338,37 @@
     - name: Set up inventory-service dev and prod runtimes on aws_gitea
       ansible.builtin.include_tasks: tasks/setup_demo_host.yml
 
-    - name: Show Gitea access information
-      ansible.builtin.debug:
-        msg:
-          - "============================================================"
-          - "Gitea is ready — use these credentials in the lab UI"
-          - "============================================================"
-          - "URL:      http://{{ gitea_public_ip }}:{{ gitea_http_port }}"
-          - "Username: {{ gitea_admin_username }}"
-          - "Password: {{ gitea_admin_password }}"
-          - "Repo:     {{ gitea_admin_username }}/inventory-service"
-          - "Dev app:  http://{{ gitea_public_ip }}:8080/"
-          - "Prod app: http://{{ gitea_public_ip }}:80/"
-          - "============================================================"
-          - "Host aws_gitea ({{ gitea_public_ip }}) — sync AWS Inventory to see it in Controller."
-          - "Connection details also written to /etc/apd-gitea.env on the host."
-          - "After AO Install (Gitea credential attached), seed sets Actions secret AO_WEBHOOK_URL automatically."
-
 - name: Publish Gitea Credential to Controller
   hosts: localhost
   gather_facts: false
   tasks:
     - name: Upsert Gitea Credential from provision facts
       ansible.builtin.include_tasks: tasks/publish_credential.yml
+
+    # Last task on purpose — students scroll to the bottom of the job (or the
+    # nested Shared Services node) looking for how to log in.
+    - name: Show Gitea access information
+      when: hostvars['localhost'].gitea_credential_host is defined
+      ansible.builtin.debug:
+        msg:
+          - "============================================================"
+          - "Gitea login (copy from here)"
+          - "============================================================"
+          - >-
+            URL:      http://{{ hostvars['localhost'].gitea_credential_host }}:{{ hostvars['localhost'].gitea_credential_port | default('3000') }}
+          - >-
+            Username: {{ hostvars['aws_gitea'].gitea_admin_username | default('apdadmin') }}
+          - >-
+            Password: {{ hostvars['aws_gitea'].gitea_admin_password | default('Ansible123!') }}
+          - >-
+            Repo:     {{ hostvars['localhost'].gitea_credential_owner | default('apdadmin') }}/{{ hostvars['localhost'].gitea_credential_repo | default('inventory-service') }}
+          - >-
+            Dev app:  http://{{ hostvars['localhost'].gitea_credential_host }}:8080/
+          - >-
+            Prod app: http://{{ hostvars['localhost'].gitea_credential_host }}:80/
+          - "============================================================"
+          - >-
+            Host aws_gitea ({{ hostvars['localhost'].gitea_credential_host }}) —
+            sync AWS Inventory to see it in Controller.
+          - "Connection details also written to /etc/apd-gitea.env on the host."
+          - "AO Install (Gitea credential attached) sets Actions secret AO_WEBHOOK_URL automatically."
