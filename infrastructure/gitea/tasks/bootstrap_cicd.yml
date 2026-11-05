@@ -89,7 +89,7 @@
     body_format: json
     body:
       name: "{{ gitea_repo_name }}"
-      description: APD CI/CD Pipeline demo application
+      description: Lightwell CI/CD demo — inventory service
       private: false
       auto_init: true
       default_branch: main
@@ -97,6 +97,9 @@
   register: gitea_repo_create
   no_log: true
 
+# Baseline matches cicd_reset_demo.yml: vulnerable aiohttp 3.9.0, empty
+# PATCHED_CVE/CHANGE_REQUEST, version 2.3.0. Simulate Lightwell PR patches to
+# aiohttp==*.rhlw-00001; Reset Demo restores this baseline for re-runs.
 - name: Seed inventory-service baseline files via API
   vars:
     _seed_files:
@@ -104,6 +107,8 @@
         message: Seed vulnerable baseline requirements
         content: |
           # inventory-service dependencies
+          # VULNERABLE: aiohttp 3.9.0 contains CVE-2024-23334 (path traversal via static file handler)
+          # Lightwell PR will patch this to the remediated build (aiohttp==*.rhlw-00001)
           aiohttp==3.9.0
       - path: version.txt
         message: Seed baseline version
@@ -115,6 +120,12 @@
       - path: CHANGE_REQUEST
         message: Seed empty CHANGE_REQUEST
         content: ""
+      - path: app.py
+        message: Seed inventory-service app
+        content: "{{ lookup('file', playbook_dir ~ '/files/inventory-service/app.py') }}"
+      - path: tests/test_app.py
+        message: Seed inventory-service unit tests
+        content: "{{ lookup('file', playbook_dir ~ '/files/inventory-service/tests/test_app.py') }}"
       - path: .gitea/workflows/ci.yml
         message: Seed Gitea Actions CI workflow
         content: "{{ lookup('file', playbook_dir ~ '/files/inventory-service-ci.yml') }}"
