@@ -134,6 +134,12 @@ ao_demos:
         credentials:
           - openflake
           - gitea
+        # Keep major.minor.patch identical to baseline (3.9.0); only the
+        # Lightwell backport suffix changes. Upstream playbook default is
+        # 3.9.2.rhlw-00001 which breaks the demo story.
+        extra_vars:
+          patched_dep: aiohttp==3.9.0.rhlw-00001
+
       - name: CI/CD Demo - Reset Demo
         playbook: cicd-pipeline/playbooks/cicd_reset_demo.yml
         credentials:

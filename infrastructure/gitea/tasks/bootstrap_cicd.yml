@@ -98,8 +98,9 @@
   no_log: true
 
 # Baseline matches cicd_reset_demo.yml: vulnerable aiohttp 3.9.0, empty
-# PATCHED_CVE/CHANGE_REQUEST, version 2.3.0. Simulate Lightwell PR patches to
-# aiohttp==*.rhlw-00001; Reset Demo restores this baseline for re-runs.
+# PATCHED_CVE/CHANGE_REQUEST, version 2.3.0. Simulate Lightwell PR must keep
+# 3.9.0 and only add .rhlw-00001 (JT extra_vars: aiohttp==3.9.0.rhlw-00001).
+# Reset Demo restores this baseline for re-runs.
 - name: Seed inventory-service baseline files via API
   vars:
     _seed_files:
@@ -108,7 +109,7 @@
         content: |
           # inventory-service dependencies
           # VULNERABLE: aiohttp 3.9.0 contains CVE-2024-23334 (path traversal via static file handler)
-          # Lightwell PR will patch this to the remediated build (aiohttp==*.rhlw-00001)
+          # Lightwell PR keeps 3.9.0 and only adds the backport: aiohttp==3.9.0.rhlw-00001
           aiohttp==3.9.0
       - path: version.txt
         message: Seed baseline version

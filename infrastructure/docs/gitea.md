@@ -37,7 +37,7 @@ Stand up a lightweight self-hosted Git forge on AWS for demos that need SCM with
 - One reusable Git forge for demos that need to push/pull without GitHub.com
 - Same cloud networking pattern as **Provision Mattermost** / **Provision Kafka Queue**
 - Seeds `apdadmin/inventory-service` at the Lightwell vulnerable baseline (`aiohttp==3.9.0`, empty `PATCHED_CVE` / `CHANGE_REQUEST`, `app.py` + tests + Actions CI), enables Actions, starts `act_runner`, and upserts the **Gitea** credential for AO Install
-- **Simulate Lightwell PR** patches to `aiohttp==*.rhlw-00001`; **Reset Demo** restores the vulnerable baseline for repeatable runs
+- **Simulate Lightwell PR** patches to `aiohttp==3.9.0.rhlw-00001` (same 3.9.0, backport suffix only); **Reset Demo** restores `aiohttp==3.9.0` for repeatable runs
 - Job output prints the URL and default login so students can open Gitea immediately
 
 ## Presenter walkthrough

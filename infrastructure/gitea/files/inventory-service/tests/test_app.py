@@ -33,9 +33,10 @@ def test_no_known_vulnerable_version():
         # No CVE declared - skip enforcement (pre-Lightwell baseline)
         return
     req = (ROOT / "requirements.txt").read_text()
-    assert "aiohttp==3.9.0.rhlw" in req or "aiohttp==3.9.2.rhlw" in req, (
+    assert "aiohttp==3.9.0.rhlw-00001" in req, (
         f"{cve}: aiohttp 3.9.0 is vulnerable to path traversal. "
-        "Ensure the Lightwell patch (aiohttp==*.rhlw-00001) is in requirements.txt."
+        "Ensure the Lightwell patch keeps 3.9.0 and only adds .rhlw-00001 "
+        "(aiohttp==3.9.0.rhlw-00001) in requirements.txt."
     )
 
 
@@ -55,7 +56,7 @@ def test_patched_cve_matches_requirements():
     if not cve:
         return
     req = (ROOT / "requirements.txt").read_text()
-    assert "rhlw" in req, (
-        f"PATCHED_CVE declares {cve} but requirements.txt does not contain a Lightwell (rhlw) build. "
-        "Ensure aiohttp==*.rhlw-00001 is in requirements.txt."
+    assert "aiohttp==3.9.0.rhlw-00001" in req, (
+        f"PATCHED_CVE declares {cve} but requirements.txt is missing "
+        "aiohttp==3.9.0.rhlw-00001 (same 3.9.0 + Lightwell backport only)."
     )
