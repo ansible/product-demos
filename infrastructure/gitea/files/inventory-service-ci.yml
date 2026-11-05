@@ -11,10 +11,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      # Job image is node:20-bookworm (actions/* need node). Install Python
+      # from apt — actions/setup-python needs a hosted toolcache act_runner lacks.
+      - name: Install Python
+        run: |
+          apt-get update -qq
+          DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-pip python3-venv
+          python3 --version
 
       - name: Read version
         id: version
@@ -26,10 +29,10 @@ jobs:
           echo "Building ${GITHUB_REPOSITORY##*/} ${BUILD_VERSION} (sha: ${GITHUB_SHA:0:7})"
 
       - name: Install test dependencies
-        run: pip install pytest --quiet
+        run: pip3 install pytest --quiet --break-system-packages
 
       - name: Run unit tests
-        run: pytest tests/ -v
+        run: python3 -m pytest tests/ -v
 
       - name: Package artifact
         run: |

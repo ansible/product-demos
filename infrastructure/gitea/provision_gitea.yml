@@ -188,28 +188,10 @@
         group: "1000"
         mode: "0755"
 
-    # Persist a fixed instance-level runner token so we do not depend on the
-    # admin registration-token API (403 when Actions/unit scopes disagree).
-    - name: Ensure Actions runner registration token file
-      ansible.builtin.copy:
-        dest: /etc/apd-gitea-runner.token
-        mode: "0600"
-        content: "{{ lookup('password', '/dev/null length=40 chars=ascii_letters,digits') }}\n"
-        force: false
-
-    - name: Load Actions runner registration token
-      ansible.builtin.slurp:
-        src: /etc/apd-gitea-runner.token
-      register: gitea_runner_token_file
-      no_log: true
-
-    - name: Store Actions runner registration token fact
-      ansible.builtin.set_fact:
-        gitea_runner_registration_token: "{{ gitea_runner_token_file.content | b64decode | trim }}"
-      no_log: true
-
     # Official image applies GITEA__* into app.ini on start; also pin Actions
     # in app.ini so re-runs against older hosts enable the runners API/UI.
+    # act_runner registration token is fetched from Gitea Admin API during
+    # bootstrap_cicd.yml (invented tokens are rejected — runners stay at 0).
     - name: Ensure Actions enabled in Gitea app.ini
       ansible.builtin.blockinfile:
         path: "{{ gitea_data_dir }}/gitea/conf/app.ini"
@@ -246,7 +228,6 @@
           GITEA__service__DISABLE_REGISTRATION: "true"
           GITEA__actions__ENABLED: "true"
           GITEA__actions__DEFAULT_ACTIONS_URL: github
-          GITEA_RUNNER_REGISTRATION_TOKEN: "{{ gitea_runner_registration_token }}"
         volumes:
           - "{{ gitea_data_dir }}:/data:Z"
 

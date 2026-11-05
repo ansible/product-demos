@@ -135,13 +135,31 @@
   loop_control:
     loop_var: gitea_seed_file
 
-- name: Require Actions runner registration token from provision
+# Instance registration tokens live in Gitea's DB — fetch the real one.
+# Homegrown tokens in /etc/apd-gitea-runner.token never match → 0 runners.
+- name: Fetch Actions runner registration token from Gitea Admin API
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/admin/runners/registration-token"
+    method: GET
+    user: "{{ gitea_admin_username }}"
+    password: "{{ gitea_admin_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: gitea_runner_token_api
+  no_log: true
+
+- name: Store Actions runner registration token fact
+  ansible.builtin.set_fact:
+    gitea_runner_registration_token: "{{ gitea_runner_token_api.json.token }}"
+  no_log: true
+
+- name: Require Actions runner registration token
   ansible.builtin.assert:
     that:
       - (gitea_runner_registration_token | default('') | length) >= 32
     fail_msg: >-
-      gitea_runner_registration_token was not set by provision_gitea.yml.
-      Re-run Infrastructure | AWS - Provision Gitea from a synced project.
+      Could not read /api/v1/admin/runners/registration-token from Gitea.
+      Confirm Actions is enabled and {{ gitea_admin_username }} is a site admin.
 
 # Repos disable Actions by default even when the instance has Actions on.
 - name: Enable Actions unit on inventory-service
@@ -179,6 +197,9 @@
     path: /var/lib/gitea-runner/.runner
     state: absent
 
+# Use the published ROOT_URL host so the runner reaches Gitea the same way
+# browsers/CI checkout do. node image is required for actions/checkout; the
+# workflow installs Python via apt (setup-python needs a hosted toolcache).
 - name: Run Gitea act_runner
   containers.podman.podman_container:
     name: gitea-runner
@@ -186,12 +207,39 @@
     state: started
     restart_policy: always
     env:
-      GITEA_INSTANCE_URL: "http://{{ ansible_default_ipv4.address }}:{{ gitea_http_port }}"
+      GITEA_INSTANCE_URL: "http://{{ gitea_public_ip }}:{{ gitea_http_port }}"
       GITEA_RUNNER_REGISTRATION_TOKEN: "{{ gitea_runner_registration_token }}"
       GITEA_RUNNER_NAME: apd-demo-runner
+      GITEA_RUNNER_LABELS: "ubuntu-latest:docker://docker.io/library/node:20-bookworm"
     volumes:
       - /var/lib/gitea-runner:/data:Z
-      - /run/podman/podman.sock:/var/run/docker.sock:Z
+      # Do not SELinux-relabel the Podman socket (:Z breaks sibling containers).
+      - /run/podman/podman.sock:/var/run/docker.sock
+
+- name: Wait for act_runner to declare labels
+  ansible.builtin.command:
+    argv:
+      - podman
+      - logs
+      - gitea-runner
+  register: gitea_runner_logs
+  changed_when: false
+  failed_when: false
+  until: >-
+    'declare successfully' in (gitea_runner_logs.stdout | default(''))
+    or 'declare successfully' in (gitea_runner_logs.stderr | default(''))
+  retries: 30
+  delay: 2
+
+- name: Fail when act_runner did not register
+  ansible.builtin.assert:
+    that:
+      - >-
+        'declare successfully' in (gitea_runner_logs.stdout | default(''))
+        or 'declare successfully' in (gitea_runner_logs.stderr | default(''))
+    fail_msg: >-
+      gitea-runner did not register with Gitea Actions.
+      Last logs: {{ (gitea_runner_logs.stdout ~ gitea_runner_logs.stderr) | trim | truncate(500) }}
 
 - name: Persist CI/CD token facts for Controller publish
   ansible.builtin.set_fact:
