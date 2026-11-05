@@ -113,6 +113,7 @@ ao_demos:
         playbook: cicd-pipeline/playbooks/cicd_drain_lb.yml
         credentials:
           - machine
+          - openflake
         limit: aws_gitea
       - name: CI/CD Demo - Deploy to Prod
         playbook: cicd-pipeline/playbooks/cicd_deploy_prod.yml
@@ -124,6 +125,7 @@ ao_demos:
         playbook: cicd-pipeline/playbooks/cicd_rollback_to_snapshot.yml
         credentials:
           - machine
+          - openflake
         limit: aws_gitea
       - name: CI/CD Demo - Close Loop
         playbook: cicd-pipeline/playbooks/cicd_close_loop.yml
