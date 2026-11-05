@@ -208,6 +208,11 @@
     ao_gitea_present: true
     ao_gitea_host: "{{ ao_gitea_cred_lookup.json.results[0].inputs.gitea_host }}"
     ao_gitea_port: "{{ ao_gitea_cred_lookup.json.results[0].inputs.gitea_port | default('3000') }}"
+    ao_gitea_owner: >-
+      {{ ao_gitea_cred_lookup.json.results[0].inputs.gitea_owner | default('apdadmin') }}
+    ao_gitea_repo: >-
+      {{ ao_gitea_cred_lookup.json.results[0].inputs.gitea_repo | default('inventory-service') }}
+
 
 - name: Look up Product Demos execution environment
   ansible.builtin.uri:

@@ -33,6 +33,87 @@
           })
       }}
 
+# Webhook mock-run dialog uses input_schema property defaults when present.
+# ci_build_url is built from the Controller Gitea credential (lab host/port).
+- name: Snapshot triggers before CI/CD mock defaults
+  when:
+    - ao_gitea_present | default(false) | bool
+    - (ao_gitea_host | default('') | length) > 0
+  ansible.builtin.set_fact:
+    __ao_triggers_before_cicd: "{{ __ao_triggers }}"
+    __ao_triggers: []
+
+- name: Inject CI/CD webhook mock defaults from Gitea
+  when:
+    - ao_gitea_present | default(false) | bool
+    - (ao_gitea_host | default('') | length) > 0
+  ansible.builtin.set_fact:
+    __ao_triggers: "{{ __ao_triggers + [__ao_trigger_out] }}"
+  loop: "{{ __ao_triggers_before_cicd }}"
+  loop_control:
+    loop_var: __ao_trigger_src
+  vars:
+    __ao_cicd_build_url: >-
+      http://{{ ao_gitea_host }}:{{ ao_gitea_port | default('3000') }}/{{ ao_gitea_owner | default('apdadmin') }}/{{ ao_gitea_repo | default('inventory-service') }}/actions/runs/33
+    __ao_is_cicd_webhook: >-
+      {{
+        (__ao_trigger_src.type | default('')) == 'webhook_trigger'
+        and (
+          (__ao_trigger_src.parameters.webhook_path | default('')) == 'lightwell-ci-cd'
+          or (__ao_trigger_src.name | default('')) == 'CI Pipeline Succeeded'
+        )
+      }}
+    __ao_trigger_params: "{{ __ao_trigger_src.parameters | default({}) }}"
+    __ao_schema_props: "{{ __ao_trigger_params.input_schema.properties | default({}) }}"
+    __ao_cicd_props:
+      git_sha:
+        type: string
+        default: c6bbec0
+      app_name:
+        type: string
+        default: inventory-service
+      affected_cve:
+        type: string
+        default: CVE-2024-23334
+      ci_build_url:
+        type: string
+        default: "{{ __ao_cicd_build_url }}"
+      change_request:
+        type: string
+        default: CHG0034907
+      ci_build_number:
+        type: string
+        default: "33"
+      artifact_version:
+        type: string
+        default: 2.4.0-b33
+    __ao_trigger_base: >-
+      {{
+        __ao_trigger_src
+        | dict2items
+        | rejectattr('key', 'equalto', 'parameters')
+        | list
+        | items2dict
+      }}
+    __ao_trigger_out: >-
+      {{
+        __ao_trigger_base
+        | combine({
+            'parameters': (
+              __ao_trigger_params
+              | combine({
+                  'input_schema': (
+                    __ao_trigger_params.input_schema
+                    | default({'type': 'object', '$schema': 'http://json-schema.org/draft-07/schema#', 'additionalProperties': true})
+                    | combine({
+                        'properties': __ao_schema_props | combine(__ao_cicd_props, recursive=True)
+                      }, recursive=True)
+                  )
+                }, recursive=True)
+            ) if (__ao_is_cicd_webhook | bool) else __ao_trigger_params
+          })
+      }}
+
 - name: Normalize workflow nodes
   ansible.builtin.set_fact:
     __ao_nodes: "{{ __ao_nodes + [__ao_node] }}"
