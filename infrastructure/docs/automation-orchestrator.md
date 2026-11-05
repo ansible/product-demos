@@ -40,7 +40,7 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 | Task Step Example | Open **Task Step Example** in AO — question is pre-filled; press Run | LiteMaaS wired (RHDP boot + Install) |
 | Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | `aws-rhel9` + Mattermost |
 | Multi-OS Cloud Patching | [Multi-OS Cloud Patching](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/multi-os-cloud-patching/) | Full cloud stack + existing **Cloud \| AWS \|*** JTs |
-| CI/CD Pipeline | [CI/CD Pipeline](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/cicd-pipeline/) | [Gitea](./gitea.md) (`inventory-service`) + OpenFlake + `AO_WEBHOOK_URL` |
+| CI/CD Pipeline | [CI/CD Pipeline](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/cicd-pipeline/) | [Gitea](./gitea.md) (`inventory-service`) + OpenFlake + `AO_WEBHOOK_URL`. Re-run helper: **CI/CD Demo - Reset Change Request** (default `CHG0034907`) |
 
 ### Task Step Example — LiteMaaS smoke test
 

@@ -219,3 +219,44 @@
     status_code: [200, 201, 204, 400]
   failed_when: false
   no_log: true
+
+- name: Enable survey on {{ ao_jt.name }}
+  when: ao_jt.survey is defined
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/job_templates/{{ ao_jt_id }}/"
+    method: PATCH
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    body_format: json
+    body:
+      survey_enabled: true
+    validate_certs: false
+    status_code: [200]
+  no_log: true
+
+- name: Upsert survey spec for {{ ao_jt.name }}
+  when: ao_jt.survey is defined
+  ansible.builtin.uri:
+    url: "{{ ao_controller_api }}/job_templates/{{ ao_jt_id }}/survey_spec/"
+    method: POST
+    headers: >-
+      {{
+        {'Authorization': 'Bearer ' ~ _controller_oauth_token, 'Content-Type': 'application/json'}
+        if ao_controller_use_token | bool
+        else {'Content-Type': 'application/json'}
+      }}
+    user: "{{ _controller_username if not (ao_controller_use_token | bool) else omit }}"
+    password: "{{ _controller_password if not (ao_controller_use_token | bool) else omit }}"
+    force_basic_auth: "{{ not (ao_controller_use_token | bool) }}"
+    body_format: json
+    body: "{{ ao_jt.survey }}"
+    validate_certs: false
+    status_code: [200]
+  no_log: true
