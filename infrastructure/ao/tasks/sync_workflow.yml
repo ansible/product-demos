@@ -114,6 +114,55 @@
           })
       }}
 
+# AO requires authorized_service_account_ids on webhook triggers before publish.
+- name: Snapshot triggers before webhook service account authorize
+  when:
+    - ao_cicd_sa_ready | default(false) | bool
+    - (ao_cicd_sa_id | default('') | length) > 0
+  ansible.builtin.set_fact:
+    __ao_triggers_before_sa: "{{ __ao_triggers }}"
+    __ao_triggers: []
+
+- name: Authorize CI/CD webhook service account on trigger
+  when:
+    - ao_cicd_sa_ready | default(false) | bool
+    - (ao_cicd_sa_id | default('') | length) > 0
+  ansible.builtin.set_fact:
+    __ao_triggers: "{{ __ao_triggers + [__ao_trigger_out] }}"
+  loop: "{{ __ao_triggers_before_sa }}"
+  loop_control:
+    loop_var: __ao_trigger_src
+  vars:
+    __ao_is_cicd_webhook: >-
+      {{
+        (__ao_trigger_src.type | default('')) == 'webhook_trigger'
+        and (
+          (__ao_trigger_src.parameters.webhook_path | default('')) == 'lightwell-ci-cd'
+          or (__ao_trigger_src.name | default('')) == 'CI Pipeline Succeeded'
+        )
+      }}
+    __ao_trigger_params: "{{ __ao_trigger_src.parameters | default({}) }}"
+    __ao_trigger_base: >-
+      {{
+        __ao_trigger_src
+        | dict2items
+        | rejectattr('key', 'equalto', 'parameters')
+        | list
+        | items2dict
+      }}
+    __ao_trigger_out: >-
+      {{
+        __ao_trigger_base
+        | combine({
+            'parameters': (
+              __ao_trigger_params
+              | combine({
+                  'authorized_service_account_ids': [ao_cicd_sa_id]
+                }, recursive=True)
+            ) if (__ao_is_cicd_webhook | bool) else __ao_trigger_params
+          })
+      }}
+
 - name: Normalize workflow nodes
   ansible.builtin.set_fact:
     __ao_nodes: "{{ __ao_nodes + [__ao_node] }}"

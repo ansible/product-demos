@@ -1,0 +1,104 @@
+---
+# Publish the CI/CD workflow so webhook + Run use the authorized draft.
+- name: Skip CI/CD workflow publish when service account was not prepared
+  when: not (ao_cicd_sa_ready | default(false) | bool)
+  ansible.builtin.debug:
+    msg: Skipping CI/CD workflow publish — AO webhook service account was not prepared.
+
+- name: Publish CI/CD Pipeline workflow
+  when: ao_cicd_sa_ready | default(false) | bool
+  block:
+    - name: Find seeded CI/CD workflow
+      ansible.builtin.uri:
+        url: "{{ ao_api_url }}/workflows?limit=100"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ ao_api_token }}"
+        validate_certs: false
+        return_content: true
+        status_code: [200]
+      register: ao_workflows_for_publish
+      no_log: true
+
+    - name: Select CI/CD workflow by source_file
+      ansible.builtin.set_fact:
+        ao_cicd_workflow: >-
+          {{
+            ao_workflows_for_publish.json.resources
+            | default(ao_workflows_for_publish.json.results | default([]))
+            | selectattr('labels', 'defined')
+            | selectattr('labels.source_file', 'defined')
+            | selectattr('labels.source_file', 'equalto', 'cicd-pipeline.json')
+            | list
+            | first
+            | default({})
+          }}
+
+    - name: Soft-warn when CI/CD workflow is missing for publish
+      when: ao_cicd_workflow | length == 0
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'CI/CD workflow not found after sync — could not auto-publish. '
+              ~ 'Open the workflow, confirm the webhook service account, then Publish.'
+            ]
+          }}
+
+    - name: Resolve CI/CD workflow current version
+      when: ao_cicd_workflow | length > 0
+      ansible.builtin.uri:
+        url: "{{ ao_api_url }}/workflows/{{ ao_cicd_workflow.id }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ ao_api_token }}"
+        validate_certs: false
+        return_content: true
+        status_code: [200]
+      register: ao_cicd_workflow_detail
+      no_log: true
+
+    - name: Publish CI/CD workflow current version
+      when:
+        - ao_cicd_workflow | length > 0
+        - (ao_cicd_workflow_detail.json.version.version | default(0) | int) > 0
+      ansible.builtin.uri:
+        url: >-
+          {{ ao_api_url }}/workflows/{{ ao_cicd_workflow.id }}/versions/{{ ao_cicd_workflow_detail.json.version.version }}/publish
+        method: POST
+        headers:
+          Authorization: "Bearer {{ ao_api_token }}"
+          Content-Type: application/json
+        body_format: json
+        body:
+          publish_name: APD seed
+          change_description: >-
+            Published by APD AO Install with authorized CI/CD webhook service account.
+        validate_certs: false
+        status_code: [200, 201]
+        return_content: true
+      register: ao_cicd_publish
+      failed_when: false
+      no_log: true
+
+    - name: Soft-warn when CI/CD workflow publish failed
+      when:
+        - ao_cicd_workflow | length > 0
+        - (ao_cicd_publish.status | default(0) | int) not in [200, 201]
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'Could not auto-publish CI/CD Pipeline (HTTP '
+              ~ (ao_cicd_publish.status | default('n/a') | string)
+              ~ '). Open the workflow, confirm Authorized service accounts on '
+              ~ 'CI Pipeline Succeeded, then Publish workflow.'
+            ]
+          }}
+
+    - name: Record CI/CD workflow publish success
+      when:
+        - ao_cicd_workflow | length > 0
+        - (ao_cicd_publish.status | default(0) | int) in [200, 201]
+      ansible.builtin.set_fact:
+        ao_cicd_workflow_published: true

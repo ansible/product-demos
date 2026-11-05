@@ -25,7 +25,7 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 4. For **CI/CD Pipeline**: run **Infrastructure ǀ AWS - Deploy Shared Services** so Gitea seeds `inventory-service` + act_runner + dev/prod app runtimes on `aws_gitea`, OpenFlake installs on OpenShift, and both **Gitea** / **OpenFlake** credentials are upserted (or run Provision Gitea + OpenFlake alone). Skip for demos that do not need SCM/ITSM.
 5. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
 6. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost / OpenFlake / Gitea notes when provisioned). Soft warnings appear for missing optional deps — Install does not fail.
-7. For CI/CD: Install sets Gitea Actions secret `AO_WEBHOOK_URL` automatically when the **Gitea** credential is attached and provisioned; confirm that line in the seed summary, then open the seeded workflow.
+7. For CI/CD: Install creates an AO webhook **service account**, authorizes it on `lightwell-ci-cd`, publishes the workflow, and writes Gitea Actions secrets (`AO_WEBHOOK_URL` + OAuth client). Confirm that in the seed summary, then open the seeded workflow.
 8. Open the seeded workflow you want to show.
 
 <aside class="info-callout" role="note">

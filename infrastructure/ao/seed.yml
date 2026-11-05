@@ -94,8 +94,14 @@
     - name: Refresh AO API token before workflow sync
       ansible.builtin.include_tasks: tasks/ao_login.yml
 
+    - name: Ensure AO CI/CD webhook service account
+      ansible.builtin.include_tasks: tasks/wire_ao_cicd_service_account.yml
+
     - name: Synchronize enabled AO workflow exports
       ansible.builtin.include_tasks: tasks/sync_demos.yml
+
+    - name: Publish CI/CD workflow with authorized webhook service account
+      ansible.builtin.include_tasks: tasks/publish_cicd_workflow.yml
 
     - name: Wire AO webhook URL into Gitea Actions secrets
       ansible.builtin.include_tasks: tasks/wire_gitea_ao_webhook.yml
@@ -199,10 +205,29 @@
                 ]
                 + (
                   [
-                    'Gitea Actions AO_WEBHOOK_URL: set to ' ~ ao_cicd_webhook_url,
+                    'Gitea Actions AO webhook secrets: set (AO_WEBHOOK_URL'
+                    ~ (
+                      ', AO_TOKEN_URL, AO_CLIENT_ID, AO_CLIENT_SECRET'
+                      if (ao_gitea_oauth_secrets_set | default(false) | bool)
+                      else ''
+                    )
+                    ~ ') → ' ~ ao_cicd_webhook_url,
                   ]
                   if (ao_gitea_webhook_secret_set | default(false) | bool)
                   else []
+                )
+                + (
+                  [
+                    'AO CI/CD webhook service account: authorized + workflow published',
+                  ]
+                  if (ao_cicd_workflow_published | default(false) | bool)
+                  else (
+                    [
+                      'AO CI/CD webhook service account: prepared (publish pending)',
+                    ]
+                    if (ao_cicd_sa_ready | default(false) | bool)
+                    else []
+                  )
                 )
               )
               if (ao_gitea_present | default(false) | bool)
