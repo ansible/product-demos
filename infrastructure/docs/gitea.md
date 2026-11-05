@@ -47,7 +47,7 @@ Stand up a lightweight self-hosted Git forge on AWS for demos that need SCM with
 2. At the end of the job, copy the printed **URL / Username / Password** block — also note `apdadmin/inventory-service`
 3. Open the URL in a browser and sign in — default login is `apdadmin` / `Ansible123!`
 4. Run **AO Install** (with the **Gitea** credential attached) — seed authorizes an AO webhook service account, publishes the CI/CD workflow, and writes Actions secrets **`AO_WEBHOOK_URL`**, **`AO_TOKEN_URL`**, **`AO_CLIENT_ID`**, **`AO_CLIENT_SECRET`**
-5. To re-show the pipeline against the same OpenFlake ticket, launch **CI/CD Demo - Reset Change Request** (survey defaults to `CHG0034907`) — clears work/close notes and reopens the change. Use **CI/CD Demo - Reset Demo** separately to restore the Gitea repo baseline.
+5. To re-show the pipeline against the same OpenFlake ticket number, launch **CI/CD Demo - Reset Change Request** (survey defaults to `CHG0034907`) — deletes and recreates the change so Activity history is empty. Use **CI/CD Demo - Reset Demo** separately to restore the Gitea repo baseline.
 
 Default admin login is `apdadmin` / `Ansible123!` (same as Mattermost; username `admin` is reserved by Gitea). Change it for long-lived labs.
 
