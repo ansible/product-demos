@@ -47,7 +47,7 @@ The job template is seeded by the demo setup. Prefer launching it via **[Infrast
 
 Leave the admin password unset (the default) and the chart generates one on first install, then reuses it on every subsequent run via a cluster lookup — re-running the template will not roll the password out from under a running demo.
 
-The **Infrastructure | OpenFlake** job prints the URL, username and password at the end of a successful install. When you use **Deploy Shared Services**, that text is on the nested OpenFlake node — easy to miss. Prefer the **AO Install** seed summary, which also prints OpenFlake URL / username / password when the service is present.
+The **Infrastructure | OpenFlake** job prints URL / username / password as its **last** task (`Report how to reach OpenFlake`). Scroll to the bottom of that job (or the nested OpenFlake node under Deploy Shared Services) — not the earlier “credential publish” line, which is only the Controller credential URL. **AO Install** seed summary also prints the same login when OpenFlake is present.
 
 > [!NOTE]
 > That is a deliberate choice for a demo workload: AAP retains job output and shows it to anyone with read access on the job. Fine for an ephemeral demo cluster, not something to carry into anything long-lived. Only the admin password is exposed — the same Secret also holds `SECRET_KEY` and `POSTGRESQL_PASSWORD`, and those stay out of the log.

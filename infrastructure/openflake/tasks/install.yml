@@ -176,15 +176,21 @@
          | default('') | b64decode }}
   no_log: true
 
+- name: Publish OpenFlake credential for AO demos
+  ansible.builtin.include_tasks: publish_credential.yml
+
+# Last install task on purpose — students scroll to the bottom of the job
+# (or the nested Shared Services node) looking for how to log in.
 - name: Report how to reach OpenFlake
   ansible.builtin.debug:
     msg:
       # default(..., true) so an empty string falls through to the hint too,
       # not just an undefined variable.
+      - '============================================================'
+      - 'OpenFlake login (copy from here)'
+      - '============================================================'
       - 'OpenFlake URL:      {{ openflake_public_url | default("no Route - use the in-cluster Service", true) }}'
       - 'OpenFlake username: {{ _openflake_admin_username }}'
       - 'OpenFlake password: {{ _openflake_resolved_admin_password | default("not found - read it from the Secret in the namespace", true) }}'
       - 'OpenFlake namespace: {{ _openflake_namespace }}'
-
-- name: Publish OpenFlake credential for AO demos
-  ansible.builtin.include_tasks: publish_credential.yml
+      - 'Controller credential OpenFlake updated for AO CI/CD Demo JTs.'
