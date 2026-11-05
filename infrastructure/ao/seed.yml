@@ -73,25 +73,7 @@
       no_log: true
 
     - name: Log in to Automation Orchestrator API
-      ansible.builtin.uri:
-        url: "{{ ao_api_url }}/auth/login"
-        method: POST
-        body_format: json
-        body:
-          username: admin
-          password: "{{ ao_admin_password }}"
-        validate_certs: false
-        status_code: [200]
-      register: ao_login
-      no_log: true
-      until: ao_login.status | default(0) == 200
-      retries: 30
-      delay: 5
-
-    - name: Store AO API token
-      ansible.builtin.set_fact:
-        ao_api_token: "{{ ao_login.json.access_token }}"
-      no_log: true
+      ansible.builtin.include_tasks: tasks/ao_login.yml
 
     - name: Resolve AAP token for AO integration
       ansible.builtin.include_tasks: tasks/resolve_aap_token.yml
@@ -107,6 +89,10 @@
 
     - name: Provision AAP project and job templates for enabled demos
       ansible.builtin.include_tasks: tasks/provision_aap_demos.yml
+
+    # AAP JT provisioning can outlive the AO JWT; refresh before workflow sync.
+    - name: Refresh AO API token before workflow sync
+      ansible.builtin.include_tasks: tasks/ao_login.yml
 
     - name: Synchronize enabled AO workflow exports
       ansible.builtin.include_tasks: tasks/sync_demos.yml
