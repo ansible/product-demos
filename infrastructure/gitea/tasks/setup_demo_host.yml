@@ -1,0 +1,181 @@
+---
+# Install inventory-service runtime on this host (dev :8080, prod :80).
+# Included from Provision Gitea so Shared Services gets forge + apps together.
+- name: Set CI/CD demo host defaults
+  ansible.builtin.set_fact:
+    app_name: "{{ app_name | default('inventory-service') }}"
+    initial_version: "{{ initial_version | default('2.3.0-b40') }}"
+    prod_port: "{{ prod_port | default(80) }}"
+    dev_port: "{{ dev_port | default(8080) }}"
+    prod_app_dir: "{{ prod_app_dir | default('/opt/app-prod') }}"
+    dev_app_dir: "{{ dev_app_dir | default('/opt/app-dev') }}"
+    snapshot_base: "{{ snapshot_base | default('/opt/app-snapshots') }}"
+
+- name: Install Python3 and git
+  ansible.builtin.package:
+    name:
+      - python3
+      - git
+    state: present
+
+- name: Create app directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ prod_app_dir }}"
+    - "{{ dev_app_dir }}"
+    - "{{ snapshot_base }}"
+
+- name: Write initial version manifest for prod
+  ansible.builtin.copy:
+    dest: "{{ prod_app_dir }}/version.txt"
+    content: "{{ initial_version }}"
+    mode: "0644"
+
+- name: Write initial version manifest for dev
+  ansible.builtin.copy:
+    dest: "{{ dev_app_dir }}/version.txt"
+    content: "{{ initial_version }}"
+    mode: "0644"
+
+- name: Write app.py to prod and dev
+  ansible.builtin.copy:
+    dest: "{{ item }}/app.py"
+    mode: "0755"
+    content: |
+      import http.server, json, os, pathlib
+      APP_NAME = os.getenv("APP_NAME", "inventory-service")
+      APP_VERSION = pathlib.Path(__file__).parent.joinpath("version.txt").read_text().strip()
+      APP_ENV = os.getenv("APP_ENV", "dev")
+      APP_PORT = int(os.getenv("APP_PORT", "8080"))
+      class AppHandler(http.server.BaseHTTPRequestHandler):
+          def log_message(self, fmt, *args): pass
+          def _send(self, code, body, ct="application/json"):
+              enc = body.encode()
+              self.send_response(code)
+              self.send_header("Content-Type", ct)
+              self.send_header("Content-Length", len(enc))
+              self.end_headers()
+              self.wfile.write(enc)
+          def do_GET(self):
+              if self.path == "/health":
+                  self._send(200, json.dumps({"status":"ok","app":APP_NAME,"version":APP_VERSION,"env":APP_ENV}))
+              elif self.path == "/version.txt":
+                  self._send(200, f"app={APP_NAME}\nversion={APP_VERSION}\nenv={APP_ENV}\n", "text/plain")
+              elif self.path == "/":
+                  self._send(200, f"<h1>{APP_NAME}</h1><p>Version: {APP_VERSION}</p><p>Env: {APP_ENV}</p>", "text/html")
+              else:
+                  self._send(404, json.dumps({"error":"not found"}))
+      if __name__ == "__main__":
+          http.server.HTTPServer(("0.0.0.0", APP_PORT), AppHandler).serve_forever()
+  loop:
+    - "{{ prod_app_dir }}"
+    - "{{ dev_app_dir }}"
+
+- name: Install prod systemd service (app.py)
+  ansible.builtin.copy:
+    dest: "/etc/systemd/system/app-prod.service"
+    content: |
+      [Unit]
+      Description={{ app_name }} production environment
+      After=network.target
+
+      [Service]
+      Type=simple
+      WorkingDirectory={{ prod_app_dir }}
+      Environment=APP_NAME={{ app_name }}
+      Environment=APP_ENV=prod
+      Environment=APP_PORT={{ prod_port }}
+      ExecStart=/usr/bin/python3 app.py
+      Restart=on-failure
+      RestartSec=3
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: "0644"
+
+- name: Install dev systemd service (app.py)
+  ansible.builtin.copy:
+    dest: "/etc/systemd/system/app-dev.service"
+    content: |
+      [Unit]
+      Description={{ app_name }} dev environment
+      After=network.target
+
+      [Service]
+      Type=simple
+      WorkingDirectory={{ dev_app_dir }}
+      Environment=APP_NAME={{ app_name }}
+      Environment=APP_ENV=dev
+      Environment=APP_PORT={{ dev_port }}
+      ExecStart=/usr/bin/python3 app.py
+      Restart=on-failure
+      RestartSec=3
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: "0644"
+
+- name: Reload systemd and start both services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+    daemon_reload: true
+  loop:
+    - app-prod
+    - app-dev
+
+- name: Allow demo app HTTP ports through firewalld
+  ansible.posix.firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop:
+    - "80"
+    - "8080"
+  when:
+    - "'firewalld.service' in ansible_facts.services"
+    - ansible_facts.services['firewalld.service'].state == 'running'
+
+- name: Verify prod service responds
+  ansible.builtin.uri:
+    url: "http://localhost:{{ prod_port }}/health"
+    method: GET
+    status_code: 200
+  register: prod_health
+  until: prod_health.status == 200
+  retries: 10
+  delay: 3
+
+- name: Verify dev service responds
+  ansible.builtin.uri:
+    url: "http://localhost:{{ dev_port }}/health"
+    method: GET
+    status_code: 200
+  register: dev_health
+  until: dev_health.status == 200
+  retries: 10
+  delay: 3
+
+- name: Take initial baseline snapshot
+  ansible.builtin.command:
+    argv:
+      - tar
+      - -czf
+      - "{{ snapshot_base }}/{{ app_name }}-baseline.tar.gz"
+      - -C
+      - /
+      - opt/app-prod
+  changed_when: true
+
+- name: Print demo host setup summary
+  ansible.builtin.debug:
+    msg:
+      - "Demo host ready on this aws_gitea instance."
+      - "Prod app: http://{{ gitea_public_ip | default(ansible_host) }}:{{ prod_port }}/ (version {{ initial_version }})"
+      - "Dev app:  http://{{ gitea_public_ip | default(ansible_host) }}:{{ dev_port }}/ (version {{ initial_version }})"
+      - "Baseline snapshot: {{ snapshot_base }}/{{ app_name }}-baseline.tar.gz"

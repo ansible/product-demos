@@ -157,7 +157,7 @@
               ~ (ao_gitea_demos | map(attribute='slug') | list | join(', '))
               ~ ' need aws_gitea + Gitea Controller credential. Run '
               ~ 'Infrastructure | AWS - Deploy Shared Services (or Provision Gitea), '
-              ~ 'sync AWS Inventory, run CI/CD Demo - Setup Demo Host, then re-run Install.'
+              ~ 'sync AWS Inventory, then re-run Install.'
             ]
           }}
 

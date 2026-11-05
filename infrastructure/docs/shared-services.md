@@ -56,7 +56,7 @@ OpenFlake runs with `openflake_operation: install` from the workflow extra vars 
 
 - Does **not** create `aws-rhel9`, Windows, or reports hosts — use **Deploy Cloud Stack in AWS** when you need those
 - Mattermost opens TCP **8065**; Gitea opens TCP **3000** (UI) plus **80**/**8080** (CI/CD demo app) on `aws-test-sg`
-- Provision Gitea also seeds `inventory-service`, starts an Actions runner, and upserts the **Gitea** credential for AO CI/CD Pipeline
+- Provision Gitea also seeds `inventory-service`, starts an Actions runner, installs inventory-service dev/prod runtimes on `aws_gitea`, and upserts the **Gitea** credential for AO CI/CD Pipeline
 - OpenFlake does not use the AWS VPC — it installs via Helm on the lab OpenShift cluster and upserts the **OpenFlake** credential
 - Kafka and other shared hosts can be added as parallel nodes later
 

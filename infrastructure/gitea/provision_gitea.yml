@@ -335,6 +335,9 @@
     - name: Bootstrap CI/CD repo, Actions runner, and API token
       ansible.builtin.include_tasks: tasks/bootstrap_cicd.yml
 
+    - name: Set up inventory-service dev and prod runtimes on aws_gitea
+      ansible.builtin.include_tasks: tasks/setup_demo_host.yml
+
     - name: Show Gitea access information
       ansible.builtin.debug:
         msg:
@@ -345,6 +348,8 @@
           - "Username: {{ gitea_admin_username }}"
           - "Password: {{ gitea_admin_password }}"
           - "Repo:     {{ gitea_admin_username }}/inventory-service"
+          - "Dev app:  http://{{ gitea_public_ip }}:8080/"
+          - "Prod app: http://{{ gitea_public_ip }}:80/"
           - "============================================================"
           - "Host aws_gitea ({{ gitea_public_ip }}) — sync AWS Inventory to see it in Controller."
           - "Connection details also written to /etc/apd-gitea.env on the host."

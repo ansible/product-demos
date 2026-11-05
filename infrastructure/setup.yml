@@ -867,8 +867,9 @@ controller_templates:
     description: >-
       Provisions a dedicated aws_gitea EC2 instance and deploys Gitea with
       Podman (SQLite). Creates an admin user, seeds inventory-service for
-      the CI/CD Pipeline demo, starts an act_runner, and upserts the
-      Gitea credential on Controller (requires AAP Credential).
+      the CI/CD Pipeline demo, starts an act_runner, installs inventory-service
+      runtime (dev :8080 / prod :80), and upserts the Gitea credential on
+      Controller (requires AAP Credential).
     labels:
       - aws.ec2
       - infrastructure
@@ -920,6 +921,28 @@ controller_templates:
             - Dev
             - QA
             - Prod
+
+  - name: "Infrastructure | AWS - Setup CI/CD Demo Host"
+    description: >-
+      Re-runs inventory-service runtime setup on aws_gitea (dev :8080, prod :80,
+      systemd units, baseline snapshot). Provision Gitea / Deploy Shared Services
+      already do this; use this JT only to refresh the apps without re-provisioning
+      Gitea.
+    labels:
+      - aws.ec2
+      - infrastructure
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - APD Machine Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/gitea/setup_demo_host.yml
+    inventory: Ansible Product Demos Inventory
+    limit: aws_gitea
+    ask_limit_on_launch: true
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
 
   - name: "LINUX | Config Drift - Deploy Audit and Filebeat"
     description: >-
@@ -1188,8 +1211,9 @@ controller_workflows:
   - name: Infrastructure | AWS - Deploy Shared Services
     description: >-
       One-click shared lab services without cloud-stack VMs: Create VPC and
-      keypair, then provision Mattermost and Gitea in parallel, while OpenFlake
-      installs on OpenShift in parallel from the start (upserts OpenFlake credential).
+      keypair, then provision Mattermost and Gitea in parallel (Gitea also seeds
+      inventory-service and installs dev/prod app runtimes on aws_gitea), while
+      OpenFlake installs on OpenShift in parallel from the start.
     labels:
       - aws.ec2
       - aws.vpc
