@@ -1208,13 +1208,68 @@ controller_templates:
           required: true
           default: stable
 
+  - name: "Infrastructure | AWS - Shared Services Portal"
+    description: >-
+      Publishes a password-gated S3 website with this lab's Mattermost, Gitea,
+      and OpenFlake URLs and UI logins. Attach those three Controller
+      credentials (filled by the provision jobs) plus AWS. Prefer launching via
+      Deploy Shared Services, which runs this node after all three succeed.
+    labels:
+      - aws.ec2
+      - infrastructure
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    credentials:
+      - AWS
+      - Mattermost
+      - Gitea
+      - OpenFlake
+    project: Ansible Product Demos
+    playbook: infrastructure/shared-services/publish_credentials_portal.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            Region for the credentials portal S3 bucket. Use the same region as
+            Deploy Shared Services / Mattermost / Gitea.
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+            - ap-south-1
+            - ap-northeast-1
+            - ap-northeast-2
+            - ap-northeast-3
+            - ap-southeast-1
+            - ap-southeast-2
+            - ca-central-1
+            - eu-central-1
+            - eu-west-1
+            - eu-west-2
+            - eu-west-3
+            - eu-north-1
+            - sa-east-1
+
 controller_workflows:
   - name: Infrastructure | AWS - Deploy Shared Services
     description: >-
       One-click shared lab services without cloud-stack VMs: Create VPC and
       keypair, then provision Mattermost and Gitea in parallel (Gitea also seeds
       inventory-service and installs dev/prod app runtimes on aws_gitea), while
-      OpenFlake installs on OpenShift in parallel from the start.
+      OpenFlake installs on OpenShift in parallel from the start. After all three
+      succeed, publishes a password-gated S3 credentials portal.
     labels:
       - aws.ec2
       - aws.vpc
@@ -1269,6 +1324,8 @@ controller_workflows:
       # OpenFlake is OpenShift-only — start it immediately alongside AWS networking.
       - identifier: Provision OpenFlake
         unified_job_template: Infrastructure | OpenFlake
+        success_nodes:
+          - Publish Credentials Portal
         failure_nodes:
           - Ticket - OpenFlake Failed
       - identifier: Create Keypair
@@ -1288,13 +1345,22 @@ controller_workflows:
       - identifier: Provision Mattermost
         unified_job_template: Infrastructure | AWS - Provision Mattermost
         all_parents_must_converge: true
+        success_nodes:
+          - Publish Credentials Portal
         failure_nodes:
           - Ticket - Mattermost Failed
       - identifier: Provision Gitea
         unified_job_template: Infrastructure | AWS - Provision Gitea
         all_parents_must_converge: true
+        success_nodes:
+          - Publish Credentials Portal
         failure_nodes:
           - Ticket - Gitea Failed
+      - identifier: Publish Credentials Portal
+        unified_job_template: Infrastructure | AWS - Shared Services Portal
+        all_parents_must_converge: true
+        failure_nodes:
+          - Ticket - Portal Failed
       - identifier: Ticket - Keypair Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
@@ -1315,6 +1381,10 @@ controller_workflows:
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to provision OpenFlake shared ITSM service
+      - identifier: Ticket - Portal Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to publish Shared Services credentials portal
 
   - name: Infrastructure | ROSA - Lifecycle (Create)
     description: >-
