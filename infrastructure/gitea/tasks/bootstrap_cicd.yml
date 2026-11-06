@@ -304,7 +304,9 @@
       - "'Docker Engine socket not found' not in gitea_runner_log_text"
     fail_msg: >-
       gitea-runner did not stay registered with Gitea Actions (Podman socket /
-      docker_host). Last logs: {{ gitea_runner_log_text | truncate(500) }}- name: Persist CI/CD token facts for Controller publish
+      docker_host). Last logs: {{ gitea_runner_log_text | truncate(500) }}
+
+- name: Persist CI/CD token facts for Controller publish
   ansible.builtin.set_fact:
     gitea_credential_host: "{{ gitea_public_ip }}"
     gitea_credential_port: "{{ gitea_http_port }}"
