@@ -142,7 +142,7 @@
     <section id="services" hidden></section>
   </main>
 
-  <script id="payload" type="application/json">{{ ss_portal_ciphertext_json }}</script>
+  <script id="payload" type="application/json">{{ ss_portal_ciphertext | to_json }}</script>
   <script>
 (function () {
   const payload = JSON.parse(document.getElementById('payload').textContent);
