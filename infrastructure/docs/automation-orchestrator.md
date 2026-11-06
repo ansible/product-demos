@@ -57,6 +57,10 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
 }
 ```
 
+### Zero-Day Response — two workflows
+
+Install seeds two workflows from two `demos.yml` entries: **Zero-Day Response - PHP2Shell: KNOW + CONTAIN** (`zero-day-response`, which also creates the `p2s-*` job templates) and **Zero-Day Response - PHP2Shell: FIX + PROVE** (`zero-day-response-fix`, which reuses them). Run KNOW + CONTAIN first. Both come from the `zero-day-response/` folder of [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos), so `ao_demos_ref` in [`demos.yml`](../ao/demos.yml) must point at a ref that contains it.
+
 ## The three AO templates
 
 | Template | When to use it | Playbook |
@@ -78,7 +82,7 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
 
 What **Install** does when it seeds curated demos:
 
-- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**, **zero-day-response**) plus local workflows such as **Task Step Example**.
+- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**, **zero-day-response**, **zero-day-response-fix**) plus local workflows such as **Task Step Example**.
 - Creates the **AAP Orchestrator Demos** project and any demo-owned job templates (disk-utilization playbooks and the zero-day-response `p2s-*` templates). Multi-OS reuses existing **Cloud | AWS |*** templates from cloud setup — seed only imports the workflow.
 - Wires AO-native **AAP** and **LiteMaaS** (LLM Provider) integrations; allow-lists the LiteMaaS hostname for AO workers.
 - Rewrites each workflow’s AAP org/credential placeholders → APD, and fills `llm_model_id` on agentic nodes when LiteMaaS is wired, then imports into AO.

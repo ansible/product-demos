@@ -99,59 +99,47 @@ ao_demos:
         playbook: zero-day-response/playbooks/estate_configure.yml
         credentials:
           - machine
-        ask_variables_on_launch: true
       - name: p2s-estate-provision
         playbook: zero-day-response/playbooks/infra_provision_aws.yml
         credentials:
           - aws
           - machine
-        ask_variables_on_launch: true
       - name: p2s-independent-check
         playbook: zero-day-response/playbooks/p2s_independent_check.yml
         credentials:
           - machine
-        ask_variables_on_launch: true
       - name: p2s-know-scan
         playbook: zero-day-response/playbooks/p2s_scan.yml
         credentials:
           - machine
-        ask_variables_on_launch: true
       - name: p2s-know-lookback
         playbook: zero-day-response/playbooks/p2s_lookback.yml
         credentials:
           - machine
-        ask_variables_on_launch: true
       - name: p2s-ai-output-check
         playbook: zero-day-response/playbooks/p2s_ai_check.yml
         credentials: []
-        ask_variables_on_launch: true
       - name: p2s-contain-spec-check
         playbook: zero-day-response/playbooks/p2s_spec_check.yml
         credentials: []
-        ask_variables_on_launch: true
       - name: p2s-contain-controls
         playbook: zero-day-response/playbooks/p2s_controls.yml
         credentials:
           - machine
-        ask_variables_on_launch: true
       - name: p2s-fix-availability
         playbook: zero-day-response/playbooks/p2s_fix_availability.yml
         credentials: []
-        ask_variables_on_launch: true
       - name: p2s-fix-patch
         playbook: zero-day-response/playbooks/p2s_patch.yml
         credentials:
           - machine
-        ask_variables_on_launch: true
       - name: p2s-fix-standdown
         playbook: zero-day-response/playbooks/p2s_standdown.yml
         credentials:
           - machine
-        ask_variables_on_launch: true
       - name: p2s-prove-case-record
         playbook: zero-day-response/playbooks/p2s_case_record.yml
         credentials: []
-        ask_variables_on_launch: true
 
   - slug: zero-day-response-fix
     enabled: true
