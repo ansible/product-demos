@@ -13,6 +13,8 @@ ao_aap_integration_name: APD AAP
 ao_machine_credential_name: APD Machine Credential
 ao_aws_credential_name: AWS
 ao_mattermost_credential_name: Mattermost
+ao_openflake_credential_name: OpenFlake
+ao_gitea_credential_name: Gitea
 # Controller credential (RHDP boot / setup.yml); Install JT attaches it for env injectors.
 ao_litemaas_credential_name: LiteMaaS
 # AO-native LLM assets created by seed from the Controller LiteMaaS credential.
@@ -88,3 +90,85 @@ ao_demos:
     requires_cloud_stack: false
     requires_mattermost: false
     job_templates: []
+
+  # CI/CD Pipeline — OpenFlake CHG + Gitea PR/CI → AO webhook.
+  # Demo host is aws_gitea (shared services); app ports 8080/80 + Gitea.
+  # JT names must match cicd-pipeline/ao/cicd-pipeline.json exactly.
+  - slug: cicd-pipeline
+    enabled: true
+    workflow: cicd-pipeline/ao/cicd-pipeline.json
+    inventory_limit: aws_gitea
+    requires_cloud_stack: false
+    requires_mattermost: false
+    requires_openflake: true
+    requires_gitea: true
+    job_templates:
+      - name: CI/CD Demo - Deploy and Test Dev
+        playbook: cicd-pipeline/playbooks/cicd_deploy_dev_and_test.yml
+        credentials:
+          - machine
+          - openflake
+        limit: aws_gitea
+      - name: CI/CD Demo - Drain Load Balancer
+        playbook: cicd-pipeline/playbooks/cicd_drain_lb.yml
+        credentials:
+          - machine
+          - openflake
+        limit: aws_gitea
+      - name: CI/CD Demo - Deploy to Prod
+        playbook: cicd-pipeline/playbooks/cicd_deploy_prod.yml
+        credentials:
+          - machine
+          - openflake
+        limit: aws_gitea
+      - name: CI/CD Demo - Rollback to Snapshot
+        playbook: cicd-pipeline/playbooks/cicd_rollback_to_snapshot.yml
+        credentials:
+          - machine
+          - openflake
+        limit: aws_gitea
+      - name: CI/CD Demo - Close Loop
+        playbook: cicd-pipeline/playbooks/cicd_close_loop.yml
+        credentials:
+          - openflake
+      - name: CI/CD Demo - Simulate Lightwell PR
+        playbook: cicd-pipeline/playbooks/cicd_simulate_lightwell_pr.yml
+        credentials:
+          - openflake
+          - gitea
+        # Keep major.minor.patch identical to baseline (3.9.0); only the
+        # Lightwell backport suffix changes. Upstream playbook default is
+        # 3.9.2.rhlw-00001 which breaks the demo story.
+        extra_vars:
+          patched_dep: aiohttp==3.9.0.rhlw-00001
+
+      - name: CI/CD Demo - Reset Demo
+        playbook: cicd-pipeline/playbooks/cicd_reset_demo.yml
+        credentials:
+          - machine
+          - gitea
+        limit: aws_gitea
+      # Presenter helper — clear OpenFlake CHG activity so the pipeline can be re-shown.
+      - name: CI/CD Demo - Reset Change Request
+        playbook: cicd-pipeline/playbooks/cicd_reset_change_request.yml
+        credentials:
+          - openflake
+        ask_variables_on_launch: false
+        survey:
+          name: Reset OpenFlake change
+          description: Clear work/close notes and reopen the change for another AO demo run.
+          spec:
+            - question_name: Change request number
+              type: text
+              variable: change_request
+              required: true
+              default: CHG0034907
+              question_description: >-
+                OpenFlake change to reset (e.g. CHG0034907 or 34907).
+        extra_vars:
+          change_request: CHG0034907
+      - name: CI/CD Demo - Setup Demo Host
+        playbook: cicd-pipeline/setup/cicd_setup_demo_host.yml
+        credentials:
+          - machine
+        limit: aws_gitea

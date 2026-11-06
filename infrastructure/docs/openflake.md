@@ -2,7 +2,7 @@
 
 Deploy [OpenFlake](https://github.com/rlopez133/open-flake) — a lightweight ITSM platform with a ServiceNow-compatible REST API — on an OpenShift cluster. It gives demos a real incident/change backend to drive without needing a ServiceNow instance, and the ServiceNow-compatible endpoints mean `servicenow.itsm` content can point at it with only a URL change.
 
-This is **not** part of the automatic `infrastructure` demo setup. The job template is seeded by the demo setup, but the deployment only happens when someone launches it.
+The job template is seeded by the demo setup. Prefer launching it via **[Infrastructure ǀ AWS - Deploy Shared Services](./shared-services.md)** (OpenFlake starts in parallel with AWS networking), or run **Infrastructure ǀ OpenFlake** alone when you only need ITSM.
 
 ## Prerequisites
 
@@ -16,6 +16,7 @@ This is **not** part of the automatic `infrastructure` demo setup. The job templ
 | Credential | Type | Where to get it |
 |------------|------|-----------------|
 | OpenShift Credential | OpenShift or Kubernetes API Bearer Token | OpenShift console — Service Account or user token |
+| AAP Credential | Red Hat Ansible Automation Platform | Required so install can upsert the **OpenFlake** Controller credential for AO CI/CD |
 
 ## Survey prompts
 
@@ -46,7 +47,7 @@ This is **not** part of the automatic `infrastructure` demo setup. The job templ
 
 Leave the admin password unset (the default) and the chart generates one on first install, then reuses it on every subsequent run via a cluster lookup — re-running the template will not roll the password out from under a running demo.
 
-The job output prints the URL, username and password at the end of a successful install, so they can be copied straight out of the job.
+The **Infrastructure | OpenFlake** job prints URL / username / password as its **last** task (`Report how to reach OpenFlake`). Scroll to the bottom of that job (or the nested OpenFlake node under Deploy Shared Services) — not the earlier “credential publish” line, which is only the Controller credential URL. **AO Install** seed summary also prints the same login when OpenFlake is present.
 
 > [!NOTE]
 > That is a deliberate choice for a demo workload: AAP retains job output and shows it to anyone with read access on the job. Fine for an ephemeral demo cluster, not something to carry into anything long-lived. Only the admin password is exposed — the same Secret also holds `SECRET_KEY` and `POSTGRESQL_PASSWORD`, and those stay out of the log.
@@ -107,6 +108,7 @@ Everything the survey does not expose is settable in extra_vars.
 | `openflake_postgres_storage_size` | `10Gi` | Postgres volume |
 | `openflake_attachments_storage_size` | `5Gi` | Attachments volume |
 | `openflake_wait_timeout` | `10m` | Helm wait timeout |
+| `openflake_access_token_expire_minutes` | `2880` (48h) | UI JWT lifetime (`ACCESS_TOKEN_EXPIRE_MINUTES`); upstream default without this is 60m |
 | `openflake_verify` | `true` | Wait for Postgres, backend and frontend to report ready |
 | `openflake_validate_certs` | *(from the credential's `K8S_AUTH_VERIFY_SSL`)* | Verify the cluster API certificate when helm connects |
 | `openflake_ca_cert` | *(from the credential's `K8S_AUTH_SSL_CA_CERT`)* | Cluster CA for helm — a file path, or an inline PEM the playbook spills to a temp file |

@@ -121,7 +121,7 @@
           group-name: "{{ create_vm_aws_securitygroup_name }}"
       register: gitea_security_group
 
-    - name: Allow Gitea HTTP port
+    - name: Allow Gitea HTTP and demo app ports
       when: gitea_security_group.security_groups | length > 0
       amazon.aws.ec2_security_group:
         name: "{{ create_vm_aws_securitygroup_name }}"
@@ -133,6 +133,8 @@
           - proto: tcp
             ports:
               - "{{ gitea_http_port }}"
+              - 80
+              - 8080
             cidr_ip: 0.0.0.0/0
 
 - name: Deploy Gitea with Podman
@@ -178,11 +180,39 @@
         group: "1000"
         mode: "0755"
 
+    - name: Create Gitea config directory
+      ansible.builtin.file:
+        path: "{{ gitea_data_dir }}/gitea/conf"
+        state: directory
+        owner: "1000"
+        group: "1000"
+        mode: "0755"
+
+    # Official image applies GITEA__* into app.ini on start; also pin Actions
+    # in app.ini so re-runs against older hosts enable the runners API/UI.
+    # act_runner registration token is fetched from Gitea Admin API during
+    # bootstrap_cicd.yml (invented tokens are rejected — runners stay at 0).
+    - name: Ensure Actions enabled in Gitea app.ini
+      ansible.builtin.blockinfile:
+        path: "{{ gitea_data_dir }}/gitea/conf/app.ini"
+        create: true
+        owner: "1000"
+        group: "1000"
+        mode: "0644"
+        marker: "# {mark} APD ACTIONS"
+        block: |
+          [actions]
+          ENABLED = true
+          DEFAULT_ACTIONS_URL = github
+
+    # recreate so Actions env + fixed runner token apply when re-running
+    # against an older aws_gitea host provisioned before CI/CD bootstrap.
     - name: Run Gitea application
       containers.podman.podman_container:
         name: gitea
         image: "{{ gitea_image }}"
         state: started
+        recreate: true
         restart_policy: always
         publish:
           - "{{ gitea_http_port }}:3000"
@@ -196,6 +226,8 @@
           GITEA__server__DISABLE_SSH: "true"
           GITEA__security__INSTALL_LOCK: "true"
           GITEA__service__DISABLE_REGISTRATION: "true"
+          GITEA__actions__ENABLED: "true"
+          GITEA__actions__DEFAULT_ACTIONS_URL: github
         volumes:
           - "{{ gitea_data_dir }}:/data:Z"
 
@@ -281,15 +313,43 @@
           GITEA_ADMIN_PASSWORD={{ gitea_admin_password }}
           GITEA_ADMIN_EMAIL={{ gitea_admin_email }}
 
+    - name: Bootstrap CI/CD repo, Actions runner, and API token
+      ansible.builtin.include_tasks: tasks/bootstrap_cicd.yml
+
+    - name: Set up inventory-service dev and prod runtimes on aws_gitea
+      ansible.builtin.include_tasks: tasks/setup_demo_host.yml
+
+- name: Publish Gitea Credential to Controller
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Upsert Gitea Credential from provision facts
+      ansible.builtin.include_tasks: tasks/publish_credential.yml
+
+    # Last task on purpose — students scroll to the bottom of the job (or the
+    # nested Shared Services node) looking for how to log in.
     - name: Show Gitea access information
+      when: hostvars['localhost'].gitea_credential_host is defined
       ansible.builtin.debug:
         msg:
           - "============================================================"
-          - "Gitea is ready — use these credentials in the lab UI"
+          - "Gitea login (copy from here)"
           - "============================================================"
-          - "URL:      http://{{ gitea_public_ip }}:{{ gitea_http_port }}"
-          - "Username: {{ gitea_admin_username }}"
-          - "Password: {{ gitea_admin_password }}"
+          - >-
+            URL:      http://{{ hostvars['localhost'].gitea_credential_host }}:{{ hostvars['localhost'].gitea_credential_port | default('3000') }}
+          - >-
+            Username: {{ hostvars['aws_gitea'].gitea_admin_username | default('apdadmin') }}
+          - >-
+            Password: {{ hostvars['aws_gitea'].gitea_admin_password | default('Ansible123!') }}
+          - >-
+            Repo:     {{ hostvars['localhost'].gitea_credential_owner | default('apdadmin') }}/{{ hostvars['localhost'].gitea_credential_repo | default('inventory-service') }}
+          - >-
+            Dev app:  http://{{ hostvars['localhost'].gitea_credential_host }}:8080/
+          - >-
+            Prod app: http://{{ hostvars['localhost'].gitea_credential_host }}:80/
           - "============================================================"
-          - "Host aws_gitea ({{ gitea_public_ip }}) — sync AWS Inventory to see it in Controller."
+          - >-
+            Host aws_gitea ({{ hostvars['localhost'].gitea_credential_host }}) —
+            sync AWS Inventory to see it in Controller.
           - "Connection details also written to /etc/apd-gitea.env on the host."
+          - "AO Install (Gitea credential attached) sets Actions secret AO_WEBHOOK_URL automatically."

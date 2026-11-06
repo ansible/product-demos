@@ -1,0 +1,23 @@
+---
+# Obtain (or refresh) an AO API bearer token. Seed can run long enough that the
+# initial login expires before workflow sync; call this again before sync_demos.
+- name: Log in to Automation Orchestrator API
+  ansible.builtin.uri:
+    url: "{{ ao_api_url }}/auth/login"
+    method: POST
+    body_format: json
+    body:
+      username: admin
+      password: "{{ ao_admin_password }}"
+    validate_certs: false
+    status_code: [200]
+  register: ao_login
+  no_log: true
+  until: ao_login.status | default(0) == 200
+  retries: 30
+  delay: 5
+
+- name: Store AO API token
+  ansible.builtin.set_fact:
+    ao_api_token: "{{ ao_login.json.access_token }}"
+  no_log: true

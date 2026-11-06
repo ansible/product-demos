@@ -1,0 +1,118 @@
+---
+name: CI - Build, Test, and Trigger CD
+"on":
+  push:
+    branches: [main]
+jobs:
+  build-and-test:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Job image is node:20-bookworm (actions/* need node). Install Python
+      # from apt — actions/setup-python needs a hosted toolcache act_runner lacks.
+      - name: Install Python
+        run: |
+          apt-get update -qq
+          DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-pip python3-venv
+          python3 --version
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(cat version.txt)
+          BUILD_VERSION="${VERSION}-b${GITHUB_RUN_NUMBER}"
+          echo "version=${BUILD_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "base_version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Building ${GITHUB_REPOSITORY##*/} ${BUILD_VERSION} (sha: ${GITHUB_SHA:0:7})"
+
+      - name: Install test dependencies
+        run: pip3 install pytest --quiet --break-system-packages
+
+      - name: Run unit tests
+        run: python3 -m pytest tests/ -v
+
+      - name: Package artifact
+        run: |
+          tar -czf "/tmp/artifact-${{ steps.version.outputs.version }}.tar.gz" \
+            --exclude='.gitea' \
+            .
+          echo "Artifact packaged: /tmp/artifact-${{ steps.version.outputs.version }}.tar.gz"
+          ls -lh "/tmp/artifact-${{ steps.version.outputs.version }}.tar.gz"
+
+      - name: Read patched CVE (if any)
+        id: cve
+        run: |
+          CVE=$(tr -d '[:space:]' < PATCHED_CVE 2>/dev/null || true)
+          echo "cve=${CVE}" >> "$GITHUB_OUTPUT"
+          if [ -n "$CVE" ]; then
+            echo "This build remediates: ${CVE}"
+          fi
+
+      - name: Read SNOW change request number (if any)
+        id: chg
+        run: |
+          CHG=$(tr -d '[:space:]' < CHANGE_REQUEST 2>/dev/null || true)
+          echo "change_request=${CHG}" >> "$GITHUB_OUTPUT"
+          if [ -n "$CHG" ]; then
+            echo "SNOW change request: ${CHG}"
+          fi
+
+      - name: Trigger AO CD pipeline via webhook
+        if: success()
+        env:
+          AO_TOKEN_URL: ${{ secrets.AO_TOKEN_URL }}
+          AO_WEBHOOK_URL: ${{ secrets.AO_WEBHOOK_URL }}
+          AO_CLIENT_ID: ${{ secrets.AO_CLIENT_ID }}
+          AO_CLIENT_SECRET: ${{ secrets.AO_CLIENT_SECRET }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${AO_WEBHOOK_URL:-}" ]; then
+            echo "AO_WEBHOOK_URL secret not set — skip webhook (AO Install sets it when Gitea is attached)"
+            exit 0
+          fi
+
+          # Reset Demo leaves CHANGE_REQUEST empty; do not wake AO on baseline.
+          if [ -z "${{ steps.chg.outputs.change_request }}" ]; then
+            echo "CHANGE_REQUEST empty — baseline/reset commit; skip AO webhook"
+            exit 0
+          fi
+
+          APP_NAME="${GITHUB_REPOSITORY##*/}"
+          ARTIFACT_VERSION="${{ steps.version.outputs.version }}"
+          GIT_SHA="${GITHUB_SHA:0:7}"
+          CI_BUILD_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          AFFECTED_CVE="${{ steps.cve.outputs.cve }}"
+          CHANGE_REQUEST="${{ steps.chg.outputs.change_request }}"
+
+          AUTH_HEADER=()
+          if [ -n "${AO_TOKEN_URL:-}" ] && [ -n "${AO_CLIENT_ID:-}" ] && [ -n "${AO_CLIENT_SECRET:-}" ]; then
+            echo "Obtaining AO access token..."
+            TOKEN=$(curl -sf -X POST "${AO_TOKEN_URL}" \
+              --data-urlencode "grant_type=client_credentials" \
+              --data-urlencode "client_id=${AO_CLIENT_ID}" \
+              --data-urlencode "client_secret=${AO_CLIENT_SECRET}" \
+              | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+            AUTH_HEADER=(-H "Authorization: Bearer ${TOKEN}")
+          else
+            echo "AO OAuth secrets not set — posting webhook without bearer token"
+          fi
+
+          echo "Posting CD trigger to AO workflow..."
+          curl -sf -X POST "${AO_WEBHOOK_URL}" \
+            "${AUTH_HEADER[@]}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"app_name\": \"${APP_NAME}\",
+              \"artifact_version\": \"${ARTIFACT_VERSION}\",
+              \"git_sha\": \"${GIT_SHA}\",
+              \"ci_build_url\": \"${CI_BUILD_URL}\",
+              \"ci_build_number\": \"${GITHUB_RUN_NUMBER}\",
+              \"affected_cve\": \"${AFFECTED_CVE}\",
+              \"change_request\": \"${CHANGE_REQUEST}\"
+            }"
+
+          echo "AO CD pipeline triggered for ${APP_NAME} ${ARTIFACT_VERSION}"

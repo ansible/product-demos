@@ -82,6 +82,84 @@ controller_credential_types:
         litellm_api_base_url: !unsafe '{{ api_base_url }}'
         litellm_virtual_key: !unsafe '{{ virtual_key }}'
         litellm_available_models_list: !unsafe '{{ model }}'
+  - name: OpenFlake
+    description: >-
+      OpenFlake ITSM endpoint for AO CI/CD Pipeline (ServiceNow-compatible
+      Table API). Filled by Infrastructure | OpenFlake.
+    kind: cloud
+    inputs:
+      fields:
+        - id: instance_url
+          type: string
+          label: OpenFlake URL
+          help_text: Base URL with no trailing slash (example https://openflake.apps.example.com).
+        - id: username
+          type: string
+          label: Username
+          help_text: OpenFlake admin username (default admin).
+        - id: password
+          type: string
+          label: Password
+          secret: true
+      required:
+        - instance_url
+        - username
+        - password
+    injectors:
+      env:
+        SN_HOST: !unsafe '{{ instance_url }}'
+        SN_USERNAME: !unsafe '{{ username }}'
+        SN_PASSWORD: !unsafe '{{ password }}'
+        OPENFLAKE_INSTANCE_URL: !unsafe '{{ instance_url }}'
+        OPENFLAKE_USERNAME: !unsafe '{{ username }}'
+        OPENFLAKE_PASSWORD: !unsafe '{{ password }}'
+      extra_vars:
+        openflake_instance_url: !unsafe '{{ instance_url }}'
+        openflake_username: !unsafe '{{ username }}'
+        openflake_password: !unsafe '{{ password }}'
+        snow_instance_url: !unsafe '{{ instance_url }}'
+        snow_username: !unsafe '{{ username }}'
+        snow_password: !unsafe '{{ password }}'
+  - name: Gitea
+    description: >-
+      Gitea API endpoint for AO CI/CD Pipeline (Simulate Lightwell PR / Reset).
+      Filled by Infrastructure | AWS - Provision Gitea.
+    kind: cloud
+    inputs:
+      fields:
+        - id: gitea_host
+          type: string
+          label: Gitea host
+          help_text: Hostname or IP only (no http://).
+        - id: gitea_port
+          type: string
+          label: Gitea HTTP port
+          help_text: Default 3000.
+        - id: gitea_token
+          type: string
+          label: API token
+          secret: true
+        - id: gitea_owner
+          type: string
+          label: Owner / org
+          help_text: Repo owner (APD default apdadmin).
+        - id: gitea_repo
+          type: string
+          label: Repository
+          help_text: Default inventory-service.
+      required:
+        - gitea_host
+        - gitea_port
+        - gitea_token
+        - gitea_owner
+        - gitea_repo
+    injectors:
+      extra_vars:
+        gitea_host: !unsafe '{{ gitea_host }}'
+        gitea_port: !unsafe '{{ gitea_port }}'
+        gitea_token: !unsafe '{{ gitea_token }}'
+        gitea_owner: !unsafe '{{ gitea_owner }}'
+        gitea_repo: !unsafe '{{ gitea_repo }}'
 
 controller_credentials:
   - name: ROSA Token
@@ -114,6 +192,30 @@ controller_credentials:
       api_base_url: REPLACEME
       virtual_key: REPLACEME
       model: qwen3-235b
+  - name: OpenFlake
+    credential_type: OpenFlake
+    organization: Ansible Product Demos (APD)
+    description: >-
+      Updated automatically by Infrastructure | OpenFlake.
+    update_secrets: false
+    state: exists
+    inputs:
+      instance_url: REPLACEME
+      username: admin
+      password: REPLACEME
+  - name: Gitea
+    credential_type: Gitea
+    organization: Ansible Product Demos (APD)
+    description: >-
+      Updated automatically by Infrastructure | AWS - Provision Gitea.
+    update_secrets: false
+    state: exists
+    inputs:
+      gitea_host: REPLACEME
+      gitea_port: "3000"
+      gitea_token: REPLACEME
+      gitea_owner: apdadmin
+      gitea_repo: inventory-service
   - name: OpenShift Credential
     organization: Ansible Product Demos (APD)
     credential_type: OpenShift or Kubernetes API Bearer Token
@@ -363,6 +465,7 @@ controller_templates:
       - OpenShift Credential
       - AAP Credential
       - LiteMaaS
+      - Gitea
 
   - name: Infrastructure | Automation Orchestrator | Uninstall
     description: >-
@@ -764,8 +867,10 @@ controller_templates:
   - name: "Infrastructure | AWS - Provision Gitea"
     description: >-
       Provisions a dedicated aws_gitea EC2 instance and deploys Gitea with
-      Podman (SQLite). Creates an admin user and prints the URL, username,
-      and password in the job output for lab use.
+      Podman (SQLite). Creates an admin user, seeds inventory-service for
+      the CI/CD Pipeline demo, starts an act_runner, installs inventory-service
+      runtime (dev :8080 / prod :80), and upserts the Gitea credential on
+      Controller (requires AAP Credential).
     labels:
       - aws.ec2
       - infrastructure
@@ -774,6 +879,7 @@ controller_templates:
     credentials:
       - AWS
       - APD Machine Credential
+      - AAP Credential
     project: Ansible Product Demos
     playbook: infrastructure/gitea/provision_gitea.yml
     inventory: Ansible Product Demos Inventory
@@ -816,6 +922,28 @@ controller_templates:
             - Dev
             - QA
             - Prod
+
+  - name: "Infrastructure | AWS - Setup CI/CD Demo Host"
+    description: >-
+      Re-runs inventory-service runtime setup on aws_gitea (dev :8080, prod :80,
+      systemd units, baseline snapshot). Provision Gitea / Deploy Shared Services
+      already do this; use this JT only to refresh the apps without re-provisioning
+      Gitea.
+    labels:
+      - aws.ec2
+      - infrastructure
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - APD Machine Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/gitea/setup_demo_host.yml
+    inventory: Ansible Product Demos Inventory
+    limit: aws_gitea
+    ask_limit_on_launch: true
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
 
   - name: "LINUX | Config Drift - Deploy Audit and Filebeat"
     description: >-
@@ -1027,6 +1155,7 @@ controller_templates:
       ServiceNow-compatible REST API -- on OpenShift via its Helm chart.
       The chart generates the admin password on first install and keeps it
       across upgrades; the job output reports the URL and credentials.
+      On install, upserts the OpenFlake Controller credential for AO CI/CD.
       Set Operation to uninstall to remove the release and its namespace.
     # Labels must already exist in controller_labels (common/setup.yml);
     # the job template module does not create them.
@@ -1038,6 +1167,7 @@ controller_templates:
     inventory: Ansible Product Demos Inventory
     credentials:
       - OpenShift Credential
+      - AAP Credential
     project: Ansible Product Demos
     playbook: infrastructure/openflake/provision.yml
     notification_templates_started: Telemetry
@@ -1078,15 +1208,73 @@ controller_templates:
           required: true
           default: stable
 
+  - name: "Infrastructure | AWS - Shared Services Portal"
+    description: >-
+      Publishes a password-gated S3 website with this lab's Mattermost, Gitea,
+      and OpenFlake URLs and UI logins. Attach those three Controller
+      credentials (filled by the provision jobs) plus AWS. Prefer launching via
+      Deploy Shared Services, which runs this node after all three succeed.
+    labels:
+      - aws.ec2
+      - infrastructure
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    credentials:
+      - AWS
+      - Mattermost
+      - Gitea
+      - OpenFlake
+    project: Ansible Product Demos
+    playbook: infrastructure/shared-services/publish_credentials_portal.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            Region for the credentials portal S3 bucket. Use the same region as
+            Deploy Shared Services / Mattermost / Gitea.
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+            - ap-south-1
+            - ap-northeast-1
+            - ap-northeast-2
+            - ap-northeast-3
+            - ap-southeast-1
+            - ap-southeast-2
+            - ca-central-1
+            - eu-central-1
+            - eu-west-1
+            - eu-west-2
+            - eu-west-3
+            - eu-north-1
+            - sa-east-1
+
 controller_workflows:
   - name: Infrastructure | AWS - Deploy Shared Services
     description: >-
-      One-click shared AWS services without cloud-stack VMs: Create VPC and
-      keypair, then provision Mattermost and Gitea in parallel.
+      One-click shared lab services without cloud-stack VMs: Create VPC and
+      keypair, then provision Mattermost and Gitea in parallel (Gitea also seeds
+      inventory-service and installs dev/prod app runtimes on aws_gitea), while
+      OpenFlake installs on OpenShift in parallel from the start. After all three
+      succeed, publishes a password-gated S3 credentials portal.
     labels:
       - aws.ec2
       - aws.vpc
       - infrastructure
+      - openshift
     organization: Ansible Product Demos (APD)
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
@@ -1097,6 +1285,10 @@ controller_workflows:
       create_vm_aws_securitygroup_name: aws-test-sg
       create_vm_aws_vpc_subnet_name: aws-test-subnet
       create_vm_vm_deployment: cloud_stack
+      # Fixed for APD labs — no survey for owner/env (one-size-fits-all).
+      create_vm_aws_owner_tag: apd
+      create_vm_vm_environment: Prod
+      openflake_operation: install
     survey_enabled: true
     survey:
       name: ''
@@ -1104,7 +1296,8 @@ controller_workflows:
       spec:
         - question_name: AWS Region
           question_description: >-
-            AWS region for VPC, keypair, Mattermost, and Gitea.
+            Region for VPC, keypair, Mattermost, and Gitea. Choices match
+            regions enabled on the APD AWS account.
           type: multiplechoice
           variable: create_vm_aws_region
           required: true
@@ -1114,24 +1307,27 @@ controller_workflows:
             - us-east-2
             - us-west-1
             - us-west-2
-        - question_name: Owner
-          question_description: >-
-            EC2 owner tag on networking and service hosts. Use your name or
-            team for cost attribution.
-          type: text
-          variable: create_vm_aws_owner_tag
-          required: true
-          default: your_name
-        - question_name: Environment
-          type: multiplechoice
-          variable: create_vm_vm_environment
-          required: true
-          default: Prod
-          choices:
-            - Dev
-            - QA
-            - Prod
+            - ap-south-1
+            - ap-northeast-1
+            - ap-northeast-2
+            - ap-northeast-3
+            - ap-southeast-1
+            - ap-southeast-2
+            - ca-central-1
+            - eu-central-1
+            - eu-west-1
+            - eu-west-2
+            - eu-west-3
+            - eu-north-1
+            - sa-east-1
     simplified_workflow_nodes:
+      # OpenFlake is OpenShift-only — start it immediately alongside AWS networking.
+      - identifier: Provision OpenFlake
+        unified_job_template: Infrastructure | OpenFlake
+        success_nodes:
+          - Publish Credentials Portal
+        failure_nodes:
+          - Ticket - OpenFlake Failed
       - identifier: Create Keypair
         unified_job_template: Cloud | AWS | Create Keypair
         success_nodes:
@@ -1149,13 +1345,22 @@ controller_workflows:
       - identifier: Provision Mattermost
         unified_job_template: Infrastructure | AWS - Provision Mattermost
         all_parents_must_converge: true
+        success_nodes:
+          - Publish Credentials Portal
         failure_nodes:
           - Ticket - Mattermost Failed
       - identifier: Provision Gitea
         unified_job_template: Infrastructure | AWS - Provision Gitea
         all_parents_must_converge: true
+        success_nodes:
+          - Publish Credentials Portal
         failure_nodes:
           - Ticket - Gitea Failed
+      - identifier: Publish Credentials Portal
+        unified_job_template: Infrastructure | AWS - Shared Services Portal
+        all_parents_must_converge: true
+        failure_nodes:
+          - Ticket - Portal Failed
       - identifier: Ticket - Keypair Failed
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
@@ -1172,6 +1377,14 @@ controller_workflows:
         unified_job_template: 'SUBMIT FEEDBACK'
         extra_data:
           feedback: Failed to provision Gitea shared service
+      - identifier: Ticket - OpenFlake Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to provision OpenFlake shared ITSM service
+      - identifier: Ticket - Portal Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to publish Shared Services credentials portal
 
   - name: Infrastructure | ROSA - Lifecycle (Create)
     description: >-

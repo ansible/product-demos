@@ -41,13 +41,13 @@ Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route eve
 |--------------|-------------|
 | **Vault** | Install or remove HashiCorp Vault on an OpenShift cluster via the HashiCorp Helm chart (dev mode). Install seeds the KV v2 secrets engine and userpass auth with sample credentials. |
 
-### Shared services (Mattermost + Gitea)
+### Shared services (Mattermost + Gitea + OpenFlake)
 
 #### Workflows
 
 | Workflow | Description |
 |----------|-------------|
-| [**Infrastructure ǀ AWS - Deploy Shared Services**](docs/shared-services.md) | One-click VPC + keypair, then Mattermost and Gitea in parallel (no cloud-stack VMs) |
+| [**Infrastructure ǀ AWS - Deploy Shared Services**](docs/shared-services.md) | One-click VPC + keypair, then Mattermost and Gitea in parallel, with OpenFlake on OpenShift from the start; ends with a password-gated S3 credentials portal (no cloud-stack VMs) |
 
 #### Jobs
 
@@ -55,6 +55,7 @@ Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route eve
 |--------------|-------------|
 | [**Infrastructure ǀ AWS - Provision Mattermost**](docs/mattermost.md) | EC2 `aws_mattermost` + Podman Mattermost with bot token for AO and other chat demos |
 | [**Infrastructure ǀ AWS - Provision Gitea**](docs/gitea.md) | EC2 `aws_gitea` + Podman Gitea (SQLite); job output prints `apdadmin` / `Ansible123!` |
+| [**Infrastructure ǀ AWS - Shared Services Portal**](docs/shared-services.md) | S3 password-gated page with this lab’s Mattermost / Gitea / OpenFlake logins |
 
 ### OPA (Open Policy Agent)
 

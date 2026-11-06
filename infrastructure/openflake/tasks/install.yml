@@ -16,6 +16,11 @@
         persistence:
           size: '{{ _openflake_postgres_storage_size }}'
       backend:
+        # Demo-friendly UI session (upstream default is 60m). Matches AO's
+        # 48h refresh window so presenters are not kicked mid-lab.
+        extraEnv:
+          - name: ACCESS_TOKEN_EXPIRE_MINUTES
+            value: '{{ openflake_access_token_expire_minutes | default("2880") }}'
         attachments:
           persistence:
             size: '{{ _openflake_attachments_storage_size }}'
@@ -176,12 +181,21 @@
          | default('') | b64decode }}
   no_log: true
 
+- name: Publish OpenFlake credential for AO demos
+  ansible.builtin.include_tasks: publish_credential.yml
+
+# Last install task on purpose — students scroll to the bottom of the job
+# (or the nested Shared Services node) looking for how to log in.
 - name: Report how to reach OpenFlake
   ansible.builtin.debug:
     msg:
       # default(..., true) so an empty string falls through to the hint too,
       # not just an undefined variable.
+      - '============================================================'
+      - 'OpenFlake login (copy from here)'
+      - '============================================================'
       - 'OpenFlake URL:      {{ openflake_public_url | default("no Route - use the in-cluster Service", true) }}'
       - 'OpenFlake username: {{ _openflake_admin_username }}'
       - 'OpenFlake password: {{ _openflake_resolved_admin_password | default("not found - read it from the Secret in the namespace", true) }}'
       - 'OpenFlake namespace: {{ _openflake_namespace }}'
+      - 'Controller credential OpenFlake updated for AO CI/CD Demo JTs.'

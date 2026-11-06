@@ -1,0 +1,318 @@
+---
+# Non-destructive CI/CD bootstrap on an already-running APD Gitea container:
+# PAT, inventory-service repo seed files, Actions workflow stub, act_runner.
+- name: Enable Podman socket for act_runner
+  ansible.builtin.systemd:
+    name: podman.socket
+    state: started
+    enabled: true
+
+- name: Allow demo app HTTP ports through firewalld
+  ansible.posix.firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - "80"
+    - "8080"
+  when:
+    - "'firewalld.service' in ansible_facts.services"
+    - ansible_facts.services['firewalld.service'].state == 'running'
+
+- name: Create act_runner data directory
+  ansible.builtin.file:
+    path: /var/lib/gitea-runner
+    state: directory
+    mode: "0755"
+
+- name: List existing Gitea API tokens for admin
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/users/{{ gitea_admin_username }}/tokens"
+    method: GET
+    user: "{{ gitea_admin_username }}"
+    password: "{{ gitea_admin_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: gitea_existing_tokens
+  no_log: true
+
+- name: Delete existing apd-cicd-token when present
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/users/{{ gitea_admin_username }}/tokens/{{ item.id }}"
+    method: DELETE
+    user: "{{ gitea_admin_username }}"
+    password: "{{ gitea_admin_password }}"
+    force_basic_auth: true
+    status_code: [204, 404]
+  loop: "{{ gitea_existing_tokens.json | selectattr('name', 'equalto', 'apd-cicd-token') | list }}"
+  when: gitea_existing_tokens.json is sequence
+  failed_when: false
+  no_log: true
+
+- name: Create Gitea API token for CI/CD demos
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/users/{{ gitea_admin_username }}/tokens"
+    method: POST
+    user: "{{ gitea_admin_username }}"
+    password: "{{ gitea_admin_password }}"
+    force_basic_auth: true
+    headers:
+      Content-Type: application/json
+    body_format: json
+    body:
+      name: apd-cicd-token
+      scopes:
+        - write:repository
+        - write:issue
+        - write:user
+        - write:organization
+        - write:package
+    status_code: [201]
+  register: gitea_token_result
+  no_log: true
+
+- name: Store Gitea API token fact
+  ansible.builtin.set_fact:
+    gitea_api_token: "{{ gitea_token_result.json.sha1 }}"
+    gitea_repo_owner: "{{ gitea_admin_username }}"
+    gitea_repo_name: inventory-service
+  no_log: true
+
+- name: Create inventory-service repository when missing
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/user/repos"
+    method: POST
+    headers:
+      Authorization: "token {{ gitea_api_token }}"
+      Content-Type: application/json
+    body_format: json
+    body:
+      name: "{{ gitea_repo_name }}"
+      description: Lightwell CI/CD demo — inventory service
+      private: false
+      auto_init: true
+      default_branch: main
+    status_code: [201, 409]
+  register: gitea_repo_create
+  no_log: true
+
+# Baseline matches cicd_reset_demo.yml: vulnerable aiohttp 3.9.0, empty
+# PATCHED_CVE/CHANGE_REQUEST, version 2.3.0. Simulate Lightwell PR must keep
+# 3.9.0 and only add .rhlw-00001 (JT extra_vars: aiohttp==3.9.0.rhlw-00001).
+# Reset Demo restores this baseline for re-runs.
+- name: Seed inventory-service baseline files via API
+  vars:
+    _seed_files:
+      - path: requirements.txt
+        message: Seed vulnerable baseline requirements
+        content: |
+          # inventory-service dependencies
+          # VULNERABLE: aiohttp 3.9.0 contains CVE-2024-23334 (path traversal via static file handler)
+          # Lightwell PR keeps 3.9.0 and only adds the backport: aiohttp==3.9.0.rhlw-00001
+          aiohttp==3.9.0
+      - path: version.txt
+        message: Seed baseline version
+        content: |
+          2.3.0
+      - path: PATCHED_CVE
+        message: Seed empty PATCHED_CVE
+        content: ""
+      - path: CHANGE_REQUEST
+        message: Seed empty CHANGE_REQUEST
+        content: ""
+      - path: app.py
+        message: Seed inventory-service app
+        content: "{{ lookup('file', playbook_dir ~ '/files/inventory-service/app.py') }}"
+      - path: tests/test_app.py
+        message: Seed inventory-service unit tests
+        content: "{{ lookup('file', playbook_dir ~ '/files/inventory-service/tests/test_app.py') }}"
+      - path: .gitea/workflows/ci.yml
+        message: Seed Gitea Actions CI workflow
+        content: "{{ lookup('file', playbook_dir ~ '/files/inventory-service-ci.yml') }}"
+  ansible.builtin.include_tasks: seed_repo_file.yml
+  loop: "{{ _seed_files }}"
+  loop_control:
+    loop_var: gitea_seed_file
+
+# Instance registration tokens live in Gitea's DB — fetch the real one.
+# Homegrown tokens in /etc/apd-gitea-runner.token never match → 0 runners.
+- name: Fetch Actions runner registration token from Gitea Admin API
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/admin/runners/registration-token"
+    method: GET
+    user: "{{ gitea_admin_username }}"
+    password: "{{ gitea_admin_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: gitea_runner_token_api
+  no_log: true
+
+- name: Store Actions runner registration token fact
+  ansible.builtin.set_fact:
+    gitea_runner_registration_token: "{{ gitea_runner_token_api.json.token }}"
+  no_log: true
+
+- name: Require Actions runner registration token
+  ansible.builtin.assert:
+    that:
+      - (gitea_runner_registration_token | default('') | length) >= 32
+    fail_msg: >-
+      Could not read /api/v1/admin/runners/registration-token from Gitea.
+      Confirm Actions is enabled and {{ gitea_admin_username }} is a site admin.
+
+# Repos disable Actions by default even when the instance has Actions on.
+- name: Enable Actions unit on inventory-service
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ gitea_http_port }}/api/v1/repos/{{ gitea_repo_owner }}/{{ gitea_repo_name }}"
+    method: PATCH
+    headers:
+      Authorization: "token {{ gitea_api_token }}"
+      Content-Type: application/json
+    body_format: json
+    body:
+      has_actions: true
+    status_code: [200, 422]
+  register: gitea_repo_actions_enable
+  no_log: true
+  failed_when: false
+
+- name: Warn when inventory-service Actions unit could not be enabled via API
+  when: (gitea_repo_actions_enable.status | default(0) | int) != 200
+  ansible.builtin.debug:
+    msg: >-
+      Could not set has_actions via API
+      (HTTP {{ gitea_repo_actions_enable.status | default('n/a') }}).
+      Enable Repository Actions in the Gitea UI if workflows do not run.
+
+- name: Remove existing act_runner container when present
+  containers.podman.podman_container:
+    name: gitea-runner
+    state: absent
+  failed_when: false
+
+# Drop prior registration so the runner re-registers with the fixed token.
+- name: Clear stale act_runner registration file
+  ansible.builtin.file:
+    path: /var/lib/gitea-runner/.runner
+    state: absent
+
+# act (inside act_runner) bind-mounts docker_host from the *host* path. If we
+# only expose the socket as /var/run/docker.sock inside the runner, job
+# containers fail looking for that path on the host. Keep the real Podman
+# socket path on both sides and point config/DOCKER_HOST at it.
+- name: Assert host Podman API socket exists
+  ansible.builtin.stat:
+    path: /run/podman/podman.sock
+  register: gitea_podman_sock
+
+- name: Fail when Podman API socket is missing
+  ansible.builtin.assert:
+    that:
+      - gitea_podman_sock.stat.exists | default(false)
+      - gitea_podman_sock.stat.issock | default(false)
+    fail_msg: >-
+      /run/podman/podman.sock is missing after enabling podman.socket.
+      act_runner cannot launch job containers without the host Podman API.
+
+- name: Write act_runner config for host Podman socket
+  ansible.builtin.copy:
+    dest: /var/lib/gitea-runner/config.yaml
+    mode: "0644"
+    content: |
+      log:
+        level: info
+      runner:
+        capacity: 1
+        timeout: 3h
+      container:
+        # Same path inside the runner container (see volume mount below).
+        docker_host: "unix:///run/podman/podman.sock"
+        privileged: true
+        valid_volumes:
+          - /data/**
+          - /run/podman/**
+
+# Use the published ROOT_URL host so the runner reaches Gitea the same way
+# browsers/CI checkout do. node image is required for actions/checkout; the
+# workflow installs Python via apt (setup-python needs a hosted toolcache).
+- name: Run Gitea act_runner
+  containers.podman.podman_container:
+    name: gitea-runner
+    image: docker.io/gitea/act_runner:latest
+    state: started
+    restart_policy: always
+    privileged: true
+    # Socket access under SELinux without :Z on the Podman sock mount.
+    security_opt:
+      - label=disable
+    env:
+      GITEA_INSTANCE_URL: "http://{{ gitea_public_ip }}:{{ gitea_http_port }}"
+      GITEA_RUNNER_REGISTRATION_TOKEN: "{{ gitea_runner_registration_token }}"
+      GITEA_RUNNER_NAME: apd-demo-runner
+      GITEA_RUNNER_LABELS: "ubuntu-latest:docker://docker.io/library/node:20-bookworm"
+      CONFIG_FILE: /data/config.yaml
+      DOCKER_HOST: unix:///run/podman/podman.sock
+    volumes:
+      - /var/lib/gitea-runner:/data:Z
+      # Keep host path identical inside the container (see config.yaml).
+      # Do not SELinux-relabel the Podman socket (:Z breaks sibling containers).
+      - /run/podman/podman.sock:/run/podman/podman.sock
+
+- name: Wait for act_runner daemon to stay healthy
+  ansible.builtin.command:
+    argv:
+      - podman
+      - logs
+      - gitea-runner
+  register: gitea_runner_logs
+  changed_when: false
+  failed_when: false
+  until: >-
+    (
+      (
+        'declare successfully' in ((gitea_runner_logs.stdout | default('')) ~ (gitea_runner_logs.stderr | default('')))
+      )
+      or (
+        'Runner registered successfully' in ((gitea_runner_logs.stdout | default('')) ~ (gitea_runner_logs.stderr | default('')))
+      )
+    )
+    and (
+      'docker_host config was invalid' not in ((gitea_runner_logs.stdout | default('')) ~ (gitea_runner_logs.stderr | default('')))
+    )
+    and (
+      'Docker Engine socket not found' not in ((gitea_runner_logs.stdout | default('')) ~ (gitea_runner_logs.stderr | default('')))
+    )
+  retries: 30
+  delay: 2
+
+- name: Capture act_runner log text for assert
+  ansible.builtin.set_fact:
+    gitea_runner_log_text: >-
+      {{
+        ((gitea_runner_logs.stdout | default('')) ~ (gitea_runner_logs.stderr | default('')))
+        | trim
+      }}
+
+- name: Fail when act_runner did not register cleanly
+  ansible.builtin.assert:
+    that:
+      - >-
+        ('declare successfully' in gitea_runner_log_text)
+        or ('Runner registered successfully' in gitea_runner_log_text)
+      - "'docker_host config was invalid' not in gitea_runner_log_text"
+      - "'Docker Engine socket not found' not in gitea_runner_log_text"
+    fail_msg: >-
+      gitea-runner did not stay registered with Gitea Actions (Podman socket /
+      docker_host). Last logs: {{ gitea_runner_log_text | truncate(500) }}
+
+- name: Persist CI/CD token facts for Controller publish
+  ansible.builtin.set_fact:
+    gitea_credential_host: "{{ gitea_public_ip }}"
+    gitea_credential_port: "{{ gitea_http_port }}"
+    gitea_credential_token: "{{ gitea_api_token }}"
+    gitea_credential_owner: "{{ gitea_repo_owner }}"
+    gitea_credential_repo: "{{ gitea_repo_name }}"
+  delegate_to: localhost
+  delegate_facts: true
+  no_log: true

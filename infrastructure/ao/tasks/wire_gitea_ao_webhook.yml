@@ -1,0 +1,140 @@
+---
+# When Gitea is provisioned, set inventory-service Actions secrets so CI can
+# call the AO lightwell-ci-cd webhook with a service-account bearer token.
+# Requires the Gitea Controller credential attached to AO Install (token inject).
+- name: Skip Gitea AO webhook secrets when Gitea is not ready
+  when: >-
+    not (ao_gitea_present | default(false) | bool)
+    or (ao_gitea_demos | default([]) | length) == 0
+  ansible.builtin.debug:
+    msg: >-
+      Skipping AO webhook Gitea Actions secrets — provision Gitea and
+      re-run Install when ready for cicd-pipeline.
+
+- name: Configure Gitea Actions AO webhook secrets
+  when:
+    - ao_gitea_present | default(false) | bool
+    - (ao_gitea_demos | default([]) | length) > 0
+  vars:
+    _ao_cicd_webhook_url: "https://{{ ao_api_host }}/api/v1/webhooks/lightwell-ci-cd"
+    _ao_cicd_token_url: "{{ ao_cicd_token_url | default('https://' ~ ao_api_host ~ '/api/v1/auth/token') }}"
+    _gitea_api_base: "http://{{ ao_gitea_host }}:{{ ao_gitea_port | default('3000') }}/api/v1"
+    _gitea_owner: "{{ ao_gitea_owner | default(gitea_owner | default('apdadmin')) }}"
+    _gitea_repo: "{{ ao_gitea_repo | default(gitea_repo | default('inventory-service')) }}"
+    # Prefer JT-injected token from attached Gitea credential; never log it.
+    _gitea_token: "{{ gitea_token | default('') }}"
+    _gitea_token_usable: >-
+      {{
+        (_gitea_token | default('') | length) > 0
+        and (_gitea_token | default('')) not in ['REPLACEME', 'replace_me']
+      }}
+    _ao_oauth_ready: >-
+      {{
+        (ao_cicd_sa_ready | default(false) | bool)
+        and (ao_cicd_client_id | default('') | length) > 0
+        and (ao_cicd_client_secret | default('') | length) > 0
+      }}
+    _gitea_ao_secrets: >-
+      {{
+        [
+          {'name': 'AO_WEBHOOK_URL', 'data': _ao_cicd_webhook_url,
+           'description': 'AO CI/CD Pipeline webhook (lightwell-ci-cd) — set by APD AO Install'},
+        ]
+        + (
+          [
+            {'name': 'AO_TOKEN_URL', 'data': _ao_cicd_token_url,
+             'description': 'AO OAuth token endpoint for webhook service account'},
+            {'name': 'AO_CLIENT_ID', 'data': ao_cicd_client_id,
+             'description': 'AO CI/CD webhook service account client id'},
+            {'name': 'AO_CLIENT_SECRET', 'data': ao_cicd_client_secret,
+             'description': 'AO CI/CD webhook service account client secret'},
+          ]
+          if (_ao_oauth_ready | bool) else []
+        )
+      }}
+  block:
+    - name: Soft-warn when Gitea token is missing for webhook secrets
+      when: not (_gitea_token_usable | bool)
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'Could not set Gitea Actions AO webhook secrets — attach the '
+              ~ 'Gitea credential to AO Install (injects gitea_token), then re-run Install. '
+              ~ 'Webhook URL would be: ' ~ _ao_cicd_webhook_url
+            ]
+          }}
+
+    - name: Soft-warn when AO OAuth client facts are missing
+      when:
+        - _gitea_token_usable | bool
+        - not (_ao_oauth_ready | bool)
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'Set AO_WEBHOOK_URL only — AO service account client credentials were '
+              ~ 'not prepared, so Gitea CI cannot authenticate to the webhook.'
+            ]
+          }}
+
+    - name: Upsert Gitea Actions AO secrets
+      when: _gitea_token_usable | bool
+      ansible.builtin.uri:
+        url: >-
+          {{ _gitea_api_base }}/repos/{{ _gitea_owner }}/{{ _gitea_repo }}/actions/secrets/{{ item.name }}
+        method: PUT
+        headers:
+          Authorization: "token {{ _gitea_token }}"
+          Content-Type: application/json
+        body_format: json
+        body:
+          data: "{{ item.data }}"
+          description: "{{ item.description }}"
+        status_code: [201, 204]
+        validate_certs: false
+      loop: "{{ _gitea_ao_secrets }}"
+      loop_control:
+        label: "{{ item.name }}"
+      no_log: true
+      register: _gitea_ao_secret_results
+      failed_when: false
+
+    - name: Soft-warn when any Gitea Actions secret upsert failed
+      when:
+        - _gitea_token_usable | bool
+        - >-
+          (
+            _gitea_ao_secret_results.results
+            | default([])
+            | map(attribute='status')
+            | reject('in', [201, 204])
+            | list
+            | length
+          ) > 0
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'Failed to set one or more Gitea Actions AO secrets '
+              ~ '(expected HTTP 201/204). Re-run Install after checking the Gitea token.'
+            ]
+          }}
+
+    - name: Record Gitea webhook secrets success for seed summary
+      when:
+        - _gitea_token_usable | bool
+        - >-
+          (
+            _gitea_ao_secret_results.results
+            | default([])
+            | selectattr('status', 'defined')
+            | selectattr('status', 'in', [201, 204])
+            | list
+            | length
+          ) == (_gitea_ao_secrets | length)
+        - (_gitea_ao_secrets | length) > 0
+      ansible.builtin.set_fact:
+        ao_gitea_webhook_secret_set: true
+        ao_cicd_webhook_url: "{{ _ao_cicd_webhook_url }}"
+        ao_gitea_oauth_secrets_set: "{{ _ao_oauth_ready | bool }}"
