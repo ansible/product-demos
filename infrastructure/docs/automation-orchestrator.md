@@ -2,16 +2,16 @@
 
 Start here for Automation Orchestrator (AO) on the [Ansible Product Demos catalog item](https://red.ht/apd-sandbox) from [demo.redhat.com](https://demo.redhat.com). OpenShift, credentials, and the AO execution environment are already wired.
 
-Before either path: confirm AO templates exist — if not, run **APD ǀ Multi-demo setup** (or **APD ǀ Single demo setup** → `infrastructure`).
+Before either path: confirm AO templates exist — if not, run **APD Multi-demo setup** (or **APD Single demo setup** with infrastructure).
 
 ## Path 1 — Just install AO
 
 Stupid simple: one job template.
 
-1. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**.
-2. Open the AO URL from the job output and log in as `admin` with the printed password. Install sets a **48-hour** browser session (`APP_JWT_REFRESH_TOKEN_LIFETIME_HOURS`) so demos are less likely to kick you out mid-lab.
+1. Launch **Infrastructure Automation Orchestrator Install**.
+2. Open the AO URL from the job output and log in as **admin** with the printed password. Install sets a **48-hour** browser session so demos are less likely to kick you out mid-lab.
 
-You now have AO. On demo.redhat.com, Install also wires the pre-filled Controller **LiteMaaS** credential into AO as an LLM Provider integration so agentic (AI) workflow nodes can run. The Install job template must have **LiteMaaS** attached (APD setup on this branch does that). If the seed summary says LLM was not wired, re-run Install once after setup so the virtual key injects. Seeded demo workflows may still need Path 2 (**Deploy Shared Services**, and Cloud Stack only when you need `aws-rhel9` / Multi-OS hosts). Install **warns** on missing deps; it does not fail.
+You now have AO. On demo.redhat.com, Install also wires the pre-filled Controller **LiteMaaS** credential into AO as an LLM Provider integration so agentic (AI) workflow nodes can run. The Install job template must have **LiteMaaS** attached (APD setup on this branch does that). If the seed summary says LLM was not wired, re-run Install once after setup so the virtual key injects. Seeded demo workflows may still need Path 2 (**Deploy Shared Services**, and Cloud Stack only when you need aws-rhel9 / Multi-OS hosts). Install **warns** on missing deps; it does not fail.
 
 Skip Network Configuration on RHDP — Install already ran it.
 
@@ -19,12 +19,12 @@ Skip Network Configuration on RHDP — Install already ran it.
 
 Still simple — shared lab services (and cloud VMs only when a demo needs them), then Install.
 
-1. Ensure **APD ǀ Multi-demo setup** (or Single → `cloud` + `infrastructure`) created the **Cloud | AWS |*** patch/snapshot JTs and OpenFlake / Gitea / Mattermost credential types.
-2. Launch **Infrastructure ǀ AWS - Deploy Shared Services** ([details](./shared-services.md)). One workflow: VPC + keypair, then Mattermost + Gitea in parallel, plus OpenFlake on OpenShift. That covers chat (disk-utilization), SCM/Actions (`inventory-service` + act_runner), and ITSM (OpenFlake) credentials — you do **not** need separate Provision Mattermost / Provision Gitea / OpenFlake jobs unless you prefer to run them alone.
-3. Only if you need disk-utilization or Multi-OS Cloud Patching hosts: also run **Deploy Cloud Stack in AWS** (`aws-rhel9`, Windows, reports, and so on). Skip for CI/CD Pipeline or Task Step Example alone.
-4. Launch **Infrastructure ǀ Automation Orchestrator ǀ Install**. Soft-failed / retried tasks in the middle are normal on a cold cluster; the job should still finish green (often ~10 minutes). Soft warnings for missing optional deps do **not** fail Install.
+1. Ensure **APD Multi-demo setup** (or Single demo setup with cloud + infrastructure) created the Cloud AWS patch/snapshot job templates and the OpenFlake / Gitea / Mattermost credential types.
+2. Launch **Infrastructure AWS - Deploy Shared Services** ([details](./shared-services.md)). One workflow: VPC + keypair, then Mattermost + Gitea in parallel, plus OpenFlake on OpenShift. That covers chat (disk-utilization), SCM/Actions (inventory-service + act_runner), and ITSM (OpenFlake) credentials — you do not need separate Provision Mattermost / Provision Gitea / OpenFlake jobs unless you prefer to run them alone.
+3. Only if you need disk-utilization or Multi-OS Cloud Patching hosts: also run **Deploy Cloud Stack in AWS** (aws-rhel9, Windows, reports, and so on). Skip for CI/CD Pipeline or Task Step Example alone.
+4. Launch **Infrastructure Automation Orchestrator Install**. Soft-failed / retried tasks in the middle are normal on a cold cluster; the job should still finish green (often about 10 minutes). Soft warnings for missing optional deps do not fail Install.
 5. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost / OpenFlake / Gitea login details when Shared Services ran).
-6. For CI/CD: Install creates an AO webhook **service account**, authorizes it on `lightwell-ci-cd`, publishes the workflow, and writes Gitea Actions secrets (`AO_WEBHOOK_URL` + OAuth client). Confirm that in the seed summary, then open the seeded workflow.
+6. For CI/CD: Install creates an AO webhook service account, authorizes it on lightwell-ci-cd, publishes the workflow, and writes Gitea Actions secrets (AO_WEBHOOK_URL + OAuth client). Confirm that in the seed summary, then open the seeded workflow.
 7. Open the seeded workflow you want to show.
 
 <aside class="info-callout" role="note">
@@ -37,9 +37,11 @@ Still simple — shared lab services (and cloud VMs only when a demo needs them)
 | Demo | Directions | Needs |
 |------|------------|-------|
 | Task Step Example | Open **Task Step Example** in AO — question is pre-filled; press Run | LiteMaaS wired (RHDP boot + Install) |
-| Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | `aws-rhel9` + Mattermost |
-| Multi-OS Cloud Patching | [Multi-OS Cloud Patching](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/multi-os-cloud-patching/) | Full cloud stack + existing **Cloud \| AWS \|*** JTs |
-| CI/CD Pipeline | [CI/CD Pipeline](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/cicd-pipeline/) | [Gitea](./gitea.md) (`inventory-service`) + OpenFlake + `AO_WEBHOOK_URL`. Re-run helper: **CI/CD Demo - Reset Change Request** (default `CHG0034907`, delete+recreate). Install rewrites close/rollback ServiceNow notes to trigger-based text so an empty AI structured output cannot block the AAP step (no Controller job = expression failed before launch). Seed also forces agentic note nodes to `tool_selections: []` + `response_schema.required` (LiteMaaS/qwen otherwise often returns `finish_reason: tool_calls` with empty `result.content` while the node still shows completed). |
+| Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | aws-rhel9 + Mattermost |
+| Multi-OS Cloud Patching | [Multi-OS Cloud Patching](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/multi-os-cloud-patching/) | Full cloud stack + existing Cloud AWS patch/snapshot JTs |
+| CI/CD Pipeline | [CI/CD Pipeline](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/cicd-pipeline/) | [Gitea](./gitea.md) (inventory-service) + OpenFlake + AO_WEBHOOK_URL. Re-run helper: **CI/CD Demo - Reset Change Request** (default CHG0034907). |
+
+Install rewrites CI/CD close/rollback ServiceNow notes to trigger-based text so an empty AI structured output cannot block the AAP step (no Controller job = expression failed before launch). Seed also forces agentic note nodes to empty tool selections plus `response_schema.required` (LiteMaaS/qwen otherwise often returns `finish_reason: tool_calls` with empty `result.content` while the node still shows completed).
 
 ### Task Step Example — LiteMaaS smoke test
 
@@ -62,9 +64,9 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
 
 | Template | When to use it | Playbook |
 |----------|----------------|----------|
-| **Infrastructure ǀ Automation Orchestrator ǀ Install** | Path 1 — stands up AO, wires AAP, seeds demos from [`demos.yml`](../ao/demos.yml). | [`install.yml`](../ao/install.yml) |
-| **Infrastructure ǀ AO Network Configuration ǀ Install** | Rare re-run of allow-listing. **Skip on RHDP.** | [`network-access.yml`](../ao/network-access.yml) |
-| **Infrastructure ǀ Automation Orchestrator ǀ Uninstall** | Tear down AO when the lab session is done. Waits until the `automation-orchestrator` namespace is gone so Install can be re-run cleanly. | [`uninstall.yml`](../ao/uninstall.yml) |
+| **Infrastructure Automation Orchestrator Install** | Path 1 — stands up AO, wires AAP, seeds demos from [demos.yml](../ao/demos.yml). | [install.yml](../ao/install.yml) |
+| **Infrastructure AO Network Configuration Install** | Rare re-run of allow-listing. **Skip on RHDP.** | [network-access.yml](../ao/network-access.yml) |
+| **Infrastructure Automation Orchestrator Uninstall** | Tear down AO when the lab session is done. Waits until the automation-orchestrator namespace is gone so Install can be re-run cleanly. | [uninstall.yml](../ao/uninstall.yml) |
 
 ## Configure credentials
 
@@ -73,9 +75,9 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
 | OpenShift Credential | OpenShift or Kubernetes API Bearer Token | Pre-configured |
 | AAP Credential | Red Hat Ansible Automation Platform | Pre-configured |
 | LiteMaaS | Custom (API base URL + virtual key + model) | Pre-configured at catalog boot; Install wires it into AO |
-| Mattermost | Custom (server + webhook id) | Path 2 — **Deploy Shared Services** (or Provision Mattermost alone) |
-| OpenFlake | Custom (instance URL + admin) | Path 2 — **Deploy Shared Services** (or OpenFlake alone) |
-| Gitea | Custom (host/port/token/owner/repo) | Path 2 — **Deploy Shared Services** (or Provision Gitea alone) |
+| Mattermost | Custom (server + webhook id) | Path 2 — Deploy Shared Services (or Provision Mattermost alone) |
+| OpenFlake | Custom (instance URL + admin) | Path 2 — Deploy Shared Services (or OpenFlake alone) |
+| Gitea | Custom (host/port/token/owner/repo) | Path 2 — Deploy Shared Services (or Provision Gitea alone) |
 
 ## Under the hood
 

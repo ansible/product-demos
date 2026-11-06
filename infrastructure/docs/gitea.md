@@ -54,7 +54,7 @@ Default admin login is `apdadmin` / `Ansible123!` (same as Mattermost; username 
 ## Talking points
 
 - Gitea runs as a Podman container with SQLite on a dedicated RHEL 9 EC2 host; Actions enabled
-- Companion `gitea-runner` (`act_runner`) uses the host Podman socket and registers with the live Admin registration token (not a homegrown secret)
+- Companion `gitea-runner` (`act_runner`) mounts the host Podman socket at the same path (`/run/podman/podman.sock`), sets `DOCKER_HOST` + `config.yaml` `docker_host`, and runs privileged so job containers can start; registers with the live Admin registration token (not a homegrown secret)
 - Ports **3000**, **80**, and **8080** are opened on `aws-test-sg` (Gitea UI + demo app ports used by CI/CD Setup Demo Host)
 - Connection details are also written to `/etc/apd-gitea.env` on the host
 - Sync **AWS Inventory** afterward if you need `aws_gitea` as a managed host in Controller

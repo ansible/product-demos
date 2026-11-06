@@ -197,6 +197,42 @@
     path: /var/lib/gitea-runner/.runner
     state: absent
 
+# act (inside act_runner) bind-mounts docker_host from the *host* path. If we
+# only expose the socket as /var/run/docker.sock inside the runner, job
+# containers fail looking for that path on the host. Keep the real Podman
+# socket path on both sides and point config/DOCKER_HOST at it.
+- name: Assert host Podman API socket exists
+  ansible.builtin.stat:
+    path: /run/podman/podman.sock
+  register: gitea_podman_sock
+
+- name: Fail when Podman API socket is missing
+  ansible.builtin.assert:
+    that:
+      - gitea_podman_sock.stat.exists | default(false)
+      - gitea_podman_sock.stat.issock | default(false)
+    fail_msg: >-
+      /run/podman/podman.sock is missing after enabling podman.socket.
+      act_runner cannot launch job containers without the host Podman API.
+
+- name: Write act_runner config for host Podman socket
+  ansible.builtin.copy:
+    dest: /var/lib/gitea-runner/config.yaml
+    mode: "0644"
+    content: |
+      log:
+        level: info
+      runner:
+        capacity: 1
+        timeout: 3h
+      container:
+        # Same path inside the runner container (see volume mount below).
+        docker_host: "unix:///run/podman/podman.sock"
+        privileged: true
+        valid_volumes:
+          - /data/**
+          - /run/podman/**
+
 # Use the published ROOT_URL host so the runner reaches Gitea the same way
 # browsers/CI checkout do. node image is required for actions/checkout; the
 # workflow installs Python via apt (setup-python needs a hosted toolcache).
@@ -206,17 +242,24 @@
     image: docker.io/gitea/act_runner:latest
     state: started
     restart_policy: always
+    privileged: true
+    # Socket access under SELinux without :Z on the Podman sock mount.
+    security_opt:
+      - label=disable
     env:
       GITEA_INSTANCE_URL: "http://{{ gitea_public_ip }}:{{ gitea_http_port }}"
       GITEA_RUNNER_REGISTRATION_TOKEN: "{{ gitea_runner_registration_token }}"
       GITEA_RUNNER_NAME: apd-demo-runner
       GITEA_RUNNER_LABELS: "ubuntu-latest:docker://docker.io/library/node:20-bookworm"
+      CONFIG_FILE: /data/config.yaml
+      DOCKER_HOST: unix:///run/podman/podman.sock
     volumes:
       - /var/lib/gitea-runner:/data:Z
+      # Keep host path identical inside the container (see config.yaml).
       # Do not SELinux-relabel the Podman socket (:Z breaks sibling containers).
-      - /run/podman/podman.sock:/var/run/docker.sock
+      - /run/podman/podman.sock:/run/podman/podman.sock
 
-- name: Wait for act_runner to declare labels
+- name: Wait for act_runner daemon to stay healthy
   ansible.builtin.command:
     argv:
       - podman
@@ -226,22 +269,42 @@
   changed_when: false
   failed_when: false
   until: >-
-    'declare successfully' in (gitea_runner_logs.stdout | default(''))
-    or 'declare successfully' in (gitea_runner_logs.stderr | default(''))
+    (
+      (
+        'declare successfully' in ((gitea_runner_logs.stdout | default('')) ~ (gitea_runner_logs.stderr | default('')))
+      )
+      or (
+        'Runner registered successfully' in ((gitea_runner_logs.stdout | default('')) ~ (gitea_runner_logs.stderr | default('')))
+      )
+    )
+    and (
+      'docker_host config was invalid' not in ((gitea_runner_logs.stdout | default('')) ~ (gitea_runner_logs.stderr | default('')))
+    )
+    and (
+      'Docker Engine socket not found' not in ((gitea_runner_logs.stdout | default('')) ~ (gitea_runner_logs.stderr | default('')))
+    )
   retries: 30
   delay: 2
 
-- name: Fail when act_runner did not register
+- name: Capture act_runner log text for assert
+  ansible.builtin.set_fact:
+    gitea_runner_log_text: >-
+      {{
+        ((gitea_runner_logs.stdout | default('')) ~ (gitea_runner_logs.stderr | default('')))
+        | trim
+      }}
+
+- name: Fail when act_runner did not register cleanly
   ansible.builtin.assert:
     that:
       - >-
-        'declare successfully' in (gitea_runner_logs.stdout | default(''))
-        or 'declare successfully' in (gitea_runner_logs.stderr | default(''))
+        ('declare successfully' in gitea_runner_log_text)
+        or ('Runner registered successfully' in gitea_runner_log_text)
+      - "'docker_host config was invalid' not in gitea_runner_log_text"
+      - "'Docker Engine socket not found' not in gitea_runner_log_text"
     fail_msg: >-
-      gitea-runner did not register with Gitea Actions.
-      Last logs: {{ (gitea_runner_logs.stdout ~ gitea_runner_logs.stderr) | trim | truncate(500) }}
-
-- name: Persist CI/CD token facts for Controller publish
+      gitea-runner did not stay registered with Gitea Actions (Podman socket /
+      docker_host). Last logs: {{ gitea_runner_log_text | truncate(500) }}- name: Persist CI/CD token facts for Controller publish
   ansible.builtin.set_fact:
     gitea_credential_host: "{{ gitea_public_ip }}"
     gitea_credential_port: "{{ gitea_http_port }}"
