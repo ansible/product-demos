@@ -43,9 +43,11 @@
       - "{{ ao_instance }}-background-worker"
 
     # Demo-friendly session: refresh cookie is the hard logout boundary
-    # (default 8h). Access JWT stays short; the UI refreshes it from the cookie.
-    ao_session_refresh_hours: "{{ ao_session_refresh_hours | default(48) }}"
-    ao_session_access_minutes: "{{ ao_session_access_minutes | default(60) }}"
+    # (upstream default 8h). Access JWT stays short; the UI refreshes it.
+    # Plain ints — do not self-template (ao_x: "{{ ao_x | default(...) }}"
+    # recurses). Override with -e ao_session_refresh_hours=N if needed.
+    ao_session_refresh_hours: 48
+    ao_session_access_minutes: 60
 
     ao_env_all:
       - name: APP_INTEGRATION_URL_ALLOWED_HOSTS
