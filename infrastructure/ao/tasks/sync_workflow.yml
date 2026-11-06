@@ -267,9 +267,6 @@
             )
             else {}
           )
-        # Task Step Example works with qwen when schema has required[] and
-        # empty tool_selections. Upstream cicd note agents omit those and
-        # often finish with tool_calls + empty result.content.
         | combine(
             {
               'tool_selections': [],
