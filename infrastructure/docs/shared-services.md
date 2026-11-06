@@ -59,7 +59,7 @@ Owner and environment are fixed in workflow extra vars (`apd` / `Prod`) so labs 
 - Mattermost opens TCP **8065**; Gitea opens TCP **3000** (UI) plus **80**/**8080** (CI/CD demo app) on `aws-test-sg`
 - Provision Gitea also seeds `inventory-service`, starts an Actions runner, installs inventory-service dev/prod runtimes on `aws_gitea`, and upserts the **Gitea** credential for AO CI/CD Pipeline
 - OpenFlake does not use the AWS VPC — it installs via Helm on the lab OpenShift cluster and upserts the **OpenFlake** credential
-- Portal auth is demo-grade (client-side AES-GCM unlock on a public S3 website). Object key is prefixed by the Gitea host so shared APD AWS accounts do not overwrite each other. Portal buckets (`apd-ss-portal-*`) are not deleted by cloud destroy workflows
+- Portal auth is demo-grade (client-side AES-GCM unlock). The printed URL is the **HTTPS** S3 object link — the HTTP website endpoint cannot unlock because browsers block `crypto.subtle` on non-HTTPS pages. Object key is prefixed by the Gitea host so shared APD AWS accounts do not overwrite each other. Portal buckets (`apd-ss-portal-*`) are not deleted by cloud destroy workflows
 - Kafka and other shared hosts can be added as parallel nodes later
 
 ## Related demos
