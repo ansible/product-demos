@@ -21,11 +21,9 @@ One-click workflow that stands up shared lab services — AWS networking plus Ma
 
 | Prompt | Variable | Default |
 |--------|----------|---------|
-| AWS Region | `create_vm_aws_region` | `us-east-2` |
-| Owner | `create_vm_aws_owner_tag` | `your_name` |
-| Environment | `create_vm_vm_environment` | `Prod` |
+| AWS Region | `create_vm_aws_region` | `us-east-2` (dropdown of APD-enabled regions) |
 
-OpenFlake runs with `openflake_operation: install` from the workflow extra vars (no separate survey question).
+Owner and environment are fixed in workflow extra vars (`apd` / `Prod`) so labs stay one-size-fits-all. OpenFlake runs with `openflake_operation: install` from the same extra vars (no survey question).
 
 ## Job templates
 
@@ -45,7 +43,7 @@ OpenFlake runs with `openflake_operation: install` from the workflow extra vars 
 
 ## Presenter walkthrough
 
-1. Launch **Infrastructure ǀ AWS - Deploy Shared Services** (region + owner + environment)
+1. Launch **Infrastructure AWS - Deploy Shared Services** (pick region only)
 2. OpenFlake starts immediately on OpenShift; Create VPC and Create Keypair run in parallel, then Mattermost and Gitea
 3. From the Mattermost job output, save the UI login (`apdadmin` / `Ansible123!`) and confirm the Controller credential was updated
 4. From the Gitea job output, save the URL and login (`apdadmin` / `Ansible123!`); confirm the **Gitea** credential was upserted

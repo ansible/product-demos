@@ -1230,6 +1230,9 @@ controller_workflows:
       create_vm_aws_securitygroup_name: aws-test-sg
       create_vm_aws_vpc_subnet_name: aws-test-subnet
       create_vm_vm_deployment: cloud_stack
+      # Fixed for APD labs — no survey for owner/env (one-size-fits-all).
+      create_vm_aws_owner_tag: apd
+      create_vm_vm_environment: Prod
       openflake_operation: install
     survey_enabled: true
     survey:
@@ -1238,7 +1241,8 @@ controller_workflows:
       spec:
         - question_name: AWS Region
           question_description: >-
-            AWS region for VPC, keypair, Mattermost, and Gitea.
+            Region for VPC, keypair, Mattermost, and Gitea. Choices match
+            regions enabled on the APD AWS account.
           type: multiplechoice
           variable: create_vm_aws_region
           required: true
@@ -1248,23 +1252,19 @@ controller_workflows:
             - us-east-2
             - us-west-1
             - us-west-2
-        - question_name: Owner
-          question_description: >-
-            EC2 owner tag on networking and service hosts. Use your name or
-            team for cost attribution.
-          type: text
-          variable: create_vm_aws_owner_tag
-          required: true
-          default: your_name
-        - question_name: Environment
-          type: multiplechoice
-          variable: create_vm_vm_environment
-          required: true
-          default: Prod
-          choices:
-            - Dev
-            - QA
-            - Prod
+            - ap-south-1
+            - ap-northeast-1
+            - ap-northeast-2
+            - ap-northeast-3
+            - ap-southeast-1
+            - ap-southeast-2
+            - ca-central-1
+            - eu-central-1
+            - eu-west-1
+            - eu-west-2
+            - eu-west-3
+            - eu-north-1
+            - sa-east-1
     simplified_workflow_nodes:
       # OpenFlake is OpenShift-only — start it immediately alongside AWS networking.
       - identifier: Provision OpenFlake
