@@ -16,6 +16,11 @@
         persistence:
           size: '{{ _openflake_postgres_storage_size }}'
       backend:
+        # Demo-friendly UI session (upstream default is 60m). Matches AO's
+        # 48h refresh window so presenters are not kicked mid-lab.
+        extraEnv:
+          - name: ACCESS_TOKEN_EXPIRE_MINUTES
+            value: '{{ openflake_access_token_expire_minutes | default("2880") }}'
         attachments:
           persistence:
             size: '{{ _openflake_attachments_storage_size }}'

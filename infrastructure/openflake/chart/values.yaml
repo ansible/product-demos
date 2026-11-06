@@ -86,6 +86,8 @@ backend:
   tolerations: []
   affinity: {}
   # -- Extra environment variables, e.g. [{name: FOO, value: bar}].
+  # APD Install sets ACCESS_TOKEN_EXPIRE_MINUTES=2880 (48h) for demos;
+  # upstream OpenFlake default without that env is 60 minutes.
   extraEnv: []
 
   attachments:

@@ -108,6 +108,7 @@ Everything the survey does not expose is settable in extra_vars.
 | `openflake_postgres_storage_size` | `10Gi` | Postgres volume |
 | `openflake_attachments_storage_size` | `5Gi` | Attachments volume |
 | `openflake_wait_timeout` | `10m` | Helm wait timeout |
+| `openflake_access_token_expire_minutes` | `2880` (48h) | UI JWT lifetime (`ACCESS_TOKEN_EXPIRE_MINUTES`); upstream default without this is 60m |
 | `openflake_verify` | `true` | Wait for Postgres, backend and frontend to report ready |
 | `openflake_validate_certs` | *(from the credential's `K8S_AUTH_VERIFY_SSL`)* | Verify the cluster API certificate when helm connects |
 | `openflake_ca_cert` | *(from the credential's `K8S_AUTH_SSL_CA_CERT`)* | Cluster CA for helm — a file path, or an inline PEM the playbook spills to a temp file |
