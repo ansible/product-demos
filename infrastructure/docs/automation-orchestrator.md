@@ -38,6 +38,7 @@ Still simple — short cloud/chat setup, then Install, so curated content can hi
 | Task Step Example | Open **Task Step Example** in AO — question is pre-filled; press Run | LiteMaaS wired (RHDP boot + Install) |
 | Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | `aws-rhel9` + Mattermost |
 | Multi-OS Cloud Patching | [Multi-OS Cloud Patching](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/multi-os-cloud-patching/) | Full cloud stack + existing **Cloud \| AWS \|*** JTs |
+| Zero-Day Response | [Zero-Day Response](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/zero-day-response/) | Its own six-instance AWS estate (no cloud stack, no Mattermost): **p2s-estate-provision**, update **AWS Inventory**, then **p2s-estate-configure** |
 
 ### Task Step Example — LiteMaaS smoke test
 
@@ -55,6 +56,10 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
   "aws_region": "<your region>"
 }
 ```
+
+### Zero-Day Response — two workflows
+
+Install seeds two workflows from two `demos.yml` entries: **Zero-Day Response - PHP2Shell: KNOW + CONTAIN** (`zero-day-response`, which also creates the `p2s-*` job templates) and **Zero-Day Response - PHP2Shell: FIX + PROVE** (`zero-day-response-fix`, which reuses them). Run KNOW + CONTAIN first. Both come from the `zero-day-response/` folder of [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos), so `ao_demos_ref` in [`demos.yml`](../ao/demos.yml) must point at a ref that contains it.
 
 ## The three AO templates
 
@@ -77,8 +82,8 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
 
 What **Install** does when it seeds curated demos:
 
-- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**) plus local workflows such as **Task Step Example**.
-- Creates the **AAP Orchestrator Demos** project and any demo-owned job templates (disk-utilization playbooks). Multi-OS reuses existing **Cloud | AWS |*** templates from cloud setup — seed only imports the workflow.
+- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**, **zero-day-response**, **zero-day-response-fix**) plus local workflows such as **Task Step Example**.
+- Creates the **AAP Orchestrator Demos** project and any demo-owned job templates (disk-utilization playbooks and the zero-day-response `p2s-*` templates). Multi-OS reuses existing **Cloud | AWS |*** templates from cloud setup — seed only imports the workflow.
 - Wires AO-native **AAP** and **LiteMaaS** (LLM Provider) integrations; allow-lists the LiteMaaS hostname for AO workers.
 - Rewrites each workflow’s AAP org/credential placeholders → APD, and fills `llm_model_id` on agentic nodes when LiteMaaS is wired, then imports into AO.
 - When present, attaches the **Mattermost** credential and **Product Demos EE** to **Notify Chatroom**.
