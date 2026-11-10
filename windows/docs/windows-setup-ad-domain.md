@@ -32,7 +32,7 @@ graph LR
 1. **Create Keypair + VPC** — Provisions AWS infrastructure
 2. **Create VMs** (parallel) — Deploys one domain controller and two domain computers
 3. **Inventory Sync + Test Connectivity** — Verifies all three VMs are reachable
-4. **Create Domain** — Promotes the DC to a domain controller
+4. **Create Domain** — Promotes the DC to a domain controller and updates the Kerberos and AD LDAP credentials with its connection info
 5. **Join Domain** — Joins the two computers to the new domain
 6. **Inventory Sync** (parallel) — Refreshes the AWS dynamic inventory and the AD LDAP inventory to pick up domain membership
 7. **Validation** (parallel) — Tests PowerShell and Kerberos authentication
@@ -42,8 +42,7 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 ## Prerequisites
 
 - AWS credential configured with Access and Secret key
-- SSH public key for AWS keypair creation
-- **APD Machine Credential** with Windows administrator credentials
+- **APD Machine Credential** with Windows administrator credentials and an SSH private key (Create Keypair derives the public key from it)
 - **AAP Credential** for Controller API callbacks during domain creation
 
 ## Survey prompts
@@ -51,7 +50,6 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 | Prompt | Variable | Type | Required |
 |--------|----------|------|----------|
 | AWS Region | `create_vm_aws_region` | multiplechoice | Yes |
-| Keypair Public Key | `aws_public_key` | textarea | Yes |
 | Owner | `create_vm_vm_owner` | text | Yes |
 | Environment | `create_vm_vm_environment` | multiplechoice | Yes |
 | Subnet | `create_vm_aws_vpc_subnet_name` | text | Yes |
@@ -68,7 +66,7 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 | Cloud ǀ AWS ǀ Create VM (Computer 2 - winthrop) | [`cloud/create_vm.yml`](../../cloud/create_vm.yml) | Deploys the winthrop Windows Server instance as domain computer |
 | AWS Inventory | `(inventory sync)` | Syncs the AWS dynamic inventory to import the new VMs |
 | WINDOWS ǀ Test Connectivity | [`windows/connect.yml`](../connect.yml) | Validates WinRM connectivity to all three Windows hosts |
-| WINDOWS ǀ AD ǀ Create Domain | [`windows/create_ad_domain.yml`](../create_ad_domain.yml) | Promotes dc01 to domain controller and creates the ANSIBLE.LOCAL domain |
+| WINDOWS ǀ AD ǀ Create Domain | [`windows/create_ad_domain.yml`](../create_ad_domain.yml) | Promotes dc01 to domain controller, creates the ANSIBLE.LOCAL domain, and updates the Kerberos and AD LDAP credentials with dc01's connection info |
 | WINDOWS ǀ AD ǀ Join Domain | [`windows/join_ad_domain.yml`](../join_ad_domain.yml) | Joins winston and winthrop to the Active Directory domain |
 | AWS Inventory (Post-Join) | `(inventory sync)` | Re-syncs the AWS dynamic inventory after domain join |
 | AD LDAP Inventory | `(inventory sync)` | Syncs the AD LDAP inventory via `microsoft.ad.ldap` to discover domain-joined hosts |
@@ -108,6 +106,7 @@ On any failure, the **Cleanup Resources** rollback node runs automatically.
 
 | Demo | Description |
 |------|-------------|
+| 💥 [Destroy Active Directory Domain](./windows-destroy-ad-domain.md) | Tear down everything this workflow creates |
 | 🪟 [AD — New User](./windows-ad-new-user.md) | Create users in the domain built by this workflow for a helpdesk self-service demo |
 | 🪟 [Patching](./windows-patching.md) | Patch the domain-joined Windows hosts to show day-2 operations |
 | 🚀 [Deploy Cloud Stack in AWS](../../cloud/docs/deploy-cloud-stack.md) | The general-purpose infrastructure provisioning workflow for mixed OS environments |
