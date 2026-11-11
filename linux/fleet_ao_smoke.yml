@@ -1,0 +1,27 @@
+---
+# A bounded, visible state change for the aap-demo Fleet/AO integration.
+# The transient unit is collected by systemd after its five-minute sleep.
+- name: Start a short-lived Fleet AO demo service
+  hosts: "{{ _hosts | default('all') }}"
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Check whether the transient demo service is already active
+      ansible.builtin.command:
+        cmd: systemctl is-active --quiet aap-demo-fleet-smoke.service
+      register: fleet_ao_service_state
+      changed_when: false
+      failed_when: false
+
+    - name: Run the temporary Fleet AO demo service
+      ansible.builtin.command:
+        cmd: >-
+          systemd-run --collect --unit=aap-demo-fleet-smoke /usr/bin/sleep 300
+      when: fleet_ao_service_state.rc != 0
+      changed_when: true
+
+    - name: Verify transient Fleet AO demo service is active
+      ansible.builtin.command:
+        cmd: systemctl is-active --quiet aap-demo-fleet-smoke.service
+      changed_when: false

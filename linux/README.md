@@ -32,6 +32,7 @@ This category of demos shows examples of linux operations and management with An
 | [**Start Service**](docs/linux-start-service.md) | Start a named service on a target system. |
 | [**Stop Service**](docs/linux-stop-service.md) | Stop a named service on a target system. |
 | [**Run Shell Script**](docs/linux-run-shell-script.md) | Execute a shell script or command across a group of systems as root, with RBAC-controlled access. |
+| [**Fleet AO Smoke Service**](docs/linux-fleet-ao-smoke.md) | Start and verify the bounded transient service used by the Fleet Automation Orchestrator integration. |
 | [**Add SSH Public Key**](docs/linux-install-ssh-key.md) | Add an SSH public key to a Linux user's authorized_keys file on one or more hosts. |
 | [**Fact Scan**](docs/linux-fact-scan.md) | Run a fact, package, and service scan against a system and store results in the AAP fact cache. |
 | [**Podman Webserver**](docs/linux-podman-webserver.md) | Install and run an Apache webserver in a Podman container with a configurable home page message. |
