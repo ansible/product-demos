@@ -21,7 +21,7 @@ Still simple — shared lab services (and cloud VMs only when a demo needs them)
 
 1. Ensure **APD Multi-demo setup** (or Single demo setup with cloud + infrastructure) created the Cloud AWS patch/snapshot job templates and the OpenFlake / Gitea / Mattermost credential types.
 2. Launch **Infrastructure AWS - Deploy Shared Services** ([details](./shared-services.md)). One workflow: VPC + keypair, then Mattermost + Gitea in parallel, plus OpenFlake on OpenShift; when all three succeed it publishes a password-gated S3 credentials portal for this lab. That covers chat (disk-utilization), SCM/Actions (inventory-service + act_runner), and ITSM (OpenFlake) credentials — you do not need separate Provision Mattermost / Provision Gitea / OpenFlake jobs unless you prefer to run them alone. Copy the portal URL and password (`Ansible123!`) from the **Shared Services Portal** nested job.
-3. Only if you need disk-utilization or Multi-OS Cloud Patching hosts: also run **Deploy Cloud Stack in AWS** (aws-rhel9, Windows, reports, and so on). Skip for CI/CD Pipeline or Task Step Example alone.
+3. Only if you need disk-utilization or Multi-OS Cloud Patching hosts: also run **Deploy Cloud Stack in AWS** (aws-rhel9, Windows, reports, and so on). Skip for CI/CD Pipeline, Zero-Day Response, or Task Step Example alone.
 4. Launch **Infrastructure Automation Orchestrator Install**. Soft-failed / retried tasks in the middle are normal on a cold cluster; the job should still finish green (often about 10 minutes). Soft warnings for missing optional deps do not fail Install.
 5. Use the **seed summary** at the end of Install for AO URL / admin password (and Mattermost / OpenFlake / Gitea login details when Shared Services ran).
 6. For CI/CD: Install creates an AO webhook service account, authorizes it on lightwell-ci-cd, publishes the workflow, and writes Gitea Actions secrets (AO_WEBHOOK_URL + OAuth client). Confirm that in the seed summary, then open the seeded workflow.
@@ -40,6 +40,7 @@ Still simple — shared lab services (and cloud VMs only when a demo needs them)
 | Disk utilization | [Disk Utilization & Remediation](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/disk-utilization/) | aws-rhel9 + Mattermost |
 | Multi-OS Cloud Patching | [Multi-OS Cloud Patching](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/multi-os-cloud-patching/) | Full cloud stack + existing Cloud AWS patch/snapshot JTs |
 | CI/CD Pipeline | [CI/CD Pipeline](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/cicd-pipeline/) | [Gitea](./gitea.md) (inventory-service) + OpenFlake + AO_WEBHOOK_URL. Re-run helper: **CI/CD Demo - Reset Change Request** (default CHG0034907). |
+| Zero-Day Response | [Zero-Day Response](https://ansible-tmm.github.io/aap-orchestrator-demos/demos/zero-day-response/) | Its own six-instance AWS estate (no cloud stack, no Mattermost): **p2s-estate-provision**, update **AWS Inventory**, then **p2s-estate-configure** |
 
 Install rewrites CI/CD close/rollback ServiceNow notes to trigger-based text so an empty AI structured output cannot block the AAP step (no Controller job = expression failed before launch). Seed also forces agentic note nodes to empty tool selections plus `response_schema.required` (LiteMaaS/qwen otherwise often returns `finish_reason: tool_calls` with empty `result.content` while the node still shows completed).
 
@@ -59,6 +60,10 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
   "aws_region": "<your region>"
 }
 ```
+
+### Zero-Day Response — two workflows
+
+Install seeds two workflows from two `demos.yml` entries: **Zero-Day Response - PHP2Shell: KNOW + CONTAIN** (`zero-day-response`, which also creates the `p2s-*` job templates) and **Zero-Day Response - PHP2Shell: FIX + PROVE** (`zero-day-response-fix`, which reuses them). Run KNOW + CONTAIN first. Both come from the `zero-day-response/` folder of [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos), so `ao_demos_ref` in [`demos.yml`](../ao/demos.yml) must point at a ref that contains it.
 
 ## The three AO templates
 
@@ -83,8 +88,8 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
 
 What **Install** does when it seeds curated demos:
 
-- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**, **cicd-pipeline**) plus local workflows such as **Task Step Example**.
-- Creates the **AAP Orchestrator Demos** project and any demo-owned job templates (disk-utilization / CI/CD playbooks). Multi-OS reuses existing **Cloud | AWS |*** templates from cloud setup — seed only imports the workflow.
+- Reads [`demos.yml`](../ao/demos.yml) and seeds entries with `enabled: true` from [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos) (**disk-utilization**, **multi-os-cloud-patching**, **cicd-pipeline**, **zero-day-response**, **zero-day-response-fix**) plus local workflows such as **Task Step Example**.
+- Creates the **AAP Orchestrator Demos** project and any demo-owned job templates (disk-utilization / CI/CD playbooks and the zero-day-response `p2s-*` templates). Multi-OS reuses existing **Cloud | AWS |*** templates from cloud setup — seed only imports the workflow.
 - Wires AO-native **AAP** and **LiteMaaS** (LLM Provider) integrations; allow-lists the LiteMaaS hostname for AO workers.
 - Rewrites each workflow’s AAP org/credential placeholders → APD, and fills `llm_model_id` on agentic nodes when LiteMaaS is wired, then imports into AO.
 - When present, attaches the **Mattermost** credential and **Product Demos EE** to **Notify Chatroom**.
