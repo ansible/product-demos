@@ -172,3 +172,64 @@ ao_demos:
         credentials:
           - machine
         limit: aws_gitea
+
+  # Zero-Day Response (PHP2Shell) — KNOW+CONTAIN owns p2s-* JTs; FIX+PROVE reuses them.
+  # Upstream content: ansible-tmm/aap-orchestrator-demos zero-day-response/
+  - slug: zero-day-response
+    enabled: true
+    workflow: zero-day-response/ao/flow-a-know-contain.json
+    requires_cloud_stack: false
+    requires_mattermost: false
+    job_templates:
+      - name: p2s-estate-configure
+        playbook: zero-day-response/playbooks/estate_configure.yml
+        credentials:
+          - machine
+      - name: p2s-estate-provision
+        playbook: zero-day-response/playbooks/infra_provision_aws.yml
+        credentials:
+          - aws
+          - machine
+      - name: p2s-independent-check
+        playbook: zero-day-response/playbooks/p2s_independent_check.yml
+        credentials:
+          - machine
+      - name: p2s-know-scan
+        playbook: zero-day-response/playbooks/p2s_scan.yml
+        credentials:
+          - machine
+      - name: p2s-know-lookback
+        playbook: zero-day-response/playbooks/p2s_lookback.yml
+        credentials:
+          - machine
+      - name: p2s-ai-output-check
+        playbook: zero-day-response/playbooks/p2s_ai_check.yml
+        credentials: []
+      - name: p2s-contain-spec-check
+        playbook: zero-day-response/playbooks/p2s_spec_check.yml
+        credentials: []
+      - name: p2s-contain-controls
+        playbook: zero-day-response/playbooks/p2s_controls.yml
+        credentials:
+          - machine
+      - name: p2s-fix-availability
+        playbook: zero-day-response/playbooks/p2s_fix_availability.yml
+        credentials: []
+      - name: p2s-fix-patch
+        playbook: zero-day-response/playbooks/p2s_patch.yml
+        credentials:
+          - machine
+      - name: p2s-fix-standdown
+        playbook: zero-day-response/playbooks/p2s_standdown.yml
+        credentials:
+          - machine
+      - name: p2s-prove-case-record
+        playbook: zero-day-response/playbooks/p2s_case_record.yml
+        credentials: []
+
+  - slug: zero-day-response-fix
+    enabled: true
+    workflow: zero-day-response/ao/flow-b-fix-prove.json
+    requires_cloud_stack: false
+    requires_mattermost: false
+    job_templates: []
