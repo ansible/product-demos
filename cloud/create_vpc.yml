@@ -59,12 +59,17 @@
           purpose: "{{ aws_purpose_tag }}"
       register: aws_gateway
 
+    # purge_rules defaults to true; keep false so Deploy Cloud Stack and Deploy
+    # Shared Services can run in either order. Mattermost (8065), Gitea (3000/80/8080),
+    # and Kafka (9095) add ports with purge_rules: false — a second Create VPC must
+    # not strip those rules from the shared aws-test-sg.
     - name: Create security group internal
       amazon.aws.ec2_security_group:
         state: present
         name: "{{ aws_sg_name }}"
         region: "{{ create_vm_aws_region }}"
         description: Inbound WinRM and RDP, http for demo servers and internal AD ports
+        purge_rules: false
         rules:
           - proto: tcp
             ports:
