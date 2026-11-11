@@ -1,0 +1,54 @@
+---
+- name: restart vm using api
+  ansible.builtin.uri:
+    url: "{{ kubevirt_vm_endpoint_url }}/{{ vm_operation }}"
+    method: PUT
+    body: "{}"
+    body_format: json
+    headers:
+      Authorization: Bearer {{ api_key }}
+      Content-Type: application/json
+    validate_certs: "{{ lookup('env', 'K8S_AUTH_VERIFY_SSL') | bool }}"
+    status_code: [200, 201, 202, 409]
+  register: restart_result
+  changed_when: restart_result.status in [200, 201, 202]
+  loop: "{{ ansible_play_hosts }}"
+  loop_control:
+    loop_var: vm
+  when:
+    - nodes is defined
+    - hostvars[vm].labels['vm.kubevirt.io/name'] is defined
+    - (nodes | json_query(query)) | length > 0
+  vars:
+    _vm_name: "{{ hostvars[vm].labels['vm.kubevirt.io/name'] }}"
+    query: "@[?name==`{{ _vm_name }}`]"
+    kubevirt_vm_endpoint_url: >-
+      {{ k8s_host }}/apis/subresources.kubevirt.io/v1alpha3/namespaces/{{ kubevirt_boot_winpe_target_namespace }}/virtualmachines/{{ _vm_name }}
+    vm_operation: restart
+    k8s_host: "{{ lookup('env', 'K8S_AUTH_HOST') }}"
+
+- name: wait for vm status to be running
+  kubernetes.core.k8s_info:
+    api_version: "{{ kubevirt_boot_winpe_api_version_virtual_machine }}"
+    kind: VirtualMachine
+    name: "{{ hostvars[vm].labels['vm.kubevirt.io/name'] }}"
+    namespace: "{{ kubevirt_boot_winpe_target_namespace }}"
+    verify_ssl: false
+    api_key: "{{ api_key }}"
+  register: vm_info
+  until:
+    - (vm_info.resources | default([])) | length > 0
+    - vm_info.resources[0].status.printableStatus is defined
+    - vm_info.resources[0].status.printableStatus == 'Running'
+  delay: 5
+  retries: 30
+  failed_when: false
+  loop: "{{ ansible_play_hosts }}"
+  loop_control:
+    loop_var: vm
+  when:
+    - nodes is defined
+    - hostvars[vm].labels['vm.kubevirt.io/name'] is defined
+    - (nodes | json_query(query)) | length > 0
+  vars:
+    query: "@[?name==`{{ hostvars[vm].labels['vm.kubevirt.io/name'] }}`]"

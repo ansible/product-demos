@@ -1,0 +1,29 @@
+apiVersion: {{ api_version_dv }}
+kind: DataVolume
+metadata:
+  name: {{ iso_pvc_name }}
+  namespace: {{ target_namespace }}
+{% if owner_uid is defined and owner_uid is not none %}
+  ownerReferences:
+    - apiVersion: "{{ api_version_virtual_machine }}"
+      kind: VirtualMachine
+      name: {{ template.name }}
+      uid: {{ owner_uid }}
+      controller: true
+      blockOwnerDeletion: true
+{% endif %}
+  annotations:
+    cdi.kubevirt.io/storage.bind.immediate.requested: 'true'
+spec:
+  storage:
+    accessModes:
+      - ReadWriteOnce
+#      - ReadOnlyMany
+#    dataSource: null
+    resources:
+      requests:
+        storage: 20Mi
+    storageClassName: {{ pvc_storage_class }}
+    volumeMode: Filesystem
+  source:
+    upload: {}

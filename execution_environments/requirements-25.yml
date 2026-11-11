@@ -45,13 +45,17 @@ collections:
     version: ">=4.0.0"
   # network demos
   - name: ansible.netcommon
-    version: ">=6.0.0"
+    version: "8.7.1"
   - name: cisco.ios
-    version: ">=7.0.0"
+    version: "11.6.0"
   - name: cisco.iosxr
     version: ">=8.0.0"
   - name: cisco.nxos
-    version: ">=7.0.0"
+    version: "13.0.0"
+  - name: arista.eos
+    version: "12.3.0"
+  - name: juniper.device
+    version: "2.0.1"
   - name: network.backup
     version: ">=3.0.0"
   - name: paloaltonetworks.panos

@@ -1,0 +1,21 @@
+---
+
+- name: expand disk job
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'resize-job.yml') | from_yaml }}"
+    validate_certs: no
+    api_key: "{{ api_key }}"
+
+- name: wait for job to finish
+  k8s_info:
+    api_version: batch/v1
+    kind: Job
+    name: '{{ template.name }}-expand'
+    namespace: '{{ target_namespace }}'
+    validate_certs: no
+    api_key: "{{ api_key }}"
+  register: job_info
+  until: (job_info.resources[0].status.succeeded | default(0) | int) == 1
+  retries: 120
+  delay: 5

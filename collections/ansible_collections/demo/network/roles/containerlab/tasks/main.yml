@@ -1,4 +1,9 @@
 ---
+- name: Require the connected Product Demos topology
+  ansible.builtin.assert:
+    that: clab_topology == 'product_demos'
+    fail_msg: The network demos now use one connected product_demos topology. Rerun Network setup to refresh the surveys.
+
 - name: Set containerlab files path
   ansible.builtin.set_fact:
     clab_files_path: "{{ role_path }}/files/clab/"

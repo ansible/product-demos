@@ -1,0 +1,29 @@
+---
+
+- block:
+    - name: remove iso (dv)
+      kubernetes.core.k8s:
+        state: absent
+        definition: "{{ lookup('template', 'iso-dv.yml') | from_yaml }}"
+        validate_certs: no
+        api_key: "{{ api_key }}"
+      when: not kubevirt_use_configmap|bool
+
+    - include_tasks: remove_pvc.yml
+      when: not kubevirt_use_configmap|bool
+      vars:
+        target_pvc_name: '{{ iso_pvc_name }}'
+
+    - name: remove configmap
+      kubernetes.core.k8s:
+        state: absent
+        api_version: v1
+        kind: ConfigMap
+        name: '{{ template.name }}-configmap'
+        namespace: '{{ target_namespace }}'
+        validate_certs: no
+        api_key: "{{ api_key }}"
+      when: kubevirt_use_configmap|bool
+  when:
+    - vm_os_type == 'windows'
+    - template.sysprep is undefined or (template.sysprep is defined and template.sysprep|bool)

@@ -7,7 +7,23 @@
   vars:
     ao_namespace: automation-orchestrator
     ao_instance: automation-orchestrator
-    ao_extra_hosts: []
+    # LiteMaaS hostname from Install JT env injectors (Controller LiteMaaS cred).
+    # RHDP api_endpoint is typically a full URL (https://…); the allow-list
+    # needs a bare hostname, same as CONTROLLER_HOST / AAP above.
+    ao_litemaas_hostname: >-
+      {{
+        (
+          lookup('env', 'LITELLM_API_ENDPOINT')
+          | default(lookup('env', 'LITELLM_API_BASE'), true)
+          | default(lookup('env', 'OPENAI_API_BASE'), true)
+          | default('', true)
+          | trim
+        )
+        | ansible.builtin.urlsplit('hostname')
+        | default('', true)
+      }}
+    ao_extra_hosts: >-
+      {{ [ao_litemaas_hostname] if (ao_litemaas_hostname | default('') | length) > 0 else [] }}
 
     # AAP gateway hostname, from the AAP credential on the job template.
     # CONTROLLER_HOST is a URL; the allow-list takes a bare hostname.
@@ -26,9 +42,20 @@
       - "{{ ao_instance }}-worker"
       - "{{ ao_instance }}-background-worker"
 
+    # Demo-friendly session: refresh cookie is the hard logout boundary
+    # (upstream default 8h). Access JWT stays short; the UI refreshes it.
+    # Plain ints — do not self-template (ao_x: "{{ ao_x | default(...) }}"
+    # recurses). Override with -e ao_session_refresh_hours=N if needed.
+    ao_session_refresh_hours: 48
+    ao_session_access_minutes: 60
+
     ao_env_all:
       - name: APP_INTEGRATION_URL_ALLOWED_HOSTS
         value: "{{ ao_allowed_hosts | to_json }}"
+      - name: APP_JWT_REFRESH_TOKEN_LIFETIME_HOURS
+        value: "{{ ao_session_refresh_hours | string }}"
+      - name: APP_JWT_ACCESS_TOKEN_LIFETIME_MINUTES
+        value: "{{ ao_session_access_minutes | string }}"
     ao_env_backend:
       - name: APP_OIDC_ALLOW_PRIVATE_NETWORKS
         value: "true"
@@ -103,6 +130,13 @@
     - name: Show the allow-list
       ansible.builtin.debug:
         var: ao_allowed_hosts
+
+    - name: Show demo session lifetime
+      ansible.builtin.debug:
+        msg: >-
+          AO browser sessions last {{ ao_session_refresh_hours }}h
+          (APP_JWT_REFRESH_TOKEN_LIFETIME_HOURS; access JWT
+          {{ ao_session_access_minutes }}m with auto-refresh).
 
     - name: Get admin password
       kubernetes.core.k8s_info:

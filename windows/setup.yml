@@ -55,6 +55,34 @@ controller_credential_types:
         ansible_user: !unsafe '{{ username }}'
         ansible_password: !unsafe '{{ password }}'
 
+  - name: Microsoft AD LDAP
+    description: >-
+      Credential for the microsoft.ad.ldap inventory plugin. Injects the
+      connection env vars documented at
+      https://docs.ansible.com/projects/ansible/latest/collections/microsoft/ad/ldap_inventory.html
+    kind: cloud
+    inputs:
+      fields:
+        - id: username
+          type: string
+          label: Username
+        - id: password
+          type: string
+          label: Password
+          secret: true
+        - id: server
+          type: string
+          label: Domain Controller (LDAP Server)
+      required:
+        - username
+        - password
+        - server
+    injectors:
+      env:
+        MICROSOFT_AD_LDAP_USERNAME: !unsafe '{{ username }}'
+        MICROSOFT_AD_LDAP_PASSWORD: !unsafe '{{ password }}'
+        MICROSOFT_AD_LDAP_SERVER: !unsafe '{{ server }}'
+
 controller_credentials:
   - name: Kerberos Credential
     credential_type: Kerberos
@@ -66,6 +94,39 @@ controller_credentials:
       password: REPLACEME
       default_realm: ANSIBLE.LOCAL
       kdc: REPLACEME
+
+  - name: Microsoft AD LDAP Credential
+    credential_type: Microsoft AD LDAP
+    organization: Ansible Product Demos (APD)
+    update_secrets: false
+    state: exists
+    inputs:
+      username: ec2-user@ANSIBLE.LOCAL
+      password: REPLACEME
+      server: REPLACEME
+
+controller_inventories:
+  - name: Windows AD Inventory
+    organization: Ansible Product Demos (APD)
+    description: Hosts discovered from Active Directory via microsoft.ad.ldap
+    variables:
+      DISCLAIMER: RUN SETUP ACTIVE DIRECTORY DOMAIN BEFORE SYNCING
+
+# Disable AD inventory sync during setup; dependent on Setup Active Directory Domain workflow
+aap_configuration_dispatcher_exclude_roles: [controller_inventory_source_update]
+
+controller_inventory_sources:
+  - name: AD LDAP Inventory
+    inventory: Windows AD Inventory
+    source: scm
+    source_project: Ansible Product Demos
+    source_path: windows/inventory.microsoft.ad.ldap.yml
+    credential: Microsoft AD LDAP Credential
+    overwrite: true
+    update_on_launch: false
+    update_on_project_update: false
+    source_vars:
+      DISCLAIMER: RUN SETUP ACTIVE DIRECTORY DOMAIN BEFORE SYNCING
 
 controller_templates:
   - name: "WINDOWS | Install IIS"
@@ -276,7 +337,8 @@ controller_templates:
     project: "Ansible Product Demos"
     playbook: "windows/powershell.yml"
     limit: domain_ansible_local
-    ask_limit_on_launch: false
+    ask_inventory_on_launch: true
+    ask_limit_on_launch: true
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -367,6 +429,19 @@ controller_templates:
           type: text
           variable: _hosts
           required: false
+
+  - name: "WINDOWS | AD | Reset Configuration"
+    labels:
+      - windows
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "windows/reset_ad_configuration.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    credentials:
+      - AAP Credential
 
   - name: "WINDOWS | AD | Join Domain"
     labels:
@@ -494,10 +569,6 @@ controller_workflows:
             - us-east-2
             - us-west-1
             - us-west-2
-        - question_name: Keypair Public Key
-          type: textarea
-          variable: aws_public_key
-          required: true
         # Create VM variables
         - question_name: Owner
           type: text
@@ -594,12 +665,15 @@ controller_workflows:
         failure_nodes:
           - Cleanup Resources
         success_nodes:
-          - Domain Inventory Sync
-      - identifier: Domain Inventory Sync
+          - AWS Inventory Sync
+          - AD LDAP Inventory Sync
+      - identifier: AWS Inventory Sync
         unified_job_template: AWS Inventory
-        all_parents_must_converge: true
         success_nodes:
           - PowerShell Validation
+      - identifier: AD LDAP Inventory Sync
+        unified_job_template: AD LDAP Inventory
+        success_nodes:
           - Kerberos Validation
       - identifier: Cleanup Resources
         unified_job_template: WINDOWS | Rollback
@@ -615,6 +689,72 @@ controller_workflows:
           ps_script: "Get-ADComputer -Filter * | Select-Object -Property 'Name'"
       - identifier: Kerberos Validation
         unified_job_template: WINDOWS | Run PowerShell | Kerberos
+        inventory: Windows AD Inventory
+        limit: all
         job_type: run
         extra_data:
           ps_script: "Get-WinEvent -LogName Security | Where-Object {$_.Message -like '*Kerberos*'} | Select-Object TimeCreated, Message -First 1"
+
+  - name: Destroy Active Directory Domain
+    description: Tear down the AD domain VMs, VPC, and keypair created by Setup Active Directory Domain
+    labels:
+      - aws.ec2
+      - aws.vpc
+      - windows
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            AWS region where the AD domain stack was deployed.
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+    simplified_workflow_nodes:
+      - identifier: Delete Domain Controller
+        unified_job_template: Cloud | AWS | Delete VM
+        extra_data:
+          create_vm_vm_name: dc01
+        success_nodes:
+          - Update Inventory
+      - identifier: Delete Computer 1
+        unified_job_template: Cloud | AWS | Delete VM
+        extra_data:
+          create_vm_vm_name: winston
+        success_nodes:
+          - Update Inventory
+      - identifier: Delete Computer 2
+        unified_job_template: Cloud | AWS | Delete VM
+        extra_data:
+          create_vm_vm_name: winthrop
+        success_nodes:
+          - Update Inventory
+      - identifier: Reset AD Configuration
+        unified_job_template: WINDOWS | AD | Reset Configuration
+        job_type: run
+        success_nodes:
+          - Update Inventory
+      - identifier: Update Inventory
+        unified_job_template: AWS Inventory
+        all_parents_must_converge: true
+        success_nodes:
+          - Delete Keypair
+          - Delete VPC
+      - identifier: Delete Keypair
+        unified_job_template: Cloud | AWS | Delete Keypair
+        all_parents_must_converge: true
+      - identifier: Delete VPC
+        unified_job_template: Cloud | AWS | Delete VPC
+        all_parents_must_converge: true

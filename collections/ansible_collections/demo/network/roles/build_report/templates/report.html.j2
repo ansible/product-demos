@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APD Network Report</title>
+<style>
+:root{color-scheme:light;--ink:#192b3c;--muted:#526577;--line:#dce3ea;--red:#c9190b;--bg:#f3f6f9;--navy:#142639}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,sans-serif}
+header{background:var(--navy);color:#fff;padding:36px max(24px,calc((100vw - 1340px)/2));border-top:5px solid var(--red)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#b8c9d8}h1{font-size:36px;letter-spacing:-.04em;margin:6px 0 10px}header p{color:#c7d5e0;max-width:800px;margin:8px 0}header a{color:#fff}
+main{max-width:1390px;margin:auto;padding:24px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}.stat{background:white;border:1px solid var(--line);border-radius:8px;padding:18px 22px}.stat strong{display:block;font-size:30px;letter-spacing:-.04em}.stat span,.muted{color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:24px}.toolbar input{flex:1;min-width:240px}.toolbar input,.toolbar select{font:inherit;border:1px solid #9aabba;border-radius:5px;padding:11px;background:#fff;color:var(--ink)}.toolbar label{font-weight:600}.device{background:#fff;border:1px solid var(--line);border-radius:9px;margin-bottom:24px;overflow:hidden;scroll-margin-top:16px}
+.device-head{padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fbfcfe;border-bottom:1px solid var(--line)}h2{margin:0;font-size:25px;letter-spacing:-.02em}h3{font-size:17px;margin:0}h4{font-size:15px;margin:0 0 12px}.device-head p{margin:3px 0 0;color:var(--muted)}.badge{border-radius:4px;padding:4px 9px;white-space:nowrap;font-size:12px;font-weight:700;background:#e8eef4;color:#3e5266}.collected{background:#e3f3e8;color:#195b32}.partial,.failed{background:#fce8e6;color:#9f2018}.identity{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding:24px}.identity dt{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}.identity dd{margin:4px 0 0;overflow-wrap:anywhere}.identity dl{margin:0}.content{padding:0 24px 24px}.note{padding:12px 15px;border-left:3px solid #73a8d0;background:#eff6fc;margin:0 0 18px;color:#354e63}.errors{border-left-color:var(--red);background:#fff3f1}.errors ul{margin:6px 0;padding-left:20px}
+details{border:1px solid var(--line);border-radius:5px;margin-top:10px}summary{cursor:pointer;padding:14px 16px;font-weight:600}summary .badge{float:right;margin-left:8px}.section-body{padding:0 16px 16px}.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th{text-align:left;color:var(--muted);background:#f5f7fa;font-weight:600;white-space:nowrap}th,td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}td{overflow-wrap:anywhere}pre{font:12px/1.5 ui-monospace,monospace;margin:0;white-space:pre-wrap;max-height:330px;overflow:auto;min-width:80px}code{font:13px ui-monospace,monospace}.section-label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:24px 0 10px}.empty{color:var(--muted);padding:12px 0}footer{color:var(--muted);padding:8px 0 28px;font-size:13px}.hidden{display:none!important}button{font:inherit;background:white;border:1px solid #9aabba;border-radius:5px;padding:11px;cursor:pointer}
+@media(max-width:850px){.identity{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}main{padding:16px}h1{font-size:30px}.content{padding:0 16px 16px}}@media print{.toolbar{display:none}header{background:white;color:var(--ink);padding:16px}header p,.eyebrow{color:var(--muted)}.device{break-inside:avoid}.scroll{overflow:visible}}
+</style>
+</head>
+<body>
+<header>
+<div class="eyebrow">Ansible Product Demos / Network automation</div>
+<h1>One network. Multiple vendors.</h1>
+<p>Detailed device inventory, operational observations, and structured configuration gathered with Ansible.</p>
+<p>Generated {{ network_report.generated_at | e }} · <a href="report.json" download>Download report data</a></p>
+</header>
+<main>
+<div class="stats">
+<div class="stat"><strong>{{ network_report.devices | length }}</strong><span>Devices selected</span></div>
+<div class="stat"><strong>{{ network_report.vendor_count }}</strong><span>Vendors represented</span></div>
+<div class="stat"><strong>{{ network_report.complete_count }}</strong><span>Collected without errors</span></div>
+<div class="stat"><strong>{{ network_report.issue_count }}</strong><span>Devices with collection issues</span></div>
+</div>
+<div class="toolbar">
+<label for="search">Find a device</label><input id="search" type="search" placeholder="Hostname, platform, version, address…">
+<label for="vendor">Vendor</label><select id="vendor"><option value="">All vendors</option>{% for vendor in network_report.devices | map(attribute='vendor') | unique | sort %}<option>{{ vendor | e }}</option>{% endfor %}</select>
+<button id="expand" type="button">Expand all sections</button>
+</div>
+{% for device in network_report.devices %}
+<article class="device" data-vendor="{{ device.vendor | e }}" data-search="{{ (device.name ~ ' ' ~ device.hostname ~ ' ' ~ device.vendor ~ ' ' ~ device.os ~ ' ' ~ device.version ~ ' ' ~ device.address) | lower | e }}">
+<div class="device-head"><div><h2>{{ device.hostname | e }}</h2><p>{{ device.vendor | e }} {{ device.os | e }} · inventory: {{ device.name | e }}</p></div><span class="badge {{ device.status | e }}">{{ device.status | e }}</span></div>
+<div class="identity">
+{% for label, value in [('Version', device.version), ('Model', device.model), ('Serial number', device.serial), ('Management endpoint', device.address ~ ':' ~ device.port), ('Transport', device.transport), ('Facts module', device.facts_module), ('Memory total / free (MB)', device.memory_total_mb ~ ' / ' ~ device.memory_free_mb), ('Network OS plugin', device.network_os)] %}
+<dl><dt>{{ label | e }}</dt><dd>{{ value | e }}</dd></dl>
+{% endfor %}
+</div>
+<div class="content">
+{% if device.errors %}<div class="note errors"><strong>Collection issues</strong><ul>{% for error in device.errors %}<li>{{ error.section | e }}: {{ error.message | e }}</li>{% endfor %}</ul></div>{% endif %}
+<div class="section-label">Operational observations</div>
+<details open><summary>Live interface state <span class="badge">{{ device.interface_status | e }}</span></summary><div class="section-body">
+{% if device.interfaces %}<div class="scroll"><table><thead><tr>{% for title in ['Interface', 'Description', 'Operational', 'Admin', 'MTU', 'Speed / bandwidth', 'MAC', 'IPv4 observations'] %}<th>{{ title }}</th>{% endfor %}</tr></thead><tbody>
+{% for interface in device.interfaces %}<tr>{% for key in ['name', 'description', 'operational', 'admin', 'mtu', 'speed', 'mac', 'addresses'] %}<td><pre>{{ interface[key] | demo.network.network_report_cell | e }}</pre></td>{% endfor %}</tr>{% endfor %}
+</tbody></table></div>{% else %}<p class="empty">No live interface observations were collected.</p>{% endif %}
+</div></details>
+<details open><summary>Discovered neighbors <span class="badge">{{ device.neighbor_status | e }}</span></summary><div class="section-body">
+{% if device.neighbors %}<div class="scroll"><table><thead><tr><th>Local interface</th><th>Neighbor</th><th>Remote port</th><th>Source</th></tr></thead><tbody>{% for neighbor in device.neighbors %}<tr><td>{{ neighbor.local_interface | e }}</td><td>{{ neighbor.neighbor | e }}</td><td>{{ neighbor.remote_port | e }}</td><td>{{ neighbor.source | e }}</td></tr>{% endfor %}</tbody></table></div>{% elif device.neighbor_status == 'collected' %}<p class="empty">The device reported no discovered neighbors.</p>{% else %}<p class="empty">Neighbor discovery was not collected successfully.</p>{% endif %}
+</div></details>
+<div class="section-label">Structured configuration</div>
+<p class="note">These resource sections describe configuration at collection time. Configured protocol neighbors do not establish session health. Routing protocol operational state is not collected in this report.</p>
+{% for section in device.sections %}
+<details><summary>{{ section.title | e }} <span class="badge">{{ section.status | e }}</span></summary><div class="section-body">
+{% if section.rows %}<div class="scroll"><table><thead><tr>{% for column in section.columns %}<th>{{ column | replace('_', ' ') | title | e }}</th>{% endfor %}</tr></thead><tbody>{% for row in section.rows %}<tr>{% for column in section.columns %}<td><pre>{{ row.get(column, '—') | demo.network.network_report_cell | e }}</pre></td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+{% elif section.status == 'unsupported' %}<p class="empty">This resource is not supported by the selected platform's facts module.</p>
+{% elif section.status == 'not configured' %}<p class="empty">No explicit configuration was returned for this resource.</p>
+{% elif section.status == 'failed' %}<p class="empty">Collection failed. See the device's collection issues.</p>
+{% else %}<p class="empty">This resource was not collected in this run.</p>{% endif %}
+</div></details>
+{% endfor %}
+</div>
+</article>
+{% endfor %}
+<p id="no-matches" class="empty hidden">No devices match these filters.</p>
+<footer>APD Network Report · Configuration gathered through vendor network resource facts · Sensitive configuration fields redacted · All timestamps in UTC</footer>
+</main>
+<script>
+const search = document.getElementById('search');
+const vendor = document.getElementById('vendor');
+const devices = [...document.querySelectorAll('.device')];
+function filterDevices() {
+  const query = search.value.toLowerCase().trim();
+  for (const device of devices) device.classList.toggle('hidden', !(device.dataset.search.includes(query) && (!vendor.value || device.dataset.vendor === vendor.value)));
+  document.getElementById('no-matches').classList.toggle('hidden', devices.some(device => !device.classList.contains('hidden')));
+}
+search.addEventListener('input', filterDevices);
+vendor.addEventListener('change', filterDevices);
+document.getElementById('expand').addEventListener('click', event => {
+  const expand = event.target.textContent.startsWith('Expand');
+  document.querySelectorAll('.device:not(.hidden) details').forEach(detail => { detail.open = expand; });
+  event.target.textContent = expand ? 'Collapse all sections' : 'Expand all sections';
+});
+</script>
+</body>
+</html>

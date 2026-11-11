@@ -13,7 +13,7 @@ Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route eve
 | [**Config Drift Demo**](docs/config-drift.md) | Stage-by-stage setup, validation commands, and live demo script |
 | **LINUX ǀ Config Drift - Deploy Audit and Filebeat** | Deploy persistent auditd watch (Stage 1; Filebeat in Stage 2) |
 
-**Prerequisite:** [Deploy Cloud Stack in AWS](../cloud/docs/deploy-cloud-stack.md) for RHEL targets (`aws_rhel9`, etc.).
+**Prerequisite:** [Deploy Cloud Stack in AWS](../cloud/docs/deploy-cloud-stack.md) for RHEL targets (`aws-rhel9`, etc.).
 
 ### ROSA (Red Hat OpenShift Service on AWS)
 
@@ -41,13 +41,21 @@ Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route eve
 |--------------|-------------|
 | **Vault** | Install or remove HashiCorp Vault on an OpenShift cluster via the HashiCorp Helm chart (dev mode). Install seeds the KV v2 secrets engine and userpass auth with sample credentials. |
 
-### Mattermost
+### Shared services (Mattermost + Gitea + OpenFlake)
+
+#### Workflows
+
+| Workflow | Description |
+|----------|-------------|
+| [**Infrastructure ǀ AWS - Deploy Shared Services**](docs/shared-services.md) | One-click VPC + keypair, then Mattermost and Gitea in parallel, with OpenFlake on OpenShift from the start; ends with a password-gated S3 credentials portal (no cloud-stack VMs) |
 
 #### Jobs
 
 | Job Template | Description |
 |--------------|-------------|
 | [**Infrastructure ǀ AWS - Provision Mattermost**](docs/mattermost.md) | EC2 `aws_mattermost` + Podman Mattermost with bot token for AO and other chat demos |
+| [**Infrastructure ǀ AWS - Provision Gitea**](docs/gitea.md) | EC2 `aws_gitea` + Podman Gitea (SQLite); job output prints `apdadmin` / `Ansible123!` |
+| [**Infrastructure ǀ AWS - Shared Services Portal**](docs/shared-services.md) | S3 password-gated page with this lab’s Mattermost / Gitea / OpenFlake logins |
 
 ### OPA (Open Policy Agent)
 
@@ -57,6 +65,14 @@ Detect unauthorized changes to `/etc/ssh/sshd_config` via Linux audit, route eve
 |--------------|-------------|
 | **Infrastructure | OPA - Deploy Open Policy Agent on OpenShift** | Deploys a demo (non-production) OPA on OpenShift, loads bundled Rego policies into a ConfigMap, and configures AAP's Policy as Code settings |
 | **Infrastructure | OPA - Add Policy** | Uploads a Rego policy to OPA via the REST API (in-memory only, does not persist across pod restarts) |
+
+### OpenFlake (ITSM)
+
+#### Jobs
+
+| Job Template | Description |
+|--------------|-------------|
+| [**Infrastructure ǀ OpenFlake**](docs/openflake.md) | Installs or removes OpenFlake — a lightweight ITSM platform with a ServiceNow-compatible REST API — on OpenShift via its bundled Helm chart |
 
 ## Post Setup
 

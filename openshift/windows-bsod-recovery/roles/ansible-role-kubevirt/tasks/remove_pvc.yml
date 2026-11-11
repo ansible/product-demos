@@ -1,0 +1,14 @@
+---
+- name: Wait for PVC deletion without bypassing protection finalizers
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: PersistentVolumeClaim
+    name: '{{ target_pvc_name }}'
+    namespace: '{{ target_namespace }}'
+    verify_ssl: false
+    api_key: '{{ api_key }}'
+  register: target_pvc_iso_info
+  until: target_pvc_iso_info.resources | length == 0
+  retries: '{{ instance_wait_retry_limit }}'
+  delay: 3
+  when: target_pvc_name is defined

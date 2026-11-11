@@ -84,3 +84,15 @@
           password: "{{ ansible_password }}"
           default_realm: "{{ domain_name | upper }}"
           kdc: "{{ ansible_host }}"
+
+    - name: Update Microsoft AD LDAP Credential
+      run_once: true
+      delegate_to: localhost
+      ansible.controller.credential:
+        name: Microsoft AD LDAP Credential
+        credential_type: Microsoft AD LDAP
+        organization: Ansible Product Demos (APD)
+        inputs:
+          username: "{{ ansible_user }}@{{ domain_name | upper }}"
+          password: "{{ ansible_password }}"
+          server: "{{ ansible_host }}"

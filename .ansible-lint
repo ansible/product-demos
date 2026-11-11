@@ -16,6 +16,10 @@ exclude_paths:
   - .github/
   - execution_environments/ee_contexts/
   - .patch_demo_export/
+  # Vendored BSOD recovery playbooks/roles (legacy naming; linted CaC is in openshift/setup.yml)
+  - openshift/windows-bsod-recovery/
+  # Vendored Helm chart -- Go templates and chart metadata, not Ansible YAML.
+  - infrastructure/openflake/chart/
 
 mock_modules:
   - amazon.aws.aws_caller_info
@@ -80,11 +84,16 @@ mock_modules:
   - cisco.iosxr.iosxr_facts
   - cisco.nxos.nxos_banner
   - cisco.nxos.nxos_config
+  - cisco.nxos.nxos_feature
   - cisco.nxos.nxos_facts
   - cisco.nxos.nxos_ntp_global
   - cisco.nxos.nxos_snmp_server
   - community.aws.s3_sync
   - community.aws.s3_website
+  - arista.eos.eos_config
+  - juniper.device.junos_command
+  - juniper.device.junos_config
+  - community.general.seport
   - community.general.filesystem
   - community.general.modprobe
   - community.general.redhat_subscription
@@ -92,6 +101,7 @@ mock_modules:
   - community.windows.win_psmodule
   - containers.podman.podman_container
   - containers.podman.podman_image
+  - kubernetes.core.helm
   - kubernetes.core.k8s
   - kubernetes.core.k8s_cluster_info
   - kubernetes.core.k8s_info

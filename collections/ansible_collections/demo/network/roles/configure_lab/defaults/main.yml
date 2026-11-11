@@ -1,0 +1,178 @@
+---
+# Routed links follow the connected product_demos topology. Junos logical
+# interfaces omit enabled because juniper.device 2.0.1 emits an invalid leaf.
+network_lab_prefixes:
+  cisco.ios.ios: cisco.ios.ios
+  arista.eos.eos: arista.eos.eos
+  juniper.device.junos: juniper.device.junos
+network_lab_ntp:
+  servers:
+    - server: 216.239.35.0
+    - server: 216.239.35.4
+network_lab_snmp_community: apd-demo
+network_lab_resources:
+  cat8kv1:
+    - resource: interfaces
+      config:
+        - name: GigabitEthernet2
+          description: To veos2 Ethernet1
+          enabled: true
+        - name: GigabitEthernet3
+          description: To vjunos3 ge-0/0/0
+          enabled: true
+        - name: Loopback10
+          description: APD connected demo
+          enabled: true
+    - resource: l3_interfaces
+      config:
+        - name: GigabitEthernet2
+          ipv4:
+            - address: 10.10.12.1/30
+        - name: GigabitEthernet3
+          ipv4:
+            - address: 10.10.13.1/30
+        - name: Loopback10
+          ipv4:
+            - address: 10.255.0.1/32
+    - resource: lldp_global
+      config:
+        enabled: true
+    - resource: static_routes
+      config:
+        - address_families:
+            - afi: ipv4
+              routes:
+                - dest: 10.255.0.2/32
+                  next_hops:
+                    - forward_router_address: 10.10.12.2
+                - dest: 10.255.0.3/32
+                  next_hops:
+                    - forward_router_address: 10.10.13.2
+                - dest: 10.255.0.4/32
+                  next_hops:
+                    - forward_router_address: 10.10.12.2
+  veos2:
+    - resource: interfaces
+      config:
+        - name: Ethernet1
+          description: To cat8kv1 GigabitEthernet2
+          enabled: true
+          mode: layer3
+        - name: Ethernet2
+          description: To veos4 Ethernet1
+          enabled: true
+          mode: layer3
+        - name: Loopback10
+          description: APD connected demo
+          enabled: true
+    - resource: l3_interfaces
+      config:
+        - name: Ethernet1
+          ipv4:
+            - address: 10.10.12.2/30
+        - name: Ethernet2
+          ipv4:
+            - address: 10.10.24.1/30
+        - name: Loopback10
+          ipv4:
+            - address: 10.255.0.2/32
+    - resource: lldp_global
+      config:
+        timer: 30
+        holdtime: 120
+        reinit: 2
+        tlv_select:
+          system_name: true
+          port_description: true
+    - resource: static_routes
+      config:
+        - address_families:
+            - afi: ipv4
+              routes:
+                - dest: 10.255.0.1/32
+                  next_hops:
+                    - forward_router_address: 10.10.12.1
+                - dest: 10.255.0.3/32
+                  next_hops:
+                    - forward_router_address: 10.10.12.1
+                - dest: 10.255.0.4/32
+                  next_hops:
+                    - forward_router_address: 10.10.24.2
+  vjunos3:
+    - resource: interfaces
+      config:
+        - name: ge-0/0/0
+          description: To cat8kv1 GigabitEthernet3
+        - name: lo0
+          description: APD connected demo
+    - resource: l3_interfaces
+      config:
+        - name: ge-0/0/0
+          unit: 0
+          ipv4:
+            - address: 10.10.13.2/30
+        - name: lo0
+          unit: 0
+          ipv4:
+            - address: 10.255.0.3/32
+    - resource: lldp_interfaces
+      config:
+        - name: ge-0/0/0
+          enabled: true
+    - resource: lldp_global
+      config:
+        enabled: true
+    - resource: static_routes
+      config:
+        - address_families:
+            - afi: ipv4
+              routes:
+                - dest: 10.255.0.1/32
+                  next_hop:
+                    - forward_router_address: 10.10.13.1
+                - dest: 10.255.0.2/32
+                  next_hop:
+                    - forward_router_address: 10.10.13.1
+                - dest: 10.255.0.4/32
+                  next_hop:
+                    - forward_router_address: 10.10.13.1
+  veos4:
+    - resource: interfaces
+      config:
+        - name: Ethernet1
+          description: To veos2 Ethernet2
+          enabled: true
+          mode: layer3
+        - name: Loopback10
+          description: APD connected demo
+          enabled: true
+    - resource: l3_interfaces
+      config:
+        - name: Ethernet1
+          ipv4:
+            - address: 10.10.24.2/30
+        - name: Loopback10
+          ipv4:
+            - address: 10.255.0.4/32
+    - resource: lldp_global
+      config:
+        timer: 30
+        holdtime: 120
+        reinit: 2
+        tlv_select:
+          system_name: true
+          port_description: true
+    - resource: static_routes
+      config:
+        - address_families:
+            - afi: ipv4
+              routes:
+                - dest: 10.255.0.1/32
+                  next_hops:
+                    - forward_router_address: 10.10.24.1
+                - dest: 10.255.0.2/32
+                  next_hops:
+                    - forward_router_address: 10.10.24.1
+                - dest: 10.255.0.3/32
+                  next_hops:
+                    - forward_router_address: 10.10.24.1

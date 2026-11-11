@@ -1,0 +1,62 @@
+---
+
+controller_workflows:
+  - name: 2 - OpenShift Virt / BSOD Fix Scenario
+    description: Automates the process of triggering a BSOD, fixing it, and verifying the fix on OpenShift Virtualization Environment
+    organization: Default
+    extra_vars:
+      infra_template_name: windows-2022-standard
+    simplified_workflow_nodes:
+      - identifier: Provision Infrastructure
+        unified_job_template: Provision Infrastructure
+        credentials:
+          - OpenShift Credential
+          - Windows Machine Credential
+        extra_data:
+          provider: kubevirt
+          scenario: bsod_fix
+          infra_template_name: windows-2022-standard
+        success_nodes:
+          - Produce BSOD
+      - identifier: Produce BSOD
+        unified_job_template: Produce BSOD
+        inventory: OpenShift Inventory
+        credentials:
+          - Windows Machine Credential
+        limit: label_app_name_bsodfix
+        success_nodes:
+          - Recover from BSOD
+      - identifier: Recover from BSOD
+        unified_job_template: Recover from BSOD
+        inventory: OpenShift Inventory
+        credentials:
+          - OpenShift Credential
+          - Windows Machine Credential
+        limit: label_app_name_bsodfix
+        extra_data:
+          provider: kubevirt
+          scenario: bsod_fix
+        success_nodes:
+          - Check System
+      - identifier: Check System
+        unified_job_template: Check System
+        inventory: OpenShift Inventory
+        credentials:
+          - Windows Machine Credential
+        limit: label_app_name_bsodfix
+  - name: 2 - OpenShift Virt / Clean up VMs for BSOD Fix Scenario
+    description: Removes VMs on OpenShift Virtualization Environment
+    organization: Default
+    extra_vars:
+      infra_template_name: windows-2022-standard
+    simplified_workflow_nodes:
+      - identifier: Remove Infrastructure
+        unified_job_template: Remove Infrastructure
+        inventory: OpenShift Inventory
+        credentials:
+          - OpenShift Credential
+          - Windows Machine Credential
+        limit: label_app_name_bsodfix
+        extra_data:
+          provider: kubevirt
+          scenario: bsod_fix

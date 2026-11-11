@@ -1,0 +1,26 @@
+---
+- name: Reset AD Controller configuration to placeholders
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Reset Kerberos Credential
+      ansible.controller.credential:
+        name: Kerberos Credential
+        credential_type: Kerberos
+        organization: Ansible Product Demos (APD)
+        inputs:
+          username: ec2-user@ANSIBLE.LOCAL
+          password: REPLACEME
+          default_realm: ANSIBLE.LOCAL
+          kdc: REPLACEME
+
+    - name: Reset Microsoft AD LDAP Credential
+      ansible.controller.credential:
+        name: Microsoft AD LDAP Credential
+        credential_type: Microsoft AD LDAP
+        organization: Ansible Product Demos (APD)
+        inputs:
+          username: ec2-user@ANSIBLE.LOCAL
+          password: REPLACEME
+          server: REPLACEME

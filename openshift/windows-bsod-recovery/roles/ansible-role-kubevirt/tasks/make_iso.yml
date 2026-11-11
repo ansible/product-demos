@@ -1,0 +1,26 @@
+---
+- block:
+    - name: create temporary directory
+      file:
+        path: "{{ temp_directory }}/ks_iso"
+        state: directory
+
+    - name: create Autounattend.xml file
+      template:
+        src: "unattended.xml.j2"
+        dest: "{{ temp_directory }}/ks_iso/unattend.xml"
+
+    - name: create iso
+      command: mkisofs -V ADDISO -r -iso-level 4 -o {{ playbook_dir }}/{{ temp_directory }}/{{ iso_file }} .
+      args:
+        chdir: "{{ playbook_dir }}/{{ temp_directory }}/ks_iso"
+
+    - include_tasks: datastore_upload.yml
+  always:
+    - name: remove temporary files
+      file:
+        path: "{{ temp_directory }}/{{ item }}"
+        state: absent
+      loop:
+        - "{{ iso_file }}"
+        - ks_iso/

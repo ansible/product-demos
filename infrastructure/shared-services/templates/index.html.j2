@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>APD Shared Services</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --text: #e8eef5;
+      --muted: #8b9bb0;
+      --accent: #ee0000;
+      --ok: #3ba55d;
+      --border: #2a3544;
+      --input: #0d1117;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Red Hat Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: radial-gradient(ellipse at top, #1c2738 0%, var(--bg) 55%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    main {
+      width: min(640px, 100%);
+    }
+    h1 {
+      margin: 0 0 0.35rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .sub {
+      margin: 0 0 1.5rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    #gate, #services {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.35rem;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    input[type="password"] {
+      flex: 1;
+      background: var(--input);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 0.65rem 0.75rem;
+      font-size: 1rem;
+    }
+    input[type="password"]:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      border-radius: 6px;
+      padding: 0.65rem 1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.3rem 0.55rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    #error {
+      color: #ff6b6b;
+      font-size: 0.9rem;
+      margin-top: 0.75rem;
+      min-height: 1.2em;
+    }
+    .service {
+      border-top: 1px solid var(--border);
+      padding: 1rem 0;
+    }
+    .service:first-child { border-top: 0; padding-top: 0; }
+    .service:last-child { padding-bottom: 0; }
+    .service h2 {
+      margin: 0 0 0.65rem;
+      font-size: 1.05rem;
+    }
+    .field {
+      display: grid;
+      grid-template-columns: 5.5rem 1fr auto;
+      gap: 0.4rem;
+      align-items: center;
+      margin-bottom: 0.4rem;
+      font-size: 0.92rem;
+    }
+    .field span:first-child { color: var(--muted); }
+    .field a, .field code {
+      color: var(--text);
+      word-break: break-all;
+      font-family: "Red Hat Mono", ui-monospace, Menlo, Consolas, monospace;
+      font-size: 0.88rem;
+      text-decoration: none;
+    }
+    .field a:hover { color: #ff4d4d; }
+    .copied { color: var(--ok) !important; border-color: var(--ok) !important; }
+    #locked { display: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>APD Shared Services</h1>
+    <p class="sub">Lab credentials for Mattermost, Gitea, and OpenFlake.</p>
+
+    <section id="gate">
+      <label for="password">Portal password</label>
+      <form class="row" id="unlock-form" autocomplete="off">
+        <input id="password" type="password" name="password" required autofocus>
+        <button type="submit">Unlock</button>
+      </form>
+      <div id="error"></div>
+    </section>
+
+    <section id="services" hidden></section>
+  </main>
+
+  <script id="payload" type="application/json">{{ ss_portal_ciphertext | to_json }}</script>
+  <script>
+(function () {
+  const payload = JSON.parse(document.getElementById('payload').textContent);
+  const gate = document.getElementById('gate');
+  const services = document.getElementById('services');
+  const error = document.getElementById('error');
+  const form = document.getElementById('unlock-form');
+
+  function b64ToBytes(b64) {
+    const bin = atob(b64);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  async function deriveKey(password, salt) {
+    const enc = new TextEncoder();
+    const baseKey = await crypto.subtle.importKey(
+      'raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']
+    );
+    return crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
+      baseKey,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['decrypt']
+    );
+  }
+
+  async function decrypt(password) {
+    const salt = b64ToBytes(payload.salt);
+    const nonce = b64ToBytes(payload.nonce);
+    const ciphertext = b64ToBytes(payload.ciphertext);
+    const key = await deriveKey(password, salt);
+    const plain = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: nonce },
+      key,
+      ciphertext
+    );
+    return JSON.parse(new TextDecoder().decode(plain));
+  }
+
+  function copyText(text, btn) {
+    navigator.clipboard.writeText(text).then(function () {
+      const prev = btn.textContent;
+      btn.textContent = 'Copied';
+      btn.classList.add('copied');
+      setTimeout(function () {
+        btn.textContent = prev;
+        btn.classList.remove('copied');
+      }, 1200);
+    });
+  }
+
+  function field(label, value, isLink) {
+    const wrap = document.createElement('div');
+    wrap.className = 'field';
+    const l = document.createElement('span');
+    l.textContent = label;
+    const v = isLink ? document.createElement('a') : document.createElement('code');
+    if (isLink) {
+      v.href = value;
+      v.target = '_blank';
+      v.rel = 'noopener';
+    }
+    v.textContent = value;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'secondary';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', function () { copyText(value, btn); });
+    wrap.appendChild(l);
+    wrap.appendChild(v);
+    wrap.appendChild(btn);
+    return wrap;
+  }
+
+  function render(data) {
+    services.innerHTML = '';
+    (data.services || []).forEach(function (svc) {
+      const block = document.createElement('article');
+      block.className = 'service';
+      const h = document.createElement('h2');
+      h.textContent = svc.name;
+      block.appendChild(h);
+      block.appendChild(field('URL', svc.url, true));
+      block.appendChild(field('User', svc.username, false));
+      block.appendChild(field('Password', svc.password, false));
+      if (svc.note) {
+        const note = document.createElement('p');
+        note.className = 'sub';
+        note.style.margin = '0.5rem 0 0';
+        note.textContent = svc.note;
+        block.appendChild(note);
+      }
+      services.appendChild(block);
+    });
+    gate.hidden = true;
+    services.hidden = false;
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    error.textContent = '';
+    const password = document.getElementById('password').value;
+    decrypt(password).then(render).catch(function () {
+      error.textContent = 'Incorrect password.';
+    });
+  });
+})();
+  </script>
+</body>
+</html>

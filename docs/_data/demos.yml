@@ -87,8 +87,8 @@
       B["🌐 Create VPC"] --> C
       C -->|always| D["🪟 aws-dc<br/>windows_full"]
       C -->|always| E["🪟 aws_win1<br/>windows_core"]
-      C -->|always| F["🐧 aws_rhel8<br/>rhel8"]
-      C -->|always| G["🐧 aws_rhel9<br/>rhel9"]
+      C -->|always| F["🐧 aws-rhel9<br/>rhel9"]
+      C -->|always| G["🐧 aws-rhel10<br/>rhel10"]
       C -->|always| H["📋 reports<br/>rhel9"]
       D --> I["🔄 Sync Inventory"]
       E --> I
@@ -156,22 +156,21 @@
       S --> C
       S --> D
       S --> E
-      S --> G
-      A["💥 Delete aws-dc"] --> F["🌐 Delete VPC"]
+      A["💥 Delete aws-dc"] --> F["🔄 Sync Inventory"]
       B["💥 Delete aws_win1"] --> F
-      C["💥 Delete aws_rhel8"] --> F
-      D["💥 Delete aws_rhel9"] --> F
+      C["💥 Delete aws-rhel9"] --> F
+      D["💥 Delete aws-rhel10"] --> F
       E["💥 Delete reports"] --> F
-      F --> H["🔄 Sync Inventory"]
-      G["🔑 Delete Key"] --> H
+      F --> G["🔑 Delete Keypair"]
+      F --> H["🌐 Delete VPC"]
       style A fill:#4a1a1a,stroke:#ef4444,color:#fff
       style B fill:#4a1a1a,stroke:#ef4444,color:#fff
       style C fill:#4a1a1a,stroke:#ef4444,color:#fff
       style D fill:#4a1a1a,stroke:#ef4444,color:#fff
       style E fill:#4a1a1a,stroke:#ef4444,color:#fff
-      style F fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style F fill:#2d1f4e,stroke:#a78bfa,color:#fff
       style G fill:#1e3a5f,stroke:#4a90d9,color:#fff
-      style H fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style H fill:#1e3a5f,stroke:#4a90d9,color:#fff
       style S fill:#212427,stroke:#8a8d90,color:#fff
 
 - slug: cloud-create-vpc
@@ -990,9 +989,10 @@
       F --> G["🔌 Test Connectivity"]
       G --> H["🏰 Create Domain"]
       H --> I["🤝 Join Domain"]
-      I --> J["🔄 Domain Inventory Sync"]
+      I --> J["🔄 AWS Inventory Sync"]
+      I --> N["🔄 AD LDAP Inventory Sync"]
       J --> K["⚡ PowerShell Validation"]
-      J --> L["🔐 Kerberos Validation"]
+      N --> L["🔐 Kerberos Validation"]
       G -. "any failure" .-> M["🧹 Cleanup Resources"]
       H -. "any failure" .-> M
       I -. "any failure" .-> M
@@ -1006,9 +1006,52 @@
       style H fill:#2d1f4e,stroke:#a78bfa,color:#fff
       style I fill:#2d1f4e,stroke:#a78bfa,color:#fff
       style J fill:#2d2d2d,stroke:#888,color:#fff
+      style N fill:#2d2d2d,stroke:#888,color:#fff
       style K fill:#162c46,stroke:#58a6ff,color:#fff
       style L fill:#162c46,stroke:#58a6ff,color:#fff
       style M fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: windows-destroy-ad-domain
+  readme_path: windows/docs/windows-destroy-ad-domain.md
+  title: "Destroy Active Directory Domain"
+  category: windows
+  status: active
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - Active Directory
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)"
+    icon: "💥"
+  blurb: "Tear down the domain controller, both domain-joined hosts, VPC, and keypair created by Setup Active Directory Domain, reset AD credentials, and sync inventory."
+  stats:
+    workflows: 1
+    playbooks: 5
+  url: /demos/windows-destroy-ad-domain/
+  github_path: windows/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      S --> B
+      S --> C
+      S --> D
+      A["💥 Delete dc01"] --> F["🔄 Sync Inventory"]
+      B["💥 Delete winston"] --> F
+      C["💥 Delete winthrop"] --> F
+      D["🔧 Reset AD Configuration"] --> F
+      F --> G["🔑 Delete Keypair"]
+      F --> H["🌐 Delete VPC"]
+      style A fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style B fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style C fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style D fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style F fill:#2d2d2d,stroke:#888,color:#fff
+      style G fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style H fill:#1e3a5f,stroke:#4a90d9,color:#fff
       style S fill:#212427,stroke:#8a8d90,color:#fff
 
 # ─── Network ────────────────────────────────────────────────────────
@@ -1016,7 +1059,7 @@
 - slug: network-deploy-containerlab-stack
   readme_path: network/docs/network-deploy-containerlab-stack.md
   title: "Deploy Containerlab Stack"
-  subtitle: "Nested-virt hypervisor, n9kv + cat8kv, inventory sync"
+  subtitle: "Connected IOS-XE, EOS, and vSRX lab with inventory sync"
   category: network
   status: active
   author: "Matthew Fernandez <matferna@redhat.com>"
@@ -1030,7 +1073,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #0d9488 0%, #065f54 100%)"
     icon: "🚀"
-  blurb: "Provision an AWS nested-virt hypervisor, deploy a containerlab Cisco lab (n9kv + cat8kv), and sync ContainerLab Inventory."
+  blurb: "Provision an AWS nested-virt hypervisor, deploy a connected Containerlab lab with IOS-XE, two EOS nodes, and vSRX, and sync ContainerLab Inventory."
   stats:
     workflows: 1
     playbooks: 2
@@ -1090,7 +1133,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #38b000 0%, #006400 100%)"
     icon: "🌐"
-  blurb: "Apply baseline banner, NTP, and SNMP configuration to containerlab Cisco NX-OS and IOS-XE devices."
+  blurb: "Configure connected IOS-XE, EOS, and Junos devices with native modules for interfaces, addressing, LLDP, NTP, and static routes."
   stats:
     playbooks: 1
   github_path: network/configure_devices.yml
@@ -1108,7 +1151,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)"
     icon: "🌐"
-  blurb: "Gather facts from containerlab Cisco NX-OS and IOS-XE devices and display hostname, version, model, and interfaces."
+  blurb: "Publish a detailed Cisco, Juniper, and Arista web report with operational observations and structured configuration."
   stats:
     playbooks: 1
   github_path: network/report.yml
@@ -1143,7 +1186,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #38b000 0%, #006400 100%)"
     icon: "🌐"
-  blurb: "Back up running configurations from containerlab NX-OS and IOS-XE devices to the execution node."
+  blurb: "Back up the connected Containerlab IOS-XE configuration to the execution node."
   stats:
     playbooks: 1
   github_path: network/backup.yml
@@ -1546,7 +1589,7 @@
   thumbnail:
     gradient: "linear-gradient(135deg, #1a365d 0%, #ee0000 100%)"
     icon: "🛒"
-  blurb: "Install a tiny ACME storefront on aws_rhel9, then change the live page from a survey that re-renders one Jinja template."
+  blurb: "Install a tiny ACME storefront on aws-rhel9, then change the live page from a survey that re-renders one Jinja template."
   stats:
     playbooks: 2
   url: /demos/infrastructure-simple-config-drift/
@@ -1554,7 +1597,7 @@
   workflow_mermaid: |
     flowchart LR
       setup["ACME App Setup"]
-      httpd["httpd on aws_rhel9"]
+      httpd["httpd on aws-rhel9"]
       page["index.html from Jinja"]
       survey["Update Configuration survey"]
       browser["Browser port 80"]
@@ -1857,6 +1900,27 @@
     playbooks: 1
   github_path: infrastructure/ao/uninstall.yml
 
+- slug: infrastructure-shared-services
+  readme_path: infrastructure/docs/shared-services.md
+  title: "Infrastructure | AWS — Deploy Shared Services"
+  subtitle: "One-click VPC, keypair, Mattermost, Gitea, and OpenFlake"
+  category: infrastructure
+  status: active
+  tags:
+    - AWS
+    - Chat
+    - Git
+    - OpenShift
+    - Workflow
+  thumbnail:
+    gradient: "linear-gradient(135deg, #231f20 0%, #3d7ea6 100%)"
+    icon: "🧩"
+  blurb: "Create VPC and keypair, then provision Mattermost and Gitea in parallel while OpenFlake installs on OpenShift — shared lab services without the five Deploy Cloud Stack VMs."
+  stats:
+    playbooks: 3
+  url: /demos/infrastructure-shared-services/
+  github_path: infrastructure/setup.yml
+
 - slug: infrastructure-mattermost
   readme_path: infrastructure/docs/mattermost.md
   title: "Infrastructure | AWS — Provision Mattermost"
@@ -1875,3 +1939,45 @@
     playbooks: 1
   url: /demos/infrastructure-mattermost/
   github_path: infrastructure/setup.yml
+
+- slug: infrastructure-gitea
+  readme_path: infrastructure/docs/gitea.md
+  title: "Infrastructure | AWS — Provision Gitea"
+  subtitle: "Lightweight self-hosted Git forge for lab SCM demos"
+  category: infrastructure
+  status: active
+  tags:
+    - AWS
+    - Git
+    - SCM
+  thumbnail:
+    gradient: "linear-gradient(135deg, #231f20 0%, #609926 100%)"
+    icon: "📦"
+  blurb: "Provision aws_gitea with Podman Gitea (SQLite), create an admin user, and print the URL plus login (apdadmin / Ansible123!) in the job output."
+  stats:
+    playbooks: 1
+  url: /demos/infrastructure-gitea/
+  github_path: infrastructure/setup.yml
+
+- slug: openflake
+  readme_path: infrastructure/docs/openflake.md
+  title: "Infrastructure | OpenFlake"
+  subtitle: "Run a ServiceNow-compatible ITSM backend on OpenShift for demos"
+  category: infrastructure
+  status: active
+  featured: false
+  tags:
+    - Playbook
+    - Survey
+    - OpenShift
+    - ITSM
+    - ServiceNow
+    - Helm
+  thumbnail:
+    gradient: "linear-gradient(135deg, #1f6feb 0%, #0b3d91 100%)"
+    icon: "🎫"
+  blurb: "Deploy OpenFlake — a lightweight ITSM platform with a ServiceNow-compatible REST API — on OpenShift via its bundled Helm chart, so servicenow.itsm content can run against it with only a URL change."
+  stats:
+    playbooks: 1
+  url: /demos/openflake/
+  github_path: infrastructure/openflake/provision.yml

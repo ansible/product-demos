@@ -28,8 +28,8 @@ graph LR
   B["🌐 Create VPC"] --> C
   C --> D["🪟 aws-dc\n(Windows Full)"]
   C --> E["🪟 aws_win1\n(Windows Core)"]
-  C --> F["🐧 aws_rhel8\n(RHEL 8)"]
-  C --> G["🐧 aws_rhel9\n(RHEL 9)"]
+  C --> F["🐧 aws-rhel9\n(RHEL 9)"]
+  C --> G["🐧 aws-rhel10\n(RHEL 10)"]
   C --> H["📋 reports\n(RHEL 9)"]
   D --> I["🔄 Sync Inventory"]
   E --> I
@@ -50,14 +50,14 @@ graph LR
 
 - Creates a complete demo environment in minutes — no manual AWS console clicking
 - Configuration-as-code for infrastructure — the entire stack is defined in playbooks and blueprints
-- Mixed OS fleet (RHEL 8, RHEL 9, Windows Server) reflects real customer environments
+- Mixed OS fleet (RHEL 9, RHEL 10, Windows Server) reflects real customer environments
 - Dynamic inventory automatically imports all provisioned VMs into AAP
 
 ## Manual SSH access
 
 Linux VMs launch with the `aws-test-key` EC2 keypair (public key derived from **APD Machine Credential**). AAP cannot export that private key after it is saved.
 
-To SSH in with **your own** key (for example Ed25519), run [**LINUX | Add SSH Public Key**](../../linux/docs/linux-install-ssh-key.md) against `aws_rhel*` or a single host, then connect as `ec2-user`:
+To SSH in with **your own** key (for example Ed25519), run [**LINUX | Add SSH Public Key**](../../linux/docs/linux-install-ssh-key.md) against `aws-rhel*` or a single host, then connect as `ec2-user`:
 
 ```bash
 ssh -i ~/.ssh/your-private-key ec2-user@<instance-ip>

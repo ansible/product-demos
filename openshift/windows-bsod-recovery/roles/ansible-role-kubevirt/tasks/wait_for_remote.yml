@@ -1,0 +1,72 @@
+---
+- name: Wait for running VMI with a node assignment
+  kubernetes.core.k8s_info:
+    api_version: '{{ api_version_virtual_machine }}'
+    kind: VirtualMachineInstance
+    name: '{{ template.name }}'
+    namespace: '{{ target_namespace }}'
+    verify_ssl: false
+    api_key: '{{ api_key }}'
+  register: template_vmi
+  until: >-
+    template_vmi.resources | length > 0 and
+    template_vmi.resources[0].status.phase | default('') == 'Running' and
+    template_vmi.resources[0].status.nodeName | default('') | length > 0
+  retries: '{{ instance_wait_retry_limit }}'
+  delay: 3
+
+- name: set vmi info
+  set_fact:
+    new_vmis: '{{ new_vmis | default({}) | combine({template_vmi.resources[0].metadata.name: template_vmi.resources[0]}) }}'
+
+- name: provision service
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'svc.yml') | from_yaml }}"
+    validate_certs: no
+    api_key: "{{ api_key }}"
+  vars:
+    owner_uid: "{{ template_vmi.resources[0].metadata.ownerReferences[0].uid | default(None) }}"
+  register: template_svc
+  when:
+    - template.networks is undefined or template.networks | length == 0
+
+- name: provision route
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'route.yml') | from_yaml }}"
+    validate_certs: no
+    api_key: "{{ api_key }}"
+  vars:
+    owner_uid: "{{ template_vmi.resources[0].metadata.ownerReferences[0].uid | default(None) }}"
+  loop: "{{ template.ports }}"
+  loop_control:
+    loop_var: port
+  when:
+    - template.networks is undefined or template.networks | length == 0
+    - template.ports | default([]) | length > 0
+    - port.route | default(false) | bool
+
+- name: wait for remote port to be available
+  wait_for:
+    port: "{{ remote_port }}"
+    host: "{{ remote_host }}"
+    delay: 10
+    timeout: "{{ instance_wait_connection_timeout }}"
+  connection: local
+  when: template_vmi is success
+
+- name: wait for remote ip to be available on vmi
+  k8s_info:
+    api_version: '{{ api_version_virtual_machine }}'
+    kind: VirtualMachineInstance
+    name: '{{ template.name }}'
+    namespace: '{{ target_namespace }}'
+    validate_certs: no
+    api_key: "{{ api_key }}"
+  register: template_vmi
+  until: (template_vmi.resources[0].status.interfaces[0]['ipAddress'] | default('')) | length > 0
+  retries: "{{ instance_wait_for_ip_retry_limit }}"
+  delay: 3
+  when: instance_wait_for_ip_retry_limit > 0
+

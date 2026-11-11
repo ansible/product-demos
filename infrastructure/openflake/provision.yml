@@ -1,0 +1,118 @@
+---
+# The operation comes from a survey rather than a provision/destroy flag, and
+# the generated admin password is read back out of the Secret the chart
+# creates rather than cached on the execution node.
+- name: OpenFlake | Provision on OpenShift
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    _openflake_operation: '{{ openflake_operation | default("install") }}'
+    _openflake_namespace: '{{ openflake_namespace | default("openflake") }}'
+    _openflake_release_name: '{{ openflake_release_name | default("openflake") }}'
+
+    # Vendored next to this playbook so the Ansible Product Demos project
+    # ships the chart it installs.
+    _openflake_chart_path: '{{ playbook_dir }}/chart'
+
+    _openflake_image_registry: '{{ openflake_image_registry | default("quay.io/acme_corp") }}'
+    _openflake_image_tag: '{{ openflake_image_tag | default("stable") }}'
+    # The tag is mutable, so IfNotPresent would reuse a stale cached layer.
+    _openflake_image_pull_policy: '{{ openflake_image_pull_policy | default("Always") }}'
+
+    # Empty lets OpenShift generate a hostname, which this playbook then
+    # reconciles into BASE_URL/CORS_ORIGINS with a second Helm pass.
+    _openflake_route_host: '{{ openflake_route_host | default("") }}'
+    _openflake_route_enabled: '{{ openflake_route_enabled | default(true) | bool }}'
+    _openflake_route_tls_enabled: '{{ openflake_route_tls_enabled | default(true) | bool }}'
+
+    _openflake_admin_username: '{{ openflake_admin_username | default("admin") }}'
+    # Left empty, the chart generates the admin password, the JWT key and the
+    # Postgres password, and preserves them across upgrades via a cluster
+    # lookup. The install task reads the admin password back afterwards.
+    _openflake_admin_password: '{{ openflake_admin_password | default("") }}'
+
+    _openflake_postgres_storage_size: '{{ openflake_postgres_storage_size | default("10Gi") }}'
+    _openflake_attachments_storage_size: '{{ openflake_attachments_storage_size | default("5Gi") }}'
+    _openflake_storage_class: '{{ openflake_storage_class | default("") }}'
+
+    _openflake_wait: '{{ openflake_wait | default(true) | bool }}'
+    _openflake_wait_timeout: '{{ openflake_wait_timeout | default("10m") }}'
+    _openflake_verify: '{{ openflake_verify | default(true) | bool }}'
+    _openflake_verify_retries: '{{ openflake_verify_retries | default(30) | int }}'
+    _openflake_verify_delay: '{{ openflake_verify_delay | default(10) | int }}'
+
+    _openflake_remove_pvcs: '{{ openflake_remove_pvcs | default(true) | bool }}'
+    _openflake_remove_namespace: '{{ openflake_remove_namespace | default(true) | bool }}'
+    _openflake_namespace_delete_timeout: '{{ openflake_namespace_delete_timeout | default(600) | int }}'
+
+    # kubernetes.core.helm shells out to the helm CLI, which does not read the
+    # K8S_AUTH_* env vars the OpenShift credential injects. Pass them through
+    # explicitly so helm talks to the same cluster the k8s modules do.
+    _openflake_api_url: '{{ lookup("env", "K8S_AUTH_HOST") | default("", true) }}'
+    _openflake_api_key: '{{ lookup("env", "K8S_AUTH_API_KEY") | default("", true) }}'
+
+    # Take the TLS posture from the credential rather than hardcoding it, so
+    # helm agrees with the k8s modules in this same play -- they read these
+    # env vars themselves, helm does not.
+    _openflake_validate_certs: >-
+      {{ openflake_validate_certs
+         | default(lookup("env", "K8S_AUTH_VERIFY_SSL") | default("true", true), true) | bool }}
+    _openflake_ca_raw: >-
+      {{ openflake_ca_cert
+         | default(lookup("env", "K8S_AUTH_SSL_CA_CERT") | default("", true), true) }}
+    _openflake_ca_is_inline: '{{ _openflake_ca_raw is search("BEGIN CERTIFICATE") }}'
+    # preflight.yml overrides this with a path once it has resolved the CA.
+    _openflake_ca_cert: ''
+
+    # Product Demos EE bakes helm into /usr/local/bin
+    # (execution_environments/apd-ee-27.yml), so this only needs setting when
+    # the job runs on an EE that does not ship it.
+    _openflake_helm_binary: '{{ openflake_helm_binary | default("") }}'
+
+  tasks:
+    - name: Reject an unknown operation
+      ansible.builtin.assert:
+        that:
+          - _openflake_operation in ["install", "uninstall"]
+        fail_msg: >-
+          openflake_operation must be 'install' or 'uninstall',
+          got '{{ _openflake_operation }}'.
+        quiet: true
+
+    # Both come from free-text survey fields and the uninstall path deletes
+    # the namespace, so reject anything that is not a well-formed name before
+    # it reaches a destructive task.
+    - name: Validate the namespace and release name
+      ansible.builtin.assert:
+        that:
+          - _openflake_namespace is match('^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$')
+          - _openflake_release_name is match('^[a-z0-9]([-a-z0-9]{0,51}[a-z0-9])?$')
+        fail_msg: >-
+          openflake_namespace ('{{ _openflake_namespace }}') and
+          openflake_release_name ('{{ _openflake_release_name }}') must be
+          lowercase RFC 1123 labels.
+        quiet: true
+
+    - name: Verify the OpenShift credential env vars are set
+      ansible.builtin.assert:
+        that:
+          - _openflake_api_url | length > 0
+          - _openflake_api_key | length > 0
+        fail_msg: >-
+          K8S_AUTH_HOST and K8S_AUTH_API_KEY must be set. Attach an
+          'OpenShift or Kubernetes API Bearer Token' credential to this
+          job template.
+        quiet: true
+
+    - name: Run preflight checks
+      ansible.builtin.include_tasks: tasks/preflight.yml
+
+    - name: Install OpenFlake
+      ansible.builtin.include_tasks: tasks/install.yml
+      when: _openflake_operation == "install"
+
+    - name: Uninstall OpenFlake
+      ansible.builtin.include_tasks: tasks/uninstall.yml
+      when: _openflake_operation == "uninstall"

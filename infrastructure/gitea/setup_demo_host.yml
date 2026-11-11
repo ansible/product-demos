@@ -1,0 +1,13 @@
+---
+# Standalone re-run of inventory-service runtime setup on aws_gitea.
+# Shared Services / Provision Gitea already include these tasks.
+- name: Provision demo host for CI/CD pipeline demo (dev port 8080, prod port 80)
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Gather service facts for firewalld
+      ansible.builtin.service_facts:
+
+    - name: Set up inventory-service dev and prod runtimes
+      ansible.builtin.include_tasks: tasks/setup_demo_host.yml

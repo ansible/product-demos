@@ -1,0 +1,51 @@
+---
+
+- name: Validate optional KubeVirt action UUID
+  ansible.builtin.assert:
+    that:
+      - kubevirt_action_id is string
+      - kubevirt_action_id is match('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89aAbB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$')
+    fail_msg: kubevirt_action_id must be a UUID.
+  when: kubevirt_action_id is defined and kubevirt_action_id | string | length > 0
+
+- include_tasks: preflight_check.yml
+
+- name: provision a new vm ({{ vm_os_type }})
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', vm_os_type + '-vm.yml') | from_yaml }}"
+    validate_certs: no
+    api_key: "{{ api_key }}"
+  register: new_vm
+
+- name: set vm info
+  set_fact:
+    new_vms: '{{ new_vms | default({}) | combine({new_vm.result.metadata.name: new_vm.result}) }}'
+
+- block:
+    - include_tasks: make_iso.yml
+      when: not kubevirt_use_configmap|bool
+
+    - include_tasks: unattend-config.yml
+      when: kubevirt_use_configmap|bool
+  vars:
+    owner_uid: "{{ new_vm.result.metadata.uid | default(None) }}"
+  when:
+    - vm_os_type == 'windows'
+    - template.sysprep is undefined or (template.sysprep is defined and template.sysprep|bool)
+
+#- name: clone from template
+#  kubevirt_vm:
+#    state: present
+#    validate_certs: no
+#    api_key: "{{ api_key }}"
+#    name: "{{ template.name }}"
+#    namespace: "{{ template.namespace | default('default') }}"
+#    memory: "{{ template.memory }}M"
+#    labels:
+#      app_name: "{{ template.app_name }}"
+#      role: "{{ template.role }}"
+#    template: "{{ template.template }}"
+#    template_parameters:
+#      name: "{{ template.name }}"
+#      description: "{{ template.name }}"

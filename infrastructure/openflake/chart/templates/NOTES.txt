@@ -1,0 +1,55 @@
+OpenFlake {{ .Chart.AppVersion }} is installing into namespace {{ .Release.Namespace }}.
+
+Watch it come up:
+
+  oc rollout status deploy/{{ include "openflake.backend.fullname" . }} -n {{ .Release.Namespace }}
+  oc rollout status deploy/{{ include "openflake.frontend.fullname" . }} -n {{ .Release.Namespace }}
+
+The backend applies Alembic migrations and seeds reference data during its
+first boot, so that rollout can take a couple of minutes.
+
+{{ if .Values.route.enabled -}}
+{{- if .Values.route.host -}}
+URL:
+
+  {{ include "openflake.publicUrl" . }}
+{{- else -}}
+ACTION REQUIRED -- route.host was not set.
+
+OpenShift generated a hostname for the Route, but the backend could not be
+told about it at install time, so BASE_URL and CORS_ORIGINS currently point at
+the in-cluster Service. Reference links and browser API clients will be wrong
+until you feed the real hostname back in:
+
+  ROUTE_HOST=$(oc get route {{ include "openflake.fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.spec.host}')
+  helm upgrade {{ .Release.Name }} <chart> -n {{ .Release.Namespace }} --reuse-values --set route.host="$ROUTE_HOST"
+
+The Ansible role in ansible/roles/openflake_openshift does this automatically.
+{{- end }}
+{{- else -}}
+No Route was created (route.enabled=false). Reach the UI with a port-forward:
+
+  oc port-forward svc/{{ include "openflake.frontend.fullname" . }} 8080:{{ .Values.frontend.service.port }} -n {{ .Release.Namespace }}
+{{- end }}
+
+Sign in as:
+
+  username: {{ .Values.auth.adminUsername }}
+  password: oc get secret {{ include "openflake.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath='{.data.ADMIN_PASSWORD}' | base64 -d
+
+{{ if not .Values.auth.adminPassword -}}
+That password was generated at install time and is preserved across upgrades.
+Change it after first login.
+{{- end }}
+
+{{- if not .Values.backend.attachments.persistence.enabled }}
+
+WARNING: backend.attachments.persistence.enabled=false. Uploaded attachments
+live in an emptyDir and are lost whenever the backend pod restarts.
+{{- end }}
+{{- if not .Values.postgresql.persistence.enabled }}
+
+WARNING: postgresql.persistence.enabled=false. The database lives in an
+emptyDir and is lost whenever the Postgres pod restarts. Never do this outside
+a throwaway demo.
+{{- end }}

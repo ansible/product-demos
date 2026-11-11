@@ -1,0 +1,48 @@
+---
+- name: Install report server and SELinux management dependencies
+  ansible.builtin.package:
+    name: [httpd, policycoreutils-python-utils]
+    state: present
+
+- name: Configure report HTTP port
+  ansible.builtin.lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^Listen '
+    line: "Listen {{ network_report_port }}"
+    validate: /usr/sbin/httpd -t -f %s
+  notify: Restart network report server
+
+- name: Allow report port in SELinux policy
+  community.general.seport:
+    ports: "{{ network_report_port }}"
+    proto: tcp
+    setype: http_port_t
+    state: present
+  when: ansible_selinux.status | default('disabled') == 'enabled'
+
+- name: Create report document directory
+  ansible.builtin.file:
+    path: "{{ network_report_path }}"
+    state: directory
+    mode: '0755'
+    setype: httpd_sys_content_t
+
+- name: Check firewall service state
+  ansible.builtin.service_facts:
+
+- name: Allow report HTTP traffic through active host firewall
+  ansible.posix.firewalld:
+    port: "{{ network_report_port }}/tcp"
+    state: enabled
+    permanent: true
+    immediate: true
+  when: ansible_facts.services.get('firewalld.service', {}).get('state') == 'running'
+
+- name: Enable persistent report server
+  ansible.builtin.service:
+    name: httpd
+    enabled: true
+    state: started
+
+- name: Apply report server configuration
+  ansible.builtin.meta: flush_handlers

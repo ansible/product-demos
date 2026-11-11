@@ -73,6 +73,7 @@
               - 22  # SSH
               - 5986  # WinRM
               - 88  # Kerberos Authentication
+              - 389  # LDAP
               - 3389  # RDP
               - 9090  # Cockpit
               - 9095  # Kafka EDA external listener (aws_kafka config drift)

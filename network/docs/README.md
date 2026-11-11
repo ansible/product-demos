@@ -10,5 +10,6 @@ Each file in this folder documents a corresponding network demo playbook or work
 | Report | [network-report.md](network-report.md) | [`network/report.yml`](../report.yml) |
 | DISA STIG | [network-disa-stig.md](network-disa-stig.md) | [`network/compliance.yml`](../compliance.yml) |
 | Backup | [network-backup.md](network-backup.md) | [`network/backup.yml`](../backup.yml) |
+| Staging and Upgrade | [network-staging-upgrade.md](network-staging-upgrade.md) | [`network/staging.yml`](../staging.yml), [`network/upgrade.yml`](../upgrade.yml) |
 | Troubleshoot Containerlab | [network-troubleshoot-containerlab.md](network-troubleshoot-containerlab.md) | [`network/troubleshoot_containerlab.yml`](../troubleshoot_containerlab.yml) |
 | Palo Alto Firewall Demo | [network-panos-workflow.md](network-panos-workflow.md) | [`network/panos/deploy.yml`](../panos/deploy.yml) |

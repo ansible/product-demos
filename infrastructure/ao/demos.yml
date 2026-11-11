@@ -13,6 +13,14 @@ ao_aap_integration_name: APD AAP
 ao_machine_credential_name: APD Machine Credential
 ao_aws_credential_name: AWS
 ao_mattermost_credential_name: Mattermost
+ao_openflake_credential_name: OpenFlake
+ao_gitea_credential_name: Gitea
+# Controller credential (RHDP boot / setup.yml); Install JT attaches it for env injectors.
+ao_litemaas_credential_name: LiteMaaS
+# AO-native LLM assets created by seed from the Controller LiteMaaS credential.
+ao_llm_credential_name: APD LiteMaaS
+ao_llm_integration_name: APD LiteMaaS
+ao_llm_model: qwen3-235b
 # community.general (Mattermost module) ships in the APD EE image.
 ao_execution_environment_name: Product Demos EE
 
@@ -20,38 +28,208 @@ ao_demos:
   - slug: disk-utilization
     enabled: true
     workflow: disk-utilization/ao/disk-demo-101.json
-    inventory_limit: aws_rhel9
+    inventory_limit: aws-rhel9
     requires_cloud_stack: true
+    cloud_stack_hosts:
+      - aws-rhel9
     requires_mattermost: true
     job_templates:
       - name: Disk Utilization Check
         playbook: disk-utilization/playbooks/check_disk.yml
         credentials:
           - machine
-        limit: aws_rhel9
+        limit: aws-rhel9
       - name: Linux - Remediate - Continue
         playbook: disk-utilization/playbooks/remediate_disk_continue.yml
         credentials:
           - machine
-        limit: aws_rhel9
+        limit: aws-rhel9
       - name: Linux - Remediate - Disk Cleanup
         playbook: disk-utilization/playbooks/remediate_disk_cleanup.yml
         credentials:
           - machine
-        limit: aws_rhel9
+        limit: aws-rhel9
       - name: Linux - Remediate - Disk Expand
         playbook: disk-utilization/playbooks/remediate_disk_expand.yml
         credentials:
           - machine
           - aws
-        limit: aws_rhel9
+        limit: aws-rhel9
       - name: Disk Utilization - Fallback
         playbook: disk-utilization/playbooks/remediate_disk_fallback.yml
         credentials:
           - machine
-        limit: aws_rhel9
+        limit: aws-rhel9
       - name: Notify Chatroom
         playbook: disk-utilization/playbooks/notify_chatroom.yml
         credentials:
           - mattermost
         ask_variables_on_launch: true
+
+  # Playbooks/JTs already live in product-demos cloud/setup.yml
+  # (Cloud | AWS | Snapshot/Patch/Restore/Compliance). Seed only imports
+  # the AO workflow and rewrites AAP org/credential placeholders.
+  - slug: multi-os-cloud-patching
+    enabled: true
+    workflow: multi-os-cloud-patching/ao/multi-os-cloud-patching.json
+    requires_cloud_stack: true
+    cloud_stack_hosts:
+      - aws-rhel9
+      - aws-rhel10
+      - aws-dc
+      - aws_win1
+      - reports
+    requires_mattermost: false
+    job_templates: []
+
+  # Local smoke-test for LiteMaaS → AO LLM wiring (no cloud/chat deps).
+  # workflow_local is relative to infrastructure/ao/.
+  - slug: task-step-example
+    enabled: true
+    workflow_local: workflows/task-step-example.json
+    requires_cloud_stack: false
+    requires_mattermost: false
+    job_templates: []
+
+  # CI/CD Pipeline — OpenFlake CHG + Gitea PR/CI → AO webhook.
+  # Demo host is aws_gitea (shared services); app ports 8080/80 + Gitea.
+  # JT names must match cicd-pipeline/ao/cicd-pipeline.json exactly.
+  - slug: cicd-pipeline
+    enabled: true
+    workflow: cicd-pipeline/ao/cicd-pipeline.json
+    inventory_limit: aws_gitea
+    requires_cloud_stack: false
+    requires_mattermost: false
+    requires_openflake: true
+    requires_gitea: true
+    job_templates:
+      - name: CI/CD Demo - Deploy and Test Dev
+        playbook: cicd-pipeline/playbooks/cicd_deploy_dev_and_test.yml
+        credentials:
+          - machine
+          - openflake
+        limit: aws_gitea
+      - name: CI/CD Demo - Drain Load Balancer
+        playbook: cicd-pipeline/playbooks/cicd_drain_lb.yml
+        credentials:
+          - machine
+          - openflake
+        limit: aws_gitea
+      - name: CI/CD Demo - Deploy to Prod
+        playbook: cicd-pipeline/playbooks/cicd_deploy_prod.yml
+        credentials:
+          - machine
+          - openflake
+        limit: aws_gitea
+      - name: CI/CD Demo - Rollback to Snapshot
+        playbook: cicd-pipeline/playbooks/cicd_rollback_to_snapshot.yml
+        credentials:
+          - machine
+          - openflake
+        limit: aws_gitea
+      - name: CI/CD Demo - Close Loop
+        playbook: cicd-pipeline/playbooks/cicd_close_loop.yml
+        credentials:
+          - openflake
+      - name: CI/CD Demo - Simulate Lightwell PR
+        playbook: cicd-pipeline/playbooks/cicd_simulate_lightwell_pr.yml
+        credentials:
+          - openflake
+          - gitea
+        # Keep major.minor.patch identical to baseline (3.9.0); only the
+        # Lightwell backport suffix changes. Upstream playbook default is
+        # 3.9.2.rhlw-00001 which breaks the demo story.
+        extra_vars:
+          patched_dep: aiohttp==3.9.0.rhlw-00001
+
+      - name: CI/CD Demo - Reset Demo
+        playbook: cicd-pipeline/playbooks/cicd_reset_demo.yml
+        credentials:
+          - machine
+          - gitea
+        limit: aws_gitea
+      # Presenter helper — clear OpenFlake CHG activity so the pipeline can be re-shown.
+      - name: CI/CD Demo - Reset Change Request
+        playbook: cicd-pipeline/playbooks/cicd_reset_change_request.yml
+        credentials:
+          - openflake
+        ask_variables_on_launch: false
+        survey:
+          name: Reset OpenFlake change
+          description: Clear work/close notes and reopen the change for another AO demo run.
+          spec:
+            - question_name: Change request number
+              type: text
+              variable: change_request
+              required: true
+              default: CHG0034907
+              question_description: >-
+                OpenFlake change to reset (e.g. CHG0034907 or 34907).
+        extra_vars:
+          change_request: CHG0034907
+      - name: CI/CD Demo - Setup Demo Host
+        playbook: cicd-pipeline/setup/cicd_setup_demo_host.yml
+        credentials:
+          - machine
+        limit: aws_gitea
+
+  # Zero-Day Response (PHP2Shell) — KNOW+CONTAIN owns p2s-* JTs; FIX+PROVE reuses them.
+  # Upstream content: ansible-tmm/aap-orchestrator-demos zero-day-response/
+  - slug: zero-day-response
+    enabled: true
+    workflow: zero-day-response/ao/flow-a-know-contain.json
+    requires_cloud_stack: false
+    requires_mattermost: false
+    job_templates:
+      - name: p2s-estate-configure
+        playbook: zero-day-response/playbooks/estate_configure.yml
+        credentials:
+          - machine
+      - name: p2s-estate-provision
+        playbook: zero-day-response/playbooks/infra_provision_aws.yml
+        credentials:
+          - aws
+          - machine
+      - name: p2s-independent-check
+        playbook: zero-day-response/playbooks/p2s_independent_check.yml
+        credentials:
+          - machine
+      - name: p2s-know-scan
+        playbook: zero-day-response/playbooks/p2s_scan.yml
+        credentials:
+          - machine
+      - name: p2s-know-lookback
+        playbook: zero-day-response/playbooks/p2s_lookback.yml
+        credentials:
+          - machine
+      - name: p2s-ai-output-check
+        playbook: zero-day-response/playbooks/p2s_ai_check.yml
+        credentials: []
+      - name: p2s-contain-spec-check
+        playbook: zero-day-response/playbooks/p2s_spec_check.yml
+        credentials: []
+      - name: p2s-contain-controls
+        playbook: zero-day-response/playbooks/p2s_controls.yml
+        credentials:
+          - machine
+      - name: p2s-fix-availability
+        playbook: zero-day-response/playbooks/p2s_fix_availability.yml
+        credentials: []
+      - name: p2s-fix-patch
+        playbook: zero-day-response/playbooks/p2s_patch.yml
+        credentials:
+          - machine
+      - name: p2s-fix-standdown
+        playbook: zero-day-response/playbooks/p2s_standdown.yml
+        credentials:
+          - machine
+      - name: p2s-prove-case-record
+        playbook: zero-day-response/playbooks/p2s_case_record.yml
+        credentials: []
+
+  - slug: zero-day-response-fix
+    enabled: true
+    workflow: zero-day-response/ao/flow-b-fix-prove.json
+    requires_cloud_stack: false
+    requires_mattermost: false
+    job_templates: []

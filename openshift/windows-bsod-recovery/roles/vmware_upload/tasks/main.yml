@@ -1,0 +1,18 @@
+---
+- name: ensure PowerCLI module is available
+  ansible.builtin.include_tasks: powercli.yml
+
+- name: upload ISO to vCenter datastore
+  vsphere_file_upload:
+    host: "{{ lookup('env', 'VMWARE_HOST') }}"
+    username: "{{ lookup('env', 'VMWARE_USER') }}"
+    password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
+    datastore_name: "{{ vmware_upload_vcenter_target_datastore }}"
+    file_path: "{{ vmware_upload_iso_file_path }}"
+    destination_path: "{{ vmware_upload_vcenter_destination_path }}/{{ vmware_upload_iso_file_path | win_basename }}"
+    validate_certs: false
+  register: upload_result
+
+- name: display upload result
+  ansible.builtin.debug:
+    var: upload_result

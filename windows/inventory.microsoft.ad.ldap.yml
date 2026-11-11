@@ -1,0 +1,27 @@
+---
+plugin: microsoft.ad.ldap
+# Connection secrets are not set here; they are supplied via environment
+# variables injected by the "Microsoft AD LDAP" credential
+#   server    <- MICROSOFT_AD_LDAP_SERVER
+#   username  <- MICROSOFT_AD_LDAP_USERNAME  (secret)
+#   password  <- MICROSOFT_AD_LDAP_PASSWORD  (secret)
+auth_protocol: ntlm
+search_base: DC=ansible,DC=local
+search_scope: subtree
+attributes:
+  sAMAccountName:
+    sam_account_name:
+  objectSid:
+    object_sid:
+  operatingSystem:
+    operating_system:
+compose:
+  ansible_connection: "'winrm'"
+  ansible_winrm_transport: "'kerberos'"
+  ansible_winrm_server_cert_validation: "'ignore'"
+  ansible_port: "5986"
+  ansible_winrm_kinit_env_vars: "['KRB5_CONFIG']"
+keyed_groups:
+  - key: microsoft_ad_distinguished_name | microsoft.ad.parse_dn | selectattr('0', 'eq', 'OU') | map(attribute='1') | first | lower | default('default')
+    prefix: ou
+    separator: "_"

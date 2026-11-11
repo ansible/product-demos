@@ -1,11 +1,11 @@
 # Infrastructure | Simple Config Drift
 
-Ansible owns one HTML file. **Infrastructure ǀ Configuration management - ACME App - Setup** installs a tiny ACME storefront on `aws_rhel9` and writes the approved baseline. **Infrastructure ǀ Configuration management - ACME App - Update Configuration** re-renders the same Jinja2 template with survey knobs so the live page changes. Re-run Setup to restore the baseline. No Kafka, EDA, or auditd — this is the teaching step before [Event-Driven Config Drift Remediation](config-drift.md).
+Ansible owns one HTML file. **Infrastructure ǀ Configuration management - ACME App - Setup** installs a tiny ACME storefront on `aws-rhel9` and writes the approved baseline. **Infrastructure ǀ Configuration management - ACME App - Update Configuration** re-renders the same Jinja2 template with survey knobs so the live page changes. Re-run Setup to restore the baseline. No Kafka, EDA, or auditd — this is the teaching step before [Event-Driven Config Drift Remediation](config-drift.md).
 
 ```mermaid
 flowchart LR
   setup["ACME App Setup"]
-  httpd["httpd on aws_rhel9"]
+  httpd["httpd on aws-rhel9"]
   page["index.html from Jinja"]
   survey["Update Configuration survey"]
   browser["Browser port 80"]
@@ -18,7 +18,7 @@ flowchart LR
 
 ## Prerequisites
 
-- **Deploy Cloud Stack in AWS** so `aws_rhel9` is in inventory
+- **Deploy Cloud Stack in AWS** so `aws-rhel9` is in inventory
 - **APD ǀ Single demo setup** — category `infrastructure`
 - **LINUX ǀ Register RHEL with RHSM** — `dnf` needs a subscription to install httpd
 - SSH access via **APD Machine Credential**
@@ -29,7 +29,7 @@ flowchart LR
 
 | Prompt | Variable | Type | Default |
 |--------|----------|------|---------|
-| Server Name or Pattern | `_hosts` | text | `aws_rhel9` |
+| Server Name or Pattern | `_hosts` | text | `aws-rhel9` |
 
 Baseline storefront vars are pinned on the job template as extra vars (company, theme, product, price, and so on). Click Launch.
 
@@ -37,7 +37,7 @@ Baseline storefront vars are pinned on the job template as extra vars (company, 
 
 | Prompt | Variable | Type | Default |
 |--------|----------|------|---------|
-| Server Name or Pattern | `_hosts` | text | `aws_rhel9` |
+| Server Name or Pattern | `_hosts` | text | `aws-rhel9` |
 | Company name | `acme_app_company` | text | ACME Corp |
 | Tagline | `acme_app_tagline` | text | Widgets you can trust |
 | Environment | `acme_app_environment` | multiplechoice | Production |
@@ -66,8 +66,8 @@ Environment choices: Production, Staging, Development. Theme choices: redhat, na
 
 ## Presenter walkthrough
 
-1. Launch **Infrastructure ǀ Configuration management - ACME App - Setup** with the default host `aws_rhel9`.
-2. Open the URL from the job output (`http://<aws_rhel9 public IP>/`) — ACME Corp, Production, Super Widget at $19.99.
+1. Launch **Infrastructure ǀ Configuration management - ACME App - Setup** with the default host `aws-rhel9`.
+2. Open the URL from the job output (`http://<aws-rhel9 public IP>/`) — ACME Corp, Production, Super Widget at $19.99.
 3. Launch **Infrastructure ǀ Configuration management - ACME App - Update Configuration**. Change environment to Staging, theme to navy, and the product name or price.
 4. Refresh the browser — same template, new values.
 5. Re-run **Infrastructure ǀ Configuration management - ACME App - Setup** — the approved baseline is back.

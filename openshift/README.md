@@ -16,6 +16,8 @@ This category of demos shows examples of OpenShift operations and management wit
 |----------|-------------|
 | [**CNV — Infra Stack**](docs/openshift-cnv-infra-stack.md) | Workflow to deploy virtualized infrastructure (RHEL 8 + RHEL 9 VMs) in OpenShift Virtualization with inventory sync. |
 | [**CNV — Patch Workflow**](docs/openshift-cnv-patch-workflow.md) | Snapshot CNV virtual machines, apply patches, and automatically restore from snapshot on failure. |
+| [**Windows — BSOD Recovery**](docs/openshift-windows-bsod-recovery.md) | Simulate and recover from a Windows Blue Screen of Death on OpenShift Virtualization. |
+| [**Windows — Generate WinPE Image**](docs/openshift-windows-bsod-recovery.md) | Build and upload a WinPE recovery ISO to OpenShift Virtualization. |
 
 ### Jobs
 
@@ -32,6 +34,8 @@ This category of demos shows examples of OpenShift operations and management wit
 These demos require an OpenShift cluster to deploy to. Luckily the default Ansible Product Demos item from [demo.redhat.com](https://demo.redhat.com) includes an OpenShift cluster. Most of the jobs require an `OpenShift or Kubernetes API Bearer Token` credential in order to interact with OpenShift. When ordered from RHDP this credential is configured for the user.
 
 ## Suggested Usage
+**Windows BSOD workflows** inherit their credentials and inventories from the job templates in `setup.yml`. Configure **OpenShift Credential** and **APD Machine Credential** before launching these workflows; see the [BSOD Recovery prerequisites](docs/openshift-windows-bsod-recovery.md#prerequisites).
+
 **OpenShift / EDA / Install Controller** - This job uses the `admin` Controller user's password to configure the EDA controller login of the same name. This job displays the created route after finished and takes roughly 2.5 minutes to run.
 
 **OpenShift / CNV /  Deploy Automation Hub and sync EEs and Collections** - A custom credential type is created for the use in this WJT, `Usable Hub Credential` and it must be filled out in order to pull content from console.redhat.com. This workflow takes roughly 30 minutes to run. This workflow includes the following Job Templates:

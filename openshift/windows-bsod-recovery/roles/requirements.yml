@@ -1,0 +1,5 @@
+---
+# Roles used by this demo are vendored under this directory
+# (ansible-role-kubevirt, oatakan.openshift-add-auth-config). Controller does
+# not install a nested roles/requirements.yml for the APD project.
+roles: []

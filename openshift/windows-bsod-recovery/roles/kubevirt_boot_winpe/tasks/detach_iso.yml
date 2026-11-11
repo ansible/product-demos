@@ -1,0 +1,64 @@
+---
+- name: detach iso and start vm
+  kubernetes.core.k8s:
+    state: present
+    merge_type: merge
+    validate_certs: false
+    api_key: "{{ api_key }}"
+    definition:
+      apiVersion: "{{ kubevirt_boot_winpe_api_version_virtual_machine }}"
+      kind: VirtualMachine
+      metadata:
+        name: "{{ hostvars[vm].labels['vm.kubevirt.io/name'] }}"
+        namespace: "{{ kubevirt_boot_winpe_target_namespace }}"
+      spec:
+        runStrategy:
+        running: true
+        template:
+          spec:
+            domain:
+              devices:
+                disks:
+                  - bootOrder: 1
+                    disk:
+                      bus: virtio
+                    name: disk0
+            volumes:
+              - dataVolume:
+                  name: "{{ hostvars[vm].labels['vm.kubevirt.io/name'] }}-disk0"
+                name: disk0
+  loop: "{{ ansible_play_hosts }}"
+  loop_control:
+    loop_var: vm
+  when:
+    - nodes is defined
+    - hostvars[vm].labels['vm.kubevirt.io/name'] is defined
+    - (nodes | json_query(query)) | length > 0
+  vars:
+    query: "@[?name==`{{ hostvars[vm].labels['vm.kubevirt.io/name'] }}`]"
+
+- name: wait for vm status to be running
+  kubernetes.core.k8s_info:
+    api_version: "{{ kubevirt_boot_winpe_api_version_virtual_machine }}"
+    kind: VirtualMachine
+    name: "{{ hostvars[vm].labels['vm.kubevirt.io/name'] }}"
+    namespace: "{{ kubevirt_boot_winpe_target_namespace }}"
+    verify_ssl: false
+    api_key: "{{ api_key }}"
+  register: vm_info
+  until:
+    - (vm_info.resources | default([])) | length > 0
+    - vm_info.resources[0].spec.running is defined
+    - vm_info.resources[0].spec.running | bool
+  delay: 5
+  retries: 30
+  failed_when: false
+  loop: "{{ ansible_play_hosts }}"
+  loop_control:
+    loop_var: vm
+  when:
+    - nodes is defined
+    - hostvars[vm].labels['vm.kubevirt.io/name'] is defined
+    - (nodes | json_query(query)) | length > 0
+  vars:
+    query: "@[?name==`{{ hostvars[vm].labels['vm.kubevirt.io/name'] }}`]"

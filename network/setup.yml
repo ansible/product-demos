@@ -2,7 +2,11 @@
 _deployment_id: '{{ lookup("ansible.builtin.password", playbook_dir + "/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
 apd_managed_by: aap-product-demos
 
-user_message:
+user_message: >-
+  Product Demos deploys one connected IOS-XE, Arista EOS, and Juniper vSRX lab.
+  Rebuild the Product Demos EE with the pinned network collections and Python dependencies.
+  Run Configure Devices, Validate Devices, and Report after deployment.
+  Redeployment replaces older product_demos and multi-vendor labs and resets device configuration.
 
 controller_credential_types:
   - name: SSH Proxy
@@ -118,7 +122,7 @@ controller_credentials:
       ssh_proxy_host: REPLACEME
       ssh_proxy_username: ec2-user
   - name: Containerlab Device Access
-    description: Admin credentials for containerlab network devices (n9kv, cat8kv)
+    description: Admin credentials shared by Cisco, Juniper, and Arista lab devices
     organization: Ansible Product Demos (APD)
     credential_type: SSH Proxy
     inputs:
@@ -147,45 +151,58 @@ controller_inventories:
     description: Containerlab network devices discovered via AWS EC2
 
 controller_hosts:
-  - name: n9kv
+  - name: cat8kv1
     inventory: ContainerLab Inventory
-    enabled: true
-  - name: cat8kv
+  - name: veos2
     inventory: ContainerLab Inventory
-    enabled: true
+  - name: vjunos3
+    inventory: ContainerLab Inventory
+  - name: veos4
+    inventory: ContainerLab Inventory
 
 controller_groups:
   - name: clab_nxos
     inventory: ContainerLab Inventory
-    hosts:
-      - n9kv
-    variables:
-      ansible_port: 2122
-      ansible_network_os: cisco.nxos.nxos
+    state: absent
   - name: clab_ios
     inventory: ContainerLab Inventory
-    hosts:
-      - cat8kv
+    hosts: [cat8kv1]
     variables:
-      ansible_port: 2123
       ansible_network_os: cisco.ios.ios
+      ansible_connection: ansible.netcommon.network_cli
+      ansible_connect_timeout: 900
+      ansible_command_timeout: 120
+  - name: clab_junos
+    inventory: ContainerLab Inventory
+    hosts: [vjunos3]
+    variables:
+      ansible_network_os: juniper.device.junos
+      ansible_connection: ansible.netcommon.netconf
+      ansible_netconf_port: !unsafe '{{ ansible_port }}'
+      ansible_connect_timeout: 1800
+      ansible_command_timeout: 120
+  - name: clab_eos
+    inventory: ContainerLab Inventory
+    hosts: [veos2, veos4]
+    variables:
+      ansible_network_os: arista.eos.eos
+      ansible_connection: ansible.netcommon.network_cli
+      ansible_connect_timeout: 900
+      ansible_command_timeout: 120
+      ansible_become: true
+      ansible_become_method: enable
   - name: clab_switches
     inventory: ContainerLab Inventory
-    hosts:
-      - n9kv
+    hosts: [veos2, veos4]
   - name: clab_routers
     inventory: ContainerLab Inventory
-    hosts:
-      - cat8kv
+    hosts: [cat8kv1, vjunos3]
   - name: containerlab
     inventory: ContainerLab Inventory
-    children:
-      - clab_nxos
-      - clab_ios
+    children: [clab_ios, clab_junos, clab_eos]
     variables:
       ansible_user: !unsafe '{{ ssh_proxy_username }}'
       ansible_password: !unsafe '{{ ssh_proxy_password }}'
-      ansible_connection: ansible.netcommon.network_cli
       ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
 
 controller_inventory_sources:
@@ -253,6 +270,9 @@ controller_templates:
     project: Ansible Product Demos
     playbook: network/provision_hypervisor.yml
     inventory: Ansible Product Demos Inventory
+    extra_vars:
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -270,13 +290,20 @@ controller_templates:
             - us-east-2
             - us-west-2
         - question_name: Instance Type
+          question_description: c8i.4xlarge is the validated four-device lab size (16 vCPU, 32 GiB); it costs more than the previous c8i.2xlarge default.
           type: multiplechoice
           variable: clab_aws_instance_type
           required: true
-          default: c8i.2xlarge
+          default: c8i.4xlarge
           choices:
             - c8i.2xlarge
             - c8i.4xlarge
+        - question_name: Allowed management source CIDR
+          question_description: Include AAP execution-node egress and presenter addresses. The default 0.0.0.0/0 exposes SSH, NETCONF, and the HTTP report publicly.
+          type: text
+          variable: clab_access_cidr
+          required: true
+          default: 0.0.0.0/0
         - question_name: Owner
           type: text
           variable: clab_aws_owner_tag
@@ -299,6 +326,9 @@ controller_templates:
     project: Ansible Product Demos
     playbook: network/deploy_containerlab.yml
     inventory: Ansible Product Demos Inventory
+    extra_vars:
+      apd_id: "{{ _deployment_id }}"
+      apd_managed_by: "{{ apd_managed_by }}"
     notification_templates_started: Telemetry
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
@@ -315,6 +345,12 @@ controller_templates:
           choices:
             - us-east-2
             - us-west-2
+        - question_name: Allowed management source CIDR
+          question_description: Include AAP execution-node egress and presenter addresses. The default 0.0.0.0/0 exposes SSH, NETCONF, and the HTTP report publicly.
+          type: text
+          variable: clab_access_cidr
+          required: true
+          default: 0.0.0.0/0
 
   - name: "NETWORK | Containerlab | Teardown Topology"
     labels:
@@ -328,6 +364,7 @@ controller_templates:
     credentials:
       - AWS
       - Containerlab SSH
+      - AAP Credential
     project: Ansible Product Demos
     playbook: network/teardown_containerlab.yml
     inventory: Ansible Product Demos Inventory
@@ -429,6 +466,29 @@ controller_templates:
             - us-east-2
             - us-west-2
 
+  - name: "NETWORK | Containerlab | Validate Devices"
+    description: Validate EC2 KVM, resource usage, device facts, and configured lab connectivity
+    labels: [network, containerlab]
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: ContainerLab Inventory
+    project: Ansible Product Demos
+    playbook: network/validate_containerlab.yml
+    credentials:
+      - Containerlab Device Access
+      - Containerlab SSH
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Which devices should be validated?
+          type: multiplechoice
+          variable: _hosts
+          default: containerlab
+          required: true
+          choices: [clab_junos, containerlab, clab_ios, clab_eos]
+
   - name: "NETWORK | Report"
     labels:
       - network
@@ -442,6 +502,7 @@ controller_templates:
     notification_templates_error: Telemetry
     credentials:
       - Containerlab Device Access
+      - Containerlab SSH
     survey_enabled: true
     survey:
       name: ''
@@ -454,8 +515,9 @@ controller_templates:
           required: true
           choices:
             - containerlab
-            - clab_nxos
             - clab_ios
+            - clab_junos
+            - clab_eos
 
   - name: "NETWORK | DISA STIG"
     labels:
@@ -485,7 +547,7 @@ controller_templates:
           required: true
           choices:
             - clab_ios
-            - cat8kv
+            - cat8kv1
 
   - name: "NETWORK | Backup"
     labels:
@@ -737,13 +799,20 @@ controller_workflows:
             - us-east-2
             - us-west-2
         - question_name: Instance Type
+          question_description: c8i.4xlarge is the validated four-device lab size (16 vCPU, 32 GiB); it costs more than the previous c8i.2xlarge default.
           type: multiplechoice
           variable: clab_aws_instance_type
           required: true
-          default: c8i.2xlarge
+          default: c8i.4xlarge
           choices:
             - c8i.2xlarge
             - c8i.4xlarge
+        - question_name: Allowed management source CIDR
+          question_description: Include AAP execution-node egress and presenter addresses. The default 0.0.0.0/0 exposes SSH, NETCONF, and the HTTP report publicly.
+          type: text
+          variable: clab_access_cidr
+          required: true
+          default: 0.0.0.0/0
         - question_name: Owner
           type: text
           variable: clab_aws_owner_tag

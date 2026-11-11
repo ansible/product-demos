@@ -1,0 +1,45 @@
+---
+
+- name: detach cdroms
+  kubernetes.core.k8s:
+    state: present
+    merge_type: merge
+    validate_certs: no
+    api_key: "{{ api_key }}"
+    definition:
+      apiVersion: "{{ api_version_virtual_machine }}"
+      kind: VirtualMachine
+      metadata:
+        name: '{{ template.name }}'
+        namespace: '{{ target_namespace }}'
+      spec:
+        template:
+          spec:
+            domain:
+              devices:
+                disks:
+                  - bootOrder: 1
+                    disk:
+                      bus: virtio
+                    name: disk0
+            volumes:
+              - dataVolume:
+                  name: '{{ template.name }}-disk0'
+                name: disk0
+
+#- name: detach cdroms
+#  kubevirt_vm:
+#    validate_certs: no
+#    api_key: "{{ api_key }}"
+#    state: running
+#    wait: true
+#    name: '{{ template.name }}'
+#    namespace: '{{ target_namespace }}'
+#    disks:
+#      - bootOrder: 1
+#        disk:
+#          bus: virtio
+#        name: disk0
+#        volume:
+#          dataVolume:
+#            name: '{{ template.name }}-disk0'

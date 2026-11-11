@@ -1,0 +1,15 @@
+#network-data
+{% if template.networks[0].ip is defined and template.networks[0].netmask is defined and template.networks[0].gateway is defined %}
+version: 2
+ethernets:
+{% for network in template.networks %}
+  {{ network.device_name | default(network.nic_name) }}:
+    addresses:
+      - {{ network.ip }}/{{ (network.ip + '/' + network.netmask) | ansible.utils.ipaddr('prefix') }}
+    gateway4: {{ network.gateway }}
+{% if network.dns_servers is defined %}
+    nameservers:
+      addresses: {{ network.dns_servers }}
+{% endif %}
+{% endfor %}
+{% endif %}

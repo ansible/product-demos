@@ -1,0 +1,24 @@
+apiVersion: v2
+name: openflake
+description: Lightweight ITSM platform with a ServiceNow-compatible REST API, packaged for OpenShift
+type: application
+
+# Chart version. Bump on any chart change.
+version: 0.1.0
+# Version of OpenFlake this chart deploys by default. Overridden by image.tag.
+appVersion: "0.1.0"
+
+keywords:
+  - itsm
+  - servicenow
+  - ansible
+  - openshift
+  - fastapi
+
+home: https://github.com/rlopez133/open-flake
+sources:
+  - https://github.com/rlopez133/open-flake
+
+annotations:
+  charts.openshift.io/name: OpenFlake
+  charts.openshift.io/provider: OpenFlake

@@ -1,0 +1,21 @@
+---
+network_report_platforms:
+  cisco.ios.ios: {vendor: Cisco, os: IOS-XE, facts_module: cisco.ios.ios_facts}
+  cisco.nxos.nxos: {vendor: Cisco, os: NX-OS, facts_module: cisco.nxos.nxos_facts}
+  arista.eos.eos: {vendor: Arista, os: EOS, facts_module: arista.eos.eos_facts}
+  juniper.device.junos: {vendor: Juniper, os: Junos, facts_module: juniper.device.junos_facts}
+network_report_resources:
+  - interfaces
+  - l2_interfaces
+  - l3_interfaces
+  - vlans
+  - lldp_global
+  - lldp_interfaces
+  - lag_interfaces
+  - lacp_interfaces
+  - static_routes
+  - bgp_global
+  - bgp_address_family
+  - ospfv2
+  - ospf_interfaces
+  - ntp_global

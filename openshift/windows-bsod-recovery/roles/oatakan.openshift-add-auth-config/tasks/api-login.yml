@@ -1,0 +1,44 @@
+---
+
+# - name: cluster {{ auth_action }}
+#   kubernetes.core.k8s_auth:
+#     state: '{{ state }}'
+#     username: "{{ lookup('env','K8S_AUTH_USERNAME') }}"
+#     password: "{{ lookup('env','K8S_AUTH_PASSWORD') }}"
+#     host: "{{ lookup('env','K8S_AUTH_HOST') }}"
+#     validate_certs: "{{ lookup('env','K8S_AUTH_VERIFY_SSL') | bool }}"
+#   register: k8s_auth_results
+#   until: k8s_auth_results is success
+#   delay: 3
+#   retries: 15
+
+# - name: set api_key
+#   set_fact:
+#     api_key: "{{ k8s_auth_results.k8s_auth.api_key }}"
+#   no_log: true
+
+- name: check if api_key is specified
+  set_fact:
+    api_key: "{{ lookup('env', 'K8S_AUTH_API_KEY') | default(None) }}"
+  no_log: true
+  when: api_key is undefined
+
+- block:
+    - name: cluster {{ auth_action }}
+      community.okd.openshift_auth:
+        state: '{{ state }}'
+        username: "{{ lookup('env','K8S_AUTH_USERNAME') }}"
+        password: "{{ lookup('env','K8S_AUTH_PASSWORD') }}"
+        host: "{{ lookup('env','K8S_AUTH_HOST') }}"
+        validate_certs: "{{ lookup('env','K8S_AUTH_VERIFY_SSL') | bool }}"
+      register: openshift_auth_results
+      until: openshift_auth_results is success
+      delay: 3
+      retries: 15
+
+    - name: set api_key
+      set_fact:
+        api_key: "{{ openshift_auth_results.openshift_auth.api_key }}"
+      when: openshift_auth_results is success
+      no_log: true
+  when: api_key is undefined or api_key == ''

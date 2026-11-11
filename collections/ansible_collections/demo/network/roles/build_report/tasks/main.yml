@@ -1,0 +1,50 @@
+---
+- name: Build the report from this job's selected devices
+  ansible.builtin.set_fact:
+    network_report: >-
+      {{ hostvars | demo.network.network_report_document(
+         hostvars['localhost'].network_report_selected_hosts,
+         now(utc=true, fmt='%Y-%m-%d %H:%M:%S UTC')) }}
+
+- name: Render detailed standalone HTML
+  ansible.builtin.template:
+    src: report.html.j2
+    dest: "{{ network_report_path }}/index.html"
+    mode: '0644'
+    setype: httpd_sys_content_t
+
+- name: Publish sanitized structured report data
+  ansible.builtin.copy:
+    content: "{{ network_report | to_nice_json }}\n"
+    dest: "{{ network_report_path }}/report.json"
+    mode: '0644'
+    setype: httpd_sys_content_t
+
+- name: Verify report is served
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ network_report_port }}/network/"
+    return_content: true
+  register: network_report_http
+  failed_when: "network_report_http.status != 200 or 'APD Network Report' not in network_report_http.content"
+
+- name: Export report URL and collection outcome to AAP artifacts
+  ansible.builtin.set_stats:
+    data:
+      network_report_url: "{{ network_report_url }}"
+      network_report_devices: "{{ network_report.devices | length }}"
+      network_report_devices_with_issues: "{{ network_report.issue_count }}"
+    per_host: false
+
+- name: Display report location and collection outcome
+  ansible.builtin.debug:
+    msg:
+      - "Detailed report: {{ network_report_url }}"
+      - "{{ network_report.complete_count }}/{{ network_report.devices | length }} devices collected without errors; {{ network_report.issue_count }} with issues."
+
+- name: Fail the job when any selected device has collection errors
+  ansible.builtin.assert:
+    that: network_report.issue_count | int == 0
+    fail_msg: >-
+      Report published at {{ network_report_url }}. Collection failed for:
+      {{ network_report.devices | rejectattr('status', 'equalto', 'collected') | map(attribute='name') | join(', ') }}.
+      Review the device errors in the published report and network_report_devices_with_issues in job artifacts.

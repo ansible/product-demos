@@ -73,25 +73,7 @@
       no_log: true
 
     - name: Log in to Automation Orchestrator API
-      ansible.builtin.uri:
-        url: "{{ ao_api_url }}/auth/login"
-        method: POST
-        body_format: json
-        body:
-          username: admin
-          password: "{{ ao_admin_password }}"
-        validate_certs: false
-        status_code: [200]
-      register: ao_login
-      no_log: true
-      until: ao_login.status | default(0) == 200
-      retries: 30
-      delay: 5
-
-    - name: Store AO API token
-      ansible.builtin.set_fact:
-        ao_api_token: "{{ ao_login.json.access_token }}"
-      no_log: true
+      ansible.builtin.include_tasks: tasks/ao_login.yml
 
     - name: Resolve AAP token for AO integration
       ansible.builtin.include_tasks: tasks/resolve_aap_token.yml
@@ -99,14 +81,30 @@
     - name: Wire AO AAP credential and integration
       ansible.builtin.include_tasks: tasks/wire_aap_integration.yml
 
+    - name: Wire Controller LiteMaaS into AO as LLM Provider
+      ansible.builtin.include_tasks: tasks/wire_litemaas_integration.yml
+
     - name: Run demo preflight checks
       ansible.builtin.include_tasks: tasks/preflight.yml
 
     - name: Provision AAP project and job templates for enabled demos
       ansible.builtin.include_tasks: tasks/provision_aap_demos.yml
 
+    # AAP JT provisioning can outlive the AO JWT; refresh before workflow sync.
+    - name: Refresh AO API token before workflow sync
+      ansible.builtin.include_tasks: tasks/ao_login.yml
+
+    - name: Ensure AO CI/CD webhook service account
+      ansible.builtin.include_tasks: tasks/wire_ao_cicd_service_account.yml
+
     - name: Synchronize enabled AO workflow exports
       ansible.builtin.include_tasks: tasks/sync_demos.yml
+
+    - name: Publish CI/CD workflow with authorized webhook service account
+      ansible.builtin.include_tasks: tasks/publish_cicd_workflow.yml
+
+    - name: Wire AO webhook URL into Gitea Actions secrets
+      ansible.builtin.include_tasks: tasks/wire_gitea_ao_webhook.yml
 
     - name: Record Mattermost warning when credential and inventory are missing
       when:
@@ -122,6 +120,70 @@
               ~ ' post to Mattermost. Run Infrastructure | AWS - Provision Mattermost '
               ~ '(writes the Mattermost Controller credential and syncs AWS Inventory), '
               ~ 'then re-run Install so Notify Chatroom attaches that credential.'
+            ]
+          }}
+
+    - name: Record OpenFlake warning when credential is missing
+      when:
+        - (ao_openflake_demos | default([]) | length) > 0
+        - not (ao_openflake_present | default(false) | bool)
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'Demo(s) '
+              ~ (ao_openflake_demos | map(attribute='slug') | list | join(', '))
+              ~ ' need OpenFlake. Run Infrastructure | OpenFlake (writes the '
+              ~ 'OpenFlake Controller credential), then re-run Install.'
+            ]
+          }}
+
+    # Chart-generated admin password lives only in the OpenShift Secret.
+    # Surface it in the Install seed summary (same pattern as Mattermost) so
+    # students do not have to dig into the nested Shared Services / OpenFlake job.
+    - name: Read OpenFlake admin password from cluster Secret
+      when: ao_openflake_present | default(false) | bool
+      kubernetes.core.k8s_info:
+        kind: Secret
+        name: openflake
+        namespace: "{{ ao_openflake_namespace | default('openflake') }}"
+      register: ao_openflake_secret
+      failed_when: false
+      no_log: true
+
+    - name: Decode OpenFlake admin login for seed summary
+      when:
+        - ao_openflake_present | default(false) | bool
+        - (ao_openflake_secret.resources | default([]) | length) > 0
+      ansible.builtin.set_fact:
+        ao_openflake_username: >-
+          {{
+            ao_openflake_secret.resources[0].data.ADMIN_USERNAME
+            | default('') | b64decode
+            | default('admin', true)
+          }}
+        ao_openflake_password: >-
+          {{
+            ao_openflake_secret.resources[0].data.ADMIN_PASSWORD
+            | default('') | b64decode
+          }}
+      no_log: true
+
+    - name: Record Gitea warning when credential or host is missing
+      when:
+        - (ao_gitea_demos | default([]) | length) > 0
+        - >-
+          not (ao_gitea_present | default(false) | bool)
+          or not (ao_gitea_host_present | default(false) | bool)
+      ansible.builtin.set_fact:
+        ao_seed_warnings: >-
+          {{
+            ao_seed_warnings + [
+              'Demo(s) '
+              ~ (ao_gitea_demos | map(attribute='slug') | list | join(', '))
+              ~ ' need aws_gitea + Gitea Controller credential. Run '
+              ~ 'Infrastructure | AWS - Deploy Shared Services (or Provision Gitea), '
+              ~ 'sync AWS Inventory, then re-run Install.'
             ]
           }}
 
@@ -149,8 +211,103 @@
               ]
               if (ao_mattermost_server | default('') | length) > 0
               else [
-                'Mattermost: not provisioned — run Infrastructure | AWS - Provision Mattermost (updates Mattermost credential + syncs inventory)',
+                'Mattermost: not provisioned — run Infrastructure | AWS - Deploy Shared Services (or Provision Mattermost)',
               ]
+            )
+            + (
+              (
+                [
+                  'Gitea URL: http://' ~ ao_gitea_host ~ ':' ~ ao_gitea_port,
+                  'Gitea Username: apdadmin',
+                  'Gitea Password: Ansible123!',
+                  'Gitea Controller credential: attached to CI/CD Demo JTs when present',
+                ]
+                + (
+                  [
+                    'Gitea Actions AO webhook secrets: set (AO_WEBHOOK_URL'
+                    ~ (
+                      ', AO_TOKEN_URL, AO_CLIENT_ID, AO_CLIENT_SECRET'
+                      if (ao_gitea_oauth_secrets_set | default(false) | bool)
+                      else ''
+                    )
+                    ~ ') → ' ~ ao_cicd_webhook_url,
+                  ]
+                  if (ao_gitea_webhook_secret_set | default(false) | bool)
+                  else [
+                    'Gitea Actions AO webhook secrets: NOT set — re-run Install after Gitea is healthy',
+                  ]
+                )
+                + (
+                  [
+                    'AO CI/CD webhook service account: authorized + workflow published',
+                  ]
+                  if (ao_cicd_workflow_published | default(false) | bool)
+                  else (
+                    [
+                      'AO CI/CD webhook service account: prepared (publish pending)',
+                    ]
+                    if (ao_cicd_sa_ready | default(false) | bool)
+                    else [
+                      'AO CI/CD webhook service account: not ready',
+                    ]
+                  )
+                )
+              )
+              if (
+                (ao_gitea_present | default(false) | bool)
+                and (ao_gitea_host | default('') | length) > 0
+              )
+              else [
+                'Gitea: not provisioned — Shared Services / Provision Gitea may have failed or was skipped. Check that workflow node, then re-run Install for cicd-pipeline.',
+              ]
+            )
+            + (
+              (
+                [
+                  'OpenFlake URL: ' ~ ao_openflake_url,
+                  'OpenFlake Username: '
+                  ~ (ao_openflake_username | default('admin')),
+                ]
+                + (
+                  [
+                    'OpenFlake Password: ' ~ ao_openflake_password,
+                  ]
+                  if (ao_openflake_password | default('') | length) > 0
+                  else [
+                    'OpenFlake Password: see Infrastructure | OpenFlake job output '
+                    ~ '(or: oc -n openflake get secret openflake '
+                    ~ '-o jsonpath="{.data.ADMIN_PASSWORD}" | base64 -d)',
+                  ]
+                )
+                + [
+                  'OpenFlake Controller credential: attached to CI/CD Demo JTs when present',
+                ]
+              )
+              if (ao_openflake_present | default(false) | bool)
+              else [
+                'OpenFlake: not provisioned — run Infrastructure | AWS - Deploy Shared Services (or OpenFlake) for cicd-pipeline',
+              ]
+            )
+            + (
+              [
+                'AO LLM: ' ~ ao_llm_integration_name
+                ~ ' (model ' ~ (ao_llm_model_name | default(ao_llm_model))
+                ~ ', id ' ~ ao_llm_model_id ~ ')',
+              ]
+              if (
+                (ao_litemaas_present | default(false) | bool)
+                and (ao_llm_model_id | default('') | length) > 0
+                and (ao_llm_credential_id | default('') | length) > 0
+              )
+              else (
+                [
+                  'AO LLM: credential/integration created but no model id yet — see warnings',
+                ]
+                if (ao_litemaas_present | default(false) | bool)
+                else [
+                  'AO LLM: not wired — ensure Controller LiteMaaS is populated and attached to Install',
+                ]
+              )
             )
           }}
 

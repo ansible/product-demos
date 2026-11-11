@@ -1,0 +1,14 @@
+---
+
+nodes:
+  - name: winwaik
+    role: wadk
+    app_name: winpe
+    environment: dev
+    domain: home.ad
+    disks:
+      - name: winwaik-disk0
+        size: 60GiB
+    memory: 6144
+    cpu: 2
+    template: "{{ infra_template_name | default('windows-2022-standard') }}"

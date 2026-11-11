@@ -1,0 +1,77 @@
+---
+- name: Validate lab device selection
+  ansible.builtin.assert:
+    that:
+      - inventory_hostname in network_lab_resources
+      - ansible_network_os in network_lab_prefixes
+    fail_msg: Select a supported ContainerLab Inventory device.
+
+- name: Normalize the retained vSRX management routing context
+  ansible.builtin.include_tasks: normalize_junos_management.yml
+  when: ansible_network_os == 'juniper.device.junos'
+
+- name: Merge structured lab configuration
+  ansible.builtin.include_tasks: resource.yml
+  loop: "{{ network_lab_resources[inventory_hostname] + [{'resource': 'ntp_global', 'config': network_lab_ntp}] }}"
+  loop_control:
+    loop_var: network_lab_item
+    label: "{{ network_lab_item.resource }}"
+
+- name: Permit diagnostic pings from the vSRX data interface to its loopback
+  juniper.device.junos_config:
+    lines:
+      - set security policies from-zone trust to-zone trust policy apd-loopback-ping match source-address any
+      - set security policies from-zone trust to-zone trust policy apd-loopback-ping match destination-address any
+      - set security policies from-zone trust to-zone trust policy apd-loopback-ping match application junos-icmp-ping
+      - set security policies from-zone trust to-zone trust policy apd-loopback-ping then permit
+    update: merge
+  when: ansible_network_os == 'juniper.device.junos'
+
+- name: Configure Cisco login banner
+  action: "{{ network_lab_prefixes[ansible_network_os] }}_banner"
+  args:
+    banner: motd
+    text: "MANAGED BY ANSIBLE AUTOMATION PLATFORM. Unauthorized access is prohibited."
+    state: present
+  when: ansible_network_os == 'cisco.ios.ios'
+
+- name: Inspect Cisco SNMP configuration before migrating the community
+  cisco.ios.ios_snmp_server:
+    state: gathered
+  register: network_lab_snmp_before
+  no_log: true
+  when:
+    - ansible_network_os == 'cisco.ios.ios'
+    - network_lab_snmp_community != 'public'
+
+# ios_snmp_server state=deleted removes the entire SNMP configuration. Limit
+# this migration to the named community and leave all other settings intact.
+- name: Remove the previous generic Cisco SNMP community
+  cisco.ios.ios_config:
+    lines: no snmp-server community public
+  when:
+    - ansible_network_os == 'cisco.ios.ios'
+    - network_lab_snmp_community != 'public'
+    - network_lab_snmp_before.gathered.communities | default([]) | selectattr('name', 'equalto', 'public') | list | length > 0
+
+- name: Merge Cisco SNMP baseline
+  action: "{{ network_lab_prefixes[ansible_network_os] }}_snmp_server"
+  args:
+    config:
+      communities:
+        - name: "{{ network_lab_snmp_community }}"
+          ro: true
+      contact: Ansible Product Demos
+      location: Containerlab on AWS
+    state: merged
+  when: ansible_network_os == 'cisco.ios.ios'
+
+- name: Preserve IOS-XE configuration across upgrades
+  cisco.ios.ios_config:
+    save_when: modified
+  when: ansible_network_os == 'cisco.ios.ios'
+
+- name: Save EOS configuration
+  arista.eos.eos_config:
+    save_when: modified
+  when: ansible_network_os == 'arista.eos.eos'

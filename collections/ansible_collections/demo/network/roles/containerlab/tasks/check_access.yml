@@ -1,0 +1,10 @@
+---
+- name: Warn when lab management access is open to all IPv4 sources
+  ansible.builtin.debug:
+    msg: >-
+      WARNING: clab_access_cidr is 0.0.0.0/0. This exposes hypervisor SSH,
+      device SSH/NETCONF, and the HTTP report on port {{ clab_report_port }}
+      to the public Internet. The lab uses demo credentials. Restrict
+      clab_access_cidr to a network containing the AAP execution-node egress
+      and presenter addresses before deploying outside an isolated demo environment.
+  when: clab_access_cidr == '0.0.0.0/0'

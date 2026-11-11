@@ -1,0 +1,33 @@
+galaxy_info:
+  author: Orcun Atakan
+  description: Ansible galaxy role for creating virtual machines on kubevirt/OpenShift Container-native Virtualization (CNV)
+  role_name: kubevirt
+  company: Red Hat
+
+  license: MIT
+
+  min_ansible_version: 2.9
+
+  platforms:
+    - name: EL
+      versions:
+        - all
+    - name: Windows
+      versions:
+        - all
+
+  cloud_platforms:
+    - openshift
+    - kubernetes
+
+  galaxy_tags:
+    - windows
+    - openshift
+    - kubevirt
+    - cnv
+    - container
+    - cloud
+    - multicloud
+    - template
+
+dependencies: []

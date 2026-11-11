@@ -1,0 +1,34 @@
+---
+
+controller_credentials:
+  - name: VMware Credential
+    credential_type: VMware vCenter
+    organization: Default
+    inputs:
+      host: "{{ lookup('env', 'VMWARE_HOST') }}"
+      username: "{{ lookup('env', 'VMWARE_USERNAME') }}"
+      password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
+
+controller_projects:
+  - name: aap-vmware-inventory-source
+    organization: Default
+    scm_type: git
+    scm_url: https://github.com/oatakan/ansible-vmware-vsphere-inventory-source.git
+    scm_branch: master
+
+controller_inventories:
+  - name: VMware Inventory
+    description: VMware dynamic inventory
+    organization: Default
+
+controller_inventory_sources:
+  - name: VMware vCenter
+    inventory: VMware Inventory
+    organization: Default
+    source: scm
+    source_project: aap-vmware-inventory-source
+    source_path: vmware.yml
+    credential: VMware Credential
+    update_on_launch: true
+    overwrite_vars: true
+    overwrite: true

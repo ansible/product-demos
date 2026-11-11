@@ -1,0 +1,71 @@
+---
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template.name }}-expand
+  namespace: '{{ target_namespace }}'
+  labels:
+    app: {{ template.name }}-expand
+{% if owner_uid is defined and owner_uid is not none %}
+  ownerReferences:
+    - apiVersion: "{{ api_version_virtual_machine }}"
+      kind: VirtualMachine
+      name: {{ template.name }}
+      uid: {{ owner_uid }}
+      controller: true
+      blockOwnerDeletion: true
+{% endif %}
+spec:
+  activeDeadlineSeconds: {{ resize_job_timeout }}
+  template:
+    annotations:
+      openshift.io/scc: anyuid
+    metadata:
+      name: {{ template.name }}-expand
+    spec:
+      restartPolicy: Never
+      serviceAccountName: default
+      priority: 0
+      schedulerName: default-scheduler
+      enableServiceLinks: true
+      terminationGracePeriodSeconds: 30
+      containers:
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: {{ template.name }}-expand
+          command:
+            - /bin/bash
+            - -c
+            - '/usr/bin/qemu-img resize /var/run/cdi/clone/source/disk.img $NEW_SIZE'
+          env:
+            - name: NEW_SIZE
+              value: {{ template.disks[0].size | replace('GiB', 'G') }}
+            - name: VOLUME_MODE
+              value: filesystem
+            - name: MOUNT_POINT
+              value: /var/run/cdi/clone/source
+          ports:
+            - name: metrics
+              containerPort: 8443
+              protocol: TCP
+          volumeMounts:
+            - name: cdi-data-vol
+              mountPath: /var/run/cdi/clone/source
+          terminationMessagePolicy: File
+          image: {{ kubevirt_launcher_image }}
+      serviceAccount: default
+      volumes:
+        - name: cdi-data-vol
+          persistentVolumeClaim:
+            claimName: {{ template.name }}-disk0
+      dnsPolicy: ClusterFirst
+      tolerations:
+        - key: node.kubernetes.io/not-ready
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 300
+        - key: node.kubernetes.io/unreachable
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 300

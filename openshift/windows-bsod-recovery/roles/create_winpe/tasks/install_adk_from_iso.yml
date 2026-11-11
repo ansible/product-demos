@@ -1,0 +1,37 @@
+---
+- name: download windows adk
+  block:
+    - name: set win_adk_iso_path
+      ansible.builtin.set_fact:
+        win_adk_iso_path: "{{ create_winpe_temp_directory }}\\adk.iso"
+
+    - name: download adk iso file
+      ansible.windows.win_get_url:
+        dest: "{{ win_adk_iso_path }}"
+        url: "{{ win_adk_iso_download_url }}"
+      register: download_adk_iso
+      until: download_adk_iso is success
+      delay: 3
+      retries: 5
+  when:
+    - (":" in win_adk_iso_path)
+    - (not adk_iso_file.stat.exists)
+
+- name: install windows adk
+  block:
+    - name: mount adk iso
+      community.windows.win_disk_image:
+        image_path: "{{ win_adk_iso_path }}"
+        state: present
+      register: adk_disk_image_out
+
+    - name: install windows adk
+      ansible.windows.win_package:
+        path: "{{ adk_disk_image_out.mount_paths[0] }}adksetup.exe"
+        product_id: "{{ create_winpe_win_adk_product_id }}"
+        arguments: /quiet /installpath c:\ADK /norestart /ceip off /features {{ create_winpe_win_adk_features }}
+  always:
+    - name: unmount adk iso
+      community.windows.win_disk_image:
+        image_path: "{{ win_adk_iso_path }}"
+        state: absent

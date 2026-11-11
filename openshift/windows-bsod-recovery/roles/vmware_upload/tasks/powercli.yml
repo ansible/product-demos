@@ -1,0 +1,20 @@
+---
+- name: add PowerCLI module
+  block:
+    - name: add PowerCLI module
+      community.windows.win_psmodule:
+        name: VMware.PowerCLI
+        state: present
+        allow_clobber: true
+  rescue:
+    - name: add PowerCLI module (retry with allow_clobber disabled)
+      community.windows.win_psmodule:
+        name: VMware.PowerCLI
+        state: present
+      failed_when: false
+
+    - name: add PowerCLI module (retry with allow_clobber re-enabled)
+      community.windows.win_psmodule:
+        name: VMware.PowerCLI
+        state: present
+        allow_clobber: true

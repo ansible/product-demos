@@ -23,10 +23,10 @@ Two parts: **one-time setup**, then **show the demo**.
 
 That single workflow:
 
-- Checks whether `aws_rhel8` and `aws_rhel9` are in inventory — if not, stops with a message to run **Deploy Cloud Stack in AWS** first
+- Checks whether `aws-rhel9` and `aws-rhel10` are in inventory — if not, stops with a message to run **Deploy Cloud Stack in AWS** first
 - Provisions the Kafka queue (`aws_kafka`)
 - Syncs AWS inventory
-- Deploys auditd + Filebeat on `aws_rhel*` with Kafka output
+- Deploys auditd + Filebeat on `aws-rhel*` with Kafka output
 - Activates the EDA rulebook (`config_drift_kafka`)
 
 When it finishes, the demo is ready to go.
@@ -36,7 +36,7 @@ When it finishes, the demo is ready to go.
 **Option A — drift from AAP (recommended for presenters):**
 
 1. Open **http://PUBLIC_IP/** on the Kafka broker (`aws_kafka`) — a live dashboard shows friendly lines like `/etc/ssh/sshd_config modified — event published` when drift happens.
-2. Run **LINUX | Config Drift - Introduce SSHD Drift** (default limit `aws_rhel*` hits both RHEL workers).
+2. Run **LINUX | Config Drift - Introduce SSHD Drift** (default limit `aws-rhel*` hits both RHEL workers).
 3. Watch **Automation Decisions** — activation `config_drift_kafka` consumes the event.
 4. Watch **Automation Execution** — **LINUX | SSHD Configuration Remediation** launches (once per host, throttled to every 20 seconds).
 5. Confirm on the workers: `sudo grep -i Root /etc/ssh/sshd_config` → `PermitRootLogin no`.
@@ -59,7 +59,7 @@ Same EDA → remediation flow follows within ~20 seconds.
 
 ## Prerequisites
 
-- **Deploy Cloud Stack in AWS** already run (`aws_rhel8`, `aws_rhel9` in inventory)
+- **Deploy Cloud Stack in AWS** already run (`aws-rhel9`, `aws-rhel10` in inventory)
 - **APD | Single demo setup** — category `infrastructure`
 - **RHSM Registration** credential — org ID and activation key (see **LINUX | Register RHEL with RHSM**)
 - **Automation Decisions (EDA)** on AAP
@@ -69,10 +69,10 @@ Same EDA → remediation flow follows within ~20 seconds.
 
 Launch **Infrastructure | Config Drift - Full Setup** — a single workflow that:
 
-1. Verifies `aws_rhel8` and `aws_rhel9` are in inventory (fails with guidance if missing)
+1. Verifies `aws-rhel9` and `aws-rhel10` are in inventory (fails with guidance if missing)
 2. Provisions Kafka (`aws_kafka`)
 3. Syncs AWS inventory
-4. Deploys auditd + Filebeat with Kafka output on `aws_rhel*`
+4. Deploys auditd + Filebeat with Kafka output on `aws-rhel*`
 5. Activates the EDA rulebook
 
 ```mermaid
@@ -99,8 +99,8 @@ For the live demo moment, run **LINUX | Config Drift - Introduce SSHD Drift** se
 
 If you prefer individual jobs:
 
-1. **Deploy Cloud Stack in AWS** — `aws_rhel8`, `aws_rhel9` in inventory
-2. **LINUX | Register RHEL with RHSM** — default `_hosts`: `aws_rhel*`
+1. **Deploy Cloud Stack in AWS** — `aws-rhel9`, `aws-rhel10` in inventory
+2. **LINUX | Register RHEL with RHSM** — default `_hosts`: `aws-rhel*`
 3. **Infrastructure | AWS - Provision Kafka Queue**
 4. Sync **AWS Inventory**
 5. **LINUX | Config Drift - Deploy Audit and Filebeat** — Filebeat output: `kafka`
@@ -110,11 +110,11 @@ If you prefer individual jobs:
 
 | Pattern | Hosts matched | Use when |
 |---------|---------------|----------|
-| `aws_rhel9` | One RHEL 9 worker | Quick single-host demo |
-| `aws_rhel*` | `aws_rhel8` + `aws_rhel9` | Filebeat/auditd on every RHEL **worker** VM |
+| `aws-rhel9` | One RHEL 9 worker | Quick single-host demo |
+| `aws-rhel*` | `aws-rhel9` + `aws-rhel10` | Filebeat/auditd on every RHEL **worker** VM |
 | `reports` | Report server only | Not a config-drift target — different role in the stack |
 
-`aws_rhel*` does **not** match `reports`. If your job run includes `reports`, you used a broader limit than `aws_rhel*` (for example a group or `*`).
+`aws-rhel*` does **not** match `reports`. If your job run includes `reports`, you used a broader limit than `aws-rhel*` (for example a group or `*`).
 
 Unreachable hosts are skipped (`ignore_unreachable`) so one bad SSH target does not block the rest of the fleet.
 
@@ -147,7 +147,7 @@ Unreachable hosts are skipped (`ignore_unreachable`) so one bad SSH target does 
 ### Setup
 
 1. Run **APD | Single demo setup** with `infrastructure`.
-2. Run **Infrastructure | Config Drift - Full Setup**, or deploy auditd manually with **LINUX | Config Drift - Deploy Audit and Filebeat** — default `_hosts`: `aws_rhel*`.
+2. Run **Infrastructure | Config Drift - Full Setup**, or deploy auditd manually with **LINUX | Config Drift - Deploy Audit and Filebeat** — default `_hosts`: `aws-rhel*`.
 
 ### What was deployed
 

@@ -13,6 +13,8 @@ dependencies:
     - pkg-config [platform:rpm]
   python:
     - pywinrm>=0.4.3
+    - ncclient>=0.7.0
+    - passlib>=1.7.4
   python_interpreter:
     python_path: /usr/bin/python3.12
 

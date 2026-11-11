@@ -1,6 +1,6 @@
 ---
 - name: Introduce sshd_config drift for demo
-  hosts: "{{ _hosts | default('aws_rhel*') }}"
+  hosts: "{{ _hosts | default('aws-rhel*') }}"
   become: true
   gather_facts: false
   ignore_unreachable: true

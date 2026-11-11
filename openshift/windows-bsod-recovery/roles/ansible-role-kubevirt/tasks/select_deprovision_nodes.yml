@@ -1,0 +1,18 @@
+---
+- name: Reset inventory scope for this deprovision run
+  ansible.builtin.set_fact:
+    kubevirt_inventory_vm_names: []
+
+- name: Collect VM names selected by the current guest inventory
+  ansible.builtin.set_fact:
+    kubevirt_inventory_vm_names: "{{ kubevirt_inventory_vm_names + [hostvars[inventory_vm].labels['vm.kubevirt.io/name']] }}"
+  loop: '{{ ansible_play_hosts }}'
+  loop_control:
+    loop_var: inventory_vm
+  when: hostvars[inventory_vm].labels['vm.kubevirt.io/name'] is defined
+
+- name: Select explicit nodes while honoring a guest inventory limit
+  ansible.builtin.set_fact:
+    kubevirt_deprovision_nodes: >-
+      {{ nodes | default([]) | selectattr('name', 'in', kubevirt_inventory_vm_names) | list
+      if kubevirt_inventory_vm_names | length > 0 else nodes | default([]) }}

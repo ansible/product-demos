@@ -1,0 +1,9 @@
+---
+
+kubevirt_boot_winpe_iso_file: "{{ iso_file | default('file.iso') }}"
+
+kubevirt_boot_winpe_target_namespace: "{{ target_namespace | default('openshift-cnv') }}"
+
+kubevirt_boot_winpe_api_version_virtual_machine: "{{ api_version_virtual_machine | default('kubevirt.io/v1') }}"
+
+kubevirt_boot_winpe_kubevirt_clear_auth_key: "{{ kubevirt_clear_auth_key | default(false) }}"

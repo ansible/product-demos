@@ -41,6 +41,125 @@ controller_credential_types:
       extra_vars:
         mattermost_server: !unsafe '{{ mattermost_server }}'
         api_chat_token: !unsafe '{{ api_chat_token }}'
+  # RHDP boot already populates this via agnosticv; stub exists for BYO / JT attach.
+  - name: LiteMaaS
+    description: >-
+      Models-as-a-Service (LiteMaaS / LiteLLM) OpenAI-compatible endpoint and
+      virtual key. On demo.redhat.com this is pre-filled at catalog boot.
+    kind: cloud
+    inputs:
+      fields:
+        - type: string
+          id: api_endpoint
+          label: API Endpoint
+          help_text: LiteMaaS / LiteLLM API endpoint host
+        - type: string
+          id: api_base_url
+          label: API Base URL
+          help_text: OpenAI-compatible API base URL (typically includes /v1)
+        - type: string
+          id: virtual_key
+          label: Virtual Key
+          secret: true
+          help_text: LiteMaaS virtual key / access token
+        - type: string
+          id: model
+          label: Model
+          help_text: Default model id available with this key
+      required:
+        - api_base_url
+        - virtual_key
+    injectors:
+      env:
+        LITELLM_API_ENDPOINT: !unsafe '{{ api_endpoint }}'
+        LITELLM_API_BASE: !unsafe '{{ api_base_url }}'
+        OPENAI_API_BASE: !unsafe '{{ api_base_url }}'
+        LITELLM_API_KEY: !unsafe '{{ virtual_key }}'
+        OPENAI_API_KEY: !unsafe '{{ virtual_key }}'
+        LITELLM_MODEL: !unsafe '{{ model }}'
+      extra_vars:
+        litellm_api_endpoint: !unsafe '{{ api_endpoint }}'
+        litellm_api_base_url: !unsafe '{{ api_base_url }}'
+        litellm_virtual_key: !unsafe '{{ virtual_key }}'
+        litellm_available_models_list: !unsafe '{{ model }}'
+  - name: OpenFlake
+    description: >-
+      OpenFlake ITSM endpoint for AO CI/CD Pipeline (ServiceNow-compatible
+      Table API). Filled by Infrastructure | OpenFlake.
+    kind: cloud
+    inputs:
+      fields:
+        - id: instance_url
+          type: string
+          label: OpenFlake URL
+          help_text: Base URL with no trailing slash (example https://openflake.apps.example.com).
+        - id: username
+          type: string
+          label: Username
+          help_text: OpenFlake admin username (default admin).
+        - id: password
+          type: string
+          label: Password
+          secret: true
+      required:
+        - instance_url
+        - username
+        - password
+    injectors:
+      env:
+        SN_HOST: !unsafe '{{ instance_url }}'
+        SN_USERNAME: !unsafe '{{ username }}'
+        SN_PASSWORD: !unsafe '{{ password }}'
+        OPENFLAKE_INSTANCE_URL: !unsafe '{{ instance_url }}'
+        OPENFLAKE_USERNAME: !unsafe '{{ username }}'
+        OPENFLAKE_PASSWORD: !unsafe '{{ password }}'
+      extra_vars:
+        openflake_instance_url: !unsafe '{{ instance_url }}'
+        openflake_username: !unsafe '{{ username }}'
+        openflake_password: !unsafe '{{ password }}'
+        snow_instance_url: !unsafe '{{ instance_url }}'
+        snow_username: !unsafe '{{ username }}'
+        snow_password: !unsafe '{{ password }}'
+  - name: Gitea
+    description: >-
+      Gitea API endpoint for AO CI/CD Pipeline (Simulate Lightwell PR / Reset).
+      Filled by Infrastructure | AWS - Provision Gitea.
+    kind: cloud
+    inputs:
+      fields:
+        - id: gitea_host
+          type: string
+          label: Gitea host
+          help_text: Hostname or IP only (no http://).
+        - id: gitea_port
+          type: string
+          label: Gitea HTTP port
+          help_text: Default 3000.
+        - id: gitea_token
+          type: string
+          label: API token
+          secret: true
+        - id: gitea_owner
+          type: string
+          label: Owner / org
+          help_text: Repo owner (APD default apdadmin).
+        - id: gitea_repo
+          type: string
+          label: Repository
+          help_text: Default inventory-service.
+      required:
+        - gitea_host
+        - gitea_port
+        - gitea_token
+        - gitea_owner
+        - gitea_repo
+    injectors:
+      extra_vars:
+        gitea_host: !unsafe '{{ gitea_host }}'
+        gitea_port: !unsafe '{{ gitea_port }}'
+        gitea_token: !unsafe '{{ gitea_token }}'
+        gitea_owner: !unsafe '{{ gitea_owner }}'
+        gitea_repo: !unsafe '{{ gitea_repo }}'
 
 controller_credentials:
   - name: ROSA Token
@@ -60,6 +179,43 @@ controller_credentials:
     inputs:
       mattermost_server: REPLACEME
       api_chat_token: REPLACEME
+  - name: LiteMaaS
+    credential_type: LiteMaaS
+    organization: Ansible Product Demos (APD)
+    description: >-
+      Pre-filled on demo.redhat.com. AO Install wires this into Automation
+      Orchestrator as an LLM Provider integration for agentic workflow nodes.
+    update_secrets: false
+    state: exists
+    inputs:
+      api_endpoint: REPLACEME
+      api_base_url: REPLACEME
+      virtual_key: REPLACEME
+      model: qwen3-235b
+  - name: OpenFlake
+    credential_type: OpenFlake
+    organization: Ansible Product Demos (APD)
+    description: >-
+      Updated automatically by Infrastructure | OpenFlake.
+    update_secrets: false
+    state: exists
+    inputs:
+      instance_url: REPLACEME
+      username: admin
+      password: REPLACEME
+  - name: Gitea
+    credential_type: Gitea
+    organization: Ansible Product Demos (APD)
+    description: >-
+      Updated automatically by Infrastructure | AWS - Provision Gitea.
+    update_secrets: false
+    state: exists
+    inputs:
+      gitea_host: REPLACEME
+      gitea_port: "3000"
+      gitea_token: REPLACEME
+      gitea_owner: apdadmin
+      gitea_repo: inventory-service
   - name: OpenShift Credential
     organization: Ansible Product Demos (APD)
     credential_type: OpenShift or Kubernetes API Bearer Token
@@ -289,10 +445,8 @@ controller_templates:
   - name: Infrastructure | Automation Orchestrator | Install
     description: >-
       Deploys Automation Orchestrator on an existing OpenShift cluster using
-      aapctl, configures network access, wires the AAP integration, and seeds
-      curated AO demos from infrastructure/ao/demos.yml (disk-utilization by
-      default). Warns if aws_rhel9 or Mattermost are missing; Deploy Cloud
-      Stack and Provision Mattermost before running the disk demo end-to-end.
+      aapctl, configures network access, wires the AAP and LiteMaaS (LLM)
+      integrations, and seeds curated AO demos from infrastructure/ao/demos.yml.
     labels:
       - infrastructure
       - orchestrator
@@ -310,6 +464,8 @@ controller_templates:
     credentials:
       - OpenShift Credential
       - AAP Credential
+      - LiteMaaS
+      - Gitea
 
   - name: Infrastructure | Automation Orchestrator | Uninstall
     description: >-
@@ -332,9 +488,10 @@ controller_templates:
 
   - name: Infrastructure | AO Network Configuration | Install
     description: >-
-      Allow-lists the AAP gateway and AO route hostnames on Automation
-      Orchestrator's integration URL allow-list and enables private-network
-      OIDC, then restarts the instance so the change takes effect.
+      Allow-lists the AAP gateway, AO route, and LiteMaaS hostnames on
+      Automation Orchestrator's integration URL allow-list and enables
+      private-network OIDC, then restarts the instance so the change takes
+      effect.
     labels:
       - infrastructure
       - orchestrator
@@ -350,6 +507,7 @@ controller_templates:
     credentials:
       - OpenShift Credential
       - AAP Credential
+      - LiteMaaS
 
   - name: Infrastructure | HashiCorp Vault
     labels:
@@ -465,7 +623,7 @@ controller_templates:
 
   - name: "Infrastructure | Configuration management - ACME App - Setup"
     description: >-
-      Installs httpd on aws_rhel9 and renders the approved ACME storefront
+      Installs httpd on aws-rhel9 and renders the approved ACME storefront
       from a Jinja2 template. Click Launch with the default host to deploy
       the baseline page.
     labels:
@@ -497,12 +655,12 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           question_description: >-
-            Default is aws_rhel9 for a single-host demo. The ACME App is
+            Default is aws-rhel9 for a single-host demo. The ACME App is
             installed on this host only.
           type: text
           variable: _hosts
           required: true
-          default: aws_rhel9
+          default: aws-rhel9
 
   - name: "Infrastructure | Configuration management - ACME App - Update Configuration"
     description: >-
@@ -527,11 +685,11 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           question_description: >-
-            Same host as Setup. Default is aws_rhel9.
+            Same host as Setup. Default is aws-rhel9.
           type: text
           variable: _hosts
           required: true
-          default: aws_rhel9
+          default: aws-rhel9
         - question_name: Company name
           type: text
           variable: acme_app_company
@@ -706,6 +864,87 @@ controller_templates:
             - QA
             - Prod
 
+  - name: "Infrastructure | AWS - Provision Gitea"
+    description: >-
+      Provisions a dedicated aws_gitea EC2 instance and deploys Gitea with
+      Podman (SQLite). Creates an admin user, seeds inventory-service for
+      the CI/CD Pipeline demo, starts an act_runner, installs inventory-service
+      runtime (dev :8080 / prod :80), and upserts the Gitea credential on
+      Controller (requires AAP Credential).
+    labels:
+      - aws.ec2
+      - infrastructure
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - APD Machine Credential
+      - AAP Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/gitea/provision_gitea.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_aws_keypair_name: aws-test-key
+      create_vm_aws_securitygroup_name: aws-test-sg
+      create_vm_aws_vpc_subnet_name: aws-test-subnet
+      create_vm_vm_deployment: cloud_stack
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Owner
+          question_description: >-
+            Must match the owner tag on your existing cloud stack VMs.
+          type: text
+          variable: create_vm_aws_owner_tag
+          required: true
+          default: your_name
+        - question_name: Environment
+          type: multiplechoice
+          variable: create_vm_vm_environment
+          required: true
+          default: Prod
+          choices:
+            - Dev
+            - QA
+            - Prod
+
+  - name: "Infrastructure | AWS - Setup CI/CD Demo Host"
+    description: >-
+      Re-runs inventory-service runtime setup on aws_gitea (dev :8080, prod :80,
+      systemd units, baseline snapshot). Provision Gitea / Deploy Shared Services
+      already do this; use this JT only to refresh the apps without re-provisioning
+      Gitea.
+    labels:
+      - aws.ec2
+      - infrastructure
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - APD Machine Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/gitea/setup_demo_host.yml
+    inventory: Ansible Product Demos Inventory
+    limit: aws_gitea
+    ask_limit_on_launch: true
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+
   - name: "LINUX | Config Drift - Deploy Audit and Filebeat"
     description: >-
       Deploys persistent auditd rules that watch /etc/ssh/sshd_config for writes
@@ -731,13 +970,13 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           question_description: >-
-            Default is aws_rhel* (aws_rhel8 and aws_rhel9). Use aws_rhel9 for
+            Default is aws-rhel* (aws-rhel9 and aws-rhel10). Use aws-rhel9 for
             one host only. Unreachable hosts are skipped. reports is not matched
-            by aws_rhel*.
+            by aws-rhel*.
           type: text
           variable: _hosts
           required: true
-          default: aws_rhel*
+          default: aws-rhel*
         - question_name: Filebeat output
           type: multiplechoice
           variable: config_drift_filebeat_output
@@ -772,12 +1011,12 @@ controller_templates:
       spec:
         - question_name: Server Name or Pattern
           question_description: >-
-            Default is aws_rhel* (aws_rhel8 and aws_rhel9). Use aws_rhel9 for
+            Default is aws-rhel* (aws-rhel9 and aws-rhel10). Use aws-rhel9 for
             one host only. Unreachable hosts are skipped.
           type: text
           variable: _hosts
           required: true
-          default: aws_rhel*
+          default: aws-rhel*
 
   - name: "Infrastructure | Setup Rulebook for Kafka Queue - Config Drift & Remediation"
     description: >-
@@ -820,7 +1059,7 @@ controller_templates:
 
   - name: "Infrastructure | Config Drift - Check Cloud Stack"
     description: >-
-      Verifies aws_rhel8 and aws_rhel9 exist in inventory before config drift
+      Verifies aws-rhel9 and aws-rhel10 exist in inventory before config drift
       setup. Used by the Full Setup workflow; fails when Deploy Cloud Stack in
       AWS must be run first.
     labels:
@@ -836,7 +1075,317 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
 
+  - name: "Infrastructure | Enable AAP MCP server on operator deployment"
+    description: >-
+      Enables the AAP MCP server on an operator deployment by patching the
+      AnsibleAutomationPlatform custom resource to add the mcp spec.
+    labels:
+      - infrastructure
+      - openshift
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    credentials:
+      - OpenShift Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/aap-mcp-operator.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AAP custom resource name
+          type: text
+          variable: aap_custom_resource_name
+          required: true
+          default: aap
+        - question_name: AAP custom resource namespace
+          type: text
+          variable: aap_custom_resource_namespace
+          required: true
+          default: aap
+        - question_name: Enable MCP write operations?
+          type: multiplechoice
+          variable: aap_mcp_allow_write_operations
+          required: true
+          default: "true"
+          choices:
+            - "true"
+            - "false"
+
+  - name: "Infrastructure | Disable AAP MCP server on operator deployment"
+    description: >-
+      Disables the AAP MCP server on an operator deployment by patching the
+      AnsibleAutomationPlatform custom resource definition to set mcp.disabled: true.
+    labels:
+      - infrastructure
+      - openshift
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    credentials:
+      - OpenShift Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/aap-mcp-operator-disable.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AAP custom resource name
+          type: text
+          variable: aap_custom_resource_name
+          required: true
+          default: aap
+        - question_name: AAP custom resource namespace
+          type: text
+          variable: aap_custom_resource_namespace
+          required: true
+          default: aap
+
+  - name: "Infrastructure | OpenFlake"
+    description: >-
+      Deploys OpenFlake -- a lightweight ITSM platform with a
+      ServiceNow-compatible REST API -- on OpenShift via its Helm chart.
+      The chart generates the admin password on first install and keeps it
+      across upgrades; the job output reports the URL and credentials.
+      On install, upserts the OpenFlake Controller credential for AO CI/CD.
+      Set Operation to uninstall to remove the release and its namespace.
+    # Labels must already exist in controller_labels (common/setup.yml);
+    # the job template module does not create them.
+    labels:
+      - infrastructure
+      - openshift
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    credentials:
+      - OpenShift Credential
+      - AAP Credential
+    project: Ansible Product Demos
+    playbook: infrastructure/openflake/provision.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Operation
+          type: multiplechoice
+          variable: openflake_operation
+          required: true
+          default: install
+          choices:
+            - install
+            - uninstall
+        - question_name: OpenFlake namespace
+          question_description: >-
+            OpenShift project/namespace for the OpenFlake deployment.
+            Created if it does not exist.
+          type: text
+          variable: openflake_namespace
+          required: true
+          default: openflake
+        - question_name: Route hostname
+          question_description: >-
+            Leave blank to let OpenShift generate one from the cluster's
+            wildcard apps domain.
+          type: text
+          variable: openflake_route_host
+          required: false
+          default: ''
+        - question_name: OpenFlake image tag
+          type: text
+          variable: openflake_image_tag
+          required: true
+          default: stable
+
+  - name: "Infrastructure | AWS - Shared Services Portal"
+    description: >-
+      Publishes a password-gated S3 website with this lab's Mattermost, Gitea,
+      and OpenFlake URLs and UI logins. Attach those three Controller
+      credentials (filled by the provision jobs) plus AWS. Prefer launching via
+      Deploy Shared Services, which runs this node after all three succeed.
+    labels:
+      - aws.ec2
+      - infrastructure
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    inventory: Ansible Product Demos Inventory
+    credentials:
+      - AWS
+      - Mattermost
+      - Gitea
+      - OpenFlake
+    project: Ansible Product Demos
+    playbook: infrastructure/shared-services/publish_credentials_portal.yml
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            Region for the credentials portal S3 bucket. Use the same region as
+            Deploy Shared Services / Mattermost / Gitea.
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+            - ap-south-1
+            - ap-northeast-1
+            - ap-northeast-2
+            - ap-northeast-3
+            - ap-southeast-1
+            - ap-southeast-2
+            - ca-central-1
+            - eu-central-1
+            - eu-west-1
+            - eu-west-2
+            - eu-west-3
+            - eu-north-1
+            - sa-east-1
+
 controller_workflows:
+  - name: Infrastructure | AWS - Deploy Shared Services
+    description: >-
+      One-click shared lab services without cloud-stack VMs: Create VPC and
+      keypair, then provision Mattermost and Gitea in parallel (Gitea also seeds
+      inventory-service and installs dev/prod app runtimes on aws_gitea), while
+      OpenFlake installs on OpenShift in parallel from the start. After all three
+      succeed, publishes a password-gated S3 credentials portal.
+    labels:
+      - aws.ec2
+      - aws.vpc
+      - infrastructure
+      - openshift
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      aws_key_name: aws-test-key
+      create_vm_aws_keypair_name: aws-test-key
+      create_vm_aws_securitygroup_name: aws-test-sg
+      create_vm_aws_vpc_subnet_name: aws-test-subnet
+      create_vm_vm_deployment: cloud_stack
+      # Fixed for APD labs — no survey for owner/env (one-size-fits-all).
+      create_vm_aws_owner_tag: apd
+      create_vm_vm_environment: Prod
+      openflake_operation: install
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            Region for VPC, keypair, Mattermost, and Gitea. Choices match
+            regions enabled on the APD AWS account.
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+            - ap-south-1
+            - ap-northeast-1
+            - ap-northeast-2
+            - ap-northeast-3
+            - ap-southeast-1
+            - ap-southeast-2
+            - ca-central-1
+            - eu-central-1
+            - eu-west-1
+            - eu-west-2
+            - eu-west-3
+            - eu-north-1
+            - sa-east-1
+    simplified_workflow_nodes:
+      # OpenFlake is OpenShift-only — start it immediately alongside AWS networking.
+      - identifier: Provision OpenFlake
+        unified_job_template: Infrastructure | OpenFlake
+        success_nodes:
+          - Publish Credentials Portal
+        failure_nodes:
+          - Ticket - OpenFlake Failed
+      - identifier: Create Keypair
+        unified_job_template: Cloud | AWS | Create Keypair
+        success_nodes:
+          - Provision Mattermost
+          - Provision Gitea
+        failure_nodes:
+          - Ticket - Keypair Failed
+      - identifier: Create VPC
+        unified_job_template: Cloud | AWS | Create VPC
+        success_nodes:
+          - Provision Mattermost
+          - Provision Gitea
+        failure_nodes:
+          - Ticket - VPC Failed
+      - identifier: Provision Mattermost
+        unified_job_template: Infrastructure | AWS - Provision Mattermost
+        all_parents_must_converge: true
+        success_nodes:
+          - Publish Credentials Portal
+        failure_nodes:
+          - Ticket - Mattermost Failed
+      - identifier: Provision Gitea
+        unified_job_template: Infrastructure | AWS - Provision Gitea
+        all_parents_must_converge: true
+        success_nodes:
+          - Publish Credentials Portal
+        failure_nodes:
+          - Ticket - Gitea Failed
+      - identifier: Publish Credentials Portal
+        unified_job_template: Infrastructure | AWS - Shared Services Portal
+        all_parents_must_converge: true
+        failure_nodes:
+          - Ticket - Portal Failed
+      - identifier: Ticket - Keypair Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to create AWS keypair for shared services
+      - identifier: Ticket - VPC Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to create AWS VPC for shared services
+      - identifier: Ticket - Mattermost Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to provision Mattermost shared service
+      - identifier: Ticket - Gitea Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to provision Gitea shared service
+      - identifier: Ticket - OpenFlake Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to provision OpenFlake shared ITSM service
+      - identifier: Ticket - Portal Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to publish Shared Services credentials portal
+
   - name: Infrastructure | ROSA - Lifecycle (Create)
     description: >-
       End-to-end ROSA cluster creation: preflight checks, create,
@@ -987,7 +1536,7 @@ controller_workflows:
       One-shot config drift pipeline setup: verify cloud stack RHEL workers are
       in inventory, provision Kafka, sync inventory, deploy auditd and Filebeat
       with Kafka output, and activate the EDA rulebook. Run Deploy Cloud Stack
-      in AWS first if aws_rhel8/aws_rhel9 are missing. Run Introduce SSHD Drift
+      in AWS first if aws-rhel9/aws-rhel10 are missing. Run Introduce SSHD Drift
       separately for the live demo.
     labels:
       - compliance
@@ -1059,7 +1608,7 @@ controller_workflows:
           type: job_template
         extra_data:
           feedback: >-
-            aws_rhel8 and aws_rhel9 were not found in inventory. Run Deploy
+            aws-rhel9 and aws-rhel10 were not found in inventory. Run Deploy
             Cloud Stack in AWS first, then re-launch Infrastructure | Config
             Drift - Full Setup.
       - identifier: Provision Kafka
@@ -1096,7 +1645,7 @@ controller_workflows:
             type: organization
           type: job_template
         extra_data:
-          _hosts: aws_rhel*
+          _hosts: aws-rhel*
           config_drift_filebeat_output: kafka
       - identifier: Setup EDA
         unified_job_template:

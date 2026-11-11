@@ -73,16 +73,45 @@
     - role: demo.network.containerlab
 
   tasks:
-    - name: Destroy containerlab topology
-      ansible.builtin.command:
-        cmd: containerlab destroy --cleanup
-        chdir: "/root/clab/{{ clab_topology }}/"
-      environment:
-        DOCKER_HOST: "unix:///run/user/1000/podman/podman.sock"
-      register: clab_destroy
-      changed_when: clab_destroy.rc == 0
-      failed_when: false
+    - name: Discover deployed topology
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: discover_active
 
-    - name: Display result
+    - name: Destroy Product Demos and legacy split deployments
+      ansible.builtin.include_role:
+        name: demo.network.containerlab
+        tasks_from: destroy_topology
+      loop: "{{ clab_active_topologies | list }}"
+      loop_control:
+        loop_var: clab_destroy_topology
+
+    - name: Remove the generated report after changing device membership
+      ansible.builtin.file:
+        path: /var/www/html/network
+        state: absent
+
+    - name: Display remaining topologies
       ansible.builtin.debug:
-        msg: "Containerlab topology '{{ clab_topology }}' destroyed"
+        msg: "Remaining topologies: {{ clab_active_topologies | join(', ') }}"
+
+- name: Update remaining ContainerLab device inventory
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - role: demo.network.containerlab
+  tasks:
+    - name: Enable only devices from remaining deployed topologies
+      ansible.controller.host:
+        name: "{{ item.key }}"
+        inventory: ContainerLab Inventory
+        enabled: "{{ clab_topology in hostvars['clab-hypervisor'].clab_active_topologies }}"
+        state: present
+      loop: "{{ clab_device_catalog | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+      when:
+        - lookup('ansible.builtin.env', 'AWX_HOST') | length > 0
+        - "'clab-hypervisor' in hostvars"
+        - hostvars['clab-hypervisor'].clab_active_topologies is defined

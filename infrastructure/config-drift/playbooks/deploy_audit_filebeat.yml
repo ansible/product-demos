@@ -1,6 +1,6 @@
 ---
 - name: Deploy auditd and Filebeat for config drift detection
-  hosts: "{{ _hosts | default('aws_rhel*') }}"
+  hosts: "{{ _hosts | default('aws-rhel*') }}"
   become: true
   ignore_unreachable: true
 

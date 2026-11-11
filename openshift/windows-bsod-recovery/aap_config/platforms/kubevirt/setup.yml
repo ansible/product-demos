@@ -1,0 +1,73 @@
+---
+
+controller_credential_types:
+  - name: OpenShift
+    kind: cloud
+    inputs:
+      fields:
+        - id: url
+          type: string
+          label: URL
+        - id: username
+          type: string
+          label: Username
+        - id: password
+          type: string
+          label: Password
+          secret: true
+        - id: api_key
+          type: string
+          label: API Key
+          secret: true
+        - id: verify_ssl
+          type: string
+          label: Verify SSL
+          choices:
+            - "False"
+            - "True"
+      required:
+        - url
+        - verify_ssl
+    injectors:
+      env:
+        K8S_AUTH_HOST: "{% raw %}{{ url }}{% endraw %}"
+        K8S_AUTH_API_KEY: "{% raw %}{{ api_key }}{% endraw %}"
+        K8S_AUTH_PASSWORD: "{% raw %}{{ password }}{% endraw %}"
+        K8S_AUTH_USERNAME: "{% raw %}{{ username }}{% endraw %}"
+        K8S_AUTH_KUBECONFIG: config
+        K8S_AUTH_VERIFY_SSL: "{% raw %}{{ verify_ssl }}{% endraw %}"
+
+controller_credentials:
+  - name: OpenShift Credential
+    credential_type: OpenShift
+    organization: Default
+    inputs:
+      url: "{{ lookup('env', 'K8S_AUTH_HOST') | default('') }}"
+      username: "{{ lookup('env', 'K8S_AUTH_USERNAME') | default('') }}"
+      password: "{{ lookup('env', 'K8S_AUTH_PASSWORD') | default('') }}"
+      api_key: "{{ lookup('env', 'K8S_AUTH_API_KEY') | default('') }}"
+      verify_ssl: "{{ lookup('env', 'K8S_AUTH_VERIFY_SSL') | default('False') }}"
+
+controller_projects:
+  - name: aap-openshift-inventory-source
+    organization: Default
+    scm_type: git
+    scm_url: https://github.com/oatakan/ansible-openshift-virtualization-inventory-source.git
+    scm_branch: main
+
+controller_inventories:
+  - name: OpenShift Inventory
+    description: OpenShift dynamic inventory
+    organization: Default
+
+controller_inventory_sources:
+  - name: OpenShift Dynamic Inventory
+    inventory: OpenShift Inventory
+    organization: Default
+    source: scm
+    source_project: aap-openshift-inventory-source
+    source_path: kubevirt.yml
+    credential: OpenShift Credential
+    update_on_launch: true
+    overwrite_vars: true
+    overwrite: true
