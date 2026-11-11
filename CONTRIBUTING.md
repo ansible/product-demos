@@ -7,7 +7,22 @@ This document aims to outline the requirements for the various forms of contribu
 
 ## Pull Requests
 
-**ALL** contributions are subject to review via pull request
+All contributions must go through a pull request into `ansible/product-demos`. Most PRs still need a human approving review before merge.
+
+### Docs-only exception (markdown + graphics)
+
+Pull requests that change **only** documentation assets do not need a second **human** approving review:
+
+- Markdown: `*.md`
+- Graphics: `*.png`, `*.jpg`, `*.jpeg`, `*.gif`, `*.webp`, `*.svg`
+
+When the docs-approver GitHub App is configured, [`.github/workflows/docs-only-auto-approve.yml`](.github/workflows/docs-only-auto-approve.yml) labels the PR `docs-only` and submits the required APPROVE automatically (deterministic path check — no AI). After CI is green, a collaborator with write access may merge.
+
+This is intentional: README / docs / screenshot updates are low risk to demo job templates compared with playbooks, `setup.yml`, roles, and collections.
+
+If the PR changes any other path (even one `.yml` / `.yaml` / `.j2` / workflow / script), the normal human review requirement still applies.
+
+Background and App secret setup: [.github/proposals/docs-only-pr-fast-path.md](.github/proposals/docs-only-pr-fast-path.md).
 
 ### Pull Requests
 1) Ensure the "base repository" is set to "ansible/product-demos".
