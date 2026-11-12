@@ -252,6 +252,29 @@ controller_templates:
           variable: service_name
           required: true
 
+  - name: "LINUX | Fleet AO Smoke Service"
+    labels:
+      - linux
+    job_type: run
+    inventory: Ansible Product Demos Inventory
+    project: "Ansible Product Demos"
+    playbook: "linux/fleet_ao_smoke.yml"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    use_fact_cache: true
+    credentials:
+      - APD Machine Credential
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: Server Name or Pattern
+          type: text
+          variable: _hosts
+          required: true
+
   - name: "LINUX | Stop Service"
     labels:
       - linux

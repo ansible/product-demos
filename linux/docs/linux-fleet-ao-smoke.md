@@ -6,6 +6,32 @@
 the unit is active. The transient service sleeps for five minutes and systemd
 collects it afterwards.
 
-Run it only through the Fleet-scoped AAP job template created by the
-integration. The playbook needs a host with systemd and permission to use
-`systemd-run`.
+Product Demos setup creates a generic job template. The `aap-demo` integration
+separately provisions its Fleet-scoped template, inventory, and Automation
+Orchestrator workflow.
+
+## Prerequisites
+
+- Linux hosts with systemd and privilege to run `systemd-run`.
+- For the generic template, hosts in **Ansible Product Demos Inventory** and SSH access through **APD Machine Credential**.
+
+## Survey prompts
+
+| Prompt | Variable | Type | Required |
+|--------|----------|------|----------|
+| Server Name or Pattern | `_hosts` | text | Yes |
+
+## Job templates
+
+| Template | Playbook | Description |
+|----------|----------|-------------|
+| LINUX ǀ Fleet AO Smoke Service | [`linux/fleet_ao_smoke.yml`](../fleet_ao_smoke.yml) | Starts and verifies the transient service on selected hosts |
+
+The playbook defaults to all hosts in its inventory when `_hosts` is omitted;
+the generic template requires the survey response. Use a tightly scoped inventory
+for other templates that do not provide `_hosts`.
+
+If a previous unit remains failed or uncollected, inspect it with
+`systemctl status aap-demo-fleet-smoke.service` and clear the failed state with
+`sudo systemctl reset-failed aap-demo-fleet-smoke.service` before retrying. If
+the unit still exists, stop it with `sudo systemctl stop aap-demo-fleet-smoke.service`.
