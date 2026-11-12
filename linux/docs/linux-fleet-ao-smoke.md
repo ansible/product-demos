@@ -27,9 +27,8 @@ Orchestrator workflow.
 |----------|----------|-------------|
 | LINUX ǀ Fleet AO Smoke Service | [`linux/fleet_ao_smoke.yml`](../fleet_ao_smoke.yml) | Starts and verifies the transient service on selected hosts |
 
-The playbook defaults to all hosts in its inventory when `_hosts` is omitted;
-the generic template requires the survey response. Use a tightly scoped inventory
-for other templates that do not provide `_hosts`.
+The generic template requires a host pattern through its survey. Other job
+templates must also provide `_hosts` to select their target hosts.
 
 If a previous unit remains failed or uncollected, inspect it with
 `systemctl status aap-demo-fleet-smoke.service` and clear the failed state with

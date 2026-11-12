@@ -2,7 +2,7 @@
 # A bounded, visible state change for the aap-demo Fleet/AO integration.
 # The transient unit is collected by systemd after its five-minute sleep.
 - name: Start a short-lived Fleet AO demo service
-  hosts: "{{ _hosts | default('all') }}"
+  hosts: "{{ _hosts | default(omit) }}"
   become: true
   gather_facts: false
 
