@@ -7,7 +7,8 @@
   gather_facts: false
 
   tasks:
-    - name: Check whether the transient demo service is already active
+    # is-active returns a useful nonzero status when the transient unit is absent.
+    - name: Check whether the transient demo service is already active  # noqa: command-instead-of-module
       ansible.builtin.command:
         cmd: systemctl is-active --quiet aap-demo-fleet-smoke.service
       register: fleet_ao_service_state
@@ -21,7 +22,8 @@
       when: fleet_ao_service_state.rc != 0
       changed_when: true
 
-    - name: Verify transient Fleet AO demo service is active
+    # Verify with the same active-state check used before starting the unit.
+    - name: Verify transient Fleet AO demo service is active  # noqa: command-instead-of-module
       ansible.builtin.command:
         cmd: systemctl is-active --quiet aap-demo-fleet-smoke.service
       changed_when: false
