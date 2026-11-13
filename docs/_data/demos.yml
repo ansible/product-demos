@@ -477,6 +477,23 @@
     playbooks: 1
   github_path: linux/run_script.yml
 
+- slug: linux-fleet-ao-smoke
+  readme_path: linux/docs/linux-fleet-ao-smoke.md
+  url: /demos/linux-fleet-ao-smoke/
+  title: "Fleet AO Smoke Service"
+  category: linux
+  status: active
+  tags:
+    - Playbook
+    - Automation Orchestrator
+  thumbnail:
+    gradient: "linear-gradient(135deg, #d13438 0%, #7a0000 100%)"
+    icon: "🐧"
+  blurb: "Start and verify the short-lived service used by the Fleet Automation Orchestrator integration."
+  stats:
+    playbooks: 1
+  github_path: linux/fleet_ao_smoke.yml
+
 - slug: linux-install-ssh-key
   readme_path: linux/docs/linux-install-ssh-key.md
   url: /demos/linux-install-ssh-key/
