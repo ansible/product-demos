@@ -226,6 +226,10 @@ ao_demos:
       - name: p2s-prove-case-record
         playbook: zero-day-response/playbooks/p2s_case_record.yml
         credentials: []
+      - name: p2s-prove-report
+        playbook: zero-day-response/playbooks/p2s_report.yml
+        credentials:
+          - aws
 
   - slug: zero-day-response-fix
     enabled: true
