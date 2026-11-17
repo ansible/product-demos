@@ -1,0 +1,104 @@
+---
+- name: Force APD inventory tag strings
+  ansible.builtin.set_fact:
+    create_fsx_ontap_aws_apd_managed_by: aap-product-demos
+    create_fsx_ontap_apd_demo_tag: "true"
+
+- name: Get subnet info
+  amazon.aws.ec2_vpc_subnet_info:
+    region: "{{ create_fsx_ontap_aws_region }}"
+    filters:
+      "tag:Name": "{{ create_fsx_ontap_aws_vpc_subnet_name }}"
+  register: create_fsx_ontap_aws_subnet
+  when: create_fsx_ontap_aws_subnet_id is not defined
+
+- name: Save subnet id
+  ansible.builtin.set_fact:
+    create_fsx_ontap_aws_subnet_id: "{{ create_fsx_ontap_aws_subnet.subnets | map(attribute='id') | list | last }}"
+  when: create_fsx_ontap_aws_subnet_id is not defined
+
+- name: Get Security Group info
+  amazon.aws.ec2_security_group_info:
+    region: "{{ create_fsx_ontap_aws_region }}"
+    filters:
+      "tag:Name": "{{ create_fsx_ontap_aws_securitygroup_name }}"
+  register: create_fsx_ontap_aws_securitygroup
+  when: create_fsx_ontap_aws_securitygroup_id is not defined
+
+- name: Save Security Group id
+  ansible.builtin.set_fact:
+    create_fsx_ontap_aws_securitygroup_id: "{{ create_fsx_ontap_aws_securitygroup.security_groups | map(attribute='group_id') | list | last }}"
+  when: create_fsx_ontap_aws_securitygroup_id is not defined
+
+# The admin password is a NoEcho stack parameter and the task is no_log so it
+# never appears in job output or stored job events. no_log also hides the
+# module's own error text, so on failure show the stack's failed events instead
+# (set create_fsx_ontap_no_log=false to see the raw module error while debugging).
+- name: Create the FSx ONTAP stack and report failures
+  block:
+    - name: Deploy FSx ONTAP CloudFormation Stack
+      amazon.aws.cloudformation:
+        stack_name: "{{ create_fsx_ontap_stack_name }}"
+        state: present
+        region: "{{ create_fsx_ontap_aws_region }}"
+        template_parameters:
+          FsxAdminPassword: "{{ create_fsx_ontap_admin_password | default(fsx_ontap_password) }}"
+        template_body: |
+          AWSTemplateFormatVersion: '2010-09-09'
+          Parameters:
+            FsxAdminPassword:
+              Type: String
+              NoEcho: true
+          Resources:
+            FSxFileSystem:
+              Type: AWS::FSx::FileSystem
+              Properties:
+                FileSystemType: ONTAP
+                SecurityGroupIds:
+                  - "{{ create_fsx_ontap_aws_securitygroup_id }}"
+                StorageCapacity: {{ create_fsx_ontap_storage_capacity | int }}
+                SubnetIds:
+                  - "{{ create_fsx_ontap_aws_subnet_id }}"
+                OntapConfiguration:
+                  DeploymentType: "{{ create_fsx_ontap_deployment_type }}"
+                  ThroughputCapacity: {{ create_fsx_ontap_throughput_capacity | int }}
+                  PreferredSubnetId: "{{ create_fsx_ontap_aws_subnet_id }}"
+                  FsxAdminPassword: !Ref FsxAdminPassword
+                Tags:
+                  - Key: Name
+                    Value: "{{ create_fsx_ontap_aws_name }}"
+          Outputs:
+            FileSystemId:
+              Description: "FSx file system ID"
+              Value: !Ref FSxFileSystem
+        tags:
+          environment: "{{ create_fsx_ontap_aws_environment }}"
+          deployment: "{{ create_fsx_ontap_deployment }}"
+          owner: "{{ create_fsx_ontap_aws_owner_tag }}"
+          purpose: "{{ create_fsx_ontap_purpose }}"
+          managed-by: "{{ create_fsx_ontap_aws_apd_managed_by }}"
+          apd: "{{ create_fsx_ontap_apd_demo_tag }}"
+      no_log: "{{ create_fsx_ontap_no_log | default(true) }}"
+  rescue:
+    - name: Get the FSx ONTAP stack events
+      amazon.aws.cloudformation_info:
+        stack_name: "{{ create_fsx_ontap_stack_name }}"
+        region: "{{ create_fsx_ontap_aws_region }}"
+        stack_events: true
+      register: create_fsx_ontap_stack_events
+      failed_when: false
+
+    - name: Show the failed stack events
+      ansible.builtin.debug:
+        msg: "{{ item.logical_resource_id }} {{ item.resource_status }}: {{ item.resource_status_reason | default('no reason given') }}"
+      loop: >-
+        {{ (create_fsx_ontap_stack_events.cloudformation | default({})).get(create_fsx_ontap_stack_name, {})
+           .get('stack_events', []) | selectattr('resource_status', 'search', 'FAILED') | list }}
+      loop_control:
+        label: "{{ item.logical_resource_id }}"
+
+    - name: Fail with the stack name
+      ansible.builtin.fail:
+        msg: >-
+          FSx ONTAP stack {{ create_fsx_ontap_stack_name }} failed; see the failed
+          stack events above or the CloudFormation console.

@@ -1,0 +1,67 @@
+---
+# Verifies the FSx ONTAP management endpoints answer on HTTPS. Run it with
+# "Ansible Product Demos Storage Inventory" so the job runs on the storage
+# execution node, which can reach the VPC subnet (the AAP controller cannot).
+
+- name: Check FSx ONTAP hosts exist in the inventory
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Fail if there are no FSx ONTAP hosts
+      ansible.builtin.assert:
+        that: groups['fsx_ontap'] | default([]) | length > 0
+        fail_msg: >-
+          No hosts in the fsx_ontap group. Run Update FSx ONTAP Inventory first
+          and launch this job with Ansible Product Demos Storage Inventory.
+
+- name: Wait for the FSx ONTAP management endpoints to respond
+  hosts: fsx_ontap
+  gather_facts: false
+  vars:
+    # From the FSx ONTAP credential, the same password create_fsx_ontap.yml set.
+    check_fsx_ontap_endpoint_user: "{{ fsx_ontap_username | default('fsxadmin', true) }}"
+    check_fsx_ontap_endpoint_password: "{{ fsx_ontap_password | default('', true) }}"
+  tasks:
+    - name: Fail if there is no usable password to query ONTAP with
+      ansible.builtin.assert:
+        that:
+          - check_fsx_ontap_endpoint_password | length > 0
+          - check_fsx_ontap_endpoint_password != 'REPLACEME'
+        fail_msg: >-
+          No fsxadmin password. Update the FSx ONTAP credential in AAP and attach it
+          to this job template.
+
+    - name: Wait for the management endpoint to answer on HTTPS
+      ansible.builtin.wait_for:
+        host: "{{ ansible_host }}"
+        port: 443
+        state: started
+        timeout: "{{ check_fsx_ontap_endpoint_timeout | default(600) }}"
+        delay: 10
+
+    # Uses the netapp.ontap collection, so a successful run also proves the
+    # collection works from this execution node. FSx ONTAP uses a self-signed
+    # certificate, hence validate_certs: false. The fsxadmin account is
+    # restricted: it may read the cluster version, but not cluster/software.
+    - name: Get the ONTAP version
+      netapp.ontap.na_ontap_rest_info:
+        hostname: "{{ ansible_host }}"
+        username: "{{ check_fsx_ontap_endpoint_user }}"
+        password: "{{ check_fsx_ontap_endpoint_password }}"
+        use_rest: always
+        https: true
+        validate_certs: false
+        gather_subset:
+          - cluster
+        fields:
+          - version
+      register: check_fsx_ontap_endpoint_cluster
+      until: check_fsx_ontap_endpoint_cluster is not failed
+      retries: 6
+      delay: 10
+
+    - name: Show the ONTAP version
+      ansible.builtin.debug:
+        msg: "{{ check_fsx_ontap_endpoint_cluster.ontap_info['cluster'].version.full }}"
+...

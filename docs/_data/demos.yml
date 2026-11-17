@@ -173,6 +173,79 @@
       style H fill:#1e3a5f,stroke:#4a90d9,color:#fff
       style S fill:#212427,stroke:#8a8d90,color:#fff
 
+- slug: deploy-storage-stack
+  readme_path: cloud/docs/deploy-storage-stack.md
+  title: "Deploy a Storage Stack on AWS"
+  subtitle: "An execution node and Amazon FSx for NetApp ONTAP, wired into AAP"
+  category: cloud
+  status: active
+  author: "Seth Kress <skress@redhat.com>"
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%)"
+    icon: "💾"
+  blurb: "Build on the cloud stack with a RHEL 9 execution node and an Amazon FSx for NetApp ONTAP file system, wired into AAP so jobs run next to the storage."
+  stats:
+    workflows: 1
+    playbooks: 5
+  url: /demos/deploy-storage-stack/
+  github_path: cloud/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      S --> F
+      A["🐧 Deploy Storage Node<br/>RHEL 9 VM"] --> B["🔄 Sync Inventory"]
+      B --> C["🛰️ Register<br/>Execution Node"]
+      F["💾 Create<br/>FSx ONTAP"] --> G["🔄 Update FSx<br/>Inventory"]
+      C --> H["✅ Check FSx<br/>Endpoint"]
+      G --> H
+      style A fill:#3d1a1a,stroke:#cc0000,color:#fff
+      style B fill:#162c46,stroke:#58a6ff,color:#fff
+      style C fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style F fill:#1a2744,stroke:#2b88d8,color:#fff
+      style G fill:#162c46,stroke:#58a6ff,color:#fff
+      style H fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
+- slug: cloud-destroy-storage-stack
+  readme_path: cloud/docs/cloud-destroy-storage-stack.md
+  title: "Destroy a Storage Stack on AWS"
+  category: cloud
+  status: active
+  author: "Seth Kress <skress@redhat.com>"
+  is_workflow: true
+  tags:
+    - Workflow
+    - Survey
+    - AWS
+  thumbnail:
+    gradient: "linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)"
+    icon: "💥"
+  blurb: "Delete the FSx ONTAP file system, deregister the execution node, and terminate its VM."
+  stats:
+    workflows: 1
+    playbooks: 3
+  url: /demos/cloud-destroy-storage-stack/
+  github_path: cloud/setup.yml
+  workflow_mermaid: |
+    graph LR
+      S["🏠 Start"]
+      S --> A
+      S --> B
+      A["💥 Delete<br/>FSx ONTAP"]
+      B["🛰️ Deregister<br/>Execution Node"] --> C["💥 Delete<br/>Storage Node"]
+      C --> D["🔄 Sync Inventory"]
+      style A fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style B fill:#1e3a5f,stroke:#4a90d9,color:#fff
+      style C fill:#4a1a1a,stroke:#ef4444,color:#fff
+      style D fill:#2d1f4e,stroke:#a78bfa,color:#fff
+      style S fill:#212427,stroke:#8a8d90,color:#fff
+
 - slug: cloud-create-vpc
   readme_path: cloud/docs/cloud-create-vpc.md
   url: /demos/cloud-create-vpc/

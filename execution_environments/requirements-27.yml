@@ -37,6 +37,10 @@ collections:
     version: "<11.6.0"
   - name: community.aws
     version: "<11.2.0"
+  - name: ansible.receptor
+    version: ">=2.0.10"
+  - name: netapp.ontap
+    version: ">=21.0.0"
   # satellite demos
   - name: redhat.satellite
     version: "<5.12.0"

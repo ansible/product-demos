@@ -1,0 +1,122 @@
+---
+- name: Add or update Amazon FSx for NetApp ONTAP systems in the AAP inventory
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - vars/controller_api.yml
+  module_defaults:
+    ansible.builtin.uri: "{{ apd_controller_api_uri_defaults }}"
+
+  vars:
+    update_fsx_ontap_inventory_name: Ansible Product Demos Storage Inventory
+    update_fsx_ontap_inventory_group: fsx_ontap
+    # Only FSx file systems carrying this tag are added (set by create_fsx_ontap.yml)
+    update_fsx_ontap_inventory_managed_by: aap-product-demos
+
+  tasks:
+    # Deploy a Storage Stack on AWS supplies the region as create_vm_aws_region.
+    - name: Default the region from the shared workflow survey answer
+      ansible.builtin.set_fact:
+        update_fsx_ontap_inventory_aws_region: "{{ create_vm_aws_region }}"
+      when:
+        - lookup('ansible.builtin.vars', 'update_fsx_ontap_inventory_aws_region', default='') | length == 0
+        - lookup('ansible.builtin.vars', 'create_vm_aws_region', default='') | length > 0
+
+    - name: Fail if variables not defined
+      ansible.builtin.assert:
+        that:
+          - update_fsx_ontap_inventory_aws_region is defined
+        fail_msg: "update_fsx_ontap_inventory_aws_region must be set"
+
+    - name: Discover FSx ONTAP file systems
+      ansible.builtin.command:
+        argv:
+          - "{{ ansible_playbook_python }}"
+          - -c
+          - |
+            import boto3, json, sys
+            region, managed_by = sys.argv[1], sys.argv[2]
+            fsx = boto3.client("fsx", region_name=region)
+            available, present = [], []
+            for page in fsx.get_paginator("describe_file_systems").paginate():
+                for fs in page["FileSystems"]:
+                    if fs["FileSystemType"] != "ONTAP":
+                        continue
+                    tags = {t["Key"]: t["Value"] for t in fs.get("Tags", [])}
+                    name = tags.get("Name", fs["FileSystemId"])
+                    present.append(name)  # exists in AWS, whatever its state or tags
+                    if fs["Lifecycle"] == "AVAILABLE" and tags.get("managed-by") == managed_by:
+                        mgmt = fs["OntapConfiguration"]["Endpoints"]["Management"]
+                        available.append({
+                            "name": name,
+                            "file_system_id": fs["FileSystemId"],
+                            "mgmt_ip": mgmt["IpAddresses"][0],
+                        })
+            print(json.dumps({"available": available, "present": present}))
+          - "{{ update_fsx_ontap_inventory_aws_region }}"
+          - "{{ update_fsx_ontap_inventory_managed_by }}"
+      register: update_fsx_ontap_inventory_discovered
+      changed_when: false
+
+    - name: Set FSx ONTAP facts
+      ansible.builtin.set_fact:
+        update_fsx_ontap_inventory_systems: "{{ (update_fsx_ontap_inventory_discovered.stdout | from_json).available }}"
+        update_fsx_ontap_inventory_present_names: "{{ (update_fsx_ontap_inventory_discovered.stdout | from_json).present }}"
+
+    - name: Report discovered systems
+      ansible.builtin.debug:
+        msg: "Found {{ update_fsx_ontap_inventory_systems | length }} FSx ONTAP system(s) in {{ update_fsx_ontap_inventory_aws_region }}"
+
+    - name: Add or update FSx ONTAP hosts in inventory
+      ansible.controller.host:
+        name: "{{ item.name }}"
+        inventory: "{{ update_fsx_ontap_inventory_name }}"
+        state: present
+        enabled: true
+        description: "Amazon FSx for NetApp ONTAP ({{ item.file_system_id }})"
+        variables:
+          ansible_host: "{{ item.mgmt_ip }}"
+          fsx_ontap_file_system_id: "{{ item.file_system_id }}"
+          fsx_ontap_aws_region: "{{ update_fsx_ontap_inventory_aws_region }}"
+      loop: "{{ update_fsx_ontap_inventory_systems }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    # Remove hosts for systems that were deleted outside this demo. Only hosts recorded for
+    # this region are considered (a run covers one region), and a system counts as gone only
+    # if it no longer exists in AWS at all, so one that is updating keeps its host.
+    - name: Get the FSx ONTAP hosts already in the inventory
+      ansible.builtin.uri:
+        url: "{{ apd_controller_api_url }}/hosts/?inventory__name={{ update_fsx_ontap_inventory_name | urlencode }}&groups__name={{ update_fsx_ontap_inventory_group }}&page_size=200"
+      register: update_fsx_ontap_inventory_existing
+
+    - name: Work out which of them no longer exist in AWS
+      ansible.builtin.set_fact:
+        update_fsx_ontap_inventory_stale: "{{ update_fsx_ontap_inventory_stale | default([]) + [item.name] }}"
+      loop: "{{ update_fsx_ontap_inventory_existing.json.results }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - (item.variables | from_yaml | default({}, true)).fsx_ontap_aws_region | default('') == update_fsx_ontap_inventory_aws_region
+        - item.name not in update_fsx_ontap_inventory_present_names
+
+    - name: Remove FSx ONTAP hosts that no longer exist in AWS
+      ansible.controller.host:
+        name: "{{ item }}"
+        inventory: "{{ update_fsx_ontap_inventory_name }}"
+        state: absent
+      loop: "{{ update_fsx_ontap_inventory_stale | default([]) }}"
+
+    - name: Ensure FSx ONTAP inventory group contains the hosts
+      ansible.controller.group:
+        name: "{{ update_fsx_ontap_inventory_group }}"
+        inventory: "{{ update_fsx_ontap_inventory_name }}"
+        state: present
+        # ONTAP is managed through its REST API, not SSH, so tasks for these
+        # hosts run on the execution node itself.
+        variables:
+          ansible_connection: local
+        preserve_existing_hosts: true
+        hosts: "{{ update_fsx_ontap_inventory_systems | map(attribute='name') | list }}"
+      when: update_fsx_ontap_inventory_systems | length > 0

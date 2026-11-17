@@ -23,6 +23,8 @@ This category of demos shows examples of multi-cloud provisioning and management
 | [**Patch Cloud Stack in AWS**](docs/patch-cloud-stack.md) | Enterprise-grade patching workflow with EBS snapshots, parallel RHEL and Windows paths, automatic rollback on failure, and a consolidated compliance report. |
 | [**Deploy Cloud Stack in AWS**](docs/deploy-cloud-stack.md) | One-click workflow to provision a full demo stack — VPC, keypair, and five VMs (2 Windows, 2 RHEL, 1 report server) — with inventory sync and VPC report. |
 | [**Destroy Cloud Stack in AWS**](docs/cloud-destroy-stack.md) | Tear down all five stack VMs, VPC, and keypair created by Deploy Cloud Stack, then sync inventory. |
+| [**Deploy a Storage Stack on AWS**](docs/deploy-storage-stack.md) | Build on the cloud stack with a RHEL 9 execution node and an Amazon FSx for NetApp ONTAP file system, wired into AAP so jobs run next to the storage. |
+| [**Destroy a Storage Stack on AWS**](docs/cloud-destroy-storage-stack.md) | Delete the FSx ONTAP file system, deregister the execution node, and terminate its VM. |
 
 ### Jobs
 
@@ -105,6 +107,22 @@ The workflow:
 4. Syncs AWS inventory so hosts are removed from AAP
 
 **Note:** S3 report buckets created during deploy (`reports-pd-*`) are not deleted by this workflow.
+
+### Deploy a Storage Stack on AWS
+
+Run this after **Deploy Cloud Stack in AWS**, in the same region. It reuses that stack's keypair, subnet, and security group. Complete the survey (**AWS Region**, **Owner**, **Environment**, **Email**).
+
+The workflow runs two branches in parallel:
+
+1. Creates a RHEL 9 VM `aws-storage-node`, syncs inventory, and registers the VM as an AAP **execution node** in the `storage` instance group
+2. Creates an Amazon FSx for NetApp ONTAP file system and adds it to **Ansible Product Demos Storage Inventory**
+3. Checks, from the new node, that ONTAP answers and prints its version
+
+**Prerequisites:** the **AWS**, **APD Machine Credential**, and **RHSM Registration** credentials configured, and the **FSx ONTAP** credential set to the `fsxadmin` password you want (setup seeds it with `REPLACEME`). See [Deploy a Storage Stack on AWS](docs/deploy-storage-stack.md) for details and troubleshooting.
+
+### Destroy a Storage Stack on AWS
+
+Use this workflow to remove a storage stack. Select the **same AWS Region** used for deploy. It deletes the FSx file system (and the data on it), deregisters the execution node, terminates the VM, and syncs inventory. Run **Destroy Cloud Stack in AWS** afterwards to remove the VPC. See [Destroy a Storage Stack on AWS](docs/cloud-destroy-storage-stack.md).
 
 ### Patch Cloud Stack in AWS
 

@@ -1,0 +1,27 @@
+---
+# How playbooks call the AAP controller API with ansible.builtin.uri: the calls
+# the ansible.controller modules cannot make (downloading an install bundle,
+# running a health check) and the checks around them (is the instance
+# registered, has it been removed). A plain uri call shows exactly which request
+# is made, which keeps the playbooks easy to follow.
+#
+# Authentication comes from the environment variables AAP injects with the
+# "Red Hat Ansible Automation Platform" credential: an OAuth token if there is
+# one, otherwise username and password.
+#
+# Load it with:
+#   vars_files:
+#     - vars/controller_api.yml
+#   module_defaults:
+#     ansible.builtin.uri: "{{ apd_controller_api_uri_defaults }}"
+# then call the API with: url: "{{ apd_controller_api_url }}/instances/"
+apd_controller_api_url: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') }}/api/controller/v2"
+# The platform gateway, for platform-level facts such as the AAP version (/ping/).
+apd_gateway_api_url: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') }}/api/gateway/v1"
+apd_controller_api_token: "{{ lookup('ansible.builtin.env', 'CONTROLLER_OAUTH_TOKEN') }}"
+apd_controller_api_uri_defaults:
+  headers: "{{ {'Authorization': 'Bearer ' ~ apd_controller_api_token} if apd_controller_api_token | length > 0 else {} }}"
+  url_username: "{{ lookup('ansible.builtin.env', 'CONTROLLER_USERNAME') if apd_controller_api_token | length == 0 else omit }}"
+  url_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') if apd_controller_api_token | length == 0 else omit }}"
+  force_basic_auth: "{{ apd_controller_api_token | length == 0 }}"
+  validate_certs: "{{ (lookup('ansible.builtin.env', 'CONTROLLER_VERIFY_SSL') | default('true', true)) | bool }}"

@@ -1,0 +1,362 @@
+---
+# Registers an EC2 VM (created by create_vm.yml) as an AAP execution node:
+#   1. create the instance in AAP (node_type=execution) and download its install bundle
+#   2. install receptor on the VM using the bundle's settings (ansible.receptor.setup)
+#   3. add the instance to an instance group and wait for it to become ready
+#
+# Requires: AAP Credential (injects CONTROLLER_*), AWS credential, a machine
+# credential that can SSH/sudo on the VM, and network reachability from the AAP
+# control/hop nodes to the VM on the receptor listener port (default 27199).
+
+- name: Register the VM as an AAP execution node (controller side)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    register_execution_node_listener_port: 27199
+    # package: install the receptor and ansible-runner RPMs from the AAP repo,
+    #   which needs the VM registered with RHSM (RHSM Registration credential).
+    # release: download receptor from GitHub; no subscription needed.
+    register_execution_node_receptor_install_method: package
+  vars_files:
+    - vars/controller_api.yml
+  module_defaults:
+    ansible.builtin.uri: "{{ apd_controller_api_uri_defaults }}"
+  tasks:
+    # Deploy a Storage Stack on AWS supplies the region as create_vm_aws_region.
+    - name: Default the region from the shared workflow survey answer
+      ansible.builtin.set_fact:
+        register_execution_node_aws_region: "{{ create_vm_aws_region }}"
+      when:
+        - lookup('ansible.builtin.vars', 'register_execution_node_aws_region', default='') | length == 0
+        - lookup('ansible.builtin.vars', 'create_vm_aws_region', default='') | length > 0
+
+    - name: Fail if variables not defined
+      ansible.builtin.assert:
+        that:
+          - register_execution_node_vm_name is defined
+          - register_execution_node_aws_region is defined
+        fail_msg: "register_execution_node_vm_name and register_execution_node_aws_region are required"
+
+    - name: Find the VM
+      amazon.aws.ec2_instance_info:
+        region: "{{ register_execution_node_aws_region }}"
+        filters:
+          tag:Name: "{{ register_execution_node_vm_name }}"
+          tag:apd: "true"
+          instance-state-name: running
+      register: register_execution_node_vm
+
+    - name: Fail if the VM was not found
+      ansible.builtin.assert:
+        that: register_execution_node_vm.instances | length == 1
+        fail_msg: "Expected exactly one running VM named {{ register_execution_node_vm_name }}"
+
+    # AAP control nodes must reach this address on the listener port.
+    - name: Set the node address
+      ansible.builtin.set_fact:
+        register_execution_node_hostname: >-
+          {{ register_execution_node_vm.instances[0].public_dns_name
+             | default(register_execution_node_vm.instances[0].private_ip_address, true) }}
+
+    # The module returns the instance id whether it created, updated or left it as is.
+    - name: Create the execution node in AAP
+      ansible.controller.instance:
+        hostname: "{{ register_execution_node_hostname }}"
+        node_type: execution
+        listener_port: "{{ register_execution_node_listener_port }}"
+        peers_from_control_nodes: true
+      register: register_execution_node_instance
+
+    # The AAP repo on the VM is named for the platform version; ask the gateway,
+    # as install-apd.yml does. Keep major.minor in case a patch number is included.
+    - name: Get the AAP platform version
+      ansible.builtin.uri:
+        url: "{{ apd_gateway_api_url }}/ping/"
+      register: register_execution_node_gateway_ping
+
+    - name: Set the AAP platform version
+      ansible.builtin.set_fact:
+        register_execution_node_aap_version: "{{ register_execution_node_gateway_ping.json.version | default('') | regex_search('^[0-9]+[.][0-9]+') | default('', true) }}"
+
+    - name: Fail if the AAP platform version is unknown
+      ansible.builtin.assert:
+        that: register_execution_node_aap_version | length > 0
+        fail_msg: >-
+          Could not read the AAP platform version from {{ apd_gateway_api_url }}/ping/
+          (got {{ register_execution_node_gateway_ping.json.version | default('nothing') }}).
+
+    # Everything from here on works in the bundle directory; if any of it fails,
+    # remove the directory (it holds receptor's TLS private key) and re-raise.
+    # On success it is kept for play 2, which removes it after the install.
+    - name: Download and parse the install bundle
+      block:
+        - name: Create a working directory for the install bundle
+          ansible.builtin.tempfile:
+            state: directory
+            prefix: exec_node_bundle_
+          register: register_execution_node_workdir
+
+        - name: Download the install bundle
+          ansible.builtin.uri:
+            url: "{{ apd_controller_api_url }}/instances/{{ register_execution_node_instance.id }}/install_bundle/"
+            dest: "{{ register_execution_node_workdir.path }}/bundle.tar.gz"
+            return_content: false
+
+        - name: Extract the install bundle
+          ansible.builtin.unarchive:
+            src: "{{ register_execution_node_workdir.path }}/bundle.tar.gz"
+            dest: "{{ register_execution_node_workdir.path }}"
+            remote_src: true
+
+        - name: List the install bundle files
+          ansible.builtin.find:
+            paths: "{{ register_execution_node_workdir.path }}"
+            file_type: file
+            recurse: true
+          register: register_execution_node_bundle_files
+
+        - name: Show the install bundle files
+          ansible.builtin.debug:
+            msg: "{{ register_execution_node_bundle_files.files | map(attribute='path') | map('regex_replace', '^' ~ register_execution_node_workdir.path ~ '/', '') | sort }}"
+
+        - name: Locate the bundle group vars
+          ansible.builtin.set_fact:
+            register_execution_node_bundle_group_vars: >-
+              {{ register_execution_node_bundle_files.files | map(attribute='path')
+                 | select('match', '.*/group_vars/all[.]ya?ml$') | first | default('') }}
+
+        - name: Fail if the bundle has no group vars
+          ansible.builtin.assert:
+            that: register_execution_node_bundle_group_vars | length > 0
+            fail_msg: >-
+              group_vars/all.yml was not found in the install bundle; see the file
+              list above for what the bundle contains.
+
+        # The receptor settings live in the bundle's group_vars/all.yml.
+        - name: Read the bundle group vars
+          ansible.builtin.slurp:
+            src: "{{ register_execution_node_bundle_group_vars }}"
+          register: register_execution_node_group_vars_raw
+
+        - name: Collect receptor settings from the bundle
+          ansible.builtin.set_fact:
+            register_execution_node_bundle_settings: "{{ (register_execution_node_group_vars_raw.content | b64decode | from_yaml) or {} }}"
+
+        # Settings that are file paths (custom_*file) are relative to the bundle
+        # directory (the parent of group_vars), so make them absolute.
+        - name: Build receptor settings from the bundle
+          ansible.builtin.set_fact:
+            register_execution_node_receptor_vars: >-
+              {{ register_execution_node_receptor_vars | default({}) | combine({
+                   item.key: (register_execution_node_bundle_group_vars | dirname | dirname ~ '/' ~ item.value)
+                             if (item.key.startswith('custom_') and item.key.endswith('file')
+                                 and item.value is string and not item.value.startswith('/'))
+                             else item.value }) }}
+          loop: "{{ register_execution_node_bundle_settings | dict2items }}"
+          loop_control:
+            label: "{{ item.key }}"
+          when: not item.key.startswith('ansible_')
+
+        # The bundle's playbook creates receptor_user, and the roles need the group too, so
+        # both must come from the bundle's settings.
+        - name: Fail if the bundle did not provide the receptor settings
+          ansible.builtin.assert:
+            that:
+              - register_execution_node_receptor_vars | default({}) | length > 0
+              - (register_execution_node_receptor_vars | default({})).receptor_user is defined
+              - (register_execution_node_receptor_vars | default({})).receptor_group is defined
+            fail_msg: >-
+              The install bundle did not provide receptor settings including receptor_user
+              and receptor_group. Check the bundle file list above and group_vars/all.yml.
+
+        # The port was registered in AAP above; use it unless the bundle sets its own.
+        - name: Default the receptor port to the registered listener port
+          ansible.builtin.set_fact:
+            register_execution_node_receptor_vars: >-
+              {{ {'receptor_port': register_execution_node_listener_port}
+                 | combine(register_execution_node_receptor_vars) }}
+
+        # package (default): the bundle's receptor RPMs, plus ansible-runner, come
+        # from the AAP repo that play 2 enables. release: receptor is downloaded and
+        # receptorctl installed with pip, so ansible-runner is installed with pip too.
+        - name: Choose how receptor is installed
+          ansible.builtin.set_fact:
+            register_execution_node_receptor_vars: >-
+              {{ register_execution_node_receptor_vars
+                 | combine({'receptor_install_method': register_execution_node_receptor_install_method})
+                 | combine(
+                     {'additional_system_packages':
+                        (register_execution_node_receptor_vars.additional_system_packages | default([])
+                         + ['ansible-runner']) | unique}
+                     if register_execution_node_receptor_install_method == 'package' else
+                     {'additional_python_packages':
+                        (register_execution_node_receptor_vars.additional_python_packages | default([])
+                         + ['ansible-runner']) | unique}) }}
+      rescue:
+        - name: Remove the install bundle working directory
+          ansible.builtin.file:
+            path: "{{ register_execution_node_workdir.path }}"
+            state: absent
+          when: register_execution_node_workdir is defined
+
+        - name: Fail with the original error
+          ansible.builtin.fail:
+            msg: "{{ ansible_failed_task.name }}: {{ ansible_failed_result.msg | default('failed') }}"
+
+- name: Install receptor on the VM
+  hosts: "{{ register_execution_node_vm_name | default('aws-storage-node') }}"
+  gather_facts: true
+  become: true
+  vars:
+    # Named for the platform version (from play 1) and this host's RHEL major version and
+    # architecture, e.g. ansible-automation-platform-2.7-for-rhel-9-x86_64-rpms.
+    register_execution_node_aap_repo: >-
+      ansible-automation-platform-{{ hostvars['localhost'].register_execution_node_aap_version }}-for-rhel-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}-rpms
+  tasks:
+    - name: Install receptor and remove the install bundle files
+      block:
+        - name: Load receptor settings from the bundle
+          ansible.builtin.set_fact:
+            "{{ item.key }}": "{{ item.value }}"
+          loop: "{{ hostvars['localhost'].register_execution_node_receptor_vars | dict2items }}"
+          loop_control:
+            label: "{{ item.key }}"
+
+        - name: Check the receptor user and group are valid account names
+          ansible.builtin.assert:
+            that:
+              - receptor_user is match('^[a-z_][a-z0-9_-]*$')
+              - receptor_group is match('^[a-z_][a-z0-9_-]*$')
+            fail_msg: >-
+              receptor_user/receptor_group are not valid account names
+              (receptor_user={{ receptor_user | to_json }}, receptor_group={{ receptor_group | to_json }}).
+
+        # The receptor and ansible-runner RPMs are in the AAP repo, which a stock
+        # RHEL VM does not have: register it with RHSM, then enable the repo.
+        - name: Enable the AAP repo for the receptor packages
+          when: receptor_install_method == 'package'
+          block:
+            - name: Ensure RHSM registration
+              ansible.builtin.include_tasks: tasks/rhsm_ensure_registered.yml
+
+            - name: Fail if the VM could not be registered
+              ansible.builtin.assert:
+                that: rhsm_registered | default(false)
+                fail_msg: >-
+                  The VM is not registered with RHSM, so the AAP repo cannot be enabled.
+                  Add the RHSM Registration credential (org id and activation key) to
+                  this job template, or set register_execution_node_receptor_install_method
+                  to release to download receptor instead.
+
+            - name: Enable the AAP repo
+              community.general.rhsm_repository:
+                name: "{{ register_execution_node_aap_repo }}"
+                state: enabled
+
+        # The same three steps as the bundle's install_receptor.yml. The podman role reads
+        # its account from podman_user and podman_group (default "podman"), so pass the
+        # bundle's receptor account explicitly.
+        - name: Create the receptor user
+          ansible.builtin.user:
+            name: "{{ receptor_user }}"
+            shell: /bin/bash
+
+        - name: Install podman for receptor
+          ansible.builtin.include_role:
+            name: ansible.receptor.podman
+          vars:
+            podman_user: "{{ hostvars['localhost'].register_execution_node_receptor_vars.receptor_user }}"
+            podman_group: "{{ hostvars['localhost'].register_execution_node_receptor_vars.receptor_group }}"
+
+        # The bundle's TLS certificate is issued for the hostname the instance was
+        # registered under, and the role uses routable_hostname (else ansible_host,
+        # which is the public IP here) as the receptor node id and certificate file
+        # name. They must match or receptor refuses to start.
+        - name: Install and configure receptor
+          ansible.builtin.include_role:
+            name: ansible.receptor.setup
+          vars:
+            receptor_user: "{{ hostvars['localhost'].register_execution_node_receptor_vars.receptor_user }}"
+            receptor_group: "{{ hostvars['localhost'].register_execution_node_receptor_vars.receptor_group }}"
+            routable_hostname: "{{ hostvars['localhost'].register_execution_node_hostname }}"
+
+        - name: Verify ansible-runner is available
+          ansible.builtin.command: ansible-runner --version
+          changed_when: false
+
+        - name: Get the receptor service status
+          ansible.builtin.systemd:
+            name: receptor
+          register: register_execution_node_service
+
+        - name: Verify receptor is running
+          ansible.builtin.assert:
+            that: register_execution_node_service.status.ActiveState | default('') == 'active'
+            fail_msg: >-
+              receptor is not running (state: {{ register_execution_node_service.status.ActiveState | default('unknown') }});
+              check the receptor service logs on the node.
+
+        - name: Verify receptor is listening on the mesh port
+          ansible.builtin.wait_for:
+            host: 127.0.0.1
+            port: "{{ receptor_port }}"
+            timeout: 60
+      # The bundle holds receptor's TLS private key; it is only needed until the
+      # role has copied it to the VM, so remove it whether or not the install worked.
+      always:
+        - name: Remove the install bundle working directory
+          ansible.builtin.file:
+            path: "{{ hostvars['localhost'].register_execution_node_workdir.path }}"
+            state: absent
+          delegate_to: localhost
+          become: false
+          run_once: true
+          when: hostvars['localhost'].register_execution_node_workdir is defined
+
+- name: Add the execution node to an instance group and wait for it
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    register_execution_node_instance_group: storage
+    register_execution_node_inventory_name: Ansible Product Demos Storage Inventory
+    register_execution_node_organization: Ansible Product Demos (APD)
+  vars_files:
+    - vars/controller_api.yml
+  module_defaults:
+    ansible.builtin.uri: "{{ apd_controller_api_uri_defaults }}"
+  tasks:
+    - name: Add the instance to the instance group
+      ansible.controller.instance_group:
+        name: "{{ register_execution_node_instance_group }}"
+        instances:
+          - "{{ register_execution_node_hostname }}"
+        state: present
+
+    # Jobs that use this inventory run on the storage instance group.
+    - name: Run storage inventory jobs on the instance group
+      ansible.controller.inventory:
+        name: "{{ register_execution_node_inventory_name }}"
+        organization: "{{ register_execution_node_organization }}"
+        instance_groups:
+          - "{{ register_execution_node_instance_group }}"
+
+    # The control plane dials the node on its listener port, so a failure here
+    # (for example "not in the receptor mesh") means AAP cannot reach it.
+    - name: Run an AAP health check on the node
+      ansible.builtin.uri:
+        url: "{{ apd_controller_api_url }}/instances/{{ register_execution_node_instance.id }}/health_check/"
+        method: POST
+        status_code: [200, 202]
+
+    - name: Wait for the health check to pass
+      ansible.builtin.uri:
+        url: "{{ apd_controller_api_url }}/instances/{{ register_execution_node_instance.id }}/health_check/"
+      register: register_execution_node_health
+      until:
+        - register_execution_node_health.json.last_health_check | default(none) is not none
+        - register_execution_node_health.json.errors | default('') | length == 0
+      retries: 30
+      delay: 10
+...

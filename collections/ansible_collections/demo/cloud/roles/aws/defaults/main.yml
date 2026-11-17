@@ -41,3 +41,12 @@ create_vm_apd_managed_by: aap-product-demos
 create_vm_apd_demo_tag: "true"
 create_vm_aws_image_filter: 'RHEL-9*HVM-*Hourly*'
 create_vm_aws_image_architecture: x86_64
+
+#######
+# CREATE FSX ONTAP VARS
+#######
+create_fsx_ontap_storage_capacity: 1024      # GiB
+create_fsx_ontap_throughput_capacity: 128    # MB/s
+create_fsx_ontap_deployment_type: SINGLE_AZ_1
+create_fsx_ontap_deployment: demo            # value of the "deployment" stack tag
+create_fsx_ontap_purpose: demo               # value of the "purpose" stack tag
