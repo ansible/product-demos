@@ -48,6 +48,8 @@ Install rewrites CI/CD close/rollback ServiceNow notes to trigger-based text so 
 
 No cloud stack. After Install, open **Task Step Example**, leave the default question (or edit it), and Run. Seed injects both the model (`llm_model_id`) and the **APD LiteMaaS** LLM Provider credential (`credential_id`) on the AI task step — model alone is not enough to call LiteMaaS.
 
+For affected workshop instances, an opt-in, version-pinned [structured-output workaround](../ao/workaround/README.md) is available. It requires cluster access and is not an operator-supported customization.
+
 ### Multi-OS Cloud Patching — manual trigger
 
 The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_region`** to the region where you deployed the stack, then run:

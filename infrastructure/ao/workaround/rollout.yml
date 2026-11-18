@@ -1,0 +1,101 @@
+---
+- name: Manage the AO structured-output workshop workaround
+  hosts: ao_workshops
+  connection: local
+  gather_facts: false
+  serial: 1
+  any_errors_fatal: true
+  tasks:
+    - name: Check instance configuration
+      ansible.builtin.assert:
+        that:
+          - ao_workaround_state | default('present') in ['present', 'absent']
+          - (ao_kubeconfig | default('') | length > 0) != (ao_workshop_creds_file | default('') | length > 0)
+          - ao_context | default('') | length == 0 or ao_kubeconfig | default('') | length > 0
+        fail_msg: >-
+          Set ao_workaround_state to present or absent and supply exactly one of
+          ao_kubeconfig or ao_workshop_creds_file. ao_context only applies to a kubeconfig.
+
+    - name: Manage one workshop instance
+      block:
+        - name: Read workshop OpenShift connection details
+          ansible.builtin.set_fact:
+            ao_provision_data:
+              openshift_api_url: "{{ ao_raw_provision_data.openshift_api_url }}"
+              openshift_api_ca_cert: "{{ ao_raw_provision_data.openshift_api_ca_cert }}"
+              openshift_cluster_admin_token: "{{ ao_raw_provision_data.openshift_cluster_admin_token }}"
+          vars:
+            ao_raw_provision_data: "{{ (lookup('ansible.builtin.file', ao_workshop_creds_file) | from_yaml).status.summary.provision_data }}"
+          no_log: true
+          when: ao_workshop_creds_file | default('') | length > 0
+
+        - name: Create a private temporary kubeconfig
+          ansible.builtin.tempfile:
+            state: file
+            prefix: ao-workshop-kubeconfig-
+          register: ao_temporary_kubeconfig
+          check_mode: false
+          changed_when: false
+          no_log: true
+          when: ao_workshop_creds_file | default('') | length > 0
+
+        - name: Populate the temporary kubeconfig
+          ansible.builtin.copy:
+            dest: "{{ ao_temporary_kubeconfig.path }}"
+            mode: '0600'
+            content: "{{ ao_temporary_config | to_nice_yaml }}"
+          vars:
+            ao_temporary_config:
+              apiVersion: v1
+              kind: Config
+              clusters:
+                - name: workshop
+                  cluster:
+                    server: "{{ ao_provision_data.openshift_api_url }}"
+                    certificate-authority-data: "{{ ao_provision_data.openshift_api_ca_cert | b64encode }}"
+              users:
+                - name: workshop
+                  user:
+                    token: "{{ ao_provision_data.openshift_cluster_admin_token }}"
+              contexts:
+                - name: workshop
+                  context:
+                    cluster: workshop
+                    user: workshop
+              current-context: workshop
+          check_mode: false
+          changed_when: false
+          no_log: true
+          when: ao_workshop_creds_file | default('') | length > 0
+
+        - name: Apply or inspect the version-checked worker overlay
+          ansible.builtin.command:
+            argv: >-
+              {{ [ansible_playbook_python, ao_overlay_script | default(playbook_dir ~ '/manage_overlay.py'),
+                  ('install' if ao_workaround_state | default('present') == 'present' else 'remove'),
+                  '--namespace', ao_namespace | default('automation-orchestrator'),
+                  '--deployment', ao_background_deployment | default('automation-orchestrator-background-worker'),
+                  '--container', ao_background_container | default('background-worker')]
+                 + (['--context', ao_context] if ao_context | default('') | length > 0 else [])
+                 + (['--check'] if ansible_check_mode else []) }}
+          environment:
+            KUBECONFIG: "{{ ao_temporary_kubeconfig.path if (ao_workshop_creds_file | default('') | length > 0) else ao_kubeconfig }}"
+          register: ao_overlay_result
+          changed_when: >-
+            (ao_overlay_result.rc | default(1) == 0) and
+            ((ao_overlay_result.stdout | from_json).changed | bool)
+          check_mode: false
+
+        - name: Report the instance result
+          ansible.builtin.debug:
+            msg: "{{ inventory_hostname }}: {{ ao_overlay_result.stdout | from_json }}"
+
+      always:
+        - name: Remove the temporary kubeconfig
+          ansible.builtin.file:
+            path: "{{ ao_temporary_kubeconfig.path }}"
+            state: absent
+          check_mode: false
+          changed_when: false
+          no_log: true
+          when: ao_temporary_kubeconfig.path is defined
