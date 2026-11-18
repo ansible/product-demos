@@ -139,11 +139,64 @@
           purpose: "{{ aws_purpose_tag }}"
       register: aws_subnet
 
-    - name: Create a subnet route table
+    # The owner tag can differ between Cloud Stack and Shared Services. Find
+    # the table by its VPC and stable Name rather than by all mutable tags.
+    - name: Find the demo subnet route tables
+      amazon.aws.ec2_vpc_route_table_info:
+        region: "{{ create_vm_aws_region }}"
+        filters:
+          vpc-id: "{{ aws_vpc.vpc.id }}"
+          tag:Name: "{{ aws_rt_name }}"
+      register: aws_named_route_tables
+
+    - name: Select non-main route tables
+      ansible.builtin.set_fact:
+        aws_demo_route_tables: "{{ aws_demo_route_tables | default([]) + [item] }}"
+      loop: "{{ aws_named_route_tables.route_tables }}"
+      loop_control:
+        label: "{{ item.id }}"
+      when: item.associations | default([]) | selectattr('main', 'defined') | selectattr('main') | list | length == 0
+
+    - name: Find a demo route table already associated with the subnet
+      ansible.builtin.set_fact:
+        aws_associated_route_tables: "{{ aws_associated_route_tables | default([]) + [item] }}"
+      loop: "{{ aws_demo_route_tables | default([]) }}"
+      loop_control:
+        label: "{{ item.id }}"
+      when: aws_subnet.subnet.id in (item.associations | default([]) | selectattr('subnet_id', 'defined') | map(attribute='subnet_id') | list)
+
+    - name: Reject ambiguous demo route tables
+      ansible.builtin.assert:
+        that:
+          - aws_associated_route_tables | default([]) | length <= 1
+          - (aws_associated_route_tables | default([]) | length == 1) or (aws_demo_route_tables | default([]) | length <= 1)
+        fail_msg: >-
+          Multiple demo route tables exist and none is uniquely associated with
+          the demo subnet. Inspect the tables and resolve the ambiguity before retrying.
+
+    - name: Reject a matching main table when no reusable table exists
+      ansible.builtin.assert:
+        that:
+          - (aws_demo_route_tables | default([]) | length > 0) or (aws_named_route_tables.route_tables | length == 0)
+        fail_msg: >-
+          A matching main route table exists but no non-main demo table is
+          available. Inspect the VPC before retrying.
+
+    - name: Select the demo route table to reuse
+      ansible.builtin.set_fact:
+        aws_reusable_route_table: >-
+          {{ (aws_associated_route_tables | default([]) | first)
+             if (aws_associated_route_tables | default([]) | length > 0)
+             else (aws_demo_route_tables | default([]) | first | default({})) }}
+
+    - name: Create or update the subnet route table
       amazon.aws.ec2_vpc_route_table:
         state: present
         vpc_id: "{{ aws_vpc.vpc.id }}"
         region: "{{ create_vm_aws_region }}"
+        lookup: "{{ 'id' if aws_reusable_route_table.id is defined else 'tag' }}"
+        route_table_id: "{{ aws_reusable_route_table.id | default(omit) }}"
+        purge_subnets: false
         subnets:
           - "{{ aws_subnet.subnet.id }}"
         routes:
