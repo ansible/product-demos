@@ -1,4 +1,4 @@
-"""Exercise install, idempotence, check mode, rollback and version guards."""
+"""Exercise the Install job's workaround tasks using a Kubernetes CLI double."""
 
 import hashlib
 import json
@@ -9,9 +9,12 @@ import subprocess
 import tempfile
 import unittest
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[1]
+INSTALL = ROOT.parent / "install.yml"
 ORIGINAL = "class GenericAgent:\n    async def _execute_structured(self, state, response_schema):\n        return state\n"
-BASE_HASH = "e7f21a189bf9863a0a0b1d756cdcb0e28eaa1b2c932168923ca0b6229996344f"
+SOURCE_HASH = "e7f21a189bf9863a0a0b1d756cdcb0e28eaa1b2c932168923ca0b6229996344f"
 OVERLAY_HASH = "d78d4ab4734d0b9c82a5e7b908722617ed5dfdc13ad1bfb98ff205a20ace4342"
 IMAGE = "registry.example/backend@sha256:22279cf11cc61116e4eb5b67d3479d011af668708effe74203913071dcc99f14"
 
@@ -22,35 +25,23 @@ class RolloutTest(unittest.TestCase):
         self.path = Path(self.tmp.name)
         scripts = self.path / "scripts"
         scripts.mkdir()
-        for name in (
-            "build_overlay.py",
-            "manage_overlay.py",
-            "structured_method.py.txt",
-        ):
-            shutil.copy(ROOT / name, scripts / name)
-        builder = scripts / "build_overlay.py"
-        builder.write_text(
-            builder.read_text().replace(
-                BASE_HASH, hashlib.sha256(ORIGINAL.encode()).hexdigest()
-            )
-        )
-        original = self.path / "original.py"
-        original.write_text(ORIGINAL)
-        overlay = self.path / "overlay.py"
-        subprocess.run(
-            ["python3", str(builder), str(original), str(overlay)],
-            check=True,
-            capture_output=True,
-        )
+        shutil.copy(ROOT / "structured_method.py.txt", scripts)
         manager = scripts / "manage_overlay.py"
+        fragment = (scripts / "structured_method.py.txt").read_text()
+        lines = ORIGINAL.splitlines(keepends=True)
+        original_method = "".join(lines[1:]).replace(
+            "async def _execute_structured(", "async def _execute_structured_native(", 1
+        )
+        overlay = lines[0] + fragment + "\n\n" + original_method
         manager.write_text(
-            manager.read_text().replace(
-                OVERLAY_HASH, hashlib.sha256(overlay.read_bytes()).hexdigest()
-            )
+            (ROOT / "manage_overlay.py")
+            .read_text()
+            .replace(SOURCE_HASH, hashlib.sha256(ORIGINAL.encode()).hexdigest())
+            .replace(OVERLAY_HASH, hashlib.sha256(overlay.encode()).hexdigest())
         )
         bindir = self.path / "bin"
         bindir.mkdir()
-        (bindir / "oc").symlink_to(ROOT / "tests" / "fake_oc.py")
+        (bindir / "kubectl").symlink_to(ROOT / "tests" / "fake_kubectl.py")
         self.state = self.path / "state.json"
         self.state.write_text(
             json.dumps(
@@ -87,9 +78,41 @@ class RolloutTest(unittest.TestCase):
                 }
             )
         )
-        self.inventory = self.path / "inventory.yml"
-        self.inventory.write_text(
-            "all:\n  children:\n    ao_workshops:\n      hosts:\n        demo:\n          ao_kubeconfig: /unused/test-kubeconfig\n"
+        plays = yaml.safe_load(INSTALL.read_text())
+        block = next(
+            task["block"]
+            for task in plays[0]["tasks"]
+            if task["name"] == "Deploy Automation Orchestrator"
+        )
+        names = {
+            "Validate the AO structured-output workaround state",
+            "Wait for the AO background worker",
+            "Manage the AO structured-output workaround",
+        }
+        tasks = [task for task in block if task.get("name") in names]
+        self.assertEqual(len(tasks), len(names))
+        tasks[-1]["ansible.builtin.command"]["argv"] = tasks[-1][
+            "ansible.builtin.command"
+        ]["argv"].replace(
+            "playbook_dir ~ '/workaround/manage_overlay.py'", repr(str(manager))
+        )
+        self.playbook = self.path / "test.yml"
+        self.playbook.write_text(
+            yaml.safe_dump(
+                [
+                    {
+                        "name": "Test Install workaround tasks",
+                        "hosts": "localhost",
+                        "gather_facts": False,
+                        "vars": {
+                            "ao_namespace": "automation-orchestrator",
+                            "_kubeconfig_tmp": {"path": "/unused/kubeconfig"},
+                        },
+                        "tasks": tasks,
+                    }
+                ],
+                sort_keys=False,
+            )
         )
         self.env = dict(
             os.environ,
@@ -97,122 +120,98 @@ class RolloutTest(unittest.TestCase):
             FAKE_OC_STATE=str(self.state),
             ANSIBLE_NOCOLOR="1",
         )
-        self.manager = manager
 
     def tearDown(self):
         self.tmp.cleanup()
 
     def run_play(self, *args, succeeds=True):
-        cmd = [
-            "ansible-playbook",
-            "-i",
-            str(self.inventory),
-            str(ROOT / "rollout.yml"),
-            "-e",
-            "ao_overlay_script=" + str(self.manager),
-            *args,
-        ]
         result = subprocess.run(
-            cmd, env=self.env, text=True, capture_output=True, timeout=90
+            [
+                "ansible-playbook",
+                "-i",
+                "localhost,",
+                "-c",
+                "local",
+                str(self.playbook),
+                *args,
+            ],
+            env=self.env,
+            text=True,
+            capture_output=True,
+            timeout=90,
         )
         self.assertEqual(
             result.returncode == 0, succeeds, result.stdout + result.stderr
         )
         return result.stdout + result.stderr
 
-    def test_complete_lifecycle_and_image_guard(self):
+    def test_install_reapply_and_remove(self):
         initial = self.state.read_text()
-        output = self.run_play("--check")
-        self.assertIn("would", output)
+        self.run_play("--check")
         self.assertEqual(initial, self.state.read_text())
-        output = self.run_play()
-        self.assertIn("verified_replicas", output)
-        after = json.loads(self.state.read_text())
-        self.assertIsNotNone(after["configmap"])
-        output = self.run_play()
-        self.assertIn("changed=0", output)
-        conflict = json.loads(self.state.read_text())
-        volumes = conflict["deployment"]["spec"]["template"]["spec"]["volumes"]
-        volumes.append(
-            {
-                "name": "other-user",
-                "configMap": {"name": "ao-workshop-structured-output"},
-            }
-        )
-        self.state.write_text(json.dumps(conflict))
-        before_conflict = self.state.read_text()
-        self.assertIn(
-            "other deployment references",
-            self.run_play("-e", "ao_workaround_state=absent", succeeds=False),
-        )
-        self.assertEqual(before_conflict, self.state.read_text())
-        volumes.pop()
-        self.state.write_text(json.dumps(conflict))
+        self.run_play()
+        self.assertIsNotNone(json.loads(self.state.read_text())["configmap"])
+        self.assertIn("changed=0", self.run_play())
+        # Removal must still work after the backend image changes on upgrade.
+        upgraded = json.loads(self.state.read_text())
+        upgraded["deployment"]["spec"]["template"]["spec"]["containers"][0][
+            "image"
+        ] = "registry.example/backend@sha256:new-release"
+        self.state.write_text(json.dumps(upgraded))
         unchanged = self.state.read_text()
         self.run_play("--check", "-e", "ao_workaround_state=absent")
         self.assertEqual(unchanged, self.state.read_text())
         self.run_play("-e", "ao_workaround_state=absent")
         self.assertIsNone(json.loads(self.state.read_text())["configmap"])
         self.assertIn("changed=0", self.run_play("-e", "ao_workaround_state=absent"))
+
+    def test_image_and_source_guards(self):
         data = json.loads(self.state.read_text())
         data["deployment"]["spec"]["template"]["spec"]["containers"][0][
             "image"
-        ] = "example/unknown:latest"
+        ] = "unknown:latest"
         self.state.write_text(json.dumps(data))
-        before = self.state.read_text()
         self.assertIn(
             "Unexpected AO background-worker image", self.run_play(succeeds=False)
         )
-        self.assertEqual(before, self.state.read_text())
-
-    def test_credential_cleanup_and_conflicting_configmap(self):
-        private_tmp = self.path / "private-tmp"
-        private_tmp.mkdir()
-        self.env["TMPDIR"] = str(private_tmp)
-        creds = self.path / "workshop.creds.yml"
-        creds.write_text(
-            "status:\n  summary:\n    provision_data:\n"
-            "      openshift_api_url: https://example.invalid:6443\n"
-            "      openshift_api_ca_cert: fake-ca\n"
-            "      openshift_cluster_admin_token: sensitive-test-token-12345\n"
-        )
-        self.inventory.write_text(
-            "all:\n  children:\n    ao_workshops:\n      hosts:\n"
-            f"        demo:\n          ao_workshop_creds_file: {creds}\n"
-        )
-        output = self.run_play("--check")
-        self.assertNotIn("sensitive-test-token-12345", output)
-        self.assertFalse(list(private_tmp.rglob("ao-workshop-kubeconfig-*")))
-        data = json.loads(self.state.read_text())
-        data["configmap"] = {
-            "metadata": {"name": "ao-workshop-structured-output"},
-            "data": {"generic_agent.py": "unexpected"},
-        }
+        self.assertIsNone(json.loads(self.state.read_text())["configmap"])
+        data["deployment"]["spec"]["template"]["spec"]["containers"][0]["image"] = IMAGE
+        data["original"] = ORIGINAL + "# unexpected source\n"
         self.state.write_text(json.dumps(data))
-        before = self.state.read_text()
-        self.assertIn("unexpected content", self.run_play(succeeds=False))
-        self.assertEqual(before, self.state.read_text())
-        self.assertFalse(list(private_tmp.rglob("ao-workshop-kubeconfig-*")))
-
-    def test_source_guard_and_serial_failure(self):
-        data = json.loads(self.state.read_text())
-        data["original"] = ORIGINAL + "# unexpected image source\n"
-        self.state.write_text(json.dumps(data))
-        before = self.state.read_text()
         self.assertIn(
-            "Unexpected upstream agent source SHA-256",
-            self.run_play("--check", succeeds=False),
+            "Unexpected upstream agent source SHA-256", self.run_play(succeeds=False)
         )
-        self.assertEqual(before, self.state.read_text())
-        self.inventory.write_text(
-            "all:\n  children:\n    ao_workshops:\n      hosts:\n"
-            "        first:\n          ao_kubeconfig: /unused/test-kubeconfig\n"
-            "        second:\n          ao_kubeconfig: /unused/test-kubeconfig\n"
+        self.assertIsNone(json.loads(self.state.read_text())["configmap"])
+
+    def test_conflicting_configmap_and_invalid_state_fail(self):
+        data = json.loads(self.state.read_text())
+        data["configmap"] = {"data": {"generic_agent.py": "unexpected"}}
+        self.state.write_text(json.dumps(data))
+        unchanged = self.state.read_text()
+        self.assertIn("unexpected content", self.run_play(succeeds=False))
+        self.assertEqual(unchanged, self.state.read_text())
+        self.assertIn(
+            "Set ao_workaround_state to present or absent",
+            self.run_play("-e", "ao_workaround_state=bad", succeeds=False),
         )
-        output = self.run_play(succeeds=False)
-        self.assertIn("first", output)
-        self.assertNotIn("second", output)
-        self.assertEqual(before, self.state.read_text())
+        self.assertEqual(unchanged, self.state.read_text())
+
+    def test_removal_rejects_other_deployment_references(self):
+        self.run_play()
+        data = json.loads(self.state.read_text())
+        data["deployment"]["spec"]["template"]["spec"]["volumes"].append(
+            {
+                "name": "other-user",
+                "configMap": {"name": "ao-workshop-structured-output"},
+            }
+        )
+        self.state.write_text(json.dumps(data))
+        unchanged = self.state.read_text()
+        self.assertIn(
+            "other deployment references",
+            self.run_play("-e", "ao_workaround_state=absent", succeeds=False),
+        )
+        self.assertEqual(unchanged, self.state.read_text())
 
 
 if __name__ == "__main__":

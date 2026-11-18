@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Manage the workshop-only AO agent overlay using the configured oc context."""
+"""Manage the workshop-only AO agent overlay using the configured kubeconfig."""
 
 import argparse
+import ast
 import hashlib
 import json
 import pathlib
@@ -12,6 +13,7 @@ import tempfile
 VOLUME = "workshop-structured-output"
 CONFIG_MAP = "ao-workshop-structured-output"
 TARGET = "/opt/app-root/src/src/syntara/agent_orchestrator/agents/generic_agent.py"
+SOURCE_SHA256 = "e7f21a189bf9863a0a0b1d756cdcb0e28eaa1b2c932168923ca0b6229996344f"
 IMAGE_DIGEST = "sha256:22279cf11cc61116e4eb5b67d3479d011af668708effe74203913071dcc99f14"
 OVERLAY_SHA256 = "d78d4ab4734d0b9c82a5e7b908722617ed5dfdc13ad1bfb98ff205a20ace4342"
 METHOD_SHA256 = "b676ca4450420033a6aa323fa729e5ced1a7ea547b5c4d89bd75e999ac98a2d3"
@@ -21,10 +23,9 @@ def sha(text):
     return hashlib.sha256(text.encode()).hexdigest()
 
 
-def oc(*args, input_text=None):
-    context = ["--context", ARGS.context] if ARGS.context else []
+def kubectl(*args, input_text=None):
     result = subprocess.run(
-        ["oc", *context, "-n", ARGS.namespace, *args],
+        ["kubectl", "-n", ARGS.namespace, *args],
         input=input_text,
         text=True,
         check=True,
@@ -36,7 +37,7 @@ def oc(*args, input_text=None):
 
 
 def get_resource(kind, name):
-    raw = oc("get", kind, name, "--ignore-not-found", "-o", "json")
+    raw = kubectl("get", kind, name, "--ignore-not-found", "-o", "json")
     return json.loads(raw) if raw.strip() else None
 
 
@@ -91,11 +92,13 @@ def patch(doc, patch_ops):
             "value": doc["metadata"]["resourceVersion"],
         }
     ] + patch_ops
-    oc("patch", "deployment", ARGS.deployment, "--type=json", "-p", json.dumps(guarded))
+    kubectl(
+        "patch", "deployment", ARGS.deployment, "--type=json", "-p", json.dumps(guarded)
+    )
 
 
 def rollout_and_verify(doc):
-    oc("rollout", "status", "deployment/" + ARGS.deployment, "--timeout=180s")
+    kubectl("rollout", "status", "deployment/" + ARGS.deployment, "--timeout=180s")
     current, _, _ = get_deployment()
     replicas = current["spec"].get("replicas", 1)
     if replicas < 1:
@@ -104,7 +107,7 @@ def rollout_and_verify(doc):
     if not labels:
         raise ValueError("Cannot identify worker pods without matchLabels")
     selector = ",".join(f"{k}={v}" for k, v in sorted(labels.items()))
-    pods = json.loads(oc("get", "pods", "-l", selector, "-o", "json"))["items"]
+    pods = json.loads(kubectl("get", "pods", "-l", selector, "-o", "json"))["items"]
     ready = [
         p
         for p in pods
@@ -118,7 +121,7 @@ def rollout_and_verify(doc):
     if len(ready) != replicas:
         raise ValueError(f"Expected {replicas} ready worker pods, found {len(ready)}")
     for pod in ready:
-        output = oc(
+        output = kubectl(
             "exec",
             "pod/" + pod["metadata"]["name"],
             "-c",
@@ -149,48 +152,61 @@ def install(doc, spec, container, cm, state):
     if state == "installed":
         ready = None if ARGS.check else rollout_and_verify(doc)
         return {"changed": False, "state": state, "verified_replicas": ready}
-    with tempfile.TemporaryDirectory(prefix="ao-workaround-") as tmp:
-        original, overlay = pathlib.Path(tmp, "original.py"), pathlib.Path(
-            tmp, "generic_agent.py"
+    source = kubectl(
+        "exec",
+        "deployment/" + ARGS.deployment,
+        "-c",
+        ARGS.container,
+        "--",
+        "cat",
+        TARGET,
+    )
+    if sha(source) != SOURCE_SHA256:
+        raise ValueError(
+            "Unexpected upstream agent source SHA-256; review the patch for this version"
         )
-        original.write_text(
-            oc(
-                "exec",
-                "deployment/" + ARGS.deployment,
-                "-c",
-                ARGS.container,
-                "--",
-                "cat",
-                TARGET,
-            )
-        )
-        subprocess.run(
-            [
-                sys.executable,
-                str(pathlib.Path(__file__).with_name("build_overlay.py")),
-                str(original),
-                str(overlay),
-            ],
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-        if sha(overlay.read_text()) != OVERLAY_SHA256:
-            raise ValueError("Generated overlay differs from the validated version")
-        if ARGS.check:
-            return {"changed": True, "state": state, "would": "install"}
-        if not cm:
-            manifest = oc(
+    tree = ast.parse(source)
+    cls = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.ClassDef) and node.name == "GenericAgent"
+    )
+    method = next(
+        node
+        for node in cls.body
+        if isinstance(node, ast.AsyncFunctionDef) and node.name == "_execute_structured"
+    )
+    lines = source.splitlines(keepends=True)
+    original = "".join(lines[method.lineno - 1 : method.end_lineno]).replace(
+        "async def _execute_structured(", "async def _execute_structured_native(", 1
+    )
+    fragment = pathlib.Path(__file__).with_name("structured_method.py.txt").read_text()
+    overlay = (
+        "".join(lines[: method.lineno - 1])
+        + fragment
+        + "\n\n"
+        + original
+        + "".join(lines[method.end_lineno :])
+    )
+    ast.parse(overlay)
+    if sha(overlay) != OVERLAY_SHA256:
+        raise ValueError("Generated overlay differs from the validated version")
+    if ARGS.check:
+        return {"changed": True, "state": state, "would": "install"}
+    if not cm:
+        with tempfile.TemporaryDirectory(prefix="ao-workaround-") as tmp:
+            overlay_path = pathlib.Path(tmp, "generic_agent.py")
+            overlay_path.write_text(overlay)
+            manifest = kubectl(
                 "create",
                 "configmap",
                 CONFIG_MAP,
-                "--from-file=generic_agent.py=" + str(overlay),
+                "--from-file=generic_agent.py=" + str(overlay_path),
                 "--dry-run=client",
                 "-o",
                 "json",
             )
-            oc("create", "-f", "-", input_text=manifest)
+            kubectl("create", "-f", "-", input_text=manifest)
     index = spec["containers"].index(container)
     patch(
         doc,
@@ -224,7 +240,7 @@ def install(doc, spec, container, cm, state):
 def remove(doc, spec, container, cm, state):
     if state == "absent":
         return {"changed": False, "state": "absent"}
-    deployments = json.loads(oc("get", "deployments", "-o", "json"))["items"]
+    deployments = json.loads(kubectl("get", "deployments", "-o", "json"))["items"]
     refs = [
         d["metadata"]["name"]
         for d in deployments
@@ -264,8 +280,8 @@ def remove(doc, spec, container, cm, state):
                 {"op": "remove", "path": f"/spec/template/spec/volumes/{vi}"},
             ],
         )
-        oc("rollout", "status", "deployment/" + ARGS.deployment, "--timeout=180s")
-    oc("delete", "configmap", CONFIG_MAP)
+        kubectl("rollout", "status", "deployment/" + ARGS.deployment, "--timeout=180s")
+    kubectl("delete", "configmap", CONFIG_MAP)
     return {"changed": True, "state": "absent"}
 
 
@@ -279,7 +295,6 @@ def main():
         "--deployment", default="automation-orchestrator-background-worker"
     )
     parser.add_argument("--container", default="background-worker")
-    parser.add_argument("--context", default="")
     ARGS = parser.parse_args()
     doc, spec, container = get_deployment()
     cm = get_resource("configmap", CONFIG_MAP)

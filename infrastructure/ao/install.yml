@@ -185,6 +185,48 @@
               oc get csv,pods -n {{ ao_namespace }}
           when: ao_routes.resources | default([]) | length == 0
 
+        # Temporary workaround for AAP-99739. Remove this block and the
+        # workaround directory after the product fix has shipped and any
+        # installed overlays have been removed.
+        - name: Validate the AO structured-output workaround state
+          ansible.builtin.assert:
+            that:
+              - ao_workaround_state | default('present') in ['present', 'absent']
+            fail_msg: "Set ao_workaround_state to present or absent."
+
+        - name: Wait for the AO background worker
+          ansible.builtin.command:
+            argv:
+              - kubectl
+              - --kubeconfig
+              - "{{ _kubeconfig_tmp.path }}"
+              - -n
+              - "{{ ao_namespace }}"
+              - rollout
+              - status
+              - deployment/automation-orchestrator-background-worker
+              - --timeout=10s
+          register: _ao_worker_rollout
+          until: _ao_worker_rollout.rc == 0
+          retries: 30
+          delay: 10
+          changed_when: false
+          check_mode: false
+
+        - name: Manage the AO structured-output workaround
+          ansible.builtin.command:
+            argv: >-
+              {{ [ansible_playbook_python, playbook_dir ~ '/workaround/manage_overlay.py',
+                  ('install' if ao_workaround_state | default('present') == 'present' else 'remove'),
+                  '--namespace', ao_namespace] + (['--check'] if ansible_check_mode else []) }}
+          environment:
+            KUBECONFIG: "{{ _kubeconfig_tmp.path }}"
+          register: _ao_workaround_result
+          changed_when: >-
+            (_ao_workaround_result.rc | default(1) == 0) and
+            ((_ao_workaround_result.stdout | from_json).changed | bool)
+          check_mode: false
+
       always:
         - name: Clean up generated credentials
           ansible.builtin.file:

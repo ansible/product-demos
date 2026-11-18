@@ -459,6 +459,7 @@ controller_templates:
     notification_templates_success: Telemetry
     notification_templates_error: Telemetry
     timeout: 3600
+    ask_variables_on_launch: true
     extra_vars:
       ao_operator_channel: stable
     credentials:

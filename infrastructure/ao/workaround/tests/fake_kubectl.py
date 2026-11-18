@@ -10,6 +10,8 @@ import sys
 path = pathlib.Path(os.environ["FAKE_OC_STATE"])
 s = json.loads(path.read_text())
 a = sys.argv[1:]
+if a[:1] == ["--kubeconfig"]:
+    a = a[2:]
 if a[:1] == ["--context"]:
     a = a[2:]
 if a[:1] == ["-n"]:
