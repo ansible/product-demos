@@ -63,7 +63,7 @@ The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_r
 
 ### Zero-Day Response — two workflows
 
-Install seeds two workflows from two `demos.yml` entries: **Zero-Day Response - PHP2Shell: KNOW + CONTAIN** (`zero-day-response`, which also creates the `p2s-*` job templates) and **Zero-Day Response - PHP2Shell: FIX + PROVE** (`zero-day-response-fix`, which reuses them). Run KNOW + CONTAIN first. Both come from the `zero-day-response/` folder of [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos), so `ao_demos_ref` in [`demos.yml`](../ao/demos.yml) must point at a ref that contains it.
+Install seeds two workflows from two `demos.yml` entries: **Zero-Day Response - PHP2Shell: KNOW + CONTAIN** (`zero-day-response`, which also creates the `p2s-*` job templates) and **Zero-Day Response - PHP2Shell: FIX + PROVE** (`zero-day-response-fix`, which reuses them). Run KNOW + CONTAIN first. FIX + PROVE ends with **PROVE · Incident report** (`p2s-prove-report`, AWS credential): it renders the run's records into one HTML page, stores it in a private S3 bucket and publishes a link that expires in 24 hours. Both come from the `zero-day-response/` folder of [aap-orchestrator-demos](https://github.com/ansible-tmm/aap-orchestrator-demos), so `ao_demos_ref` in [`demos.yml`](../ao/demos.yml) must point at a ref that contains it.
 
 ## The three AO templates
 
