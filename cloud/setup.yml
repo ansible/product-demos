@@ -2,11 +2,29 @@
 _deployment_id: '{{ lookup("ansible.builtin.password", playbook_dir + "/.deployment_id", chars=["ascii_lowercase", "digits"], length=5) }}'
 apd_managed_by: aap-product-demos
 
+# Names shared by the storage job templates and the Deploy / Destroy a Storage Stack
+# workflows. Change them here only: the surveys, workflow nodes and the playbooks'
+# inventory name all read these. The keypair, subnet and security group must match
+# what Deploy Cloud Stack in AWS creates.
+apd_storage_vm_name: aws-storage-node
+apd_storage_fsx_name: aws-ontap
+apd_storage_fsx_stack_name: aws-ontap-stack
+apd_storage_instance_group: storage
+apd_storage_inventory_name: Ansible Product Demos Storage Inventory
+apd_storage_aws_keypair_name: aws-test-key
+apd_storage_aws_subnet_name: aws-test-subnet
+apd_storage_aws_securitygroup_name: aws-test-sg
+
 user_message:
   - >-
     To enable automatic RHSM registration on unregistered RHEL hosts,
     update the 'RHSM Registration' credential in AAP with your org ID
     and activation key. https://access.redhat.com/management/activation_keys
+  - >-
+    To create or manage Amazon FSx for NetApp ONTAP, update the 'FSx ONTAP'
+    credential in AAP with the password for the fsxadmin account. It is set
+    as the fsxadmin password when the file system is created, and used to
+    log in to it afterwards.
 
 controller_credential_types:
   - name: RHSM Activation Key
@@ -27,6 +45,25 @@ controller_credential_types:
       extra_vars:
         rhsm_org_id: !unsafe '{{ rhsm_org_id }}'
         rhsm_activation_key: !unsafe '{{ rhsm_activation_key }}'
+  - name: FSx ONTAP Admin
+    kind: cloud
+    inputs:
+      fields:
+        - id: fsx_ontap_username
+          type: string
+          label: Admin Username
+          default: fsxadmin
+        - id: fsx_ontap_password
+          type: string
+          label: Admin Password
+          secret: true
+      required:
+        - fsx_ontap_username
+        - fsx_ontap_password
+    injectors:
+      extra_vars:
+        fsx_ontap_username: !unsafe '{{ fsx_ontap_username }}'
+        fsx_ontap_password: !unsafe '{{ fsx_ontap_password }}'
 
 controller_credentials:
   - name: RHSM Registration
@@ -37,12 +74,29 @@ controller_credentials:
     inputs:
       rhsm_org_id: REPLACEME
       rhsm_activation_key: REPLACEME
+  - name: FSx ONTAP
+    credential_type: FSx ONTAP Admin
+    organization: Ansible Product Demos (APD)
+    update_secrets: false
+    state: exists
+    inputs:
+      fsx_ontap_username: fsxadmin
+      fsx_ontap_password: REPLACEME
 
 controller_execution_environments:
   - name: TMM AWS EE
     image: quay.io/acme_corp/aws_ee
     organization: Ansible Product Demos (APD)
     pull: missing
+
+# Holds the FSx ONTAP systems. The "storage" instance group (the execution
+# node registered by Deploy a Storage Stack on AWS) is attached to this
+# inventory by cloud/register_execution_node.yml, so jobs run against ONTAP
+# hosts execute on that node.
+controller_inventories:
+  - name: "{{ apd_storage_inventory_name }}"
+    description: Amazon FSx for NetApp ONTAP systems managed from the storage execution node
+    organization: Ansible Product Demos (APD)
 
 controller_templates:
   - name: Cloud | AWS | Create Peer Infrastructure
@@ -436,6 +490,276 @@ controller_templates:
       _report_server: reports
     limit: all
 
+  - name: Cloud | AWS | Create FSx ONTAP
+    labels:
+      - storage
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - FSx ONTAP
+    project: Ansible Product Demos
+    playbook: cloud/create_fsx_ontap.yml
+    inventory: Ansible Product Demos Inventory
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            AWS region where the FSx ONTAP will be created. Optional when
+            launched from Deploy a Storage Stack on AWS, which supplies the region.
+          type: multiplechoice
+          variable: create_fsx_ontap_aws_region
+          required: false
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: FSx ONTAP Name
+          question_description: >-
+            Name for the FSx ONTAP file system. Will be used as the value for
+            the EC2 tag key "Name" on the FSx ONTAP file system.
+          type: text
+          variable: create_fsx_ontap_aws_name
+          required: true
+          default: "{{ apd_storage_fsx_name }}"
+        - question_name: FSx ONTAP Stack Name
+          question_description: >-
+            Name for the collection of ONTAP nodes. This dominates the
+            FSx ONTAP Name
+          type: text
+          variable: create_fsx_ontap_stack_name
+          required: true
+          default: "{{ apd_storage_fsx_stack_name }}"
+        - question_name: Owner
+          question_description: >-
+            Value for the EC2 tag key "owner" on all resources this workflow
+            creates. Use your name or team for cost attribution; appears in
+            inventory keyed groups as owner_*.
+          type: text
+          variable: create_fsx_ontap_aws_owner_tag
+          required: false
+        - question_name: Environment
+          question_description: >-
+            Value for the EC2 tag key "environment" on FSx ONTAP (Dev, QA, or
+            Prod). Metadata only—it does not change settings.
+          type: multiplechoice
+          variable: create_fsx_ontap_aws_environment
+          required: false
+          choices:
+            - Dev
+            - QA
+            - Prod
+        - question_name: Subnet
+          type: text
+          variable: create_fsx_ontap_aws_vpc_subnet_name
+          required: true
+          default: "{{ apd_storage_aws_subnet_name }}"
+        - question_name: Security Group
+          type: text
+          variable: create_fsx_ontap_aws_securitygroup_name
+          required: true
+          default: "{{ apd_storage_aws_securitygroup_name }}"
+
+  - name: Cloud | AWS | Update FSx ONTAP Inventory
+    labels:
+      - storage
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - AAP Credential
+    project: Ansible Product Demos
+    playbook: cloud/update_fsx_ontap_inventory.yml
+    inventory: Ansible Product Demos Inventory
+    extra_vars:
+      update_fsx_ontap_inventory_name: "{{ apd_storage_inventory_name }}"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            AWS region to search for FSx ONTAP file systems created by the
+            Create FSx ONTAP job template. Optional when launched from Deploy
+            a Storage Stack on AWS, which supplies the region.
+          type: multiplechoice
+          variable: update_fsx_ontap_inventory_aws_region
+          required: false
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+
+  - name: Cloud | AWS | Delete FSx ONTAP
+    labels:
+      - storage
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - AAP Credential
+    project: Ansible Product Demos
+    playbook: cloud/delete_fsx_ontap.yml
+    inventory: Ansible Product Demos Inventory
+    extra_vars:
+      delete_fsx_ontap_inventory_name: "{{ apd_storage_inventory_name }}"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            AWS region where the FSx ONTAP stack was created. Optional when
+            launched from Destroy a Storage Stack on AWS, which supplies the region.
+          type: multiplechoice
+          variable: delete_fsx_ontap_aws_region
+          required: false
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: FSx ONTAP Stack Name
+          question_description: >-
+            Name of the CloudFormation stack to delete. Deleting the stack
+            also deletes the FSx ONTAP file system and all of its data.
+          type: text
+          variable: delete_fsx_ontap_stack_name
+          required: true
+          default: "{{ apd_storage_fsx_stack_name }}"
+        - question_name: FSx ONTAP Name
+          question_description: >-
+            Name used when the file system was created. The host with this
+            name is removed from {{ apd_storage_inventory_name }}.
+          type: text
+          variable: delete_fsx_ontap_aws_name
+          required: false
+          default: "{{ apd_storage_fsx_name }}"
+
+  - name: Cloud | AWS | Register Execution Node
+    labels:
+      - storage
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - AAP Credential
+      - APD Machine Credential
+      - RHSM Registration
+    project: Ansible Product Demos
+    playbook: cloud/register_execution_node.yml
+    inventory: Ansible Product Demos Inventory
+    extra_vars:
+      register_execution_node_inventory_name: "{{ apd_storage_inventory_name }}"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            AWS region where the VM was created. Optional when launched from
+            Deploy a Storage Stack on AWS, which supplies the region.
+          type: multiplechoice
+          variable: register_execution_node_aws_region
+          required: false
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: VM Name
+          question_description: >-
+            Name tag of the RHEL VM to register as an AAP execution node. It
+            must already be in Ansible Product Demos Inventory.
+          type: text
+          variable: register_execution_node_vm_name
+          required: true
+          default: "{{ apd_storage_vm_name }}"
+        - question_name: Instance Group
+          question_description: >-
+            AAP instance group the execution node is added to.
+          type: text
+          variable: register_execution_node_instance_group
+          required: false
+          default: "{{ apd_storage_instance_group }}"
+
+  - name: Cloud | AWS | Check FSx ONTAP Endpoint
+    labels:
+      - storage
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - FSx ONTAP
+    project: Ansible Product Demos
+    playbook: cloud/check_fsx_ontap_endpoint.yml
+    # Must use the storage inventory so the job runs on the execution node.
+    inventory: "{{ apd_storage_inventory_name }}"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+
+  - name: Cloud | AWS | Deregister Execution Node
+    labels:
+      - storage
+    job_type: run
+    organization: Ansible Product Demos (APD)
+    credentials:
+      - AWS
+      - AAP Credential
+    project: Ansible Product Demos
+    playbook: cloud/deregister_execution_node.yml
+    inventory: Ansible Product Demos Inventory
+    extra_vars:
+      deregister_execution_node_inventory_name: "{{ apd_storage_inventory_name }}"
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            AWS region where the VM was created. Optional when launched from
+            Destroy a Storage Stack on AWS, which supplies the region.
+          type: multiplechoice
+          variable: deregister_execution_node_aws_region
+          required: false
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: VM Name
+          question_description: >-
+            Name tag of the RHEL VM registered as an AAP execution node. It
+            must still be running so AAP can uninstall receptor from it.
+          type: text
+          variable: deregister_execution_node_vm_name
+          required: true
+          default: "{{ apd_storage_vm_name }}"
+
 controller_workflows:
   - name: Deploy Cloud Stack in AWS
     description: A workflow to deploy a cloud stack
@@ -776,3 +1100,207 @@ controller_workflows:
           _report_server: reports
         limit: all
         all_parents_must_converge: true
+
+  - name: Deploy a Storage Stack on AWS
+    description: >-
+      Deploy a RHEL VM registered as an AAP execution node for managing
+      storage, and an Amazon FSx for NetApp ONTAP file system that is added
+      to the storage inventory. Requires the keypair and VPC created by
+      Deploy Cloud Stack in AWS, so run that workflow first.
+    labels:
+      - aws.ec2
+      - rhel
+      - storage
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    extra_vars:
+      create_vm_aws_keypair_name: "{{ apd_storage_aws_keypair_name }}"
+      create_vm_aws_securitygroup_name: "{{ apd_storage_aws_securitygroup_name }}"
+      create_vm_aws_vpc_subnet_name: "{{ apd_storage_aws_subnet_name }}"
+      create_vm_vm_deployment: storage_stack
+      create_vm_vm_purpose: demo
+      create_vm_apd_managed_by: aap-product-demos
+      create_vm_apd_demo_tag: "true"
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            AWS region where the VPC, keypair, VM, and FSx ONTAP will be created.
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+        - question_name: Owner
+          question_description: >-
+            Value for the EC2 tag key "owner" on the VM.
+          type: text
+          variable: create_vm_aws_owner_tag
+          required: true
+          default: your_name
+        - question_name: Environment
+          question_description: >-
+            Value for the EC2 tag key "environment" on the VM (Dev, QA, or Prod).
+          type: multiplechoice
+          variable: vm_environment
+          required: true
+          default: Prod
+          choices:
+            - Dev
+            - QA
+            - Prod
+        - question_name: Email
+          question_description: >-
+            Operator contact at launch. Not written to EC2 tags.
+          type: text
+          variable: email
+          required: true
+          default: your_name@acme.org
+    simplified_workflow_nodes:
+      - identifier: Deploy Storage Node
+        unified_job_template: Cloud | AWS | Create VM
+        extra_data:
+          create_vm_vm_name: "{{ apd_storage_vm_name }}"
+          vm_blueprint: rhel9
+        success_nodes:
+          - Update Inventory
+        failure_nodes:
+          - Ticket - Instance Failed
+      - identifier: Update Inventory
+        unified_job_template: AWS Inventory
+        success_nodes:
+          - Register Execution Node
+      - identifier: Register Execution Node
+        unified_job_template: Cloud | AWS | Register Execution Node
+        extra_data:
+          register_execution_node_vm_name: "{{ apd_storage_vm_name }}"
+          register_execution_node_instance_group: "{{ apd_storage_instance_group }}"
+        success_nodes:
+          - Check FSx Endpoint
+        failure_nodes:
+          - Ticket - Execution Node Failed
+      - identifier: Create FSx ONTAP
+        unified_job_template: Cloud | AWS | Create FSx ONTAP
+        extra_data:
+          create_fsx_ontap_aws_name: "{{ apd_storage_fsx_name }}"
+          create_fsx_ontap_stack_name: "{{ apd_storage_fsx_stack_name }}"
+          create_fsx_ontap_aws_vpc_subnet_name: "{{ apd_storage_aws_subnet_name }}"
+          create_fsx_ontap_aws_securitygroup_name: "{{ apd_storage_aws_securitygroup_name }}"
+        success_nodes:
+          - Update FSx Inventory
+        failure_nodes:
+          - Ticket - FSx Failed
+      - identifier: Update FSx Inventory
+        unified_job_template: Cloud | AWS | Update FSx ONTAP Inventory
+        success_nodes:
+          - Check FSx Endpoint
+        failure_nodes:
+          - Ticket - FSx Inventory Failed
+      # Runs on the execution node, so it only starts once the node is
+      # registered and the FSx system is in the storage inventory.
+      - identifier: Check FSx Endpoint
+        unified_job_template: Cloud | AWS | Check FSx ONTAP Endpoint
+        all_parents_must_converge: true
+        failure_nodes:
+          - Ticket - FSx Endpoint Failed
+      - identifier: Ticket - FSx Endpoint Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: FSx ONTAP management endpoint is not reachable from the execution node
+      - identifier: Ticket - FSx Inventory Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to add FSx ONTAP to the storage inventory
+      - identifier: Ticket - Instance Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to create AWS storage node instance
+      - identifier: Ticket - Execution Node Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to register execution node
+      - identifier: Ticket - FSx Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to create FSx ONTAP
+
+  - name: Destroy a Storage Stack on AWS
+    description: >-
+      Tear down what Deploy a Storage Stack on AWS created: the FSx ONTAP
+      file system and its inventory host, and the storage execution node
+      (deregistered from AAP, then its VM deleted). The keypair and VPC from
+      Deploy Cloud Stack in AWS are left in place; use Destroy Cloud Stack in
+      AWS for those.
+    labels:
+      - aws.ec2
+      - rhel
+      - storage
+    organization: Ansible Product Demos (APD)
+    notification_templates_started: Telemetry
+    notification_templates_success: Telemetry
+    notification_templates_error: Telemetry
+    survey_enabled: true
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - question_name: AWS Region
+          question_description: >-
+            AWS region where the storage stack was deployed.
+          type: multiplechoice
+          variable: create_vm_aws_region
+          required: true
+          default: us-east-2
+          choices:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+    simplified_workflow_nodes:
+      - identifier: Delete FSx ONTAP
+        unified_job_template: Cloud | AWS | Delete FSx ONTAP
+        extra_data:
+          delete_fsx_ontap_stack_name: "{{ apd_storage_fsx_stack_name }}"
+          delete_fsx_ontap_aws_name: "{{ apd_storage_fsx_name }}"
+        failure_nodes:
+          - Ticket - FSx Delete Failed
+      # The node must be deregistered while its VM is still running.
+      - identifier: Deregister Execution Node
+        unified_job_template: Cloud | AWS | Deregister Execution Node
+        extra_data:
+          deregister_execution_node_vm_name: "{{ apd_storage_vm_name }}"
+        success_nodes:
+          - Delete Storage Node
+        failure_nodes:
+          - Ticket - Deregister Failed
+      - identifier: Delete Storage Node
+        unified_job_template: Cloud | AWS | Delete Stack VM
+        extra_data:
+          create_vm_vm_name: "{{ apd_storage_vm_name }}"
+        success_nodes:
+          - Update Inventory
+        failure_nodes:
+          - Ticket - VM Delete Failed
+      - identifier: Update Inventory
+        unified_job_template: AWS Inventory
+      - identifier: Ticket - FSx Delete Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to delete FSx ONTAP
+      - identifier: Ticket - Deregister Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to deregister the storage execution node
+      - identifier: Ticket - VM Delete Failed
+        unified_job_template: 'SUBMIT FEEDBACK'
+        extra_data:
+          feedback: Failed to delete the storage node instance

@@ -151,6 +151,8 @@ controller_labels:
     organization: Ansible Product Demos (APD)
   - name: satellite
     organization: Ansible Product Demos (APD)
+  - name: storage
+    organization: Ansible Product Demos (APD)
   - name: windows
     organization: Ansible Product Demos (APD)
 

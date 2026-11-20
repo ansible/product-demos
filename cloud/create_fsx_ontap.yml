@@ -1,0 +1,50 @@
+---
+- name: Create Amazon FSx for NetApp ONTAP File System
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    # Deploy a Storage Stack on AWS asks for these once, using the Create VM
+    # variable names; use them when the FSx-specific ones are not set.
+    - name: Default variables from the shared workflow survey answers
+      ansible.builtin.set_fact:
+        "{{ item.key }}": "{{ lookup('ansible.builtin.vars', item.value) }}"
+      loop: "{{ _shared_defaults | dict2items }}"
+      when:
+        - lookup('ansible.builtin.vars', item.key, default='') | length == 0
+        - lookup('ansible.builtin.vars', item.value, default='') | length > 0
+      vars:
+        _shared_defaults:
+          create_fsx_ontap_aws_region: create_vm_aws_region
+          create_fsx_ontap_aws_owner_tag: create_vm_aws_owner_tag
+          create_fsx_ontap_aws_environment: vm_environment
+
+    - name: Fail if variables not defined
+      ansible.builtin.assert:
+        that:
+          - create_fsx_ontap_aws_vpc_subnet_name is defined
+          - create_fsx_ontap_aws_securitygroup_name is defined
+          - create_fsx_ontap_aws_name is defined
+          - create_fsx_ontap_aws_region is defined
+          - create_fsx_ontap_stack_name is defined
+          - create_fsx_ontap_aws_owner_tag is defined
+          - create_fsx_ontap_aws_environment is defined
+        fail_msg: "Required variables not set"
+
+    # The password comes from the FSx ONTAP credential (fsx_ontap_password), or
+    # create_fsx_ontap_admin_password. The credential is seeded with REPLACEME.
+    - name: Fail if there is no usable fsxadmin password
+      ansible.builtin.assert:
+        that:
+          - (create_fsx_ontap_admin_password | default(fsx_ontap_password | default('', true), true)) | length > 0
+          - (create_fsx_ontap_admin_password | default(fsx_ontap_password | default('', true), true)) != 'REPLACEME'
+        fail_msg: >-
+          No fsxadmin password. Update the FSx ONTAP credential in AAP with the
+          password to set (and attach it to this job template), or set
+          create_fsx_ontap_admin_password.
+
+    - name: Include create fsx ontap role
+      ansible.builtin.include_role:
+        name: demo.cloud.aws
+        tasks_from: create_fsx_ontap
+...

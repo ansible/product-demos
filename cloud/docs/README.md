@@ -7,6 +7,8 @@ Each file in this folder documents a corresponding cloud demo playbook or workfl
 | Patch Cloud Stack in AWS | [patch-cloud-stack.md](patch-cloud-stack.md) | [`cloud/setup.yml`](../setup.yml) |
 | Deploy Cloud Stack in AWS | [deploy-cloud-stack.md](deploy-cloud-stack.md) | [`cloud/setup.yml`](../setup.yml) |
 | Destroy Cloud Stack in AWS | [cloud-destroy-stack.md](cloud-destroy-stack.md) | [`cloud/setup.yml`](../setup.yml) |
+| Deploy a Storage Stack on AWS | [deploy-storage-stack.md](deploy-storage-stack.md) | [`cloud/setup.yml`](../setup.yml) |
+| Destroy a Storage Stack on AWS | [cloud-destroy-storage-stack.md](cloud-destroy-storage-stack.md) | [`cloud/setup.yml`](../setup.yml) |
 | AWS — Create VPC | [cloud-create-vpc.md](cloud-create-vpc.md) | [`cloud/create_vpc.yml`](../create_vpc.yml) |
 | AWS — Create Keypair | [cloud-create-keypair.md](cloud-create-keypair.md) | [`cloud/aws_key.yml`](../aws_key.yml) |
 | AWS — Create VM | [cloud-create-vm.md](cloud-create-vm.md) | [`cloud/create_vm.yml`](../create_vm.yml) |

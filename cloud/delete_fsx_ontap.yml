@@ -1,0 +1,32 @@
+---
+- name: Delete Amazon FSx for NetApp ONTAP File System
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    # Destroy a Storage Stack on AWS supplies the region as create_vm_aws_region.
+    - name: Default the region from the shared workflow survey answer
+      ansible.builtin.set_fact:
+        delete_fsx_ontap_aws_region: "{{ create_vm_aws_region }}"
+      when:
+        - lookup('ansible.builtin.vars', 'delete_fsx_ontap_aws_region', default='') | length == 0
+        - lookup('ansible.builtin.vars', 'create_vm_aws_region', default='') | length > 0
+
+    - name: Fail if variables not defined
+      ansible.builtin.assert:
+        that:
+          - delete_fsx_ontap_aws_region is defined
+          - delete_fsx_ontap_stack_name is defined
+        fail_msg: "delete_fsx_ontap_aws_region and delete_fsx_ontap_stack_name are required"
+
+    - name: Include delete fsx ontap role
+      ansible.builtin.include_role:
+        name: demo.cloud.aws
+        tasks_from: delete_fsx_ontap
+
+    - name: Remove FSx ONTAP host from the AAP inventory
+      ansible.controller.host:
+        name: "{{ delete_fsx_ontap_aws_name }}"
+        inventory: "{{ delete_fsx_ontap_inventory_name | default('Ansible Product Demos Storage Inventory') }}"
+        state: absent
+      when: delete_fsx_ontap_aws_name is defined

@@ -1,0 +1,36 @@
+---
+- name: Look up FSx ONTAP CloudFormation stack
+  amazon.aws.cloudformation_info:
+    stack_name: "{{ delete_fsx_ontap_stack_name }}"
+    region: "{{ delete_fsx_ontap_aws_region }}"
+    all_facts: true
+  register: delete_fsx_ontap_stack_info
+
+- name: Set stack facts
+  ansible.builtin.set_fact:
+    delete_fsx_ontap_stack_found: >-
+      {{ delete_fsx_ontap_stack_info.cloudformation[delete_fsx_ontap_stack_name] is defined }}
+
+- name: Delete the stack if it exists
+  when: delete_fsx_ontap_stack_found | bool
+  block:
+    - name: Refuse to delete stacks not created by this demo
+      ansible.builtin.assert:
+        that:
+          - >-
+            (delete_fsx_ontap_stack_info.cloudformation[delete_fsx_ontap_stack_name].stack_tags
+            | default({})).get('managed-by') == 'aap-product-demos'
+        fail_msg: >-
+          Stack {{ delete_fsx_ontap_stack_name }} is not tagged managed-by=aap-product-demos;
+          refusing to delete it.
+
+    - name: Delete FSx ONTAP CloudFormation stack (also deletes the file system)
+      amazon.aws.cloudformation:
+        stack_name: "{{ delete_fsx_ontap_stack_name }}"
+        state: absent
+        region: "{{ delete_fsx_ontap_aws_region }}"
+
+- name: Report missing stack
+  ansible.builtin.debug:
+    msg: "Stack {{ delete_fsx_ontap_stack_name }} not found in {{ delete_fsx_ontap_aws_region }}; nothing to delete in AWS."
+  when: not (delete_fsx_ontap_stack_found | bool)

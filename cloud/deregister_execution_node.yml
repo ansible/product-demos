@@ -1,0 +1,102 @@
+---
+# Reverses register_execution_node.yml. Run it BEFORE deleting the VM: AAP
+# deprovisions an execution node by uninstalling receptor over the mesh, so
+# the VM must still be running.
+#   1. detach the instance group from the storage inventory
+#   2. set the AAP instance to deprovisioning
+#   3. wait for AAP to finish and remove the instance
+# The instance group itself is left in place (it is empty afterwards).
+
+- name: Deregister the AAP execution node
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    deregister_execution_node_inventory_name: Ansible Product Demos Storage Inventory
+    deregister_execution_node_organization: Ansible Product Demos (APD)
+  vars_files:
+    - vars/controller_api.yml
+  module_defaults:
+    ansible.builtin.uri: "{{ apd_controller_api_uri_defaults }}"
+  tasks:
+    # Destroy a Storage Stack on AWS supplies the region as create_vm_aws_region.
+    - name: Default the region from the shared workflow survey answer
+      ansible.builtin.set_fact:
+        deregister_execution_node_aws_region: "{{ create_vm_aws_region }}"
+      when:
+        - lookup('ansible.builtin.vars', 'deregister_execution_node_aws_region', default='') | length == 0
+        - lookup('ansible.builtin.vars', 'create_vm_aws_region', default='') | length > 0
+
+    - name: Fail if variables not defined
+      ansible.builtin.assert:
+        that:
+          - deregister_execution_node_vm_name is defined
+          - deregister_execution_node_aws_region is defined
+        fail_msg: "deregister_execution_node_vm_name and deregister_execution_node_aws_region are required"
+
+    - name: Find the VM
+      amazon.aws.ec2_instance_info:
+        region: "{{ deregister_execution_node_aws_region }}"
+        filters:
+          tag:Name: "{{ deregister_execution_node_vm_name }}"
+          tag:apd: "true"
+          instance-state-name:
+            - running
+            - stopped
+      register: deregister_execution_node_vm
+
+    - name: Nothing to do if the VM is already gone
+      ansible.builtin.debug:
+        msg: "No VM named {{ deregister_execution_node_vm_name }}; nothing to deregister."
+      when: deregister_execution_node_vm.instances | length == 0
+
+    - name: Stop if the VM is already gone
+      ansible.builtin.meta: end_play
+      when: deregister_execution_node_vm.instances | length == 0
+
+    # Same address register_execution_node.yml used when it created the instance.
+    - name: Set the node address
+      ansible.builtin.set_fact:
+        deregister_execution_node_hostname: >-
+          {{ deregister_execution_node_vm.instances[0].public_dns_name
+             | default(deregister_execution_node_vm.instances[0].private_ip_address, true) }}
+
+    # ansible.controller.instance creates a missing instance rather than skipping
+    # it, so only deprovision a node that is actually registered.
+    - name: Look up the AAP instance
+      ansible.builtin.uri:
+        url: "{{ apd_controller_api_url }}/instances/?hostname={{ deregister_execution_node_hostname }}"
+      register: deregister_execution_node_lookup
+
+    - name: Nothing to do if the node is not registered
+      ansible.builtin.debug:
+        msg: "{{ deregister_execution_node_hostname }} is not registered in AAP."
+      when: deregister_execution_node_lookup.json.count == 0
+
+    - name: Stop if the node is not registered
+      ansible.builtin.meta: end_play
+      when: deregister_execution_node_lookup.json.count == 0
+
+    # Stop new storage jobs being scheduled onto a node that is going away.
+    - name: Detach the instance groups from the storage inventory
+      ansible.controller.inventory:
+        name: "{{ deregister_execution_node_inventory_name }}"
+        organization: "{{ deregister_execution_node_organization }}"
+        instance_groups: []
+
+    - name: Deprovision the execution node
+      ansible.controller.instance:
+        hostname: "{{ deregister_execution_node_hostname }}"
+        node_state: deprovisioning
+
+    # Deprovisioning is asynchronous (AAP uninstalls receptor over the mesh, then
+    # deletes the instance). Wait for that, because the next workflow step deletes
+    # the VM and would otherwise strand the uninstall.
+    - name: Wait for AAP to remove the instance
+      ansible.builtin.uri:
+        url: "{{ apd_controller_api_url }}/instances/?hostname={{ deregister_execution_node_hostname }}"
+      register: deregister_execution_node_removed
+      until: deregister_execution_node_removed.json.count == 0
+      retries: 30
+      delay: 10
+...
