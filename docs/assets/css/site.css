@@ -1327,3 +1327,99 @@ html:not([data-theme="dark"]) .demo-card:hover {
     display: none;
   }
 }
+
+/* Upcoming event banner (auto-hides after event end date) */
+.reinvent-banner {
+  background-color: #ee0000;
+  color: white;
+  width: 100%;
+  padding: 12px 0;
+  position: relative;
+  z-index: 1000;
+  display: block;
+  animation: reinvent-slideDown 0.5s ease-out;
+  box-sizing: border-box;
+}
+
+.reinvent-banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.reinvent-banner-text {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  flex-grow: 1;
+}
+
+.reinvent-banner-text a {
+  color: white !important;
+  text-decoration: underline !important;
+  font-weight: 700;
+}
+
+.reinvent-banner-text a:hover {
+  color: #ffdddd !important;
+}
+
+.reinvent-banner-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 15px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.reinvent-banner-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.reinvent-banner-close:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+@keyframes reinvent-slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.reinvent-banner.hidden {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .reinvent-banner {
+    padding: 10px 0;
+  }
+
+  .reinvent-banner-text {
+    font-size: 14px;
+    padding-right: 28px;
+  }
+
+  .reinvent-banner-close {
+    position: absolute;
+    top: 8px;
+    right: 15px;
+    margin-left: 0;
+  }
+}
