@@ -46,6 +46,13 @@ graph LR
 4. Syncs AWS dynamic inventory so new hosts appear in AAP
 5. Publishes VPC infrastructure report to S3
 
+Cloud Stack and Shared Services both use the demo VPC. Run their VPC setup
+steps sequentially. The VPC playbook reuses the named subnet route table even
+when the workflows use different owner tags. If multiple matching tables exist,
+it prefers the one associated with the demo subnet; if none is associated, it
+stops for inspection rather than choosing between them. It does not delete
+duplicate tables.
+
 ## Why it matters
 
 - Creates a complete demo environment in minutes — no manual AWS console clicking
