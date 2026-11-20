@@ -48,6 +48,8 @@ Install rewrites CI/CD close/rollback ServiceNow notes to trigger-based text so 
 
 No cloud stack. After Install, open **Task Step Example**, leave the default question (or edit it), and Run. Seed injects both the model (`llm_model_id`) and the **APD LiteMaaS** LLM Provider credential (`credential_id`) on the AI task step — model alone is not enough to call LiteMaaS.
 
+Install automatically applies a temporary, version-pinned structured-output workaround for [AAP-99739](https://redhat.atlassian.net/browse/AAP-99739). It validates object-schema responses from Task Agents with no tools and retries invalid output. Unsupported AO images fail the workaround preflight. The deployment overlay is not operator-supported and may need verification after reconciliation or an upgrade. To remove it after a product release with the fix, launch Install with the extra variable `ao_workaround_state: absent`; removal restarts the background workers. Once existing overlays are removed, the temporary workaround block and `ao/workaround` directory can be deleted from this project.
+
 ### Multi-OS Cloud Patching — manual trigger
 
 The seeded workflow pre-fills inventory limits for the cloud stack. Set **`aws_region`** to the region where you deployed the stack, then run:

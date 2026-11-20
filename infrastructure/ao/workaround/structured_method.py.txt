@@ -1,0 +1,61 @@
+    async def _execute_structured(self, state: AgentState, response_schema: dict[str, Any]) -> AgentState:
+        """Workshop workaround: prompt for JSON and validate before returning it."""
+        if response_schema.get("type") != "object":
+            return await self._execute_structured_native(state, response_schema)
+
+        from jsonschema.validators import validator_for
+
+        validator_cls = validator_for(response_schema)
+        validator_cls.check_schema(response_schema)
+        validator = validator_cls(response_schema)
+        system_prompt = await get_runtime_settings().get_str(
+            "agentic.task_agent_system_prompt", default=_default_task_agent_prompt()
+        )
+        messages = [
+            SystemMessage(content=(
+                f"{system_prompt}\n\n"
+                "Return ONLY one valid JSON object matching this JSON Schema. "
+                "Include every required property, use the specified types, and do not "
+                "include markdown or other text.\n\n" + _json.dumps(response_schema)
+            )),
+            HumanMessage(content=state["prompt"]),
+        ]
+        token_log = []
+        for attempt in range(3):
+            raw_message = await record_llm_call(
+                get_metrics_recorder(),
+                lambda: self.llm.ainvoke(messages),
+                model=getattr(self.llm, "model_name", None),
+            )
+            token_entry = self._build_token_usage_entry(raw_message)
+            if token_entry is not None:
+                token_log.append(token_entry)
+            text = str(raw_message.text).strip()
+            if text.startswith("```") and text.endswith("```"):
+                text = text.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+            try:
+                content = _json.loads(text)
+                if not isinstance(content, dict):
+                    raise ValueError("response is not a JSON object")
+                errors = list(validator.iter_errors(content))
+                if errors:
+                    raise ValueError("response does not match JSON schema")
+            except (ValueError, TypeError) as error:
+                logger.warning("Workshop structured response rejected", attempt=attempt + 1, error_type=type(error).__name__)
+                if attempt == 2:
+                    raise ValueError("Task agent failed to produce a schema-valid JSON object after 3 attempts") from error
+                continue
+
+            state["llm_token_usage_log"] = token_log
+            state["messages"] = [raw_message]
+            result = GenericAgentResponse(
+                content=content,
+                response_metadata=normalize_response_metadata(
+                    raw_message.response_metadata,
+                    usage_metadata=getattr(raw_message, "usage_metadata", None),
+                ),
+            ).model_dump(by_alias=True)
+            result["structured_output_metadata"] = {"fallback_strategy_used": "workshop_prompt_json"}
+            state["result"] = result
+            return state
+        raise AssertionError("unreachable")
