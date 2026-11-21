@@ -7,6 +7,14 @@ We want to make attempts to run our integration tests in the same manner whether
 
 These images are built given the structure defined in their respective EE [definitions][../execution_environments]. Because they differ (mainly due to their python versions), each gets some special handling.
 
+## docs-only-auto-approve
+
+[`docs-only-auto-approve.yml`](docs-only-auto-approve.yml) runs on `pull_request_target` and **only** uses the GitHub API (no checkout of PR head). If every changed file is markdown or a common graphic, it approves via a dedicated GitHub App so the approval counts toward branch protection.
+
+Requires secrets `APD_DOCS_APPROVER_APP_ID` and `APD_DOCS_APPROVER_APP_PRIVATE_KEY`. See [../proposals/docs-only-pr-fast-path.md](../proposals/docs-only-pr-fast-path.md).
+
+Do not expand this job to run untrusted PR code while holding App credentials.
+
 ## pre-commit workflow: `pull_request` vs `pull_request_target`
 
 The `pre-commit.yml` job only lints code. It does **not** need repo secrets.

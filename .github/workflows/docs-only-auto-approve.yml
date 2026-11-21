@@ -1,0 +1,168 @@
+---
+# Auto-approve PRs that only touch documentation / static graphics.
+# No AI — deterministic path filter + GitHub App approval.
+#
+# Required repo secrets (GitHub App installed on ansible/product-demos):
+#   APD_DOCS_APPROVER_APP_ID
+#   APD_DOCS_APPROVER_APP_PRIVATE_KEY
+#
+# Uses pull_request_target so fork PRs can receive an approval that counts
+# toward branch protection. Never check out or execute PR head code.
+name: docs-only-auto-approve
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: docs-only-auto-approve-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  auto-approve:
+    name: Auto-approve docs-only PR
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: List changed files (API only)
+        id: files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(
+            gh api "repos/${REPO}/pulls/${PR}/files" --paginate --jq '.[].filename'
+          )
+
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "eligible=false" >> "$GITHUB_OUTPUT"
+            echo "reason=no changed files listed" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Changed files:"
+          printf '  %s\n' "${files[@]}"
+
+          # Chris / RHDP-style: markdown + common image assets only.
+          allowed_re='\.([Mm][Dd]|png|jpe?g|gif|webp|svg)$'
+          ineligible=()
+          for f in "${files[@]}"; do
+            if [[ ! "$f" =~ $allowed_re ]]; then
+              ineligible+=("$f")
+            fi
+          done
+
+          if [ "${#ineligible[@]}" -gt 0 ]; then
+            echo "eligible=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "reason<<EOF"
+              echo "Non-docs paths present (human review required):"
+              printf '%s\n' "${ineligible[@]}"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "eligible=true" >> "$GITHUB_OUTPUT"
+          echo "reason=all changed files are markdown or graphics" >> "$GITHUB_OUTPUT"
+
+      - name: Skip non-docs PRs
+        if: steps.files.outputs.eligible != 'true'
+        env:
+          REASON: ${{ steps.files.outputs.reason }}
+        run: |
+          echo "Not docs-only — leaving review to humans."
+          echo "$REASON"
+
+      - name: Require docs-approver App secrets
+        id: secrets
+        if: steps.files.outputs.eligible == 'true'
+        env:
+          APP_ID: ${{ secrets.APD_DOCS_APPROVER_APP_ID }}
+          APP_KEY: ${{ secrets.APD_DOCS_APPROVER_APP_PRIVATE_KEY }}
+        run: |
+          if [ -z "${APP_ID:-}" ] || [ -z "${APP_KEY:-}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Docs-only PR detected, but APD_DOCS_APPROVER_APP_ID / APD_DOCS_APPROVER_APP_PRIVATE_KEY are not set. Configure the GitHub App secrets to enable auto-approve."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Mint GitHub App token
+        id: app-token
+        if: >-
+          steps.files.outputs.eligible == 'true'
+          && steps.secrets.outputs.configured == 'true'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APD_DOCS_APPROVER_APP_ID }}
+          private-key: ${{ secrets.APD_DOCS_APPROVER_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+
+      - name: Label and approve
+        if: >-
+          steps.files.outputs.eligible == 'true'
+          && steps.secrets.outputs.configured == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          gh label create docs-only --repo "$REPO" --color 0E8A16 --description "Markdown/graphics only; eligible for auto-approve" 2>/dev/null || true
+          gh pr edit "$PR" --repo "$REPO" --add-label docs-only
+
+          # Idempotent: skip if this App already approved the current head.
+          already=$(
+            gh api "repos/${REPO}/pulls/${PR}/reviews" --paginate \
+              --jq --arg sha "$HEAD_SHA" \
+              '[.[] | select(.state=="APPROVED" and .commit_id==$sha)] | length'
+          )
+          if [ "${already}" != "0" ]; then
+            echo "Already approved on ${HEAD_SHA}; nothing to do."
+            exit 0
+          fi
+
+          gh pr review "$PR" --repo "$REPO" --approve --body "$(cat <<'EOF'
+**docs-only auto-approve**
+
+All changed files are markdown or graphics (`.md`, `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.svg`).
+No playbooks, setup YAML, roles, or other demo-breaking paths.
+
+Human review is still welcome; this approval only satisfies the required-review gate for docs-only PRs.
+EOF
+)"
+
+      - name: Comment when App is not configured
+        if: >-
+          steps.files.outputs.eligible == 'true'
+          && steps.secrets.outputs.configured != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          marker="<!-- apd-docs-only-auto-approve-unconfigured -->"
+          existing=$(gh api "repos/${REPO}/issues/${PR}/comments" --paginate --jq '.[].body' || true)
+          if echo "$existing" | grep -Fq "$marker"; then
+            echo "Unconfigured notice already posted."
+            exit 0
+          fi
+          gh pr comment "$PR" --repo "$REPO" --body "$(cat <<EOF
+${marker}
+This PR looks **docs-only** (markdown/graphics), but auto-approve is not active yet.
+
+A repo admin still needs to install the docs-approver GitHub App and set secrets \`APD_DOCS_APPROVER_APP_ID\` and \`APD_DOCS_APPROVER_APP_PRIVATE_KEY\`. See \`.github/proposals/docs-only-pr-fast-path.md\`.
+EOF
+)"
